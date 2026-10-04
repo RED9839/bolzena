@@ -13,16 +13,18 @@
 //           HP가 N% 이하가 되면 · 고학년 스킬을 쓰면 · 적이 즉시 행동하면 ·
 //     파티는 한 몸이다(docs/16 §8) — HP · 방어 · 실드 · 상태는 파티의 것이라 「피해를 받으면」 · 「HP가 …」 · 「방어나 실드를 얻으면」 ·
 //     「자신 사기가 …」 은 모두 파티를 본다. 「아군이 쓰러지면」 은 없앴다(쓰러지는 사도가 없다)
-//           적에게 디버프를 걸면 · 회복량이 최대 HP를 초과하면 · 「X」가 N개가 되면 · 항상
-//     조건  「X」가 있으면 · 「X」가 N개 이상이면 · HP가 N% 이하이면 · HP가 N% 이상이면 · 적이 N명 이상이면 ·
+//           적에게 디버프를 걸면 · 회복량이 최대 HP를 초과하면 · 「X」가 N개가 되면 · 항상 ·
+//           이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면(리코타의 … — 그 사도 것만) · 「X」가 사라지면 · 「X」가 다 닳으면
+//     조건  「X」가 있으면 · 「X」가 없으면 · 「X」가 N개 이상이면 · HP가 N% 이하이면 · HP가 N% 이상이면 · 적이 N명 이상이면 ·
 //           적이 N명뿐이면 · 파티가 이번 턴 카드를 N장 이상(이하로) 냈으면 · 이번 턴 에르핀의 카드를 내지 않았으면 ·
 //           AP가 남았으면 · 고학년 게이지가 N% 이상이면 · 실드가 있으면 · 적이 즉시 행동했으면
 //     효과  카드와 같은 말(공격력 N% 피해 · 방어력 N% 방어 · AP +1 · 드로우 1 · 「X」 +1 …) +
 //           능력치 증감: 주는 피해 ±N% · 받는 피해 ±N% · 공격력 +N% · 방어력 +N% · 치명 확률 +N%
 //           (이번 턴 · N턴간 · 이번 전투 동안 — 안 적으면 이번 턴, 「항상」 이면 내내)
 //
-//   **키워드 「X」** 설명. 최대 N. 적의 차례가 끝나면 N 감소. 적에게 거는 표식이다.
-//                     1개당 자신 주는 피해 +N%. 1개당 턴 종료 시 공격력 N% 피해. 「X」가 N개가 되면: …
+//   **키워드 「X」** 설명. 최대 N. 적의 차례가 끝나면 N 감소. 적에게 거는 표식이다. 다른 사도의 카드를 내면 전부 사라진다.
+//                     1개당 자신 주는 피해 +N%. 1개당 턴 종료 시 공격력 N% 피해. 「X」가 N개가 되면: … ·
+//                     「X」가 사라지면: …(0 이 되는 순간 — 무엇으로든) · 「X」가 다 닳으면: …(「적의 차례가 끝나면 … 감소」 로 0 이 됐을 때만)
 
 import { parseEffect } from "./effects.js";
 import { STAT_ST, stackEff, STATUS_V } from "./rules.js";
@@ -30,12 +32,21 @@ import { STAT_ST, stackEff, STATUS_V } from "./rules.js";
 // ── 읽기 ───────────────────────────────────────────────────────────────
 
 const TRIGGERS = [
+  // 「「X」가 사라지면」 — 겹이 0 보다 크다가 0 이 되는 순간(소모 · 감소 · 「다른 사도의 카드를 내면 전부 사라진다」 · 무엇이든).
+  // 「「X」가 다 닳으면」 — 그 가운데 「적의 차례가 끝나면 N 감소」(decayKeywords)로 0 이 됐을 때만(예약형의 시계 — docs/19). combat kwGone 이 알린다.
+  // 맨 앞에 둔다 — 뒤의 효과 글(「… 턴 종료 시 …」)이 다른 언제로 먼저 읽히지 않게
+  [/「([^」]+)」\s*(?:이|가)?\s*다\s*닳으면/, (m) => ({ on: "stackGone", id: m[1], decay: true })],
+  [/「([^」]+)」\s*(?:이|가)?\s*사라지면/, (m) => ({ on: "stackGone", id: m[1] })],
   [/전투\s*시작\s*시/, () => ({ on: "fightStart" })],
   [/턴\s*시작\s*시/, () => ({ on: "turnStart" })],
   [/턴\s*종료\s*시/, () => ({ on: "turnEnd" })],
   // 장수를 누구 것으로 세나 — 글에 밝힌다(2026-10, 사용자: 「카드를 3장 낼 때마다」 가 파티 전체로 읽혔다).
   //   「파티가 …」            파티 누구의 카드든 센다(who: "any")
   //   「에르핀의 …」 「자신의 …」 그 사도(장비면 낀 사도)가 낸 카드만 센다. 이름 없는 옛 글도 이쪽으로 읽는다
+  // 박자형(docs/19) — 「이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면」 파티가 이번 턴 바로 잇달아 그 종류 순서로 냈을 때, 마지막 장을 내는 순간(종류 2~3).
+  // 「리코타의 공격 · 스킬 · 강화 카드를 차례로 내면」 — 그 사도의 카드만, 사이에 다른 카드가 끼면 끊긴다. 같은 턴에 다시 완성하면 또 돈다(emit · seqStep)
+  [/^\s*(?:([^\s「」:,.·][^「」:,.·]{0,11}?)의\s+|(?:파티가\s*)?이번\s*턴\s+)?((?:공격|스킬|강화)(?:\s*[·→]\s*(?:공격|스킬|강화)){1,2})\s*카드를\s*차례로\s*내면/,
+    (m) => ({ on: "play", seq: m[2].split(/\s*[·→]\s*/), ...(m[1] ? { by: m[1].trim() } : { who: "any" }) })],
   // 「파티가 이번 턴 카드를 3장째 낼 때」 — 파티가 그 턴 세 번째 카드를 낼 때(옛 글 「한 턴에 카드를 3장째 낼 때」)
   [/(?:파티가\s*)?(?:한\s*턴에|이번\s*턴)\s*카드를\s*(\d+)\s*장째\s*낼\s*때/, (m) => ({ on: "play", nth: Number(m[1]), who: "any" })],
   // 「파티가 공격 카드를 4장 낼 때마다」 — 누가 냈든 센다
@@ -76,7 +87,9 @@ const TRIGGERS = [
 
 const CONDS = [
   [/「(.+?)」\s*(?:이|가)?\s*(\d+)\s*개?\s*이상이면/, (m) => ({ c: "stack", id: m[1], n: Number(m[2]) })],
-  [/「(.+?)」\s*(?:이|가)?\s*(?:이미\s*)?있으면/, (m) => ({ c: "stack", id: m[1], n: 1 })],
+  [/「(.+?)」\s*(?:이|가)?\s*(?:이미\s*)?있으면(?:\s*[:：])?/, (m) => ({ c: "stack", id: m[1], n: 1 })],
+  // 「「X」가 없으면」 — 위의 반대(겹이 0 일 때). 카드 글처럼 쌍점을 붙여도 된다(「「X」가 없으면: …」)
+  [/「([^」]+)」\s*(?:이|가)?\s*없으면(?:\s*[:：])?/, (m) => ({ c: "stack", id: m[1], n: 1, not: true })],
   [/HP가\s*(\d+)\s*%\s*이하이면/, (m) => ({ c: "hp", pct: Number(m[1]) / 100 })],
   // 「자신 사기가 3 이상이면」 — 이 사도에게 지금 걸린 상태의 겹(장비 · 패시브가 상태를 쌓은 만큼 보상)
   // v6 — 파티 층 버프(잔광 · 피해 감소 · 면역 · 실드 유지 · 저장 · 협공 · 고동)도 겹으로 본다. 받침 따라 이 · 가
@@ -155,7 +168,12 @@ function readRule(sentence, keywords, prevTrigger) {
 // 「이름: 규칙 · 이름2: 규칙2」 를 가른다. 효과 안의 「·」 와 헷갈리지 않게, 뒤에 「이름:」 이 오는 곳만 자른다.
 export function parsePassive(text, keywords = []) {
   if (!text) return [];
-  const parts = text.split(/\s·\s(?=[^:·.]{1,30}:)/);
+  // 이름에 「·」 가 든 것(「전채 · 메인 · 디저트: …」)은 쌍점이 없는 조각을 다음 조각에 도로 붙인다 — 이름 없는 「전채」 · 「메인」 규칙이 따로 생겼다
+  const parts = text.split(/\s·\s(?=[^:·.]{1,30}:)/).reduce((acc, p) => {
+    const last = acc[acc.length - 1];
+    if (last != null && !last.includes(":")) acc[acc.length - 1] = `${last} · ${p}`; else acc.push(p);
+    return acc;
+  }, []);
   const out = [];
   for (const part of parts) {
     const i = part.indexOf(":");
@@ -184,6 +202,7 @@ const PER_STATS = [
   [/치명\s*(?:확률)?\s*([+\-])\s*(\d+)\s*%/, "crit"],
 ];
 
+const WIPE = /다른\s*사도의?\s*카드를\s*내면\s*(?:전부|모두)\s*사라/;
 export function parseKeyword(id, text, keywords = []) {
   const kw = { id, cap: null, decay: 0, carrier: "self", per: [], rules: [], left: [] };
   if (!text) return kw;
@@ -198,12 +217,14 @@ export function parseKeyword(id, text, keywords = []) {
   const use = text.match(/발동하면\s*(?:(\d+)\s*(?:씩\s*)?(?:감소|줄어)|(?:전부\s*|모두\s*)?사라)/);
   if (use) kw.consume = use[1] ? Number(use[1]) : "all";
   else { const d = text.match(new RegExp(WHEN + "(\\d+)\\s*(?:씩\\s*)?(?:감소|줄어)")); if (d) kw.decay = Number(d[1]); }
+  // 「다른 사도의 카드를 내면 전부 사라진다」(박자형 — 끊기면 처음부터) — 이 키워드 주인이 아닌 카드(교주 카드 포함)를 내면 겹이 0(combat kwWipe)
+  if (WIPE.test(text)) kw.wipe = true;
 
   // 첫 문장은 설명(사람이 읽는 말)이다. 그 뒤 문장은 모두 규칙이어야 한다 — 못 읽으면 left 에 남긴다.
   const sentences = text.split(/(?<=[.。])\s+/).map((x) => x.replace(/[.。]\s*$/, "").trim()).filter(Boolean);
   sentences.forEach((s, i) => {
     if (i === 0) return;
-    const meta = /최대\s*\d+|(?:턴\s*종료\s*시|적의\s*차례가\s*끝나면)\s*(?:\d+\s*(?:씩\s*)?(?:감소|줄어)|(?:전부|모두)\s*사라)|턴\s*끝에\s*(?:전부\s*|모두\s*)?사라|발동하면\s*(?:\d+\s*(?:씩\s*)?(?:감소|줄어)|(?:전부\s*|모두\s*)?사라)|(?:적|아군)에게\s*(?:거는|붙는|쌓는|새기는|주는|나눠\s*주는|씌우는)/;
+    const meta = /다른\s*사도의?\s*카드를\s*내면\s*(?:전부|모두)\s*사라|최대\s*\d+|(?:턴\s*종료\s*시|적의\s*차례가\s*끝나면)\s*(?:\d+\s*(?:씩\s*)?(?:감소|줄어)|(?:전부|모두)\s*사라)|턴\s*끝에\s*(?:전부\s*|모두\s*)?사라|발동하면\s*(?:\d+\s*(?:씩\s*)?(?:감소|줄어)|(?:전부\s*|모두\s*)?사라)|(?:적|아군)에게\s*(?:거는|붙는|쌓는|새기는|주는|나눠\s*주는|씌우는)/;
     // 「1개당 …」 으로 시작하는 문장만 — 「턴 종료 시 「드론」 1개당 …」 은 규칙 문장이다(뒤의 피해를 쌓인 수만큼)
     const per = s.match(/^1\s*개\s*당\s*(.+)/);
     if (per) {
@@ -325,7 +346,8 @@ function condOk(s, owner, r, info) {
       const holder = kc === "enemy" ? info.target
         : kc === "ally" && r.kwOf === "ally" && info.actor ? (s.party.find((u) => u.key === info.actor) || owner)
         : owner;
-      if (stackOn(s, holder, c.id, owner) < c.n) return false;
+      const n = stackOn(s, holder, c.id, owner);
+      if (c.not ? n > 0 : n < c.n) return false;   // not — 「「X」가 없으면」
     }
     if (c.c === "hp" && owner.hp / owner.maxHp > c.pct) return false;
     if (c.c === "status" && (((owner.status || {})[c.id]) || 0) < c.n) return false;
@@ -371,6 +393,8 @@ function matches(s, owner, w, ev, info, kwOf) {
     case "debuff": return info.by === owner.key;
     case "overheal": return info.by === owner.key;
     case "stackReach": return w.id === info.id && info.before < w.n && info.after >= w.n && (!info.owner || info.owner === owner.key);
+    // 「「X」가 사라지면」 — 무엇으로든 0 이 되면 · 「다 닳으면」(w.decay) — 「적의 차례가 끝나면 N 감소」 로 0 이 됐을 때만(info.decay). 주인은 키워드 주인
+    case "stackGone": return w.id === info.id && (!w.decay || !!info.decay) && (!info.owner || info.owner === owner.key);
     default: return true;
   }
 }
@@ -402,6 +426,12 @@ export function emit(s, ev, info, run) {
           s.counts[ck] = (s.counts[ck] || 0) + 1;
           if (s.counts[ck] % r.when.every) return;
         }
+        // 「공격 · 스킬 · 강화 카드를 차례로 내면」 — 이번 턴 낸 카드(s.playLog)의 끝이 그 차례면. 한 번 돌면 거기까지 쓴 것으로 친다(다시 완성해야 또 돈다)
+        if (r.when.seq) {
+          const sk = `${id}|seq|${s.turn}`;
+          if (seqStep(s, r.when, owner.key, s.counts[sk] || 0) < r.when.seq.length) return;
+          s.counts[sk] = (s.playLog || []).length;
+        }
         if (!condOk(s, owner, r, info)) return;
         if (r.limit) {
           const key = `${id}|${r.limit.per === "turn" ? s.turn : "f"}`;
@@ -411,7 +441,7 @@ export function emit(s, ev, info, run) {
         if (!r.fx.length) return;
         let fx = r.fx;
         const target = info.target && info.target.side === "enemy" ? info.target : null;
-        const holder = ev === "stackReach" && info.target && info.target !== owner ? info.target : null;
+        const holder = (ev === "stackReach" || ev === "stackGone") && info.target && info.target !== owner ? info.target : null;
         const ally = info.who && info.who.side === "party" && !info.who.dead ? info.who : owner;
         // 규칙이 스스로를 다시 부르지 않는다 — 「디버프를 걸면 … 적 1명 주는 피해 -10%」 · 「방어를 얻으면 … 방어」 가 제 효과로 또 돌던 고리
         if (!FIRING.has(s)) FIRING.set(s, new Set());
@@ -466,20 +496,39 @@ export function tickTurnEnd(s, hurt, say) {
 // 키워드 겹 줄이기(「적의 차례가 끝나면 N 감소」) — 버프 시간처럼 **다음 내 턴이 시작될 때** 부른다.
 // 전에는 내 턴 끝(적의 차례 앞)에 줄여서, 「받는 피해 -8%」 같은 막는 표식이 적이 치기 전에 한 겹씩 빠졌다 —
 // 한 겹짜리는 한 번도 막지 못했다(우이(기억)의 세잎클로버). 공격 쪽 표식은 내 턴에만 쓰이니 달라지지 않는다
+// 돌려주는 것 — 이번에 다 닳아 0 이 된 것 [{ kw, holder }](든 사람 — 자기 주머니면 주인 사도). combat 이 「「X」가 다 닳으면」 을 부른다
 export function decayKeywords(s) {
+  const gone = [];
   for (const kw of Object.values(s.kw || {})) {
     if (!kw.decay) continue;
     const cut = (n) => (kw.decay === "all" ? 0 : Math.max(0, n - kw.decay));
     if (kw.carrier === "self") {
       const pool = (s.stacks || {})[kw.owner];
-      if (pool && pool[kw.id]) pool[kw.id] = cut(pool[kw.id]);
+      if (pool && pool[kw.id]) { pool[kw.id] = cut(pool[kw.id]); if (!pool[kw.id]) gone.push({ kw, holder: s.party.find((u) => u.key === kw.owner) || null }); }
     } else {
       for (const u of [...s.party.slice(0, 1), ...s.enemies]) if (u.status && u.status[kw.id]) {   // 파티 상태는 하나 — 한 번만 줄인다
         u.status[kw.id] = cut(u.status[kw.id]);
-        if (!u.status[kw.id]) delete u.status[kw.id];
+        if (!u.status[kw.id]) { delete u.status[kw.id]; gone.push({ kw, holder: u }); }
       }
     }
   }
+  return gone;
+}
+
+// 「공격 · 스킬 · 강화 카드를 차례로 내면」 이 어디까지 왔나 — 이번 턴 낸 카드(s.playLog)의 끝이 차례의 앞 몇 장과 맞는가(0 ~ 차례 길이).
+// 이름을 붙인 것(w.who 가 "any" 가 아니면)은 그 사도(ownerKey)의 카드만 — 사이에 다른 카드가 끼면 끊긴다. from — 이미 쓴 자리(그 앞은 안 본다).
+// 화면(fight-screen 패시브 칩)과 봇(tools/lib/bot.js)이 같은 셈을 쓴다
+export function seqStep(s, w, ownerKey, from = 0) {
+  const log = s.playLog || [], seq = w.seq || [];
+  for (let k = Math.min(seq.length, log.length - from); k > 0; k--) {
+    let ok = true;
+    for (let i = 0; i < k; i++) {
+      const p = log[log.length - k + i];
+      if (p.type !== seq[i] || (w.who !== "any" && p.hero !== ownerKey)) { ok = false; break; }
+    }
+    if (ok) return k;
+  }
+  return 0;
 }
 
 // 버프 시간 줄이기 — 다음 내 턴이 시작될 때 부른다(「이번 턴」 이 적의 차례까지 가도록)

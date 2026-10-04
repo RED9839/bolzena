@@ -16,10 +16,10 @@ const winOf = Object.fromEntries((meta ? meta.heroes : []).map((h) => [h.k, h.wi
 // 패시브가 일하는 때 — 사람 말로
 const ON = {
   play: "카드를 낼 때", turnStart: "턴 시작", turnEnd: "턴 끝", kill: "처치", hurt: "맞을 때", break: "격파", lowHp: "HP 낮을 때",
-  ult: "고학년", debuff: "디버프", guard: "방어 · 실드", overheal: "넘친 회복", fightStart: "전투 시작", rush: "즉시 행동", stackReach: "다 차면",
+  ult: "고학년", debuff: "디버프", guard: "방어 · 실드", overheal: "넘친 회복", fightStart: "전투 시작", rush: "즉시 행동", stackReach: "다 차면", stackGone: "사라지면 · 다 닳으면",
 };
 // 누가 낸 카드인가 — 그 사도의 것(by) · 아군 누구든(who any). 같은 「공격 카드」 라도 손이 다르다
-const playKind = (w) => `${w.by ? "제 " : w.who === "any" ? "아군 " : ""}${w.type ? `${w.type} 카드` : w.every ? `카드 ${w.every}장마다` : "카드"}`;
+const playKind = (w) => w.seq ? `${w.seq.join(" → ")} 차례로` : `${w.by ? "제 " : w.who === "any" ? "아군 " : ""}${w.type ? `${w.type} 카드` : w.every ? `카드 ${w.every}장마다` : "카드"}`;
 const whenKo = (w) => (!w ? "?" : w.on === "play" ? playKind(w) : ON[w.on] || w.on);
 const FX_KO = { dmg: "피해", status: "상태", ap: "AP", draw: "드로우", heal: "회복", shield: "실드", block: "방어", tough: "강인도", make: "카드 생성", gauge: "게이지", rushDown: "즉시 행동 늦춤", perStack: "1개당", stack: "쌓기" };
 

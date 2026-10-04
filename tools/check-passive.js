@@ -144,25 +144,24 @@ console.log("본보기 — 나이아 「물보라」(넘친 회복을 모아 쏜
 }
 
 console.log("");
-console.log("본보기 — 티그 「연격」(셋째 칼)");
+console.log("본보기 — 티그 「연격」(박자형 — 끊기지 않는 박자, docs/19)");
 {
-  const s = fight(["티그", "에르핀", "네르"]); tough(s);
+  // 손을 비운다 — 동료의 연계 카드가 저절로 나가면 그것도 「다른 사도의 카드」 라 박자가 끊긴다(규칙대로)
+  const s = fight(["티그", "에르핀", "네르"]); tough(s); s.hand = [];
   const beat = () => stackOf(s, "티그", "연격");
   const slash = kitOf("티그").start.find((c) => c.type === "공격" && c.cost === 1).id;
   play(s, slash); play(s, slash);
-  check(beat() === 2, `티그의 1코 이상 공격 카드마다 「연격」 +1 (지금 ${beat()})`);
-  s.ap = 3; const hp0 = foeHp(s);
-  play(s, slash);
-  check(beat() === 0 && s.ap === 3 - 1 + 1 && foeHp(s) < hp0, `셋째 칼 — 「연격」 을 다 쓰고 적 전체 피해 · AP +1 (AP ${s.ap})`);
-  // 장작 패기 — 모인 박자를 한 명에게 쏟는다(카드가 먼저 다 쓰고, 그 뒤 패시브가 +1)
+  check(beat() === 2, `티그의 공격 카드마다 「연격」 +1 (지금 ${beat()})`);
   play(s, slash); play(s, slash);
+  check(beat() === 3, `셋에서 멈춘다 — 저절로 터지지 않는다 (지금 ${beat()})`);
+  // 장작 패기 — 모인 박자를 한 명에게 쏟는다(카드가 먼저 다 쓰고, 그 뒤 패시브가 +1)
   play(s, idOf("티그", "장작 패기"));
   check(beat() === 1, `「장작 패기」 — 「연격」 을 다 쓴 뒤 그 장으로 +1 (지금 ${beat()})`);
-  // 에르핀의 공격 카드는 티그의 박자에 들지 않는다
-  const t = fight(["티그", "에르핀", "네르"]); tough(t);
+  // 에르핀의 카드가 끼면 박자가 끊긴다
+  play(s, slash);
   const shot = kitOf("에르핀").start.find((x) => x.type === "공격").id;
-  for (let i = 0; i < 3; i++) play(t, shot);
-  check(stackOf(t, "티그", "연격") === 0, "에르핀의 공격 카드 세 장 — 티그의 「연격」 은 그대로 0");
+  play(s, shot);
+  check(beat() === 0, `에르핀의 카드가 끼면 「연격」 이 사라진다 (지금 ${beat()})`);
 }
 
 console.log("");

@@ -114,13 +114,20 @@ export function runFx(s, fxList, ctx, api) {
       case "ifTune": gate = !!ctx.tune; break;
       // 「연속: …」 — 이번 턴 바로 앞에 낸 카드가 이 카드와 같은 속성(사도 성격)이면 뒤가 돈다(combat playCard 가 ctx.chain 을 정한다)
       case "ifChain": gate = !!ctx.chain; break;
+      // 「잇기: …」 — 이번 턴 바로 앞에 낸 카드가 같은 사도의 카드였으면(combat playCard 가 ctx.link 를 정한다)
+      case "ifLink": gate = !!ctx.link; break;
+      // 「앞이 공격: …」 — 이번 턴 바로 앞에 낸 카드(누구 것이든)의 종류가 그것이었으면(ctx.prev — 첫 장이면 없다)
+      case "ifPrev": gate = !!ctx.prev && ctx.prev === f.type; break;
+      // 「「X」가 있으면」 · 「「X」가 없으면」(not)
       case "ifStack": {
         const kw = (s.kw || {})[f.id];
+        let has;
         if (kw && kw.carrier === "enemy") {
           const t = resolve(s, ctx, "oneEnemy")[0];
-          gate = !!t && ((t.status || {})[f.id] || 0) > 0;
-        } else if (kw && kw.carrier === "ally") gate = !!owner && ((owner.status || {})[f.id] || 0) > 0;
-        else gate = owner ? stackOf(s, owner.key, f.id) > 0 : false;
+          has = !!t && ((t.status || {})[f.id] || 0) > 0;
+        } else if (kw && kw.carrier === "ally") has = !!owner && ((owner.status || {})[f.id] || 0) > 0;
+        else has = owner ? stackOf(s, owner.key, f.id) > 0 : false;
+        gate = f.not ? !has : has;
         break;
       }
       case "targetLowest": ctx.lowest = true; break;
@@ -289,10 +296,17 @@ export function runFx(s, fxList, ctx, api) {
           const holders = ctx.holder ? [ctx.holder] : resolve(s, ctx, kw.carrier === "enemy" ? "oneEnemy" : "self");
           for (const t of holders) {
             if (!t.status || !t.status[f.id]) continue;
+            const before = t.status[f.id];
             t.status[f.id] = f.v === "all" ? 0 : Math.max(0, t.status[f.id] - f.v);
             if (!t.status[f.id]) delete t.status[f.id];
+            // 줄었다고 알린다 — 0 이 되면 「「X」가 사라지면」(combat stackChanged)
+            if (api.stackChanged) api.stackChanged(owner.key, f.id, before, t.status[f.id] || 0, t);
           }
-        } else addStack(s, owner.key, f.id, f.v === "all" ? -stackOf(s, owner.key, f.id) : -f.v);
+        } else {
+          const before = stackOf(s, owner.key, f.id);
+          addStack(s, owner.key, f.id, f.v === "all" ? -before : -f.v);
+          if (api.stackChanged) api.stackChanged(owner.key, f.id, before, stackOf(s, owner.key, f.id), owner);
+        }
         break;
       }
       case "capStack": if (owner) { s.stackCap = s.stackCap || {}; s.stackCap[owner.key] = s.stackCap[owner.key] || {}; s.stackCap[owner.key][f.id] = f.v; } break;

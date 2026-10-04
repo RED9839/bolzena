@@ -317,6 +317,8 @@ function openingPlays(s) {
 
 // 화면이 칩에 쓰는 값 — 버프·「항상」 패시브·키워드 1개당을 합친 것
 export const statOf = (s, u, stat) => P.statMod(s, u, stat);
+// 「… 카드를 차례로 내면」 이 어디까지 왔나(passive.js seqStep) — 화면의 패시브 칩 · 봇이 쓴다
+export const seqStep = (s, w, ownerKey, from) => P.seqStep(s, w, ownerKey, from);
 
 // 패시브를 부른다 — 누가 일으켰는지(acting)를 잠깐 바꿔 두어야 「적을 처치하면」 이 제 사람을 찾는다
 function emit(s, ev, info) {
@@ -395,6 +397,7 @@ function beginTurn(s) {
   s.lastHero = null; s.nextCheaper = 0; s.erpinSp = 0; s.nerWorked = false;
   s.ending = false;
   s.prevNat = null;           // 연속 — 이번 턴 바로 앞에 낸 카드의 속성(사도 성격). 턴이 바뀌면 없다
+  s.playLog = [];             // 이번 턴 낸 카드 차례 [{ hero, type }] — 「잇기:」 · 「앞이 공격:」 · 「… 카드를 차례로 내면」(박자형, docs/19). 턴이 바뀌면 없다
   s.playedThisTurn = 0;
   s.playedBy = {};            // 사도마다 이번 턴 낸 장수 — 「이번 턴 에르핀의 카드를 내지 않았으면」(passive.js)
   s.rushedThisTurn = false;   // 「적이 즉시 행동했으면」
@@ -411,7 +414,8 @@ function beginTurn(s) {
   } else for (const u of alive(s.party)) u.block = 0;
   // 「이번 턴」 버프는 적의 차례까지 간다 — 막아 주는 버프가 적이 치기 전에 풀리면 안 된다.
   // 그래서 다음 내 턴이 시작될 때 줄인다(방어도 여기서 사라진다).
-  if (s.turn > 1) { P.tickMods(s); P.decayKeywords(s); }   // 버프 시간 · 키워드 겹 — 적의 차례가 끝난 뒤에 줄인다
+  // 다 닳아 0 이 된 키워드 — 「「X」가 다 닳으면」 · 「사라지면」(예약형의 시계, docs/19). 적 표식은 적마다 따로 돈다
+  if (s.turn > 1) { P.tickMods(s); for (const g of P.decayKeywords(s)) kwGone(s, g.kw.id, g.kw.owner, g.holder, true); }   // 버프 시간 · 키워드 겹 — 적의 차례가 끝난 뒤에 줄인다
 
   // 원작의 중독은 지속 피해가 아니라 공격력을 깎는 것이다. 그래서 턴 시작에 아무 일도 안 한다.
   // 촉수는 턴이 끝날 때 때린다(프리클) — 아래 endTurn 에 있다.
@@ -1318,9 +1322,11 @@ export function playCard(s, handIdx, targetIdx, opts = {}) {
   // opts.ally — 적과 아군을 둘 다 고르는 카드(「적 1명 …, 아군 1명 …」)의 아군 쪽. 화면이 한 번 더 묻는다
   // tags — 이 카드의 키워드(분쇄 · 잔불 · 약점). card — 카드(고학년 포함)의 피해만 강인도를 깎는다(패시브 · 축복 덤은 안 깎는다)
   // chain — 연속: 이번 턴 바로 앞에 낸 카드의 속성(사도 성격)이 이 카드와 같다. 교주 카드는 속성이 없다
+  // link — 잇기: 이번 턴 바로 앞에 낸 카드가 같은 사도의 카드다(교주 카드는 잇지 못한다) · prev — 앞이 공격 …: 바로 앞 카드의 종류(박자형, docs/19)
   const nat = owner ? natureOf(owner.key) : null;
+  const last = (s.playLog || [])[(s.playLog || []).length - 1] || null;
   const ctx = { owner, combo: null, targetIdx, allyIdx: opts.ally, x: c.xcost ? paid : 0, shin: R.shinKindOf(CARDS[cardId], sh), tags: cardTags(s, cardId, c), card: true,
-    type: c.type, chain: !!nat && s.prevNat === nat, tune };
+    type: c.type, chain: !!nat && s.prevNat === nat, tune, link: !!c.hero && !!last && last.hero === c.hero, prev: last ? last.type : null };
   // 봉인(v6 카제나) — 처음 내면 효과 없이 봉인만 풀린다(이 전투 동안). 비용은 치른다
   const sealed = (hasTag(c, "봉인") || blessTag(s, cardId, "봉인")) && !(s.unsealed && s.unsealed[cardId]);
   // 연결(v6 카제나) — 직접 내면 손의 다른 연결 카드를 모두 버린다(저절로 나간 것은 안 버린다)
@@ -1329,9 +1335,11 @@ export function playCard(s, handIdx, targetIdx, opts = {}) {
     if (drop.length) { for (const id of drop) s.hand.splice(s.hand.indexOf(id), 1); s.discard.push(...drop); say(s, `연결 — ${drop.map((id) => `「${cardOf(s, id).name}」`).join(" ")} 버린다`); }
   }
   s.prevNat = nat;
+  (s.playLog = s.playLog || []).push({ hero: c.hero || null, type: c.type });
   s.acting = c.hero || null;
   s.modSrc = `${owner ? owner.ko + " " : ""}「${c.name}」`;   // 버프 · 디버프의 출처(정보 창)
   cue(s, "act", owner, { anim: c.type === "공격" ? "attack" : "skill", card: c });   // card — 화면이 카드에 맞는 동작을 고른다(js/data/card-motion.js)
+  kwWipe(s, c);
   try {
     if (sealed) {
       (s.unsealed = s.unsealed || {})[cardId] = true;
@@ -1675,13 +1683,43 @@ function kwConsume(s, owner, c) {
     if (kw.carrier === "self") {
       if (!owner || owner.key !== kw.owner || c.type !== "공격") continue;
       const bag = (s.stacks || {})[kw.owner];
-      if (bag && bag[kw.id]) { bag[kw.id] = cut(bag[kw.id]); say(s, `「${kw.id}」 — 발동해 ${bag[kw.id] ? `${bag[kw.id]} 남는다` : "사라진다"}`); }
+      if (bag && bag[kw.id]) {
+        bag[kw.id] = cut(bag[kw.id]); say(s, `「${kw.id}」 — 발동해 ${bag[kw.id] ? `${bag[kw.id]} 남는다` : "사라진다"}`);
+        if (!bag[kw.id]) kwGone(s, kw.id, kw.owner, owner);
+      }
     } else if (kw.carrier === "enemy") {
-      for (const e of s.enemies) if (e.hitSeq === s.actSeq && e.status && e.status[kw.id]) { e.status[kw.id] = cut(e.status[kw.id]); if (!e.status[kw.id]) delete e.status[kw.id]; }
+      for (const e of s.enemies) if (e.hitSeq === s.actSeq && e.status && e.status[kw.id]) {
+        e.status[kw.id] = cut(e.status[kw.id]);
+        if (!e.status[kw.id]) { delete e.status[kw.id]; kwGone(s, kw.id, kw.owner, e); }
+      }
     } else if (owner && c.type === "공격" && s.pool.status[kw.id]) {
-      s.pool.status[kw.id] = cut(s.pool.status[kw.id]); if (!s.pool.status[kw.id]) delete s.pool.status[kw.id];
+      s.pool.status[kw.id] = cut(s.pool.status[kw.id]);
+      if (!s.pool.status[kw.id]) { delete s.pool.status[kw.id]; kwGone(s, kw.id, kw.owner, partyRep(s)); }
     }
   }
+}
+// 「다른 사도의 카드를 내면 전부 사라진다」(passive.js parseKeyword kw.wipe — 박자형, docs/19) — 키워드 주인이 아닌 카드(교주 카드 포함)를 내는 순간 겹이 0.
+// 그 카드의 효과보다 먼저 지운다(끊긴 뒤에 그 카드가 다시 쌓으면 처음부터 센다)
+function kwWipe(s, c) {
+  for (const kw of Object.values(s.kw || {})) {
+    if (!kw.wipe || c.hero === kw.owner) continue;
+    if (kw.carrier === "self") {
+      const bag = (s.stacks || {})[kw.owner];
+      if (bag && bag[kw.id]) { bag[kw.id] = 0; say(s, `「${kw.id}」 — 다른 카드가 끼어 사라진다`); kwGone(s, kw.id, kw.owner, s.party.find((u) => u.key === kw.owner) || null); }
+    } else {
+      for (const u of [partyRep(s), ...s.enemies]) if (u && u.status && u.status[kw.id]) {   // 파티 상태는 하나 — 한 번만
+        delete u.status[kw.id]; say(s, `「${kw.id}」 — 다른 카드가 끼어 사라진다`);
+        kwGone(s, kw.id, kw.owner, u);
+      }
+    }
+    if (s.over) return;
+  }
+}
+// 키워드 겹이 0 보다 크다가 0 이 됐다 — 「「X」가 사라지면」 · decay(적의 차례가 끝나 다 닳았으면) 「「X」가 다 닳으면」 도(passive.js matches stackGone).
+// 적 표식이면 그 효과의 「적 1명」 은 표식이 있던 그 적이다 — 그 적이 쓰러졌으면 돌지 않는다. 아군 표식 · 자기 주머니면 키워드 주인이 시전자
+function kwGone(s, id, ownerKey, holder, decay = false) {
+  if (s.over || (holder && holder.side === "enemy" && holder.dead)) return;
+  emit(s, "stackGone", { id, owner: ownerKey, target: holder, decay });
 }
 // 좋은 상태 — 적에게 걸려도 「디버프를 걸면」 이 아니다
 const BUFF_ST = new Set(["사기", "불굴", "결의", "반격", "결정화", "잔광", "피해 감소", "면역", "실드 유지", "저장", "협공", "고동"]);
@@ -1792,7 +1830,9 @@ function fxApi(s) {
     stackChanged: (owner, id, before, after, holder) => {
       // 쌓이면 든 사람 위에 꼬리표 「초청객 +1」 — 칩 숫자만 바뀌면 언제 늘었는지 안 보였다
       if (after > before) cue(s, "status", holder, { id: `${id} +${after - before}`, up: true });
-      emit(s, "stackReach", { id, before, after, owner, target: holder });
+      if (after > before) emit(s, "stackReach", { id, before, after, owner, target: holder });
+      // 0 이 됐다 — 「「X」가 사라지면」(쓰기 · 「X」 -N · 「N개가 되면: 「X」 전부 소모」 …). 주인은 키워드 주인(없으면 낸 사도)
+      else if (before > 0 && after <= 0) kwGone(s, id, ((s.kw || {})[id] || {}).owner || owner, holder);
     },
     cleanse: (t, n) => { for (let i = 0; i < (n || 1); i++) { const bad = BAD.find((b) => st(t, b) > 0); if (bad) delete t.status[bad]; } },
     trigger: () => {},          // 사도 전용 발동(재채기 등) — 아직 몸이 없다

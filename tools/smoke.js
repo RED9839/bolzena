@@ -1439,6 +1439,189 @@ console.log("전투 배속 (js/speed.js)");
   }
 }
 
+// ── 박자형 · 예약형 문법(docs/19 2단계) — 시험 카드 · 키워드를 판의 장부에 세워 실제로 내고 턴을 넘겨 본다 ─────
+console.log("");
+console.log("박자형 · 예약형 문법 — 잇기 · 앞이 공격 · 차례로 내면 · 다른 사도 카드에 사라짐 · 없으면 · 사라지면 · 다 닳으면");
+{
+  const C = C2;
+  const B4 = (await import("../js/data/built.js")).default;
+  const { parseEffect } = await import("../js/effects.js");
+  const PV = await import("../js/passive.js");
+  const { ENEMIES } = await import("../js/data/enemies.js");
+  const [A, Bk, Ck] = Object.keys(B4.heroes).filter((k) => B4.starter[k]);
+  const FOE = Object.keys(ENEMIES).find((k) => !ENEMIES[k].boss && !(ENEMIES[k].passives || []).length && ENEMIES[k].nature);
+  const KWS = ["X", "Y", "Z"];
+  // 패시브 · 키워드 · 상성을 끈 판 — 적은 가만히 있는다. 시험할 규칙만 꽂는다
+  const mk = (foes = 1) => {
+    const s = C.newCombat({ partyKeys: [A, Bk, Ck], deck: [], enemyIds: Array(foes).fill(FOE), seed: 5 });
+    for (const u of s.party) { u.crit = 0; u.hp = u.maxHp = 99999; u.status = {}; u.mods = []; }
+    for (const e of s.enemies) { e.hp = e.maxHp = 99999; e.tough = e.toughMax = 99; e.intent = { t: "block", v: 0, say: "가만히", rush: 0 }; }
+    s.passives = {}; s.kw = {}; s.always = {}; s.stacks = {}; s.counts = {}; s.fired = {}; s.noNature = true;
+    s.hand = []; s.draw = []; s.discard = []; s.ap = 50;
+    return s;
+  };
+  let n = 0;
+  const play = (s, hero, text, type = "스킬", target = 0) => {
+    const { fx, left } = parseEffect(text, { keywords: KWS });
+    if (left) throw new Error(`못 읽음: ${text} → ${left}`);
+    const id = `박자시험${++n}`;
+    s.book[id] = { id, name: `박자 ${n}`, ko: `박자 ${n}`, cost: 1, type, hero, built: true, target: "적", text, fx, tags: [] };
+    s.hand.push(id);
+    const r = C.playCard(s, s.hand.indexOf(id), target);
+    if (!r.ok) throw new Error(r.why);
+  };
+  const apGain = (s, f) => { const a = s.ap; f(); return s.ap - a + 1; };   // 낸 카드 비용 1 을 돌려 센다
+  const nextTurn = (s) => { C.endTurn(s); for (const e of s.enemies) e.intent = { t: "block", v: 0, say: "가만히", rush: 0 }; s.ap = 50; };
+  const addKw = (s, id, text, owner = A) => {
+    const kw = PV.parseKeyword(id, text, [id]);
+    if (kw.left.length) throw new Error(`키워드 못 읽음: ${kw.left.join(" / ")}`);
+    s.kw[id] = { ...kw, owner };
+    s.passives[owner] = [...(s.passives[owner] || []), ...kw.rules.map((r) => ({ ...r, kwOf: kw.carrier }))];
+    return kw;
+  };
+  const stk = (s, id, k = A) => ((s.stacks[k] || {})[id]) || 0;
+  const CLOCK = "걸어 둔 시계. 적에게 거는 표식이다. 최대 3. 적의 차례가 끝나면 1 감소. 「Z」가 다 닳으면: 적 1명에게 공격력 100% 피해.";
+
+  // 1. 잇기 — 바로 앞이 같은 사도의 카드면. 교주 카드 · 다른 사도 카드가 끼면 끊긴다 · 턴이 바뀌면 없다
+  {
+    const s = mk();
+    check(apGain(s, () => play(s, A, "잇기: AP +3")) === 0, "잇기 — 이번 턴 첫 카드면 안 돈다");
+    check(apGain(s, () => play(s, A, "잇기: AP +3")) === 3, "잇기 — 바로 앞이 같은 사도의 카드면 돈다");
+    play(s, Bk, "드로우 1");
+    check(apGain(s, () => play(s, A, "잇기: AP +3")) === 0, "잇기 — 다른 사도의 카드가 끼면 끊긴다");
+    play(s, null, "드로우 1");
+    check(apGain(s, () => play(s, A, "잇기: AP +3")) === 0, "잇기 — 교주 카드가 끼어도 끊긴다");
+    nextTurn(s);
+    check(apGain(s, () => play(s, A, "잇기: AP +3")) === 0, "잇기 — 지난 턴 카드는 잇지 않는다");
+  }
+  // 2. 앞이 공격 · 스킬 · 강화 — 바로 앞 카드(누구 것이든, 교주 카드 포함)의 종류
+  {
+    const s = mk();
+    check(apGain(s, () => play(s, A, "앞이 공격: AP +3")) === 0, "앞이 공격 — 첫 카드면 안 돈다");
+    play(s, Bk, "적 1명에게 공격력 10% 피해", "공격");
+    check(apGain(s, () => play(s, A, "앞이 공격: AP +3")) === 3, "앞이 공격 — 다른 사도의 공격 카드 뒤에 돈다");
+    check(apGain(s, () => play(s, A, "앞이 공격: AP +3")) === 0 && apGain(s, () => play(s, A, "앞이 스킬: AP +3")) === 3, "앞이 공격 — 스킬 뒤에는 안 돌고, 앞이 스킬이 돈다");
+    play(s, null, "드로우 1", "강화");
+    check(apGain(s, () => play(s, A, "앞이 강화: AP +3")) === 3, "앞이 강화 — 교주 카드도 앞 카드다");
+  }
+  // 3. 「이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면」 — 파티가 바로 잇달아 · 다시 완성하면 또 · 「○○의」 는 그 사도 카드만
+  {
+    const s = mk();
+    s.passives[A] = PV.parsePassive("풀코스: 이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면 AP +5");
+    const runs = () => s.log.filter((l) => l.includes("풀코스")).length;
+    play(s, A, "적 1명에게 공격력 10% 피해", "공격"); play(s, Bk, "드로우 1", "스킬");
+    const g = apGain(s, () => play(s, null, "드로우 1", "강화"));
+    check(g === 5 && runs() === 1, `차례로 — 공격(제 것) · 스킬(다른 사도) · 강화(교주) 마지막 장에 돈다 (AP +${g})`);
+    play(s, Bk, "적 1명에게 공격력 10% 피해", "공격"); play(s, A, "드로우 1", "스킬"); play(s, A, "드로우 1", "강화");
+    check(runs() === 2, "차례로 — 같은 턴에 다시 완성하면 또 돈다");
+    play(s, A, "적 1명에게 공격력 10% 피해", "공격"); play(s, A, "드로우 1", "스킬"); play(s, A, "드로우 1", "스킬"); play(s, A, "드로우 1", "강화");
+    check(runs() === 2, "차례로 — 사이에 다른 카드가 끼면(공격 · 스킬 · 스킬 · 강화) 안 돈다");
+    play(s, A, "적 1명에게 공격력 10% 피해", "공격"); play(s, A, "드로우 1", "스킬"); play(s, A, "적 1명에게 공격력 10% 피해", "공격");
+    play(s, A, "드로우 1", "스킬"); play(s, A, "드로우 1", "강화");
+    check(runs() === 3, "차례로 — 끊긴 자리(둘째 공격)부터 다시 이으면 돈다");
+    const t = mk();
+    const ko = B4.heroes[A].ko;
+    t.passives[A] = PV.parsePassive(`칼: ${ko}의 공격 · 스킬 카드를 차례로 내면 AP +5`);
+    check(t.passives[A][0].when.seq && t.passives[A][0].when.who !== "any", `「${ko}의 …」 — 그 사도 카드만 센다`);
+    const tr = () => t.log.filter((l) => l.includes(" · 칼")).length;
+    play(t, A, "적 1명에게 공격력 10% 피해", "공격"); play(t, Bk, "드로우 1", "스킬");
+    check(tr() === 0, "이름 붙은 차례 — 다른 사도의 스킬로는 안 돈다");
+    play(t, A, "드로우 1", "스킬");
+    check(tr() === 0, "이름 붙은 차례 — 사이에 다른 사도 카드가 끼면 끊긴다");
+    play(t, A, "적 1명에게 공격력 10% 피해", "공격"); play(t, A, "드로우 1", "스킬");
+    check(tr() === 1, "이름 붙은 차례 — 제 공격 · 스킬을 이으면 돈다");
+    play(t, A, "적 1명에게 공격력 10% 피해", "공격");
+    nextTurn(t);
+    play(t, A, "드로우 1", "스킬");
+    check(tr() === 1, "차례로 — 지난 턴의 공격은 잇지 않는다");
+  }
+  // 4. 「다른 사도의 카드를 내면 전부 사라진다」 · 6. 「「X」가 사라지면」
+  {
+    const s = mk();
+    const kw = addKw(s, "X", "끊기지 않는 박자. 최대 5. 다른 사도의 카드를 내면 전부 사라진다. 「X」가 사라지면: AP +4.");
+    check(kw.wipe && !kw.left.length, "키워드 줄 「다른 사도의 카드를 내면 전부 사라진다」 를 읽는다");
+    play(s, A, "「X」 +2"); play(s, A, "「X」 +1");
+    check(stk(s, "X") === 3, `제 카드로는 쌓인다 (${stk(s, "X")})`);
+    const g = apGain(s, () => play(s, Bk, "드로우 1"));
+    check(stk(s, "X") === 0 && g === 4, `다른 사도의 카드를 내면 0 — 「X」가 사라지면 AP +4 (겹 ${stk(s, "X")} · AP +${g})`);
+    play(s, A, "「X」 +1"); play(s, null, "드로우 1");
+    check(stk(s, "X") === 0, "교주 카드를 내도 사라진다");
+    check(apGain(s, () => play(s, null, "드로우 1")) === 0, "이미 0 이면 「사라지면」 이 다시 돌지 않는다");
+    play(s, A, "「X」 +2");
+    check(apGain(s, () => play(s, A, "「X」 전부 소모")) === 4, "「X」 전부 소모로 0 이 돼도 「사라지면」 이 돈다");
+    play(s, A, "「X」 +1");
+    check(apGain(s, () => play(s, A, "「X」 -1")) === 4, "「X」 -1 로 0 이 돼도 돈다");
+  }
+  // 5. 「「X」가 없으면」 — 카드 글 · 패시브 조건
+  {
+    const s = mk();
+    addKw(s, "Y", "표시. 최대 3.");
+    check(apGain(s, () => play(s, A, "「Y」가 없으면 AP +3")) === 3, "카드 — 「Y」가 없으면 돈다");
+    play(s, A, "「Y」 +1");
+    check(apGain(s, () => play(s, A, "「Y」가 없으면 AP +3")) === 0, "카드 — 「Y」가 있으면 안 돈다");
+    check(apGain(s, () => play(s, A, "「Y」가 있으면 AP +3")) === 3, "「있으면」 은 그대로");
+    const t = mk();
+    addKw(t, "Y", "표시. 최대 3.");
+    t.passives[A] = [...(t.passives[A] || []), ...PV.parsePassive("빈 그릇: 카드를 낼 때마다 「Y」가 없으면 AP +2", ["Y"])];
+    check(t.passives[A].some((r) => r.conds.some((c) => c.c === "stack" && c.not)), "패시브 조건 「「Y」가 없으면」 을 읽는다");
+    check(apGain(t, () => play(t, A, "드로우 1")) === 2, "패시브 — 「Y」가 없으면 돈다");
+    play(t, A, "「Y」 +1");
+    check(apGain(t, () => play(t, A, "드로우 1")) === 0, "패시브 — 「Y」가 있으면 안 돈다");
+  }
+  // 6. 「「Z」가 다 닳으면」 — 적의 차례가 끝나 줄어 0 이 될 때만. 적마다 따로 · 그 적에게 · 쓰러진 적은 안 돈다
+  {
+    const s = mk(3);
+    addKw(s, "Z", CLOCK);
+    const [e0, e1, e2] = s.enemies;
+    play(s, A, "적 1명 「Z」 +1", "스킬", e0.idx); play(s, A, "적 1명 「Z」 +2", "스킬", e1.idx); play(s, A, "적 1명 「Z」 +1", "스킬", e2.idx);
+    e2.hp = 0; e2.dead = true;
+    const h0 = e0.hp, h1 = e1.hp, atk = s.party.find((u) => u.key === A).atk;
+    nextTurn(s);
+    check(h0 - e0.hp >= atk * 0.9 && h1 === e1.hp, `다 닳은 적(1 → 0)에게만 터진다 (${h0 - e0.hp} · 옆 적 ${h1 - e1.hp})`);
+    check(s.log.filter((l) => l.includes(" · Z")).length === 1, "쓰러진 적의 시계는 돌지 않는다");
+    nextTurn(s);
+    check(h1 - e1.hp >= atk * 0.9, `둘째 적은 한 턴 더 뒤에 (${h1 - e1.hp})`);
+    const t = mk(2);
+    addKw(t, "Z", CLOCK);
+    play(t, A, "적 전체에 「Z」 +1");
+    const k0 = t.enemies.map((e) => e.hp);
+    nextTurn(t);
+    check(t.enemies.every((e, i) => k0[i] - e.hp >= atk * 0.9), `한 번에 여러 적이 닳으면 적마다 따로 (${t.enemies.map((e, i) => k0[i] - e.hp).join(" · ")})`);
+    const u = mk();
+    addKw(u, "Z", CLOCK);
+    play(u, A, "적 1명 「Z」 +1", "스킬", u.enemies[0].idx);
+    const q0 = u.enemies[0].hp;
+    play(u, A, "적 1명 「Z」 1 소모", "스킬", u.enemies[0].idx);
+    check(!(u.enemies[0].status || {}).Z && q0 === u.enemies[0].hp, "소모로 0 이 된 것은 「다 닳으면」 이 아니다");
+    nextTurn(u);
+    check(q0 === u.enemies[0].hp, "다음 턴에도 안 터진다(이미 없다)");
+  }
+  // 7. smart 봇이 차례를 맞추는가(tools/lib/bot.js — 순서 조건 카드 · 「차례로 내면」 패시브가 있으면 두 수 앞까지)
+  {
+    const { makeBots } = await import("./lib/bot.js");
+    const bots = makeBots({ C, B: await import("../js/cardbook.js"), R: await import("../js/rules.js"), ENEMIES });
+    const put = (s, hero, text, type) => {
+      const { fx } = parseEffect(text, { keywords: KWS });
+      const id = `박자시험${++n}`;
+      s.book[id] = { id, name: `박자 ${n}`, ko: `박자 ${n}`, cost: 1, type, hero, built: true, target: "적", text, fx, tags: [] };
+      s.hand.push(id);
+      return id;
+    };
+    const s = mk();
+    s.ap = 2;
+    const big = put(s, A, "앞이 공격: 적 1명에게 공격력 400% 피해", "스킬");
+    put(s, Bk, "적 1명에게 공격력 30% 피해", "공격");
+    bots.smartPlay(s, { depth: 1 });
+    check(s.discard.indexOf(big) === 1 && s.playLog.map((p) => p.type).join(" ") === "공격 스킬", `봇 — 「앞이 공격」 카드를 공격 카드 뒤에 낸다 (${s.playLog.map((p) => p.type).join(" → ")})`);
+    const t = mk();
+    t.ap = 3;
+    t.passives[A] = PV.parsePassive("풀코스: 이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면 적 전체에 공격력 300% 피해");
+    put(t, A, "드로우 1", "강화"); put(t, Bk, "방어력 50% 방어", "스킬"); put(t, Ck, "적 1명에게 공격력 30% 피해", "공격");
+    bots.smartPlay(t, { depth: 1 });
+    check(t.log.some((l) => l.includes("풀코스")), `봇 — 공격 · 스킬 · 강화 를 차례로 내 패시브를 살린다 (${t.playLog.map((p) => p.type).join(" → ")})`);
+  }
+}
+
 console.log("모듈이 읽히는가");
 {
   const JS = pathNode.join(pathNode.dirname(f2u(import.meta.url)), "..", "js");

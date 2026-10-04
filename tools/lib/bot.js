@@ -5,7 +5,7 @@
 // 엔진은 부르는 쪽이 넘긴다(role-sim 의 --root 처럼 옛 사본으로도 돌게). 엔진은 읽기만 한다.
 // 봇은 난수를 쓰지 않는다 — 복사한 판에는 고정 씨앗을 준다. 같은 씨앗이면 같은 판이 나온다.
 // 파티는 한 몸이다(docs/16 §8) — HP · 방어 · 실드 · 상태는 s.pool 하나. 적의 수는 모두 파티를 친다(전체 공격은 한 대 × FOE_ALL_X).
-import { valueOf } from "./card-value.js";
+import { valueOf, orderCond } from "./card-value.js";
 
 export function makeBots({ C, B, R, ENEMIES }) {
   const ATTACKS = ["attack", "back", "multi", "attackAll"];
@@ -64,6 +64,41 @@ export function makeBots({ C, B, R, ENEMIES }) {
     }
     return v;
   }
+  // 순서 조건(잇기 · 앞이 공격 …, docs/19 박자형)이 지금 판에서 서 있으면 조건 몫까지 다 센 값 — 서 있지 않으면 위의 확률 값.
+  // 그래서 받쳐 줄 카드(같은 사도 · 그 종류)를 먼저 내면 손에 남은 이 카드의 몫(potential)이 오른다 — 한 수 앞만 봐도 차례를 맞춘다
+  function liveValue(s, id, c) {
+    const oc = orderCond(c.fx);
+    if (!oc) return cardValue(s, id);
+    const last = (s.playLog || [])[(s.playLog || []).length - 1];
+    const on = !!last && (oc.k === "ifLink" ? !!c.hero && last.hero === c.hero : last.type === oc.type);
+    if (!on) return cardValue(s, id);
+    const key = id + ":" + ((s.flash || {})[id] || 0) + ":live";
+    let v = cvCache.get(key);
+    if (v == null) { v = valueOf(c.fx, { live: true }); cvCache.set(key, v); }
+    return v;
+  }
+  // 「… 카드를 차례로 내면」 패시브(passive.js seqStep) — 반쯤 이은 차례는 그만큼 값이 있다(다음 종류의 카드를 낼 수 있을 때만).
+  // 한 장씩 고르는 손(depth 1)이 공격 → 스킬 → 강화 를 이어 가게 하는 덤. 값은 그 패시브 효과 × 이은 몫(potential 과 같은 눈금)
+  function seqBonus(s) {
+    if (!C.seqStep || !s.passives) return 0;
+    let v = 0;
+    for (const u of s.party) {
+      if (u.dead) continue;
+      (s.passives[u.key] || []).forEach((r, i) => {
+        const w = r.when;
+        if (!w || !w.seq) return;
+        const k = C.seqStep(s, w, u.key, (s.counts || {})[`${u.key}|${i}|seq|${s.turn}`] || 0);
+        if (k <= 0 || k >= w.seq.length) return;
+        const want = w.seq[k];
+        const can = s.hand.some((id) => { const c = C.cardOf(s, id); return c && c.type === want && (w.who === "any" || c.hero === u.key) && !C.canPlay(s, id); });
+        if (can) v += 0.6 * 1.2 * u.atk * Math.max(0, valueOf(r.fx)) * (k / w.seq.length);
+      });
+    }
+    return v;
+  }
+  // 차례가 값어치를 바꾸는 손인가 — 순서 조건 카드가 손에 있거나 「차례로 내면」 패시브가 있으면 두 수 앞까지 둬 본다(smartPlay)
+  const orderly = (s) => s.hand.some((id) => orderCond((C.cardOf(s, id) || {}).fx))
+    || s.party.some((u) => !u.dead && ((s.passives || {})[u.key] || []).some((r) => r.when && r.when.seq));
 
   // 적 하나가 한 턴에 얼마나 아픈가 — 수의 평균(전체 공격은 셋을 친다). 처치 값어치에 쓴다
   const threatCache = new Map();
@@ -164,7 +199,7 @@ export function makeBots({ C, B, R, ENEMIES }) {
       // 연계 · 천상 — 손에 들고 있으면 다른 카드를 낼 때 공짜로 나간다. 비용 0 으로 치되, 깨울 카드가 있어야 하니 덜 친다
       const auto = C.hasTag && (C.hasTag(c, "연계") || C.hasTag(c, "천상"));
       const cost = auto ? 0 : c.xcost ? Math.max(1, ap) : C.costOf(s, id);
-      const v = cardValue(s, id) * (auto ? 0.7 : 1);
+      const v = liveValue(s, id, c) * (auto ? 0.7 : 1);
       if (v <= 0) continue;
       const o = c.hero ? s.party.find((u) => u.key === c.hero) : null;
       cards.push({ cost, v: v * 1.2 * (o ? o.atk : 12 * K) });
@@ -245,7 +280,7 @@ export function makeBots({ C, B, R, ENEMIES }) {
     // 턴 끝에 손에 있으면 아픈 카드(상태 카드) — 들고 넘기면 그만큼 깎인다
     for (const id of s.hand) { const c = C.cardOf(s, id); if (c && (c.fx || []).some((f) => f.k === "when" && f.on === "handEnd")) v -= 6 * K; }
     v -= 5 * K * (s.apJam || 0);
-    if (withPot && s.over !== "win") v += 0.6 * potential(s);
+    if (withPot && s.over !== "win") v += 0.6 * potential(s) + seqBonus(s);
     return v;
   }
 
@@ -327,10 +362,13 @@ export function makeBots({ C, B, R, ENEMIES }) {
 
   // 이번 턴에 둘 수를 하나씩 고른다. 턴 넘기기의 점수(남은 것 없이)보다 나은 수가 없으면 멈춘다.
   // depth 2 — 점수가 높은 수 width 개에 대해 그다음 한 수까지 둬 보고 더 나은 쪽(두 장을 묶어야 사는 수를 찾는다)
+  // 차례가 값어치를 바꾸는 손(orderly — 잇기 · 앞이 공격 · 차례로 내면)이면 그때만 두 수 앞까지(폭 2) 본다 — 늘 깊이 보면 meta-sim 이 느려진다
   function smartPlay(s, opt = {}) {
-    const depth = opt.depth || 1, width = opt.width || 3, trace = opt.trace;
+    const depth0 = opt.depth || 1, width0 = opt.width || 3, trace = opt.trace;
     let g = 0;
     while (!s.over && g++ < 60) {
+      const deep = depth0 < 2 && orderly(s);
+      const depth = deep ? 2 : depth0, width = deep ? 2 : width0;
       const stop = score(s, false);
       const ms = moves(s);
       if (!ms.length) break;

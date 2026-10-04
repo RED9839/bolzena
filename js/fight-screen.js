@@ -3269,8 +3269,22 @@ export function fightScreen(run, onDone, onQuit, opts = {}) {
           tags.push(`${whose} ${r.when.type || "카드"} ${cnt % r.when.every}/${r.when.every}${r.when.perTurn ? " · 이번 턴" : ""}`);
         }
         if (r.when.nth) tags.push(`파티 ${st.playedThisTurn || 0}장 · ${r.when.nth}장째에`);
+        // 「공격 · 스킬 · 강화 카드를 차례로 내면」 — 이번 턴 어디까지 이었나(「파티 차례 공격✓ → 스킬 → 강화」)
+        if (r.when.seq) {
+          const k = C.seqStep(st, r.when, u.key, (st.counts || {})[`${id}|seq|${st.turn}`] || 0);
+          tags.push(`${whose} 차례 ${r.when.seq.map((t, j) => (j < k ? `${t}✓` : t)).join(" → ")}`);
+        }
+        // 「「X」가 사라지면 · 다 닳으면」 — 지금 든 수(0 이 되는 순간에 돈다)
+        if (r.when.on === "stackGone") {
+          const kw = (st.kw || {})[r.when.id];
+          const held = kw && kw.carrier !== "self"
+            ? [...st.party.slice(0, 1), ...st.enemies].filter((x) => !x.dead && (x.status || {})[kw.id]).map((x) => `${x.side === "party" ? "파티" : x.ko} ${x.status[kw.id]}`)
+            : [`${(((st.stacks || {})[u.key] || {})[r.when.id]) || 0}개`];
+          tags.push(`「${r.when.id}」 ${held.length ? held.join(" · ") : "없음"}`);
+        }
         for (const c of r.conds || []) {
           if (c.c === "playedMax" || c.c === "playedMin") tags.push(`파티 ${st.playedThisTurn || 0}장`);
+          if (c.c === "stack" && c.not) tags.push(`「${c.id}」 ${(((st.stacks || {})[u.key] || {})[c.id]) || ((u.status || {})[c.id]) || 0}개`);
           if (c.c === "ownNone") tags.push(`${u.ko} 이번 턴 ${(st.playedBy || {})[u.key] || 0}장`);
         }
         if (r.limit) {

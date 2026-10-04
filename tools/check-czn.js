@@ -80,11 +80,25 @@ console.log("글 읽기 — 상태 문법");
   }
   const kw = [["연계. 적 1명에게 공격력 50% 피해", "tag:연계"], ["천상. 드로우 1", "tag:천상"], ["신속. 드로우 1", "tag:신속"], ["증발. 드로우 1", "tag:증발"],
     ["유일. 드로우 1", "tag:유일"], ["사용 불가. 증발.", "tag:사용불가"],
-    ["드로우 1. 연속: AP +1", "ifChain"], ["드로우 1. 영감: AP +1", "when:draw"], ["소멸. 턴 끝에 손에 있으면: 아군 전원 HP 20 소모", "when:handEnd"]];
+    ["드로우 1. 연속: AP +1", "ifChain"], ["드로우 1. 영감: AP +1", "when:draw"], ["소멸. 턴 끝에 손에 있으면: 아군 전원 HP 20 소모", "when:handEnd"],
+    // 박자형(docs/19) — 잇기 · 앞이 공격|스킬|강화 · 「X」가 없으면
+    ["적 1명에게 공격력 100% 피해. 잇기: 드로우 1", "ifLink"], ["드로우 1. 앞이 공격: AP +1", "ifPrev:공격"], ["드로우 1. 앞이 강화: AP +1", "ifPrev:강화"],
+    ["「박자」가 없으면 드로우 1", "ifStack:not"], ["「박자」가 있으면 드로우 1", "ifStack"], ["드로우 1. 「박자」가 없으면: 「박자」 +2", "ifStack:not"], ["드로우 1. 「박자」가 있으면: AP +1", "ifStack"]];
   for (const [t, w] of kw) {
-    const { fx, left } = parseEffect(t);
-    const got = fx.map((f) => (f.k === "tag" ? `tag:${f.id}` : f.k === "when" ? `when:${f.on}` : f.k));
+    const { fx, left } = parseEffect(t, { keywords: ["박자"] });
+    const got = fx.map((f) => (f.k === "tag" ? `tag:${f.id}` : f.k === "when" ? `when:${f.on}` : f.k === "ifPrev" ? `ifPrev:${f.type}` : f.k === "ifStack" && f.not ? "ifStack:not" : f.k));
     check(!left && got.includes(w), `「${t}」 → ${got.join(" · ")}`);
+  }
+  // 패시브 · 키워드 문법(박자형 · 예약형) — 차례로 내면 · 사라지면 · 다 닳으면 · 없으면 · 다른 사도의 카드를 내면 전부 사라진다
+  {
+    const [seq, named, gone, worn, none] = parsePassive("풀코스: 이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면 드로우 1 · 쌍검: 리코타의 공격 · 스킬 카드를 차례로 내면 드로우 1 · "
+      + "지움: 「박자」가 사라지면 드로우 1 · 시계: 「박자」가 다 닳으면 드로우 1 · 빈손: 턴 시작 시 「박자」가 없으면 드로우 1", ["박자"]);
+    check(seq.when.seq.join() === "공격,스킬,강화" && seq.when.who === "any" && !seq.left, "「이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면」 — 파티 차례(seq)");
+    check(named.when.seq.join() === "공격,스킬" && named.when.by === "리코타" && named.when.who !== "any", "「리코타의 공격 · 스킬 카드를 …」 — 그 사도 것만");
+    check(gone.when.on === "stackGone" && !gone.when.decay && worn.when.on === "stackGone" && worn.when.decay, "「「X」가 사라지면」 · 「「X」가 다 닳으면」(decay)");
+    check(none.conds.some((c) => c.c === "stack" && c.not) && !none.left, "패시브 조건 「「X」가 없으면」");
+    const k = parsePassiveKw("박자", "끊기면 처음부터. 최대 3. 다른 사도의 카드를 내면 전부 사라진다. 「박자」가 사라지면: 드로우 1.", ["박자"]);
+    check(k.wipe && !k.left.length && k.rules.length === 1, "키워드 줄 「다른 사도의 카드를 내면 전부 사라진다」(meta) · 「사라지면:」(규칙)");
   }
   check(!parseEffect("사기진작").fx.length && !parseEffect("적 전체에 「늑대 표식」 +2").fx.some((f) => f.k === "status"), "낱말 속 · 사도 표식은 상태가 아니다(사기진작 · 「늑대 표식」)");
   check(!parseEffect("잔광. 적 1명에게 공격력 50% 피해").fx.some((f) => f.k === "tag") && !parseEffect("드로우 1. 감응: AP +1").fx.some((f) => f.k === "when"),

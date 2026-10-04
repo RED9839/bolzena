@@ -74,7 +74,7 @@ for (const file of files) {
       else { read++; passiveDoes++; }
       if (r.left) errs.push(`패시브 「${r.name}」 — 못 읽은 말: 「${r.left}」 (${r.text})`);
       for (const c of r.conds) if (c.c === "stack" && c.id !== kwName && !STATUS.includes(c.id)) errs.push(`패시브 조건의 「${c.id}」 는 이 사도의 키워드가 아니다`);
-      if (r.when.on === "stackReach" && r.when.id !== kwName) errs.push(`패시브 「${r.name}」 — 「${r.when.id}」 는 이 사도의 키워드가 아니다`);
+      if ((r.when.on === "stackReach" || r.when.on === "stackGone") && r.when.id !== kwName) errs.push(`패시브 「${r.name}」 — 「${r.when.id}」 는 이 사도의 키워드가 아니다`);
       notes.push(`패시브 ${r.name}: [${whenLabel(r.when)}${r.conds.length ? " · " + r.conds.map(condLabel).join(" · ") : ""}${r.limit ? ` · ${r.limit.per === "turn" ? "턴당" : "전투당"} ${r.limit.n}회` : ""}] → ${what || "없음"}`);
       for (const f of r.fx) sane(f, `패시브 「${r.name}」`, errs, r.when.on === "always");
       capRule(r, `패시브 「${r.name}」`, errs);
@@ -357,8 +357,9 @@ function layers(r) {
 //   AP · 드로우는 언제 자체가 막는 것에만 — 턴 시작 · 턴 종료 · 전투 시작 · 파티가 이번 턴 N장째 · 「X」가 N개가 되면 ·
 //   이름의 1코 이상 카드를 N장(N ≥ 2 — 쓴 AP 보다 돌려받는 AP 가 늘 적다) · HP N% 이하 · 고학년 스킬. 드로우는 처치도(적 수만큼)
 function STRUCT(w) {
-  return ["turnStart", "turnEnd", "fightStart", "stackReach", "lowHp", "ult"].includes(w.on)
-    || (w.on === "play" && !!(w.nth || (w.every >= 2 && w.minCost >= 1)));
+  // 「「X」가 사라지면 · 다 닳으면」(쌓아야 비는 것) · 「… 카드를 차례로 내면」(장수를 치른다 — docs/19 박자형)도 언제 자체가 막는다
+  return ["turnStart", "turnEnd", "fightStart", "stackReach", "stackGone", "lowHp", "ult"].includes(w.on)
+    || (w.on === "play" && !!(w.nth || (w.seq && w.seq.length >= 2) || (w.every >= 2 && w.minCost >= 1)));
 }
 function capRule(r, where, errs) {
   if (r.limit && r.limit.per === "turn") errs.push(`${where} — 「(턴당 ${r.limit.n}회)」 는 쓰지 않는다. 턴에 한 번 도는 언제(턴 시작 시 · 파티가 이번 턴 N장째 …)나 값으로 막는다`);
@@ -392,10 +393,10 @@ function fxLabel(f) {
   }
 }
 function whenLabel(w) {
-  return { fightStart: "전투 시작", turnStart: "턴 시작", turnEnd: "턴 끝", play: `${w.sig ? "시그니처 " : ""}카드${w.type ? "(" + w.type + ")" : ""}${w.who === "any" ? "(파티)" : w.every ? "(자기)" : ""}${w.minCost ? ` ${w.minCost}코 이상` : ""}${w.every ? ` ${w.every}장마다` : ""}${w.nth ? ` ${w.nth}장째` : ""}`, kill: w.mine ? "처치" : "적 쓰러짐", hurt: w.who === "any" ? "아군 피격" : "피격", lowHp: `HP ${Math.round(w.pct * 100)}% 이하`, allyDown: "아군 쓰러짐", ult: "고학년 스킬", combo: "연계", rush: "적 즉시 행동", guard: `${w.who === "any" ? "아군 " : ""}${w.kind === "block" ? "방어" : w.kind === "shield" ? "실드" : "방어·실드"} 얻음`, debuff: "디버프 걺", overheal: "회복량 초과", stackReach: `${w.id} ${w.n}개`, always: "항상" }[w.on] || w.on;
+  return { fightStart: "전투 시작", turnStart: "턴 시작", turnEnd: "턴 끝", play: w.seq ? `${w.who === "any" ? "파티 " : ""}${w.seq.join(" → ")} 차례로` : `${w.sig ? "시그니처 " : ""}카드${w.type ? "(" + w.type + ")" : ""}${w.who === "any" ? "(파티)" : w.every ? "(자기)" : ""}${w.minCost ? ` ${w.minCost}코 이상` : ""}${w.every ? ` ${w.every}장마다` : ""}${w.nth ? ` ${w.nth}장째` : ""}`, kill: w.mine ? "처치" : "적 쓰러짐", hurt: w.who === "any" ? "아군 피격" : "피격", lowHp: `HP ${Math.round(w.pct * 100)}% 이하`, allyDown: "아군 쓰러짐", ult: "고학년 스킬", combo: "연계", rush: "적 즉시 행동", guard: `${w.who === "any" ? "아군 " : ""}${w.kind === "block" ? "방어" : w.kind === "shield" ? "실드" : "방어·실드"} 얻음`, debuff: "디버프 걺", overheal: "회복량 초과", stackReach: `${w.id} ${w.n}개`, stackGone: `${w.id} ${w.decay ? "다 닳음" : "사라짐"}`, always: "항상" }[w.on] || w.on;
 }
 function condLabel(c) {
-  return c.c === "stack" ? `${c.id} ${c.n}+` : c.c === "hp" ? `HP ${Math.round(c.pct * 100)}% 이하` : c.c === "hpMin" ? `HP ${Math.round(c.pct * 100)}% 이상` : c.c === "foes" ? `적 ${c.n}명+`
+  return c.c === "stack" ? (c.not ? `${c.id} 없음` : `${c.id} ${c.n}+`) : c.c === "hp" ? `HP ${Math.round(c.pct * 100)}% 이하` : c.c === "hpMin" ? `HP ${Math.round(c.pct * 100)}% 이상` : c.c === "foes" ? `적 ${c.n}명+`
     : c.c === "foesMax" ? `적 ${c.n}명 이하` : c.c === "playedMax" ? `파티 ${c.n}장 이하` : c.c === "playedMin" ? `파티 ${c.n}장 이상` : c.c === "ownNone" ? "자기 카드 안 냄"
     : c.c === "apLeft" ? `AP ${c.n} 남음` : c.c === "gauge" ? `게이지 ${c.n}%+` : c.c === "guarded" ? "방어·실드 있음" : c.c === "rushed" ? "적 즉시 행동했음" : c.c;
 }

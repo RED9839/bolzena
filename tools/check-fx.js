@@ -302,7 +302,7 @@ console.log("안 도는 조각");
 console.log("");
 console.log("전체");
 {
-  const KNOWN = new Set(["ifStack", "targetLowest", "perStack", "dmg", "block", "shield", "heal", "draw", "ap", "gauge",
+  const KNOWN = new Set(["ifStack", "ifLink", "ifPrev", "targetLowest", "perStack", "dmg", "block", "shield", "heal", "draw", "ap", "gauge",
     "status", "strip", "cleanse", "invuln", "immune", "stack", "spend", "capStack", "trigger", "payHp", "payHpPct", "discard"]);
   let live = 0, pend = 0;
   for (const c of Object.values(B.cards)) for (const f of c.fx) (KNOWN.has(f.k) ? live++ : pend++);
