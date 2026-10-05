@@ -1,0 +1,701 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Bolzena.RunUI
+{
+    // 사도를 고르고 살피는 화면 셋 — 다른 판 화면과 같은 어두운 남색 판 + 금 테(Docs/톤.md). 카제나 「팀 편성」 · 「전투원 목록」 · 「상세 정보」 의 배치만 따른다.
+    //   편성(PartyScreen): 큰 세로 사도 카드 셋(스탠딩 · 이어진 수치 판) · 아래 왼쪽 추천 편성 · 시작 덱 평균 비용 · 오른쪽 이번 층 판 · 「모험 시작」
+    //   사도 목록(HeroList): 왼쪽 성격 탭 · 카드 격자(스탠딩 상반신 · 파티 = 금 테 + 번호 · 보고 있는 사도 = 하늘 테) · 아래 「상세 정보」 · 「편성」
+    //   사도 상세(HeroDetail): 왼쪽 초상 줄 · 세로 메뉴(능력치 · 카드 · 고유 효과) · 큰 스탠딩 + 기울어진 색 판 · 수치 표
+    // 그림: 스탠딩(CardArt.Standing · Upper) — 없으면 미니미 SD · 초상으로 대신.
+    public partial class Flow
+    {
+        // ── 판 조각 ──
+        /// <summary>바탕 — 맨 뒤 남색(불투명이면 밑 화면이 비치지 않는다) · 가운데 남색 빛 · 아래 그늘 · 가는 금빛 사선.</summary>
+        static void RosterBg(RectTransform root, float alpha = 1f)
+        {
+            var bg = Ui.Img(root, Theme.White, Theme.Night.A(alpha), "rosterbg", true); bg.rectTransform.Fill();
+            var halo = Ui.Img(root, Theme.S("soft"), Theme.NavyCell.A(0.7f), "halo"); halo.rectTransform.At(0.55f, 0.6f, 0, 0, 1900, 1200);
+            var low = Ui.Img(root, Theme.S("fade_down"), Theme.Night.A(0.8f), "low"); low.rectTransform.Band(0, 300);
+            for (int i = 0; i < 5; i++)
+            {
+                var ln = Ui.Img(root, Theme.White, Theme.Edge.A(0.05f), "deco");
+                ln.rectTransform.At(0.5f, 0.5f, -700 + i * 360, 0, 1, 1400);
+                ln.rectTransform.localRotation = Quaternion.Euler(0, 0, -28);
+            }
+        }
+
+        /// <summary>큰 판(남색 + 얇은 금 테 — panel.png).</summary>
+        static RectTransform NavyBox(Transform parent, string name = "panel", float alpha = 0.96f)
+            => Ui.Img(parent, Theme.Panel, Color.white.A(alpha), name, true).rectTransform;
+
+        TextMeshProUGUI RosterHead(RectTransform root, string title, Action back, bool info = true)
+        {
+            var bk = Btn.Icon(root, Theme.S("ic_back"), back, 56, "back");
+            bk.GetComponent<RectTransform>().At(0, 1, Theme.Gutter, -18, 56, 56);
+            Stage.Hot["back"] = bk;
+            var t = Ui.Title(root, title, Theme.Fs2xl - 4, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+            t.rectTransform.At(0, 1, Theme.Gutter + 72, -16, 600, 60);
+            t.textWrappingMode = TextWrappingModes.NoWrap; t.Outline(0.2f);
+            if (info)
+            {
+                var ii = Ui.Img(root, Theme.S("ic_info"), Theme.Dim, "info"); ii.preserveAspect = true;
+                ii.rectTransform.At(0, 1, Theme.Gutter + 72 + t.preferredWidth + 10, -34, 24, 24);
+            }
+            return t;
+        }
+
+        /// <summary>남색 알약 단추(금 테) — 아이콘 + 글.</summary>
+        Btn NavyPill(Transform parent, string icon, string label, Action go, string name, float w = -1, float h = 52, Color? text = null)
+        {
+            var b = Btn.Make(parent, null, BtnStyle.PillDark, go, 0, name);
+            var rt = b.GetComponent<RectTransform>();
+            Ui.Row(rt, 8, TextAnchor.MiddleCenter, new RectOffset(icon != null ? 16 : 22, 22, 6, 6), false, false);
+            if (icon != null) { var ic = Ui.Img(rt, Theme.S(icon), Theme.Gold, "ic"); ic.preserveAspect = true; ic.Pref(24, 24); }
+            var t = Ui.Title(rt, label, Theme.FsBody, text ?? Theme.Ink); t.textWrappingMode = TextWrappingModes.NoWrap;
+            b.Label = t;
+            b.Pref(w, h);
+            return b;
+        }
+
+        static Color NatureCol(HeroInfo h) => Theme.NatureCardOf(h?.nature);
+
+        Sprite Icon(string key) => Theme.Icon(key);
+
+        /// <summary>사도 그림을 rt 에 채운다 — 스탠딩(위에서 frac 만큼, rt 비율로 자름) → 없으면 미니미 SD(spine) → 초상.</summary>
+        void HeroArt(RectTransform rt, HeroInfo h, float w, float hgt, float frac, float spineH, float phase = 0, Color? tint = null)
+        {
+            var up = h?.art != null ? CardArt.Upper(h.art, w / hgt, frac) : null;
+            if (up != null)
+            {
+                var im = Ui.Img(rt, up, tint ?? Color.white, "standing"); im.rectTransform.Fill();
+                return;
+            }
+            var spot = Ui.Rect("mini", rt).At(0.5f, 0, 0, hgt * 0.06f, 10, 10);
+            var g = spineH > 0 ? SpineUi.Make(spot, "minimi", h?.MiniSkin, spineH, "Idle", "idle") : null;
+            if (g != null) { g.AnimationState.Update(phase); if (tint != null) g.color = tint.Value; return; }
+            if (h?.Icon != null) { var face = Ui.Img(rt, h.Icon, tint ?? Color.white, "icon"); face.rectTransform.At(0.5f, 1, 0, 0, w * 1.08f, w * 1.08f); face.preserveAspect = true; }
+        }
+
+        // ═════════════════════════════ 편성 ═════════════════════════════
+        void BuildPartyLight(RectTransform root, PartyState st)
+        {
+            Ui.Clear(root);
+            RosterBg(root, 0.8f);
+            int count = st.Slots.Count(s => s != null);
+            RosterHead(root, "팀 편성", () => VillageReveal(st.Village, () => Party(st.Village)));
+            var size = Stage.Size;
+            float side = Theme.C(440, 400);
+            float top = 96, bottom = Theme.C(104, 92);
+            float leftW = size.x - side - Theme.Gutter * 3;
+            float plateH = Theme.C(78, 66);
+            float cardH = size.y - top - bottom - plateH - 10;
+            float gap = Theme.C(22, 14);
+            float cw = Mathf.Min((leftW - gap * 2) / 3f, cardH * 0.74f);
+            float x0 = Theme.Gutter + (leftW - (cw * 3 + gap * 2)) / 2f;
+            for (int i = 0; i < 3; i++)
+            {
+                var slot = Ui.Rect("slot" + i, root).At(0, 1, x0 + i * (cw + gap), -top, cw, cardH + plateH + 6);
+                PartyCard(slot, st, i, cw, cardH, plateH, root);
+                Tw.Rise(slot, 0.05f + i * 0.07f, 30, 0.45f);
+            }
+
+            // 아래 왼쪽 — 추천 편성 · 시작 덱 평균 비용 · 성격 점
+            var row = Ui.Rect("tools", root).At(0, 0, Theme.Gutter, Theme.C(24, 18), leftW, 58);
+            Ui.Row(row, 12, TextAnchor.MiddleLeft, null, false, true);
+            var auto = NavyPill(row, "ic_refresh", "추천 편성", () => { AutoParty(st); BuildPartyLight(root, st); }, "auto", -1, 58);
+            auto.Label.fontSize = Theme.FsMd;
+            Stage.Hot["party.auto"] = auto;
+            var picked = st.Slots.Where(k => k != null).Select(Roster.ByKey).Where(h => h != null && h.Playable).ToList();
+            var starter = picked.SelectMany(h => P.Data.Hero(h.CoreId)?.Starter ?? new List<string>()).Select(id => P.Data.Card(id)).Where(c => c != null && !c.X).ToList();
+            var deckChip = Ui.Img(row, Theme.S("pill_dark", 46), Color.white.A(0.94f), "deck"); deckChip.Pref(340, 58);
+            var dic = Ui.Img(deckChip.transform, Theme.S("ic_deck"), Theme.Gold, "ic"); dic.rectTransform.At(0, 0.5f, 18, 0, 26, 26); dic.preserveAspect = true;
+            var dtt = Ui.Title(deckChip.transform, $"<size=70%><color={Theme.SubTag}>시작 덱 {starter.Count}장 · 평균 비용</color></size>  <color={Theme.GoldTag}>{(starter.Count > 0 ? starter.Average(c => c.Cost).ToString("0.0") : "—")}</color>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+            dtt.rectTransform.Fill(54, 0, 12, 0); dtt.textWrappingMode = TextWrappingModes.NoWrap;
+            foreach (var g in picked.GroupBy(h => h.nature))
+            {
+                var nc = Ui.Img(row, Theme.S("pill_dark", 46), Color.white.A(0.94f), "nat"); nc.Pref(96, 58);
+                var ni = Ui.Img(nc.transform, Icon("성격_" + g.Key), Color.white, "ic"); ni.rectTransform.At(0, 0.5f, 14, 0, 28, 28); ni.preserveAspect = true;
+                var nt = Ui.Title(nc.transform, "×" + g.Count(), Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); nt.rectTransform.Fill(50, 0, 6, 0);
+            }
+
+            // 오른쪽 — 이번 층
+            var right = NavyBox(root, "floor");
+            right.At(1, 1, -Theme.Gutter, -top + 4, side, size.y - top - bottom - 2);
+            FloorPanelLight(right, st.Village, side);
+            Tw.Rise(right, 0.1f, 30, 0.45f, Vector2.right);
+
+            // 「모험 시작」 — 주 동작(금 알약), 왼쪽 동그라미 아이콘
+            var go = Btn.Make(root, null, BtnStyle.PillGold, () =>
+            {
+                var party = st.Slots.Select(k => Roster.ByKey(k).CoreId).ToList();
+                var rows = Enumerable.Range(0, 3).ToDictionary(i => party[i], i => RowKey[i]);
+                RunPort.ClearSave();
+                P.NewRun(party, st.Village, DateTime.Now.Ticks & 0x7fffffff);
+                foreach (var kv in rows) P.S.Rows[kv.Key] = kv.Value;
+                MapStep();
+            }, 0, "go");
+            var grt = go.GetComponent<RectTransform>(); grt.At(1, 0, -Theme.Gutter, Theme.C(20, 14), side, Theme.C(76, 66));
+            var disc = Ui.Img(grt, Theme.S("circle"), Theme.Brown.A(0.16f), "disc"); disc.rectTransform.At(0, 0.5f, 14, 0, 50, 50);
+            var dring = Ui.Img(disc.transform, Theme.S("ring"), Theme.Brown.A(0.5f), "ring"); dring.rectTransform.Fill();
+            var dp = Ui.Img(disc.transform, Theme.S("ic_play"), Theme.Brown, "ic"); dp.rectTransform.Fill(15, 14, 13, 14); dp.preserveAspect = true;
+            var gl = Ui.Title(grt, count < 3 ? $"사도 {3 - count}명 더" : "모험 시작", Theme.FsXl, Theme.Brown, TextAlignmentOptions.MidlineRight);
+            gl.rectTransform.Fill(80, 4, 34, 4);
+            go.Label = gl;
+            go.Interactable = count == 3;
+            go.Why = "사도 셋을 고르세요";
+            Stage.Hot["party.go"] = go;
+            if (count == 3) Tw.Breathe(go.transform, 0.015f, 1.4f);
+        }
+
+        /// <summary>빈 칸을 줄에 맞는 고를 수 있는 사도로 채운다(추천 편성).</summary>
+        void AutoParty(PartyState st)
+        {
+            var pool = Roster.All.Where(h => h.Playable && !st.Slots.Contains(h.key)).ToList();
+            for (int i = 0; i < 3; i++)
+            {
+                if (st.Slots[i] != null) continue;
+                var pick = pool.FirstOrDefault(h => (P.Data.Hero(h.CoreId)?.Row ?? h.row) == RowKey[i]) ?? pool.FirstOrDefault();
+                if (pick == null) break;
+                st.Slots[i] = pick.key; pool.Remove(pick);
+            }
+        }
+
+        // 큰 세로 사도 카드(스탠딩) + 이어진 수치 판
+        void PartyCard(RectTransform slot, PartyState st, int i, float w, float h, float plateH, RectTransform root)
+        {
+            var key = st.Slots[i];
+            var hero = key != null ? Roster.ByKey(key) : null;
+            var b = Btn.Make(slot, null, BtnStyle.Ghost, () => HeroList(st, i, () => BuildPartyLight(root, st)), 0, "card" + i);
+            b.Bg.sprite = Theme.Round;
+            var rt = b.GetComponent<RectTransform>(); rt.At(0, 1, 0, 0, w, h);
+            Stage.Hot["slot" + i] = b;
+            if (hero == null)
+            {
+                b.SetColor(Theme.NavyCell.A(0.85f));
+                var rim0 = Ui.Img(rt, Theme.Frame, Theme.Edge.A(0.45f), "rim"); rim0.rectTransform.Fill();
+                var plus = Ui.Img(rt, Theme.S("circle"), Theme.Gold, "plus"); plus.rectTransform.At(0.5f, 0.5f, 0, 30, 76, 76);
+                var pi = Ui.Img(plus.transform, Theme.S("ic_plus"), Theme.Brown, "ic"); pi.rectTransform.Fill(20, 20, 20, 20);
+                Tw.Breathe(plus.transform, 0.05f, 1.5f, i * 0.3f);
+                var t0 = Ui.Title(rt, "사도 넣기", Theme.FsLg, Theme.Ink, TextAlignmentOptions.Center); t0.rectTransform.At(0.5f, 0.5f, 0, -36, 300, 34);
+                var r0 = Ui.Title(rt, RowKo[i], Theme.Fs2xl, Theme.Dim, TextAlignmentOptions.BottomLeft); r0.rectTransform.At(0, 0, 18, 12, 200, 56);
+                var plate0 = NavyBox(slot, "plate", 0.75f); plate0.At(0, 1, 0, -(h + 6), w, plateH);
+                var pt0 = Ui.Text(plate0, "눌러서 사도 목록에서 고릅니다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); pt0.rectTransform.Fill(10, 0, 10, 0);
+                return;
+            }
+            var nc = NatureCol(hero);
+            b.SetColor(Color.Lerp(Theme.NavyWell, nc, 0.3f));
+            var glow = Ui.Img(rt, Theme.S("fade_top"), nc.A(0.5f), "glow"); glow.rectTransform.Fill(2, 2, 2, 2);
+            var halo = Ui.Img(rt, Theme.S("soft"), Color.Lerp(nc, Color.white, 0.4f).A(0.28f), "halo"); halo.rectTransform.At(0.5f, 0.5f, 0, 40, w * 1.3f, w * 1.3f);
+            var mask = Ui.Img(rt, Theme.Round, Color.white, "mask"); mask.rectTransform.Fill(3, 3, 3, 3); mask.gameObject.AddComponent<Mask>().showMaskGraphic = false;
+            // 스탠딩 — 무릎께까지(카드가 키가 크다)
+            HeroArt(mask.rectTransform, hero, w - 6, h - 6, 0.72f, Mathf.Min(h * 0.46f, 300), i * 0.37f);
+            var shade = Ui.Img(rt, Theme.S("fade_down"), Color.black.A(0.72f), "shade"); shade.rectTransform.Band(0, h * 0.32f, 3, 3, 3);
+            var shadeT = Ui.Img(rt, Theme.S("fade_top"), Color.black.A(0.35f), "shadeT"); shadeT.rectTransform.Band(1, 120, 3, 3, -3);
+            // 왼쪽 위 세로 아이콘 열 — 역할 · 성격 · 본래 줄
+            var col = Ui.Rect("icons", rt).At(0, 1, 12, -12, 34, 200);
+            Ui.Col(col, 6, TextAnchor.UpperLeft, null, false, false);
+            foreach (var k in new[] { "역할_" + hero.role, "성격_" + hero.nature, "위치_" + hero.RowKo })
+            {
+                var sp = Icon(k); if (sp == null) continue;
+                var ic = Ui.Img(col, sp, Color.white, k); ic.Pref(32, 32); ic.preserveAspect = true;
+            }
+            // 오른쪽 위 돋보기
+            var zoom = Btn.Icon(rt, Theme.S("ic_zoom"), () => HeroDetail(key, st.Slots.Where(x => x != null).ToList(), () => BuildPartyLight(root, st)), 44, "zoom");
+            zoom.GetComponent<RectTransform>().At(1, 1, -10, -10, 44, 44);
+            Stage.Hot["zoom" + i] = zoom;
+            // 왼쪽 아래 큰 줄 이름 · 오른쪽 아래 장비 칸(빈 칸)
+            var rowT = Ui.Title(rt, $"<size=45%>자리 {i + 1}</size>\n{RowKo[i]}", Theme.Fs2xl, Color.white, TextAlignmentOptions.BottomLeft);
+            rowT.rectTransform.At(0, 0, 16, 10, 160, 80); rowT.lineSpacing = -22; rowT.Outline(0.22f);
+            var own = P.Data.Hero(hero.CoreId)?.Row ?? hero.row;
+            if (own != RowKey[i]) { var warn = Ui.Text(rt, $"본래 {(own == "front" ? "전열" : own == "mid" ? "중열" : "후열")}", Theme.FsCap, Theme.Gold, TextAlignmentOptions.BottomLeft); warn.rectTransform.At(0, 0, 18, 88, 140, 20); warn.Outline(0.25f); }
+            for (int s = 0; s < RunPort.Slots.Length; s++)
+            {
+                var box = Ui.Img(rt, Theme.Round, Color.black.A(0.45f), "gear" + s); box.rectTransform.At(1, 0, -12 - (2 - s) * 40, 14, 34, 34);
+                var gi = Ui.Img(box.transform, W.SlotIcon(RunPort.Slots[s]), Color.white.A(0.4f), "ic"); gi.rectTransform.Fill(8, 8, 8, 8); gi.preserveAspect = true;
+            }
+            var rim = Ui.Img(rt, Theme.Frame, nc, "rim"); rim.rectTransform.Fill();
+            // 이어진 수치 판 — 이름 · 핵심 수치
+            var plate = NavyBox(slot, "plate"); plate.At(0, 1, 0, -(h + 6), w, plateH);
+            var stripe = Ui.Img(plate, Theme.Round, nc, "stripe"); stripe.rectTransform.At(0, 0.5f, 10, 0, 5, plateH - 24);
+            var d = P.Data.Hero(hero.CoreId);
+            var nm = Ui.Title(plate, $"{hero.ko}  <size=70%><color={Theme.GoldTag}>{new string('★', Mathf.Clamp(hero.star, 1, 5))}</color></size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.TopLeft); nm.rectTransform.Fill(24, plateH * 0.45f, 10, 9);
+            nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 14; nm.fontSizeMax = Theme.FsLg;
+            var stt = Ui.Text(plate, $"HP <b>{d?.Hp ?? hero.hp:N0}</b>   공격 <b>{d?.Atk ?? hero.atk}</b>   방어 <b>{d?.Def ?? hero.def}</b>", Theme.FsSm, Theme.Sub, TextAlignmentOptions.BottomLeft);
+            stt.rectTransform.Fill(24, 9, 10, plateH * 0.5f); stt.textWrappingMode = TextWrappingModes.NoWrap; stt.enableAutoSizing = true; stt.fontSizeMin = 11; stt.fontSizeMax = Theme.FsSm;
+        }
+
+        void FloorPanelLight(RectTransform panel, string villageId, float w)
+        {
+            var v = P.Village(villageId);
+            var f = v.Floors[0];
+            var body = Ui.Rect("body", panel).Fill(24, 18, 24, 20);
+            Ui.Col(body, 8, TextAnchor.UpperLeft, null, true, false);
+            var chip = Ui.Text(body, $"{v.Name} · {v.Race} 마을", Theme.FsSm, Theme.Sub); chip.Pref(-1, 22);
+            var t = Ui.Title(body, $"1층 · {f.Name}", Theme.FsXl + 2, Theme.Gold); t.Pref(-1, 44);
+            t.textWrappingMode = TextWrappingModes.NoWrap; t.enableAutoSizing = true; t.fontSizeMin = 18; t.fontSizeMax = Theme.FsXl + 2;
+            void Band(string label, string val, string icon)
+            {
+                var b = Ui.Img(body, Theme.Round, Theme.NavyWell.A(0.7f), "band"); b.Pref(-1, 40);
+                if (icon != null) { var ic = Ui.Img(b.transform, Theme.S(icon), Theme.Gold, "ic"); ic.rectTransform.At(0, 0.5f, 12, 0, 22, 22); ic.preserveAspect = true; }
+                var l = Ui.Title(b.transform, label, Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); l.rectTransform.Fill(icon != null ? 44 : 14, 0, 0, 0);
+                if (val != null) { var r = Ui.Text(b.transform, val, Theme.FsSm, Theme.Sub, TextAlignmentOptions.MidlineRight); r.rectTransform.Fill(0, 0, 14, 0); r.textWrappingMode = TextWrappingModes.NoWrap; }
+            }
+            Band("층의 모습", f.Sub, "ic_flag");
+            Band("보스", null, "ic_crown");
+            var bossRow = Ui.Rect("boss", body); bossRow.Pref(-1, 78);
+            Ui.Row(bossRow, 10, TextAnchor.MiddleLeft, new RectOffset(4, 0, 0, 0), false, false);
+            foreach (var id in f.Boss.Distinct()) FoeCell(bossRow, id, true);
+            var foes = f.Pools.SelectMany(p => p).SelectMany(x => x).Concat(f.Elites.SelectMany(x => x)).Distinct().Where(id => !f.Boss.Contains(id)).ToList();
+            Band("나오는 적", foes.Count + "종", "ic_skull");
+            var foeGrid = Ui.Rect("foes", body); foeGrid.Pref(-1, Theme.C(176, 92));
+            var grid = foeGrid.gameObject.AddComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(70, 80); grid.spacing = new Vector2(8, 8); grid.padding = new RectOffset(4, 0, 0, 0);
+            foreach (var id in foes.Take(Theme.Compact ? 4 : 10)) FoeCell(foeGrid, id, false);
+            var line = Ui.Text(body, v.Line ?? "", Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft); line.Pref(-1, 44);
+            line.enableAutoSizing = true; line.fontSizeMin = 11; line.fontSizeMax = Theme.FsSm;
+        }
+
+        void FoeCell(RectTransform parent, string id, bool boss)
+        {
+            var e = P.Data.Enemy(id);
+            var cell = Ui.Rect("foe " + id, parent); cell.Pref(70, boss ? 78 : 80); cell.sizeDelta = new Vector2(70, 80);
+            var nc = Theme.NatureCardOf(e?.Nature);
+            var disc = Ui.Img(cell, Theme.S("circle"), Color.Lerp(Theme.NavyWell, nc, 0.35f), "disc"); disc.rectTransform.At(0.5f, 1, 0, 0, 56, 56);
+            var ring = Ui.Img(disc.transform, Theme.S("ring"), (boss ? Theme.Gold : Theme.Edge).A(0.8f), "ring"); ring.rectTransform.Fill();
+            var ic = Ui.Img(disc.transform, Theme.S(boss ? "ic_crown" : "ic_skull"), Color.white.A(0.9f), "ic"); ic.rectTransform.Fill(14, 14, 14, 14); ic.preserveAspect = true;
+            var ni = Icon("성격_" + e?.Nature);
+            if (ni != null) { var nb = Ui.Img(disc.transform, ni, Color.white, "nat"); nb.rectTransform.At(1, 0, 6, -6, 22, 22); nb.preserveAspect = true; }
+            var nm = Ui.Text(cell, e?.Name ?? id, Theme.FsCap - 1, Theme.Ink, TextAlignmentOptions.Top); nm.rectTransform.At(0.5f, 1, 0, -58, 76, 22);
+            nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 9; nm.fontSizeMax = Theme.FsCap - 1;
+        }
+
+        // ═════════════════════════════ 사도 목록 ═════════════════════════════
+        // 목록 상태 — 다시 그려도(파티 넣기 · 상세에서 돌아오기) 필터 · 정렬 · 고른 사도 · 스크롤 자리를 그대로 둔다.
+        class ListState { public string Nature; public string Sort = "성급"; public bool Quick = true; public string Focus; public float ScrollY; public bool Drawn; }
+        static readonly string[] Sorts = { "성급", "이름", "역할", "종족" };
+
+        /// <summary>정렬 — 성급(높은 별 먼저) · 이름 · 역할 · 종족, 같으면 가나다순.</summary>
+        static IEnumerable<HeroInfo> SortHeroes(IEnumerable<HeroInfo> list, string sort) => sort switch
+        {
+            "이름" => list.OrderBy(h => h.ko, StringComparer.Ordinal),
+            "역할" => list.OrderBy(h => h.role, StringComparer.Ordinal).ThenBy(h => h.ko, StringComparer.Ordinal),
+            "종족" => list.OrderBy(h => h.race, StringComparer.Ordinal).ThenBy(h => h.ko, StringComparer.Ordinal),
+            _ => list.OrderByDescending(h => h.star).ThenBy(h => h.ko, StringComparer.Ordinal),
+        };
+
+        /// <summary>사도 목록 — st 가 있으면 편성(target 칸에 넣기 · 빼기), 없으면 도감(보기만). done 은 닫을 때.</summary>
+        void HeroList(PartyState st, int target, Action done, ListState ls = null, RectTransform host = null)
+        {
+            ls ??= new ListState { Focus = st != null && target >= 0 ? st.Slots[target] : null };
+            var size = Stage.Size;
+            // host 가 있으면 그 화면에 그린다(도감), 없으면 창 층에 덮는다(편성)
+            var layer = host != null ? host : Ui.Rect("modal herolist", Stage.ModalLayer).Fill();
+            if (host != null) Ui.Clear(host);
+            RosterBg(layer, host != null ? 0.9f : 1f);
+            void Close() { if (host == null && layer) Destroy(layer.gameObject); done?.Invoke(); }
+            void Rebuild() { if (host == null && layer) Destroy(layer.gameObject); HeroList(st, target, done, ls, host); }
+            void Refilter() { ls.ScrollY = 0; Rebuild(); }
+            bool dex = st == null;
+            RosterHead(layer, "사도 목록", Close);
+
+            // 위 오른쪽 — 빠른 편성 · 정렬 · (도감) 교주 카드 · 장비
+            var tr = Ui.Rect("tools", layer).At(1, 1, -Theme.Gutter, -20, 900, 52);
+            Ui.Row(tr, 10, TextAnchor.MiddleRight, null, false, true);
+            if (!dex)
+            {
+                var q = Btn.Make(tr, null, BtnStyle.PillDark, () => { ls.Quick = !ls.Quick; Rebuild(); }, 0, "quick");
+                Ui.Row(q.GetComponent<RectTransform>(), 8, TextAnchor.MiddleCenter, new RectOffset(18, 12, 6, 6), false, false);
+                var qt = Ui.Title(q.transform, "빠른 편성", Theme.FsBody, Theme.Ink); qt.textWrappingMode = TextWrappingModes.NoWrap;
+                var pill = Ui.Img(q.transform, Theme.Pill, ls.Quick ? Theme.Gold : Theme.NavyWell, "sw"); pill.Pref(48, 26);
+                var knob = Ui.Img(pill.transform, Theme.S("circle"), ls.Quick ? Theme.Brown : Theme.Dim, "knob"); knob.rectTransform.At(ls.Quick ? 1 : 0, 0.5f, ls.Quick ? -3 : 3, 0, 20, 20);
+                q.Pref(-1, 52);
+                Stage.Hot["list.quick"] = q;
+            }
+            var sb = NavyPill(tr, "ic_refresh", $"<color={Theme.SubTag}>정렬</color>  {ls.Sort}", () => { ls.Sort = Sorts[(Array.IndexOf(Sorts, ls.Sort) + 1) % Sorts.Length]; Refilter(); }, "sort", 168);
+            Stage.Hot["list.sort"] = sb;
+            if (dex)
+            {
+                DexTabs(tr, host, "사도", done);   // 도감 탭 — 같은 화면 틀(Flow.Dex.cs)
+            }
+
+            // 왼쪽 세로 성격 탭 — ALL + 다섯(덱 보기 탭 줄과 같은 꼴: 고른 탭은 금빛 바탕 + 왼쪽 금 막대)
+            float railW = 76;
+            var rail = Ui.Rect("rail", layer); rail.anchorMin = new Vector2(0, 0); rail.anchorMax = new Vector2(0, 1); rail.pivot = new Vector2(0, 1);
+            rail.sizeDelta = new Vector2(railW, -110); rail.anchoredPosition = new Vector2(Theme.Gutter, -96);
+            Ui.Col(rail, 10, TextAnchor.UpperCenter, null, false, false);
+            void Tab(string nat, string label)
+            {
+                bool on = ls.Nature == nat;
+                var b = Btn.Make(rail, null, BtnStyle.Ghost, () => { ls.Nature = nat; Refilter(); }, 0, "tab " + label);
+                b.Bg.sprite = Theme.Round; b.SetColor(on ? Theme.Gold.A(0.16f) : Theme.NavyCell.A(0.6f));
+                b.Pref(railW, 62);
+                if (nat == null) { var t = Ui.Title(b.transform, "ALL", Theme.FsLg, on ? Theme.Gold : Theme.Sub, TextAlignmentOptions.Center); t.rectTransform.Fill(); }
+                else { var ic = Ui.Img(b.transform, Icon("성격_" + nat), on ? Color.white : Color.white.A(0.5f), "ic"); ic.rectTransform.Fill(14, 12, 14, 12); ic.preserveAspect = true; }
+                if (on)
+                {
+                    var br = Ui.Img(b.transform, Theme.Frame, Theme.Gold, "on"); br.rectTransform.Fill();
+                    var bar = Ui.Img(b.transform, Theme.Round, Theme.Gold, "bar"); bar.rectTransform.At(0, 0.5f, -10, 0, 4, 36);
+                }
+                Stage.Hot["nat:" + label] = b;
+            }
+            Tab(null, "ALL");
+            foreach (var n in new[] { "순수", "광기", "냉정", "우울", "활발" }) Tab(n, n);
+
+            // 카드 격자
+            float footH = Theme.C(84, 72);
+            var area = Ui.Rect("grid", layer); area.anchorMin = Vector2.zero; area.anchorMax = Vector2.one;
+            area.offsetMin = new Vector2(Theme.Gutter + railW + 16, footH + 8); area.offsetMax = new Vector2(-Theme.Gutter, -92);
+            var content = Ui.Scroll(area, out var sr);
+            ScrollBar(area, sr);
+            float k = Theme.C(1f, 0.86f);
+            var grid = content.gameObject.AddComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(150 * k, 214 * k); grid.spacing = new Vector2(14, 14); grid.padding = new RectOffset(6, 18, 8, 16);
+            grid.childAlignment = TextAnchor.UpperLeft;
+            var list = SortHeroes(Roster.All.Where(h => ls.Nature == null || h.nature == ls.Nature), ls.Sort);
+            if (!dex) list = list.OrderByDescending(h => h.Playable);   // 고를 수 있는 사도 먼저(안정 정렬 — 정렬 순서는 그대로)
+            var shown = list.ToList();
+            var shownKeys = shown.Select(x => x.key).ToList();
+            bool anim = !ls.Drawn;
+            int idx = 0;
+            foreach (var h in shown) ListCard(content, h, st, ls, target, k, idx++, anim, Rebuild, shownKeys);
+            ls.Drawn = true;
+            // 스크롤 자리 — 다시 그려도 보던 자리 그대로(첫 누름이 엉뚱한 칸에 가지 않게)
+            if (ls.ScrollY > 0)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(content);
+                float maxY = Mathf.Max(0, content.rect.height - ((RectTransform)sr.viewport).rect.height);
+                content.anchoredPosition = new Vector2(content.anchoredPosition.x, Mathf.Min(ls.ScrollY, maxY));
+                sr.StopMovement();
+            }
+            sr.onValueChanged.AddListener(_ => { if (content) ls.ScrollY = content.anchoredPosition.y; });
+
+            // 아래 — 남색 띠 · 가는 금 선 · 고른 사도 · 「완료」 · 「상세 정보」 · 「편성」
+            var fbg = Ui.Img(layer, Theme.White, Theme.NavyPanel.A(0.96f), "footbg", true); fbg.rectTransform.Band(0, footH, 0, 0, 0);
+            var line = Ui.Img(layer, Theme.White, Theme.Edge.A(0.35f), "rule"); line.rectTransform.Band(0, 1, 0, 0, footH);
+            var foot = Ui.Rect("foot", layer).Band(0, footH, Theme.Gutter, Theme.Gutter, 0);
+            var fh = ls.Focus != null ? Roster.ByKey(ls.Focus) : null;
+            var info = Ui.Text(foot, fh != null ? $"<b>{fh.ko}</b>  <color={Theme.SubTag}>{fh.nature} · {fh.race} · {fh.role} · {fh.RowKo}</color>" : (dex ? $"{shown.Count}명 · 누르면 상세 정보" : $"{shown.Count}명 · 파티 <color={Theme.GoldTag}>{st.Slots.Count(x => x != null)}</color> / 3"), Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+            info.rectTransform.Fill(0, 0, dex ? 280 : 720, 0); info.textWrappingMode = TextWrappingModes.NoWrap; info.overflowMode = TextOverflowModes.Ellipsis;
+            var detail = Btn.Make(foot, null, BtnStyle.PillDark, () => { if (fh != null) HeroDetail(fh.key, shownKeys, null); }, 0, "detail");
+            var drt = detail.GetComponent<RectTransform>(); drt.At(1, 0.5f, dex ? 0 : -274, 0, 250, 58);
+            var dzi = Ui.Img(drt, Theme.S("ic_zoom"), Theme.Gold, "ic"); dzi.rectTransform.At(0, 0.5f, 22, 0, 24, 24); dzi.preserveAspect = true;
+            var dl = Ui.Title(drt, "상세 정보", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight); dl.rectTransform.Fill(50, 0, 26, 0);
+            detail.Interactable = fh != null; detail.Why = "사도를 먼저 고르세요";
+            Stage.Hot["list.detail"] = detail;
+            if (!dex)
+            {
+                bool inParty = fh != null && st.Slots.Contains(fh.key);
+                var pick = Btn.Make(foot, null, inParty ? BtnStyle.PillRose : BtnStyle.PillDark, () =>
+                {
+                    if (fh == null) return;
+                    TogglePartyHero(st, fh, target);
+                    Rebuild();
+                }, 0, "pick");
+                var prt = pick.GetComponent<RectTransform>(); prt.At(1, 0.5f, 0, 0, 260, 58);
+                var pl = Ui.Title(prt, fh == null ? "편성" : inParty ? "빼기" : "편성", Theme.FsLg, Theme.Ink, TextAlignmentOptions.Center); pl.rectTransform.Fill();
+                pick.Interactable = fh != null && (fh.Playable || inParty); pick.Why = fh == null ? "사도를 먼저 고르세요" : $"{fh.ko} — 아직 판에 데려갈 수 없습니다(코어 데이터 준비 중)";
+                Stage.Hot["list.pick"] = pick;
+                var done2 = Btn.Make(foot, null, BtnStyle.PillGold, Close, 0, "done");
+                var d2 = done2.GetComponent<RectTransform>(); d2.At(1, 0.5f, -548, 0, 150, 58);
+                var dck = Ui.Img(d2, Theme.S("ic_check"), Theme.Brown, "ic"); dck.rectTransform.At(0, 0.5f, 20, 0, 22, 22); dck.preserveAspect = true;
+                var dtl = Ui.Title(d2, "완료", Theme.FsLg, Theme.Brown, TextAlignmentOptions.MidlineRight); dtl.rectTransform.Fill(46, 0, 24, 0);
+                Stage.Hot["list.done"] = done2;
+            }
+        }
+
+        /// <summary>파티에 넣기 · 빼기 — target 칸이 있으면 그 칸에, 없으면 본래 줄 → 빈 칸.</summary>
+        void TogglePartyHero(PartyState st, HeroInfo h, int target)
+        {
+            int at = Array.IndexOf(st.Slots, h.key);
+            if (at >= 0) { st.Slots[at] = null; return; }
+            if (!h.Playable) { Toast.Show($"{h.ko} — 아직 판에 데려갈 수 없습니다(코어 데이터 준비 중)"); return; }
+            int want = Array.IndexOf(RowKey, P.Data.Hero(h.CoreId)?.Row ?? h.row);
+            int slot = target >= 0 && st.Slots[target] == null ? target : want >= 0 && st.Slots[want] == null ? want : Array.IndexOf(st.Slots, null);
+            if (slot < 0 && target >= 0) slot = target;   // 칸을 눌러 열었으면 그 칸을 바꾼다
+            if (slot >= 0) st.Slots[slot] = h.key;
+            else Toast.Show("세 칸이 다 찼습니다 — 넣은 사도를 눌러 빼세요");
+        }
+
+        void ListCard(RectTransform content, HeroInfo h, PartyState st, ListState ls, int target, float k, int idx, bool anim, Action rebuild, List<string> shownKeys)
+        {
+            bool dex = st == null;
+            int at = dex ? -1 : Array.IndexOf(st.Slots, h.key);
+            bool locked = !dex && !h.Playable;
+            var nc = NatureCol(h);
+            var b = Btn.Make(content, null, BtnStyle.Ghost, () =>
+            {
+                ls.Focus = h.key;
+                // 도감 — 한 번 누르면 바로 상세(목록은 고른 사도 · 스크롤 그대로 뒤에 남는다)
+                if (dex) { rebuild(); HeroDetail(h.key, shownKeys, null); return; }
+                if (ls.Quick && !locked) TogglePartyHero(st, h, target);
+                else if (locked) Toast.Show($"{h.ko} — 아직 판에 데려갈 수 없습니다(코어 데이터 준비 중)");
+                rebuild();
+            }, 0, "hero " + h.key);
+            b.Bg.sprite = Theme.Round; b.SetColor(locked ? Theme.NavyCell : Color.Lerp(Theme.NavyWell, nc, 0.32f));
+            var rt = b.GetComponent<RectTransform>();
+            var glow = Ui.Img(rt, Theme.S("fade_top"), (locked ? Theme.Dim : nc).A(0.45f), "glow"); glow.rectTransform.Fill(2, 2, 2, 2);
+            var mask = Ui.Img(rt, Theme.Round, Color.white, "mask"); mask.rectTransform.Fill(2, 2, 2, 2); mask.gameObject.AddComponent<Mask>().showMaskGraphic = false;
+            // 스탠딩 상반신(없으면 초상)
+            HeroArt(mask.rectTransform, h, 150 * k - 4, 214 * k - 4, 0.5f, 0, 0, locked ? new Color(0.5f, 0.5f, 0.56f) : (Color?)null);
+            var shade = Ui.Img(rt, Theme.S("fade_down"), Color.black.A(0.8f), "shade"); shade.rectTransform.Band(0, 86 * k, 2, 2, 2);
+            var col = Ui.Rect("icons", rt).At(0, 1, 6, -6, 24 * k, 120 * k);
+            Ui.Col(col, 3, TextAnchor.UpperLeft, null, false, false);
+            foreach (var key in new[] { "역할_" + h.role, "성격_" + h.nature, "종족_" + h.race })
+            {
+                var sp = Icon(key); if (sp == null) continue;
+                var ic = Ui.Img(col, sp, locked ? Color.white.A(0.6f) : Color.white, key); ic.Pref(24 * k, 24 * k); ic.preserveAspect = true;
+            }
+            var stars = Ui.Title(rt, $"<size=70%>★</size>{h.star}", Theme.FsXl, Theme.Gold, TextAlignmentOptions.BottomLeft);
+            stars.rectTransform.At(0, 0, 8, 28 * k, 80, 34 * k); stars.Outline(0.25f);
+            var nm = Ui.Title(rt, h.ko, Theme.FsBody, Color.white, TextAlignmentOptions.BottomRight);
+            nm.rectTransform.Band(0, 26 * k, 6, 8, 6 * k);
+            nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 11; nm.fontSizeMax = Theme.FsBody; nm.Outline(0.25f);
+            var rim = Ui.Img(rt, Theme.Frame, (locked ? Theme.Dim : nc).A(0.85f), "rim"); rim.rectTransform.Fill();
+            if (locked) { var lk = Ui.Img(rt, Theme.S("ic_lock"), Color.white.A(0.8f), "lock"); lk.rectTransform.At(1, 1, -8, -8, 22 * k, 22 * k); lk.preserveAspect = true; }
+            if (at >= 0)
+            {
+                var veil = Ui.Img(rt, Theme.Round, Theme.Gold.A(0.12f), "veil"); veil.rectTransform.Fill();
+                var fr = Ui.Img(rt, Theme.S("frame_thick", 24), Theme.Gold, "party"); fr.rectTransform.Fill(-2, -2, -2, -2);
+                var no = Ui.Img(rt, Theme.S("circle"), Theme.Gold, "no"); no.rectTransform.At(1, 1, -6, -6, 32 * k, 32 * k);
+                var nt = Ui.Title(no.transform, (at + 1).ToString(), Theme.FsLg, Theme.Brown, TextAlignmentOptions.Center); nt.rectTransform.Fill();
+            }
+            else if (ls.Focus == h.key) { var fr = Ui.Img(rt, Theme.S("frame_thick", 24), Theme.Sky, "focus"); fr.rectTransform.Fill(-2, -2, -2, -2); }
+            if (h.Playable || dex) Stage.Hot["hero:" + h.key] = b;
+            if (anim && idx < 36) Tw.Pop(rt, 0.01f * idx, 0.88f, 0.28f);
+        }
+
+        // ═════════════════════════════ 사도 상세 ═════════════════════════════
+        /// <summary>사도 상세 — keys 는 왼쪽 초상 줄(위아래로 넘김), 없으면 그 사도 하나. back 이 없으면 닫기만.</summary>
+        public void HeroDetail(string key, List<string> keys, Action back, string tab = "능력치")
+        {
+            keys = keys != null && keys.Count > 0 ? keys : new List<string> { key };
+            var layer = Ui.Rect("modal herodetail", Stage.ModalLayer).Fill();
+            RosterBg(layer);
+            var h = Roster.ByKey(key);
+            var d = h?.CoreId != null ? P.Data.Hero(h.CoreId) : null;
+            void Close() { if (layer) Destroy(layer.gameObject); back?.Invoke(); }
+            void Go(string k2, string t2) { if (layer) Destroy(layer.gameObject); HeroDetail(k2, keys, back, t2); }
+            RosterHead(layer, "상세 정보", Close);
+            Stage.Hot["detail.close"] = Stage.Hot["back"];
+
+            // 맨 왼쪽 — 초상 줄(보고 있는 사도가 보이게 스크롤)
+            float listW = 84;
+            var rail = Ui.Rect("faces", layer); rail.anchorMin = new Vector2(0, 0); rail.anchorMax = new Vector2(0, 1); rail.pivot = new Vector2(0, 1);
+            rail.sizeDelta = new Vector2(listW, -110); rail.anchoredPosition = new Vector2(Theme.Gutter - 4, -96);
+            var rc = Ui.Scroll(rail, out var rsr);
+            Ui.Col(rc, 10, TextAnchor.UpperCenter, new RectOffset(4, 4, 6, 6), false, false);
+            int fi = 0, cur = 0;
+            foreach (var k2 in keys)
+            {
+                var hh = Roster.ByKey(k2); if (hh == null) continue;
+                var b = Btn.Make(rc, null, BtnStyle.Ghost, () => Go(k2, tab), 0, "face " + k2);
+                b.Bg.sprite = Theme.Round; b.SetColor(Color.Lerp(Theme.NavyWell, NatureCol(hh), 0.35f));
+                b.Pref(70, 70);
+                var im = Ui.Img(b.transform, hh.Icon, Color.white, "ic"); im.rectTransform.Fill(2, 0, 2, 4); im.preserveAspect = true;
+                var r0 = Ui.Img(b.transform, Theme.Frame, NatureCol(hh).A(0.7f), "rim"); r0.rectTransform.Fill();
+                if (k2 == key) { cur = fi; var br = Ui.Img(b.transform, Theme.S("frame_thick", 24), Theme.Gold, "on"); br.rectTransform.Fill(-4, -4, -4, -4); }
+                Stage.Hot["detail.face" + fi++] = b;
+            }
+            if (cur > 0)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rc);
+                float viewH = ((RectTransform)rsr.viewport).rect.height;
+                float y = 6 + cur * 80 - viewH / 2 + 35;
+                rc.anchoredPosition = new Vector2(0, Mathf.Clamp(y, 0, Mathf.Max(0, rc.rect.height - viewH)));
+            }
+
+            // 세로 메뉴 — 능력치 · 카드 · 고유 효과
+            float menuX = Theme.Gutter + listW + 14, menuW = 150;
+            var em = Ui.Img(layer, Theme.S("ic_spark"), Theme.Gold.A(0.7f), "emblem"); em.rectTransform.At(0, 1, menuX + menuW / 2 - 14, -108, 28, 28);
+            int ti = 0;
+            foreach (var t in new[] { "능력치", "카드", "고유 효과" })
+            {
+                bool on = t == tab;
+                var b = Btn.Make(layer, null, on ? BtnStyle.PillDark : BtnStyle.Ghost, () => Go(key, t), 0, "tab " + t);
+                if (!on) { b.Bg.sprite = Theme.Pill; b.SetColor(Color.white.A(0f)); }
+                b.GetComponent<RectTransform>().At(0, 1, menuX, -150 - ti * 64, menuW, 52);
+                var tl = Ui.Title(b.transform, t, Theme.FsLg, on ? Theme.Gold : Theme.Sub, TextAlignmentOptions.Center); tl.rectTransform.Fill();
+                if (on) { var bar = Ui.Img(b.transform, Theme.Round, Theme.Gold, "bar"); bar.rectTransform.At(0, 0.5f, -8, 0, 4, 30); }
+                Stage.Hot["detail.tab:" + t] = b;
+                ti++;
+            }
+
+            var stage = Ui.Rect("stage", layer); stage.anchorMin = Vector2.zero; stage.anchorMax = Vector2.one;
+            stage.offsetMin = new Vector2(menuX + menuW + 20, Theme.Gutter); stage.offsetMax = new Vector2(-Theme.Gutter, -92);
+            if (h == null) return;
+            if (tab == "카드") DetailCards(stage, h, d);
+            else if (tab == "고유 효과") DetailTraits(stage, h, d);
+            else DetailStats(stage, h, d);
+        }
+
+        void DetailStats(RectTransform stage, HeroInfo h, Core.HeroDef d)
+        {
+            var nc = NatureCol(h);
+            float panelW = Theme.C(520, 480);
+            float stageH = Stage.Size.y - 92 - Theme.Gutter;
+            // 가운데 — 기울어진 색 판 + 큰 스탠딩(없으면 SD)
+            var fig = Ui.Rect("figure", stage); fig.anchorMin = new Vector2(0, 0); fig.anchorMax = new Vector2(1, 1); fig.offsetMin = Vector2.zero; fig.offsetMax = new Vector2(-(panelW + 20), 0);
+            var plate2 = Ui.Img(fig, Theme.Round, Theme.NavyCell.A(0.9f), "plate2"); plate2.rectTransform.At(0.5f, 0.5f, 70, -10, 300, Mathf.Min(560, stageH - 80));
+            plate2.rectTransform.localRotation = Quaternion.Euler(0, 0, -9);
+            var plate = Ui.Img(fig, Theme.Round, nc.A(0.55f), "plate"); plate.rectTransform.At(0.5f, 0.5f, 0, 0, 380, Mathf.Min(620, stageH - 40));
+            plate.rectTransform.localRotation = Quaternion.Euler(0, 0, -9);
+            var pr = Ui.Img(plate.rectTransform, Theme.Frame, Color.Lerp(nc, Color.white, 0.3f).A(0.8f), "rim"); pr.rectTransform.Fill();
+            var glow = Ui.Img(fig, Theme.S("soft"), Color.Lerp(nc, Color.white, 0.5f).A(0.35f), "glow"); glow.rectTransform.At(0.5f, 0.5f, 0, 40, 620, 620);
+            var full = CardArt.Standing(h.art);
+            if (full != null)
+            {
+                float figH = stageH + 10, figW = figH * full.rect.width / full.rect.height;
+                var im = Ui.Img(fig, full, Color.white, "standing"); im.rectTransform.At(0.5f, 0, 0, -6, figW, figH); im.preserveAspect = true;
+                var sh = Ui.Img(fig, Theme.S("fade_down"), Theme.Night.A(0.75f), "foot"); sh.rectTransform.Band(0, 90, -40, -40, -6);
+                Tw.Rise(im.rectTransform, 0.04f, 24, 0.45f);
+            }
+            else
+            {
+                var spot = Ui.Rect("mini", fig).At(0.5f, 0.5f, 0, -Theme.C(170, 140), 10, 10);
+                var g = SpineUi.Make(spot, "minimi", h.MiniSkin, Theme.C(330, 280), "Idle", "idle");
+                if (g == null) { var im = Ui.Img(spot, h.Icon, Color.white, "icon"); im.rectTransform.At(0.5f, 0, 0, 0, 360, 360); im.preserveAspect = true; }
+                Tw.Pop(spot, 0.05f, 0.8f, 0.4f);
+            }
+
+            // 오른쪽 판 — 아이콘 줄 · 이름 · 별 · 수치 표
+            var panel = NavyBox(stage, "stats"); panel.anchorMin = new Vector2(1, 0); panel.anchorMax = new Vector2(1, 1); panel.pivot = new Vector2(1, 0.5f);
+            panel.sizeDelta = new Vector2(panelW, 0); panel.anchoredPosition = Vector2.zero;
+            var body = Ui.Rect("body", panel).Fill(26, 20, 26, 20);
+            Ui.Col(body, 8, TextAnchor.UpperLeft, null, true, false);
+            var icons = Ui.Rect("icons", body); icons.Pref(-1, 34);
+            Ui.Row(icons, 8, TextAnchor.MiddleLeft, null, false, false);
+            foreach (var k in new[] { "역할_" + h.role, "성격_" + h.nature, "종족_" + h.race, "위치_" + h.RowKo })
+            {
+                var sp = Icon(k); if (sp == null) continue;
+                var ic = Ui.Img(icons, sp, Color.white, k); ic.Pref(32, 32); ic.preserveAspect = true;
+            }
+            var nm = Ui.Title(body, h.ko, Theme.Fs3xl - 10, Theme.Ink); nm.Pref(-1, 56);
+            nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 22; nm.fontSizeMax = Theme.Fs3xl - 10; nm.Outline(0.15f);
+            var starRow = Ui.Rect("stars", body); starRow.Pref(-1, 26);
+            Ui.Row(starRow, 2, TextAnchor.MiddleLeft, null, false, false);
+            for (int i = 0; i < 5; i++) { var s = Ui.Img(starRow, Icon(i < h.star ? "별_켜짐" : "별_꺼짐"), Color.white, "star"); s.Pref(24, 24); s.preserveAspect = true; }
+            var sub = Ui.Text(body, $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(h.nature))}>{h.nature}</color> · {h.race} · {h.role} · 본래 {h.RowKo}", Theme.FsBody, Theme.Sub); sub.Pref(-1, 28);
+            W.Section(body, "능력치", d == null ? "코어 데이터 준비 중 — 원작 표의 값" : null, 36);
+            (string, string)[] rows =
+            {
+                ("공격력", (d?.Atk ?? h.atk).ToString()),
+                ("방어력", (d?.Def ?? h.def).ToString()),
+                ("체력", (d?.Hp ?? h.hp).ToString("N0")),
+                ("치명 확률", (d?.Crit ?? h.crit) + "%"),
+            };
+            for (int i = 0; i < rows.Length; i++)
+            {
+                var r = Ui.Img(body, Theme.Round, i % 2 == 0 ? Theme.NavyWell.A(0.7f) : Color.white.A(0f), "row"); r.Pref(-1, 40);
+                var l = Ui.Text(r.transform, rows[i].Item1, Theme.FsBody, Theme.Sub, TextAlignmentOptions.MidlineLeft); l.rectTransform.Fill(16, 0, 0, 0);
+                var v = Ui.Title(r.transform, rows[i].Item2, Theme.FsLg, Theme.Gold, TextAlignmentOptions.MidlineRight); v.rectTransform.Fill(0, 0, 16, 0);
+            }
+            var note = Ui.Img(body, Theme.Glass, Color.white, "grow"); note.Pref(-1, 56);
+            var nt = Ui.Text(note.transform, "판 안에서 강해지는 길 — 캠프 수련 · 장비 · 은총(고유 카드)", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); nt.rectTransform.Fill(12, 0, 12, 0);
+            Tw.Rise(panel, 0.08f, 30, 0.4f, Vector2.right);
+        }
+
+        void DetailCards(RectTransform stage, HeroInfo h, Core.HeroDef d)
+        {
+            if (d == null)
+            {
+                var t = Ui.Text(stage, "코어 데이터에 아직 없는 사도라 카드가 없습니다 — 도감으로만 봅니다.", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center); t.rectTransform.Fill();
+                return;
+            }
+            float sideW = Theme.C(250, 220);
+            // 카드 크기 — PC 는 두 줄(시작 · 고유)이 한 화면에 들게 높이로, 폰은 한 줄 셋으로 줄여 크게(스크롤). 넓은 화면(21:9)은 폭이 남으면 카드를 키우고,
+            // 그래도 남는 자리는 오른쪽 판(고학년 · 고유 효과)을 카드 바로 옆에 붙여 빈 곳이 생기지 않게 한다
+            int cols = Theme.Compact ? 3 : 4;
+            float stageW = Stage.Size.x - (Theme.Gutter + 84 + 14 + 150 + 20) - Theme.Gutter;
+            float availH = Stage.Size.y - 92 - Theme.Gutter - 2 * 44 - 30;
+            float availW = stageW - sideW - 16 - 18;
+            float byW = (availW - 12 * (cols - 1) - 20) / cols;
+            float cw = Theme.Compact ? byW : Mathf.Min(Mathf.Clamp(availH / 2f / 1.4f, 140, 240), byW), ch = cw * 1.4f;
+            float gridW = cols * cw + (cols - 1) * 12 + 18 + 18;
+            var left = Ui.Rect("cards", stage); left.anchorMin = new Vector2(0, 0); left.anchorMax = new Vector2(0, 1); left.pivot = new Vector2(0, 0.5f);
+            left.sizeDelta = new Vector2(gridW, 0); left.anchoredPosition = Vector2.zero;
+            var content = Ui.Scroll(left, out var sr);
+            ScrollBar(left, sr);
+            Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(4, 14, 0, 10), true, false);
+            void Row(string title, string sub, List<string> ids)
+            {
+                var s = W.Section(content, title, sub, 40);
+                var ii = Ui.Img(s.transform.parent, Theme.S("ic_info"), Theme.Dim, "i"); ii.rectTransform.At(0, 0.5f, 14 + s.preferredWidth + 8, 0, 20, 20); ii.preserveAspect = true;
+                var holder = Ui.Rect("row " + title, content); holder.Pref(-1, Mathf.CeilToInt(ids.Count / (float)cols) * (ch + 12));
+                // 사도 안에서도 순서는 CardOrder(기본 → 고유 · 같은 카드 나란히)
+                var sorted = CardOrder.Sort(ids, P.Data, new[] { d.Id });
+                for (int i = 0; i < sorted.Count; i++)
+                {
+                    var id = sorted[i];
+                    var c = W.Card(holder, this, id, cw); c.At(0, 1, (i % cols) * (cw + 12), -(i / cols) * (ch + 12), cw, ch);
+                    var b = c.gameObject.AddComponent<Btn>(); b.OnClick = () => CardZoom(id);
+                    Stage.Hot["detail.card" + title + i] = b;
+                    Tw.Pop(c, 0.03f * i, 0.85f, 0.3f);
+                }
+            }
+            Row("시작 카드", $"{d.Starter.Count}장 · 판을 시작할 때 덱에", d.Starter);
+            Row("고유 카드", "은총으로 얻는다 · 신탁 ①~⑤ · 축복", P.Data.UniquesOf(d.Id));
+
+            // 오른쪽 — 고학년 · 키워드 둥근 칸
+            var side = Ui.Rect("side", stage); side.anchorMin = new Vector2(0, 0); side.anchorMax = new Vector2(0, 1); side.pivot = new Vector2(0, 0.5f);
+            float sideW2 = Mathf.Clamp(stageW - gridW - 16, sideW, Theme.C(420, 300));   // 넓은 화면이면 판도 넓게
+            side.sizeDelta = new Vector2(sideW2, 0); side.anchoredPosition = new Vector2(Mathf.Min(gridW + 16, stageW - sideW2), 0);   // 카드 옆에 붙인다
+            Ui.Col(side, 14, TextAnchor.UpperCenter, new RectOffset(0, 0, 6, 0), true, false);
+            void Hex(string head, Sprite pic, Color tint, string big, string name, string desc)
+            {
+                var box = NavyBox(side, head); box.Pref(-1, Theme.C(250, 214));
+                var ht = Ui.Title(box, head, Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center); ht.rectTransform.Band(1, 28, 8, 8, -10);
+                var cell = Ui.Img(box, Theme.S("tile_glow"), tint, "cell"); cell.rectTransform.At(0.5f, 1, 0, -40, 120, 96);
+                var disc = Ui.Img(box, Theme.S("circle"), Color.Lerp(Theme.NavyWell, tint, 0.35f), "disc"); disc.rectTransform.At(0.5f, 1, 0, -46, 84, 84);
+                var dm = Ui.Rect("m", disc.rectTransform).Fill(); disc.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+                if (pic != null) { var im = Ui.Img(dm, pic, Color.white, "pic"); im.rectTransform.Fill(-4, -10, -4, 0); im.preserveAspect = true; }
+                else { var gl = Ui.Img(dm, Theme.S("ic_spark"), Theme.Gold, "glyph"); gl.rectTransform.Fill(20, 20, 20, 20); gl.preserveAspect = true; }
+                if (big != null)
+                {
+                    var bp = Ui.Img(box, Theme.Pill, Theme.Gold, "cost"); bp.rectTransform.At(1, 1, -10, -8, 76, 26);
+                    var bt = Ui.Title(bp.transform, big, Theme.FsSm, Theme.Brown, TextAlignmentOptions.Center); bt.rectTransform.Fill();
+                }
+                var nm = Ui.Title(box, name, Theme.FsLg, Theme.Gold, TextAlignmentOptions.Center); nm.rectTransform.Band(1, 30, 10, 10, -136);
+                nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 12; nm.fontSizeMax = Theme.FsLg;
+                var ds = Ui.Text(box, desc, Theme.FsCap, Theme.Sub, TextAlignmentOptions.Top); ds.rectTransform.Fill(12, 10, 12, 168);
+                ds.enableAutoSizing = true; ds.fontSizeMin = 9; ds.fontSizeMax = Theme.FsCap;
+            }
+            if (d.Ult != null) Hex("고학년", h.Icon, NatureCol(h), d.Ult.Cost + "%", d.Ult.Name, P.Text.Fx(d.Ult.Fx));
+            var kw = d.AllKeywords.FirstOrDefault();
+            if (kw != null) Hex("고유 효과", null, Theme.Gold, null, kw.Name, P.Text.Keyword(kw));
+        }
+
+        void DetailTraits(RectTransform stage, HeroInfo h, Core.HeroDef d)
+        {
+            var panel = NavyBox(stage, "traits"); panel.Fill();
+            var area = Ui.Rect("area", panel).Fill(28, 20, 20, 20);
+            var content = Ui.Scroll(area, out var sr);
+            ScrollBar(area, sr);
+            Ui.Col(content, 10, TextAnchor.UpperLeft, new RectOffset(0, 18, 0, 10), true, false);
+            void Block(string title, string text)
+            {
+                if (string.IsNullOrEmpty(text)) return;
+                W.Section(content, title, null, 38);
+                var t = Ui.Text(content, text, Theme.FsBody, Theme.Ink, TextAlignmentOptions.TopLeft);
+                t.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                t.lineSpacing = 6;
+            }
+            if (d != null)
+            {
+                foreach (var kw in d.AllKeywords) Block("키워드 · " + kw.Name, P.Text.Keyword(kw));
+                if (d.Passives.Count > 0) Block("패시브", P.Text.Passives(d.Passives));
+                if (d.Ult != null) Block("고학년", P.Text.Ult(d.Ult));
+            }
+            else
+            {
+                Block("키워드", h.keyword);
+                Block("고학년", h.ult);
+            }
+            Block("이야기", h.blurb);
+        }
+    }
+}

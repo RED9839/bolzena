@@ -1,0 +1,792 @@
+{
+  "heroes": [
+    {
+      "id": "티그",
+      "name": "티그",
+      "nature": "활발",
+      "race": "수인",
+      "row": "front",
+      "role": "딜러",
+      "star": 3,
+      "hp": 820,
+      "atk": 115,
+      "def": 40,
+      "crit": 10,
+      "blurb": "수인 마을의 백호 검성이자 사료스탕스 대장.",
+      "keyword": {
+        "name": "장작 패기",
+        "desc": "「장작 패기 반복」 — 이번 턴 티그가 공격 카드를 낼 때마다 쌓이는 손맛(턴이 끝나면 사라진다). 셋이 되면 AP 1 을 돌려받는다.",
+        "carrier": "self",
+        "cap": 3,
+        "endClear": true,
+        "rules": [
+          {
+            "name": "손맛",
+            "when": {
+              "on": "stackReach",
+              "id": "장작 패기",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "장작 패기",
+                "all": true
+              },
+              {
+                "k": "ap",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "장작 패기 반복",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "오버드라이브",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "atkMod",
+            "v": 0.15,
+            "run": true,
+            "target": "self"
+          },
+          {
+            "k": "stack",
+            "id": "장작 패기",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "티그_s1",
+        "티그_s1",
+        "티그_s2",
+        "티그_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "티그_s1",
+      "name": "쌍검 베기",
+      "hero": "티그",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "티그_s2",
+      "name": "쌍검 십자베기",
+      "hero": "티그",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "티그_s3",
+      "name": "받아쳐!",
+      "hero": "티그",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "티그_u1",
+      "name": "소닉 블레이드",
+      "hero": "티그",
+      "unique": true,
+      "cost": 3,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.75,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifStack",
+          "id": "장작 패기",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.15,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 소닉 블레이드",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 소닉 블레이드",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "백호 소닉 블레이드",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 소닉 블레이드",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 소닉 블레이드",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "쌍검의 손맛",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "티그_u2",
+      "name": "쌍검 휘두르기",
+      "hero": "티그",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "ifStack",
+          "id": "장작 패기",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 쌍검 휘두르기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 쌍검 휘두르기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "백호 쌍검 휘두르기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 쌍검 휘두르기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 쌍검 휘두르기",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "쌍검의 손맛",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "티그_u3",
+      "name": "장작 패기",
+      "hero": "티그",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.55,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "장작 패기",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.25,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 장작 패기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "가벼운 장작 패기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "백호 장작 패기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "재빠른 장작 패기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 장작 패기",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "쌍검의 손맛",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "티그_u4",
+      "name": "백호 비전서",
+      "hero": "티그",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        },
+        {
+          "k": "atkMod",
+          "v": 0.2,
+          "run": true,
+          "target": "self"
+        },
+        {
+          "k": "stack",
+          "id": "장작 패기",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 백호 비전서",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 백호 비전서",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "백호 백호 비전서",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "든든한 백호 비전서",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 백호 비전서",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "쌍검의 손맛",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

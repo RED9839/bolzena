@@ -1,0 +1,666 @@
+{
+  "heroes": [
+    {
+      "id": "레비_졸업",
+      "name": "레비(졸업)",
+      "nature": "활발",
+      "race": "마녀",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 1000,
+      "atk": 75,
+      "def": 76,
+      "crit": 5,
+      "blurb": "인턴을 마치고 정식 사원이 된 레비. 소원은 오직 정시 퇴근 — 일을 빨리 끝낼수록 남는 시간이 방패가 된다.",
+      "keyword": {
+        "name": "퇴근 도장",
+        "desc": "정시 퇴근 — 종극 카드로 하루를 끝내면 찍히는 도장. 턴이 끝날 때 남은 AP 만큼 실드로 바뀐다",
+        "carrier": "self",
+        "cap": 1
+      },
+      "passives": [
+        {
+          "name": "정시 퇴근",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "퇴근 도장"
+            }
+          ],
+          "fx": [
+            {
+              "k": "perApLeft"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "spend",
+              "id": "퇴근 도장",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "열정 넘치는 신입",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.2,
+            "target": "allEnemies",
+            "base": "def",
+            "hits": 5
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "실드 유지",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "레비_졸업_s1",
+        "레비_졸업_s1",
+        "레비_졸업_s2",
+        "레비_졸업_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "레비_졸업_s1",
+      "name": "빗자루 후리기",
+      "hero": "레비_졸업",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "base": "def"
+        }
+      ]
+    },
+    {
+      "id": "레비_졸업_s2",
+      "name": "사원증 가드",
+      "hero": "레비_졸업",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "레비_졸업_u1",
+      "name": "칼퇴 선언",
+      "hero": "레비_졸업",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "signature": true,
+      "tags": [
+        "종극"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.4
+        },
+        {
+          "k": "stack",
+          "id": "퇴근 도장",
+          "v": 1
+        }
+      ],
+      "blurb": "「오늘 일은 여기까지입니다!」",
+      "oracles": [
+        {
+          "name": "당당한 칼퇴",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.25
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "조기 퇴근",
+          "cost": 0,
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "퇴근길 경계",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "내일 할 일 정리",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "퇴근 준비 완료",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "사원증 방패",
+          "kind": "guard"
+        },
+        {
+          "name": "퇴근 도시락",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "정시 알람",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "레비_졸업_u2",
+      "name": "업무 마무리",
+      "hero": "레비_졸업",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "status",
+          "id": "실드 유지",
+          "v": 1
+        }
+      ],
+      "blurb": "깔끔하게 끝내야 내일이 편하다",
+      "oracles": [
+        {
+          "name": "완벽한 마무리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대충 마무리",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "결재 완료",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "서류 폭탄",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "업무 일지",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "빗자루 스윙",
+          "kind": "power"
+        },
+        {
+          "name": "서류 뭉치",
+          "kind": "frost"
+        },
+        {
+          "name": "메모",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레비_졸업_u3",
+      "name": "반차 신청",
+      "hero": "레비_졸업",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "종극"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1
+        },
+        {
+          "k": "stack",
+          "id": "퇴근 도장",
+          "v": 1
+        }
+      ],
+      "blurb": "오후는 내 시간이다",
+      "oracles": [
+        {
+          "name": "연차 신청",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반차 + 커피",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "미리 결재",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재택 근무",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.1
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "주 4일제",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "stack",
+              "id": "퇴근 도장",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "휴가 계획",
+          "kind": "guard"
+        },
+        {
+          "name": "낮잠",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "퇴근 버스",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레비_졸업_u4",
+      "name": "정규직 계약서",
+      "hero": "레비_졸업",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ],
+      "blurb": "드디어 인턴 딱지를 뗐다",
+      "oracles": [
+        {
+          "name": "연봉 협상",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "수습 계약",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복지 포인트",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "팀장 승진",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "입사 첫날",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "정규직의 여유",
+          "kind": "defUp"
+        },
+        {
+          "name": "출근 도장",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "사내 식당",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.6
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,660 @@
+{
+  "heroes": [
+    {
+      "id": "비비_신성",
+      "name": "비비(신성)",
+      "nature": "공명",
+      "race": "미스틱",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 720,
+      "atk": 135,
+      "def": 29,
+      "crit": 10,
+      "blurb": "새 세계수가 된 비비. 동료가 함께 움직일수록 빛이 짙어지고, 셋이 다 손을 내민 턴에는 그 빛이 파티의 사기가 된다.",
+      "keyword": {
+        "name": "다정한 세상",
+        "desc": "다정한 세상 — 이번 턴 다른 아군이 카드를 낼 때마다 쌓이는 온기. 하나마다 비비(신성)의 피해가 오르고, 턴이 끝나면 사라진다",
+        "carrier": "self",
+        "cap": 3,
+        "endClear": true,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.2
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "함께 걷는 세상",
+          "when": {
+            "on": "play",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "모든 이를 굽어살피리",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 3
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "비비_신성_s1",
+        "비비_신성_s1",
+        "비비_신성_s2",
+        "비비_신성_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "비비_신성_s1",
+      "name": "빛구슬",
+      "hero": "비비_신성",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_s2",
+      "name": "빛구슬 세례",
+      "hero": "비비_신성",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_s3",
+      "name": "세계수 잎사귀",
+      "hero": "비비_신성",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u1",
+      "name": "셋의 몫",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "signature": true,
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.15,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifAllHeroes"
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ],
+      "blurb": "혼자 쥔 빛보다 셋이 나눈 빛이 밝다",
+      "oracles": [
+        {
+          "name": "넷의 몫",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 몫",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "나눈 빛",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "다정한 몫",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "남겨 둔 몫",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "따뜻한 빛",
+          "kind": "power"
+        },
+        {
+          "name": "잎사귀 바람",
+          "kind": "draw"
+        },
+        {
+          "name": "새싹",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u2",
+      "name": "모두의 빛",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifAllHeroes"
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "blurb": "세계수의 빛은 누구도 빠뜨리지 않는다",
+      "oracles": [
+        {
+          "name": "찬란한 빛",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 빛",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "빛의 장막",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "정화의 빛",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기다리는 빛",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "세계수의 가지",
+          "kind": "power"
+        },
+        {
+          "name": "빛 가루",
+          "kind": "cost"
+        },
+        {
+          "name": "잎맥",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u3",
+      "name": "손잡기",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "다정한 세상",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "헤어지는 건 싫으니까",
+      "oracles": [
+        {
+          "name": "꼭 잡은 손",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "둘러앉기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "포옹",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "지켜 주기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "놓지 않는 손",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "온기",
+          "kind": "draw"
+        },
+        {
+          "name": "토닥토닥",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "약속",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u4",
+      "name": "새 세계수의 서약",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "다정한 세상",
+          "v": 1
+        }
+      ],
+      "blurb": "모두가 함께 움직이는 세상을 위하여",
+      "oracles": [
+        {
+          "name": "영원한 서약",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 서약",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "함께하는 서약",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "지키는 서약",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "첫 서약",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "다정한 세상",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "세계수의 뿌리",
+          "kind": "atkUp"
+        },
+        {
+          "name": "아침 햇살",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "새잎",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

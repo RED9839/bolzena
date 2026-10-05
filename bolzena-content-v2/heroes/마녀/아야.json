@@ -1,0 +1,708 @@
+{
+  "heroes": [
+    {
+      "id": "아야",
+      "name": "아야",
+      "nature": "냉정",
+      "race": "마녀",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 720,
+      "atk": 146,
+      "def": 29,
+      "crit": 10,
+      "blurb": "영원살이 마녀 자매의 맏이. 탄환마다 서리를 묻혀 두고, 그 적이 무너지는 순간 눈꽃으로 피워 낸다.",
+      "keyword": {
+        "name": "서리",
+        "desc": "눈꽃 개화 — 탄환에 묻은 서리. 걸린 적의 공격이 무뎌지고, 그 적이 격파되면 꽃처럼 터져 적 전체로 번진다",
+        "carrier": "enemy",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": -0.05
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "서리 탄환",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "눈꽃 개화",
+          "when": {
+            "on": "break"
+          },
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "서리"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "서리",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "만개설화",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.9,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "서리",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "tough",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "아야_s1",
+        "아야_s1",
+        "아야_s2",
+        "아야_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "아야_s1",
+      "name": "서리 탄환",
+      "hero": "아야",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아야_s2",
+      "name": "빙창 탄환",
+      "hero": "아야",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아야_s3",
+      "name": "얼음 장막",
+      "hero": "아야",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "아야_u1",
+      "name": "얼음 결정 탄",
+      "hero": "아야",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "signature": true,
+      "tags": [
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "서리",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "blurb": "맞은 자리부터 얼어붙는 탄환",
+      "oracles": [
+        {
+          "name": "단단한 결정",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "작은 결정",
+          "cost": 0,
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "겹눈송이",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "서리 꽃봉오리",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "맏이의 조준",
+          "tags": [
+            "약점 공격",
+            "주도"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "날 선 서리",
+          "kind": "power"
+        },
+        {
+          "name": "얼어붙는 탄",
+          "kind": "frost"
+        },
+        {
+          "name": "눈송이",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아야_u2",
+      "name": "눈보라 사격",
+      "hero": "아야",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "blurb": "눈보라 속에서도 과녁은 하나",
+      "oracles": [
+        {
+          "name": "한겨울 사격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "짧은 눈보라",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "휘몰아치는 눈",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "얼음 박차",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "끝없는 겨울",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "세찬 바람",
+          "kind": "power"
+        },
+        {
+          "name": "빠른 장전",
+          "kind": "cost"
+        },
+        {
+          "name": "겨울 숨결",
+          "kind": "weakSpot"
+        }
+      ]
+    },
+    {
+      "id": "아야_u3",
+      "name": "동상 조준",
+      "hero": "아야",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "서리",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "먼저 얼려 두고, 그다음에 쏜다",
+      "oracles": [
+        {
+          "name": "깊은 동상",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "얼음 눈금",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "서릿발",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "겨울 시야",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "희망의 눈꽃",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "차가운 손끝",
+          "kind": "draw"
+        },
+        {
+          "name": "하얀 숨",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "눈 덮인 길",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아야_u4",
+      "name": "영원살이 맏이",
+      "hero": "아야",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "잔광",
+          "v": 2
+        },
+        {
+          "k": "atkMod",
+          "v": 0.15,
+          "run": true,
+          "target": "self"
+        }
+      ],
+      "blurb": "눈보라 속에서 희망을 찾아낸 맏이의 각오",
+      "oracles": [
+        {
+          "name": "맏이의 각오",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "작은 다짐",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "만개의 예감",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "겨울 지킴이",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "첫눈",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "단단한 마음",
+          "kind": "atkUp"
+        },
+        {
+          "name": "첫눈",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "눈꽃 장식",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "equips": [
+    {
+      "id": "eq_knife",
+      "name": "낡은 식칼",
+      "grade": "일반",
+      "slot": "무기",
+      "stats": {
+        "atk": 10
+      }
+    },
+    {
+      "id": "eq_apron",
+      "name": "앞치마",
+      "grade": "일반",
+      "slot": "방어구",
+      "stats": {
+        "hp": 60,
+        "def": 4
+      }
+    },
+    {
+      "id": "eq_pot",
+      "name": "무쇠 냄비",
+      "grade": "고급",
+      "slot": "방어구",
+      "stats": {
+        "hp": 90,
+        "def": 8
+      }
+    },
+    {
+      "id": "eq_charm",
+      "name": "행운 부적",
+      "grade": "고급",
+      "slot": "장신구",
+      "stats": {
+        "crit": 3
+      },
+      "effect": [
+        {
+          "name": "행운",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "firstTurn"
+            }
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eq_scope",
+      "name": "마탄 조준경",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "atk": 10,
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "날 선 눈",
+          "when": {
+            "on": "break",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eq_hoe",
+      "name": "거인의 괭이",
+      "grade": "희귀",
+      "slot": "무기",
+      "stats": {
+        "atk": 20
+      },
+      "effect": [
+        {
+          "name": "김매기",
+          "when": {
+            "on": "kill"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eq_shell",
+      "name": "용의 비늘 갑주",
+      "grade": "전설",
+      "slot": "방어구",
+      "stats": {
+        "hp": 160,
+        "def": 15
+      },
+      "effect": [
+        {
+          "name": "비늘",
+          "when": {
+            "on": "hurt"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8,
+              "target": "party"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

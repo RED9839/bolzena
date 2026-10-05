@@ -1,0 +1,815 @@
+{
+  "heroes": [
+    {
+      "id": "셰럼",
+      "name": "셰럼",
+      "nature": "순수",
+      "race": "마녀",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 860,
+      "atk": 75,
+      "def": 76,
+      "crit": 5,
+      "blurb": "궁정 서기관 마녀. 파티가 맞은 장면까지 받아 적고, 원고가 차면 몰래 쓰던 소설 속 인물이 차례로 걸어 나온다.",
+      "keyword": {
+        "name": "원고",
+        "desc": "현실로 튀어나온 원고 — 파티가 다친 장면을 받아 적은 쪽수. 셋이 차면 「연재 회차」 가 넘어간다",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "탈고",
+            "when": {
+              "on": "stackReach",
+              "id": "원고",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "원고",
+                "all": true
+              },
+              {
+                "k": "stack",
+                "id": "연재 회차",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "keywords": [
+        {
+          "name": "연재 회차",
+          "desc": "소설 속 인물이 등장하는 차례 — 1회 어둠 정령 · 2회 기사 · 3회 공주, 그다음은 처음부터",
+          "carrier": "self",
+          "cap": 3,
+          "rules": [
+            {
+              "name": "1회: 어둠 정령",
+              "when": {
+                "on": "stackReach",
+                "id": "연재 회차",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "make",
+                  "id": "셰럼_t1",
+                  "v": 1
+                }
+              ]
+            },
+            {
+              "name": "2회: 기사",
+              "when": {
+                "on": "stackReach",
+                "id": "연재 회차",
+                "n": 2
+              },
+              "fx": [
+                {
+                  "k": "make",
+                  "id": "셰럼_t2",
+                  "v": 1
+                }
+              ]
+            },
+            {
+              "name": "3회: 공주",
+              "when": {
+                "on": "stackReach",
+                "id": "연재 회차",
+                "n": 3
+              },
+              "fx": [
+                {
+                  "k": "make",
+                  "id": "셰럼_t3",
+                  "v": 1
+                },
+                {
+                  "k": "spend",
+                  "id": "연재 회차",
+                  "all": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "passives": [
+        {
+          "name": "받아 적기",
+          "when": {
+            "on": "hurt"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "생생한 흑역사",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.3,
+            "target": "allEnemies",
+            "base": "def",
+            "hits": 6
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "원고",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "셰럼_s1",
+        "셰럼_s1",
+        "셰럼_s2",
+        "셰럼_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "셰럼_s1",
+      "name": "깃펜 찌르기",
+      "hero": "셰럼",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "base": "def"
+        }
+      ]
+    },
+    {
+      "id": "셰럼_s2",
+      "name": "두꺼운 장부",
+      "hero": "셰럼",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "셰럼_t1",
+      "name": "어둠 정령",
+      "hero": "셰럼",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "blurb": "원고 1회의 주인공. 작가보다 진지하다"
+    },
+    {
+      "id": "셰럼_t2",
+      "name": "원고 속 기사",
+      "hero": "셰럼",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ],
+      "blurb": "원고 2회. 방패를 들고 걸어 나온다"
+    },
+    {
+      "id": "셰럼_t3",
+      "name": "원고 속 공주",
+      "hero": "셰럼",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ],
+      "blurb": "원고 3회. 해피엔딩 담당"
+    },
+    {
+      "id": "셰럼_u1",
+      "name": "위치 아카이브",
+      "hero": "셰럼",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "signature": true,
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.6
+        },
+        {
+          "k": "stack",
+          "id": "원고",
+          "v": 1
+        }
+      ],
+      "blurb": "마녀 왕실의 일을 다 적어 둔 서고. 펼치면 그날의 흑역사가 쏟아진다",
+      "oracles": [
+        {
+          "name": "왕실 사료 전권",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.5
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "간추린 기록",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.95
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기밀 문서",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흑역사 보관함",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.8
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "정리된 서가",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.4
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "두꺼운 표지",
+          "kind": "guard"
+        },
+        {
+          "name": "색인",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "각주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰럼_u2",
+      "name": "어둠 정령의 상처",
+      "hero": "셰럼",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "allEnemies",
+          "base": "def"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "원고",
+          "v": 1
+        }
+      ],
+      "blurb": "몰래 쓴 소설의 한 장면. 읽히는 쪽이 더 아프다",
+      "oracles": [
+        {
+          "name": "완결편",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "습작",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "2쇄 증보판",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "작가의 말",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "비밀 동인지",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "클리셰 폭발",
+          "kind": "power"
+        },
+        {
+          "name": "삽화",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "연재 마감",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "셰럼_u3",
+      "name": "미행과 잠입",
+      "hero": "셰럼",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "stack",
+          "id": "원고",
+          "v": 1
+        }
+      ],
+      "blurb": "미행 · 잠입 · 받아쓰기. 들키면 맞는 장면까지 기록에 넣는다",
+      "oracles": [
+        {
+          "name": "장기 잠입",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "숨어 엿보기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.15
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "발소리 지우기",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "현장 기록",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "검은 망토",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.95
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "검은 망토",
+          "kind": "guard"
+        },
+        {
+          "name": "메모장",
+          "kind": "draw"
+        },
+        {
+          "name": "발끝 걸음",
+          "tags": [
+            "개전"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰럼_u4",
+      "name": "서기관의 기록체",
+      "hero": "셰럼",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "원고",
+          "v": 1
+        }
+      ],
+      "blurb": "「~함.」 으로 끝나는 기록체. 모든 일은 사료가 된다",
+      "oracles": [
+        {
+          "name": "궁정 서기관",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 필기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "사료와 전례",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기록체",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "정리된 서가",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "원고",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "함.",
+          "kind": "defUp"
+        },
+        {
+          "name": "인 듯함.",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "정중한 존댓말",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,641 @@
+{
+  "heroes": [
+    {
+      "id": "스노키",
+      "name": "스노키",
+      "nature": "우울",
+      "race": "마녀",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 920,
+      "atk": 101,
+      "def": 67,
+      "crit": 5,
+      "blurb": "두유 유통 조직의 전 두목, 지금은 경호원 겸 오른팔. 동료가 주먹을 내밀 때마다 두유 한 병씩 건넨다.",
+      "keyword": {
+        "name": "두유",
+        "desc": "두유 배달 — 다른 아군이 공격 카드를 낼 때마다 건네는 두유. 한 턴에 세 병째면 경호 태세(반격)",
+        "carrier": "self",
+        "cap": 3,
+        "endClear": true,
+        "rules": [
+          {
+            "name": "세 병째",
+            "when": {
+              "on": "stackReach",
+              "id": "두유",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "반격",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "두유 배달",
+          "when": {
+            "on": "play",
+            "who": "other",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "구역 점거",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.6,
+            "target": "allEnemies",
+            "base": "def"
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "반격",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "스노키_s1",
+        "스노키_s1",
+        "스노키_s2",
+        "스노키_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "스노키_s1",
+      "name": "절도 있는 발차기",
+      "hero": "스노키",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "base": "def"
+        }
+      ]
+    },
+    {
+      "id": "스노키_s2",
+      "name": "경호 자세",
+      "hero": "스노키",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "스노키_u1",
+      "name": "경호원 출동",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "signature": true,
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.9
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "blurb": "보스 앞에는 언제나 스노키가 선다",
+      "oracles": [
+        {
+          "name": "철통 경호",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.55
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "몸으로 막기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두목의 위엄",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "경호 교대",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대기 중인 경호원",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.45
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "방탄 코트",
+          "kind": "guard"
+        },
+        {
+          "name": "선글라스",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "무전기",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "스노키_u2",
+      "name": "두유 상자 던지기",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "stack",
+          "id": "두유",
+          "v": 1
+        }
+      ],
+      "blurb": "한 상자에 스물네 병. 맞으면 아프다",
+      "oracles": [
+        {
+          "name": "대형 상자",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "한 병 던지기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "상자째 투척",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "냉장 두유",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "트럭째 배달",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "꽉 찬 상자",
+          "kind": "power"
+        },
+        {
+          "name": "차가운 두유",
+          "kind": "frost"
+        },
+        {
+          "name": "빠른 배달",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "스노키_u3",
+      "name": "오른팔의 신호",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "두유",
+          "v": 1
+        }
+      ],
+      "blurb": "눈짓 한 번이면 조직이 움직인다",
+      "oracles": [
+        {
+          "name": "합동 작전",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신호와 엄호",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "작전 지시",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두 병 건네기",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "잠복 신호",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "두유",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "수신호",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "비밀 암호",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "두유 한 병",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스노키_u4",
+      "name": "불법 유통망",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 2
+        }
+      ],
+      "blurb": "은퇴했어도 연락망은 살아 있다",
+      "oracles": [
+        {
+          "name": "전국 유통망",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "동네 유통",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "경호 계약",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "유통 장부",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "새벽 배송",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "전 두목",
+          "kind": "defUp"
+        },
+        {
+          "name": "새벽 출근",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "비상 두유",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

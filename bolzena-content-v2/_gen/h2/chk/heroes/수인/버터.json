@@ -1,0 +1,737 @@
+{
+  "heroes": [
+    {
+      "id": "버터",
+      "name": "버터",
+      "nature": "활발",
+      "race": "수인",
+      "row": "back",
+      "role": "딜러",
+      "star": 3,
+      "hp": 550,
+      "atk": 135,
+      "def": 25,
+      "crit": 10,
+      "blurb": "친구 사귀기가 제일 좋은 골든 리트리버 수인.",
+      "keyword": {
+        "name": "옐로카드",
+        "desc": "「옐로카드」 — 파티를 친 적에게 마음속으로 꺼내는 경고. 받은 적은 버터의 공격에 더 아프고, 셋이 차면 레드카드 — 기절하고 카드는 거둔다.",
+        "carrier": "enemy",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "레드카드",
+            "when": {
+              "on": "stackReach",
+              "id": "옐로카드",
+              "n": 3
+            },
+            "limit": {
+              "per": "fight",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "기절",
+                "v": 1
+              },
+              {
+                "k": "spend",
+                "id": "옐로카드",
+                "all": true
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "참다 참다",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "새쭁! 쓔튜라이크!",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.3,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "옐로카드",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "버터_s1",
+        "버터_s1",
+        "버터_s2",
+        "버터_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "버터_s1",
+      "name": "짱돌 던지기",
+      "hero": "버터",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "버터_s2",
+      "name": "왕짱돌 던지기",
+      "hero": "버터",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "버터_s3",
+      "name": "꾹 참기",
+      "hero": "버터",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "버터_u1",
+      "name": "버터 플라이!",
+      "hero": "버터",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.8,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "옐로카드"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 버터 플라이!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 버터 플라이!",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "경고하는 버터 플라이!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 버터 플라이!",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 버터 플라이!",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "휘슬",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "버터_u2",
+      "name": "부탁은 거절 안 해",
+      "hero": "버터",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.3
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 부탁은 거절 안 해",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.7
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 부탁은 거절 안 해",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.15
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "경고하는 부탁은 거절 안 해",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.7
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 부탁은 거절 안 해",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.65
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 부탁은 거절 안 해",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.65
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "휘슬",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "버터_u3",
+      "name": "구덩이 파기",
+      "hero": "버터",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "옐로카드",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 구덩이 파기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 구덩이 파기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "경고하는 구덩이 파기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 구덩이 파기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 구덩이 파기",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "휘슬",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "버터_u4",
+      "name": "에이프런 매그넘",
+      "hero": "버터",
+      "unique": true,
+      "cost": 3,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "옐로카드"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 에이프런 매그넘",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 에이프런 매그넘",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "경고하는 에이프런 매그넘",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 에이프런 매그넘",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 에이프런 매그넘",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "휘슬",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

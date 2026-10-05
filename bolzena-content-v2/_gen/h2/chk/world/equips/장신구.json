@@ -1,0 +1,762 @@
+{
+  "equips": [
+    {
+      "id": "eq_gemring",
+      "name": "보석 반지",
+      "grade": "일반",
+      "slot": "장신구",
+      "stats": {
+        "atk": 3,
+        "crit": 3
+      },
+      "effect": [
+        {
+          "name": "반짝",
+          "when": {
+            "on": "crit"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "치명타가 터지면 보석이 따라 반짝인다."
+    },
+    {
+      "id": "eq_healinglamp",
+      "name": "치유의 호롱불",
+      "grade": "일반",
+      "slot": "장신구",
+      "stats": {
+        "hp": 40,
+        "def": 2
+      },
+      "effect": [
+        {
+          "name": "작은 불빛",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "wounded"
+            }
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.5
+            }
+          ]
+        }
+      ],
+      "blurb": "다친 밤에만 켜지는 호롱불."
+    },
+    {
+      "id": "eq_catpaw",
+      "name": "묘수",
+      "grade": "일반",
+      "slot": "장신구",
+      "stats": {
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "공짜 한 수",
+          "when": {
+            "on": "play",
+            "maxCost": 0
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "고양이 발 모양 부적. 공짜 수를 두면 한 수가 더 보인다."
+    },
+    {
+      "id": "eq_cutletpin",
+      "name": "돈까스 모양 머리핀",
+      "grade": "일반",
+      "slot": "장신구",
+      "stats": {
+        "hp": 40,
+        "atk": 3
+      },
+      "effect": [
+        {
+          "name": "점심 기대",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "싸움 끝나고 먹을 생각을 하면 손이 빨라진다."
+    },
+    {
+      "id": "eq_hourglass",
+      "name": "작은 모래시계",
+      "grade": "고급",
+      "slot": "장신구",
+      "stats": {
+        "hp": 40,
+        "def": 3
+      },
+      "effect": [
+        {
+          "name": "마지막 모래",
+          "when": {
+            "on": "play",
+            "tag": "종극",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "턴을 끝내는 카드를 내면 모래가 한 줌 남는다."
+    },
+    {
+      "id": "eq_luckydice",
+      "name": "행운의 주사위",
+      "grade": "고급",
+      "slot": "장신구",
+      "stats": {
+        "atk": 4,
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "굴려 보기",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "ifRandom",
+              "pct": 0.25
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "네 번에 한 번쯤은 좋은 눈이 나온다."
+    },
+    {
+      "id": "eq_worshipframe",
+      "name": "숭배용 액자",
+      "grade": "고급",
+      "slot": "장신구",
+      "stats": {
+        "hp": 60,
+        "def": 3
+      },
+      "effect": [
+        {
+          "name": "우러러보기",
+          "when": {
+            "on": "ult",
+            "who": "any"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "고학년의 멋진 모습을 넣어 둘 액자."
+    },
+    {
+      "id": "eq_greedring",
+      "name": "탐욕의 반지",
+      "grade": "고급",
+      "slot": "장신구",
+      "stats": {
+        "atk": 6
+      },
+      "effect": [
+        {
+          "name": "하나 더",
+          "when": {
+            "on": "kill"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "한 놈 쓰러뜨리면 다음 것이 탐난다."
+    },
+    {
+      "id": "eq_thorncrown",
+      "name": "가시 왕관",
+      "grade": "고급",
+      "slot": "장신구",
+      "stats": {
+        "atk": 5,
+        "def": 3
+      },
+      "effect": [
+        {
+          "name": "가시의 각오",
+          "when": {
+            "on": "pay",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "피를 치를 때마다 왕관이 더 무거워진다."
+    },
+    {
+      "id": "eq_bracelet",
+      "name": "우정 팔찌",
+      "grade": "고급",
+      "slot": "장신구",
+      "stats": {
+        "hp": 50,
+        "atk": 4
+      },
+      "effect": [
+        {
+          "name": "겹친 매듭",
+          "when": {
+            "on": "play",
+            "tag": "결속"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "같은 매듭을 여러 번 묶은 팔찌. 묶인 것을 풀면 손이 가볍다."
+    },
+    {
+      "id": "eq_jadebook",
+      "name": "옥빛 마법서",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "atk": 8,
+        "def": 4
+      },
+      "effect": [
+        {
+          "name": "묵힌 주문",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "held",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "쥐고 넘긴 주문에 밑줄이 하나 더 그어진다."
+    },
+    {
+      "id": "eq_goldcrown",
+      "name": "황금 왕관",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "hp": 60,
+        "atk": 6
+      },
+      "effect": [
+        {
+          "name": "다섯 번째 박수",
+          "when": {
+            "on": "play",
+            "who": "any",
+            "nth": 5
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "한 턴에 다섯 장째가 나가면 왕관이 박수를 받는다."
+    },
+    {
+      "id": "eq_healpendant",
+      "name": "치유의 펜던트",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "hp": 60,
+        "def": 5
+      },
+      "effect": [
+        {
+          "name": "넘친 물방울",
+          "when": {
+            "on": "overheal",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "넘치게 고친 몫이 펜던트에 맺혀 굳는다."
+    },
+    {
+      "id": "eq_muffin",
+      "name": "폭발 머핀",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "atk": 8
+      },
+      "effect": [
+        {
+          "name": "펑",
+          "when": {
+            "on": "exhaust",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 0.4,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "카드가 사라질 때마다 부스러기가 터진다."
+    },
+    {
+      "id": "eq_fountainpen",
+      "name": "비싼 만년필",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "atk": 6,
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "정성 들인 서명",
+          "when": {
+            "on": "make",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "형상 강화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "새로 만든 카드에 서명을 하면 값이 오른다."
+    },
+    {
+      "id": "eq_pillow",
+      "name": "폭신한 베개",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "hp": 80,
+        "def": 4
+      },
+      "effect": [
+        {
+          "name": "남겨 둔 기운",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "apLeft",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "AP 를 남기고 누우면 다음 턴에 개운하다."
+    },
+    {
+      "id": "eq_eldainlamp",
+      "name": "엘다인 램프",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "hp": 60,
+        "atk": 8,
+        "def": 5
+      },
+      "effect": [
+        {
+          "name": "타오르는 심지",
+          "when": {
+            "on": "spend",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "아군이 모아 둔 힘을 쓰면 심지가 더 밝게 탄다."
+    },
+    {
+      "id": "eq_lifegem",
+      "name": "생명의 보석",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "hp": 150
+      },
+      "effect": [
+        {
+          "name": "마지막 숨",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "쓰러질 한 대를 한 번은 버티게 한다."
+    },
+    {
+      "id": "eq_sunnycard",
+      "name": "날씨는 맑음 카드",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "atk": 8,
+        "crit": 5
+      },
+      "effect": [
+        {
+          "name": "맑은 날 맞장구",
+          "when": {
+            "on": "link",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "누가 맞장구를 치면 다들 손이 바빠진다."
+    },
+    {
+      "id": "eq_assassinbook",
+      "name": "암살자의 비급",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "atk": 10,
+        "crit": 6
+      },
+      "effect": [
+        {
+          "name": "무너진 틈",
+          "when": {
+            "on": "break"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 3,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "쓰러진 자세의 적을 노리는 법이 적혀 있다."
+    },
+    {
+      "id": "eq_toyscope",
+      "name": "장난감 망원경",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "atk": 8,
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "먼저 봤다",
+          "when": {
+            "on": "foeActBefore",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "적이 휘두르기 직전 손목을 먼저 본다."
+    },
+    {
+      "id": "eq_battery",
+      "name": "마도 공학 배터리",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "hp": 60,
+        "atk": 8
+      },
+      "effect": [
+        {
+          "name": "과충전",
+          "when": {
+            "on": "play",
+            "tag": "열정",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "뜨거운 카드가 나가면 남는 열을 AP 로 돌린다."
+    },
+    {
+      "id": "eq_grail",
+      "name": "기원의 성배",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "hp": 80,
+        "def": 6
+      },
+      "effect": [
+        {
+          "name": "흘러넘친 기원",
+          "when": {
+            "on": "discard",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "버려진 카드의 기원도 성배에 고인다."
+    },
+    {
+      "id": "eq_yellowcard",
+      "name": "옐로카드",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "atk": 8,
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "경고 누적",
+          "when": {
+            "on": "debuff",
+            "who": "any",
+            "fresh": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "새 반칙을 찾아낼 때마다 한 장 더 꺼낸다."
+    },
+    {
+      "id": "eq_epad",
+      "name": "E-Pad 클래식",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "atk": 6,
+        "def": 4,
+        "crit": 3
+      },
+      "effect": [
+        {
+          "name": "새로 고침",
+          "when": {
+            "on": "shuffle"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "더미를 섞으면 화면이 새로 고쳐진다."
+    }
+  ]
+}

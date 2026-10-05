@@ -1,0 +1,774 @@
+{
+  "heroes": [
+    {
+      "id": "스패럿",
+      "name": "스패럿",
+      "nature": "순수",
+      "race": "수인",
+      "row": "back",
+      "role": "서포터",
+      "star": 3,
+      "hp": 580,
+      "atk": 86,
+      "def": 58,
+      "crit": 5,
+      "blurb": "권총을 찬 오색앵무 수인, 앵무 해적단 선장.",
+      "keyword": {
+        "name": "노획물",
+        "desc": "「해적의 약탈」 — 실드를 깨거나 적을 쓰러뜨릴 때마다 챙기는 노획물. 일제사격의 포탄이 된다.",
+        "carrier": "self",
+        "cap": 5
+      },
+      "passives": [
+        {
+          "name": "해적의 약탈",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "해적의 약탈",
+          "when": {
+            "on": "foeShieldBreak",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "야아알~! 돌격!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.5,
+            "target": "randomEnemy",
+            "hits": 4
+          },
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "make",
+            "id": "스패럿_t1",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "스패럿_s1",
+        "스패럿_s1",
+        "스패럿_s2",
+        "스패럿_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "스패럿_s1",
+      "name": "해적 권총",
+      "hero": "스패럿",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "스패럿_s2",
+      "name": "항해용 비스킷",
+      "hero": "스패럿",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "스패럿_u1",
+      "name": "오늘은 저녀석이다!",
+      "hero": "스패럿",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "표식",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 오늘은 저녀석이다!",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 오늘은 저녀석이다!",
+          "cost": 0,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "약탈한 오늘은 저녀석이다!",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 오늘은 저녀석이다!",
+          "tags": [
+            "분쇄",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 오늘은 저녀석이다!",
+          "tags": [
+            "분쇄",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "두둑한 자루",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스패럿_u2",
+      "name": "해적의 언어",
+      "hero": "스패럿",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 해적의 언어",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 해적의 언어",
+          "cost": 0,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "약탈한 해적의 언어",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 해적의 언어",
+          "tags": [
+            "분쇄",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 해적의 언어",
+          "tags": [
+            "분쇄",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "두둑한 자루",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스패럿_u3",
+      "name": "약탈한 전리품",
+      "hero": "스패럿",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "스패럿_t1",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 약탈한 전리품",
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 약탈한 전리품",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "약탈한 약탈한 전리품",
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 약탈한 전리품",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 약탈한 전리품",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "두둑한 자루",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스패럿_u4",
+      "name": "플라즈마 포 일제사격",
+      "hero": "스패럿",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "strip",
+          "target": "allEnemies"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "노획물"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 플라즈마 포 일제사격",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "strip",
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "노획물"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 플라즈마 포 일제사격",
+          "cost": 1,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "strip",
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "노획물"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "약탈한 플라즈마 포 일제사격",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "strip",
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "노획물"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "재빠른 플라즈마 포 일제사격",
+          "tags": [
+            "분쇄",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "strip",
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "노획물"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 플라즈마 포 일제사격",
+          "tags": [
+            "분쇄",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "strip",
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "노획물"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "두둑한 자루",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스패럿_t1",
+      "name": "전리품",
+      "hero": "스패럿",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "ifRandom",
+          "pct": 0.35
+        },
+        {
+          "k": "ap",
+          "v": 1
+        },
+        {
+          "k": "ifRandom",
+          "pct": 0.35
+        },
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "ifRandom",
+          "pct": 0.35
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ]
+    }
+  ]
+}

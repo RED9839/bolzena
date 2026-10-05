@@ -1,0 +1,754 @@
+{
+  "heroes": [
+    {
+      "id": "앨리스",
+      "name": "앨리스",
+      "nature": "광기",
+      "race": "유령",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 620,
+      "atk": 125,
+      "def": 28,
+      "crit": 10,
+      "blurb": "타로로 남의 미래를 봐 주다 슬쩍 골려 먹는 점술사 유령. 턴마다 카드 한 장을 펼쳐 파티의 기세나 적의 불운을 점치고, 쌓인 「행운」 을 한 방에 몰아 쓴다.",
+      "keyword": {
+        "name": "행운",
+        "desc": "타로가 점지한 운 — 앨리스의 손끝을 날카롭게 한다",
+        "carrier": "self",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "아르카나 한 장",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "ifRandom",
+              "pct": 0.3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.4
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "액땜",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "randomEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "행운",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "앨리스_s1",
+        "앨리스_s1",
+        "앨리스_s3",
+        "앨리스_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "앨리스_s1",
+      "name": "카드 날리기",
+      "hero": "앨리스",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "앨리스_s2",
+      "name": "운명 회피",
+      "hero": "앨리스",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "앨리스_s3",
+      "name": "카드 한 벌 날리기",
+      "hero": "앨리스",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "앨리스_u1",
+      "name": "아르카나",
+      "hero": "앨리스",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "행운",
+          "v": 1
+        },
+        {
+          "k": "ifRandom",
+          "pct": 0.5
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대아르카나",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "소아르카나",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "뒤집어 둔 패",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "운명의 수레바퀴",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 2
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 패",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "날 선 카드",
+          "kind": "power"
+        },
+        {
+          "name": "불길한 패",
+          "kind": "frost"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "앨리스_u2",
+      "name": "남의 불운",
+      "hero": "앨리스",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "행운"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "행운",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "최악의 점괘",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "행운"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "행운",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "가벼운 불운",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "행운"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "행운",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "미뤄 둔 불운",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "행운"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "행운",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "탑 카드",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "행운"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 불운",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "행운"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "행운",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "정확한 예언",
+          "kind": "power"
+        },
+        {
+          "name": "뒤틀린 운명",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "액땜",
+          "kind": "defUp"
+        }
+      ]
+    },
+    {
+      "id": "앨리스_u3",
+      "name": "비추는 거울",
+      "hero": "앨리스",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "행운",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "선명한 거울",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "손거울",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "덮어 둔 거울",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "거울 속 별",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 거울",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "맑은 거울",
+          "kind": "draw"
+        },
+        {
+          "name": "빠른 점",
+          "kind": "cost"
+        },
+        {
+          "name": "비친 미소",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "앨리스_u4",
+      "name": "밑장 빼기",
+      "hero": "앨리스",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "discard",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "행운",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "능숙한 밑장",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "살짝 밑장",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "숨겨 둔 패",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "패 바꿔치기",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 밑장",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "소매 속 패",
+          "kind": "draw"
+        },
+        {
+          "name": "재빠른 손",
+          "kind": "cost"
+        },
+        {
+          "name": "딱 맞는 패",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

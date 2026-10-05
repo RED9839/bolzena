@@ -1,0 +1,716 @@
+{
+ "heroes": [
+  {
+   "id": "리코타",
+   "name": "리코타",
+   "nature": "냉정",
+   "race": "요정",
+   "row": "front",
+   "role": "탱커",
+   "star": 3,
+   "hp": 960,
+   "atk": 90,
+   "def": 67,
+   "crit": 5,
+   "blurb": "요정이 요리를 한다고 무시당하던 모나티엄에서 밤잠과 단맛까지 포기하며 버텨 수석으로 졸업한 요정 왕궁 셰프. 요리 실력은 완벽한데 상황을 읽는 눈썰미가 없어 접객만 하면 사고가 나고, 돌맛이 궁금하다며 궁전 바닥까지 핥아 본다. 파인애플 피자만큼은 용서 못 한다.",
+   "keyword": {
+    "name": "코스",
+    "desc": "한 턴의 식탁 — 0코 전채, 1코 본식, 2코 이상 메인이 차례로 나오면 완성",
+    "carrier": "self",
+    "cap": 2,
+    "endClear": true,
+    "rules": [
+     {
+      "name": "풀코스",
+      "when": {
+       "on": "play",
+       "who": "any",
+       "maxCost": 0
+      },
+      "conds": [
+       {
+        "c": "stack",
+        "id": "코스",
+        "n": 1,
+        "not": true
+       }
+      ],
+      "fx": [
+       {
+        "k": "stack",
+        "id": "코스",
+        "v": 1
+       }
+      ]
+     },
+     {
+      "name": "풀코스",
+      "when": {
+       "on": "play",
+       "who": "any",
+       "minCost": 1,
+       "maxCost": 1
+      },
+      "conds": [
+       {
+        "c": "stack",
+        "id": "코스",
+        "n": 1
+       }
+      ],
+      "fx": [
+       {
+        "k": "stack",
+        "id": "코스",
+        "v": 1
+       }
+      ]
+     },
+     {
+      "name": "풀코스",
+      "when": {
+       "on": "play",
+       "who": "any",
+       "minCost": 2
+      },
+      "conds": [
+       {
+        "c": "stack",
+        "id": "코스",
+        "n": 2
+       }
+      ],
+      "limit": {
+       "per": "turn",
+       "n": 1
+      },
+      "fx": [
+       {
+        "k": "shield",
+        "ratio": 1.5
+       },
+       {
+        "k": "dmg",
+        "ratio": 1,
+        "target": "oneEnemy",
+        "base": "def"
+       },
+       {
+        "k": "spend",
+        "id": "코스",
+        "all": true
+       }
+      ]
+     }
+    ]
+   },
+   "passives": [],
+   "ult": {
+    "name": "준비만전",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 2.5,
+      "target": "oneEnemy",
+      "base": "def"
+     },
+     {
+      "k": "tough",
+      "v": 2
+     },
+     {
+      "k": "shield",
+      "ratio": 2
+     }
+    ]
+   },
+   "starter": [
+    "리코타_s1",
+    "리코타_s1",
+    "리코타_s2",
+    "리코타_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "리코타_s1",
+   "name": "주방칼 썰기",
+   "hero": "리코타",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "리코타_s2",
+   "name": "냄비 뚜껑",
+   "hero": "리코타",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ]
+  },
+  {
+   "id": "리코타_u1",
+   "name": "아뮤즈 부쉬",
+   "hero": "리코타",
+   "unique": true,
+   "cost": 0,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 1.2
+    },
+    {
+     "k": "stack",
+     "id": "코스",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "진한 전채",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.55
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 전채",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.7
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "코스의 전채",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.3
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "숙성한 전채",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.45
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "축복의 전채",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.45
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 숨결",
+     "kind": "guard",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "리코타_u2",
+   "name": "다 조려버리겠습니다",
+   "hero": "리코타",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "tags": [
+    "분쇄"
+   ],
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.8,
+     "target": "oneEnemy",
+     "base": "def"
+    },
+    {
+     "k": "shield",
+     "ratio": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "진한 조림",
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.05,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.3
+      }
+     ]
+    },
+    {
+     "name": "가벼운 조림",
+     "cost": 0,
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.6,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 0.75
+      }
+     ]
+    },
+    {
+     "name": "코스의 조림",
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.1
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "숙성한 조림",
+     "tags": [
+      "분쇄",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.95,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.2
+      }
+     ]
+    },
+    {
+     "name": "축복의 조림",
+     "tags": [
+      "분쇄",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.95,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "리코타_u3",
+   "name": "리코타 풀코스",
+   "hero": "리코타",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 3.5
+    },
+    {
+     "k": "ifStack",
+     "id": "코스",
+     "n": 1
+    },
+    {
+     "k": "dmg",
+     "ratio": 1.2,
+     "target": "oneEnemy",
+     "base": "def"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "진한 메인 요리",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 4.55
+      },
+      {
+       "k": "ifStack",
+       "id": "코스",
+       "n": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.55,
+       "target": "oneEnemy",
+       "base": "def"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 메인 요리",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.8
+      },
+      {
+       "k": "ifStack",
+       "id": "코스",
+       "n": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.95,
+       "target": "oneEnemy",
+       "base": "def"
+      }
+     ]
+    },
+    {
+     "name": "코스의 메인 요리",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.85
+      },
+      {
+       "k": "ifStack",
+       "id": "코스",
+       "n": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.3,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "숙성한 메인 요리",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 4.2
+      },
+      {
+       "k": "ifStack",
+       "id": "코스",
+       "n": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.45,
+       "target": "oneEnemy",
+       "base": "def"
+      }
+     ]
+    },
+    {
+     "name": "축복의 메인 요리",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 4.2
+      },
+      {
+       "k": "ifStack",
+       "id": "코스",
+       "n": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.45,
+       "target": "oneEnemy",
+       "base": "def"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 숨결",
+     "kind": "guard",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "리코타_u4",
+   "name": "요리를 무시하지 마십시오",
+   "hero": "리코타",
+   "unique": true,
+   "cost": 2,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "defMod",
+     "v": 0.2,
+     "run": true,
+     "target": "self"
+    },
+    {
+     "k": "status",
+     "id": "반격",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "진한 셰프의 자존심",
+     "tags": [],
+     "fx": [
+      {
+       "k": "defMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "가벼운 셰프의 자존심",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "defMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "코스의 셰프의 자존심",
+     "tags": [],
+     "fx": [
+      {
+       "k": "defMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "숙성한 셰프의 자존심",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "defMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "축복의 셰프의 자존심",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "defMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "가벼운 숨결",
+     "kind": "cost",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "기세의 숨결",
+     "kind": "atkUp",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,702 @@
+{
+  "heroes": [
+    {
+      "id": "마에스트로2호",
+      "name": "마에스트로 2호",
+      "nature": "광기",
+      "race": "엘프",
+      "row": "front",
+      "role": "탱커",
+      "star": 2,
+      "hp": 880,
+      "atk": 66,
+      "def": 66,
+      "crit": 5,
+      "blurb": "온갖 연료로 움직이는 로봇. 파티에 실드가 쌓일 때마다 배터리가 차고, 공격 한 번에 배터리를 몽땅 쏟아붓는다.",
+      "keyword": {
+        "name": "배터리",
+        "desc": "실드를 얻을 때마다 차오르는 전력(치유로는 안 찬다). 1개당 마에스트로 2호의 피해 +10%, 카드 한 장에 모두 쏟는다",
+        "carrier": "self",
+        "cap": 10,
+        "consumeAll": true,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "무엇이든 연료로",
+          "when": {
+            "on": "guard",
+            "kind": "shield"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 4
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "사운더스 쇼크 웨이브",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2,
+            "base": "def",
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "마에스트로2호_s1",
+        "마에스트로2호_s1",
+        "마에스트로2호_s2",
+        "마에스트로2호_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "마에스트로2호_s1",
+      "name": "기계 팔 가격",
+      "hero": "마에스트로2호",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마에스트로2호_s2",
+      "name": "장갑판 전개",
+      "hero": "마에스트로2호",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "마에스트로2호_u1",
+      "name": "로보틱 매트릭스",
+      "hero": "마에스트로2호",
+      "unique": true,
+      "signature": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 3.5
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "배터리",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "가동 즉시 전개",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 4.55
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "최대 출력 매트릭스",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.5
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "척살 모드 경고",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 4.2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "과충전 회로",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 5.08
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "방화벽",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 4.2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "배터리 A3쨩",
+          "kind": "guard"
+        },
+        {
+          "name": "수은음료",
+          "kind": "draw"
+        },
+        {
+          "name": "초록불 빨간불",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마에스트로2호_u2",
+      "name": "A3쨩 정비",
+      "hero": "마에스트로2호",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "배터리",
+          "v": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "아침 점검",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전면 분해 정비",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "광석 연료 투입",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.98
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "수은음료 급속 충전",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.17
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자가 회복 기능",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "방화벽",
+          "kind": "guard"
+        },
+        {
+          "name": "자가 회복 기능",
+          "kind": "draw"
+        },
+        {
+          "name": "광석 연료",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마에스트로2호_u3",
+      "name": "진격 방해 모드",
+      "hero": "마에스트로2호",
+      "unique": true,
+      "cost": 3,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.5,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "tough",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 2,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "모드 대기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "소음 출력 한계 돌파",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "방어선 유지",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "충전 방전",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.17,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "초록불 빨간불",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "수은음료",
+          "kind": "power"
+        },
+        {
+          "name": "초록불 빨간불",
+          "kind": "ap"
+        },
+        {
+          "name": "배터리 A3쨩",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마에스트로2호_u4",
+      "name": "카메라 담당",
+      "hero": "마에스트로2호",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "stack",
+          "id": "배터리",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "녹화 대기",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다각도 촬영",
+          "cost": 0,
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "줌 아웃 경고",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "공기 취급",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.17
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오프닝 불참",
+          "tags": [
+            "연계",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.98
+            },
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "자가 회복 기능",
+          "kind": "guard"
+        },
+        {
+          "name": "광석 연료",
+          "kind": "draw"
+        },
+        {
+          "name": "방화벽",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배터리",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,713 @@
+{
+  "heroes": [
+    {
+      "id": "모모",
+      "name": "모모",
+      "nature": "활발",
+      "race": "수인",
+      "row": "back",
+      "role": "딜러",
+      "star": 3,
+      "hp": 580,
+      "atk": 145,
+      "def": 30,
+      "crit": 10,
+      "blurb": "닌자 만화에 푹 빠진 다람쥐 수인.",
+      "keyword": {
+        "name": "분신",
+        "desc": "「분신술」 — 일류 닌자의 분신. 공격 카드를 내면 하나가 따라 치고, 파티가 맞으면 하나가 통나무로 바뀌어 다음 한 대를 흘린다.",
+        "carrier": "self",
+        "cap": 3
+      },
+      "passives": [
+        {
+          "name": "분신술",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "분신"
+            }
+          ],
+          "fx": [
+            {
+              "k": "spend",
+              "id": "분신",
+              "v": 1
+            },
+            {
+              "k": "extra",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "통나무 바꿔치기",
+          "when": {
+            "on": "hurt"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "분신"
+            }
+          ],
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "spend",
+              "id": "분신",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "초살 람쥐썬더",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.8,
+            "target": "oneEnemy",
+            "hits": 4
+          },
+          {
+            "k": "status",
+            "id": "충격",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "분신",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "모모_s1",
+        "모모_s1",
+        "모모_s2",
+        "모모_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "모모_s1",
+      "name": "람쥐 수리검",
+      "hero": "모모",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "모모_s2",
+      "name": "왕 람쥐 수리검",
+      "hero": "모모",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "모모_s3",
+      "name": "통나무 바꿔치기",
+      "hero": "모모",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "모모_u1",
+      "name": "두배로 안아준닷",
+      "hero": "모모",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "ifStack",
+          "id": "분신",
+          "n": 2
+        },
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 두배로 안아준닷",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "분신",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 두배로 안아준닷",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "분신",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "그림자 두배로 안아준닷",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "분신",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 두배로 안아준닷",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "분신",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 두배로 안아준닷",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "분신",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "닌자의 극의",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "모모_u2",
+      "name": "전기 수리검",
+      "hero": "모모",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "충격",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 전기 수리검",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 전기 수리검",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "그림자 전기 수리검",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 전기 수리검",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 전기 수리검",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "닌자의 극의",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "모모_u3",
+      "name": "환영술",
+      "hero": "모모",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "분신",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "회피",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 환영술",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 환영술",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "그림자 환영술",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 환영술",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 환영술",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "닌자의 극의",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "모모_u4",
+      "name": "카게닌자의 극의",
+      "hero": "모모",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "분신",
+          "v": 3
+        },
+        {
+          "k": "status",
+          "id": "회피",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 카게닌자의 극의",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 카게닌자의 극의",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "그림자 카게닌자의 극의",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 5
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 카게닌자의 극의",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 카게닌자의 극의",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "닌자의 극의",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

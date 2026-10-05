@@ -1,0 +1,14 @@
+import { load, save, setCard, hero, scale } from './lib.mjs';
+const ed=(k,f)=>{const j=load(k);f(j,hero(j));save(k,j);};
+const card=(j,id)=>j.cards.find(c=>c.id===id);
+const up=(j,id,k)=>{const c=card(j,id); setCard(j,id,{fx:scale(c.fx,k)});};
+ed('루포',(j)=>{ up(j,'루포_u1',1.15); up(j,'루포_u3',1.15); up(j,'루포_u4',1.15);
+  setCard(j,'루포_u2',{fx:[{k:'stack',id:'계획',v:2},{k:'draw',v:2},{k:'status',id:'피해 감소',v:1}]}); });
+ed('티그',(j)=>{ up(j,'티그_u1',1.15); up(j,'티그_u2',1.15); up(j,'티그_u3',1.15);
+  setCard(j,'티그_u4',{fx:[{k:'atkMod',v:0.2,run:true,target:'self'},{k:'stack',id:'장작 패기',v:2},{k:'status',id:'불굴',v:1}]}); });
+ed('쵸피',(j)=>{ up(j,'쵸피_u1',1.15); up(j,'쵸피_u2',1.15);
+  setCard(j,'쵸피_u3',{fx:[{k:'stack',id:'수련',v:2},{k:'status',id:'잔광',v:2},{k:'status',id:'불굴',v:1}]}); });
+ed('바나',(j)=>{ setCard(j,'바나_u1',{fx:[{k:'cardStatus',id:'탐구심',v:1,to:'hand',n:0},{k:'shield',ratio:2.0},{k:'stack',id:'단조',v:1}]});
+  setCard(j,'바나_u3',{fx:[{k:'shield',ratio:1.5},{k:'cardStatus',id:'탐구심',v:1,to:'hand',n:2},{k:'draw',v:1}]}); });
+ed('에피카',(j,h)=>{ h.keyword.cap=3; });
+ed('코미',(j,h)=>{ h.passives[0].fx[1].ratio=0.7; h.keyword.desc=h.keyword.desc; });

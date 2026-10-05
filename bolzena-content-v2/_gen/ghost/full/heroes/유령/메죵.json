@@ -1,0 +1,692 @@
+{
+  "heroes": [
+    {
+      "id": "메죵",
+      "name": "메죵",
+      "nature": "광기",
+      "race": "유령",
+      "row": "back",
+      "role": "딜러",
+      "star": 1,
+      "hp": 420,
+      "atk": 104,
+      "def": 23,
+      "crit": 10,
+      "blurb": "어디든 들어가면 거기가 내 집이 되는 태평한 유령. 적 하나에 「입주」 해 눌러앉고, 적이 실드를 세우면 제 집 담장인 양 파티가 나눠 쓴다. 집주인이 쓰러지면 짐 싸서 다음 집으로.",
+      "keyword": {
+        "name": "입주",
+        "desc": "메죵이 눌러앉은 집 — 집주인은 영 편하지 않다",
+        "carrier": "enemy",
+        "hunt": true,
+        "cap": 1,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.45
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "여기가 내 집",
+          "when": {
+            "on": "foeGuard"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "이사",
+          "when": {
+            "on": "huntDown",
+            "id": "입주"
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1,
+              "target": "topEnemy"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주의 천벌 - 메죵",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 4.5,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "입주",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "메죵_s1",
+        "메죵_s1",
+        "메죵_s3",
+        "메죵_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "메죵_s1",
+      "name": "수리검",
+      "hero": "메죵",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "메죵_s2",
+      "name": "이불 속으로",
+      "hero": "메죵",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "메죵_s3",
+      "name": "왕수리검",
+      "hero": "메죵",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "메죵_u1",
+      "name": "수리검 날아갑니다!",
+      "hero": "메죵",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "hits": 3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "입주",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "수리검 소나기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "hits": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "수리검 두 개",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "hits": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "모아 둔 수리검",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "hits": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "집들이 선물",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "hits": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 수리검",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "hits": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "날 선 수리검",
+          "kind": "power"
+        },
+        {
+          "name": "빈틈 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "굴러온 수리검",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "메죵_u2",
+      "name": "집문서 내놔",
+      "hero": "메죵",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "strip"
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "강제 집행",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "strip"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "문서 흔들기",
+          "cost": 1,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "strip"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "품에 든 문서",
+          "tags": [
+            "분쇄",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "strip"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "부동산 뒤엎기",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "strip"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 문서",
+          "tags": [
+            "분쇄",
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "strip"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "억지 도장",
+          "kind": "power"
+        },
+        {
+          "name": "빈틈 찾기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "빠른 서명",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "메죵_u3",
+      "name": "눌러앉기",
+      "hero": "메죵",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "입주",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 1.4
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "드러눕기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 2.05
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "살짝 앉기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.05
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "이불 깔아 두기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "내 방 꾸미기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 방석",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "두툼한 이불",
+          "kind": "guard"
+        },
+        {
+          "name": "재빠른 짐 풀기",
+          "kind": "draw"
+        },
+        {
+          "name": "태평한 하품",
+          "kind": "defUp"
+        }
+      ]
+    },
+    {
+      "id": "메죵_u4",
+      "name": "제가 주인인 양",
+      "hero": "메죵",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "입주",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "당당한 주인 행세",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "슬쩍 주인 행세",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "익숙한 주인 행세",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "문패 바꿔 달기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 집",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "큰소리",
+          "kind": "frost"
+        },
+        {
+          "name": "빠른 이사",
+          "kind": "cost"
+        },
+        {
+          "name": "집주인 미소",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

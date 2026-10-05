@@ -1,0 +1,757 @@
+{
+  "heroes": [
+    {
+      "id": "디아나_왕년",
+      "name": "디아나(왕년)",
+      "nature": "냉정",
+      "race": "수인",
+      "row": "front",
+      "role": "딜러",
+      "star": 3,
+      "hp": 850,
+      "atk": 156,
+      "def": 37,
+      "crit": 10,
+      "blurb": "우로스를 쓰러뜨리기 직전, 한창때의 디아나가 벨벳이 찢은 책에서 튀어나온 모습.",
+      "keyword": {
+        "name": "백수공권",
+        "desc": "「단순하게」 — 손을 비우고 맨몸으로 치는 버릇. 손을 다 털어 낸 공격마다 쌓여 1개당 자신의 피해가 오른다.",
+        "carrier": "self",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.15
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "단순하게",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "부순다",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "tough",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "백수공권",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "디아나_왕년_s1",
+        "디아나_왕년_s1",
+        "디아나_왕년_s2",
+        "디아나_왕년_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "디아나_왕년_s1",
+      "name": "도끼질",
+      "hero": "디아나_왕년",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_s2",
+      "name": "도끼 내려찍기",
+      "hero": "디아나_왕년",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_s3",
+      "name": "털가죽 버티기",
+      "hero": "디아나_왕년",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u1",
+      "name": "찢는다",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifHand",
+          "n": 2
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifHand",
+          "n": 0
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 찢는다",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 찢는다",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "단순한 찢는다",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "재빠른 찢는다",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 찢는다",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "귀찮은 건 질색",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u2",
+      "name": "복잡한 건 질색",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 3,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "discard",
+          "all": true
+        },
+        {
+          "k": "dmg",
+          "ratio": 3.8,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 복잡한 건 질색",
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 4.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 복잡한 건 질색",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "단순한 복잡한 건 질색",
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 4.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 복잡한 건 질색",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 4.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 복잡한 건 질색",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 4.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "귀찮은 건 질색",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u3",
+      "name": "수련은 거르지 않는다",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "백수공권",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "잔광",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 수련은 거르지 않는다",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 수련은 거르지 않는다",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "단순한 수련은 거르지 않는다",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "든든한 수련은 거르지 않는다",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 수련은 거르지 않는다",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "귀찮은 건 질색",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u4",
+      "name": "맨주먹 한 방",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifHand",
+          "n": 0
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 맨주먹 한 방",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "가벼운 맨주먹 한 방",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "단순한 맨주먹 한 방",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "재빠른 맨주먹 한 방",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 맨주먹 한 방",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "귀찮은 건 질색",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

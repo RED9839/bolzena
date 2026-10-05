@@ -1,0 +1,733 @@
+{
+ "heroes": [
+  {
+   "id": "카렌",
+   "name": "카렌",
+   "nature": "활발",
+   "race": "요정",
+   "row": "back",
+   "role": "딜러",
+   "star": 1,
+   "hp": 440,
+   "atk": 93,
+   "def": 23,
+   "crit": 10,
+   "blurb": "생식 요정의 모범이던 엘튜버였지만, 드레싱 뿌린 샐러드를 먹다 찍혀 몰락했다. 생당근은 질색, 당근 케이크는 최고. 구독자를 되찾기 위해 오늘도 방송 켠다.",
+   "keyword": {
+    "name": "구독자",
+    "desc": "샐러드 사건 뒤 다시 모으는 시청자 — 볼수록 힘이 나고, 다섯마다 떡상",
+    "carrier": "self",
+    "cap": 10,
+    "per": [
+     {
+      "stat": "dealt",
+      "v": 0.05
+     }
+    ],
+    "rules": [
+     {
+      "name": "생방송 구독자",
+      "when": {
+       "on": "fightStart"
+      },
+      "fx": [
+       {
+        "k": "stack",
+        "id": "구독자",
+        "v": 2
+       }
+      ]
+     },
+     {
+      "name": "생방송 구독자",
+      "when": {
+       "on": "kill",
+       "mine": true
+      },
+      "fx": [
+       {
+        "k": "stack",
+        "id": "구독자",
+        "v": 2
+       }
+      ]
+     },
+     {
+      "name": "생방송 구독자",
+      "when": {
+       "on": "break",
+       "mine": true
+      },
+      "fx": [
+       {
+        "k": "stack",
+        "id": "구독자",
+        "v": 2
+       }
+      ]
+     },
+     {
+      "name": "생방송 구독자",
+      "when": {
+       "on": "overheal"
+      },
+      "limit": {
+       "per": "turn",
+       "n": 1
+      },
+      "fx": [
+       {
+        "k": "stack",
+        "id": "구독자",
+        "v": 1
+       }
+      ]
+     },
+     {
+      "name": "생방송 구독자",
+      "when": {
+       "on": "lowHp",
+       "pct": 0.3
+      },
+      "fx": [
+       {
+        "k": "spend",
+        "id": "구독자",
+        "v": 3
+       }
+      ]
+     },
+     {
+      "name": "떡상",
+      "when": {
+       "on": "stackReach",
+       "id": "구독자",
+       "n": 5
+      },
+      "fx": [
+       {
+        "k": "status",
+        "id": "사기",
+        "v": 1
+       },
+       {
+        "k": "ap",
+        "v": 1
+       },
+       {
+        "k": "spend",
+        "id": "구독자",
+        "v": 5
+       }
+      ]
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "켜진 방송",
+     "when": {
+      "on": "play",
+      "type": "공격"
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "교주의 축복 - 카렌",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "heal",
+      "ratio": 6
+     },
+     {
+      "k": "status",
+      "id": "사기",
+      "v": 1
+     },
+     {
+      "k": "stack",
+      "id": "구독자",
+      "v": 3
+     }
+    ]
+   },
+   "starter": [
+    "카렌_s1",
+    "카렌_s1",
+    "카렌_s2",
+    "카렌_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "카렌_s1",
+   "name": "당근 던지기",
+   "hero": "카렌",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "카렌_s2",
+   "name": "왕당근 던지기",
+   "hero": "카렌",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "카렌_s3",
+   "name": "셀카봉 가드",
+   "hero": "카렌",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ]
+  },
+  {
+   "id": "카렌_u1",
+   "name": "어그로 댓글 추적 방송",
+   "hero": "카렌",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.8,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "취약",
+     "v": 2
+    },
+    {
+     "k": "stack",
+     "id": "구독자",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "화제의 추적 방송",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.65,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 추적 방송",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.25,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "떡상한 추적 방송",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.5,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "예약된 추적 방송",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.35,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "축복의 추적 방송",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.35,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "카렌_u2",
+   "name": "엘튜브 생방송 마법쇼",
+   "hero": "카렌",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.7,
+     "target": "randomEnemy",
+     "hits": 4
+    },
+    {
+     "k": "stack",
+     "id": "구독자",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "화제의 마법쇼",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "randomEnemy",
+       "hits": 4
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "가벼운 마법쇼",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.55,
+       "target": "randomEnemy",
+       "hits": 4
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "떡상한 마법쇼",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.75,
+       "target": "randomEnemy",
+       "hits": 4
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "예약된 마법쇼",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.85,
+       "target": "randomEnemy",
+       "hits": 4
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "축복의 마법쇼",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.85,
+       "target": "randomEnemy",
+       "hits": 4
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "카렌_u3",
+   "name": "당근 치유",
+   "hero": "카렌",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 4.2
+    },
+    {
+     "k": "stack",
+     "id": "구독자",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "화제의 당근 케이크",
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 5.45
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "가벼운 당근 케이크",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 3.35
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "떡상한 당근 케이크",
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 4.6
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "예약된 당근 케이크",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 5.05
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "축복의 당근 케이크",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 5.05
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "포근한 숨결",
+     "kind": "heal",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "카렌_u4",
+   "name": "근본 생식 챌린지",
+   "hero": "카렌",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "stack",
+     "id": "구독자",
+     "v": 3
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "화제의 챌린지",
+     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 4
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 챌린지",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 3
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "떡상한 챌린지",
+     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 5
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "예약된 챌린지",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 4
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "축복의 챌린지",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 4
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

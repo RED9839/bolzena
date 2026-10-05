@@ -1,0 +1,693 @@
+{
+  "heroes": [
+    {
+      "id": "슈로",
+      "name": "슈로",
+      "nature": "활발",
+      "race": "수인",
+      "row": "front",
+      "role": "서포터",
+      "star": 3,
+      "hp": 700,
+      "atk": 92,
+      "def": 65,
+      "crit": 5,
+      "blurb": "마카샤가 비틀어 쓴 우로스 이야기책에서 태어난 유리도마뱀 소녀.",
+      "keyword": {
+        "name": "결투",
+        "desc": "「통성명 뒤엔 결투」 — 칼을 맞댄 단 한 명의 상대(옮기면 처음부터). 그 상대의 공격을 실드로 다 막으면 강인도를 깎고, 쓰러뜨리면 반격을 세운다.",
+        "carrier": "enemy",
+        "cap": 1,
+        "hunt": true
+      },
+      "passives": [
+        {
+          "name": "통성명 뒤엔 결투",
+          "when": {
+            "on": "blocked"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "좋은 승부였어",
+          "when": {
+            "on": "huntDown",
+            "id": "결투"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "종이 한 장 차이",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "atkMod",
+            "v": 0.3,
+            "run": true,
+            "target": "self"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.4,
+            "target": "allEnemies",
+            "hits": 3
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "슈로_s1",
+        "슈로_s1",
+        "슈로_s2",
+        "슈로_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "슈로_s1",
+      "name": "목검 찌르기",
+      "hero": "슈로",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "슈로_s2",
+      "name": "유리비늘 붕대",
+      "hero": "슈로",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "슈로_u1",
+      "name": "검 조율",
+      "hero": "슈로",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.4
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 검 조율",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 검 조율",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "검사의 검 조율",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 검 조율",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 검 조율",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "맞댄 칼날",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈로_u2",
+      "name": "통성명",
+      "hero": "슈로",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "결투",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 통성명",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.3
+            }
+          ]
+        },
+        {
+          "name": "가벼운 통성명",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.9
+            }
+          ]
+        },
+        {
+          "name": "검사의 통성명",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.3
+            }
+          ]
+        },
+        {
+          "name": "재빠른 통성명",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.25
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 통성명",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "맞댄 칼날",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈로_u3",
+      "name": "장검 · 단도 · 한손검",
+      "hero": "슈로",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "ifStack",
+          "id": "결투"
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 장검 · 단도 · 한손검",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 장검 · 단도 · 한손검",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "검사의 장검 · 단도 · 한손검",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 장검 · 단도 · 한손검",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 장검 · 단도 · 한손검",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "맞댄 칼날",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈로_u4",
+      "name": "독 없는 투구꽃",
+      "hero": "슈로",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 독 없는 투구꽃",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 독 없는 투구꽃",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "검사의 독 없는 투구꽃",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 독 없는 투구꽃",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 독 없는 투구꽃",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "맞댄 칼날",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

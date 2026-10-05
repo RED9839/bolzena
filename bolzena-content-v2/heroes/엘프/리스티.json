@@ -1,0 +1,770 @@
+{
+  "heroes": [
+    {
+      "id": "리스티",
+      "name": "리스티",
+      "nature": "우울",
+      "race": "엘프",
+      "row": "back",
+      "role": "딜러",
+      "star": 3,
+      "hp": 550,
+      "atk": 135,
+      "def": 25,
+      "crit": 10,
+      "blurb": "곰인형 속 AI 글러브와 함께하는 해커. 공격할 때마다 콤보가 이어지며 고학년 게이지가 차고, 고학년 한 번이면 적의 다음 행동을 통째로 해킹한다.",
+      "keyword": {
+        "name": "콤보",
+        "desc": "이어 붙인 입력. 1개당 리스티의 피해 +8%",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.08
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "글러브 해킹",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 8
+            },
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "콤보 끊김",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "ownNone"
+            }
+          ],
+          "fx": [
+            {
+              "k": "spend",
+              "id": "콤보",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "복셀 글리치",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "콤보",
+            "v": 2
+          },
+          {
+            "k": "draw",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "리스티_s1",
+        "리스티_s1",
+        "리스티_s2",
+        "리스티_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "리스티_s1",
+      "name": "키보드 연타",
+      "hero": "리스티",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리스티_s2",
+      "name": "키보드 샷건",
+      "hero": "리스티",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.5,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리스티_s3",
+      "name": "방구석 바리케이드",
+      "hero": "리스티",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "리스티_u1",
+      "name": "테크노맨시",
+      "hero": "리스티",
+      "unique": true,
+      "signature": true,
+      "cost": 3,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "hits": 3,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "콤보",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "빌드 완성",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.91,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "리스티의 슈퍼 세이브",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "완벽한 팀",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.92,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "무한 콤보",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.01,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.32,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "마지막 입력",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.92,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "빌드 완성",
+          "kind": "power"
+        },
+        {
+          "name": "독타 페퍼",
+          "kind": "ap"
+        },
+        {
+          "name": "말동무 AI",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리스티_u2",
+      "name": "훗, 못 깨는 게임은 없지",
+      "hero": "리스티",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "콤보",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "스피드런",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "밤샘 레이드",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "팀원 캐리",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "최적화 루트",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "팀 큐",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "최적화 루트",
+          "kind": "guard"
+        },
+        {
+          "name": "양심 회로",
+          "kind": "draw"
+        },
+        {
+          "name": "무한 콤보",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리스티_u3",
+      "name": "다 마신 캔",
+      "hero": "리스티",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifChain"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "캔 탑 쌓기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifChain"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "한 박스째",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifChain"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "같이 던지기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifChain"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "리필 완료",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifChain"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "독타 페퍼",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifChain"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "독타 페퍼",
+          "kind": "power"
+        },
+        {
+          "name": "말동무 AI",
+          "kind": "ap"
+        },
+        {
+          "name": "빌드 완성",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리스티_u4",
+      "name": "글러브",
+      "hero": "리스티",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "gauge",
+          "v": 20
+        }
+      ],
+      "oracles": [
+        {
+          "name": "양심 회로",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 26
+            }
+          ]
+        },
+        {
+          "name": "분석 완료",
+          "cost": 0,
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "gauge",
+              "v": 20
+            }
+          ]
+        },
+        {
+          "name": "곰인형 방패",
+          "tags": [
+            "연계",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 24
+            }
+          ]
+        },
+        {
+          "name": "입력 보조",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "gauge",
+              "v": 20
+            },
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "말동무 AI",
+          "tags": [
+            "연계",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "gauge",
+              "v": 24
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "양심 회로",
+          "kind": "guard"
+        },
+        {
+          "name": "무한 콤보",
+          "kind": "draw"
+        },
+        {
+          "name": "최적화 루트",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_ristypad",
+      "name": "리스티의 게임 컨트롤러",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "atk": 17
+      },
+      "effect": [
+        {
+          "name": "입력 방해",
+          "when": {
+            "on": "hit"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "affinity": "리스티",
+      "affinityStats": {
+        "atk": 8
+      },
+      "affinityEffect": [
+        {
+          "name": "예열된 손가락",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "콤보",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blurb": "손에 붙은 듯 익숙한 컨트롤러. 맞힐 때마다 상대 손이 꼬인다."
+    }
+  ]
+}

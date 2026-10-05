@@ -1,0 +1,723 @@
+{
+  "heroes": [
+    {
+      "id": "유미미",
+      "name": "유미미",
+      "nature": "광기",
+      "race": "수인",
+      "row": "back",
+      "role": "딜러",
+      "star": 1,
+      "hp": 460,
+      "atk": 124,
+      "def": 23,
+      "crit": 10,
+      "blurb": "숲속에서 스스로 먹고사는 나른한 사냥꾼.",
+      "keyword": {
+        "name": "나른함",
+        "desc": "「늘어지기」 — 턴 끝마다 하나, 유미미 카드를 하나도 안 낸 턴이면 하나 더 쌓이는 나른함. 1개당 자신의 피해가 오르고, 공격 카드 한 장에 모두 쏟는다.",
+        "carrier": "self",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.3
+          }
+        ],
+        "consumeAll": true
+      },
+      "passives": [
+        {
+          "name": "늘어지기",
+          "when": {
+            "on": "turnEnd"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "늘어지기",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "ownNone"
+            }
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주의 천벌 - 유미미",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 5,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "나른함",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "유미미_s1",
+        "유미미_s1",
+        "유미미_s2",
+        "유미미_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "유미미_s1",
+      "name": "활 쏘기",
+      "hero": "유미미",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "유미미_s2",
+      "name": "강궁 한 발",
+      "hero": "유미미",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "유미미_s3",
+      "name": "나무 뒤 숨기",
+      "hero": "유미미",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "유미미_u1",
+      "name": "발싸! 아뵤~",
+      "hero": "유미미",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.3,
+          "target": "topEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "나른함",
+          "n": 3
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 발싸! 아뵤~",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3,
+              "target": "topEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 발싸! 아뵤~",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.05,
+              "target": "topEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "느긋한 발싸! 아뵤~",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.75,
+              "target": "topEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 발싸! 아뵤~",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.9,
+              "target": "topEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 발싸! 아뵤~",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.75,
+              "target": "topEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "한숨 늘어지기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "유미미_u2",
+      "name": "유령도 꿰뚫는 화살",
+      "hero": "유미미",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "나른함",
+          "n": 3
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 유령도 꿰뚫는 화살",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 유령도 꿰뚫는 화살",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "느긋한 유령도 꿰뚫는 화살",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 유령도 꿰뚫는 화살",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 유령도 꿰뚫는 화살",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "한숨 늘어지기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "유미미_u3",
+      "name": "수풀에 늘어지기",
+      "hero": "유미미",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "나른함",
+          "v": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 수풀에 늘어지기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.55
+            }
+          ]
+        },
+        {
+          "name": "가벼운 수풀에 늘어지기",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.1
+            }
+          ]
+        },
+        {
+          "name": "느긋한 수풀에 늘어지기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.45
+            }
+          ]
+        },
+        {
+          "name": "든든한 수풀에 늘어지기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            }
+          ]
+        },
+        {
+          "name": "복 받은 수풀에 늘어지기",
+          "tags": [
+            "보존",
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "한숨 늘어지기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "유미미_u4",
+      "name": "약하면 설치지 마",
+      "hero": "유미미",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifWounded",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.9,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 약하면 설치지 마",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.45,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 약하면 설치지 마",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "느긋한 약하면 설치지 마",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 약하면 설치지 마",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 약하면 설치지 마",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "한숨 늘어지기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

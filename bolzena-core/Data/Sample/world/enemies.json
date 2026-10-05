@@ -1,0 +1,544 @@
+{
+  "enemies": [
+    {
+      "id": "fairy_close",
+      "name": "저혈당 요정",
+      "hp": 420,
+      "row": "front",
+      "nature": "순수",
+      "pick": "shuffle",
+      "blurb": "굼뜬 무리 · 끼워 넣기 — 수가 다 느긋하다. 비틀거리면 「어지럼」 이 뽑을 더미에 든다.",
+      "intents": [
+        {
+          "t": "attack",
+          "v": 110,
+          "say": "달려든다",
+          "w": 2,
+          "rush": 9
+        },
+        {
+          "t": "multi",
+          "v": 40,
+          "n": 3,
+          "say": "우르르 몰려든다",
+          "rush": 10
+        },
+        {
+          "t": "block",
+          "v": 80,
+          "tough": 1,
+          "say": "웅크린다",
+          "rush": 0
+        },
+        {
+          "t": "addCard",
+          "id": "st_dizzy",
+          "n": 1,
+          "to": "draw",
+          "say": "당이 떨어져 비틀거린다",
+          "rush": 9
+        }
+      ]
+    },
+    {
+      "id": "fairy_long",
+      "name": "고혈당 요정",
+      "hp": 270,
+      "row": "back",
+      "nature": "활발",
+      "pick": "shuffle",
+      "blurb": "재촉꾼 · 당기면 손해 — 당기면 손에 「왁자지껄」 이 낀다.",
+      "passives": [
+        {
+          "name": "수다 전염",
+          "on": "rushed",
+          "do": {
+            "t": "addCard",
+            "id": "st_chatter",
+            "n": 1,
+            "to": "hand"
+          }
+        }
+      ],
+      "open": {
+        "t": "jam",
+        "v": 1,
+        "say": "왁자지껄 떠든다",
+        "rush": 3
+      },
+      "intents": [
+        {
+          "t": "back",
+          "v": 70,
+          "say": "뒤로 파고든다",
+          "w": 2,
+          "rush": 5
+        },
+        {
+          "t": "jam",
+          "v": 1,
+          "say": "왁자지껄 떠든다",
+          "rush": 3
+        },
+        {
+          "t": "debuff",
+          "id": "약화",
+          "v": 1,
+          "say": "장난을 친다",
+          "rush": 3
+        },
+        {
+          "t": "addCard",
+          "id": "st_chatter",
+          "n": 1,
+          "to": "hand",
+          "say": "수다를 퍼뜨린다",
+          "rush": 3
+        }
+      ]
+    },
+    {
+      "id": "magicfork",
+      "name": "불효자손",
+      "hp": 300,
+      "row": "front",
+      "nature": "순수",
+      "tough": 3,
+      "pick": "shuffle",
+      "blurb": "유리 대포 · 달아오름 — 턴이 끝날 때마다 사기 1.",
+      "passives": [
+        {
+          "name": "날이 선다",
+          "on": "turnEnd",
+          "do": {
+            "t": "buff",
+            "id": "사기",
+            "v": 1
+          }
+        }
+      ],
+      "intents": [
+        {
+          "t": "attack",
+          "v": 90,
+          "say": "밭을 갈듯 내리찍는다",
+          "w": 2,
+          "rush": 6
+        },
+        {
+          "t": "multi",
+          "v": 40,
+          "n": 2,
+          "id": "고통",
+          "say": "녹슨 날로 두 번 긁는다",
+          "rush": 5
+        },
+        {
+          "t": "block",
+          "v": 60,
+          "say": "자루를 곧추세운다",
+          "rush": 3
+        }
+      ]
+    },
+    {
+      "id": "ginseng",
+      "name": "산사모",
+      "hp": 300,
+      "row": "back",
+      "nature": "우울",
+      "blurb": "치유사 · 굳히기 — 절반에서 한 번 땅속으로 숨는다.",
+      "passives": [
+        {
+          "name": "땅속으로",
+          "on": "lowHp",
+          "at": 0.5,
+          "do": {
+            "t": "block",
+            "v": 80,
+            "tough": 2
+          }
+        }
+      ],
+      "intents": [
+        {
+          "t": "heal",
+          "v": 80,
+          "say": "뿌리에서 즙이 돈다",
+          "rush": 3
+        },
+        {
+          "t": "guard",
+          "v": 60,
+          "tough": 1,
+          "say": "땅에 박힌다",
+          "rush": 3
+        },
+        {
+          "t": "debuff",
+          "id": "약화",
+          "v": 1,
+          "say": "쓴 냄새",
+          "rush": 4
+        },
+        {
+          "t": "back",
+          "v": 90,
+          "say": "뿌리를 뻗는다",
+          "rush": 6
+        }
+      ]
+    },
+    {
+      "id": "curburus",
+      "name": "커버러스",
+      "hp": 2600,
+      "row": "front",
+      "nature": "광기",
+      "boss": true,
+      "blurb": "깨면 끊긴다 — 숨을 고르는 턴에 격파하면 큰 한 입이 흩어진다.",
+      "passives": [
+        {
+          "name": "격노",
+          "on": "broken",
+          "do": {
+            "t": "buff",
+            "id": "사기",
+            "v": 1,
+            "say": "세 머리가 으르렁댄다"
+          }
+        }
+      ],
+      "intents": [
+        {
+          "t": "attack",
+          "v": 160,
+          "say": "덮친다"
+        },
+        {
+          "t": "charge",
+          "say": "숨을 고른다",
+          "brk": true,
+          "next": {
+            "t": "attack",
+            "v": 300,
+            "say": "물어뜯는다"
+          }
+        },
+        {
+          "t": "multi",
+          "v": 70,
+          "n": 3,
+          "say": "세 머리가 문다"
+        },
+        {
+          "t": "guard",
+          "v": 120,
+          "tough": 1,
+          "say": "버틴다"
+        }
+      ],
+      "phase": {
+        "at": 0.5,
+        "say": "세 머리가 함께 운다",
+        "intents": [
+          {
+            "t": "attackAll",
+            "v": 110,
+            "id": "취약",
+            "n": 1,
+            "say": "포효"
+          },
+          {
+            "t": "charge",
+            "say": "불길을 모은다",
+            "brk": true,
+            "next": {
+              "t": "attackAll",
+              "v": 200,
+              "say": "불을 뿜는다"
+            }
+          },
+          {
+            "t": "buff",
+            "id": "사기",
+            "v": 1,
+            "say": "광기"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hatsnail",
+      "name": "햇팽이",
+      "hp": 380,
+      "row": "front",
+      "nature": "냉정",
+      "pick": "shuffle",
+      "blurb": "균열 — 방어를 뚫는 금을 낸다. 지나간 자리에 점액.",
+      "intents": [
+        {
+          "t": "attack",
+          "v": 120,
+          "id": "균열",
+          "n": 2,
+          "say": "모자로 들이받는다",
+          "w": 2
+        },
+        {
+          "t": "block",
+          "v": 90,
+          "tough": 1,
+          "say": "껍질에 숨는다"
+        },
+        {
+          "t": "addCard",
+          "id": "st_slime",
+          "n": 1,
+          "to": "discard",
+          "say": "점액을 남긴다"
+        }
+      ]
+    },
+    {
+      "id": "hatsnail_mad",
+      "name": "음흉한 햇팽이",
+      "hp": 320,
+      "row": "front",
+      "nature": "광기",
+      "pick": "shuffle",
+      "blurb": "녹이기 · 끼워 넣기 — 손상과 쪽지.",
+      "intents": [
+        {
+          "t": "multi",
+          "v": 50,
+          "n": 3,
+          "say": "촉수로 찌른다"
+        },
+        {
+          "t": "debuff",
+          "id": "손상",
+          "v": 1,
+          "say": "녹이는 침"
+        },
+        {
+          "t": "addCard",
+          "id": "st_note",
+          "n": 1,
+          "to": "draw",
+          "say": "쪽지를 날린다"
+        }
+      ]
+    },
+    {
+      "id": "curseddoll",
+      "name": "누루링 인형",
+      "hp": 340,
+      "row": "back",
+      "nature": "광기",
+      "pick": "shuffle",
+      "blurb": "고통 · 실 — 방어로 못 막는 피해와 손을 묶는 실.",
+      "intents": [
+        {
+          "t": "back",
+          "v": 110,
+          "say": "바늘을 던진다"
+        },
+        {
+          "t": "debuff",
+          "id": "고통",
+          "v": 2,
+          "say": "저주를 건다"
+        },
+        {
+          "t": "addCard",
+          "id": "st_thread",
+          "n": 1,
+          "to": "draw",
+          "say": "실을 푼다"
+        }
+      ]
+    },
+    {
+      "id": "doll_naive",
+      "name": "버림받은 인형",
+      "hp": 300,
+      "row": "back",
+      "nature": "순수",
+      "pick": "shuffle",
+      "blurb": "격노 · 치유사 — 동료가 쓰러지면 성난다.",
+      "passives": [
+        {
+          "name": "원한",
+          "on": "allyDown",
+          "do": {
+            "t": "buff",
+            "id": "사기",
+            "v": 1
+          }
+        }
+      ],
+      "intents": [
+        {
+          "t": "attack",
+          "v": 100,
+          "say": "할퀸다"
+        },
+        {
+          "t": "heal",
+          "v": 70,
+          "say": "실로 기운다"
+        },
+        {
+          "t": "buff",
+          "id": "피해 감소",
+          "v": 1,
+          "all": true,
+          "say": "서로 기댄다"
+        }
+      ]
+    },
+    {
+      "id": "witch",
+      "name": "왕궁 햇팽이",
+      "hp": 3000,
+      "row": "front",
+      "nature": "냉정",
+      "boss": true,
+      "blurb": "깨면 끊긴다 · 일어서면 성난다 — 둘째 판에서 고통을 퍼붓는다.",
+      "passives": [
+        {
+          "name": "깨어난 의식",
+          "on": "recover",
+          "do": {
+            "t": "buff",
+            "id": "사기",
+            "v": 1,
+            "say": "의식이 날카로워진다"
+          }
+        }
+      ],
+      "intents": [
+        {
+          "t": "attack",
+          "v": 180,
+          "id": "균열",
+          "n": 2,
+          "say": "지팡이를 휘두른다"
+        },
+        {
+          "t": "addCard",
+          "id": "st_note",
+          "n": 2,
+          "to": "draw",
+          "say": "모자 속 쪽지"
+        },
+        {
+          "t": "charge",
+          "say": "주문을 모은다",
+          "brk": true,
+          "next": {
+            "t": "attack",
+            "v": 360,
+            "say": "저주의 낙인"
+          }
+        },
+        {
+          "t": "guard",
+          "v": 150,
+          "tough": 1,
+          "say": "마법 장벽"
+        }
+      ],
+      "phase": {
+        "at": 0.5,
+        "say": "모자 속 의식이 깨어난다",
+        "intents": [
+          {
+            "t": "attackAll",
+            "v": 130,
+            "say": "저주 폭풍"
+          },
+          {
+            "t": "debuff",
+            "id": "고통",
+            "v": 3,
+            "say": "낙인"
+          },
+          {
+            "t": "multi",
+            "v": 80,
+            "n": 3,
+            "say": "바늘 비"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fairy_knight",
+      "name": "꿀벌 기사",
+      "hp": 360,
+      "row": "front",
+      "nature": "활발",
+      "pick": "cycle",
+      "intents": [
+        {
+          "t": "attack",
+          "v": 100,
+          "say": "찌르기"
+        },
+        {
+          "t": "block",
+          "v": 80,
+          "say": "날개 방패"
+        },
+        {
+          "t": "multi",
+          "v": 40,
+          "n": 2,
+          "say": "연속 찌르기"
+        }
+      ],
+      "counters": [
+        {
+          "name": "벌침",
+          "desc": "공격이 아닌 카드에 약이 오른다",
+          "onCard": 1,
+          "cardType": "!공격",
+          "max": 9,
+          "dealt": 0.1,
+          "at": 3,
+          "act": {
+            "t": "attack",
+            "v": 150,
+            "say": "독침!"
+          },
+          "mode": "now"
+        }
+      ],
+      "passives": [
+        {
+          "name": "마지막 침",
+          "on": "death",
+          "do": {
+            "t": "debuff",
+            "id": "취약",
+            "v": 2,
+            "say": "마지막 침"
+          }
+        },
+        {
+          "name": "방패가 깨지면",
+          "on": "guardBreak",
+          "do": {
+            "t": "count",
+            "id": "벌침",
+            "v": 1,
+            "say": "부글부글"
+          }
+        }
+      ],
+      "blurb": "꿀벌 기사 — 공격이 아닌 카드를 낼수록 벌침이 쌓여 셋이면 바로 찌른다. 공격 카드로 몰아치거나, 쓰러질 때 거는 취약에 대비한다. (적 효과 틀 본보기)"
+    }
+  ]
+}

@@ -1,0 +1,665 @@
+{
+ "heroes": [
+  {
+   "id": "이프리트",
+   "name": "이프리트",
+   "nature": "광기",
+   "row": "front",
+   "role": "딜러",
+   "star": 2,
+   "hp": 700,
+   "atk": 109,
+   "def": 38,
+   "crit": 10,
+   "blurb": "장작과 새까맣게 탄 음식을 좋아하는 불의 정령. 손패를 장작으로 태울수록 다음 일격이 뜨거워진다.",
+   "keyword": {
+    "name": "장작",
+    "desc": "태워 넣은 땔감. 1개당 이프리트의 다음 공격 카드 피해 +30%, 쓰면 사라진다",
+    "carrier": "self",
+    "cap": 3,
+    "consumeAll": true,
+    "per": [
+     {
+      "stat": "dealt",
+      "v": 0.3
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "장작 넣기",
+     "when": {
+      "on": "exhaust",
+      "who": "any"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 3
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "장작",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "캠프파이어",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.5,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "고통",
+      "v": 4,
+      "target": "allEnemies"
+     },
+     {
+      "k": "stack",
+      "id": "장작",
+      "v": 2
+     }
+    ]
+   },
+   "race": "정령",
+   "starter": [
+    "이프리트_s1",
+    "이프리트_s1",
+    "이프리트_s2",
+    "이프리트_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "이프리트_s1",
+   "name": "불의 검 베기",
+   "hero": "이프리트",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "이프리트_s2",
+   "name": "업화 대검 내려치기",
+   "hero": "이프리트",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "이프리트_s3",
+   "name": "열기 방벽",
+   "hero": "이프리트",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 1.5
+    }
+   ]
+  },
+  {
+   "id": "이프리트_u1",
+   "name": "땔감 던지기",
+   "hero": "이프리트",
+   "unique": true,
+   "cost": 0,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "burn",
+     "v": 1
+    },
+    {
+     "k": "draw",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "마른 장작",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "장작 한 아름",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 2
+      },
+      {
+       "k": "draw",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "불쏘시개",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "장작",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "타닥타닥",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "shield",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "미리 쌓은 장작",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "바람 불기",
+     "kind": "draw"
+    },
+    {
+     "name": "부지깽이",
+     "kind": "ap"
+    },
+    {
+     "name": "불티",
+     "fx": [
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "이프리트_u2",
+   "name": "새까만 대검",
+   "hero": "이프리트",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "burn",
+     "v": 2
+    },
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "고통",
+     "v": 3,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "숯이 된 대검",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 2
+      },
+      {
+       "k": "dmg",
+       "ratio": 2.97,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 3,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "그을린 검",
+     "cost": 1,
+     "fx": [
+      {
+       "k": "burn",
+       "v": 2
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.76,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 3,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "업화 휘두르기",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 2
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.6,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "탄 냄새",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 2
+      },
+      {
+       "k": "dmg",
+       "ratio": 2.93,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통 각인",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "불기둥",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 2
+      },
+      {
+       "k": "dmg",
+       "ratio": 2.64,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "tough",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "타오르는 날",
+     "kind": "power"
+    },
+    {
+     "name": "가벼운 칼집",
+     "kind": "cost"
+    },
+    {
+     "name": "뜨거운 약점",
+     "kind": "weakSpot"
+    }
+   ]
+  },
+  {
+   "id": "이프리트_u3",
+   "name": "불꽃 베기",
+   "hero": "이프리트",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "burn",
+     "v": 1
+    },
+    {
+     "k": "dmg",
+     "ratio": 1.2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "고통",
+     "v": 2,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "화염 베기",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.62,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "연속 베기",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.66,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 3,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "불똥 튀기기",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.97,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "잿불",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "뜨거운 일격",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "센 불",
+     "kind": "power"
+    },
+    {
+     "name": "가벼운 손목",
+     "kind": "cost"
+    },
+    {
+     "name": "그을린 상처",
+     "kind": "frost"
+    }
+   ]
+  },
+  {
+   "id": "이프리트_u4",
+   "name": "모닥불 피우기",
+   "hero": "이프리트",
+   "unique": true,
+   "cost": 1,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "status",
+     "id": "고통 각인",
+     "v": 1,
+     "target": "allEnemies"
+    },
+    {
+     "k": "stack",
+     "id": "장작",
+     "v": 3
+    }
+   ],
+   "oracles": [
+    {
+     "name": "큰 모닥불",
+     "fx": [
+      {
+       "k": "status",
+       "id": "고통 각인",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "장작",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "성냥 하나",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "status",
+       "id": "고통 각인",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "장작",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "불의 정령",
+     "fx": [
+      {
+       "k": "status",
+       "id": "고통 각인",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "장작",
+       "v": 3
+      },
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      }
+     ]
+    },
+    {
+     "name": "따뜻한 불가",
+     "fx": [
+      {
+       "k": "status",
+       "id": "고통 각인",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "장작",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "미리 지핀 불",
+     "tags": [
+      "개막"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "고통 각인",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "장작",
+       "v": 3
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "타오르는 힘",
+     "kind": "atkUp"
+    },
+    {
+     "name": "불꽃 갑옷",
+     "kind": "defUp"
+    },
+    {
+     "name": "마른 장작",
+     "kind": "cost"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,792 @@
+{
+ "heroes": [
+  {
+   "id": "로니",
+   "name": "로니",
+   "nature": "광기",
+   "race": "요정",
+   "row": "mid",
+   "role": "딜러",
+   "star": 3,
+   "hp": 650,
+   "atk": 135,
+   "def": 28,
+   "crit": 10,
+   "blurb": "막대사탕을 물고 황무지를 떠돌던 전직 요정 경비대 부관. 평소엔 깍듯한 존댓말이지만 정의 앞에선 말보다 몸이 먼저 나가는, 정의롭게 멍청한 보안관.",
+   "keyword": {
+    "name": "무법자",
+    "desc": "보안관이 점찍은 현상범 — 움직이기 직전에 로니가 먼저 쏜다",
+    "carrier": "enemy",
+    "hunt": true,
+    "cap": 1,
+    "rules": [
+     {
+      "name": "다음 현상범",
+      "when": {
+       "on": "fightStart"
+      },
+      "fx": [
+       {
+        "k": "stack",
+        "id": "무법자",
+        "v": 1,
+        "target": "topEnemy"
+       }
+      ]
+     },
+     {
+      "name": "다음 현상범",
+      "when": {
+       "on": "huntDown"
+      },
+      "fx": [
+       {
+        "k": "status",
+        "id": "사기",
+        "v": 1
+       },
+       {
+        "k": "stack",
+        "id": "무법자",
+        "v": 1,
+        "target": "topEnemy"
+       }
+      ]
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "석양의 결투",
+     "when": {
+      "on": "foeActBefore"
+     },
+     "conds": [
+      {
+       "c": "stack",
+       "id": "무법자",
+       "n": 1
+      }
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "tough",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "수사 종결",
+    "cost": 300,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.6,
+      "target": "oneEnemy",
+      "hits": 6
+     },
+     {
+      "k": "status",
+      "id": "피해 감소",
+      "v": 3
+     },
+     {
+      "k": "stack",
+      "id": "무법자",
+      "v": 1,
+      "target": "oneEnemy"
+     }
+    ]
+   },
+   "starter": [
+    "로니_s1",
+    "로니_s1",
+    "로니_s2",
+    "로니_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "로니_s1",
+   "name": "톤파 타격",
+   "hero": "로니",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "로니_s2",
+   "name": "톤파 내려찍기",
+   "hero": "로니",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "로니_s3",
+   "name": "엄폐",
+   "hero": "로니",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ]
+  },
+  {
+   "id": "로니_u1",
+   "name": "진압용 소닉붐",
+   "hero": "로니",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "stack",
+     "id": "무법자",
+     "v": 1,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "둔화",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "날랜 소닉붐",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.85,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 소닉붐",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.75,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "현상수배 소닉붐",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.75,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "물고 있던 소닉붐",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.65,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "보안관의 소닉붐",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.65,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "로니_u2",
+   "name": "석양이 질 때쯤",
+   "hero": "로니",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "atkMod",
+     "v": 0.15,
+     "run": true,
+     "target": "self"
+    },
+    {
+     "k": "status",
+     "id": "잔광",
+     "v": 1
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "날랜 석양",
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 2
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 석양",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "현상수배 석양",
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 2
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "물고 있던 석양",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "보안관의 석양",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "로니_u3",
+   "name": "부러진 리코더",
+   "hero": "로니",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1.1,
+     "target": "oneEnemy",
+     "hits": 2
+    },
+    {
+     "k": "ifStack",
+     "id": "무법자",
+     "n": 1
+    },
+    {
+     "k": "status",
+     "id": "표식",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "날랜 리코더",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.45,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "무법자",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "표식",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 리코더",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "무법자",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "표식",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "현상수배 리코더",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "무법자",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "표식",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "물고 있던 리코더",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.3,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "무법자",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "표식",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "보안관의 리코더",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.3,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "무법자",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "표식",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "로니_u4",
+   "name": "오래가는 막대사탕",
+   "hero": "로니",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    },
+    {
+     "k": "status",
+     "id": "피해 감소",
+     "v": 1
+    },
+    {
+     "k": "stack",
+     "id": "무법자",
+     "v": 1,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "날랜 막대사탕",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.6
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 막대사탕",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.5
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "현상수배 막대사탕",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.75
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "물고 있던 막대사탕",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.4
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "보안관의 막대사탕",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.4
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 숨결",
+     "kind": "guard",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

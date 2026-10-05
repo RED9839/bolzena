@@ -1,0 +1,845 @@
+{
+  "heroes": [
+    {
+      "id": "리뉴아",
+      "name": "리뉴아",
+      "nature": "광기",
+      "race": "엘프",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 720,
+      "atk": 146,
+      "def": 29,
+      "crit": 10,
+      "blurb": "규격에 딱 맞는 1초를 사랑하는 시간 여행자. 남은 AP 를 딱 맞춰 쓸 때 카드가 한 번 더 울리고, 초침이 세 번 돌면 다음 턴이 길어진다.",
+      "keyword": {
+        "name": "초침",
+        "desc": "딱 맞게 흘려보낸 1초. 셋이 돌면 다음 턴 AP +1",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "규격에 딱 맞는 1초",
+            "when": {
+              "on": "stackReach",
+              "id": "초침",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "초침",
+                "all": true
+              },
+              {
+                "k": "nextAp",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "타임 브레이크",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.3,
+            "hits": 6,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "리뉴아_s1",
+        "리뉴아_s1",
+        "리뉴아_s2",
+        "리뉴아_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "리뉴아_s1",
+      "name": "시공 사격",
+      "hero": "리뉴아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_s2",
+      "name": "시공 관통탄",
+      "hero": "리뉴아",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.5,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_s3",
+      "name": "무대 뒤로",
+      "hero": "리뉴아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u1",
+      "name": "시공의 메아리",
+      "hero": "리뉴아",
+      "unique": true,
+      "signature": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "hits": 5,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifTune"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "hits": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "초침",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "막이 오르기 전",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "hits": 5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "겹치는 시간선",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "hits": 5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "우리들의 평화로운 시간",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "hits": 5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "째깍째깍",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "hits": 5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "표독한 얼굴",
+          "cost": 2,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "hits": 5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "정각",
+          "kind": "power"
+        },
+        {
+          "name": "째깍째깍",
+          "kind": "ap"
+        },
+        {
+          "name": "평행세계의 초침",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u2",
+      "name": "규격에 딱 맞는 1초",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifTune"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "초침",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정각",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.82,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.91,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "긴 1초",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.68,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "호버보드 돌입",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.03,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.01,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "초침 감기",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "미래는 비밀",
+          "cost": 2,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "긴 1초",
+          "kind": "power"
+        },
+        {
+          "name": "멈춰버린 시간",
+          "kind": "ap"
+        },
+        {
+          "name": "미래는 비밀",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u3",
+      "name": "수많은 시간선",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "ifTune"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "초침",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "또 한 번의 시도",
+          "cost": 0,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "세계 재시작",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "멈춰버린 시간",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "평행세계의 초침",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "오천 년의 무게",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "째깍째깍",
+          "kind": "guard"
+        },
+        {
+          "name": "평행세계의 초침",
+          "kind": "draw"
+        },
+        {
+          "name": "정각",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u4",
+      "name": "오천 년 뒤의 편지",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.2,
+          "target": "self",
+          "run": true
+        },
+        {
+          "k": "gauge",
+          "v": 20
+        },
+        {
+          "k": "ifTune"
+        },
+        {
+          "k": "stack",
+          "id": "초침",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "첫 줄을 읽다",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.26,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "gauge",
+              "v": 26
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "고장난 둠스데이 클락",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "gauge",
+              "v": 20
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "교주가 있는 세계",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.24,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "gauge",
+              "v": 24
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "엘레나의 프로그래밍",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.29,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "gauge",
+              "v": 29
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "힐데가 빚은 몸",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.24,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "gauge",
+              "v": 24
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "멈춰버린 시간",
+          "kind": "atkUp"
+        },
+        {
+          "name": "미래는 비밀",
+          "kind": "draw"
+        },
+        {
+          "name": "긴 1초",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "초침",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

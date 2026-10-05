@@ -1,0 +1,734 @@
+{
+ "heroes": [
+  {
+   "id": "에르핀_왕도",
+   "name": "에르핀(왕도)",
+   "nature": "순수",
+   "race": "요정",
+   "row": "mid",
+   "role": "딜러",
+   "star": 3,
+   "hp": 720,
+   "atk": 156,
+   "def": 29,
+   "crit": 10,
+   "blurb": "세계수의 힘을 되찾아 엘다인으로 깨어나고, 여섯 종족 지도자의 축복 속에 대관식을 치른 에르핀. 네르가 늘 바라던 '왕도'를 좇아 옳은 길로 곧장 걷겠다는 각오를 주먹과 왕마력에 담았다.",
+   "keyword": {
+    "name": "왕도",
+    "desc": "여왕이 곧게 걷는 길 — 같은 적만 잇달아 칠수록 그 적이 무너진다",
+    "carrier": "enemy",
+    "hunt": true,
+    "cap": 5,
+    "per": [
+     {
+      "stat": "taken",
+      "v": 0.1
+     }
+    ],
+    "rules": [
+     {
+      "name": "왕도의 끝",
+      "when": {
+       "on": "huntDown"
+      },
+      "limit": {
+       "per": "turn",
+       "n": 1
+      },
+      "fx": [
+       {
+        "k": "status",
+        "id": "사기",
+        "v": 1
+       }
+      ]
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "곧은 왕도",
+     "when": {
+      "on": "hit"
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "에르피엔 펀치",
+    "cost": 300,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.6,
+      "target": "oneEnemy",
+      "hits": 8
+     },
+     {
+      "k": "tough",
+      "v": 2
+     },
+     {
+      "k": "stack",
+      "id": "왕도",
+      "v": 3,
+      "target": "oneEnemy"
+     }
+    ]
+   },
+   "starter": [
+    "에르핀_왕도_s1",
+    "에르핀_왕도_s1",
+    "에르핀_왕도_s2",
+    "에르핀_왕도_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "에르핀_왕도_s1",
+   "name": "왕마력탄",
+   "hero": "에르핀_왕도",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "에르핀_왕도_s2",
+   "name": "대왕마력탄",
+   "hero": "에르핀_왕도",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "에르핀_왕도_s3",
+   "name": "여왕의 예복",
+   "hero": "에르핀_왕도",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ]
+  },
+  {
+   "id": "에르핀_왕도_u1",
+   "name": "에르피엔 왕마력탄",
+   "hero": "에르핀_왕도",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "tags": [
+    "약점 공격"
+   ],
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.3,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "stack",
+     "id": "왕도",
+     "v": 1,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "곧은 왕마력탄",
+     "tags": [
+      "약점 공격"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "가뿐한 왕마력탄",
+     "cost": 1,
+     "tags": [
+      "약점 공격"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.85,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "왕도의 왕마력탄",
+     "tags": [
+      "약점 공격"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.55,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "아껴 둔 왕마력탄",
+     "tags": [
+      "약점 공격",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.75,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "대관식의 왕마력탄",
+     "tags": [
+      "약점 공격",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.75,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "에르핀_왕도_u2",
+   "name": "마력 난타",
+   "hero": "에르핀_왕도",
+   "unique": true,
+   "cost": 0,
+   "type": "공격",
+   "x": true,
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.75,
+     "target": "oneEnemy",
+     "xHits": true
+    },
+    {
+     "k": "perStack",
+     "id": "왕도"
+    },
+    {
+     "k": "dmg",
+     "ratio": 0.25,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "곧은 난타",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "oneEnemy",
+       "xHits": true
+      },
+      {
+       "k": "perStack",
+       "id": "왕도"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.35,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "가뿐한 난타",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.05,
+       "target": "oneEnemy",
+       "xHits": true
+      },
+      {
+       "k": "perStack",
+       "id": "왕도"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.35,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "왕도의 난타",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.85,
+       "target": "oneEnemy",
+       "xHits": true
+      },
+      {
+       "k": "perStack",
+       "id": "왕도"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "아껴 둔 난타",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy",
+       "xHits": true
+      },
+      {
+       "k": "perStack",
+       "id": "왕도"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.3,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "대관식의 난타",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy",
+       "xHits": true
+      },
+      {
+       "k": "perStack",
+       "id": "왕도"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.3,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "에르핀_왕도_u3",
+   "name": "축복의 왕관",
+   "hero": "에르핀_왕도",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "stack",
+     "id": "왕도",
+     "v": 2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "atkMod",
+     "v": 0.15,
+     "run": true,
+     "target": "self"
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "곧은 왕관",
+     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가뿐한 왕관",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "왕도의 왕관",
+     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "아껴 둔 왕관",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "대관식의 왕관",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "에르핀_왕도_u4",
+   "name": "모두를 위한 무게",
+   "hero": "에르핀_왕도",
+   "unique": true,
+   "cost": 2,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "atkMod",
+     "v": 0.2,
+     "run": true,
+     "target": "self"
+    },
+    {
+     "k": "status",
+     "id": "불굴",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "곧은 무게",
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "불굴",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가뿐한 무게",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "불굴",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "왕도의 무게",
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "불굴",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "왕도",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "아껴 둔 무게",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "불굴",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "대관식의 무게",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "불굴",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "가벼운 숨결",
+     "kind": "cost",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "기세의 숨결",
+     "kind": "atkUp",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

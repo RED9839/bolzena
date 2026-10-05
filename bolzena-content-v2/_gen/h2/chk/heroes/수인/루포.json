@@ -1,0 +1,753 @@
+{
+  "heroes": [
+    {
+      "id": "루포",
+      "name": "루포",
+      "nature": "활발",
+      "race": "수인",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 570,
+      "atk": 135,
+      "def": 28,
+      "crit": 10,
+      "blurb": "사료스탕스의 브레인이자 티그의 오른팔.",
+      "keyword": {
+        "name": "계획",
+        "desc": "「계획대로인 것이다」 — 「다음 턴이 끝나기 전에 적 하나를 격파한다」. 이루면 AP 2 · 드로우 1, 다 닳도록 못 이루면 손에서 1장을 버린다.",
+        "carrier": "self",
+        "cap": 2,
+        "decay": 1,
+        "rules": [
+          {
+            "name": "역관광",
+            "when": {
+              "on": "stackGone",
+              "id": "계획",
+              "decay": true
+            },
+            "fx": [
+              {
+                "k": "discard",
+                "v": 1,
+                "random": true
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "계획대로인 것이다",
+          "when": {
+            "on": "break"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "계획"
+            }
+          ],
+          "fx": [
+            {
+              "k": "spend",
+              "id": "계획",
+              "all": true
+            },
+            {
+              "k": "ap",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "오의 여우회전!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.2,
+            "target": "allEnemies",
+            "hits": 8
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "루포_s1",
+        "루포_s1",
+        "루포_s2",
+        "루포_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "루포_s1",
+      "name": "단검 찌르기",
+      "hero": "루포",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "루포_s2",
+      "name": "단검 급소 찌르기",
+      "hero": "루포",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "루포_s3",
+      "name": "몸 숙이기",
+      "hero": "루포",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "루포_u1",
+      "name": "루포류 신속베기",
+      "hero": "루포",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.95,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "tough",
+          "v": 0.5
+        },
+        {
+          "k": "ifStack",
+          "id": "계획"
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 루포류 신속베기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 루포류 신속베기",
+          "cost": 1,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "계산된 루포류 신속베기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 루포류 신속베기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 루포류 신속베기",
+          "tags": [
+            "신속",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "작전 회의",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루포_u2",
+      "name": "작전 지도 펼치기",
+      "hero": "루포",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "계획",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 작전 지도 펼치기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 작전 지도 펼치기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "계산된 작전 지도 펼치기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 작전 지도 펼치기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 작전 지도 펼치기",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "작전 회의",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루포_u3",
+      "name": "눈속임 단검",
+      "hero": "루포",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 눈속임 단검",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "가벼운 눈속임 단검",
+          "cost": 0,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "계산된 눈속임 단검",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 눈속임 단검",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 눈속임 단검",
+          "tags": [
+            "신속",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "작전 회의",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루포_u4",
+      "name": "오의 여우 꼬리",
+      "hero": "루포",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.8,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifFoe",
+          "id": "broken"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.65,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 오의 여우 꼬리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.15,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 오의 여우 꼬리",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "계산된 오의 여우 꼬리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 오의 여우 꼬리",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.05,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 오의 여우 꼬리",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "작전 회의",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

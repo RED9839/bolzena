@@ -1,0 +1,1939 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "bolzena.schema.json",
+ "title": "볼제나 콘텐츠 데이터 — Docs/데이터.md",
+ "$defs": {
+  "fx": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "k": {
+     "enum": [
+      "ifBroken",
+      "ifTune",
+      "ifChain",
+      "ifLink",
+      "ifPrev",
+      "ifRhythm",
+      "ifSwitched",
+      "ifStack",
+      "perStack",
+      "perRhythm",
+      "when",
+      "ifRepeat",
+      "ifHeld",
+      "ifPlayedMax",
+      "ifApLeft",
+      "ifSpent",
+      "ifBalanced",
+      "ifHunted",
+      "ifDebuffs",
+      "perDiscarded",
+      "perPaid",
+      "perDebuff",
+      "nextAp",
+      "burn",
+      "reflect",
+      "ifHp",
+      "perApLeft",
+      "feed",
+      "dmg",
+      "block",
+      "shield",
+      "heal",
+      "strip",
+      "dealtMod",
+      "takenMod",
+      "atkMod",
+      "defMod",
+      "critMod",
+      "healMod",
+      "draw",
+      "ap",
+      "nextCheaper",
+      "gauge",
+      "discard",
+      "make",
+      "status",
+      "cleanse",
+      "tough",
+      "rushDown",
+      "stack",
+      "spend",
+      "spendRhythm",
+      "flip",
+      "hasten",
+      "payHp",
+      "payHpPct",
+      "ifKill",
+      "ifBreak",
+      "ifWounded",
+      "perTag",
+      "drain",
+      "extra",
+      "cardStatus",
+      "transform",
+      "ifChoice",
+      "ifRandom",
+      "ifHand",
+      "ifPile",
+      "ifNth",
+      "ifStreak",
+      "ifAllHeroes",
+      "ifFoe",
+      "ifCardSt",
+      "perPlayed",
+      "perPile",
+      "perCardSt",
+      "perEvent",
+      "later",
+      "afterCards",
+      "trap",
+      "confuse",
+      "autoPlay",
+      "castOther",
+      "pull",
+      "exileFrom",
+      "dispel",
+      "moveRow",
+      "growRun",
+      "roll",
+      "ifRoll",
+      "ifPrevSame",
+      "ifInHand",
+      "ifBond",
+      "ifLastMine",
+      "ifPulled",
+      "ifShield",
+      "ifDebt",
+      "ifTypeNew",
+      "recast",
+      "costMod",
+      "addTag",
+      "cutHit",
+      "clearDebt"
+     ],
+     "description": "효과 조각 종류 — Docs/데이터.md §2"
+    },
+    "v": {
+     "type": "number"
+    },
+    "all": {
+     "type": "boolean"
+    },
+    "ratio": {
+     "type": "number",
+     "description": "배율(1.2 = 120%)"
+    },
+    "target": {
+     "anyOf": [
+      {
+       "enum": [
+        "oneEnemy",
+        "allEnemies",
+        "randomEnemy",
+        "topEnemy",
+        "lowEnemy",
+        "self",
+        "oneAlly",
+        "allAllies",
+        "otherAllies",
+        "party",
+        "auto",
+        "otherEnemy",
+        "nextEnemy",
+        "slowestEnemy",
+        "markedEnemy",
+        "strongestAlly"
+       ]
+      },
+      {
+       "type": "string",
+       "pattern": "^hero:"
+      }
+     ]
+    },
+    "id": {
+     "type": "string",
+     "description": "상태 이름 · 키워드 이름 · 만들 카드 id"
+    },
+    "hits": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "n": {
+     "type": "integer"
+    },
+    "turns": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "run": {
+     "type": "boolean",
+     "description": "전투 내내"
+    },
+    "base": {
+     "enum": [
+      "def"
+     ]
+    },
+    "fixed": {
+     "type": "boolean"
+    },
+    "xHits": {
+     "type": "boolean"
+    },
+    "xStack": {
+     "type": "string"
+    },
+    "not": {
+     "type": "boolean"
+    },
+    "type": {
+     "enum": [
+      "공격",
+      "스킬",
+      "강화",
+      "상태",
+      "저주"
+     ]
+    },
+    "on": {
+     "enum": [
+      "draw",
+      "drawAny",
+      "discard",
+      "handEnd",
+      "burn",
+      "passion"
+     ]
+    },
+    "random": {
+     "type": "boolean"
+    },
+    "per": {
+     "type": "integer"
+    },
+    "pct": {
+     "type": "number"
+    },
+    "dot": {
+     "type": "boolean",
+     "description": "dmg — 고정 지속 피해"
+    },
+    "to": {
+     "type": "string",
+     "description": "cardStatus: this · hand · draw / make: hand · draw · top · discard / pull: hand · top"
+    },
+    "from": {
+     "type": "string",
+     "description": "transform: 바꿀 카드 id / pull · exileFrom · ifPile · perPile: draw · discard · gone · hand"
+    },
+    "at": {
+     "enum": [
+      "top",
+      "bottom",
+      "random"
+     ]
+    },
+    "max": {
+     "type": "integer",
+     "description": "ifStack 의 위 끝(n 이상 max 이하)"
+    },
+    "then": {
+     "$ref": "#/$defs/fxList",
+     "description": "later · afterCards · trap 안의 효과"
+    },
+    "who": {
+     "type": "string",
+     "description": "카드 거르개 — self · other · 사도 id"
+    },
+    "unique": {
+     "type": "boolean"
+    },
+    "basic": {
+     "type": "boolean"
+    },
+    "each": {
+     "type": "boolean"
+    },
+    "battle": {
+     "type": "boolean"
+    },
+    "tag": {
+     "type": "string"
+    },
+    "ofEvent": {
+     "type": "number"
+    },
+    "else": {
+     "$ref": "#/$defs/fxList"
+    }
+   },
+   "required": [
+    "k"
+   ],
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "k": {
+        "const": "status"
+       }
+      }
+     },
+     "then": {
+      "properties": {
+       "id": {
+        "enum": [
+         "취약",
+         "약화",
+         "손상",
+         "피해 감소",
+         "반격",
+         "표식",
+         "잔광",
+         "면역",
+         "실드 유지",
+         "저장",
+         "협공",
+         "충격",
+         "충격파",
+         "그을림",
+         "회피",
+         "공명",
+         "실드 보존",
+         "행동 둔화",
+         "응징",
+         "미끄러움",
+         "사기",
+         "불굴",
+         "결의",
+         "결정화",
+         "고동",
+         "칼날 벼리기",
+         "형상 강화",
+         "탄성",
+         "포자증식",
+         "고통 각인",
+         "근면",
+         "계몽",
+         "집중",
+         "고통",
+         "균열",
+         "빙벽",
+         "절대 무적",
+         "열정 약점",
+         "구속",
+         "초재생",
+         "정신 붕괴",
+         "다음 턴 드로우",
+         "죽음의 낙인",
+         "급속",
+         "둔화",
+         "끈기",
+         "잔불",
+         "리듬",
+         "기절"
+        ]
+       }
+      },
+      "required": [
+       "id",
+       "v"
+      ]
+     }
+    }
+   ]
+  },
+  "fxList": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/fx"
+   }
+  },
+  "tags": {
+   "type": "array",
+   "items": {
+    "type": "string",
+    "pattern": "^(개전|보존|소멸|증발|종극|주도|유일|연계|천상|신속|분쇄|약점|연결|개막|금기|봉인|회수|연쇄|사용 불가|망각|제거|봉인된 금기|약점 공격|탄환|결속|축복|열정)( [0-9]+)?$"
+   }
+  },
+  "stats": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "hp": {
+     "type": "integer"
+    },
+    "atk": {
+     "type": "integer"
+    },
+    "def": {
+     "type": "integer"
+    },
+    "crit": {
+     "type": "integer"
+    }
+   }
+  },
+  "oracle": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "cost": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "tags": {
+     "$ref": "#/$defs/tags"
+    },
+    "fx": {
+     "$ref": "#/$defs/fxList"
+    },
+    "power": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "name",
+    "fx"
+   ]
+  },
+  "bless": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "kind": {
+     "enum": [
+      "power",
+      "cost",
+      "weakSpot",
+      "frost",
+      "ap",
+      "draw",
+      "heal",
+      "guard",
+      "atkUp",
+      "defUp"
+     ]
+    },
+    "fx": {
+     "$ref": "#/$defs/fxList"
+    },
+    "tags": {
+     "$ref": "#/$defs/tags"
+    }
+   },
+   "required": [
+    "name"
+   ]
+  },
+  "card": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "type": "string",
+     "pattern": "^[^~^]*$"
+    },
+    "name": {
+     "type": "string"
+    },
+    "hero": {
+     "type": "string"
+    },
+    "cost": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "x": {
+     "type": "boolean"
+    },
+    "type": {
+     "enum": [
+      "공격",
+      "스킬",
+      "강화",
+      "상태",
+      "저주"
+     ]
+    },
+    "tags": {
+     "$ref": "#/$defs/tags"
+    },
+    "fx": {
+     "$ref": "#/$defs/fxList"
+    },
+    "unique": {
+     "type": "boolean"
+    },
+    "signature": {
+     "type": "boolean"
+    },
+    "oracles": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/oracle"
+     },
+     "minItems": 5,
+     "maxItems": 5
+    },
+    "blesses": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/bless"
+     },
+     "maxItems": 3
+    },
+    "grade": {
+     "enum": [
+      "일반",
+      "고급",
+      "희귀",
+      "전설"
+     ]
+    },
+    "price": {
+     "type": "integer"
+    },
+    "gift": {
+     "type": "boolean"
+    },
+    "blurb": {
+     "type": "string"
+    },
+    "token": {
+     "type": "boolean",
+     "description": "사도 전용 생성 카드(덱에 안 든다)"
+    },
+    "evolve": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "n": {
+       "type": "integer",
+       "minimum": 2
+      },
+      "into": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "into"
+     ]
+    },
+    "bondCard": {
+     "type": "string",
+     "description": "결속 — 겹친 수 3 이상의 강해진 카드 id"
+    },
+    "becomes": {
+     "type": "string",
+     "description": "봉인된 금기 — 보스 처치 뒤 바뀔 금기 카드 id"
+    },
+    "payWith": {
+     "type": "string",
+     "description": "비용을 이 고유 효과(키워드) 겹으로"
+    },
+    "debt": {
+     "type": "boolean",
+     "description": "AP 가 모자라도 낸다(AP 빚)"
+    },
+    "choices": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "minItems": 2,
+     "maxItems": 2
+    },
+    "payRate": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "payMix": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "cost",
+    "type"
+   ]
+  },
+  "when": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "on": {
+     "enum": [
+      "fightStart",
+      "turnStart",
+      "turnEnd",
+      "play",
+      "guard",
+      "break",
+      "kill",
+      "hurt",
+      "lowHp",
+      "rush",
+      "ult",
+      "debuff",
+      "overheal",
+      "stackReach",
+      "stackGone",
+      "reserveGone",
+      "switch",
+      "rhythm",
+      "always",
+      "discard",
+      "pay",
+      "exhaust",
+      "huntDown",
+      "blocked",
+      "spend",
+      "link",
+      "crit",
+      "make",
+      "drawn",
+      "shuffle",
+      "extra",
+      "hit",
+      "shieldBreak",
+      "foeShieldBreak",
+      "foeGuard",
+      "foeAct",
+      "foeActBefore",
+      "endure",
+      "unwound"
+     ]
+    },
+    "type": {
+     "enum": [
+      "공격",
+      "스킬",
+      "강화",
+      "기타"
+     ]
+    },
+    "every": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "perTurn": {
+     "type": "boolean"
+    },
+    "minCost": {
+     "type": "integer"
+    },
+    "nth": {
+     "type": "integer"
+    },
+    "who": {
+     "enum": [
+      "any",
+      "other"
+     ]
+    },
+    "sig": {
+     "type": "boolean"
+    },
+    "seq": {
+     "type": "array",
+     "items": {
+      "enum": [
+       "공격",
+       "스킬",
+       "강화"
+      ]
+     },
+     "minItems": 2,
+     "maxItems": 3
+    },
+    "kind": {
+     "enum": [
+      "block",
+      "shield"
+     ]
+    },
+    "mine": {
+     "type": "boolean"
+    },
+    "fresh": {
+     "type": "boolean"
+    },
+    "repeat": {
+     "type": "boolean"
+    },
+    "guarded": {
+     "type": "boolean"
+    },
+    "pct": {
+     "type": "number",
+     "exclusiveMinimum": 0,
+     "exclusiveMaximum": 1
+    },
+    "id": {
+     "type": "string"
+    },
+    "n": {
+     "type": "integer"
+    },
+    "decay": {
+     "type": "boolean"
+    },
+    "tag": {
+     "type": "string"
+    },
+    "maxCost": {
+     "type": "integer"
+    },
+    "marked": {
+     "type": "string"
+    },
+    "weak": {
+     "type": "boolean"
+    },
+    "unique": {
+     "type": "boolean"
+    },
+    "basic": {
+     "type": "boolean"
+    },
+    "cardSt": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "on"
+   ]
+  },
+  "cond": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "c": {
+     "enum": [
+      "stack",
+      "hp",
+      "hpMin",
+      "status",
+      "foes",
+      "foesMax",
+      "row",
+      "playedMin",
+      "playedMax",
+      "ownNone",
+      "apLeft",
+      "gauge",
+      "guarded",
+      "rushed",
+      "hurtLast",
+      "killedLast",
+      "firstTurn",
+      "targetBroken",
+      "repeat",
+      "held",
+      "spent",
+      "balanced",
+      "debuffs",
+      "paid",
+      "wounded",
+      "onlyMe",
+      "ally",
+      "inDebt",
+      "heldCards",
+      "idleLast",
+      "typeNew"
+     ]
+    },
+    "id": {
+     "type": "string"
+    },
+    "n": {
+     "type": "integer"
+    },
+    "not": {
+     "type": "boolean"
+    },
+    "pct": {
+     "type": "number"
+    },
+    "kind": {
+     "enum": [
+      "block",
+      "shield"
+     ]
+    },
+    "row": {
+     "enum": [
+      "front",
+      "mid",
+      "back"
+     ]
+    },
+    "max": {
+     "type": "integer"
+    },
+    "type": {
+     "enum": [
+      "공격",
+      "스킬",
+      "강화"
+     ]
+    }
+   },
+   "required": [
+    "c"
+   ]
+  },
+  "rule": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "when": {
+     "$ref": "#/$defs/when"
+    },
+    "conds": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cond"
+     }
+    },
+    "limit": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "per": {
+       "enum": [
+        "turn",
+        "fight"
+       ]
+      },
+      "n": {
+       "type": "integer",
+       "minimum": 1
+      }
+     }
+    },
+    "fx": {
+     "$ref": "#/$defs/fxList"
+    }
+   },
+   "required": [
+    "name",
+    "when",
+    "fx"
+   ]
+  },
+  "keyword": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "desc": {
+     "type": "string"
+    },
+    "carrier": {
+     "enum": [
+      "self",
+      "enemy",
+      "ally",
+      "hero"
+     ]
+    },
+    "cap": {
+     "type": "integer"
+    },
+    "decay": {
+     "type": "integer"
+    },
+    "decayAll": {
+     "type": "boolean"
+    },
+    "consume": {
+     "type": "integer"
+    },
+    "consumeAll": {
+     "type": "boolean"
+    },
+    "wipe": {
+     "type": "boolean"
+    },
+    "mode": {
+     "type": "boolean"
+    },
+    "reserve": {
+     "type": "boolean"
+    },
+    "hunt": {
+     "type": "boolean"
+    },
+    "per": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "stat": {
+        "enum": [
+         "dealt",
+         "taken",
+         "atk",
+         "def",
+         "crit",
+         "guard",
+         "dot",
+         "hot",
+         "tough"
+        ]
+       },
+       "v": {
+        "type": "number"
+       },
+       "ratio": {
+        "type": "number"
+       },
+       "who": {
+        "enum": [
+         "holder",
+         "allies"
+        ]
+       },
+       "from": {
+        "enum": [
+         "owner"
+        ]
+       },
+       "else": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "stat"
+      ]
+     }
+    },
+    "rules": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/rule"
+     }
+    },
+    "endDecay": {
+     "type": "integer"
+    },
+    "endClear": {
+     "type": "boolean"
+    },
+    "wrap": {
+     "type": "boolean"
+    },
+    "guard": {
+     "type": "boolean"
+    },
+    "weakens": {
+     "type": "boolean"
+    },
+    "cut": {
+     "type": "number"
+    },
+    "tagWhile": {
+     "type": "string"
+    },
+    "tagType": {
+     "enum": [
+      "공격",
+      "스킬",
+      "강화"
+     ]
+    },
+    "spread": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "name"
+   ]
+  },
+  "hero": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "nature": {
+     "enum": [
+      "순수",
+      "광기",
+      "냉정",
+      "활발",
+      "우울",
+      "공명"
+     ]
+    },
+    "race": {
+     "type": "string"
+    },
+    "row": {
+     "enum": [
+      "front",
+      "mid",
+      "back"
+     ]
+    },
+    "role": {
+     "enum": [
+      "탱커",
+      "서포터",
+      "딜러"
+     ]
+    },
+    "style": {
+     "type": "string"
+    },
+    "star": {
+     "type": "integer"
+    },
+    "hp": {
+     "type": "integer"
+    },
+    "atk": {
+     "type": "integer"
+    },
+    "def": {
+     "type": "integer"
+    },
+    "crit": {
+     "type": "integer"
+    },
+    "keyword": {
+     "$ref": "#/$defs/keyword"
+    },
+    "passives": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/rule"
+     }
+    },
+    "ult": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "cost": {
+       "type": "integer"
+      },
+      "fx": {
+       "$ref": "#/$defs/fxList"
+      }
+     },
+     "required": [
+      "name",
+      "cost",
+      "fx"
+     ]
+    },
+    "starter": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "blurb": {
+     "type": "string"
+    },
+    "keywords": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/keyword"
+     }
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "role",
+    "hp",
+    "atk",
+    "def"
+   ]
+  },
+  "intent": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "t": {
+     "enum": [
+      "attack",
+      "back",
+      "attackAll",
+      "multi",
+      "charge",
+      "block",
+      "guard",
+      "heal",
+      "buff",
+      "debuff",
+      "jam",
+      "addCard",
+      "summon",
+      "thorns",
+      "selfHeal",
+      "count",
+      "cardDebuff",
+      "handCost",
+      "reshuffle",
+      "autoPlay",
+      "shift",
+      "revive",
+      "feign"
+     ]
+    },
+    "v": {
+     "type": "integer"
+    },
+    "n": {
+     "type": "integer"
+    },
+    "per": {
+     "type": "integer"
+    },
+    "id": {
+     "type": "string"
+    },
+    "say": {
+     "type": "string"
+    },
+    "w": {
+     "type": "integer"
+    },
+    "rush": {
+     "type": "integer"
+    },
+    "next": {
+     "$ref": "#/$defs/intent"
+    },
+    "brk": {
+     "type": "boolean"
+    },
+    "tough": {
+     "type": "number"
+    },
+    "all": {
+     "type": "boolean"
+    },
+    "to": {
+     "enum": [
+      "draw",
+      "discard",
+      "hand"
+     ]
+    },
+    "if": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "allies": {
+       "type": "integer"
+      },
+      "partyBlock": {
+       "type": "boolean"
+      },
+      "selfBlock": {
+       "type": "boolean"
+      },
+      "counter": {
+       "type": "string"
+      },
+      "n": {
+       "type": "integer"
+      }
+     }
+    },
+    "max": {
+     "type": "integer"
+    }
+   },
+   "required": [
+    "t"
+   ]
+  },
+  "phase": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "at": {
+     "type": "number"
+    },
+    "say": {
+     "type": "string"
+    },
+    "intents": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/intent"
+     }
+    }
+   },
+   "required": [
+    "at",
+    "intents"
+   ]
+  },
+  "enemyPassive": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "on": {
+     "enum": [
+      "fightStart",
+      "turnStart",
+      "turnEnd",
+      "hurt",
+      "lowHp",
+      "allyDown",
+      "card",
+      "rushed",
+      "debuffed",
+      "broken",
+      "recover",
+      "death",
+      "guardBreak",
+      "act",
+      "afterDraw"
+     ]
+    },
+    "at": {
+     "type": "number"
+    },
+    "type": {
+     "enum": [
+      "공격",
+      "스킬",
+      "강화",
+      "!공격",
+      "!스킬",
+      "!강화"
+     ]
+    },
+    "every": {
+     "type": "integer"
+    },
+    "limit": {
+     "type": "integer"
+    },
+    "phase": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     }
+    },
+    "who": {
+     "type": "string"
+    },
+    "do": {
+     "$ref": "#/$defs/intent"
+    },
+    "same": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "name",
+    "on",
+    "do"
+   ]
+  },
+  "enemy": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "hp": {
+     "type": "integer"
+    },
+    "row": {
+     "enum": [
+      "front",
+      "back"
+     ]
+    },
+    "nature": {
+     "enum": [
+      "순수",
+      "광기",
+      "냉정",
+      "활발",
+      "우울",
+      "공명"
+     ]
+    },
+    "weak": {
+     "type": "array",
+     "items": {
+      "enum": [
+       "순수",
+       "광기",
+       "냉정",
+       "활발",
+       "우울",
+       "공명"
+      ]
+     }
+    },
+    "tough": {
+     "type": "number"
+    },
+    "boss": {
+     "type": "boolean"
+    },
+    "pick": {
+     "enum": [
+      "cycle",
+      "shuffle"
+     ]
+    },
+    "open": {
+     "$ref": "#/$defs/intent"
+    },
+    "intents": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/intent"
+     }
+    },
+    "phase": {
+     "$ref": "#/$defs/phase"
+    },
+    "phase2": {
+     "$ref": "#/$defs/phase"
+    },
+    "rush": {
+     "type": "integer"
+    },
+    "passives": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/enemyPassive"
+     }
+    },
+    "blurb": {
+     "type": "string"
+    },
+    "art": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "spine": {
+       "type": "string"
+      },
+      "skin": {
+       "type": "string"
+      },
+      "icon": {
+       "type": "string"
+      },
+      "scale": {
+       "type": "number"
+      }
+     }
+    },
+    "counters": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/counter"
+     }
+    },
+    "rare": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "enum": [
+         "poisonHand",
+         "reshuffle",
+         "anxietyHits",
+         "autoCard",
+         "costUp",
+         "crystal",
+         "actDebuff",
+         "toughGuard"
+        ]
+       },
+       "card": {
+        "type": "string"
+       },
+       "st": {
+        "enum": [
+         "취약",
+         "약화"
+        ]
+       }
+      },
+      "required": [
+       "id"
+      ]
+     }
+    },
+    "tied": {
+     "type": "boolean"
+    },
+    "soul": {
+     "type": "boolean"
+    },
+    "toughTaken": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "hp",
+    "intents"
+   ]
+  },
+  "party": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "minItems": 1
+  },
+  "floor": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "sub": {
+     "type": "string"
+    },
+    "land": {
+     "type": "string"
+    },
+    "bg": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "string"
+     }
+    },
+    "pools": {
+     "type": "array",
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "#/$defs/party"
+      }
+     },
+     "minItems": 3,
+     "maxItems": 3
+    },
+    "elites": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/party"
+     }
+    },
+    "boss": {
+     "$ref": "#/$defs/party"
+    },
+    "bossElite": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "name",
+    "land",
+    "pools",
+    "boss"
+   ]
+  },
+  "village": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "race": {
+     "type": "string"
+    },
+    "line": {
+     "type": "string"
+    },
+    "floors": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/floor"
+     },
+     "minItems": 2,
+     "maxItems": 2
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "floors"
+   ]
+  },
+  "next": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "ap": {
+     "type": "integer"
+    },
+    "gauge": {
+     "type": "integer"
+    },
+    "hand": {
+     "type": "integer"
+    },
+    "weak": {
+     "type": "integer"
+    },
+    "rush": {
+     "type": "integer"
+    },
+    "foeVuln": {
+     "type": "integer"
+    },
+    "quiet": {
+     "type": "integer"
+    },
+    "hpCut": {
+     "type": "number"
+    },
+    "buff": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "integer"
+     }
+    }
+   }
+  },
+  "outcome": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "k": {
+     "enum": [
+      "none",
+      "gold",
+      "hp",
+      "maxHp",
+      "remove",
+      "dupe",
+      "unique",
+      "neutral",
+      "equip",
+      "flash",
+      "shin",
+      "noShin",
+      "shinNow",
+      "shinPick",
+      "curse",
+      "gift",
+      "scout",
+      "shopGift",
+      "rewardFlash",
+      "next",
+      "mindBreak"
+     ]
+    },
+    "v": {
+     "type": "number"
+    },
+    "n": {
+     "type": "integer"
+    },
+    "grade": {
+     "enum": [
+      "일반",
+      "고급",
+      "희귀",
+      "전설"
+     ]
+    },
+    "slot": {
+     "enum": [
+      "무기",
+      "방어구",
+      "장신구"
+     ]
+    },
+    "id": {
+     "type": "string"
+    },
+    "kind": {
+     "type": "string"
+    },
+    "all": {
+     "type": "boolean"
+    },
+    "swap": {
+     "type": "boolean"
+    },
+    "next": {
+     "$ref": "#/$defs/next"
+    },
+    "basic": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "k"
+   ]
+  },
+  "outs": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/outcome"
+   }
+  },
+  "option": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "label": {
+     "type": "string"
+    },
+    "out": {
+     "$ref": "#/$defs/outs"
+    },
+    "say": {
+     "type": "string"
+    },
+    "hero": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "race": {
+     "type": "string"
+    },
+    "when": {
+     "enum": [
+      "hp30"
+     ]
+    },
+    "gamble": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "p": {
+        "type": "number"
+       },
+       "out": {
+        "$ref": "#/$defs/outs"
+       },
+       "say": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "p",
+       "out"
+      ]
+     }
+    },
+    "choose": {
+     "type": "boolean"
+    },
+    "judge": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "by": {
+       "enum": [
+        "atk-max",
+        "hp-party"
+       ]
+      },
+      "at": {
+       "type": "integer"
+      },
+      "pass": {
+       "$ref": "#/$defs/outs"
+      },
+      "fail": {
+       "$ref": "#/$defs/outs"
+      },
+      "passSay": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "by",
+      "at",
+      "pass",
+      "fail"
+     ]
+    },
+    "fight": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "enemies": {
+       "$ref": "#/$defs/party"
+      },
+      "byLand": {
+       "type": "object",
+       "additionalProperties": {
+        "$ref": "#/$defs/party"
+       }
+      },
+      "win": {
+       "$ref": "#/$defs/outs"
+      },
+      "elite": {
+       "type": "boolean"
+      }
+     }
+    },
+    "price": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "hero": {
+       "type": "string"
+      },
+      "out": {
+       "$ref": "#/$defs/outs"
+      }
+     },
+     "required": [
+      "hero",
+      "out"
+     ]
+    },
+    "needGold": {
+     "type": "integer"
+    },
+    "hidden": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "label"
+   ]
+  },
+  "event": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "pool": {
+     "type": "string"
+    },
+    "npc": {
+     "type": "string"
+    },
+    "scene": {
+     "type": "string"
+    },
+    "rare": {
+     "type": "number"
+    },
+    "options": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/option"
+     }
+    },
+    "leave": {
+     "type": "string"
+    },
+    "leaveOut": {
+     "$ref": "#/$defs/outs"
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "options"
+   ]
+  },
+  "equip": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "grade": {
+     "enum": [
+      "일반",
+      "고급",
+      "희귀",
+      "전설"
+     ]
+    },
+    "slot": {
+     "enum": [
+      "무기",
+      "방어구",
+      "장신구"
+     ]
+    },
+    "stats": {
+     "$ref": "#/$defs/stats"
+    },
+    "effect": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/rule"
+     }
+    },
+    "affinity": {
+     "type": "string"
+    },
+    "affinityStats": {
+     "$ref": "#/$defs/stats"
+    },
+    "affinityEffect": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/rule"
+     }
+    },
+    "blurb": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "grade",
+    "slot"
+   ]
+  },
+  "counter": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "start": {
+     "type": "integer"
+    },
+    "max": {
+     "type": "integer"
+    },
+    "dealt": {
+     "type": "number"
+    },
+    "taken": {
+     "type": "number"
+    },
+    "flat": {
+     "type": "integer"
+    },
+    "onHit": {
+     "type": "integer"
+    },
+    "onCard": {
+     "type": "integer"
+    },
+    "onTurnStart": {
+     "type": "integer"
+    },
+    "onTurnEnd": {
+     "type": "integer"
+    },
+    "cardType": {
+     "enum": [
+      "공격",
+      "스킬",
+      "강화",
+      "!공격",
+      "!스킬",
+      "!강화"
+     ]
+    },
+    "afterAct": {
+     "type": "boolean"
+    },
+    "resetTurnStart": {
+     "type": "boolean"
+    },
+    "clearTurnEnd": {
+     "type": "boolean"
+    },
+    "at": {
+     "type": "integer"
+    },
+    "act": {
+     "$ref": "#/$defs/intent"
+    },
+    "mode": {
+     "enum": [
+      "now",
+      "next",
+      "replace"
+     ]
+    },
+    "keep": {
+     "type": "boolean"
+    },
+    "stunAtZero": {
+     "type": "boolean"
+    },
+    "desc": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "name"
+   ]
+  }
+ }
+}

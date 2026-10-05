@@ -1,0 +1,685 @@
+{
+  "heroes": [
+    {
+      "id": "마고",
+      "name": "마고",
+      "nature": "순수",
+      "race": "수인",
+      "row": "mid",
+      "role": "서포터",
+      "star": 2,
+      "hp": 540,
+      "atk": 75,
+      "def": 57,
+      "crit": 5,
+      "blurb": "동물 친구들을 돌보는 산양 목장주.",
+      "keyword": {
+        "name": "목장 친구",
+        "desc": "「목장 친구들」 — 마고를 따라 나온 동물 친구. 파티를 친 적을 들이받는다. 적의 차례가 끝나면 하나가 목장으로 돌아간다.",
+        "carrier": "self",
+        "cap": 3,
+        "decay": 1
+      },
+      "passives": [
+        {
+          "name": "목장 친구들",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "목장 친구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "메⋯에~류겐!",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 3,
+            "base": "def",
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 1.5
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "마고_s1",
+        "마고_s1",
+        "마고_s2",
+        "마고_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "마고_s1",
+      "name": "뿔 박치기",
+      "hero": "마고",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마고_s2",
+      "name": "양배추 종이 쌈",
+      "hero": "마고",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "마고_u1",
+      "name": "마고 마구 회복해",
+      "hero": "마고",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.2
+        },
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "목장 친구",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 마고 마구 회복해",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.85
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 마고 마구 회복해",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "목장의 마고 마구 회복해",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.65
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "든든한 마고 마구 회복해",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.75
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 마고 마구 회복해",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.75
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "따뜻한 손",
+          "kind": "heal"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "울타리 너머 친구",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마고_u2",
+      "name": "사료가 제일 맛있어",
+      "hero": "마고",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        },
+        {
+          "k": "stack",
+          "id": "목장 친구",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 사료가 제일 맛있어",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 사료가 제일 맛있어",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.25
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "목장의 사료가 제일 맛있어",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.7
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 사료가 제일 맛있어",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.75
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 사료가 제일 맛있어",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.75
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "울타리 너머 친구",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마고_u3",
+      "name": "내 목장에서 나가",
+      "hero": "마고",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "목장 친구"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 내 목장에서 나가",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "목장 친구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 내 목장에서 나가",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "목장 친구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "목장의 내 목장에서 나가",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "목장 친구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 내 목장에서 나가",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "목장 친구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 내 목장에서 나가",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "목장 친구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "울타리 너머 친구",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마고_u4",
+      "name": "아기 동물 돌보기",
+      "hero": "마고",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "목장 친구",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 아기 동물 돌보기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 아기 동물 돌보기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "목장의 아기 동물 돌보기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 아기 동물 돌보기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 아기 동물 돌보기",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "울타리 너머 친구",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목장 친구",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

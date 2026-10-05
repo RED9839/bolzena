@@ -1,0 +1,631 @@
+{
+  "heroes": [
+    {
+      "id": "피코라",
+      "name": "피코라",
+      "nature": "냉정",
+      "race": "마녀",
+      "row": "back",
+      "role": "서포터",
+      "star": 3,
+      "hp": 580,
+      "atk": 75,
+      "def": 58,
+      "crit": 5,
+      "blurb": "스티커 만들기가 낙인 패셔니스타 마녀. 반짝 · 하트 · 별 · 해골 넷을 다 모으면 한정판 세트가 된다.",
+      "keyword": {
+        "name": "스티커",
+        "desc": "한정 스티커 수집 — 피코라가 카드를 낼 때마다 한 장씩 붙인다. 넷이 모이면 「한정판 세트」",
+        "carrier": "self",
+        "cap": 4,
+        "rules": [
+          {
+            "name": "한정판 세트",
+            "when": {
+              "on": "stackReach",
+              "id": "스티커",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "사기",
+                "v": 1
+              },
+              {
+                "k": "status",
+                "id": "피해 감소",
+                "v": 2
+              },
+              {
+                "k": "spend",
+                "id": "스티커",
+                "all": true
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "스티커 붙이기",
+          "when": {
+            "on": "play"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "너도 될 수 있다 패션피플",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "shield",
+            "ratio": 3
+          },
+          {
+            "k": "stack",
+            "id": "스티커",
+            "v": 2
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "피코라_s1",
+        "피코라_s1",
+        "피코라_s2",
+        "피코라_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "피코라_s1",
+      "name": "요술봉 톡",
+      "hero": "피코라",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "base": "def"
+        }
+      ]
+    },
+    {
+      "id": "피코라_s2",
+      "name": "반짝 파우더",
+      "hero": "피코라",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "피코라_u1",
+      "name": "반짝이 스티커",
+      "hero": "피코라",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "signature": true,
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.6
+        },
+        {
+          "k": "stack",
+          "id": "스티커",
+          "v": 1
+        }
+      ],
+      "blurb": "붙이면 반짝, 떼면 아쉬운 첫 장",
+      "oracles": [
+        {
+          "name": "홀로그램 반짝이",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.25
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 반짝이",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.1
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반짝이 코팅",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두 장 겹쳐 붙이기",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.7
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "마음에 든 장",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.1
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "반짝 코팅",
+          "kind": "guard"
+        },
+        {
+          "name": "새 도안",
+          "kind": "draw"
+        },
+        {
+          "name": "스티커북",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "피코라_u2",
+      "name": "해골 스티커",
+      "hero": "피코라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.65,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "blurb": "귀여운 해골은 생각보다 아프다",
+      "oracles": [
+        {
+          "name": "큼직한 해골",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "미니 해골",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "해골 도배",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "해골 한 쌍",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오싹 해골",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "반짝이는 해골",
+          "kind": "power"
+        },
+        {
+          "name": "찐득한 풀",
+          "kind": "frost"
+        },
+        {
+          "name": "해골 하나 더",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "피코라_u3",
+      "name": "별 스티커",
+      "hero": "피코라",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "스티커",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "손이 빨라야 별을 모은다",
+      "oracles": [
+        {
+          "name": "별 한 묶음",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "유성 스티커",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "별빛 파우더",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "별자리 세트",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "행운의 별",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "반짝 별",
+          "kind": "draw"
+        },
+        {
+          "name": "하트 하나",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "포켓 앨범",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "피코라_u4",
+      "name": "한정판 앨범",
+      "hero": "피코라",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "스티커",
+          "v": 2
+        }
+      ],
+      "blurb": "아직 빈칸이 있다는 게 수집의 즐거움",
+      "oracles": [
+        {
+          "name": "완성된 앨범",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "얇은 앨범",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두 권째 앨범",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "패션 화보",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "첫 페이지",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "패셔니스타",
+          "kind": "defUp"
+        },
+        {
+          "name": "첫 장",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "사은품 스티커",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

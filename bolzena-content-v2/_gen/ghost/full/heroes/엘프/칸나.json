@@ -1,0 +1,728 @@
+{
+  "heroes": [
+    {
+      "id": "칸나",
+      "name": "칸나",
+      "nature": "활발",
+      "race": "엘프",
+      "row": "back",
+      "role": "딜러",
+      "star": 3,
+      "hp": 550,
+      "atk": 155,
+      "def": 25,
+      "crit": 10,
+      "blurb": "명령엔 칼 같고 휴가 신청서는 늘 반려되는 진압반장. 아군이 적을 격파할 때마다 양자폭탄 충전이 빨라지고, 쏘고 나면 반려 도장이 하나 더 쌓인다.",
+      "keyword": {
+        "name": "반려 도장",
+        "desc": "또 반려된 휴가 신청서. 1개당 칸나의 피해 +10%",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "양자폭탄 결재",
+          "when": {
+            "on": "break"
+          },
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 25
+            }
+          ]
+        },
+        {
+          "name": "휴가 신청서 반려",
+          "when": {
+            "on": "ult"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "양자폭탄",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 4.2,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "반려 도장",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "칸나_s1",
+        "칸나_s1",
+        "칸나_s2",
+        "칸나_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "칸나_s1",
+      "name": "제압 사격",
+      "hero": "칸나",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "칸나_s2",
+      "name": "제압 연사",
+      "hero": "칸나",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.5,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "칸나_s3",
+      "name": "진압 방패",
+      "hero": "칸나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "칸나_u1",
+      "name": "큰 거 한 방",
+      "hero": "칸나",
+      "unique": true,
+      "signature": true,
+      "cost": 3,
+      "type": "공격",
+      "tags": [
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "gauge",
+          "v": 25
+        }
+      ],
+      "oracles": [
+        {
+          "name": "사격 준비 완료",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "gauge",
+              "v": 33
+            }
+          ]
+        },
+        {
+          "name": "전장의 아이돌",
+          "cost": 2,
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "gauge",
+              "v": 25
+            }
+          ]
+        },
+        {
+          "name": "후발대 지원 바람",
+          "tags": [
+            "약점 공격",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "gauge",
+              "v": 30
+            }
+          ]
+        },
+        {
+          "name": "출동 명령 누적",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "gauge",
+              "v": 25
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "바늘 끝만 한 포탄",
+          "tags": [
+            "약점 공격",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "gauge",
+              "v": 30
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "사격 준비 완료",
+          "kind": "power"
+        },
+        {
+          "name": "긴급 출동",
+          "kind": "ap"
+        },
+        {
+          "name": "결재 대기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸나_u2",
+      "name": "명 받았습니다!",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "gauge",
+          "v": 20
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대기 명령",
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 26
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.3
+            }
+          ]
+        },
+        {
+          "name": "긴급 출동",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 20
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "함께 출동",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 24
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "위에서 내려온 지시",
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 29
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.45
+            }
+          ]
+        },
+        {
+          "name": "휴가 반려",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 24
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "휴가 반려",
+          "kind": "guard"
+        },
+        {
+          "name": "펀칭머신 최고점",
+          "kind": "draw"
+        },
+        {
+          "name": "사복 출근",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸나_u3",
+      "name": "오락실 패왕",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "status",
+          "id": "잔광",
+          "v": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifBreak"
+        },
+        {
+          "k": "gauge",
+          "v": 25
+        }
+      ],
+      "oracles": [
+        {
+          "name": "동전 넣기",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "gauge",
+              "v": 33
+            }
+          ]
+        },
+        {
+          "name": "로데오 완주",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "gauge",
+              "v": 30
+            }
+          ]
+        },
+        {
+          "name": "2인용 모드",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "gauge",
+              "v": 36
+            }
+          ]
+        },
+        {
+          "name": "연속 콤보",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "gauge",
+              "v": 30
+            }
+          ]
+        },
+        {
+          "name": "펀칭머신 최고점",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "gauge",
+              "v": 45
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "긴급 출동",
+          "kind": "power"
+        },
+        {
+          "name": "결재 대기",
+          "kind": "ap"
+        },
+        {
+          "name": "사격 준비 완료",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸나_u4",
+      "name": "휴가 신청서",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.15,
+          "target": "self",
+          "run": true
+        },
+        {
+          "k": "stack",
+          "id": "반려 도장",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "서류 미리 작성",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "완벽한 휴가",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "일광욕 칸나",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.18,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "결재 대기",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.22,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "사복 출근",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.18,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "펀칭머신 최고점",
+          "kind": "atkUp"
+        },
+        {
+          "name": "사복 출근",
+          "kind": "draw"
+        },
+        {
+          "name": "휴가 반려",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

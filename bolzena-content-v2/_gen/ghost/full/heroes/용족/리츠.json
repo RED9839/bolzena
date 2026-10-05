@@ -1,0 +1,687 @@
+{
+  "heroes": [
+    {
+      "id": "리츠",
+      "name": "리츠",
+      "nature": "광기",
+      "race": "용족",
+      "row": "front",
+      "role": "딜러",
+      "star": 3,
+      "hp": 880,
+      "atk": 119,
+      "def": 40,
+      "crit": 10,
+      "blurb": "소심하고 공손한 은둔 고수 용족. 먼저 맞기 전까진 몸을 사리지만, 적이 손을 대는 순간 버튼이 눌려 반말로 박살을 낸다.",
+      "keyword": {
+        "name": "명분이 서면",
+        "desc": "먼저 맞았으니 이제 박살 내도 될 명분. 1개당 리츠의 피해 +25%, 리츠의 턴이 끝나면 1 감소",
+        "carrier": "self",
+        "cap": 2,
+        "endDecay": 1,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.25
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "먼저 손대셨죠?",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "참는 자세",
+          "when": {
+            "on": "always"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "명분이 서면",
+              "not": true
+            }
+          ],
+          "fx": [
+            {
+              "k": "takenMod",
+              "v": -0.2,
+              "target": "party"
+            },
+            {
+              "k": "dealtMod",
+              "v": -0.3,
+              "target": "self"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "벼리기",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "status",
+            "id": "잔광",
+            "v": 1
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.6,
+            "target": "allEnemies",
+            "hits": 3
+          },
+          {
+            "k": "stack",
+            "id": "명분이 서면",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "리츠_s1",
+        "리츠_s1",
+        "리츠_s2",
+        "리츠_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "리츠_s1",
+      "name": "칼등 치기",
+      "hero": "리츠",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리츠_s2",
+      "name": "강철 자세",
+      "hero": "리츠",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "리츠_u1",
+      "name": "박살내주겠어!",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "명분이 서면",
+          "n": 1
+        },
+        {
+          "k": "tough",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "한 방 더",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "명분이 서면",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "버튼 눌림",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "명분이 서면",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "정당방위",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "명분이 서면",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "반말 모드",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "명분이 서면",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "명분 충분",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "명분이 서면",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "박살",
+          "kind": "power"
+        },
+        {
+          "name": "반말의 시작",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "스위치",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리츠_u2",
+      "name": "담금질",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        },
+        {
+          "k": "status",
+          "id": "잔광",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "예열",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.3
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "통곡의 벽",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "완벽히 준비될 때까지",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "직접 만든 갑옷",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대지 분쇄",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "방구석 강철",
+          "kind": "guard"
+        },
+        {
+          "name": "망치질",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "사료스탕스 명예 대원",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리츠_u3",
+      "name": "대검 밀어내기",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "rushDown",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "한 걸음 밀기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "대륙의 강자",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "갑옷 자랑",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            }
+          ]
+        },
+        {
+          "name": "전투광의 대검",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "명분이 서면",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "넉백",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "rushDown",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "손수 벼린 대검",
+          "kind": "power"
+        },
+        {
+          "name": "로네의 취향",
+          "kind": "cost"
+        },
+        {
+          "name": "밀려난 자리",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리츠_u4",
+      "name": "은둔 초고수",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "명분이 서면",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "상상 수련",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "떠돌이 무사",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "대련 상대",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "소심한 각오",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "은둔의 깨달음",
+          "cost": 0,
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명분이 서면",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "산속 오두막",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "소심한 다짐",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "명예 대원증",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

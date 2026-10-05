@@ -1,0 +1,716 @@
+{
+  "heroes": [
+    {
+      "id": "아라그니아",
+      "name": "아라그니아",
+      "nature": "냉정",
+      "race": "용족",
+      "row": "mid",
+      "role": "서포터",
+      "star": 3,
+      "hp": 680,
+      "atk": 75,
+      "def": 60,
+      "crit": 5,
+      "blurb": "산호를 씹어 모래섬 왕국을 쌓는 진주의 용족 여왕. 스킬마다 섬이 한 층 오르고, 파티가 다치면 섬이 무너지며 층마다 단단한 모래벽을 남긴다.",
+      "keyword": {
+        "name": "모래섬 왕국",
+        "desc": "산호 모래로 쌓은 작은 왕국. 1층마다 파티 받는 피해 -4%, 파티가 HP 를 잃으면 무너져 층마다 고정 실드를 남긴다",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "taken",
+            "v": -0.04,
+            "who": "allies"
+          }
+        ],
+        "rules": [
+          {
+            "name": "모래섬 붕괴",
+            "when": {
+              "on": "hurt"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "모래섬 왕국",
+                "n": 1
+              }
+            ],
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "perStack",
+                "id": "모래섬 왕국"
+              },
+              {
+                "k": "shield",
+                "ratio": 0.5,
+                "fixed": true
+              },
+              {
+                "k": "spend",
+                "id": "모래섬 왕국",
+                "all": true
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "산호 씹기",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "여왕은 백성을 버리지 않느니라",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "파도 치는 피날레",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "randomEnemy",
+            "hits": 3
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "모래섬 왕국",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "아라그니아_s1",
+        "아라그니아_s1",
+        "아라그니아_s2",
+        "아라그니아_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "아라그니아_s1",
+      "name": "최강 꼬리치기",
+      "hero": "아라그니아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_s2",
+      "name": "짐의 하사품",
+      "hero": "아라그니아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_u1",
+      "name": "마음속의 펄",
+      "hero": "아라그니아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "stack",
+          "id": "모래섬 왕국",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "작은 진주",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "구슬 아홉",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "산호 진주",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "특별함을 받아들일 미래",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "진주 왕국의 보물고",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "여왕의 귀걸이",
+          "kind": "guard"
+        },
+        {
+          "name": "조개 방패",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "파도 한 줌",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_u2",
+      "name": "해양 간척",
+      "hero": "아라그니아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "한 입",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "모래섬 확장",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "생식 요리",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "방파제",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "빙수 알바",
+          "cost": 2,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "단단한 이빨",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "산호 가루",
+          "kind": "cost"
+        },
+        {
+          "name": "모래알",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_u3",
+      "name": "파도 한 줄기",
+      "hero": "아라그니아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifStack",
+          "id": "모래섬 왕국",
+          "n": 3
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "잔물결",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "모래섬 왕국",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "큰 파도",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "모래섬 왕국",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "여왕의 칙령",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "밀물",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "모래섬 왕국",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "해일",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "왕관의 빛",
+          "kind": "power"
+        },
+        {
+          "name": "여왕의 은총",
+          "kind": "frost"
+        },
+        {
+          "name": "진주 목걸이",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_u4",
+      "name": "진주 왕국의 보물고",
+      "hero": "아라그니아",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "모래섬 왕국",
+          "v": 3
+        },
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "보물고 열쇠",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "엘리아스 최강 왕국",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 5
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "빼앗긴 진주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "앵무 해적단 격퇴",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "교주와 함께",
+          "cost": 1,
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "모래섬 왕국",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "왕좌",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "금고 문",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "보물 지도",
+          "kind": "draw"
+        }
+      ]
+    }
+  ]
+}

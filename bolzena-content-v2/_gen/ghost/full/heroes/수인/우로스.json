@@ -1,0 +1,728 @@
+{
+  "heroes": [
+    {
+      "id": "우로스",
+      "name": "우로스",
+      "nature": "공명",
+      "race": "수인",
+      "row": "back",
+      "role": "서포터",
+      "star": 3,
+      "hp": 610,
+      "atk": 95,
+      "def": 61,
+      "crit": 5,
+      "blurb": "여섯 보물을 모으던 비늘 수인 슈로가 불의 검에 주인으로 인정받는 순간, 보물에 깃든 옛 지배자 우로스의 사념이 깨어나 몸을 차지했다.",
+      "keyword": {
+        "name": "순환",
+        "desc": "「거대한 뱀의 순환」 — 뽑을 더미를 섞을 때마다 뱀이 한 바퀴 돈다: 적 전체를 휩쓸고 사기를 북돋는다(전투당 세 번). 돈 바퀴는 거대한 뱀에 실린다.",
+        "carrier": "self",
+        "cap": 3
+      },
+      "passives": [
+        {
+          "name": "거대한 뱀의 순환",
+          "when": {
+            "on": "shuffle"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "압도",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.1,
+            "target": "allEnemies",
+            "hits": 2
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "우로스_s1",
+        "우로스_s1",
+        "우로스_s2",
+        "우로스_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "우로스_s1",
+      "name": "검기 날리기",
+      "hero": "우로스",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "우로스_s2",
+      "name": "슈로의 인사",
+      "hero": "우로스",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "우로스_u1",
+      "name": "순환의 고리",
+      "hero": "우로스",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "discard",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 3
+        },
+        {
+          "k": "ifPile",
+          "from": "discard",
+          "n": 6
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 순환의 고리",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 4
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 순환의 고리",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 4
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "순환하는 순환의 고리",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 4
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 순환의 고리",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 4
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 순환의 고리",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 4
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "허물 벗기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우로스_u2",
+      "name": "마음이 비수가 되어",
+      "hero": "우로스",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifPile",
+          "from": "discard",
+          "n": 6
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 마음이 비수가 되어",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 마음이 비수가 되어",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "순환하는 마음이 비수가 되어",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 마음이 비수가 되어",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 마음이 비수가 되어",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPile",
+              "from": "discard",
+              "n": 6
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "허물 벗기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우로스_u3",
+      "name": "세계수의 보물 파괴",
+      "hero": "우로스",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "순환",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 세계수의 보물 파괴",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 세계수의 보물 파괴",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "순환하는 세계수의 보물 파괴",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 세계수의 보물 파괴",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 세계수의 보물 파괴",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "허물 벗기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우로스_u4",
+      "name": "거대한 뱀",
+      "hero": "우로스",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "순환"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 거대한 뱀",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 거대한 뱀",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "순환하는 거대한 뱀",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 거대한 뱀",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 거대한 뱀",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "허물 벗기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

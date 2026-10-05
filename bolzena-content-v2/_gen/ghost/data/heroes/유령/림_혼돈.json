@@ -1,0 +1,748 @@
+{
+  "heroes": [
+    {
+      "id": "림_혼돈",
+      "name": "림(혼돈)",
+      "nature": "광기",
+      "race": "유령",
+      "row": "back",
+      "role": "딜러",
+      "star": 3,
+      "hp": 580,
+      "atk": 145,
+      "def": 25,
+      "crit": 10,
+      "blurb": "혼돈의 빈자리를 대신 떠안은 질서의 유령. 공격은 과녁을 고르지 못하고 아무나 베지만 그만큼 세다. 적이 여럿일 때 「혼돈」 이 차오르면 한 번에 다 쓸어 버린다 — 맞으면 꿀밤 한 방에 정신이 돌아온다.",
+      "keyword": {
+        "name": "혼돈",
+        "desc": "어설프게 흉내 낸 혼돈의 기운 — 꿀밤 한 방이면 흩어진다",
+        "carrier": "self",
+        "cap": 3
+      },
+      "passives": [
+        {
+          "name": "어엿한 혼돈",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "conds": [
+            {
+              "c": "foes",
+              "n": 2
+            }
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿀밤",
+          "when": {
+            "on": "hurt"
+          },
+          "fx": [
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "차원의 눈",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 3,
+            "target": "randomEnemy"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "randomEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "혼돈",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "림_혼돈_s1",
+        "림_혼돈_s1",
+        "림_혼돈_s3",
+        "림_혼돈_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "림_혼돈_s1",
+      "name": "혼돈의 낫",
+      "hero": "림_혼돈",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_s2",
+      "name": "그림자 숨기",
+      "hero": "림_혼돈",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_s3",
+      "name": "혼돈의 대낫",
+      "hero": "림_혼돈",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u1",
+      "name": "혼돈에 이끌림",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "hits": 3,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "혼돈",
+          "n": 3
+        },
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "혼돈",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "소용돌이 혼돈",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "혼돈",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "작은 혼돈",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "혼돈",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "참아 둔 혼돈",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "혼돈",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "혼돈의 폭주",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "hits": 4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "혼돈",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "축복의 혼돈",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "hits": 3,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "혼돈",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "날뛰는 낫",
+          "kind": "power"
+        },
+        {
+          "name": "흐트러진 기운",
+          "kind": "frost"
+        },
+        {
+          "name": "다시 혼돈",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u2",
+      "name": "차원 베기",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.6,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "혼돈",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "차원 가르기",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.75,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "얕은 베기",
+          "cost": 1,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "벼려 둔 낫",
+          "tags": [
+            "분쇄",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.5,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "틈새 베기",
+          "tags": [
+            "분쇄",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 베기",
+          "tags": [
+            "분쇄",
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "예리한 날",
+          "kind": "power"
+        },
+        {
+          "name": "찢어진 공간",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "빠른 회수",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u3",
+      "name": "무서워하십시오!",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "혼돈",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진짜 무서운 얼굴",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "살짝 무서운 얼굴",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "연습한 얼굴",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "혼돈의 품위",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 위협",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "큰 목소리",
+          "kind": "frost"
+        },
+        {
+          "name": "재빠른 위협",
+          "kind": "cost"
+        },
+        {
+          "name": "어설픈 웃음",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u4",
+      "name": "꿀밤",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "혼돈"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "혼돈",
+          "all": true
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정신 번쩍",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "혼돈"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "톡 치기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "혼돈"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아껴 둔 꿀밤",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "혼돈"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "정신 차리고 정리",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "혼돈"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 꿀밤",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "혼돈"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "단단한 주먹",
+          "kind": "power"
+        },
+        {
+          "name": "맑은 정신",
+          "kind": "draw"
+        },
+        {
+          "name": "질서 회복",
+          "kind": "defUp"
+        }
+      ]
+    }
+  ]
+}

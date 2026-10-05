@@ -1,0 +1,763 @@
+{
+  "heroes": [
+    {
+      "id": "바나",
+      "name": "바나",
+      "nature": "활발",
+      "race": "수인",
+      "row": "back",
+      "role": "서포터",
+      "star": 2,
+      "hp": 500,
+      "atk": 75,
+      "def": 55,
+      "crit": 5,
+      "blurb": "영웅의 검을 만들겠다는 꿈을 품은 곱슬쥐 대장장이.",
+      "keyword": {
+        "name": "단조",
+        "desc": "「풀무질」 — 바나가 스킬 카드를 낼 때마다 손의 카드 하나를 벼리고(탐구심) 쌓는 망치질. 둘이 차면 사기 1.",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "명검 완성",
+            "when": {
+              "on": "stackReach",
+              "id": "단조",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "단조",
+                "all": true
+              },
+              {
+                "k": "status",
+                "id": "사기",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "풀무질",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "모루 탕탕이",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 3
+          },
+          {
+            "k": "shield",
+            "ratio": 2
+          },
+          {
+            "k": "stack",
+            "id": "단조",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "바나_s1",
+        "바나_s1",
+        "바나_s2",
+        "바나_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "바나_s1",
+      "name": "망치 타격",
+      "hero": "바나",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "바나_s2",
+      "name": "화로 온기",
+      "hero": "바나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "바나_u1",
+      "name": "호두까기 장인",
+      "hero": "바나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "cardStatus",
+          "id": "탐구심",
+          "v": 1,
+          "to": "hand",
+          "n": 0
+        },
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "단조",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 호두까기 장인",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 0
+            },
+            {
+              "k": "shield",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 호두까기 장인",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 0
+            },
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "벼린 호두까기 장인",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 0
+            },
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "든든한 호두까기 장인",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 0
+            },
+            {
+              "k": "shield",
+              "ratio": 2.5
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 호두까기 장인",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 0
+            },
+            {
+              "k": "shield",
+              "ratio": 2.5
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "불꽃 튀는 모루",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바나_u2",
+      "name": "모루 위의 망치",
+      "hero": "바나",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "단조",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 모루 위의 망치",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 모루 위의 망치",
+          "cost": 1,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "벼린 모루 위의 망치",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 모루 위의 망치",
+          "tags": [
+            "분쇄",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 모루 위의 망치",
+          "tags": [
+            "분쇄",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "불꽃 튀는 모루",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바나_u3",
+      "name": "정령 일꾼들아!",
+      "hero": "바나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "cardStatus",
+          "id": "탐구심",
+          "v": 1,
+          "to": "hand",
+          "n": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 정령 일꾼들아!",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.95
+            },
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 정령 일꾼들아!",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.35
+            },
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "벼린 정령 일꾼들아!",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.95
+            },
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "든든한 정령 일꾼들아!",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 정령 일꾼들아!",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "불꽃 튀는 모루",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바나_u4",
+      "name": "이야기책에 남을 검",
+      "hero": "바나",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "cardStatus",
+          "id": "탐구심",
+          "v": 2,
+          "to": "draw",
+          "n": 3
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 이야기책에 남을 검",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 2,
+              "to": "draw",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 이야기책에 남을 검",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 2,
+              "to": "draw",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "벼린 이야기책에 남을 검",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 2,
+              "to": "draw",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 이야기책에 남을 검",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 2,
+              "to": "draw",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 이야기책에 남을 검",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 2,
+              "to": "draw",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "불꽃 튀는 모루",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

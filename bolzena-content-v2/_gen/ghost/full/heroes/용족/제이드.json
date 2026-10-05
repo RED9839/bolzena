@@ -1,0 +1,842 @@
+{
+  "heroes": [
+    {
+      "id": "제이드",
+      "name": "제이드",
+      "nature": "냉정",
+      "race": "용족",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 700,
+      "atk": 125,
+      "def": 28,
+      "crit": 10,
+      "blurb": "절판 도서를 모으고 누구에게도 빌려주지 않는 비취의 용족 책벌레. 아끼는 책은 손에 쥔 채 넘길수록 값이 오르고, 꺼내 휘두를 때 그 값을 다 쓴다.",
+      "keyword": {
+        "name": "소장 가치",
+        "desc": "손에 쥐고 넘긴 책의 값. 1개당 제이드의 피해 +30%, 제이드가 공격 카드를 내면 모두 사라진다",
+        "carrier": "self",
+        "cap": 3,
+        "consumeAll": true,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.3
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "독서광",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "ownNone"
+            }
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "게르마늄 탐지법",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.3,
+            "target": "allEnemies",
+            "hits": 4
+          },
+          {
+            "k": "stack",
+            "id": "소장 가치",
+            "v": 3
+          },
+          {
+            "k": "ap",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "제이드_s1",
+        "제이드_s1",
+        "제이드_s2",
+        "제이드_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "제이드_s1",
+      "name": "옥구슬",
+      "hero": "제이드",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "제이드_s2",
+      "name": "비늘 막기",
+      "hero": "제이드",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "제이드_u1",
+      "name": "게르마늄 옥장판",
+      "hero": "제이드",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "allEnemies"
+        },
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "stack",
+          "id": "소장 가치",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "휴대용 옥장판",
+          "cost": 1,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "옥장판 공장",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "원적외선",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "따끈한 바닥",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "광역 난방",
+          "cost": 3,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "게르마늄 함량",
+          "kind": "power"
+        },
+        {
+          "name": "보증서",
+          "kind": "draw"
+        },
+        {
+          "name": "사은품",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "절판본 사이에 끼워 둔 옥장판. 오래 데울수록 뜨겁다."
+    },
+    {
+      "id": "제이드_u2",
+      "name": "책에서 봤는데",
+      "hero": "제이드",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "stack",
+          "id": "소장 가치",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "목차만 봤는데",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전집을 봤는데",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "확신에 차서",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "잘못된 상식",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "밑줄 그어 둔 곳",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "밑줄",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "책갈피",
+          "kind": "cost"
+        },
+        {
+          "name": "독서등",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "제이드_u3",
+      "name": "비취 구슬탄",
+      "hero": "제이드",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "소장 가치",
+          "n": 3
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "stack",
+          "id": "소장 가치",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "잔돈",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "소장 가치",
+              "n": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "통장째로",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "소장 가치",
+              "n": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "귀한 판본",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "비취 동전",
+          "tags": [
+            "보존",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "소장 가치",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "환불 불가",
+          "cost": 2,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "소장 가치",
+              "n": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "비취 각인",
+          "kind": "power"
+        },
+        {
+          "name": "영수증",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "귀가 얇아서",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "제이드_u4",
+      "name": "초대 교주의 수양록",
+      "hero": "제이드",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "소장 가치",
+          "v": 3
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "필사본",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "원본 수양록",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "주석 달기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "절판 도서 컬렉션",
+          "cost": 0,
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "밤새 읽기",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "지식 컬렉션",
+          "kind": "draw"
+        },
+        {
+          "name": "표지 수선",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "양장본",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_jadepen",
+      "name": "제이드의 비싼 만년필",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "atk": 10,
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "사치품의 필기감",
+          "when": {
+            "on": "play",
+            "type": "스킬",
+            "every": 2
+          },
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "self"
+            }
+          ]
+        }
+      ],
+      "affinity": "제이드",
+      "affinityStats": {
+        "hp": 30,
+        "atk": 8
+      },
+      "affinityEffect": [
+        {
+          "name": "책값 메모",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "held",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "소장 가치",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "책값을 쪼개 산 사치품. 손에 묵혀 둔 책이 있으면 그 값을 장부에 적어 둔다."
+    }
+  ]
+}

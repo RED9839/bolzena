@@ -1,0 +1,774 @@
+{
+  "heroes": [
+    {
+      "id": "코미",
+      "name": "코미",
+      "nature": "우울",
+      "race": "수인",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 1100,
+      "atk": 84,
+      "def": 70,
+      "crit": 5,
+      "blurb": "일하기 싫고 자는 게 최고인 고양이 수인.",
+      "keyword": {
+        "name": "낮잠",
+        "desc": "「낮잠의 미학」 — 턴 끝에 남긴 AP 만큼 자 둔 낮잠. 적이 치기 직전 하나를 깨워 실드를 세우고, 넷이 차면 둘을 써 다음 턴 AP 1.",
+        "carrier": "self",
+        "cap": 4,
+        "rules": [
+          {
+            "name": "쿨쿨",
+            "when": {
+              "on": "turnEnd"
+            },
+            "conds": [
+              {
+                "c": "apLeft",
+                "n": 1
+              }
+            ],
+            "fx": [
+              {
+                "k": "stack",
+                "id": "낮잠",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "쿨쿨",
+            "when": {
+              "on": "turnEnd"
+            },
+            "conds": [
+              {
+                "c": "apLeft",
+                "n": 2
+              }
+            ],
+            "fx": [
+              {
+                "k": "stack",
+                "id": "낮잠",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "개운한 기지개",
+            "when": {
+              "on": "stackReach",
+              "id": "낮잠",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "낮잠",
+                "v": 2
+              },
+              {
+                "k": "ap",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "낮잠의 미학",
+          "when": {
+            "on": "foeActBefore",
+            "type": "공격"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "낮잠"
+            }
+          ],
+          "fx": [
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "엘프산 특제 사료",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.5,
+            "base": "def",
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "코미_s1",
+        "코미_s1",
+        "코미_s2",
+        "코미_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "코미_s1",
+      "name": "냥펀치",
+      "hero": "코미",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "코미_s2",
+      "name": "몸 말기",
+      "hero": "코미",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "코미_u1",
+      "name": "푹신푹신 타임",
+      "hero": "코미",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "낮잠"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.8
+        },
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        },
+        {
+          "k": "spend",
+          "id": "낮잠",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 푹신푹신 타임",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.05
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "가벼운 푹신푹신 타임",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "졸린 푹신푹신 타임",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.05
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "든든한 푹신푹신 타임",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠"
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "복 받은 푹신푹신 타임",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠"
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "포근한 방석",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_u2",
+      "name": "베개 강타",
+      "hero": "코미",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "낮잠",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 베개 강타",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 베개 강타",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "졸린 베개 강타",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 베개 강타",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 베개 강타",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "포근한 방석",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_u3",
+      "name": "일하기 싫으면 안 해도 돼",
+      "hero": "코미",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.6
+        },
+        {
+          "k": "stack",
+          "id": "낮잠",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "저장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 일하기 싫으면 안 해도 돼",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.1
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 일하기 싫으면 안 해도 돼",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.45
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "졸린 일하기 싫으면 안 해도 돼",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 일하기 싫으면 안 해도 돼",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 일하기 싫으면 안 해도 돼",
+          "tags": [
+            "보존",
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "포근한 방석",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_u4",
+      "name": "엘프산 사료 한 그릇",
+      "hero": "코미",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "낮잠",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 2
+        },
+        {
+          "k": "heal",
+          "ratio": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 엘프산 사료 한 그릇",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.3
+            }
+          ]
+        },
+        {
+          "name": "가벼운 엘프산 사료 한 그릇",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.9
+            }
+          ]
+        },
+        {
+          "name": "졸린 엘프산 사료 한 그릇",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "든든한 엘프산 사료 한 그릇",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.25
+            }
+          ]
+        },
+        {
+          "name": "복 받은 엘프산 사료 한 그릇",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.25
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "포근한 방석",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

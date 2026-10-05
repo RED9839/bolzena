@@ -1,0 +1,662 @@
+{
+ "heroes": [
+  {
+   "id": "빅우드",
+   "name": "빅우드",
+   "nature": "순수",
+   "row": "front",
+   "role": "탱커",
+   "star": 2,
+   "hp": 930,
+   "atk": 66,
+   "def": 61,
+   "crit": 5,
+   "blurb": "얻어맞으면서도 웃는 나무 정령. 맞을 때마다 나이테가 늘고, 나이테가 두꺼울수록 그가 거는 실드도 두꺼워진다.",
+   "keyword": {
+    "name": "나이테",
+    "desc": "맞으며 늘어난 나이테. 1개당 빅우드가 주는 실드 +10%",
+    "carrier": "self",
+    "cap": 5,
+    "per": [
+     {
+      "stat": "guard",
+      "v": 0.1
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "거기 말고 여기",
+     "when": {
+      "on": "hurt",
+      "guarded": true
+     },
+     "limit": {
+      "per": "turn",
+      "n": 3
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "오래된 나무",
+     "when": {
+      "on": "play"
+     },
+     "conds": [
+      {
+       "c": "stack",
+       "id": "나이테",
+       "n": 5
+      }
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 2
+      },
+      {
+       "k": "spend",
+       "id": "나이테",
+       "all": true
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "나를~ 바라 봐라~",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "shield",
+      "ratio": 3
+     },
+     {
+      "k": "status",
+      "id": "피해 감소",
+      "v": 2
+     },
+     {
+      "k": "stack",
+      "id": "나이테",
+      "v": 2
+     }
+    ]
+   },
+   "race": "정령",
+   "starter": [
+    "빅우드_s1",
+    "빅우드_s1",
+    "빅우드_s2",
+    "빅우드_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "빅우드_s1",
+   "name": "나뭇가지 후려치기",
+   "hero": "빅우드",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "빅우드_s2",
+   "name": "나무껍질",
+   "hero": "빅우드",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 1.5
+    }
+   ]
+  },
+  {
+   "id": "빅우드_u1",
+   "name": "뿌리 내리기",
+   "hero": "빅우드",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "signature": true,
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    },
+    {
+     "k": "stack",
+     "id": "나이테",
+     "v": 1
+    },
+    {
+     "k": "status",
+     "id": "반격",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "깊은 뿌리",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.7
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "얽힌 뿌리",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "굵은 줄기",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.4
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "잔뿌리",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.6
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "천년 뿌리",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.5
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 껍질",
+     "kind": "guard"
+    },
+    {
+     "name": "수액",
+     "kind": "heal"
+    },
+    {
+     "name": "새싹",
+     "kind": "draw"
+    }
+   ]
+  },
+  {
+   "id": "빅우드_u2",
+   "name": "나이테 세기",
+   "hero": "빅우드",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "perStack",
+     "id": "나이테"
+    },
+    {
+     "k": "heal",
+     "ratio": 0.4
+    },
+    {
+     "k": "status",
+     "id": "결정화",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "나이테 자랑",
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "나이테"
+      },
+      {
+       "k": "heal",
+       "ratio": 0.55
+      },
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "한 줄씩",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "나이테"
+      },
+      {
+       "k": "heal",
+       "ratio": 0.35
+      },
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "수액 흘리기",
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "나이테"
+      },
+      {
+       "k": "heal",
+       "ratio": 0.4
+      },
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "나이테 방패",
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "나이테"
+      },
+      {
+       "k": "shield",
+       "ratio": 0.6
+      },
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "잊지 않는 나무",
+     "tags": [
+      "보존",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "나이테"
+      },
+      {
+       "k": "heal",
+       "ratio": 0.4
+      },
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "푸른 잎",
+     "kind": "heal"
+    },
+    {
+     "name": "가벼운 가지",
+     "kind": "cost"
+    },
+    {
+     "name": "송진",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 0.5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "빅우드_u3",
+   "name": "통나무 굴리기",
+   "hero": "빅우드",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.9,
+     "target": "allEnemies",
+     "base": "def"
+    },
+    {
+     "k": "shield",
+     "ratio": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "거목 굴리기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.22,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.35
+      }
+     ]
+    },
+    {
+     "name": "나뭇단 굴리기",
+     "cost": 1,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.72,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "뿌리째 뽑기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 1
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "통나무 찍기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.8,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.2
+      },
+      {
+       "k": "tough",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "나이테 굴리기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "shield",
+       "ratio": 1
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "묵직한 통나무",
+     "kind": "power"
+    },
+    {
+     "name": "미끄러운 비탈",
+     "kind": "cost"
+    },
+    {
+     "name": "도토리 세례",
+     "kind": "frost"
+    }
+   ]
+  },
+  {
+   "id": "빅우드_u4",
+   "name": "숲의 품",
+   "hero": "빅우드",
+   "unique": true,
+   "cost": 1,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "status",
+     "id": "결정화",
+     "v": 2
+    },
+    {
+     "k": "stack",
+     "id": "나이테",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "깊은 숲",
+     "fx": [
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "작은 숲",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "숲의 파수꾼",
+     "fx": [
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "반격",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "나무 그늘",
+     "fx": [
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "불굴",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "먼저 자란 나무",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "결정화",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "나이테",
+       "v": 3
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "뿌리 깊은 힘",
+     "kind": "defUp"
+    },
+    {
+     "name": "가지 휘두르기",
+     "kind": "atkUp"
+    },
+    {
+     "name": "씨앗",
+     "kind": "cost"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,677 @@
+{
+ "heroes": [
+  {
+   "id": "나이아",
+   "name": "나이아",
+   "nature": "순수",
+   "row": "mid",
+   "role": "서포터",
+   "star": 3,
+   "hp": 600,
+   "atk": 75,
+   "def": 60,
+   "crit": 5,
+   "blurb": "인사 대신 물총부터 쏘는 외로운 수문장. 물총을 맞은 아군이 이번 턴 카드를 내면 물줄기나 물보라가 따라붙는다.",
+   "keywords": [
+    {
+     "name": "물총",
+     "desc": "나이아가 쏜 물에 젖은 아군. 이번 턴 그 아군이 카드를 내면 물이 따라간다",
+     "carrier": "hero",
+     "cap": 1,
+     "endClear": true
+    }
+   ],
+   "passives": [
+    {
+     "name": "물줄기",
+     "when": {
+      "on": "play",
+      "marked": "물총",
+      "type": "공격"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 2
+     },
+     "fx": [
+      {
+       "k": "extra",
+       "ratio": 0.6,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "물보라",
+     "when": {
+      "on": "play",
+      "marked": "물총",
+      "type": "스킬"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 2
+     },
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 0.6
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "물의 세례를 받아라!",
+    "cost": 150,
+    "fx": [
+     {
+      "k": "heal",
+      "ratio": 1.5
+     },
+     {
+      "k": "shield",
+      "ratio": 1.5
+     },
+     {
+      "k": "stack",
+      "id": "물총",
+      "v": 1,
+      "target": "allAllies"
+     }
+    ]
+   },
+   "race": "정령",
+   "starter": [
+    "나이아_s1",
+    "나이아_s1",
+    "나이아_s2",
+    "나이아_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "나이아_s1",
+   "name": "물방울",
+   "hero": "나이아",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "나이아_s2",
+   "name": "물 뿌리기",
+   "hero": "나이아",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 1.2
+    }
+   ]
+  },
+  {
+   "id": "나이아_u1",
+   "name": "같이 놀자!",
+   "hero": "나이아",
+   "unique": true,
+   "cost": 0,
+   "type": "스킬",
+   "signature": true,
+   "fx": [
+    {
+     "k": "stack",
+     "id": "물총",
+     "v": 1,
+     "target": "oneAlly"
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "양손 물총",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "물풍선",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "기습 물총",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "물놀이 초대장",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "수문 앞 인사",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "탄성",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "젖은 머리",
+     "kind": "draw"
+    },
+    {
+     "name": "찰랑찰랑",
+     "kind": "guard"
+    },
+    {
+     "name": "물방울 무늬",
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 0.4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "나이아_u2",
+   "name": "수문 개방",
+   "hero": "나이아",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    },
+    {
+     "k": "heal",
+     "ratio": 1.2
+    },
+    {
+     "k": "stack",
+     "id": "물총",
+     "v": 1,
+     "target": "allAllies"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "대홍수",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.7
+      },
+      {
+       "k": "heal",
+       "ratio": 1.62
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    },
+    {
+     "name": "작은 수문",
+     "cost": 1,
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.7
+      },
+      {
+       "k": "heal",
+       "ratio": 1.02
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    },
+    {
+     "name": "수문장의 방벽",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.64
+      },
+      {
+       "k": "status",
+       "id": "실드 유지",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    },
+    {
+     "name": "맑은 물길",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2
+      },
+      {
+       "k": "heal",
+       "ratio": 1.6
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    },
+    {
+     "name": "물의 축복",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.2
+      },
+      {
+       "k": "heal",
+       "ratio": 1.4
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 물",
+     "kind": "heal"
+    },
+    {
+     "name": "굳센 둑",
+     "kind": "guard"
+    },
+    {
+     "name": "물살 타기",
+     "kind": "ap"
+    }
+   ]
+  },
+  {
+   "id": "나이아_u3",
+   "name": "물대포",
+   "hero": "나이아",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1.2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "stack",
+     "id": "물총",
+     "v": 1,
+     "target": "oneAlly"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "고압 물대포",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.68,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "물대포 연사",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.5,
+       "target": "oneEnemy",
+       "hits": 3
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "흠뻑 젖어라",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "물벼락",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "물수제비",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 물살",
+     "kind": "power"
+    },
+    {
+     "name": "차가운 물",
+     "kind": "frost"
+    },
+    {
+     "name": "가벼운 물통",
+     "kind": "cost"
+    }
+   ]
+  },
+  {
+   "id": "나이아_u4",
+   "name": "외로운 수문장",
+   "hero": "나이아",
+   "unique": true,
+   "cost": 1,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "status",
+     "id": "탄성",
+     "v": 3
+    },
+    {
+     "k": "status",
+     "id": "결의",
+     "v": 1
+    },
+    {
+     "k": "stack",
+     "id": "물총",
+     "v": 1,
+     "target": "allAllies"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "친구가 생겼어",
+     "fx": [
+      {
+       "k": "status",
+       "id": "탄성",
+       "v": 5
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    },
+    {
+     "name": "수문장 교대",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "status",
+       "id": "탄성",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    },
+    {
+     "name": "굳건한 수문",
+     "fx": [
+      {
+       "k": "status",
+       "id": "탄성",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    },
+    {
+     "name": "물의 정령",
+     "fx": [
+      {
+       "k": "status",
+       "id": "탄성",
+       "v": 4
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "면역",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "먼저 다가가기",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "탄성",
+       "v": 4
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "allAllies"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "촉촉한 마음",
+     "kind": "defUp"
+    },
+    {
+     "name": "가벼운 발걸음",
+     "kind": "cost"
+    },
+    {
+     "name": "물장구",
+     "kind": "atkUp"
+    }
+   ]
+  }
+ ]
+}

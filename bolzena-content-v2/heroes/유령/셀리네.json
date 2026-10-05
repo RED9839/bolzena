@@ -1,0 +1,711 @@
+{
+  "heroes": [
+    {
+      "id": "셀리네",
+      "name": "셀리네",
+      "nature": "활발",
+      "race": "유령",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 880,
+      "atk": 75,
+      "def": 70,
+      "crit": 5,
+      "blurb": "남의 화난 표정을 수집하는 엘튜버 유령. 적을 약 올릴 때마다 「표정」 이 모이고, 둘이 차면 「화난 얼굴」 한 장을 갤러리에서 꺼내 다시 약을 올린다.",
+      "keyword": {
+        "name": "표정",
+        "desc": "약 올린 상대의 찡그린 얼굴 — 갤러리에 한 장씩 모은다",
+        "carrier": "self",
+        "cap": 2,
+        "rules": [
+          {
+            "name": "화난 얼굴 갤러리",
+            "when": {
+              "on": "stackReach",
+              "id": "표정",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "표정",
+                "all": true
+              },
+              {
+                "k": "make",
+                "id": "셀리네_t1",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "약 올리기",
+          "when": {
+            "on": "debuff"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "핑크 더스트",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 3.5,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "표정",
+            "v": 2
+          },
+          {
+            "k": "ifBroken"
+          },
+          {
+            "k": "shield",
+            "ratio": 5
+          }
+        ]
+      },
+      "starter": [
+        "셀리네_s1",
+        "셀리네_s1",
+        "셀리네_s2",
+        "셀리네_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "셀리네_s1",
+      "name": "하트 탄",
+      "hero": "셀리네",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "셀리네_s2",
+      "name": "팬서비스 가드",
+      "hero": "셀리네",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "셀리네_u1",
+      "name": "온 마음을 다해",
+      "hero": "셀리네",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진심 어린 도발",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 도발",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "준비한 멘트",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "구독 좋아요 알림",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 도발",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "진한 하트",
+          "kind": "power"
+        },
+        {
+          "name": "약 오르지?",
+          "kind": "frost"
+        },
+        {
+          "name": "생방송",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "셀리네_u2",
+      "name": "인증샷",
+      "hero": "셀리네",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.2
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "단체 인증샷",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "셀카 한 장",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.85
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "저장한 사진",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.95
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "라이브 방송",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 사진",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.85
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "보정 필터",
+          "kind": "guard"
+        },
+        {
+          "name": "연사",
+          "kind": "cost"
+        },
+        {
+          "name": "조회수 폭발",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셀리네_u3",
+      "name": "화난 얼굴 갤러리",
+      "hero": "셀리네",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "make",
+          "id": "셀리네_t1",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "특별 전시",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "셀리네_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 액자",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "셀리네_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "소장품",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "셀리네_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "갤러리 개관",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "셀리네_t1",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 전시",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "셀리네_t1",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "명작 한 점",
+          "kind": "power"
+        },
+        {
+          "name": "관람객 반응",
+          "kind": "draw"
+        },
+        {
+          "name": "액자 테두리",
+          "kind": "guard"
+        }
+      ]
+    },
+    {
+      "id": "셀리네_u4",
+      "name": "사근사근 반말",
+      "hero": "셀리네",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "얄미운 반말",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "살짝 반말",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "아껴 둔 반말",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "반말 폭격",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "축복의 반말",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "콕 찌르는 말",
+          "kind": "frost"
+        },
+        {
+          "name": "재빠른 말",
+          "kind": "cost"
+        },
+        {
+          "name": "윙크",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셀리네_t1",
+      "name": "화난 얼굴",
+      "hero": "셀리네",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.8
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_selinemirage",
+      "name": "셀리네의 미드나잇 미라주",
+      "grade": "희귀",
+      "slot": "방어구",
+      "stats": {
+        "hp": 122,
+        "def": 15
+      },
+      "effect": [
+        {
+          "name": "한밤의 신기루",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        }
+      ],
+      "affinity": "셀리네",
+      "affinityStats": {
+        "hp": 60,
+        "def": 5
+      },
+      "affinityEffect": [
+        {
+          "name": "넘친 기운",
+          "when": {
+            "on": "overheal"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "한밤의 무대 의상. 넘치는 기운이 신기루처럼 몸을 감싼다."
+    }
+  ]
+}

@@ -1,0 +1,633 @@
+{
+  "heroes": [
+    {
+      "id": "carrot",
+      "name": "캬롯",
+      "nature": "순수",
+      "race": "요정",
+      "row": "mid",
+      "role": "서포터",
+      "style": "예약형",
+      "star": 3,
+      "hp": 600,
+      "atk": 75,
+      "def": 60,
+      "crit": 5,
+      "blurb": "뭐든지 크게 키우는 요정 정원사. 오늘 심은 씨앗이 내일 터진다.",
+      "keyword": {
+        "name": "씨앗",
+        "desc": "심어 둔 것",
+        "carrier": "self",
+        "cap": 3,
+        "decay": 1,
+        "reserve": true,
+        "rules": [
+          {
+            "name": "씨앗",
+            "when": {
+              "on": "stackGone",
+              "id": "씨앗",
+              "decay": true
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 1.2
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "수확",
+          "when": {
+            "on": "reserveGone"
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "햇살",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "firstTurn"
+            }
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "정원의 축제",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "heal",
+            "ratio": 3.0
+          },
+          {
+            "k": "hasten",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "carrot_s1",
+        "carrot_s2",
+        "carrot_s3",
+        "carrot_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "carrot_s1",
+      "name": "물뿌리개",
+      "hero": "carrot",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "carrot_s2",
+      "name": "씨 뿌리기",
+      "hero": "carrot",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "씨앗",
+          "v": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.0,
+          "target": "party"
+        }
+      ]
+    },
+    {
+      "id": "carrot_s3",
+      "name": "곡괭이질",
+      "hero": "carrot",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "carrot_u1",
+      "name": "비료 한 줌",
+      "hero": "carrot",
+      "cost": 0,
+      "type": "스킬",
+      "unique": true,
+      "signature": true,
+      "fx": [
+        {
+          "k": "hasten",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "웃거름",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "퇴비 더미",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "뿌리 깊게",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "남은 거름",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "새벽 물주기",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "gauge",
+              "v": 20
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "흙내음",
+          "kind": "draw"
+        },
+        {
+          "name": "단비",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "한 뼘 더",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carrot_u2",
+      "name": "거대 사탕수수",
+      "hero": "carrot",
+      "cost": 2,
+      "type": "공격",
+      "unique": true,
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifBroken"
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "더 크게",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifBroken"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "하늘까지",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifBroken"
+            },
+            {
+              "k": "ap",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "단물",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "ifBroken"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "쓰러지는 줄기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "수확 철",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifBroken"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carrot_u3",
+      "name": "정원 가꾸기",
+      "hero": "carrot",
+      "cost": 1,
+      "type": "강화",
+      "unique": true,
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.1,
+          "run": true,
+          "target": "self"
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "온실",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대정원",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꽃길",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "새싹",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "울타리",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carrot_u4",
+      "name": "물보라",
+      "hero": "carrot",
+      "cost": 1,
+      "type": "스킬",
+      "unique": true,
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "씨앗",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "안개비",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "소나기",
+          "cost": 2,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.0,
+              "target": "party"
+            }
+          ]
+        },
+        {
+          "name": "이슬",
+          "tags": [
+            "보존",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "무지개",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "물방울 방패",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.0,
+              "target": "party"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

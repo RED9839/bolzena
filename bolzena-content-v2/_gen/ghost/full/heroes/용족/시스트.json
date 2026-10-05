@@ -1,0 +1,620 @@
+{
+  "heroes": [
+    {
+      "id": "시스트",
+      "name": "시스트",
+      "nature": "광기",
+      "race": "용족",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 580,
+      "atk": 125,
+      "def": 28,
+      "crit": 10,
+      "blurb": "힘 대신 돈으로 가치를 증명하는 자수정의 용족 밀수꾼. 쓰러뜨리고 깨뜨린 만큼 장부에 금화가 쌓이고, 비싼 물건은 금화로만 판다.",
+      "keyword": {
+        "name": "밀수 장부",
+        "desc": "장부에 적힌 금화. 적을 격파 · 처치하면 쌓이고, 「금화로만」 파는 카드의 비용이 된다",
+        "carrier": "self",
+        "cap": 6
+      },
+      "passives": [
+        {
+          "name": "장사 수완",
+          "when": {
+            "on": "kill"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "다음 손님",
+          "when": {
+            "on": "break"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "플렉스 건",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "atkMod",
+            "v": 0.15,
+            "run": true,
+            "target": "self"
+          },
+          {
+            "k": "ap",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "밀수 장부",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "시스트_s1",
+        "시스트_s1",
+        "시스트_s2",
+        "시스트_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "시스트_s1",
+      "name": "한 발",
+      "hero": "시스트",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "시스트_s2",
+      "name": "가짜 날개",
+      "hero": "시스트",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "시스트_u1",
+      "name": "총알 배송",
+      "hero": "시스트",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "밀수 장부",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "특급 배송",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대량 주문",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "반품 불가",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 1
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "웃돈 얹기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "응원 대행 서비스",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "자수정 탄두",
+          "kind": "power"
+        },
+        {
+          "name": "배송 추적",
+          "kind": "draw"
+        },
+        {
+          "name": "덤 하나",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시스트_u2",
+      "name": "떨이 판매",
+      "hero": "시스트",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "밀수 장부",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "할인 행사",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "묶음 판매",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "VIP 패키지",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "하자품",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "엘리아스 통째로",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "계산기",
+          "kind": "draw"
+        },
+        {
+          "name": "단골 손님",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가짜 뿔",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시스트_u3",
+      "name": "4차원 바구니",
+      "hero": "시스트",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "payWith": "밀수 장부",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "allEnemies",
+          "hits": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "골디의 저금통",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "초록 괴물",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "주머니 바구니",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "덤 하나 더",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "아기 요정까지",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "자수정 탄창",
+          "kind": "power"
+        },
+        {
+          "name": "바구니 끈",
+          "kind": "frost"
+        },
+        {
+          "name": "영수증",
+          "kind": "ap"
+        }
+      ],
+      "blurb": "비용은 「밀수 장부」 로만 — 이 바구니에는 무엇이든 들어간다."
+    },
+    {
+      "id": "시스트_u4",
+      "name": "장사천재 시스트",
+      "hero": "시스트",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.15,
+          "run": true,
+          "target": "self"
+        },
+        {
+          "k": "stack",
+          "id": "밀수 장부",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "개업 전단지",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재산 2위",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "대리 응원",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "위조지폐는 상종 안 해",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "좌판 펼치기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "금고",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀수 장부",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "장부",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "자수정 반지",
+          "kind": "atkUp"
+        }
+      ]
+    }
+  ]
+}

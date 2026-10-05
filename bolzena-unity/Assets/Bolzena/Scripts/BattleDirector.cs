@@ -1,0 +1,979 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Bolzena.Battle;
+using Bolzena.UI;
+using Bolzena.View;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using Motion = Bolzena.Battle.Motion;
+
+namespace Bolzena
+{
+    // 전투 화면의 감독 — 규칙(IBattle)이 내준 이벤트를 받아 차례대로 연출한다.
+    // 장면은 전부 코드로 만든다: 싸움터(Field — 흔들림 · 줌을 탄다) · 화면 덮개(Screen) · UI(손패 · 파티 막대 · 툴팁 · 창).
+    public partial class BattleDirector : MonoBehaviour
+    {
+        public static BattleDirector I;
+        public IBattle Battle;
+        public Camera Cam;
+        public Transform FieldRoot, ScreenRoot, UiRoot;
+        public readonly List<UnitView> Heroes = new List<UnitView>();
+        public readonly List<UnitView> Enemies = new List<UnitView>();
+        public readonly List<EnemyHud> EnemyHuds = new List<EnemyHud>();
+        public HandView Hand;
+        public PartyHud Hud;
+        public bool WaitingInput { get; private set; }
+        public bool Over { get; private set; }
+        public event Action<string> Moment;                 // 「hit」 · 「crit」 · 「break」 … 연출의 고비(자동 데모가 캡처)
+        public int DemoEpiphanyPick = -1;
+        public int DemoBranchPick = -1;
+        public bool Auto;                                   // 자동 전투(위 오른쪽 토글)
+        public int UltSel { get; private set; } = -1;       // 고른 고학년(사도 번호)
+        public int UltAim { get; private set; } = -1;
+
+        enum ReqKind { Card, Ult, End }
+        (ReqKind kind, int a, int b)? request;
+        string skipPlayed;                                  // 손에서 직접 낸 카드 — 뒤따르는 CardPlayed 는 이미 그렸다
+
+        // 사도 · 적 자리(싸움터 좌표 — 발)
+        static readonly Vector3[] HeroPos = { new Vector3(-1.55f, -0.72f, 0), new Vector3(-3.2f, -0.32f, 0), new Vector3(-4.85f, -0.78f, 0) };
+        static readonly Vector3[][] EnemyPosN =
+        {
+            new[] { new Vector3(3.2f, -0.75f, 0) },
+            new[] { new Vector3(2.35f, -0.78f, 0), new Vector3(4.75f, -0.4f, 0) },
+            new[] { new Vector3(2.1f, -0.8f, 0), new Vector3(4.1f, -0.38f, 0), new Vector3(6.1f, -0.85f, 0) },
+        };
+        static readonly Vector3 BossPos = new Vector3(3.9f, -0.95f, 0);
+        const float UnitScale = 0.3f;
+
+        void Awake()
+        {
+            I = this;
+            // 한글 줄바꿈을 낱말(띄어쓰기) 단위로 — 카드 설명이 「피 / 해」처럼 글자 중간에서 끊기지 않게. 전투 동안만(판 화면은 제 설정 그대로)
+            hangulWas = TMPro.TMP_Settings.useModernHangulLineBreakingRules;
+            TMPro.TMP_Settings.useModernHangulLineBreakingRules = true;
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-demo") >= 0) Demo.DemoGuard.Install();
+            Clock.Ensure();
+            Clock.Asleep = false;
+            // 프레임 제한 · 수직동기는 화면 설정(DisplayOptions — 부팅 때 RunBoot 가 적용)을 따른다
+            int pc = Array.IndexOf(QualitySettings.names, "PC");
+            if (pc >= 0) QualitySettings.SetQualityLevel(pc, true);
+        }
+
+        void Start()
+        {
+            Build();
+            // 사람 실행 — 가짜 손가락은 늘 끈 채로 시작한다(데모 · 봇이 켠 채 남으면 진짜 마우스를 읽지 않는다)
+            PointerInput.Simulated = false;
+            PointerInput.SimHeld = PointerInput.SimRight = false;
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-demo") >= 0)
+            {
+                if (BattleBridge.Fight != null)                                 // 한 판 데모 — 판에서 넘어온 싸움
+                {
+                    // -humanfight: 판 화면은 데모가 넘기고 싸움은 사람(또는 OS 포인터를 흉내 내는 시험 스크립트)이 한다
+                    if (Array.IndexOf(Environment.GetCommandLineArgs(), "-humanfight") < 0) Demo.RunFightBot.Attach(this);
+                }
+                else Demo.DemoRunner.Attach(this);                              // 전투 시범(-battle)
+            }
+            StartCoroutine(Main());
+        }
+
+        // 창 크기가 바뀌면(설정 창의 해상도 · 전체화면) 카메라 높이 · 배경을 다시 맞춘다 — 21:9 는 옆이 넓게, 16:10 은 위아래가 넓게
+        SpriteRenderer bgSprite;
+        float lastAspect;
+        void FitBg()
+        {
+            lastAspect = Cam.aspect;
+            Cam.orthographicSize = Tone.CamSize(Cam.aspect);
+            float bw = Mathf.Max(18.4f, Cam.orthographicSize * Cam.aspect * 2 + 1.2f, (Cam.orthographicSize * 2 + 1.6f) * 18.4f / 10.35f);
+            Make.Fit(bgSprite, new Vector2(bw, bw * 10.35f / 18.4f));
+        }
+
+        void LateUpdate()
+        {
+            if (Cam != null && bgSprite != null && !Mathf.Approximately(Cam.aspect, lastAspect)) FitBg();
+        }
+
+        bool hangulWas;
+        void OnDestroy()
+        {
+            if (TMPro.TMP_Settings.instance != null) TMPro.TMP_Settings.useModernHangulLineBreakingRules = hangulWas;
+        }
+
+        void Build()
+        {
+            Cam = Camera.main;
+            Cam.orthographic = true;
+            Cam.orthographicSize = Tone.CamSize(Cam.aspect);
+            Cam.transform.position = new Vector3(0, 0, -10);
+            Cam.backgroundColor = new Color(0.02f, 0.02f, 0.04f);
+            PostFx.Create();
+
+            FieldRoot = Make.Node("Field", null);
+            FieldRoot.gameObject.AddComponent<FieldRig>();
+            ScreenRoot = Make.Node("Screen", null);
+            UiRoot = Make.Node("UI", null);
+            Vfx.Field = FieldRoot;
+            Vfx.Screen = ScreenRoot;
+
+            // 배경 — 흔들림 · 줌에 모자라지 않게 화면보다 크게
+            var run = BattleBridge.Fight;
+            var bg = Make.Sprite("bg", FieldRoot, BattleBridge.BgSprite(run?.Ticket.Bg) ?? Res.Sprite("Bg/stage3_2"), new Vector3(0, 0.4f, 0), 0);
+            bgSprite = bg;
+            FitBg();
+            // 바닥 쪽을 살짝 어둡게(유닛이 떠 보이게) · 위쪽 빛
+            Make.Box("floorShade", FieldRoot, Res.UI("soft"), new Vector3(0, -3.6f, 0), new Vector2(30, 6f), 2, new Color(0, 0, 0, 0.55f));
+            Make.Box("sky", FieldRoot, Res.UI("soft"), new Vector3(-2, 4.2f, 0), new Vector2(22, 5f), 2, new Color(1f, 0.9f, 0.7f, 0.18f), Res.SpriteMat(true, 1.1f));
+            StartCoroutine(Motes());
+
+            ScreenFx.Create(ScreenRoot);
+            Tooltip.Create(UiRoot);
+            if (run != null) Battle = run.Battle;                  // 판에서 연 싸움(Run.OpenFight)
+            else
+            {
+                var data = CoreBattle.LoadData();
+                Battle = new CoreBattle(data, CoreBattle.Fixture.FromArgs(data) ?? CoreBattle.Fixture.Pilot(data));
+            }
+            var evs0 = Battle.Begin();
+            pendingBegin = evs0;
+            var s = Battle.Snapshot;
+            for (int i = 0; i < s.Heroes.Count; i++)
+            {
+                var h = s.Heroes[i];
+                var u = UnitView.Create(FieldRoot, "hero_" + h.Key, h.Key, "Normal", true, UnitScale, HeroPos[i], 40 + i * 2);
+                u.Ref = UnitRef.Party(i);
+                Heroes.Add(u);
+            }
+            // 앞줄이 위에 오게(발이 낮을수록 앞)
+            ResetHeroOrder();
+
+            CardView.HeroOf = i => { var hs = Battle.Snapshot.Heroes; return i >= 0 && i < hs.Count ? hs[i] : null; };
+            Hand = HandView.Create(UiRoot);
+            Hand.EnemyAt = EnemyAt;
+            Hand.EnemyNear = NearestEnemy;
+            Hand.EnemyAim = i => FieldRoot.TransformPoint(Enemies[i].Center);
+            Hand.NextEnemy = NextEnemy;
+            Hand.CanPlay = c =>
+            {
+                int idx = Hand.Cards.FindIndex(v => v.Info == c);
+                return idx >= 0 && Battle.CanPlay(idx, out _);
+            };
+            Hand.WhyNot = i => Battle.CanPlay(i, out var why) ? null : why;
+            Hud = PartyHud.Create(UiRoot, s);
+            Hud.SetAp(s.Ap, s.MaxAp);
+            Hud.OnPile = OpenPile;
+            Hud.OnSpeed = ToggleSpeed;
+            Hud.OnPause = OpenPause;
+            Hud.OnHero = i => OpenHeroInfo(i, Hud.PortraitRect(i));
+            Hud.OnParty = () => OpenParty(1);
+            Hud.OnAuto = () => { Auto = !Auto; Hud.SetAuto(Auto); Sfx.Play("ui_click", 0.5f); };
+            Hud.SetSpeed(Clock.Speed);
+            Preload(s);
+        }
+
+        // 미리 불러 두기 — 고학년 · 보스 등장에서 처음 쓰는 것(컷인 스탠딩 스파인 · 목소리 · 보스 스파인 · 셰이더)을 시작할 때
+        void Preload(BattleSnapshot s)
+        {
+            var keys = new List<string>();
+            foreach (var h in s.Heroes) { keys.Add("st_" + h.Key); Sfx.Preload(h.Key); foreach (Motion m in Enum.GetValues(typeof(Motion))) { HeroSfx(h.Key, m, true); HeroSfx(h.Key, m, false); } }
+            if (Battle is CoreBattle cb) keys.AddRange(cb.SpineKeys());
+            foreach (var k in keys)
+            {
+                var data = Res.Spine(k);
+                if (data == null) continue;
+                // 한 번 세워 그려 둔다 — 아틀라스 텍스처 · 재질이 GPU 에 올라가게
+                var sa = Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(data);
+                sa.transform.position = new Vector3(0, -40, 0);
+                sa.Update(0);
+                sa.LateUpdate();
+                Destroy(sa.gameObject, 0.5f);
+            }
+            Vfx.Preload();
+            Shader.WarmupAllShaders();
+        }
+
+        IReadOnlyList<BattleEvent> pendingBegin;
+
+        void ResetHeroOrder()
+        {
+            int[] o = { 46, 42, 44 };
+            for (int i = 0; i < Heroes.Count; i++) Heroes[i].SetOrder(o[Mathf.Min(i, 2)]);
+        }
+
+        // 떠다니는 빛 티끌 — 숲의 공기
+        IEnumerator Motes()
+        {
+            while (true)
+            {
+                Vfx.Burst(new Vector3(UnityEngine.Random.Range(-8f, 8f), UnityEngine.Random.Range(-2.5f, 3f), 0), new Vfx.BurstOpt
+                {
+                    Tex = "FX_IN_Glow", Count = 1, Speed = new Vector2(0.1f, 0.35f), Angle = 80, Spread = 60, Life = new Vector2(3f, 5f),
+                    Size = new Vector2(0.05f, 0.14f), C0 = new Color(1f, 0.95f, 0.7f, 0.7f), C1 = new Color(0.8f, 1f, 0.8f, 0.5f), Order = 5, Boost = 1.6f, ShrinkTo = 0.6f,
+                });
+                yield return Clock.Wait(0.25f);
+            }
+        }
+
+        // 적 판정 상자(월드) — 그림(스파인 메시 경계)을 넉넉히 덮는다. 예전 상자(폭 45% · 발 아래 0.4)는 그림보다 작아
+        // 적 가장자리 · 머리 위에 놓으면 「클릭이 안 먹는」 것처럼 보였다
+        public static bool OldEnemyBox = Array.IndexOf(Environment.GetCommandLineArgs(), "-oldbox") >= 0;
+        public Rect EnemyBox(int i)
+        {
+            var e = Enemies[i];
+            var p = FieldRoot.TransformPoint(e.Feet);
+            if (OldEnemyBox) { float ow = e.Width() * 0.45f + 0.3f; return new Rect(p.x - ow, p.y - 0.4f, ow * 2, e.Height() + 0.4f); }   // 고치기 전 상자(-oldbox — 비교용)
+            // 그림의 실제 경계(스파인 메시) + 여유 0.3, 발 둘레 최소 상자와 합친다(그림이 아주 작거나 아직 안 그려졌을 때)
+            var b = e.ArtBounds;
+            float minW = 0.9f;
+            float x0 = Mathf.Min(b.min.x - 0.3f, p.x - minW), x1 = Mathf.Max(b.max.x + 0.3f, p.x + minW);
+            float y0 = Mathf.Min(b.min.y - 0.3f, p.y - 0.6f), y1 = Mathf.Max(b.max.y + 0.3f, p.y + 1.6f);
+            return new Rect(x0, y0, x1 - x0, y1 - y0);
+        }
+
+        int EnemyAt(Vector2 world)
+        {
+            int best = -1;
+            float bestD = float.MaxValue;
+            for (int i = 0; i < Enemies.Count; i++)
+            {
+                var e = Enemies[i];
+                if (e == null || Dead(i)) continue;
+                var r = EnemyBox(i);
+                if (!r.Contains(world)) continue;
+                float d = Mathf.Abs(world.x - r.center.x);          // 상자가 겹치면 가운데가 가까운 적
+                if (d < bestD) { bestD = d; best = i; }
+            }
+            return best;
+        }
+
+        // 적 상자 밖에 놓았을 때 — 싸움터 위쪽(손 위)이면 가장 가까운 산 적으로 붙는다(대상 카드를 놓았는데 아무 일도 없는 일이 없게)
+        int NearestEnemy(Vector2 world)
+        {
+            int best = -1;
+            float bestD = 3.2f;
+            for (int i = 0; i < Enemies.Count; i++)
+            {
+                if (Enemies[i] == null || Dead(i)) continue;
+                float d = Vector2.Distance(world, EnemyBox(i).center);
+                if (d < bestD) { bestD = d; best = i; }
+            }
+            return best;
+        }
+
+        int HeroAt(Vector2 world)
+        {
+            for (int i = 0; i < Heroes.Count; i++)
+            {
+                var u = Heroes[i];
+                var p = FieldRoot.TransformPoint(u.Feet);
+                float w = Mathf.Min(1.1f, u.Width() * 0.35f), h = Mathf.Min(2.4f, u.Height());
+                if (world.x > p.x - w && world.x < p.x + w && world.y > p.y - 0.2f && world.y < p.y + h) return i;
+            }
+            return -1;
+        }
+
+        bool Dead(int i)
+        {
+            var s = Battle.Snapshot;
+            return i >= s.Enemies.Count || s.Enemies[i].Dead;
+        }
+
+        public int FirstAliveEnemy()
+        {
+            var s = Battle.Snapshot;
+            for (int i = 0; i < s.Enemies.Count; i++) if (!s.Enemies[i].Dead) return i;
+            return 0;
+        }
+
+        int NextEnemy(int cur, int dir)
+        {
+            var s = Battle.Snapshot;
+            int n = s.Enemies.Count;
+            if (n == 0) return -1;
+            int i = cur < 0 ? (dir > 0 ? -1 : n) : cur;
+            for (int k = 0; k < n; k++)
+            {
+                i = ((i + dir) % n + n) % n;
+                if (!s.Enemies[i].Dead) return i;
+            }
+            return -1;
+        }
+
+        void Emit(string m) => Moment?.Invoke(m);
+
+        // ── 흐름 ──
+        IEnumerator Main()
+        {
+            var evs = pendingBegin;
+            yield return Intro();
+            yield return Present(evs);
+            while (!Over)
+            {
+                request = null;
+                Hand.Request = null;
+                Hand.Interactive = true;
+                WaitingInput = true;
+                Hud.SetEndReady(!AnyPlayable());
+                float autoT = 0;
+                while (request == null && !Over)
+                {
+                    if (Auto && Modal.Open == null && !Hand.HasSelection && (autoT += Time.unscaledDeltaTime) > 0.45f / Mathf.Max(1, Clock.Speed)) { request = AutoPick(); autoT = 0; if (request != null) break; }
+                    if (Hand.Request != null) { request = (ReqKind.Card, Hand.Request.Value.hand, Hand.Request.Value.target); Hand.Request = null; }
+                    else PollInput();
+                    PaintPreview();
+                    yield return null;
+                }
+                WaitingInput = false;
+                Hand.Interactive = false;
+                ClearPreview();
+                SetUltSel(-1);
+                Hud.SetEndReady(false);
+                if (request == null) break;
+                var r = request.Value;
+                Debug.Log($"[Battle] 요청 {r.kind} {r.a} → {r.b}");
+                if (r.kind == ReqKind.Card) yield return PlayCardFlow(r.a, r.b);
+                else if (r.kind == ReqKind.Ult) yield return UltFlow(r.a, r.b);
+                else yield return EndTurnFlow();
+            }
+            // 판에서 넘어온 싸움 — 끝을 보여 준 뒤 판 화면으로 돌아간다
+            if (BattleBridge.Fight != null)
+            {
+                yield return Clock.WaitU(Battle.Snapshot.Won ? 0.8f : 1.6f);
+                // 끝 자세 위에 판 화면의 보상을 띄우는 손이 있으면 그것이 「떠나기」 까지 붙든다(runui 가 아직 안 냈으면 바로 돌아간다)
+                if (BattleBridge.EndHold != null)
+                {
+                    BattleBridge.OnOverlay = () =>
+                    {
+                        Hud.gameObject.SetActive(false);   // 판 화면의 머리 띠가 파티 HP 를 맡는다
+                        if (Array.IndexOf(Environment.GetCommandLineArgs(), "-rewardoverlay") >= 0) StartCoroutine(OverlayShot());
+                    };
+                    yield return BattleBridge.EndHold(Battle.Snapshot.Won);
+                }
+                BattleBridge.Return();
+            }
+        }
+
+        // 자동 전투 — 고학년(쓸 수 있으면) → 공격 카드(가장 체력 낮은 적) → 그 밖 카드 → 턴 종료
+        (ReqKind kind, int a, int b)? AutoPick()
+        {
+            var s = Battle.Snapshot;
+            int foe = -1;
+            for (int i = 0; i < s.Enemies.Count; i++) if (!s.Enemies[i].Dead && (foe < 0 || s.Enemies[i].Hp < s.Enemies[foe].Hp)) foe = i;
+            if (foe < 0) return null;
+            for (int h = 0; h < s.Heroes.Count; h++) if (Battle.CanUlt(h, out _)) return (ReqKind.Ult, h, foe);
+            for (int pass = 0; pass < 2; pass++)
+                for (int i = 0; i < Hand.Cards.Count; i++)
+                {
+                    var c = Hand.Cards[i].Info;
+                    if (!Battle.CanPlay(i, out _) || c.Epiphany || c.Choices != null) continue;
+                    if (pass == 0 && c.Type != CardType.Attack) continue;
+                    return (ReqKind.Card, i, foe);
+                }
+            return (ReqKind.End, 0, 0);
+        }
+
+        bool AnyPlayable()
+        {
+            for (int i = 0; i < Hand.Cards.Count; i++) if (Battle.CanPlay(i, out _)) return true;
+            return false;
+        }
+
+        // ── 입력(카드 밖) — 턴 종료 · 고학년 · 더미 · 정보 · 단축키 ──
+        void PollInput()
+        {
+            if (Modal.Open != null) return;
+            var p = PointerInput.Pos;
+            Hud.EndHover = Hud.OverEnd(p) && !PointerInput.Touch;
+
+            // 단축키
+            if (PointerInput.Key(Key.Tab)) ToggleSpeed();
+            if (PointerInput.Key(Key.Q)) Hud.OnAuto?.Invoke();
+            if (PointerInput.Key(Key.Escape)) { if (Hand.HasSelection) Hand.Cancel(); else if (UltSel >= 0) SetUltSel(-1); else OpenPause(); return; }
+            if (PointerInput.Key(Key.E)) { RequestEnd(); return; }
+            if (PointerInput.Key(Key.A)) { OpenPile(0); return; }
+            if (PointerInput.Key(Key.S)) { OpenPile(1); return; }
+            Key[] ultKeys = { Key.Z, Key.X, Key.C };
+            for (int k = 0; k < ultKeys.Length && k < Hud.Ults.Count; k++) if (PointerInput.Key(ultKeys[k])) { TapUlt(k); return; }
+            if (UltSel >= 0)
+            {
+                if (PointerInput.Key(Key.RightArrow)) UltAim = NextEnemy(UltAim, 1);
+                if (PointerInput.Key(Key.LeftArrow)) UltAim = NextEnemy(UltAim, -1);
+                if (PointerInput.Key(Key.Space) || PointerInput.Key(Key.Enter)) { ConfirmUlt(); return; }
+            }
+
+            // 고른 고학년 — 마우스는 올린 적을 겨눈다
+            if (UltSel >= 0 && !PointerInput.Touch) { int e = EnemyAt(p); if (e >= 0) UltAim = e; }
+
+            // 오른쪽 클릭 · 길게 누르기 — 정보(고른 것이 있으면 내려놓기)
+            if (PointerInput.RightDown || PointerInput.LongPress)
+            {
+                if (UltSel >= 0 && PointerInput.RightDown) { SetUltSel(-1); return; }
+                if (Hand.HasSelection) return;
+                int e = EnemyAt(p);
+                if (e >= 0) { OpenEnemyInfo(e); return; }
+                int h = HeroAt(p);
+                if (h >= 0) { OpenHeroInfo(h); return; }
+                for (int k = 0; k < Hud.Ults.Count; k++) if (Hud.Ults[k].Over(p)) { OpenHeroInfo(k, RectOf(Hud.Ults[k].transform, UltButton.D)); return; }
+                return;
+            }
+
+            if (!PointerInput.Tap || Hand.HasSelection || Hand.Hover >= 0) return;
+            if (Hud.OverEnd(p)) { Sfx.Play("ui_click", 0.6f); RequestEnd(); return; }
+            for (int k = 0; k < Hud.Ults.Count; k++) if (Hud.Ults[k].Over(p)) { TapUlt(k); return; }
+            int te = EnemyAt(p);
+            if (UltSel >= 0)
+            {
+                if (te >= 0)
+                {
+                    if (PointerInput.Touch && UltAim != te) { UltAim = te; return; }   // 첫 탭 — 겨누기
+                    UltAim = te;
+                    ConfirmUlt();
+                    return;
+                }
+                if (p.y > -1.6f && !Battle.UltNeedsTarget(UltSel)) { ConfirmUlt(); return; }
+                SetUltSel(-1);
+                return;
+            }
+            // 아무것도 안 들었을 때 적 · 사도를 누르면 정보
+            if (te >= 0) { OpenEnemyInfo(te); return; }
+            int th = HeroAt(p);
+            if (th >= 0) OpenHeroInfo(th);
+        }
+
+        void TapUlt(int hero)
+        {
+            if (UltSel == hero) { ConfirmUlt(); return; }
+            if (!Battle.CanUlt(hero, out var why))
+            {
+                Sfx.Play("card_cant", 0.5f);
+                Vfx.Word(Hud.Ults[hero].transform.position + new Vector3(0, 0.9f, 0), why, 0.22f, new Color(1f, 0.75f, 0.7f), new Color(0.2f, 0, 0), 1.1f, 1f, UiRoot, 700, 0.3f);
+                return;
+            }
+            Hand.Cancel();
+            SetUltSel(hero);
+            Sfx.Play("ult_ready", 0.35f, 1.3f);
+        }
+
+        void SetUltSel(int hero)
+        {
+            UltSel = hero;
+            UltAim = hero >= 0 ? FirstAliveEnemy() : -1;
+            for (int k = 0; k < Hud.Ults.Count; k++) Hud.Ults[k].Selected = k == hero;
+        }
+
+        void ConfirmUlt()
+        {
+            if (UltSel < 0) return;
+            int t = UltAim >= 0 ? UltAim : FirstAliveEnemy();
+            request = (ReqKind.Ult, UltSel, t);
+        }
+
+        void ToggleSpeed()
+        {
+            Clock.Speed = Clock.Speed > 1 ? 1f : 2f;
+            Hud.SetSpeed(Clock.Speed);
+            Sfx.Play("ui_click", 0.5f);
+        }
+
+        public void OpenPile(int which) { if (Modal.Open == null) PileView.Show(UiRoot, Battle.Snapshot, which); }
+        // 정보 창 — 누른 대상(싸움터의 사도 · 적, 초상 원 · 고학년 원) 옆에 붙는다
+        public void OpenHeroInfo(int i, Rect? at = null) { if (Modal.Open == null && i >= 0 && i < Battle.Snapshot.Heroes.Count) PartyView.Show(UiRoot, Battle.Snapshot, 0, i); }
+        public void OpenParty(int tab = 1) { if (Modal.Open == null) PartyView.Show(UiRoot, Battle.Snapshot, tab, -1); }
+        public void OpenEnemyInfo(int i) { if (Modal.Open == null && i >= 0 && i < Enemies.Count) InfoPanel.Enemy(UiRoot, Battle.Snapshot, i, EnemyBox(i)); }
+
+        public Rect HeroRect(int i)
+        {
+            var u = Heroes[i];
+            var p = FieldRoot.TransformPoint(u.Feet);
+            float w = Mathf.Min(1.1f, u.Width() * 0.35f), h = Mathf.Min(2.4f, u.Height());
+            return new Rect(p.x - w, p.y - 0.2f, w * 2, h + 0.2f);
+        }
+
+        static Rect RectOf(Transform t, float d) { var s = d * Mathf.Abs(t.lossyScale.x); return new Rect(t.position.x - s / 2, t.position.y - s / 2, s, s); }
+        public void OpenPause() { if (Modal.Open == null) InfoPanel.Pause(UiRoot, ToggleSpeed); }
+
+        // ── 미리보기 — 든 카드(고른 고학년)를 그 대상에게 내면 ──
+        (int card, int aim, bool lifted, int ult, int ultAim) pvKey = (-9, -9, false, -9, -9);
+
+        void PaintPreview()
+        {
+            var key = (Hand.Held, Hand.Aim, Hand.Lifted, UltSel, UltAim);
+            if (key.Equals(pvKey)) return;
+            pvKey = key;
+            IReadOnlyList<PreviewFoe> foes = null;
+            PreviewParty party = null;
+            if (UltSel >= 0)
+            {
+                bool needs = Battle.UltNeedsTarget(UltSel);
+                if (!needs || UltAim >= 0) foes = Battle.PreviewUlt(UltSel, needs ? UltAim : FirstAliveEnemy());
+            }
+            else if (Hand.Held >= 0 && Hand.Held < Hand.Cards.Count)
+            {
+                var c = Hand.Cards[Hand.Held].Info;
+                if (c.Target == TargetKind.Enemy) { if (Hand.Aim >= 0) foes = Battle.PreviewCard(Hand.Held, Hand.Aim); }
+                else if (Hand.Lifted) foes = Battle.PreviewCard(Hand.Held, FirstAliveEnemy());
+                if (Hand.Lifted || Hand.Aim >= 0) party = Battle.PreviewPartyOf(Hand.Held);
+            }
+            for (int i = 0; i < EnemyHuds.Count; i++)
+                if (EnemyHuds[i] != null) EnemyHuds[i].SetPreview(foes != null && i < foes.Count ? foes[i] : null);
+            Hud.SetPreview(party);
+            if (foes != null || party != null) Emit("preview");
+        }
+
+        void ClearPreview()
+        {
+            pvKey = (-9, -9, false, -9, -9);
+            foreach (var h in EnemyHuds) if (h != null) h.SetPreview(null);
+            Hud.SetPreview(null);
+        }
+
+        IEnumerator Intro()
+        {
+            // 사도가 왼쪽에서 달려 들어온다
+            foreach (var h in Heroes)
+            {
+                h.transform.localPosition = h.Home + new Vector3(-6f, 0, 0);
+                h.Loop("Move");
+            }
+            ScreenFx.I.Fade(0, 1.6f);
+            Sfx.Play("battle_start", 0.6f);
+            for (int i = 0; i < Heroes.Count; i++) StartCoroutine(RunIn(Heroes[i], Heroes[i].Home, 0.8f + i * 0.08f));
+            yield return Clock.Wait(0.5f);
+            Sfx.Voice(Heroes[0].name.Replace("hero_", ""), "spawn");
+            yield return Clock.Wait(0.5f);
+        }
+
+        IEnumerator RunIn(UnitView u, Vector3 home, float dur)
+        {
+            var from = u.transform.localPosition;
+            yield return Clock.Tween(dur, t => u.transform.localPosition = Vector3.Lerp(from, home, Ease.OutCubic(t)));
+            u.Idle();
+        }
+
+        // ── 이벤트 연출 ──
+        static bool Boundary(EventKind k) => k == EventKind.Act || k == EventKind.WaveStart || k == EventKind.TurnStart || k == EventKind.Victory
+                                             || k == EventKind.Defeat || k == EventKind.Discard || k == EventKind.Exhaust || k == EventKind.CardPlayed || k == EventKind.EpiphanyApplied;
+
+        // 소환 — 규칙이 적을 b.Enemies 끝에 붙였는데 화면에 아직 없으면 세운다(빈 자리에 연기와 함께 솟아난다)
+        static readonly Vector3[] SummonPos = { new Vector3(6.1f, -1.35f, 0), new Vector3(1.4f, -1.45f, 0), new Vector3(5.0f, -0.2f, 0), new Vector3(7.0f, -0.4f, 0), new Vector3(2.8f, -1.7f, 0) };
+        int summoned;
+        static bool HasWave(IReadOnlyList<BattleEvent> evs) { foreach (var e in evs) if (e.Kind == EventKind.WaveStart) return true; return false; }
+        void SpawnSummons()
+        {
+            var s = Battle.Snapshot;
+            while (Enemies.Count < s.Enemies.Count)
+            {
+                int i = Enemies.Count;
+                var es = s.Enemies[i];
+                var pos = SummonPos[summoned++ % SummonPos.Length];
+                var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, UnitScale * 1.0f, pos, 34 - i * 2);
+                u.Ref = UnitRef.Enemy(i);
+                u.Mood = (es.Skin ?? "").Replace("Skin_", "");
+                Enemies.Add(u);
+                var hud = EnemyHud.Attach(u, es, i);
+                int ii = i;
+                hud.OnInfo = () => OpenEnemyInfo(ii);
+                EnemyHuds.Add(hud);
+                u.Play(u.Resolve("Spawn") ?? "Idle", 1.4f);
+                Vfx.Burst(pos + new Vector3(0, 0.3f, 0), new Vfx.BurstOpt
+                {
+                    Tex = "FX_IN_Smoke_01", Count = 10, Speed = new Vector2(1.5f, 3.5f), Angle = 90, Spread = 160, Life = new Vector2(0.5f, 0.8f),
+                    Size = new Vector2(0.6f, 1.2f), C0 = new Color(0.85f, 0.8f, 0.9f, 0.5f), C1 = new Color(0.6f, 0.55f, 0.7f, 0.3f), Additive = false, Boost = 1f,
+                    Drag = 3f, Order = 60, ShrinkTo = 1.3f,
+                });
+                Vfx.Word(pos + new Vector3(0, 2.2f, 0), "소환!", 0.36f, new Color(0.9f, 0.8f, 1f), new Color(0.15f, 0.05f, 0.25f));
+                Debug.Log($"[Battle] 소환 — {es.Name} ({i})");
+            }
+        }
+
+        IEnumerator Present(IReadOnlyList<BattleEvent> evs)
+        {
+            int i = 0;
+            if (Battle.Snapshot.Enemies.Count > Enemies.Count && Enemies.Count > 0 && !HasWave(evs)) SpawnSummons();
+
+            var dealing = new List<CardInfo>();
+            while (i < evs.Count)
+            {
+                var e = evs[i];
+                if (e.Kind == EventKind.Act)
+                {
+                    int j = i + 1;
+                    var group = new List<BattleEvent>();
+                    while (j < evs.Count && !Boundary(evs[j].Kind)) group.Add(evs[j++]);
+                    if (e.Actor.Side == Side.Party) yield return HeroAct(e, group);
+                    else yield return EnemyAct(e, group);
+                    i = j;
+                    continue;
+                }
+                if (e.Kind == EventKind.Draw)
+                {
+                    // 연달아 뽑는 것은 한꺼번에 — 부채가 한 번에 펼쳐지게
+                    while (i < evs.Count && evs[i].Kind == EventKind.Draw) dealing.Add(evs[i++].Card);
+                    yield return Deal(dealing);
+                    dealing.Clear();
+                    continue;
+                }
+                yield return Simple(e);
+                i++;
+            }
+            RefreshHud();
+        }
+
+        void RefreshHud()
+        {
+            var s = Battle.Snapshot;
+            Hud.SetAp(s.Ap, s.MaxAp);
+            Hud.SetPiles(s.DrawCount, s.DiscardCount, s.GoneCount);
+            for (int i = 0; i < s.Heroes.Count && i < Hud.Ults.Count; i++) Hud.Ults[i].Set(s.Heroes[i].Ult, s.Heroes[i].UltMax);
+            Hud.SetSnapshot(s);
+            Hud.SetBlock(s.PartyBlock);
+            for (int i = 0; i < EnemyHuds.Count && i < s.Enemies.Count; i++)
+            {
+                if (EnemyHuds[i] == null || s.Enemies[i].Dead) continue;
+                EnemyHuds[i].SetIntent(s.Enemies[i]);
+                EnemyHuds[i].SetChips(s.Enemies[i].Chips);
+            }
+            Hand.Sync(s.Hand);
+            Hand.Layout();
+        }
+
+        IEnumerator Deal(List<CardInfo> cards)
+        {
+            foreach (var c in cards)
+            {
+                Hand.Add(c);
+                Sfx.Play("card_draw", 0.3f);
+                yield return Clock.WaitU(0.07f);
+            }
+            RefreshHud();
+            yield return Clock.WaitU(0.25f);
+        }
+
+        IEnumerator Simple(BattleEvent e)
+        {
+            var s = Battle.Snapshot;
+            switch (e.Kind)
+            {
+                case EventKind.WaveStart:
+                    yield return WaveIn(e);
+                    break;
+                case EventKind.TurnStart:
+                    Hud.SetTurn(e.Value, s.Wave, s.WaveCount);
+                    Sfx.Play("turn_start", 0.5f);
+                    yield return Banners.Turn(UiRoot, "PLAYER TURN", new Color(1f, 0.85f, 0.5f));
+                    break;
+                case EventKind.ApChanged:
+                    Hud.SetAp(e.Value, s.MaxAp);
+                    break;
+                case EventKind.Block:
+                    ApplyBlock(e);
+                    break;
+                case EventKind.CardChanged:
+                {
+                    // 손 안에서 바뀜(진화 · 변신 · 결속) — 번쩍이고 새 모습으로
+                    var cv = Hand.Find(e.Card.Id);
+                    if (cv != null)
+                    {
+                        cv.Info = e.Card;
+                        cv.Refresh();
+                        Clock.Run(cv.FlashCo(0.4f, 0.9f));
+                        CueWord(cv.transform.position, e.Text);
+                        Sfx.Play("card_skill", 0.4f, 1.2f);
+                        yield return Clock.WaitU(0.25f);
+                    }
+                    break;
+                }
+                case EventKind.Discard:
+                case EventKind.Exhaust:
+                {
+                    var cv = Hand.Find(e.Card.Id);
+                    if (cv != null && e.Text != null && LabelKo.ContainsKey(e.Text)) CueWord(cv.transform.position, e.Text);
+                    if (cv != null)
+                    {
+                        Hand.Remove(cv);
+                        bool gone = e.Kind == EventKind.Exhaust;
+                        cv.TargetPos = gone ? cv.TargetPos + new Vector3(0, 1.2f, 0) : Hand.DiscardPos;
+                        cv.TargetScale = gone ? 0.9f : 0.25f;
+                        cv.TargetRot = gone ? 0 : -30;
+                        if (gone) { Clock.Run(Clock.Tween(0.4f, t => { if (cv) cv.SetAlpha(1 - t); }, true)); Clock.Run(cv.FlashCo(0.3f, 0.8f)); }
+                        Destroy(cv.gameObject, 0.5f);
+                        yield return Clock.WaitU(0.04f);
+                    }
+                    break;
+                }
+                case EventKind.CardPlayed:
+                {
+                    // 저절로 나간 카드(연계 · 천상 …) — 손에서 빠져 사도에게 날아간다
+                    if (skipPlayed == e.Card.Id) { skipPlayed = null; break; }
+                    var cv = Hand.Find(e.Card.Id);
+                    if (cv == null) break;
+                    Hand.Remove(cv);
+                    StartCoroutine(CardUse(cv, Heroes[Mathf.Clamp(e.Card.Hero, 0, Heroes.Count - 1)]));
+                    Sfx.Play("card_play", 0.4f);
+                    yield return Clock.WaitU(0.12f);
+                    break;
+                }
+                case EventKind.UltGauge:
+                    Hud.SetGauge(e.Value);
+                    if (e.Actor.Index < Hud.Ults.Count) Hud.Ults[e.Actor.Index].Set(e.Value, s.Heroes[e.Actor.Index].UltMax);
+                    break;
+                case EventKind.UltReady:
+                    Sfx.Play("ult_ready", 0.6f);
+                    Vfx.Glow(Heroes[e.Actor.Index].Center, 3f, new Color(1f, 0.85f, 0.5f, 0.8f), 0.6f, 2.5f);
+                    break;
+                case EventKind.Intent:
+                {
+                    int i = e.Target.Index;
+                    if (i < EnemyHuds.Count && EnemyHuds[i] != null && i < s.Enemies.Count) EnemyHuds[i].SetIntent(s.Enemies[i]);
+                    Hud.SetSnapshot(s);
+                    break;
+                }
+                case EventKind.Recover:
+                {
+                    int i = e.Target.Index;
+                    if (i >= EnemyHuds.Count || EnemyHuds[i] == null) break;
+                    EnemyHuds[i].SetBroken(false);
+                    EnemyHuds[i].SetTough(e.HpAfter, false);
+                    Enemies[i].Idle();
+                    Vfx.Word(Enemies[i].Top + new Vector3(0, 0.3f, 0), "회복", 0.4f, new Color(0.85f, 0.95f, 1f), new Color(0, 0.1f, 0.25f));
+                    yield return Clock.Wait(0.35f);
+                    break;
+                }
+                case EventKind.Victory:
+                    yield return VictoryFlow();
+                    break;
+                case EventKind.Defeat:
+                    Over = true;
+                    yield return Banners.Defeat(UiRoot);
+                    break;
+                default:
+                    yield return ApplyConsequence(e, null);
+                    break;
+            }
+        }
+
+        // 카드 이동 쪽지 Label → 낱말(최소 연출 — 카드 위에 떠오른다)
+        static readonly Dictionary<string, string> LabelKo = new Dictionary<string, string>
+        {
+            ["forget"] = "망각", ["remove"] = "제거", ["bond"] = "결속", ["evolve"] = "진화", ["transform"] = "변신", ["pull"] = "끌어옴",
+            ["burn"] = "소멸", ["evaporate"] = "증발", ["recall"] = "회수", ["make"] = "생성", ["connect"] = "연결",
+        };
+
+        void CueWord(Vector3 at, string label)
+        {
+            if (label == null || !LabelKo.TryGetValue(label, out var w)) return;
+            Vfx.Word(at + new Vector3(0, 1.4f, 0), w, 0.32f, new Color(1f, 0.92f, 0.7f), new Color(0.15f, 0.08f, 0), 0.9f, 1f, UiRoot, 700, 0.25f);
+        }
+
+        void ApplyBlock(BattleEvent e)
+        {
+            if (e.Target.Side == Side.Party)
+            {
+                Hud.SetBlock(e.BlockAfter);
+                if (e.Value > 0)
+                {
+                    Hud.PopBlock();
+                    Sfx.Play("block_gain", 0.6f);
+                    foreach (var h in Heroes)
+                    {
+                        Vfx.Glow(h.Center, 2.6f, new Color(0.45f, 0.75f, 1f, 0.8f), 0.45f, 2.4f, "FX_IN_Ring_ShockWave_03", 120);
+                        h.Flash(new Color(0.6f, 0.85f, 1f), 0.3f, 0.6f);
+                    }
+                    var at = Heroes[Mathf.Clamp(e.Target.Index, 0, Heroes.Count - 1)].Top + new Vector3(0, 0.2f, 0);
+                    Vfx.Word(at, (e.Text == "shield" ? "실드 +" : "방어 +") + e.Value, 0.36f, new Color(0.75f, 0.9f, 1f), new Color(0, 0.08f, 0.2f));
+                }
+            }
+            else
+            {
+                int i = e.Target.Index;
+                if (i >= EnemyHuds.Count || EnemyHuds[i] == null) return;
+                EnemyHuds[i].SetBlock(e.BlockAfter);
+                if (e.Value > 0)
+                {
+                    Sfx.Play("block_gain", 0.5f);
+                    Vfx.Glow(Enemies[i].Center, 2.6f, new Color(0.45f, 0.75f, 1f, 0.8f), 0.45f, 2.4f, "FX_IN_Ring_ShockWave_03", 120);
+                    Enemies[i].Flash(new Color(0.6f, 0.85f, 1f), 0.3f, 0.6f);
+                    Vfx.Word(Enemies[i].Top + new Vector3(0, 0.2f, 0), "방어 +" + e.Value, 0.4f, new Color(0.75f, 0.9f, 1f), new Color(0, 0.08f, 0.2f));
+                }
+            }
+        }
+
+        // 웨이브 — 적이 들어온다(보스면 등장 띠부터)
+        IEnumerator WaveIn(BattleEvent e)
+        {
+            foreach (var old in Enemies) if (old != null) Destroy(old.gameObject);
+            Enemies.Clear();
+            EnemyHuds.Clear();
+            summoned = 0;
+            var s = Battle.Snapshot;
+            if (e.Boss)
+            {
+                var b = s.Enemies.Find(x => x.Boss) ?? s.Enemies[0];
+                yield return Clock.Wait(0.3f);
+                Hud.SetTurn(s.Turn, s.Wave, s.WaveCount);
+                Emit("boss_banner_start");
+                yield return Banners.Boss(ScreenRoot, b.Key, b.Skin, b.Name, "구역 보스  ·  강인도 " + b.MaxTough);
+            }
+            int n = s.Enemies.Count;
+            int bossI = s.Enemies.FindIndex(x => x.Boss);
+            int k = 0;
+            for (int i = 0; i < n; i++)
+            {
+                var es = s.Enemies[i];
+                Vector3 pos;
+                if (es.Boss) pos = n == 1 ? BossPos : new Vector3(3.3f, -1.45f, 0);
+                else if (bossI >= 0) { pos = k == 0 ? new Vector3(6.3f, -0.95f, 0) : new Vector3(6.7f, -1.6f, 0); k++; }
+                else pos = EnemyPosN[Mathf.Clamp(n, 1, 3) - 1][Mathf.Min(i, 2)];
+                float sc = es.Boss ? UnitScale * 1.0f : UnitScale * 1.1f;
+                var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, sc, pos, es.Boss ? 30 : 36 - i * 2);
+                u.Ref = UnitRef.Enemy(i);
+                u.Mood = (es.Skin ?? "").Replace("Skin_", "");
+                Enemies.Add(u);
+                var hud = EnemyHud.Attach(u, es, i);
+                int ii = i;
+                hud.OnInfo = () => OpenEnemyInfo(ii);
+                EnemyHuds.Add(hud);
+                if (es.Boss)
+                {
+                    u.Play(u.Resolve("Spawn"), 1.6f);
+                    FieldRig.Shake(0.35f);
+                    Vfx.Burst(pos + new Vector3(0, 0.2f, 0), new Vfx.BurstOpt
+                    {
+                        Tex = "FX_IN_Smoke_01", Count = 16, Speed = new Vector2(2f, 5f), Angle = 90, Spread = 160, Life = new Vector2(0.6f, 1f),
+                        Size = new Vector2(0.8f, 1.6f), C0 = new Color(0.8f, 0.75f, 0.7f, 0.5f), C1 = new Color(0.6f, 0.55f, 0.5f, 0.4f), Additive = false, Boost = 1f,
+                        Drag = 3f, Order = 60, ShrinkTo = 1.4f,
+                    });
+                }
+                else
+                {
+                    u.transform.localPosition = pos + new Vector3(7f, 0, 0);
+                    u.Loop("Move");
+                    StartCoroutine(RunIn(u, pos, 0.75f + i * 0.1f));
+                }
+            }
+            yield return Clock.Wait(e.Boss ? 1.4f : 0.9f);
+            if (e.Boss) Emit("boss_in");
+        }
+
+        // ── 카드 ──
+        IEnumerator PlayCardFlow(int handIndex, int target)
+        {
+            if (handIndex < 0 || handIndex >= Hand.Cards.Count || !Battle.CanPlay(handIndex, out _))
+            {
+                var core = Battle.Snapshot.Hand;
+                Debug.LogWarning($"[Battle] 카드를 못 냄 — 손 {handIndex}/{Hand.Cards.Count}(규칙 손 {core.Count}) " +
+                                 $"화면 {(handIndex >= 0 && handIndex < Hand.Cards.Count ? Hand.Cards[handIndex].Info.Id : "-")} · 규칙 {(handIndex >= 0 && handIndex < core.Count ? core[handIndex].Id : "-")}");
+                yield break;
+            }
+            var cv = Hand.Cards[handIndex];
+            var info = cv.Info;
+            int choice = -1;
+            Hand.Remove(cv);
+            if (info.Epiphany)
+            {
+                var opts = Battle.EpiphanyOptions(handIndex);
+                if (opts.Count > 0) yield return EpiphanyWindow.Run(ScreenRoot, cv, opts, c => choice = c, DemoEpiphanyPick);
+            }
+            int branch = 0;
+            if (info.Choices != null && info.Choices.Count == 2)
+            {
+                yield return ChoiceWindow.Run(UiRoot, info, b => branch = b, DemoBranchPick);
+                if (branch <= 0) { Hand.Cards.Insert(Mathf.Min(handIndex, Hand.Cards.Count), cv); Hand.Layout(); yield break; }   // 물렀다
+            }
+            skipPlayed = info.Id;
+            var evs = Battle.PlayCard(handIndex, target, choice, branch);
+            StartCoroutine(CardUse(cv, Heroes[Mathf.Clamp(info.Hero, 0, Heroes.Count - 1)]));
+            Sfx.Play("card_play", 0.5f);
+            Sfx.Play(info.Type == CardType.Attack ? "card_swing" : "card_skill", 0.4f);
+            yield return Clock.WaitU(0.12f);
+            yield return Present(evs);
+        }
+
+        // 낸 카드 — 위로 떠올라 빛으로 부서지며 사도에게 날아간다
+        IEnumerator CardUse(CardView cv, UnitView hero)
+        {
+            cv.Follow = 18f;
+            cv.SetOrder(660);
+            cv.TargetPos = new Vector3(cv.transform.localPosition.x * 0.4f, -1.0f, 0);
+            cv.TargetRot = 0;
+            cv.TargetScale = 0.95f;
+            yield return Clock.WaitU(0.12f);
+            Clock.Run(cv.FlashCo(0.25f));
+            var heroWorld = FieldRoot.TransformPoint(hero.Center);
+            Vfx.Burst(cv.transform.position, new Vfx.BurstOpt
+            {
+                Tex = "FX_UI_star_02", Count = 14, Speed = new Vector2(2f, 5f), Life = new Vector2(0.3f, 0.55f), Size = new Vector2(0.08f, 0.2f),
+                C0 = new Color(1f, 0.9f, 0.6f), C1 = Color.white, Drag = 3f, Order = 670, Boost = 3f, Parent = UiRoot, ShrinkTo = 0,
+            });
+            cv.Follow = 9f;
+            cv.TargetPos = heroWorld;
+            cv.TargetScale = 0.15f;
+            yield return Clock.Tween(0.16f, t => { if (cv) cv.SetAlpha(1 - Ease.OutCubic(t)); }, true);
+            Vfx.Glow(hero.Center, 1.6f, new Color(1f, 0.9f, 0.6f, 0.8f), 0.3f, 2.5f);
+            if (cv) Destroy(cv.gameObject);
+        }
+
+        IEnumerator EndTurnFlow()
+        {
+            Sfx.Play("turn_end", 0.5f);
+            var evs = Battle.EndTurn();
+            // 손패를 버리고 적 차례 띠
+            int k = 0;
+            while (k < evs.Count && (evs[k].Kind == EventKind.Discard || evs[k].Kind == EventKind.Exhaust)) { yield return Simple(evs[k]); k++; }
+            yield return Banners.Turn(UiRoot, "ENEMY TURN", new Color(1f, 0.4f, 0.35f));
+            var rest = new List<BattleEvent>();
+            for (; k < evs.Count; k++) rest.Add(evs[k]);
+            yield return Present(rest);
+        }
+
+        // -rewardoverlay: 보상 오버레이가 뜬 모습을 찍고 끝낸다(판 자동 데모는 오버레이의 「떠나기」 를 누르지 못한다)
+        IEnumerator OverlayShot()
+        {
+            yield return Clock.WaitU(2.0f);
+            yield return new WaitForEndOfFrame();
+            var dir = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "..", "..", "Captures", "overlay"));
+            System.IO.Directory.CreateDirectory(dir);
+            var tex = ScreenCapture.CaptureScreenshotAsTexture();
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(dir, "reward_overlay.png"), tex.EncodeToPNG());
+            Debug.Log("[Capture] reward_overlay");
+            yield return Clock.WaitU(0.5f);
+            Application.Quit();
+        }
+
+        static IEnumerator FadeOut(Transform t, float dur)
+        {
+            var srs = t.GetComponentsInChildren<SpriteRenderer>();
+            var txs = t.GetComponentsInChildren<TMPro.TextMeshPro>();
+            var mrs = t.GetComponentsInChildren<MeshRenderer>();
+            yield return Clock.Tween(dur, k =>
+            {
+                foreach (var r in srs) if (r) Make.Alpha(r, r.color.a * (1 - k * 0.5f));
+                foreach (var x in txs) if (x) x.alpha = 1 - k;
+                foreach (var m in mrs) if (m && m.sharedMaterial != null && m.sharedMaterial.HasProperty("_Alpha")) m.sharedMaterial.SetFloat("_Alpha", 1 - k);
+            }, true);
+            if (t) Destroy(t.gameObject);
+        }
+
+        IEnumerator VictoryFlow()
+        {
+            Over = true;
+            Hand.Hidden = true;
+            yield return Clock.WaitU(0.6f);
+            foreach (var h in Heroes) h.Loop(h.Resolve("Victory") ?? "Idle");
+            Sfx.Voice(Heroes[0].name.Replace("hero_", ""), "victory");
+            yield return Banners.Victory(UiRoot);
+            Emit("victory");
+            yield return Clock.WaitU(1.4f);
+            // 끝 자세 — 싸움터를 그대로 두고(사도는 대기 동작) 손패 · 전투 HUD 를 걷는다. 위 파티 HP 띠와 「BATTLE END」 칩만
+            foreach (var h in Heroes) h.Idle();
+            Hud.EndPose(true);
+            // 승리 띠를 걷는다 — 끝 자세(싸움터만) 위에 보상 줄이 올라오게
+            var vic = UiRoot.Find("Victory");
+            if (vic != null) StartCoroutine(FadeOut(vic, 0.5f));
+            Emit("battle_end");
+            yield return Clock.WaitU(1.2f);
+            if (BattleBridge.EndHold == null) ScreenFx.I.Fade(1f, 1.2f);   // 보상 오버레이가 없으면 예전처럼 검게 닫고 판으로
+        }
+    }
+}

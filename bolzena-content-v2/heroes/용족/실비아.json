@@ -1,0 +1,673 @@
+{
+  "heroes": [
+    {
+      "id": "실비아",
+      "name": "실비아",
+      "nature": "광기",
+      "race": "용족",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 1040,
+      "atk": 84,
+      "def": 79,
+      "crit": 5,
+      "blurb": "은의 용족 공녀. 무례한 손님에게 티파티 초대장을 건네고, 그 손님이 손을 올리기 직전 부채로 손등을 탁 친다.",
+      "keyword": {
+        "name": "티파티 초대장",
+        "desc": "실비아의 티파티 초대장. 한 번에 한 손님만 — 초대받은 적이 공격하려 하면 실비아가 먼저 꾸짖는다",
+        "carrier": "enemy",
+        "cap": 1,
+        "hunt": true
+      },
+      "passives": [
+        {
+          "name": "숙녀의 접대",
+          "when": {
+            "on": "foeActBefore",
+            "type": "공격"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "티파티 초대장",
+              "n": 1
+            }
+          ],
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "base": "def"
+            }
+          ]
+        },
+        {
+          "name": "다음 손님",
+          "when": {
+            "on": "huntDown"
+          },
+          "fx": [
+            {
+              "k": "nextCheaper",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "topEnemy"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "소녀에게 오시려고요?",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.6,
+            "target": "allEnemies",
+            "base": "def"
+          },
+          {
+            "k": "shield",
+            "ratio": 4
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "실비아_s1",
+        "실비아_s1",
+        "실비아_s2",
+        "실비아_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "실비아_s1",
+      "name": "은빛 손짓",
+      "hero": "실비아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "실비아_s2",
+      "name": "숙녀의 자세",
+      "hero": "실비아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "실비아_u1",
+      "name": "초대장 건네기",
+      "hero": "실비아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "티파티 초대장",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "은빛 티파티",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.4
+            }
+          ]
+        },
+        {
+          "name": "진은의 대공",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 2
+            }
+          ]
+        },
+        {
+          "name": "손님은 보호받고",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "무례한 자들은",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "차 한 잔",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.6
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "파스텔 보닛",
+          "kind": "guard"
+        },
+        {
+          "name": "찻잔",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "은방울",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "실비아_u2",
+      "name": "궁극의 유희",
+      "hero": "실비아",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.5
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "가벼운 유희",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "은빛 무도회",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.6
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "맨 앞을 막아선다",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.5
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "숙녀의 여흥",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.8
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "끝나지 않는 연회",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 4
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "세바스티안 인형",
+          "kind": "guard"
+        },
+        {
+          "name": "단아한 발걸음",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "빵빵한 볼",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "실비아_u3",
+      "name": "부채로 꾸짖기",
+      "hero": "실비아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "ifStack",
+          "id": "티파티 초대장",
+          "n": 1
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "탁",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "ifStack",
+              "id": "티파티 초대장",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "장갑 던지기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "손등을 탁",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "ifStack",
+              "id": "티파티 초대장",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "숙녀의 꾸중",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "부채질",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "은 부채",
+          "kind": "power"
+        },
+        {
+          "name": "꾸짖음",
+          "kind": "frost"
+        },
+        {
+          "name": "체육관 유망주",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "실비아_u4",
+      "name": "티파티 준비",
+      "hero": "실비아",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "청소 대작전",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "어머니와 딸",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "그 어머니에 그 딸",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "초대 명단",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "각설탕",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "티세트",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "초대 손님 명부",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "은분수",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

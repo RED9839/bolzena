@@ -1,0 +1,233 @@
+{
+  "cards": [
+    {
+      "id": "n_pray",
+      "name": "기도",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "grade": "일반",
+      "price": 70,
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
+        }
+      ]
+    },
+    {
+      "id": "n_cheer",
+      "name": "응원",
+      "cost": 1,
+      "type": "스킬",
+      "grade": "일반",
+      "price": 70,
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "n_bread",
+      "name": "축복받은 빵",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "신속",
+        "소멸"
+      ],
+      "grade": "고급",
+      "price": 90,
+      "fx": [
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "n_rush",
+      "name": "기선 제압",
+      "cost": 1,
+      "type": "스킬",
+      "grade": "고급",
+      "price": 100,
+      "fx": [
+        {
+          "k": "rushDown",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "n_bond",
+      "name": "결속",
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "유일"
+      ],
+      "grade": "희귀",
+      "price": 140,
+      "fx": [
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "st_dizzy",
+      "name": "어지럼",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "blurb": "뽑히자마자 AP 를 하나 빼앗는다.",
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "ap",
+          "v": -1
+        }
+      ]
+    },
+    {
+      "id": "st_chatter",
+      "name": "왁자지껄",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "blurb": "손 한 칸을 막고, 턴이 끝나면 흩어진다."
+    },
+    {
+      "id": "st_note",
+      "name": "모자 속 쪽지",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "blurb": "AP 1 을 내 치우지 않으면 파티가 아프다.",
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "payHp",
+          "v": 90
+        }
+      ]
+    },
+    {
+      "id": "st_slime",
+      "name": "끈적한 점액",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "blurb": "치우려면 AP 1 을 내야 한다."
+    },
+    {
+      "id": "st_thread",
+      "name": "엉킨 실",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "blurb": "AP 1 을 내 풀지 않으면 방어 · 실드가 반으로 준다.",
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "손상",
+          "v": 2,
+          "target": "party"
+        }
+      ]
+    },
+    {
+      "id": "curse_chores",
+      "name": "밀린 잡일",
+      "cost": 1,
+      "type": "저주",
+      "tags": [
+        "소멸"
+      ],
+      "blurb": "치우려면 AP 1 을 내야 한다. 판 내내 덱에 남는다."
+    },
+    {
+      "id": "gift_cake",
+      "name": "요정 케이크",
+      "cost": 0,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "n_letter",
+      "name": "요정 우편",
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "소멸",
+        "망각"
+      ],
+      "grade": "일반",
+      "price": 60,
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "다음 턴 드로우",
+          "v": 1
+        }
+      ],
+      "blurb": "망각 · 다음 턴 드로우 본보기 — 소멸해도 뽑을 더미 맨 위로 돌아온다."
+    }
+  ]
+}

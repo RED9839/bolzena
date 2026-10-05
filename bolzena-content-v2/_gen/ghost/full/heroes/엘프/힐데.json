@@ -1,0 +1,747 @@
+{
+  "heroes": [
+    {
+      "id": "힐데",
+      "name": "힐데",
+      "nature": "우울",
+      "race": "엘프",
+      "row": "mid",
+      "role": "서포터",
+      "star": 3,
+      "hp": 630,
+      "atk": 75,
+      "def": 60,
+      "crit": 5,
+      "blurb": "「더 센 병이 돌아야 내가 필요해진다」 는 의사. 파티가 부상일 때 처방이 두 배로 들고, 부상 속에서 낸 처방마다 기운을 북돋운다.",
+      "keyword": {
+        "name": "처방전",
+        "desc": "위급할 때 써 둔 처방. 모아 두면 큰 치유가 된다",
+        "carrier": "self",
+        "cap": 3
+      },
+      "passives": [
+        {
+          "name": "더 센 병이 돌아야",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "conds": [
+            {
+              "c": "wounded"
+            }
+          ],
+          "limit": {
+            "per": "fight",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "과잉진료 금지",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "wounded"
+            }
+          ],
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "과잉진료",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.8,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "힐데_s1",
+        "힐데_s1",
+        "힐데_s2",
+        "힐데_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "힐데_s1",
+      "name": "청진기 톡",
+      "hero": "힐데",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "힐데_s2",
+      "name": "처방전",
+      "hero": "힐데",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "힐데_u1",
+      "name": "피톤치드 파동",
+      "hero": "힐데",
+      "unique": true,
+      "signature": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 3
+        },
+        {
+          "k": "cleanse",
+          "v": 1
+        },
+        {
+          "k": "ifWounded"
+        },
+        {
+          "k": "heal",
+          "ratio": 3
+        }
+      ],
+      "oracles": [
+        {
+          "name": "회진 시작",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.9
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 3.9
+            }
+          ]
+        },
+        {
+          "name": "온천의 효능",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 3
+            }
+          ]
+        },
+        {
+          "name": "판을 뒤집는 두 수",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.6
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 3.6
+            }
+          ]
+        },
+        {
+          "name": "장기 처방",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.35
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 4.35
+            }
+          ]
+        },
+        {
+          "name": "숲의 파동",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.6
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 3.6
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "회진 시작",
+          "kind": "guard"
+        },
+        {
+          "name": "경과 관찰",
+          "kind": "draw"
+        },
+        {
+          "name": "예방 접종",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "힐데_u2",
+      "name": "정밀 회진",
+      "hero": "힐데",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.5
+        },
+        {
+          "k": "perStack",
+          "id": "처방전"
+        },
+        {
+          "k": "heal",
+          "ratio": 1
+        },
+        {
+          "k": "spend",
+          "id": "처방전",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "차트 미리 보기",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.95
+            },
+            {
+              "k": "perStack",
+              "id": "처방전"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.3
+            },
+            {
+              "k": "spend",
+              "id": "처방전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "왕진 가방",
+          "cost": 1,
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "perStack",
+              "id": "처방전"
+            },
+            {
+              "k": "heal",
+              "ratio": 1
+            },
+            {
+              "k": "spend",
+              "id": "처방전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "처방 대신 응원",
+          "tags": [
+            "연계",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.8
+            },
+            {
+              "k": "perStack",
+              "id": "처방전"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "spend",
+              "id": "처방전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "경과 관찰",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.17
+            },
+            {
+              "k": "perStack",
+              "id": "처방전"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.45
+            },
+            {
+              "k": "spend",
+              "id": "처방전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "진짜로 아픈 환자만",
+          "tags": [
+            "연계",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.8
+            },
+            {
+              "k": "perStack",
+              "id": "처방전"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "spend",
+              "id": "처방전",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "왕진 가방",
+          "kind": "guard"
+        },
+        {
+          "name": "숲의 파동",
+          "kind": "draw"
+        },
+        {
+          "name": "따끔한 소견",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "힐데_u3",
+      "name": "의료인 보호법",
+      "hero": "힐데",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진료실 방범",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "의료진 총동원",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "레지던트의 반격",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "예방 접종",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.17
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자가치료",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "경과 관찰",
+          "kind": "guard"
+        },
+        {
+          "name": "예방 접종",
+          "kind": "draw"
+        },
+        {
+          "name": "회진 시작",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "힐데_u4",
+      "name": "주사기총 난사",
+      "hero": "힐데",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "hits": 4,
+          "base": "def",
+          "target": "randomEnemy"
+        },
+        {
+          "k": "ifWounded"
+        },
+        {
+          "k": "stack",
+          "id": "처방전",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "주사 준비",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "hits": 4,
+              "base": "def",
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대용량 주사기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "hits": 4,
+              "base": "def",
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "진정제",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "hits": 4,
+              "base": "def",
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "예방 처방",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "hits": 4,
+              "base": "def",
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "따끔한 소견",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "hits": 4,
+              "base": "def",
+              "target": "randomEnemy"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "숲의 파동",
+          "kind": "power"
+        },
+        {
+          "name": "따끔한 소견",
+          "kind": "ap"
+        },
+        {
+          "name": "왕진 가방",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "처방전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

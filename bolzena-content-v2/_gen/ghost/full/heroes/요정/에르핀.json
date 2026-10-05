@@ -1,0 +1,753 @@
+{
+ "heroes": [
+  {
+   "id": "에르핀",
+   "name": "에르핀",
+   "nature": "순수",
+   "race": "요정",
+   "row": "back",
+   "role": "딜러",
+   "star": 3,
+   "hp": 550,
+   "atk": 155,
+   "def": 25,
+   "crit": 10,
+   "blurb": "요정 왕국 에르피엔의 먹보 여왕. 세계수가 씌운 왕관의 저주로 머리는 나빠지고 식욕은 폭발해 하루 12끼에 무전취식을 일삼고, 국정은 네르와 컨닝 페이퍼에 맡긴다. 그래도 산을 뽑아 던지는 괴력과 순한 본심으로 결정적 순간엔 모든 종족을 한데 묶는 트러블메이커.",
+   "keyword": {
+    "name": "외상",
+    "desc": "갚을 생각 없는 밥값 장부 — 처치하면 탕감된다",
+    "carrier": "self",
+    "cap": 2
+   },
+   "passives": [
+    {
+     "name": "무전취식",
+     "when": {
+      "on": "kill",
+      "mine": true
+     },
+     "limit": {
+      "per": "turn",
+      "n": 1
+     },
+     "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      },
+      {
+       "k": "ifStack",
+       "id": "외상",
+       "n": 1
+      },
+      {
+       "k": "spend",
+       "id": "외상",
+       "all": true
+      },
+      {
+       "k": "ap",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "큰 주문",
+     "when": {
+      "on": "play",
+      "minCost": 2
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "외상",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "돌겨어어어!!! 억⋯?",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "피해 감소",
+      "v": 3
+     },
+     {
+      "k": "status",
+      "id": "약화",
+      "v": 2,
+      "target": "allEnemies"
+     }
+    ]
+   },
+   "starter": [
+    "에르핀_s1",
+    "에르핀_s1",
+    "에르핀_s2",
+    "에르핀_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "에르핀_s1",
+   "name": "마력탄",
+   "hero": "에르핀",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "에르핀_s2",
+   "name": "특대 마력탄",
+   "hero": "에르핀",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "에르핀_s3",
+   "name": "도끼도 튕기는 몸",
+   "hero": "에르핀",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ]
+  },
+  {
+   "id": "에르핀_u1",
+   "name": "맨주먹 결계 부수기",
+   "hero": "에르핀",
+   "unique": true,
+   "cost": 3,
+   "type": "공격",
+   "debt": true,
+   "tags": [
+    "분쇄"
+   ],
+   "fx": [
+    {
+     "k": "strip"
+    },
+    {
+     "k": "dmg",
+     "ratio": 3.6,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "배부른 맨주먹",
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "strip"
+      },
+      {
+       "k": "dmg",
+       "ratio": 4.7,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 맨주먹",
+     "cost": 2,
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "strip"
+      },
+      {
+       "k": "dmg",
+       "ratio": 2.9,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "외상의 맨주먹",
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "strip"
+      },
+      {
+       "k": "dmg",
+       "ratio": 3.95,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "몰래 둔 맨주먹",
+     "tags": [
+      "분쇄",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "strip"
+      },
+      {
+       "k": "dmg",
+       "ratio": 4.3,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "왕관의 맨주먹",
+     "tags": [
+      "분쇄",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "strip"
+      },
+      {
+       "k": "dmg",
+       "ratio": 4.3,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "에르핀_u2",
+   "name": "마력탄 폭주",
+   "hero": "에르핀",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "debt": true,
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.6,
+     "target": "randomEnemy",
+     "hits": 5
+    },
+    {
+     "k": "ifKill"
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "배부른 마력탄 폭주",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.8,
+       "target": "randomEnemy",
+       "hits": 5
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 마력탄 폭주",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.5,
+       "target": "randomEnemy",
+       "hits": 5
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "외상의 마력탄 폭주",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.65,
+       "target": "randomEnemy",
+       "hits": 5
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "몰래 둔 마력탄 폭주",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.7,
+       "target": "randomEnemy",
+       "hits": 5
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "왕관의 마력탄 폭주",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.7,
+       "target": "randomEnemy",
+       "hits": 5
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "에르핀_u3",
+   "name": "순수 케이크 공격!!!",
+   "hero": "에르핀",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "debt": true,
+   "tags": [
+    "연계"
+   ],
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.8,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "피해 감소",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "배부른 케이크 공격",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.15,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 케이크 공격",
+     "cost": 0,
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.6,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "외상의 케이크 공격",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      },
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "몰래 둔 케이크 공격",
+     "tags": [
+      "연계",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.05,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "왕관의 케이크 공격",
+     "tags": [
+      "연계",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.95,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "에르핀_u4",
+   "name": "무한의 케이크",
+   "hero": "에르핀",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "make",
+     "id": "에르핀_cake",
+     "v": 1
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "배부른 케이크 상자",
+     "tags": [],
+     "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "가벼운 케이크 상자",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "외상의 케이크 상자",
+     "tags": [],
+     "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 2
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "몰래 둔 케이크 상자",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "왕관의 케이크 상자",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "에르핀_cake",
+   "name": "케이크",
+   "cost": 0,
+   "type": "스킬",
+   "tags": [
+    "소멸"
+   ],
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 0.6
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "hero": "에르핀",
+   "token": true
+  }
+ ],
+ "equips": [
+  {
+   "id": "eq_erpinstaff",
+   "name": "에르핀의 지팡이",
+   "grade": "전설",
+   "slot": "무기",
+   "stats": {
+    "atk": 24,
+    "hp": 40
+   },
+   "effect": [
+    {
+     "name": "여왕의 마력",
+     "when": {
+      "on": "turnStart"
+     },
+     "conds": [
+      {
+       "c": "hpMin",
+       "pct": 0.99
+      }
+     ],
+     "fx": [
+      {
+       "k": "gauge",
+       "v": 20
+      }
+     ]
+    }
+   ],
+   "affinity": "에르핀",
+   "affinityStats": {
+    "hp": 40,
+    "atk": 10
+   },
+   "affinityEffect": [
+    {
+     "name": "도시락 챙기기",
+     "when": {
+      "on": "fightStart"
+     },
+     "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blurb": "요정 여왕의 마력 지팡이. 다치지 않은 날에는 마력이 넘친다."
+  }
+ ]
+}

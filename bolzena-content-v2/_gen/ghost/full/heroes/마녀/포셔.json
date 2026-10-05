@@ -1,0 +1,885 @@
+{
+  "heroes": [
+    {
+      "id": "포셔",
+      "name": "포셔",
+      "nature": "우울",
+      "race": "마녀",
+      "row": "back",
+      "role": "서포터",
+      "star": 3,
+      "hp": 580,
+      "atk": 75,
+      "def": 58,
+      "crit": 5,
+      "blurb": "맛은 무시, 효과는 확실한 약장수 마녀. 진하게 달인 약은 잘 듣지만 쓴맛이 덱에 남는다.",
+      "keyword": {
+        "name": "약효",
+        "desc": "잘 듣는 약일수록 — 진하게 달인 약이 남긴 약효. 쌓일수록 턴이 끝날 때마다 파티를 조금씩 회복한다",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "hot",
+            "ratio": 0.15
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "약효 남기기",
+          "when": {
+            "on": "make"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "약효",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "감자 고구마!",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "randomEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "약효",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "포셔_s1",
+        "포셔_s1",
+        "포셔_s2",
+        "포셔_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "포셔_s1",
+      "name": "약병 투척",
+      "hero": "포셔",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "base": "def"
+        }
+      ]
+    },
+    {
+      "id": "포셔_s2",
+      "name": "초록 물약",
+      "hero": "포셔",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "포셔_t1",
+      "name": "쓴맛",
+      "hero": "포셔",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [],
+      "blurb": "혀가 기억하는 맛. 손에 들고 있으면 아무것도 못 한다"
+    },
+    {
+      "id": "포셔_u1",
+      "name": "만병통치 물약",
+      "hero": "포셔",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "signature": true,
+      "choices": [
+        "보통",
+        "진하게"
+      ],
+      "fx": [
+        {
+          "k": "ifChoice",
+          "n": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 1.4
+        },
+        {
+          "k": "ifChoice",
+          "n": 2
+        },
+        {
+          "k": "heal",
+          "ratio": 2.1
+        },
+        {
+          "k": "make",
+          "id": "포셔_t1",
+          "v": 1,
+          "to": "draw"
+        }
+      ],
+      "blurb": "진하게 달일수록 잘 듣는다. 맛은 책임지지 않는다",
+      "oracles": [
+        {
+          "name": "특제 물약",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.8
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 2.7
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "희석 물약",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "보약",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 2.3
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "쓴 약이 몸에 좋다",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 3
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "상비약",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 2.4
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "약초 한 줌",
+          "kind": "heal"
+        },
+        {
+          "name": "약 상자",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "약사의 손",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "포셔_u2",
+      "name": "폭발 물약 투척",
+      "hero": "포셔",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "choices": [
+        "보통",
+        "진하게"
+      ],
+      "fx": [
+        {
+          "k": "ifChoice",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "allEnemies",
+          "base": "def"
+        },
+        {
+          "k": "ifChoice",
+          "n": 2
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.85,
+          "target": "allEnemies",
+          "base": "def"
+        },
+        {
+          "k": "make",
+          "id": "포셔_t1",
+          "v": 1,
+          "to": "draw"
+        }
+      ],
+      "blurb": "원래는 감기약이었다",
+      "oracles": [
+        {
+          "name": "대폭발 물약",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "작은 약병",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "부식 물약",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "끈적 물약",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "한 방 물약",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "독한 약",
+          "kind": "power"
+        },
+        {
+          "name": "흩날리는 가루",
+          "kind": "frost"
+        },
+        {
+          "name": "빠른 투척",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "포셔_u3",
+      "name": "흐물 약화 포션",
+      "hero": "포셔",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "choices": [
+        "보통",
+        "진하게"
+      ],
+      "fx": [
+        {
+          "k": "ifChoice",
+          "n": 1
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifChoice",
+          "n": 2
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "make",
+          "id": "포셔_t1",
+          "v": 1,
+          "to": "draw"
+        }
+      ],
+      "blurb": "마시면 힘이 쭉 빠진다 — 적에게 먹이면 된다",
+      "oracles": [
+        {
+          "name": "흐물흐물 포션",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "묽은 포션",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "나른 포션",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "쓰디쓴 포션",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        },
+        {
+          "name": "비상 포션",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1,
+              "to": "draw"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "수면 가루",
+          "fx": [
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "약효 강화",
+          "kind": "draw"
+        },
+        {
+          "name": "약병 선반",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "포셔_u4",
+      "name": "약장수의 비법서",
+      "hero": "포셔",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "약효",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "면역",
+          "v": 1
+        }
+      ],
+      "blurb": "부작용 목록이 효능 목록보다 길다",
+      "oracles": [
+        {
+          "name": "비법서 완본",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "약효",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "비법 메모",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "약효",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "임상 기록",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "약효",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "약초 도감",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "약효",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "개업 준비",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "약효",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "명의",
+          "kind": "defUp"
+        },
+        {
+          "name": "간판",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "감초",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.5
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

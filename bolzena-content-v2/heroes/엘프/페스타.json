@@ -1,0 +1,773 @@
+{
+  "heroes": [
+    {
+      "id": "페스타",
+      "name": "페스타",
+      "nature": "우울",
+      "race": "엘프",
+      "row": "front",
+      "role": "서포터",
+      "star": 2,
+      "hp": 680,
+      "atk": 83,
+      "def": 62,
+      "crit": 5,
+      "blurb": "규칙과 통제를 혐오하는 무정부주의 락커. 파티가 공격과 스킬을 번갈아 낼 때마다 반항심이 끓어오르고, 셋이 차면 모두가 같이 친다.",
+      "keyword": {
+        "name": "반항",
+        "desc": "정해진 박자를 깨는 쾌감. 공격과 스킬이 바뀔 때마다 +1, 셋이면 협공 1",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "나락도 락이다",
+            "when": {
+              "on": "stackReach",
+              "id": "반항",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "반항",
+                "all": true
+              },
+              {
+                "k": "status",
+                "id": "협공",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "나락도 락이다",
+          "when": {
+            "on": "play",
+            "who": "any",
+            "seq": [
+              "공격",
+              "스킬"
+            ]
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "나락도 락이다",
+          "when": {
+            "on": "play",
+            "who": "any",
+            "seq": [
+              "스킬",
+              "공격"
+            ]
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "스포트라이트!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 3
+          },
+          {
+            "k": "atkMod",
+            "v": 0.3,
+            "target": "self",
+            "run": true
+          },
+          {
+            "k": "stack",
+            "id": "반항",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "페스타_s1",
+        "페스타_s1",
+        "페스타_s2",
+        "페스타_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "페스타_s1",
+      "name": "기타 내려찍기",
+      "hero": "페스타",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "페스타_s2",
+      "name": "무대 뒤 휴식",
+      "hero": "페스타",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "페스타_u1",
+      "name": "락 앤 피스!",
+      "hero": "페스타",
+      "unique": true,
+      "signature": true,
+      "cost": 3,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.5,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "사운드 체크",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "고요한 달은 흑역사",
+          "cost": 2,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "심사석 퇴장",
+          "tags": [
+            "분쇄",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.98,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "앙코르는 없다",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.17,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "일부러 기괴하게",
+          "tags": [
+            "분쇄",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.98,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "사운드 체크",
+          "kind": "power"
+        },
+        {
+          "name": "깡통 들고",
+          "kind": "ap"
+        },
+        {
+          "name": "브랜디 한 잔",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "페스타_u2",
+      "name": "노숙 락커",
+      "hero": "페스타",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "반항",
+          "v": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "자리 펴기",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.59
+            }
+          ]
+        },
+        {
+          "name": "역 광장 점거",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            }
+          ]
+        },
+        {
+          "name": "모두의 무대",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.18
+            }
+          ]
+        },
+        {
+          "name": "체제 혐오",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.63
+            }
+          ]
+        },
+        {
+          "name": "깡통 들고",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.18
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "앙코르는 없다",
+          "kind": "guard"
+        },
+        {
+          "name": "볼륨 업",
+          "kind": "draw"
+        },
+        {
+          "name": "체제 혐오",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "페스타_u3",
+      "name": "버스킹",
+      "hero": "페스타",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.15,
+          "target": "oneAlly",
+          "run": true
+        },
+        {
+          "k": "stack",
+          "id": "반항",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "깡통 앞에 두기",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "길거리 합주",
+          "cost": 0,
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "관객 끌어들이기",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "볼륨 업",
+          "tags": [
+            "연계",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.18,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "각자 다른 꿈",
+          "tags": [
+            "연계",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.18,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "깡통 들고",
+          "kind": "guard"
+        },
+        {
+          "name": "브랜디 한 잔",
+          "kind": "draw"
+        },
+        {
+          "name": "사운드 체크",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "페스타_u4",
+      "name": "갓 오브 뮤직!",
+      "hero": "페스타",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "defMod",
+          "v": 0.15,
+          "target": "self",
+          "run": true
+        },
+        {
+          "k": "stack",
+          "id": "반항",
+          "v": 3
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "무대 입장",
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.2,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "무대 난입",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.15,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "관객과 하나",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.18,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "한계 없는 볼륨",
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.22,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "브랜디 한 잔",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.18,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "볼륨 업",
+          "kind": "atkUp"
+        },
+        {
+          "name": "체제 혐오",
+          "kind": "draw"
+        },
+        {
+          "name": "앙코르는 없다",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,688 @@
+{
+  "heroes": [
+    {
+      "id": "그윈",
+      "name": "그윈",
+      "nature": "냉정",
+      "race": "수인",
+      "row": "front",
+      "role": "서포터",
+      "star": 3,
+      "hp": 780,
+      "atk": 80,
+      "def": 65,
+      "crit": 5,
+      "blurb": "얼음 대륙 글레이시아에서 동생 델리아와 함께 표류해 온 황제펭귄 탐험가.",
+      "keyword": {
+        "name": "깃발",
+        "desc": "「먼저 찜한 쪽이 임자」 — 탐험가가 먼저 꽂은 깃발. 깃발이 꽂힌 적은 아군 카드가 약점 공격으로 친다.",
+        "carrier": "enemy",
+        "cap": 3,
+        "weakens": true
+      },
+      "passives": [
+        {
+          "name": "먼저 찜한 쪽이 임자",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "먼저 찜한 쪽이 임자",
+          "when": {
+            "on": "kill"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "깃발"
+            }
+          ],
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "극지귀가길",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.35,
+            "target": "randomEnemy",
+            "hits": 10
+          },
+          {
+            "k": "stack",
+            "id": "깃발",
+            "v": 2,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "그윈_s1",
+        "그윈_s1",
+        "그윈_s2",
+        "그윈_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "그윈_s1",
+      "name": "펭귄 부리 쪼기",
+      "hero": "그윈",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "그윈_s2",
+      "name": "깃털 품기",
+      "hero": "그윈",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "그윈_u1",
+      "name": "스노우포그",
+      "hero": "그윈",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.4
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "깃발",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 스노우포그",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 스노우포그",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "탐험가의 스노우포그",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "든든한 스노우포그",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "복 받은 스노우포그",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "인증샷 한 장",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "그윈_u2",
+      "name": "얼음 가방",
+      "hero": "그윈",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "깃발",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 얼음 가방",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 얼음 가방",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "탐험가의 얼음 가방",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 얼음 가방",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 얼음 가방",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "인증샷 한 장",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "그윈_u3",
+      "name": "신나는 모험이다!",
+      "hero": "그윈",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "근면",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 신나는 모험이다!",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 신나는 모험이다!",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "탐험가의 신나는 모험이다!",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 신나는 모험이다!",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 신나는 모험이다!",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "인증샷 한 장",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "그윈_u4",
+      "name": "깃발 꽂고 인증샷",
+      "hero": "그윈",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "깃발",
+          "v": 2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 깃발 꽂고 인증샷",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 깃발 꽂고 인증샷",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "탐험가의 깃발 꽂고 인증샷",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 깃발 꽂고 인증샷",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 깃발 꽂고 인증샷",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "인증샷 한 장",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

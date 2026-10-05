@@ -1,0 +1,694 @@
+{
+  "heroes": [
+    {
+      "id": "sion",
+      "name": "시온",
+      "nature": "냉정",
+      "race": "인간",
+      "row": "back",
+      "role": "딜러",
+      "style": "쌓고 고르기",
+      "star": 3,
+      "hp": 550,
+      "atk": 140,
+      "def": 25,
+      "crit": 10,
+      "blurb": "마탄을 재어 두는 사수. 언제 쏟을지는 손이 고른다.",
+      "keyword": {
+        "name": "마탄",
+        "desc": "쌓아 둔 탄환",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "atk",
+            "v": 0.05
+          }
+        ],
+        "rules": [
+          {
+            "name": "마탄",
+            "when": {
+              "on": "stackReach",
+              "id": "마탄",
+              "n": 5
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "마탄",
+                "all": true
+              },
+              {
+                "k": "make",
+                "id": "sion_bullet",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "장전",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마탄",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "일점사",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "진혼곡",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.0,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "마탄",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "sion_s1",
+        "sion_s1",
+        "sion_s2",
+        "sion_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "sion_s1",
+      "name": "속사",
+      "hero": "sion",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "hits": 2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "sion_s2",
+      "name": "엄폐",
+      "hero": "sion",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "block",
+          "ratio": 1.5
+        },
+        {
+          "k": "stack",
+          "id": "마탄",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "sion_s3",
+      "name": "조준 사격",
+      "hero": "sion",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "sion_bullet",
+      "name": "진혼의 탄환",
+      "hero": "sion",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.0,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "sion_u1",
+      "name": "마탄 개방",
+      "hero": "sion",
+      "cost": 1,
+      "type": "공격",
+      "unique": true,
+      "signature": true,
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "마탄"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "마탄",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "전탄 발사",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "마탄"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마탄",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "탄막 개방",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "마탄"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "마탄",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "아껴 쏘기",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "마탄"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마탄",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "철갑탄",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "마탄"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마탄",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "재장전",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "마탄"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마탄",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "불꽃 탄두",
+          "kind": "power"
+        },
+        {
+          "name": "얼음 탄두",
+          "kind": "frost"
+        },
+        {
+          "name": "약실 정리",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마탄",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sion_u2",
+      "name": "탄막",
+      "hero": "sion",
+      "cost": 2,
+      "type": "공격",
+      "unique": true,
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "hits": 4,
+          "target": "randomEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "집중 탄막",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "hits": 4,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "소나기 탄막",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "hits": 7,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "견제 사격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "hits": 4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "단발 탄막",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "hits": 4,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "약점 탄막",
+          "tags": [
+            "약점"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "hits": 4,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sion_u3",
+      "name": "냉철한 시선",
+      "hero": "sion",
+      "cost": 1,
+      "type": "강화",
+      "unique": true,
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.1,
+          "run": true,
+          "target": "self"
+        },
+        {
+          "k": "critMod",
+          "v": 0.1,
+          "run": true,
+          "target": "self"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "더 냉철하게",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "critMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "명경지수",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "critMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "숨 고르기",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "critMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "찰나",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "critMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "장전된 시선",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "critMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "마탄",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sion_u4",
+      "name": "표적 지정",
+      "hero": "sion",
+      "cost": 0,
+      "type": "스킬",
+      "unique": true,
+      "fx": [
+        {
+          "k": "status",
+          "id": "표식",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifChain"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정밀 표적",
+          "fx": [
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifChain"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전원 표적",
+          "fx": [
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChain"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "약점 노출",
+          "fx": [
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "조준선",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifChain"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "표적 갱신",
+          "fx": [
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_rifle",
+      "name": "진혼의 장총",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 28,
+        "crit": 5
+      },
+      "affinity": "sion",
+      "affinityStats": {
+        "hp": 40,
+        "atk": 10
+      },
+      "effect": [
+        {
+          "name": "인형 낙하",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "every": 4
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "affinityEffect": [
+        {
+          "name": "장전 완료",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마탄",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

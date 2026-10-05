@@ -1,0 +1,670 @@
+{
+  "heroes": [
+    {
+      "id": "스피키_메이드",
+      "name": "스피키(메이드)",
+      "nature": "활발",
+      "race": "유령",
+      "row": "back",
+      "role": "딜러",
+      "star": 3,
+      "hp": 550,
+      "atk": 135,
+      "def": 25,
+      "crit": 10,
+      "blurb": "메이드 크레페의 일을 통째로 뒤집어쓴 꼬마 유령. 카드를 낼 때마다 고장 난 청소기가 버린 더미를 한 장씩 빨아들이고, 「잡동사니」 셋이 차면 이상한 우연으로 일이 술술 풀린다.",
+      "keyword": {
+        "name": "잡동사니",
+        "desc": "청소기 먼지통에 쌓인 것들 — 셋이면 뜻밖의 행운",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "이상한 우연",
+            "when": {
+              "on": "stackReach",
+              "id": "잡동사니",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "잡동사니",
+                "all": true
+              },
+              {
+                "k": "ap",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "고장 난 청소기",
+          "when": {
+            "on": "play"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "터보 클린 모드으으!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.7,
+            "hits": 6,
+            "target": "randomEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "잡동사니",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "스피키_메이드_s1",
+        "스피키_메이드_s1",
+        "스피키_메이드_s3",
+        "스피키_메이드_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "스피키_메이드_s1",
+      "name": "먼지털이 휘두르기",
+      "hero": "스피키_메이드",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_s2",
+      "name": "호박 쟁반 방패",
+      "hero": "스피키_메이드",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_s3",
+      "name": "먼지털이 대회전",
+      "hero": "스피키_메이드",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_u1",
+      "name": "깨끗하면 할 일이 없어!",
+      "hero": "스피키_메이드",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.3,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "잡동사니",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대청소",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "빗자루질",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "미뤄 둔 청소",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "구석구석 청소",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 걸레",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘찬 먼지털이",
+          "kind": "power"
+        },
+        {
+          "name": "먼지 구름",
+          "kind": "frost"
+        },
+        {
+          "name": "반짝반짝",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_u2",
+      "name": "고장난 흡입구",
+      "hero": "스피키_메이드",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "exileFrom",
+          "from": "discard",
+          "n": 2
+        },
+        {
+          "k": "perPile",
+          "from": "gone"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "역류",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2
+            },
+            {
+              "k": "perPile",
+              "from": "gone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "덜컹 흡입",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2
+            },
+            {
+              "k": "perPile",
+              "from": "gone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "쌓인 먼지통",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2
+            },
+            {
+              "k": "perPile",
+              "from": "gone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "터보 흡입",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 3
+            },
+            {
+              "k": "perPile",
+              "from": "gone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "축복의 흡입",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2
+            },
+            {
+              "k": "perPile",
+              "from": "gone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "강한 모터",
+          "kind": "power"
+        },
+        {
+          "name": "우연의 일치",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "빠른 비우기",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_u3",
+      "name": "호박 장식 시즌",
+      "hero": "스피키_메이드",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "stack",
+          "id": "잡동사니",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "호박 축제",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.75
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 호박",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "창고 속 호박",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "호박 랜턴 행렬",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 호박",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.55
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "단단한 호박",
+          "kind": "guard"
+        },
+        {
+          "name": "빠른 장식",
+          "kind": "draw"
+        },
+        {
+          "name": "호박 웃음",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_u4",
+      "name": "크레페 선배의 특훈",
+      "hero": "스피키_메이드",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "exileFrom",
+          "from": "discard",
+          "n": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "지옥 특훈",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 특훈",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "복습",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "선배 흉내",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "칼날 벼리기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 특훈",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "우수 사원",
+          "kind": "draw"
+        },
+        {
+          "name": "재빠른 손",
+          "kind": "cost"
+        },
+        {
+          "name": "칭찬 도장",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

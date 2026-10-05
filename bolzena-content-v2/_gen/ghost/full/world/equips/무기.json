@@ -1,0 +1,655 @@
+{
+  "equips": [
+    {
+      "id": "eq_woodsword",
+      "name": "급조한 목검",
+      "grade": "일반",
+      "slot": "무기",
+      "stats": {
+        "atk": 10
+      },
+      "effect": [
+        {
+          "name": "첫 휘두름",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "conds": [
+            {
+              "c": "firstTurn"
+            }
+          ],
+          "limit": {
+            "per": "fight",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "훈련용으로 대충 깎았는데 첫 한 방은 의외로 묵직하다."
+    },
+    {
+      "id": "eq_awl",
+      "name": "녹슨 송곳",
+      "grade": "일반",
+      "slot": "무기",
+      "stats": {
+        "atk": 6,
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "틈 벌리기",
+          "when": {
+            "on": "break",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "모험가 요정이 예전 「따는 일」 에 썼다며 황급히 발뺌한 송곳."
+    },
+    {
+      "id": "eq_patchstaff",
+      "name": "덧댄 지팡이",
+      "grade": "일반",
+      "slot": "무기",
+      "stats": {
+        "atk": 8,
+        "def": 2
+      },
+      "effect": [
+        {
+          "name": "닳은 손잡이",
+          "when": {
+            "on": "play",
+            "type": "스킬",
+            "every": 3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "누군가 마법 연습에 닳도록 쓴 꼬질꼬질한 지팡이."
+    },
+    {
+      "id": "eq_treedagger",
+      "name": "고목나무 비수",
+      "grade": "일반",
+      "slot": "무기",
+      "stats": {
+        "atk": 8,
+        "crit": 3
+      },
+      "effect": [
+        {
+          "name": "껍질 벗기기",
+          "when": {
+            "on": "play",
+            "tag": "분쇄"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "손상",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "낡은 몽둥이를 깎은 것이라 찌르기보다 껍데기 벗기기용."
+    },
+    {
+      "id": "eq_steelsword",
+      "name": "강철 대검",
+      "grade": "고급",
+      "slot": "무기",
+      "stats": {
+        "atk": 14
+      },
+      "effect": [
+        {
+          "name": "무게 싣기",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "minCost": 2
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "날보다 무게로 베는 대검. 크게 휘두를수록 잘 든다."
+    },
+    {
+      "id": "eq_burnbranch",
+      "name": "불타는 가지",
+      "grade": "고급",
+      "slot": "무기",
+      "stats": {
+        "atk": 12,
+        "crit": 3
+      },
+      "effect": [
+        {
+          "name": "옮겨붙는 불",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "그을림",
+              "v": 2,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "불 정령의 기운이 깃들어 꺼지지 않는 나뭇가지."
+    },
+    {
+      "id": "eq_foxdagger",
+      "name": "여우 단검",
+      "grade": "고급",
+      "slot": "무기",
+      "stats": {
+        "atk": 12,
+        "crit": 3
+      },
+      "effect": [
+        {
+          "name": "따라 찌르기",
+          "when": {
+            "on": "link"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "여우 장식이 귀엽지만, 동료가 움직이면 먼저 따라 나선다."
+    },
+    {
+      "id": "eq_taser",
+      "name": "앗땃따건",
+      "grade": "고급",
+      "slot": "무기",
+      "stats": {
+        "atk": 13
+      },
+      "effect": [
+        {
+          "name": "찌릿",
+          "when": {
+            "on": "play",
+            "tag": "탄환"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "모나티엄 엘프 경비병의 테이저건. 탄을 갈아 끼울 때마다 찌릿하다."
+    },
+    {
+      "id": "eq_slingshot",
+      "name": "고무줄 새총",
+      "grade": "고급",
+      "slot": "무기",
+      "stats": {
+        "atk": 12,
+        "crit": 2
+      },
+      "effect": [
+        {
+          "name": "발 묶기",
+          "when": {
+            "on": "play",
+            "tag": "신속"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "재빨리 당겨 쏘면 맞은 녀석이 잠깐 멈칫한다."
+    },
+    {
+      "id": "eq_boomerang",
+      "name": "돌아오는 부메랑",
+      "grade": "고급",
+      "slot": "무기",
+      "stats": {
+        "atk": 13
+      },
+      "effect": [
+        {
+          "name": "되돌아오는 날",
+          "when": {
+            "on": "play",
+            "tag": "회수"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "던지면 꼭 돌아온다. 받는 손이 아픈 게 흠."
+    },
+    {
+      "id": "eq_sharpstaff",
+      "name": "날카로운 지팡이",
+      "grade": "희귀",
+      "slot": "무기",
+      "stats": {
+        "atk": 18
+      },
+      "effect": [
+        {
+          "name": "지팡이 끝 칼날",
+          "when": {
+            "on": "play",
+            "type": "스킬",
+            "every": 3
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 0.8,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "지팡이와 검을 하나로 합친 물건. 주문 사이사이 찌른다."
+    },
+    {
+      "id": "eq_cloakdagger",
+      "name": "망토와 단검",
+      "grade": "희귀",
+      "slot": "무기",
+      "stats": {
+        "atk": 16,
+        "crit": 5
+      },
+      "effect": [
+        {
+          "name": "괴도의 퇴장",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "수인들의 괴도 역할놀이 소품. 한 놈 해치우면 망토 자락이 가벼워진다."
+    },
+    {
+      "id": "eq_mace",
+      "name": "참회의 메이스",
+      "grade": "희귀",
+      "slot": "무기",
+      "stats": {
+        "atk": 14,
+        "hp": 60
+      },
+      "effect": [
+        {
+          "name": "웃으며 참회",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "사제장이 웃으며 휘두르는 메이스. 맞을수록 손이 매워진다."
+    },
+    {
+      "id": "eq_firebow",
+      "name": "활활 불타활",
+      "grade": "희귀",
+      "slot": "무기",
+      "stats": {
+        "atk": 18
+      },
+      "effect": [
+        {
+          "name": "불화살",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "every": 2
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "그을림",
+              "v": 2,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "옆에만 둬도 후끈한 사냥용 불화살 활."
+    },
+    {
+      "id": "eq_crossbow",
+      "name": "연발 석궁",
+      "grade": "희귀",
+      "slot": "무기",
+      "stats": {
+        "atk": 17,
+        "crit": 3
+      },
+      "effect": [
+        {
+          "name": "세 발째",
+          "when": {
+            "on": "play",
+            "tag": "탄환",
+            "every": 3
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "탄 세 발을 쏘면 한 발이 덤으로 나간다 — 고장인지 기능인지는 모른다."
+    },
+    {
+      "id": "eq_rustyred",
+      "name": "녹슨 붉은 검",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 26
+      },
+      "effect": [
+        {
+          "name": "붉은 오기",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "wounded"
+            }
+          ],
+          "fx": [
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "몰릴수록 붉게 빛난다. 알고 보니 말라붙은 석류 주스."
+    },
+    {
+      "id": "eq_kettlebell",
+      "name": "30KG 케틀벨",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 24
+      },
+      "effect": [
+        {
+          "name": "한 세트 더",
+          "when": {
+            "on": "play",
+            "who": "any",
+            "minCost": 3
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "파티 누구든 무거운 카드를 들어 올리면 손이 하나 더 움직인다."
+    },
+    {
+      "id": "eq_furnace",
+      "name": "용광검",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 22,
+        "crit": 4
+      },
+      "effect": [
+        {
+          "name": "달아오르는 날",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.04,
+              "target": "self",
+              "run": true
+            }
+          ]
+        }
+      ],
+      "blurb": "쓸수록 달아오르는 검. 이번 전투 동안 공격력이 쌓인다."
+    },
+    {
+      "id": "eq_glove",
+      "name": "슈슈슈슉 글러브",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 22,
+        "crit": 5
+      },
+      "effect": [
+        {
+          "name": "연타 표시",
+          "when": {
+            "on": "extra"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "표식",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "덤으로 날린 주먹이 다음 주먹 자리를 표시한다."
+    },
+    {
+      "id": "eq_starwand",
+      "name": "별똥 지팡이",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 24
+      },
+      "effect": [
+        {
+          "name": "별똥별",
+          "when": {
+            "on": "play",
+            "tag": "천상",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 1.2,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "하늘에서 무언가 내려올 때마다 별 부스러기가 같이 떨어진다."
+    },
+    {
+      "id": "eq_clockblade",
+      "name": "시계탑 바늘검",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 24
+      },
+      "effect": [
+        {
+          "name": "정각",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "spent",
+              "n": 3
+            }
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "이번 턴 AP 를 꼭 맞게 다 쓰면 바늘이 정각을 가리킨다."
+    }
+  ]
+}

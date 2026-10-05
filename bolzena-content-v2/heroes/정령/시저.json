@@ -1,0 +1,812 @@
+{
+ "heroes": [
+  {
+   "id": "시저",
+   "name": "시저",
+   "nature": "냉정",
+   "row": "mid",
+   "role": "서포터",
+   "star": 3,
+   "hp": 600,
+   "atk": 86,
+   "def": 60,
+   "crit": 5,
+   "blurb": "좋은 걸 맛보게 한 뒤 빼앗는 빌런 지망생. 사기를 빌려주고 두 턴 뒤 거둬 가며 적을 약하게 만든다 — 그 사이 적을 쓰러뜨리면 빚은 없던 일.",
+   "keyword": {
+    "name": "빌려준 맛",
+    "desc": "시저가 빌려준 사기. 두 턴 뒤 거둬 간다(그 사이 적을 처치하면 탕감)",
+    "carrier": "self",
+    "cap": 4
+   },
+   "passives": [
+    {
+     "name": "다 먹었으면 됐어",
+     "when": {
+      "on": "kill"
+     },
+     "conds": [
+      {
+       "c": "stack",
+       "id": "빌려준 맛",
+       "n": 1
+      }
+     ],
+     "fx": [
+      {
+       "k": "spend",
+       "id": "빌려준 맛",
+       "all": true
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "가지치기",
+    "cost": 150,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.5,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "약화",
+      "v": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "사기",
+      "v": 1
+     }
+    ]
+   },
+   "race": "정령",
+   "starter": [
+    "시저_s1",
+    "시저_s1",
+    "시저_s2",
+    "시저_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "시저_s1",
+   "name": "싹둑",
+   "hero": "시저",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "시저_s2",
+   "name": "간식 나눠주기",
+   "hero": "시저",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 1.2
+    }
+   ]
+  },
+  {
+   "id": "시저_u1",
+   "name": "한정판의 맛",
+   "hero": "시저",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "signature": true,
+   "fx": [
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 2
+    },
+    {
+     "k": "stack",
+     "id": "빌려준 맛",
+     "v": 2
+    },
+    {
+     "k": "later",
+     "n": 2,
+     "then": [
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifStack",
+       "id": "빌려준 맛"
+      },
+      {
+       "k": "dealtMod",
+       "v": -0.2,
+       "target": "allAllies",
+       "turns": 1
+      },
+      {
+       "k": "spend",
+       "id": "빌려준 맛",
+       "all": true
+      }
+     ]
+    }
+   ],
+   "oracles": [
+    {
+     "name": "특대 사이즈",
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "빌려준 맛",
+       "v": 2
+      },
+      {
+       "k": "later",
+       "n": 2,
+       "then": [
+        {
+         "k": "status",
+         "id": "약화",
+         "v": 3,
+         "target": "allEnemies"
+        },
+        {
+         "k": "ifStack",
+         "id": "빌려준 맛"
+        },
+        {
+         "k": "dealtMod",
+         "v": -0.2,
+         "target": "allAllies",
+         "turns": 1
+        },
+        {
+         "k": "spend",
+         "id": "빌려준 맛",
+         "all": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "시식 코너",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "빌려준 맛",
+       "v": 2
+      },
+      {
+       "k": "later",
+       "n": 2,
+       "then": [
+        {
+         "k": "status",
+         "id": "약화",
+         "v": 2,
+         "target": "allEnemies"
+        },
+        {
+         "k": "ifStack",
+         "id": "빌려준 맛"
+        },
+        {
+         "k": "dealtMod",
+         "v": -0.2,
+         "target": "allAllies",
+         "turns": 1
+        },
+        {
+         "k": "spend",
+         "id": "빌려준 맛",
+         "all": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "이자 없는 대출",
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 3
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "later",
+       "n": 2,
+       "then": [
+        {
+         "k": "status",
+         "id": "약화",
+         "v": 2,
+         "target": "allEnemies"
+        },
+        {
+         "k": "ifStack",
+         "id": "빌려준 맛"
+        },
+        {
+         "k": "dealtMod",
+         "v": -0.2,
+         "target": "allAllies",
+         "turns": 1
+        },
+        {
+         "k": "spend",
+         "id": "빌려준 맛",
+         "all": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "기간 한정",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "빌려준 맛",
+       "v": 2
+      },
+      {
+       "k": "later",
+       "n": 2,
+       "then": [
+        {
+         "k": "status",
+         "id": "약화",
+         "v": 2,
+         "target": "allEnemies"
+        },
+        {
+         "k": "ifStack",
+         "id": "빌려준 맛"
+        },
+        {
+         "k": "dealtMod",
+         "v": -0.2,
+         "target": "allAllies",
+         "turns": 1
+        },
+        {
+         "k": "spend",
+         "id": "빌려준 맛",
+         "all": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "맛보기 세트",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "빌려준 맛",
+       "v": 2
+      },
+      {
+       "k": "later",
+       "n": 2,
+       "then": [
+        {
+         "k": "status",
+         "id": "약화",
+         "v": 2,
+         "target": "allEnemies"
+        },
+        {
+         "k": "ifStack",
+         "id": "빌려준 맛"
+        },
+        {
+         "k": "dealtMod",
+         "v": -0.2,
+         "target": "allAllies",
+         "turns": 1
+        },
+        {
+         "k": "spend",
+         "id": "빌려준 맛",
+         "all": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "달콤한 유혹",
+     "kind": "draw"
+    },
+    {
+     "name": "발맞추기",
+     "kind": "ap"
+    },
+    {
+     "name": "가지 하나 더",
+     "fx": [
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "시저_u2",
+   "name": "싹둑싹둑",
+   "hero": "시저",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1.2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "약화",
+     "v": 1,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "ifKill"
+    },
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "정원사의 가위",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.62,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가지 솎기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.88,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "뿌리째 싹둑",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.4,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "빠른 가위질",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "빌런의 미소",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.6,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifKill"
+      },
+      {
+       "k": "ap",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "잘 드는 가위",
+     "kind": "power"
+    },
+    {
+     "name": "가벼운 가위",
+     "kind": "cost"
+    },
+    {
+     "name": "서늘한 날",
+     "kind": "frost"
+    }
+   ]
+  },
+  {
+   "id": "시저_u3",
+   "name": "빼앗는 재미",
+   "hero": "시저",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "status",
+     "id": "약화",
+     "v": 2,
+     "target": "allEnemies"
+    },
+    {
+     "k": "shield",
+     "ratio": 1.2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "몽땅 빼앗기",
+     "fx": [
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.78
+      }
+     ]
+    },
+    {
+     "name": "슬쩍 빼앗기",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "shield",
+       "ratio": 1
+      }
+     ]
+    },
+    {
+     "name": "간식 회수",
+     "fx": [
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.2
+      },
+      {
+       "k": "heal",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "빌런의 계약서",
+     "fx": [
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.2
+      },
+      {
+       "k": "status",
+       "id": "손상",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "나눠 먹기",
+     "fx": [
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.2
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "든든한 간식",
+     "kind": "guard"
+    },
+    {
+     "name": "얄미운 손",
+     "kind": "draw"
+    },
+    {
+     "name": "빠른 손",
+     "kind": "cost"
+    }
+   ]
+  },
+  {
+   "id": "시저_u4",
+   "name": "빌런의 품격",
+   "hero": "시저",
+   "unique": true,
+   "cost": 1,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 1
+    },
+    {
+     "k": "status",
+     "id": "약화",
+     "v": 1,
+     "target": "allEnemies"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "진정한 빌런",
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "지망생의 품격",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "계획된 악행",
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "빌려준 맛",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "넉넉한 인심",
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "등장 연출",
+     "tags": [
+      "개막"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "날 선 품격",
+     "kind": "atkUp"
+    },
+    {
+     "name": "여유",
+     "kind": "defUp"
+    },
+    {
+     "name": "짧은 대사",
+     "kind": "cost"
+    }
+   ]
+  }
+ ]
+}

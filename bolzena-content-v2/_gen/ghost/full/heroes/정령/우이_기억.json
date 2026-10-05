@@ -1,0 +1,674 @@
+{
+ "heroes": [
+  {
+   "id": "우이_기억",
+   "name": "우이(기억)",
+   "nature": "냉정",
+   "row": "back",
+   "role": "서포터",
+   "star": 3,
+   "hp": 580,
+   "atk": 95,
+   "def": 61,
+   "crit": 5,
+   "blurb": "지웠던 불행한 기억을 안고 돌아온 본체. 카드가 소멸할 때마다 되찾은 기억이 쌓여 손끝이 단단해지고, 제 카드가 사라질 땐 파티의 아픔 하나를 씻어 낸다.",
+   "keyword": {
+    "name": "되찾은 기억",
+    "desc": "사라진 카드에서 건져 올린 기억. 1개당 우이(기억)의 피해 · 실드 +10%",
+    "carrier": "self",
+    "cap": 6,
+    "per": [
+     {
+      "stat": "dealt",
+      "v": 0.1
+     },
+     {
+      "stat": "guard",
+      "v": 0.1
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "도망치지 않는 기억",
+     "when": {
+      "on": "exhaust",
+      "who": "any"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 3
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "씻겨 가는 아픔",
+     "when": {
+      "on": "exhaust"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 2
+     },
+     "fx": [
+      {
+       "k": "cleanse",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "이젠 피하지 않아",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "pull",
+      "from": "gone",
+      "at": "random",
+      "n": 1
+     },
+     {
+      "k": "heal",
+      "ratio": 1.5
+     },
+     {
+      "k": "stack",
+      "id": "되찾은 기억",
+      "v": 2
+     }
+    ]
+   },
+   "race": "정령",
+   "starter": [
+    "우이_기억_s1",
+    "우이_기억_s1",
+    "우이_기억_s2",
+    "우이_기억_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "우이_기억_s1",
+   "name": "물방울",
+   "hero": "우이_기억",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "우이_기억_s2",
+   "name": "맑은 연못물",
+   "hero": "우이_기억",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 1.2
+    }
+   ]
+  },
+  {
+   "id": "우이_기억_u1",
+   "name": "잊으려던 기억",
+   "hero": "우이_기억",
+   "unique": true,
+   "cost": 0,
+   "type": "스킬",
+   "tags": [
+    "소멸"
+   ],
+   "fx": [
+    {
+     "k": "draw",
+     "v": 2
+    },
+    {
+     "k": "stack",
+     "id": "되찾은 기억",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "선명한 기억",
+     "tags": [
+      "소멸"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "기억의 파편",
+     "tags": [
+      "소멸"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "되감기",
+     "tags": [
+      "소멸"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 0.6
+      }
+     ]
+    },
+    {
+     "name": "놓지 않아",
+     "tags": [
+      "소멸 2"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "첫 기억",
+     "tags": [
+      "소멸",
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "또렷한 눈",
+     "kind": "draw"
+    },
+    {
+     "name": "물결",
+     "kind": "ap"
+    },
+    {
+     "name": "기억 상자",
+     "tags": [
+      "개전"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "우이_기억_u2",
+   "name": "기억의 물결",
+   "hero": "우이_기억",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "perPile",
+     "from": "gone"
+    },
+    {
+     "k": "dmg",
+     "ratio": 0.12,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "밀려오는 기억",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "perPile",
+       "from": "gone"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.15,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "잔물결",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.8,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "perPile",
+       "from": "gone"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "기억의 해일",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.77,
+       "target": "allEnemies"
+      },
+      {
+       "k": "perPile",
+       "from": "gone"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.09,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "흘려보내기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "perPile",
+       "from": "gone"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.12,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "마주 보기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "perPile",
+       "from": "gone"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.12,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "거센 물결",
+     "kind": "power"
+    },
+    {
+     "name": "얕은 물",
+     "kind": "cost"
+    },
+    {
+     "name": "차가운 기억",
+     "kind": "frost"
+    }
+   ]
+  },
+  {
+   "id": "우이_기억_u3",
+   "name": "떠나보내기",
+   "hero": "우이_기억",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "burn",
+     "v": 1
+    },
+    {
+     "k": "shield",
+     "ratio": 1.6
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "담담한 작별",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 2.16
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼워진 마음",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 1.4
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "정리하기",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 2
+      },
+      {
+       "k": "shield",
+       "ratio": 1.8
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "작별 인사",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 1.94
+      },
+      {
+       "k": "heal",
+       "ratio": 1.21
+      }
+     ]
+    },
+    {
+     "name": "기억으로 남기",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 1.6
+      },
+      {
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 마음",
+     "kind": "guard"
+    },
+    {
+     "name": "빈손",
+     "kind": "draw"
+    },
+    {
+     "name": "가벼운 몸",
+     "kind": "cost"
+    }
+   ]
+  },
+  {
+   "id": "우이_기억_u4",
+   "name": "다시 마주한 기억",
+   "hero": "우이_기억",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "tags": [
+    "소멸"
+   ],
+   "fx": [
+    {
+     "k": "pull",
+     "from": "gone",
+     "at": "random",
+     "n": 1
+    },
+    {
+     "k": "heal",
+     "ratio": 0.8
+    }
+   ],
+   "oracles": [
+    {
+     "name": "두 번째 기회",
+     "tags": [
+      "소멸"
+     ],
+     "fx": [
+      {
+       "k": "pull",
+       "from": "gone",
+       "at": "random",
+       "n": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 1.2
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "되돌아온 날",
+     "tags": [
+      "소멸"
+     ],
+     "cost": 0,
+     "fx": [
+      {
+       "k": "pull",
+       "from": "gone",
+       "at": "random",
+       "n": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 0.6
+      }
+     ]
+    },
+    {
+     "name": "기억 꺼내기",
+     "tags": [
+      "소멸"
+     ],
+     "fx": [
+      {
+       "k": "pull",
+       "from": "gone",
+       "at": "random",
+       "n": 2
+      },
+      {
+       "k": "heal",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "본체의 귀환",
+     "tags": [
+      "소멸"
+     ],
+     "fx": [
+      {
+       "k": "pull",
+       "from": "gone",
+       "at": "random",
+       "n": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 0.8
+      },
+      {
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "품에 안기",
+     "tags": [
+      "소멸"
+     ],
+     "fx": [
+      {
+       "k": "pull",
+       "from": "gone",
+       "at": "random",
+       "n": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 1.4
+      },
+      {
+       "k": "heal",
+       "ratio": 0.8
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "맑은 연못",
+     "kind": "heal"
+    },
+    {
+     "name": "젖은 발",
+     "kind": "cost"
+    },
+    {
+     "name": "기억 한 줌",
+     "kind": "draw"
+    }
+   ]
+  }
+ ]
+}

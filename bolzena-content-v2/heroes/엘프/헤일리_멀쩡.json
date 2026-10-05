@@ -1,0 +1,700 @@
+{
+  "heroes": [
+    {
+      "id": "헤일리_멀쩡",
+      "name": "헤일리(멀쩡)",
+      "nature": "광기",
+      "race": "엘프",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 950,
+      "atk": 84,
+      "def": 70,
+      "crit": 5,
+      "blurb": "망상에서 걸어 나와 진짜 전장을 지휘하는 헤일리. 적의 공격을 실드로 받아낼 때마다 훈장이 늘고, 훈장 하나로 다음 수를 앞당긴다.",
+      "keyword": {
+        "name": "극복의 훈장",
+        "desc": "받아낸 공격 하나하나가 훈장이 된다. 턴 시작에 하나를 달아 첫 카드를 가볍게",
+        "carrier": "self",
+        "cap": 3
+      },
+      "passives": [
+        {
+          "name": "극복의 훈장",
+          "when": {
+            "on": "blocked"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전군 전진",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "극복의 훈장",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "spend",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "nextCheaper",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "전함 호출",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.3,
+            "hits": 5,
+            "base": "def",
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "극복의 훈장",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "헤일리_멀쩡_s1",
+        "헤일리_멀쩡_s1",
+        "헤일리_멀쩡_s2",
+        "헤일리_멀쩡_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "헤일리_멀쩡_s1",
+      "name": "군홧발",
+      "hero": "헤일리_멀쩡",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_s2",
+      "name": "방진",
+      "hero": "헤일리_멀쩡",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_u1",
+      "name": "나아가는 결의",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "signature": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "극복의 훈장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "통원 치료 일지",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전군 전진",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "찬란한 한때",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.16,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 2.9
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흑역사 정주행",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "회복의 핵심은 결심",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.44,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 3.6
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "통원 치료 일지",
+          "kind": "power"
+        },
+        {
+          "name": "달아 둔 훈장",
+          "kind": "ap"
+        },
+        {
+          "name": "진짜 지휘",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_u2",
+      "name": "엘피니아 장교 검법",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정석의 자세",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "장교의 대검무",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "칼끝 견제",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "훈장 수여식",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.01,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기대를 배신하는 기만술",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "정석의 자세",
+          "kind": "power"
+        },
+        {
+          "name": "작전 회의",
+          "kind": "ap"
+        },
+        {
+          "name": "아침 산책",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_u3",
+      "name": "이번엔 진짜 전장",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "cost": 3,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 4
+        },
+        {
+          "k": "stack",
+          "id": "극복의 훈장",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "작전 회의",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 5.2
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "함장 복귀",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 4
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "제대로 전한 명령",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 5.28
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "달아 둔 훈장",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 5.8
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "진짜 지휘",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 5.28
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "달아 둔 훈장",
+          "kind": "guard"
+        },
+        {
+          "name": "진짜 지휘",
+          "kind": "draw"
+        },
+        {
+          "name": "통원 치료 일지",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_u4",
+      "name": "극복의 기록",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "극복의 훈장",
+          "v": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "아침 산책",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기록 보관소",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "교주에게 쓰는 편지",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.98
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "낯선 과거",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.17
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "헤일리 다큐멘터리",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "작전 회의",
+          "kind": "guard"
+        },
+        {
+          "name": "아침 산책",
+          "kind": "draw"
+        },
+        {
+          "name": "정석의 자세",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,646 @@
+{
+ "heroes": [
+  {
+   "id": "잉클",
+   "name": "잉클",
+   "nature": "냉정",
+   "row": "back",
+   "role": "딜러",
+   "star": 3,
+   "hp": 550,
+   "atk": 145,
+   "def": 25,
+   "crit": 10,
+   "blurb": "세상에 한 획 긋기가 소원인 먹물 정령. 공격할 때마다 적 전체에 먹이 번지고, 스킬로 번진 먹을 한 획에 긋는다.",
+   "keyword": {
+    "name": "번짐",
+    "desc": "적에게 스며든 먹물. 1개당 받는 피해 +5%",
+    "carrier": "enemy",
+    "cap": 5,
+    "per": [
+     {
+      "stat": "taken",
+      "v": 0.05
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "먹물 튀기기",
+     "when": {
+      "on": "play",
+      "type": "공격"
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "한 폭 수묵화",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "stack",
+      "id": "번짐",
+      "v": 3,
+      "target": "allEnemies"
+     },
+     {
+      "k": "dmg",
+      "ratio": 1.5,
+      "target": "allEnemies"
+     }
+    ]
+   },
+   "race": "정령",
+   "starter": [
+    "잉클_s1",
+    "잉클_s1",
+    "잉클_s2",
+    "잉클_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "잉클_s1",
+   "name": "붓끝 찌르기",
+   "hero": "잉클",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "잉클_s2",
+   "name": "큰붓 내려긋기",
+   "hero": "잉클",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "잉클_s3",
+   "name": "먹 번짐 가림막",
+   "hero": "잉클",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 1.5
+    }
+   ]
+  },
+  {
+   "id": "잉클_u1",
+   "name": "세상에 한 획",
+   "hero": "잉클",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "signature": true,
+   "fx": [
+    {
+     "k": "perStack",
+     "id": "번짐"
+    },
+    {
+     "k": "dmg",
+     "ratio": 0.4,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "spend",
+     "id": "번짐",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "굵은 한 획",
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "번짐"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.55,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "spend",
+       "id": "번짐",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "가는 한 획",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "번짐"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.35,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "spend",
+       "id": "번짐",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "번지지 않는 먹",
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "번짐"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.48,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "spend",
+       "id": "번짐",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "획 그리고 점",
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "번짐"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.4,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "spend",
+       "id": "번짐",
+       "v": 2
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "붓 세우기",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "perStack",
+       "id": "번짐"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.45,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "spend",
+       "id": "번짐",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "붓놀림",
+     "kind": "draw"
+    },
+    {
+     "name": "가벼운 붓",
+     "kind": "cost"
+    },
+    {
+     "name": "먹 한 방울",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "잉클_u2",
+   "name": "큰 붓 휘두르기",
+   "hero": "잉클",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1.2,
+     "target": "allEnemies"
+    },
+    {
+     "k": "stack",
+     "id": "번짐",
+     "v": 1,
+     "target": "allEnemies"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "대필",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.62,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "잔붓질",
+     "cost": 1,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.96,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "먹구름",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "발묵",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.21,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "파묵",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.6,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "힘찬 획",
+     "kind": "power"
+    },
+    {
+     "name": "붓 바꾸기",
+     "kind": "cost"
+    },
+    {
+     "name": "스며드는 먹",
+     "kind": "weakSpot"
+    }
+   ]
+  },
+  {
+   "id": "잉클_u3",
+   "name": "농담 조절",
+   "hero": "잉클",
+   "unique": true,
+   "cost": 0,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "stack",
+     "id": "번짐",
+     "v": 2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "진한 먹",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "먹 갈기",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "흩뿌리기",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 3,
+       "target": "allEnemies"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "화선지 깔기",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "밑그림",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "먹물 튀김",
+     "kind": "draw"
+    },
+    {
+     "name": "벼루",
+     "kind": "ap"
+    },
+    {
+     "name": "번지는 먹",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "잉클_u4",
+   "name": "먹물 정령의 소원",
+   "hero": "잉클",
+   "unique": true,
+   "cost": 1,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "status",
+     "id": "취약",
+     "v": 1,
+     "target": "allEnemies"
+    },
+    {
+     "k": "stack",
+     "id": "번짐",
+     "v": 2,
+     "target": "allEnemies"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "한 폭의 세상",
+     "fx": [
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "먹 한 점",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "붓을 든 손",
+     "fx": [
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      }
+     ]
+    },
+    {
+     "name": "넓은 화선지",
+     "fx": [
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 3,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "첫 획",
+     "tags": [
+      "개막"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "번짐",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "먹의 무게",
+     "kind": "atkUp"
+    },
+    {
+     "name": "고요한 마음",
+     "kind": "defUp"
+    },
+    {
+     "name": "짧은 붓",
+     "kind": "cost"
+    }
+   ]
+  }
+ ]
+}

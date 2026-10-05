@@ -1,0 +1,779 @@
+{
+ "heroes": [
+  {
+   "id": "캬롯",
+   "name": "캬롯",
+   "nature": "순수",
+   "race": "요정",
+   "row": "back",
+   "role": "서포터",
+   "star": 3,
+   "hp": 580,
+   "atk": 90,
+   "def": 52,
+   "crit": 5,
+   "blurb": "세계수 외곽에 정원을 꾸린 요정 \"일등 정원사\". 사탕수수를 사랑하고 상냥하게 정원에 초대하지만, 작물을 깔보는 자와 공장제 자동화 농법에는 가차 없다. 특제 영양제를 과하게 뿌려 세계수 접근 금지를 당한 전적이 있다.",
+   "keyword": {
+    "name": "텃밭",
+    "desc": "새싹이 자라는 동안 쌓이는 정원의 기운 — 새싹을 심으면 처음부터",
+    "carrier": "self",
+    "cap": 3
+   },
+   "passives": [
+    {
+     "name": "사탕수수 텃밭",
+     "when": {
+      "on": "play",
+      "type": "스킬"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 1
+     },
+     "fx": [
+      {
+       "k": "make",
+       "id": "캬롯_sprout",
+       "v": 1,
+       "to": "draw"
+      },
+      {
+       "k": "spend",
+       "id": "텃밭",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "일등 정원사",
+     "when": {
+      "on": "turnStart"
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "수액 펌프 발사!",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.5,
+      "target": "allEnemies"
+     },
+     {
+      "k": "ap",
+      "v": 2
+     },
+     {
+      "k": "stack",
+      "id": "텃밭",
+      "v": 3
+     }
+    ]
+   },
+   "starter": [
+    "캬롯_s1",
+    "캬롯_s1",
+    "캬롯_s2",
+    "캬롯_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "캬롯_s1",
+   "name": "수액 방울",
+   "hero": "캬롯",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "캬롯_s2",
+   "name": "당근 주스",
+   "hero": "캬롯",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 2.1
+    }
+   ]
+  },
+  {
+   "id": "캬롯_u1",
+   "name": "탄산수액 발사",
+   "hero": "캬롯",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 1
+    },
+    {
+     "k": "heal",
+     "ratio": 2
+    },
+    {
+     "k": "stack",
+     "id": "텃밭",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "무성한 탄산수액",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "heal",
+       "ratio": 3.1
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "가벼운 탄산수액",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 1.6
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "텃밭의 탄산수액",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "heal",
+       "ratio": 3
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "아껴 둔 탄산수액",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "heal",
+       "ratio": 2.9
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "햇살의 탄산수액",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 2.65
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "포근한 숨결",
+     "kind": "heal",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "캬롯_u2",
+   "name": "특제 사탕수수 커피",
+   "hero": "캬롯",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "tags": [
+    "신속"
+   ],
+   "fx": [
+    {
+     "k": "draw",
+     "v": 2
+    },
+    {
+     "k": "stack",
+     "id": "텃밭",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "무성한 커피",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 커피",
+     "cost": 0,
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "텃밭의 커피",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "아껴 둔 커피",
+     "tags": [
+      "신속",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "햇살의 커피",
+     "tags": [
+      "신속",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "캬롯_u3",
+   "name": "당근 신선도 유지",
+   "hero": "캬롯",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 3
+    },
+    {
+     "k": "ifStack",
+     "id": "텃밭",
+     "n": 1,
+     "not": true
+    },
+    {
+     "k": "stack",
+     "id": "텃밭",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "무성한 당근",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.9
+      },
+      {
+       "k": "ifStack",
+       "id": "텃밭",
+       "n": 1,
+       "not": true
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "가벼운 당근",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.25
+      },
+      {
+       "k": "ifStack",
+       "id": "텃밭",
+       "n": 1,
+       "not": true
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "텃밭의 당근",
+     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.3
+      },
+      {
+       "k": "ifStack",
+       "id": "텃밭",
+       "n": 1,
+       "not": true
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "아껴 둔 당근",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.6
+      },
+      {
+       "k": "ifStack",
+       "id": "텃밭",
+       "n": 1,
+       "not": true
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "햇살의 당근",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.6
+      },
+      {
+       "k": "ifStack",
+       "id": "텃밭",
+       "n": 1,
+       "not": true
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 숨결",
+     "kind": "guard",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "캬롯_u4",
+   "name": "내 정원에 놀러 올래?",
+   "hero": "캬롯",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 3
+    },
+    {
+     "k": "make",
+     "id": "캬롯_sprout",
+     "v": 1
+    },
+    {
+     "k": "stack",
+     "id": "텃밭",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "무성한 정원 초대",
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 4.3
+      },
+      {
+       "k": "make",
+       "id": "캬롯_sprout",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 정원 초대",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 2.4
+      },
+      {
+       "k": "make",
+       "id": "캬롯_sprout",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "텃밭의 정원 초대",
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 4.15
+      },
+      {
+       "k": "make",
+       "id": "캬롯_sprout",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "아껴 둔 정원 초대",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 3.95
+      },
+      {
+       "k": "make",
+       "id": "캬롯_sprout",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "햇살의 정원 초대",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 3.6
+      },
+      {
+       "k": "make",
+       "id": "캬롯_sprout",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "텃밭",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "포근한 숨결",
+     "kind": "heal",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "캬롯_sprout",
+   "name": "새싹",
+   "cost": 0,
+   "type": "스킬",
+   "tags": [
+    "소멸"
+   ],
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 0.8
+    },
+    {
+     "k": "ifStack",
+     "id": "텃밭",
+     "n": 2
+    },
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 1
+    },
+    {
+     "k": "ifStack",
+     "id": "텃밭",
+     "n": 3
+    },
+    {
+     "k": "ap",
+     "v": 1
+    }
+   ],
+   "hero": "캬롯",
+   "token": true
+  }
+ ],
+  "equips": [
+    {
+      "id": "eq_carrotcane",
+      "name": "캬롯의 사탕수수",
+      "grade": "희귀",
+      "slot": "무기",
+      "stats": {
+        "atk": 16
+      },
+      "effect": [
+        {
+          "name": "달콤한 기운",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 8
+            }
+          ]
+        }
+      ],
+      "affinity": "캬롯",
+      "affinityStats": {
+        "hp": 40,
+        "def": 5
+      },
+      "affinityEffect": [
+        {
+          "name": "먼저 일군 텃밭",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "텃밭",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blurb": "텃밭에서 갓 꺾은 사탕수수. 씹으면 기운이 돈다."
+    }
+  ]
+}

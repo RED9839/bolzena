@@ -1,0 +1,783 @@
+{
+  "heroes": [
+    {
+      "id": "오르",
+      "name": "오르",
+      "nature": "우울",
+      "race": "엘프",
+      "row": "back",
+      "role": "서포터",
+      "star": 3,
+      "hp": 630,
+      "atk": 75,
+      "def": 58,
+      "crit": 5,
+      "blurb": "자재난 속에서도 우주선을 띄운 노력파 발명가. 어떤 카드든 소멸하면 자재로 주워 모으고, 스킬을 낼 때 자재 셋으로 발명품을 뚝딱 만든다.",
+      "keyword": {
+        "name": "자재",
+        "desc": "사라진 카드에서 주워 모은 부품. 셋이면 발명품 하나",
+        "carrier": "self",
+        "cap": 6
+      },
+      "passives": [
+        {
+          "name": "필요는 발명의 어머니",
+          "when": {
+            "on": "exhaust",
+            "who": "any"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "발명품 조립",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "자재",
+              "n": 3
+            }
+          ],
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "spend",
+              "id": "자재",
+              "v": 3
+            },
+            {
+              "k": "make",
+              "id": "오르_t1",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "휴대용 돔 전개기",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.3,
+            "hits": 8,
+            "base": "def",
+            "target": "randomEnemy"
+          },
+          {
+            "k": "shield",
+            "ratio": 2
+          },
+          {
+            "k": "stack",
+            "id": "자재",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "오르_s1",
+        "오르_s1",
+        "오르_s2",
+        "오르_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "오르_s1",
+      "name": "렌치 휘두르기",
+      "hero": "오르",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "오르_s2",
+      "name": "응급 수리",
+      "hero": "오르",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "오르_t1",
+      "name": "발명품",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "choices": [
+        "휴대용 돔",
+        "2인용 로켓"
+      ],
+      "fx": [
+        {
+          "k": "ifChoice",
+          "n": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "ifChoice",
+          "n": 2
+        },
+        {
+          "k": "dmg",
+          "ratio": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "hero": "오르",
+      "token": true
+    },
+    {
+      "id": "오르_u1",
+      "name": "강제 기상 장치",
+      "hero": "오르",
+      "unique": true,
+      "signature": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "hits": 3,
+          "base": "def",
+          "target": "randomEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "알람 맞춰 두기",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "hits": 3,
+              "base": "def",
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "초대형 기상 장치",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "hits": 3,
+              "base": "def",
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "크래커를 깜빡했네",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "hits": 3,
+              "base": "def",
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "자기장 증폭기",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "hits": 3,
+              "base": "def",
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "집중 방해",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "hits": 3,
+              "base": "def",
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "알람 맞춰 두기",
+          "kind": "guard"
+        },
+        {
+          "name": "기계팔 전개",
+          "kind": "draw"
+        },
+        {
+          "name": "리어카 돔",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오르_u2",
+      "name": "2인용 로켓",
+      "hero": "오르",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.15,
+          "target": "oneAlly",
+          "run": true
+        },
+        {
+          "k": "nextCheaper",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "발사 버튼",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.22,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "nextCheaper",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다단 로켓",
+          "tags": [
+            "소멸",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.18,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "nextCheaper",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자동 발사",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "nextCheaper",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자기장 추진",
+          "tags": [
+            "소멸",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.18,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "nextCheaper",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "응원의 녹음기",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "nextCheaper",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "발사 버튼",
+          "kind": "guard"
+        },
+        {
+          "name": "밤새 설계",
+          "kind": "draw"
+        },
+        {
+          "name": "오르나르도 엘빈치",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오르_u3",
+      "name": "이동식 자기장",
+      "hero": "오르",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "stack",
+          "id": "자재",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "기계팔 전개",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대형 자기장 돔",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다음 아침 준비",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "충격 흡수판",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.17
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "리어카 돔",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기계팔 전개",
+          "kind": "guard"
+        },
+        {
+          "name": "리어카 돔",
+          "kind": "draw"
+        },
+        {
+          "name": "알람 맞춰 두기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오르_u4",
+      "name": "필요는 발명의 어머니",
+      "hero": "오르",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "defMod",
+          "v": 0.15,
+          "target": "self",
+          "run": true
+        },
+        {
+          "k": "stack",
+          "id": "자재",
+          "v": 2
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "밤새 설계",
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.2,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 3
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "우주선 발사",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.15,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "내일의 발명왕",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.18,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 3
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자기장 상설화",
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.22,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 3
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오르나르도 엘빈치",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.18,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 3
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "밤새 설계",
+          "kind": "atkUp"
+        },
+        {
+          "name": "오르나르도 엘빈치",
+          "kind": "draw"
+        },
+        {
+          "name": "발사 버튼",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자재",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

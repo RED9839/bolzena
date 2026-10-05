@@ -1,0 +1,796 @@
+{
+  "heroes": [
+    {
+      "id": "레비",
+      "name": "레비",
+      "nature": "우울",
+      "race": "마녀",
+      "row": "mid",
+      "role": "딜러",
+      "star": 2,
+      "hp": 590,
+      "atk": 125,
+      "def": 27,
+      "crit": 10,
+      "blurb": "약화 포션으로 괴력을 눌러 두고 사는 인턴 마녀. 스킬로 봉인을 하나씩 풀다 보면, 다 풀린 단도가 적 전체를 벤다.",
+      "keyword": {
+        "name": "괴력 봉인",
+        "desc": "눌러 둔 괴력 — 약화 포션으로 걸어 둔 봉인. 하나마다 레비의 피해가 줄고, 다 풀리면 고유 공격 카드가 적 전체로 번진 뒤 하나가 다시 걸린다",
+        "carrier": "self",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": -0.15
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "포션 복용",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "봉인 풀기",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "레비드 더 레드",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "spend",
+            "id": "괴력 봉인",
+            "all": true
+          }
+        ]
+      },
+      "starter": [
+        "레비_s1",
+        "레비_s1",
+        "레비_s2",
+        "레비_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "레비_s1",
+      "name": "단도 찌르기",
+      "hero": "레비",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "레비_s2",
+      "name": "단도 깊숙이 찌르기",
+      "hero": "레비",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "레비_s3",
+      "name": "앞치마 방어",
+      "hero": "레비",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "레비_u1",
+      "name": "포션 깜빡",
+      "hero": "레비",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "signature": true,
+      "fx": [
+        {
+          "k": "spend",
+          "id": "괴력 봉인",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "아침 약을 깜빡했다. 큰일이다 — 적에게",
+      "oracles": [
+        {
+          "name": "포션 쏟기",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "포션 바꿔치기",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "해독제",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "빈 병",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "주머니 속 빈 병",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "깜빡깜빡",
+          "kind": "draw"
+        },
+        {
+          "name": "앞치마 주머니",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "기지개",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레비_u2",
+      "name": "단도 난무",
+      "hero": "레비",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "괴력 봉인",
+          "not": true
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "괴력 봉인",
+          "v": 1
+        }
+      ],
+      "blurb": "봉인이 풀린 손은 멈추지 않는다",
+      "oracles": [
+        {
+          "name": "피의 난무",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "단도 한 번",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "빈틈 찌르기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "붉은 궤적",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "숨긴 단도",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "붉은 칼날",
+          "kind": "power"
+        },
+        {
+          "name": "급소",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "가벼운 단도",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "레비_u3",
+      "name": "인턴의 각성",
+      "hero": "레비",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "괴력 봉인",
+          "not": true
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.5,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "괴력 봉인",
+          "v": 1
+        }
+      ],
+      "blurb": "참고 참다가 터진 인턴은 무섭다",
+      "oracles": [
+        {
+          "name": "완전 각성",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반쯤 각성",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "붉은 폭주",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "각성의 여파",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "참았던 한 방",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "괴력 봉인",
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "괴력 봉인",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "괴력",
+          "kind": "power"
+        },
+        {
+          "name": "분노",
+          "kind": "frost"
+        },
+        {
+          "name": "조급함",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "레비_u4",
+      "name": "괴력 조절 훈련",
+      "hero": "레비",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "spend",
+          "id": "괴력 봉인",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ],
+      "blurb": "조절만 하면 이 힘도 쓸모가 있다",
+      "oracles": [
+        {
+          "name": "완전 조절",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 훈련",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "훈련과 다짐",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "집중 훈련",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "출근 전 훈련",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "붉은 머리",
+          "kind": "atkUp"
+        },
+        {
+          "name": "이른 출근",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "심호흡",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_levidagger",
+      "name": "레비의 단도",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 24,
+        "crit": 5
+      },
+      "effect": [
+        {
+          "name": "버티고 베기",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 3
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "self",
+              "run": true
+            }
+          ]
+        }
+      ],
+      "affinity": "레비",
+      "affinityStats": {
+        "hp": 40,
+        "atk": 10
+      },
+      "affinityEffect": [
+        {
+          "name": "참았던 괴력",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "spend",
+              "id": "괴력 봉인",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blurb": "단도라 부르기엔 너무 큰 칼. 몰리면 봉인이 저절로 풀린다."
+    }
+  ]
+}

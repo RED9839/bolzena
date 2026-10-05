@@ -1,0 +1,714 @@
+{
+  "heroes": [
+    {
+      "id": "디아나",
+      "name": "디아나",
+      "nature": "광기",
+      "race": "수인",
+      "row": "mid",
+      "role": "서포터",
+      "star": 3,
+      "hp": 620,
+      "atk": 86,
+      "def": 60,
+      "crit": 5,
+      "blurb": "눈을 감은 채 웃는 수인 마을의 촌장이자 현자.",
+      "keyword": {
+        "name": "기공",
+        "desc": "「진짜 치료법」 — 촌장이 몸 안에 돌리는 기. 스킬 카드를 낼 때 모였다가 기공 주문으로 쏟아진다.",
+        "carrier": "self",
+        "cap": 4
+      },
+      "passives": [
+        {
+          "name": "진짜 치료법",
+          "when": {
+            "on": "overheal"
+          },
+          "fx": [
+            {
+              "k": "perEvent",
+              "per": 20
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "fixed": true,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "기공 순환",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "진정한 치료법",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.15,
+            "target": "allEnemies",
+            "hits": 10
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "디아나_s1",
+        "디아나_s1",
+        "디아나_s2",
+        "디아나_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "디아나_s1",
+      "name": "지팡이 톡",
+      "hero": "디아나",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "디아나_s2",
+      "name": "에구구",
+      "hero": "디아나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "디아나_u1",
+      "name": "자연 치유",
+      "hero": "디아나",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2
+        },
+        {
+          "k": "status",
+          "id": "초재생",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 자연 치유",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.6
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 자연 치유",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.8
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기공 자연 치유",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.4
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 자연 치유",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.5
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 자연 치유",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.5
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "따뜻한 손",
+          "kind": "heal"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "기혈 순환",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_u2",
+      "name": "기공 주문",
+      "hero": "디아나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "기공"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "기공",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 기공 주문",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "기공"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "기공",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "가벼운 기공 주문",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "기공"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "기공",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "기공 기공 주문",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "기공"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "기공",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "재빠른 기공 주문",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "기공"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "기공",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 기공 주문",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "기공"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "기공",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "기혈 순환",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_u3",
+      "name": "수인 마을 잔칫상",
+      "hero": "디아나",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.8
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 수인 마을 잔칫상",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.35
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 수인 마을 잔칫상",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기공 수인 마을 잔칫상",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.35
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 수인 마을 잔칫상",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.25
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 수인 마을 잔칫상",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.25
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "따뜻한 손",
+          "kind": "heal"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "기혈 순환",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_u4",
+      "name": "은퇴한 무인의 수련",
+      "hero": "디아나",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.2
+        },
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "기공",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 은퇴한 무인의 수련",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.55
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 은퇴한 무인의 수련",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.1
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "기공 은퇴한 무인의 수련",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.45
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "든든한 은퇴한 무인의 수련",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "복 받은 은퇴한 무인의 수련",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "기혈 순환",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기공",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

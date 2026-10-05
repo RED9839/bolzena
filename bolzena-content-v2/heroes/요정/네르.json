@@ -1,0 +1,849 @@
+{
+ "heroes": [
+  {
+   "id": "네르",
+   "name": "네르",
+   "nature": "광기",
+   "race": "요정",
+   "row": "front",
+   "role": "서포터",
+   "star": 3,
+   "hp": 720,
+   "atk": 90,
+   "def": 65,
+   "crit": 5,
+   "blurb": "세계수 교단의 사제장이자 여왕을 대신해 요정 왕국을 굴리는 섭정. 갓 태어난 여왕을 먹여 키운 보모라 잔소리가 끝이 없지만, 여왕을 해치려는 자에게는 세계수의 도끼를 진짜로 휘두른다. 졸다가 들키면 기도 중이었다고 우긴다.",
+   "keyword": {
+    "name": "기도",
+    "desc": "돌볼 아이를 지켜보며 모은 기도 — 적이 칠 때 한 대를 무르게 한다",
+    "carrier": "self",
+    "cap": 3,
+    "rules": [
+     {
+      "name": "기도가 닿다",
+      "when": {
+       "on": "spend",
+       "id": "기도"
+      },
+      "limit": {
+       "per": "turn",
+       "n": 1
+      },
+      "fx": [
+       {
+        "k": "status",
+        "id": "사기",
+        "v": 1
+       }
+      ]
+     }
+    ]
+   },
+   "keywords": [
+    {
+     "name": "돌볼 아이",
+     "desc": "네르가 먹여 키우는 아이 — 이 아군이 카드를 내면 기도가 쌓인다",
+     "carrier": "hero",
+     "cap": 1
+    }
+   ],
+   "passives": [
+    {
+     "name": "보모의 기도",
+     "when": {
+      "on": "play",
+      "marked": "돌볼 아이"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 3
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "졸다가 기도",
+     "when": {
+      "on": "foeActBefore",
+      "type": "공격"
+     },
+     "conds": [
+      {
+       "c": "stack",
+       "id": "기도",
+       "n": 1
+      }
+     ],
+     "fx": [
+      {
+       "k": "spend",
+       "id": "기도",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "엘드르의 축복",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.5,
+      "target": "allEnemies",
+      "base": "def"
+     },
+     {
+      "k": "status",
+      "id": "사기",
+      "v": 1
+     },
+     {
+      "k": "stack",
+      "id": "기도",
+      "v": 2
+     }
+    ]
+   },
+   "starter": [
+    "네르_s1",
+    "네르_s1",
+    "네르_s2",
+    "네르_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "네르_s1",
+   "name": "도끼 올려치기",
+   "hero": "네르",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "네르_s2",
+   "name": "달콤한 간식",
+   "hero": "네르",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 2.1
+    }
+   ]
+  },
+  {
+   "id": "네르_u1",
+   "name": "꿈으로 올리는 기도",
+   "hero": "네르",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "tags": [
+    "신속"
+   ],
+   "fx": [
+    {
+     "k": "stack",
+     "id": "돌볼 아이",
+     "v": 1,
+     "target": "oneAlly"
+    },
+    {
+     "k": "stack",
+     "id": "기도",
+     "v": 1
+    },
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "든든한 꿈속 기도",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 2.6
+      }
+     ]
+    },
+    {
+     "name": "가벼운 꿈속 기도",
+     "cost": 0,
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 1.5
+      }
+     ]
+    },
+    {
+     "name": "기도하는 꿈속 기도",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 2.75
+      }
+     ]
+    },
+    {
+     "name": "졸면서 둔 꿈속 기도",
+     "tags": [
+      "신속",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 2.4
+      }
+     ]
+    },
+    {
+     "name": "세계수의 꿈속 기도",
+     "tags": [
+      "신속",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 2.4
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 숨결",
+     "kind": "guard",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "네르_u2",
+   "name": "세계수의 계시",
+   "hero": "네르",
+   "unique": true,
+   "cost": 3,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 1
+    },
+    {
+     "k": "status",
+     "id": "협공",
+     "v": 2
+    },
+    {
+     "k": "stack",
+     "id": "기도",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "든든한 계시",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "가벼운 계시",
+     "cost": 2,
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "기도하는 계시",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "졸면서 둔 계시",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "세계수의 계시",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "네르_u3",
+   "name": "뒷골목 오함마",
+   "hero": "네르",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "tags": [
+    "분쇄"
+   ],
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2,
+     "target": "oneEnemy",
+     "base": "def"
+    },
+    {
+     "k": "status",
+     "id": "약화",
+     "v": 1
+    },
+    {
+     "k": "stack",
+     "id": "기도",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "든든한 오함마",
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.6,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 오함마",
+     "cost": 1,
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.6,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "기도하는 오함마",
+     "tags": [
+      "분쇄"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.5,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "졸면서 둔 오함마",
+     "tags": [
+      "분쇄",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.4,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "세계수의 오함마",
+     "tags": [
+      "분쇄",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.4,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "기도",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "네르_u4",
+   "name": "여왕님 앞은 못 지나가요",
+   "hero": "네르",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "status",
+     "id": "피해 감소",
+     "v": 3
+    },
+    {
+     "k": "shield",
+     "ratio": 3
+    },
+    {
+     "k": "stack",
+     "id": "돌볼 아이",
+     "v": 1,
+     "target": "oneAlly"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "든든한 가로막기",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "shield",
+       "ratio": 3.9
+      },
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 가로막기",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "shield",
+       "ratio": 2.4
+      },
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "기도하는 가로막기",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "shield",
+       "ratio": 4.15
+      },
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "졸면서 둔 가로막기",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "shield",
+       "ratio": 3.6
+      },
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "세계수의 가로막기",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "shield",
+       "ratio": 3.6
+      },
+      {
+       "k": "stack",
+       "id": "돌볼 아이",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 숨결",
+     "kind": "guard",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  }
+ ],
+ "equips": [
+    {
+      "id": "eq_nerflag",
+      "name": "네르의 엘드르 깃발",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "hp": 169
+      },
+      "effect": [
+        {
+          "name": "행사 깃발",
+          "when": {
+            "on": "play",
+            "type": "스킬",
+            "every": 3
+          },
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.6
+            }
+          ]
+        }
+      ],
+      "affinity": "네르",
+      "affinityStats": {
+        "hp": 60,
+        "def": 5
+      },
+      "affinityEffect": [
+        {
+          "name": "깃발 아래 기도",
+          "when": {
+            "on": "play",
+            "type": "스킬",
+            "every": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기도",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "교단 행사 때 거는 깃발. 흔들 때마다 모두 기운이 난다."
+    }
+  ]
+}

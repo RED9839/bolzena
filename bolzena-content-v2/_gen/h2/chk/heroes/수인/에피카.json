@@ -1,0 +1,686 @@
+{
+  "heroes": [
+    {
+      "id": "에피카",
+      "name": "에피카",
+      "nature": "활발",
+      "race": "수인",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 680,
+      "atk": 146,
+      "def": 29,
+      "crit": 10,
+      "blurb": "에다로 살던 지난 생의 기억을 잃은 유니콘 음유시인이자 영원살이 일곱 자매의 셋째.",
+      "keyword": {
+        "name": "에피콘",
+        "desc": "「에피콘 극단」 — 무대를 꾸미는 작은 에피콘들. 에피카가 공격하면 따라 치고, 적의 공격 한 대를 대신 받고 하나가 사라진다.",
+        "carrier": "self",
+        "cap": 3,
+        "guard": true
+      },
+      "passives": [
+        {
+          "name": "에피콘 극단",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "에피콘"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주에게 바칩니다",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.45,
+            "target": "randomEnemy",
+            "hits": 10
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "에피콘",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "에피카_s1",
+        "에피카_s1",
+        "에피카_s2",
+        "에피카_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "에피카_s1",
+      "name": "에피콘 들이받기",
+      "hero": "에피카",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "에피카_s2",
+      "name": "에피콘 떼 돌진",
+      "hero": "에피카",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "에피카_s3",
+      "name": "막 뒤로 숨으시오",
+      "hero": "에피카",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "에피카_u1",
+      "name": "극적인 연출",
+      "hero": "에피카",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "에피콘",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "클라이맥스",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 극적인 연출",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "에피콘 극적인 연출",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 극적인 연출",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 극적인 연출",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "앙코르 무대",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에피카_u2",
+      "name": "용감한 에피콘",
+      "hero": "에피카",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "에피콘"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 용감한 에피콘",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "에피콘"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 용감한 에피콘",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "에피콘"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "에피콘 용감한 에피콘",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "에피콘"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 용감한 에피콘",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "에피콘"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 용감한 에피콘",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "에피콘"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "앙코르 무대",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에피카_u3",
+      "name": "에피칸",
+      "hero": "에피카",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "에피콘",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 에피칸",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.3
+            }
+          ]
+        },
+        {
+          "name": "가벼운 에피칸",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.9
+            }
+          ]
+        },
+        {
+          "name": "에피콘 에피칸",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "든든한 에피칸",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.25
+            }
+          ]
+        },
+        {
+          "name": "복 받은 에피칸",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.25
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "앙코르 무대",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에피카_u4",
+      "name": "만족스러운 연주",
+      "hero": "에피카",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "에피콘",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 만족스러운 연주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 만족스러운 연주",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "에피콘 만족스러운 연주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 만족스러운 연주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 만족스러운 연주",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "앙코르 무대",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

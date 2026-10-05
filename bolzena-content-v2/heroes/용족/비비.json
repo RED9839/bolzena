@@ -1,0 +1,762 @@
+{
+  "heroes": [
+    {
+      "id": "비비",
+      "name": "비비",
+      "nature": "순수",
+      "race": "용족",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 990,
+      "atk": 84,
+      "def": 79,
+      "crit": 5,
+      "blurb": "은의 용족 행세를 하는 수은의 용족 귀족. 보호막을 든 채 재채기를 참아 두었다가, 누가 막을 깨면 그 적에게 수은을 뿜는다.",
+      "keyword": {
+        "name": "수은 재채기",
+        "desc": "보호막 뒤에서 참아 둔 수은 재채기. 파티 실드가 적의 공격에 깨지면 1 써서 그 적에게 뿜는다",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "수은 재채기",
+            "when": {
+              "on": "shieldBreak"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "수은 재채기",
+                "n": 1
+              }
+            ],
+            "limit": {
+              "per": "turn",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "perEvent",
+                "per": 100
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.3,
+                "target": "oneEnemy",
+                "base": "def"
+              }
+            ]
+          },
+          {
+            "name": "수은 재채기",
+            "when": {
+              "on": "shieldBreak"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "수은 재채기",
+                "n": 1
+              }
+            ],
+            "limit": {
+              "per": "turn",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "고통",
+                "v": 3
+              },
+              {
+                "k": "status",
+                "id": "손상",
+                "v": 1
+              },
+              {
+                "k": "spend",
+                "id": "수은 재채기",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "수은 보호막",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "guarded",
+              "kind": "shield"
+            }
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "소녀가 보호하겠사와요",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.4
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 4
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "퀵실버 랜스",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "oneEnemy",
+            "base": "def"
+          },
+          {
+            "k": "tough",
+            "v": 2,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "status",
+            "id": "고통",
+            "v": 5
+          }
+        ]
+      },
+      "starter": [
+        "비비_s1",
+        "비비_s1",
+        "비비_s2",
+        "비비_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "비비_s1",
+      "name": "은빛 발톱",
+      "hero": "비비",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "비비_s2",
+      "name": "귀족의 품위",
+      "hero": "비비",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "비비_u1",
+      "name": "소녀에게 오시려구요?",
+      "hero": "비비",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "수은 재채기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "먼저 맞이하는 숙녀",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "잠긴 기억의 상자",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.8
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "보호막이 터지면",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "수은 증기",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "실비아를 위해",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "오호호호",
+          "kind": "guard"
+        },
+        {
+          "name": "비비아나 아르겐툼",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "은의 용족 행세",
+          "fx": [
+            {
+              "k": "status",
+              "id": "손상",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_u2",
+      "name": "독성 재채기",
+      "hero": "비비",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "randomEnemy",
+          "hits": 3,
+          "base": "def"
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "참는 중이와요",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "randomEnemy",
+              "hits": 3,
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "연쇄 재채기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "randomEnemy",
+              "hits": 6,
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "비말 차단",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "randomEnemy",
+              "hits": 3,
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "공기 중 수은",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "정면 재채기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "더러운 건 질색이와요",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "만성 몸살",
+          "kind": "power"
+        },
+        {
+          "name": "예고 없는 재채기",
+          "tags": [
+            "개전"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_u3",
+      "name": "은빛 창 네 자루",
+      "hero": "비비",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy",
+          "base": "def",
+          "hits": 4
+        },
+        {
+          "k": "status",
+          "id": "손상",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "창 두 자루만",
+          "cost": 1,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy",
+              "base": "def",
+              "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "손상",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "은빛 창 세례",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "base": "def",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "손상",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "자매들을 위한 창",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy",
+              "base": "def",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "손상",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            }
+          ]
+        },
+        {
+          "name": "수은 묻은 창끝",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy",
+              "base": "def",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "손상",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "한 점에 꽂기",
+          "tags": [
+            "분쇄",
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy",
+              "base": "def",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "손상",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "품격 있는 흡혈",
+          "fx": [
+            {
+              "k": "drain",
+              "ratio": 0.3
+            }
+          ]
+        },
+        {
+          "name": "등 뒤의 꼬리 창",
+          "kind": "cost"
+        },
+        {
+          "name": "삼킨 은",
+          "kind": "power"
+        }
+      ]
+    },
+    {
+      "id": "비비_u4",
+      "name": "세계수 뿌리에 수은을",
+      "hero": "비비",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "수은 재채기",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "취미 생활",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "우로스 강림 계획",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 4
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "명예로운 비비",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "뿌리 깊이",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "독을 먹였더니 기운이",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "수은 재채기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "은세공 목걸이",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "엄마라 부른 나무",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "자매들의 세상",
+          "fx": [
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

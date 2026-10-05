@@ -1,0 +1,709 @@
+{
+  "heroes": [
+    {
+      "id": "아멜리아_R41",
+      "name": "아멜리아(R41)",
+      "nature": "우울",
+      "race": "엘프",
+      "row": "back",
+      "role": "서포터",
+      "star": 3,
+      "hp": 550,
+      "atk": 75,
+      "def": 58,
+      "crit": 5,
+      "blurb": "제 손으로 만든 병기가 통제를 벗어난 「이 몸」. 스킬을 낼 때마다 시제품이 떨어지고, 시험 가동이 셋 쌓이면 완성품이 나온다 — 시제품은 가끔 오작동한다.",
+      "keyword": {
+        "name": "시험 가동",
+        "desc": "시제품을 무사히 쏜 횟수. 셋이면 다음부터 완성품",
+        "carrier": "self",
+        "cap": 3
+      },
+      "passives": [
+        {
+          "name": "이 몸의 시제품",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ifStack",
+              "id": "시험 가동",
+              "n": 3,
+              "not": true
+            },
+            {
+              "k": "make",
+              "id": "아멜리아_R41_t1",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "시험 가동",
+              "n": 3
+            },
+            {
+              "k": "make",
+              "id": "아멜리아_R41_t2",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "초고출력 전자포",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "cleanse",
+            "v": 2
+          },
+          {
+            "k": "dmg",
+            "ratio": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "oneEnemy"
+          }
+        ]
+      },
+      "starter": [
+        "아멜리아_R41_s1",
+        "아멜리아_R41_s1",
+        "아멜리아_R41_s2",
+        "아멜리아_R41_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "아멜리아_R41_s1",
+      "name": "전기 충격기",
+      "hero": "아멜리아_R41",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_s2",
+      "name": "응급 수리 드론",
+      "hero": "아멜리아_R41",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_t1",
+      "name": "시제품",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.5,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "시험 가동",
+          "v": 1
+        },
+        {
+          "k": "ifRandom",
+          "pct": 0.25
+        },
+        {
+          "k": "payHpPct",
+          "v": 0.05
+        }
+      ],
+      "hero": "아멜리아_R41",
+      "token": true
+    },
+    {
+      "id": "아멜리아_R41_t2",
+      "name": "완성품",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "hero": "아멜리아_R41",
+      "token": true
+    },
+    {
+      "id": "아멜리아_R41_u1",
+      "name": "엘렌-A 오버차지",
+      "hero": "아멜리아_R41",
+      "unique": true,
+      "signature": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        },
+        {
+          "k": "stack",
+          "id": "시험 가동",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "예열 완료",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.73
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "한계 출력",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.1
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "떠오른 빈자리",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.1
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "초과분 회수",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.05
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자동 증폭",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.52
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "예열 완료",
+          "kind": "guard"
+        },
+        {
+          "name": "출력 회수 회로",
+          "kind": "draw"
+        },
+        {
+          "name": "흑뉴아 설계도",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_u2",
+      "name": "나노 수복 드론",
+      "hero": "아멜리아_R41",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 1.2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "드론 사출",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.72
+            }
+          ]
+        },
+        {
+          "name": "드론 편대",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "수복 후 출격",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "출력 회수 회로",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.74
+            }
+          ]
+        },
+        {
+          "name": "나의 엘레나",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "자동 증폭",
+          "kind": "guard"
+        },
+        {
+          "name": "나의 엘레나",
+          "kind": "draw"
+        },
+        {
+          "name": "이 몸의 은혜",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_u3",
+      "name": "영광인 줄 알거라",
+      "hero": "아멜리아_R41",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.15,
+          "target": "oneAlly",
+          "run": true
+        },
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "특별 대우",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "제국의 총애",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "고출력 보호막",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "출력 몰아주기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.18,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "이 몸의 은혜",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "target": "oneAlly",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "출력 회수 회로",
+          "kind": "guard"
+        },
+        {
+          "name": "흑뉴아 설계도",
+          "kind": "draw"
+        },
+        {
+          "name": "예열 완료",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_u4",
+      "name": "소형 전자포",
+      "hero": "아멜리아_R41",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.6,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "시험 가동",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "충전 완료",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.08,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전자포 개량형",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.92,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "엄호 사격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.32,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "출력 역류",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.92,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흑뉴아 설계도",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.17,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "나의 엘레나",
+          "kind": "power"
+        },
+        {
+          "name": "이 몸의 은혜",
+          "kind": "ap"
+        },
+        {
+          "name": "자동 증폭",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

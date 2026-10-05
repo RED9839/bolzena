@@ -1,0 +1,696 @@
+{
+  "heroes": [
+    {
+      "id": "밍스",
+      "name": "밍스",
+      "nature": "활발",
+      "race": "수인",
+      "row": "mid",
+      "role": "딜러",
+      "star": 1,
+      "hp": 520,
+      "atk": 104,
+      "def": 25,
+      "crit": 10,
+      "blurb": "촌장을 수백 번 졸라 교사가 된 늑대 수인.",
+      "keyword": {
+        "name": "졸업 미룸",
+        "desc": "「시범 수업」 — 제자가 공격 카드로 따라 할 때마다 늘어나는 졸업 연기. 셋이 되면 사기 2 로 칭찬하고 처음부터.",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "졸업은 아직",
+            "when": {
+              "on": "stackReach",
+              "id": "졸업 미룸",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "졸업 미룸",
+                "all": true
+              },
+              {
+                "k": "status",
+                "id": "사기",
+                "v": 2
+              }
+            ]
+          },
+          {
+            "name": "개학",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "제자",
+                "v": 1,
+                "target": "otherAllies"
+              }
+            ]
+          }
+        ]
+      },
+      "keywords": [
+        {
+          "name": "제자",
+          "desc": "밍스 선생님 반 학생. 공격 카드를 내면 선생님이 시범을 덧붙인다.",
+          "carrier": "hero",
+          "cap": 1
+        }
+      ],
+      "passives": [
+        {
+          "name": "시범 수업",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "marked": "제자"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            },
+            {
+              "k": "extra",
+              "ratio": 0.4
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주의 천벌 - 밍스",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 4.5,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "졸업 미룸",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "밍스_s1",
+        "밍스_s1",
+        "밍스_s2",
+        "밍스_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "밍스_s1",
+      "name": "발톱 할퀴기",
+      "hero": "밍스",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "밍스_s2",
+      "name": "늑대 발톱 찢기",
+      "hero": "밍스",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "밍스_s3",
+      "name": "교탁 방어",
+      "hero": "밍스",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "밍스_u1",
+      "name": "캬오오~",
+      "hero": "밍스",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "졸업 미룸",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 캬오오~",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 캬오오~",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "선생님의 캬오오~",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 캬오오~",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 캬오오~",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "참 잘했어요",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "밍스_u2",
+      "name": "요령은 없고 시범만",
+      "hero": "밍스",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "졸업 미룸",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 요령은 없고 시범만",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 요령은 없고 시범만",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "선생님의 요령은 없고 시범만",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 요령은 없고 시범만",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 요령은 없고 시범만",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "참 잘했어요",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "밍스_u3",
+      "name": "졸업장은 서랍 속에",
+      "hero": "밍스",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "졸업 미룸",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 졸업장은 서랍 속에",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 졸업장은 서랍 속에",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "선생님의 졸업장은 서랍 속에",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 졸업장은 서랍 속에",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 졸업장은 서랍 속에",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "참 잘했어요",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "밍스_u4",
+      "name": "오늘은 자습",
+      "hero": "밍스",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 오늘은 자습",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 오늘은 자습",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "선생님의 오늘은 자습",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 오늘은 자습",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 오늘은 자습",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "참 잘했어요",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

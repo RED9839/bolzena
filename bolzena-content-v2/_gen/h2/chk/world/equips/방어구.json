@@ -1,0 +1,485 @@
+{
+  "equips": [
+    {
+      "id": "eq_cardboard",
+      "name": "골판지 갑옷",
+      "grade": "일반",
+      "slot": "방어구",
+      "stats": {
+        "hp": 60,
+        "def": 4
+      },
+      "effect": [
+        {
+          "name": "두꺼운 상자",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "택배 상자를 겹겹이 댄 갑옷. 첫 한 대는 막아 준다."
+    },
+    {
+      "id": "eq_leafrobe",
+      "name": "잎사귀 로브",
+      "grade": "일반",
+      "slot": "방어구",
+      "stats": {
+        "hp": 50,
+        "def": 5
+      },
+      "effect": [
+        {
+          "name": "잎 겹치기",
+          "when": {
+            "on": "guard",
+            "kind": "shield"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "나뭇잎을 꿰매 만든 로브. 처음 몸을 가리면 잎이 한 겹 더 붙는다."
+    },
+    {
+      "id": "eq_towel",
+      "name": "수건 머리띠",
+      "grade": "일반",
+      "slot": "방어구",
+      "stats": {
+        "hp": 60,
+        "def": 3
+      },
+      "effect": [
+        {
+          "name": "땀 닦기",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.5
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "이마에 질끈 묶으면 반쯤 지쳐도 다시 힘이 난다."
+    },
+    {
+      "id": "eq_slimecushion",
+      "name": "슬라임 쿠션",
+      "grade": "일반",
+      "slot": "방어구",
+      "stats": {
+        "hp": 70,
+        "def": 3
+      },
+      "effect": [
+        {
+          "name": "말랑 튕기기",
+          "when": {
+            "on": "shieldBreak"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "실드가 터져도 한 번은 말랑하게 튕겨 낸다."
+    },
+    {
+      "id": "eq_leather",
+      "name": "가죽 갑옷",
+      "grade": "고급",
+      "slot": "방어구",
+      "stats": {
+        "hp": 90,
+        "def": 7
+      },
+      "effect": [
+        {
+          "name": "굳은살",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "hurtLast"
+            }
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6,
+              "fixed": true
+            }
+          ]
+        }
+      ],
+      "blurb": "지난번에 맞은 자리가 단단해져 있다."
+    },
+    {
+      "id": "eq_rubbergauntlet",
+      "name": "고무고무 건틀릿",
+      "grade": "고급",
+      "slot": "방어구",
+      "stats": {
+        "hp": 80,
+        "def": 8
+      },
+      "effect": [
+        {
+          "name": "튕겨 내기",
+          "when": {
+            "on": "blocked"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "실드로 다 받아 내면 고무처럼 되튕긴다."
+    },
+    {
+      "id": "eq_fairyrobe",
+      "name": "요정 로브",
+      "grade": "고급",
+      "slot": "방어구",
+      "stats": {
+        "hp": 80,
+        "def": 6
+      },
+      "effect": [
+        {
+          "name": "반짝이는 자락",
+          "when": {
+            "on": "drawn",
+            "who": "any",
+            "tag": "축복"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "축복받은 카드가 손에 들어오면 자락이 반짝인다."
+    },
+    {
+      "id": "eq_ovenmitt",
+      "name": "오븐 장갑",
+      "grade": "고급",
+      "slot": "방어구",
+      "stats": {
+        "hp": 90,
+        "def": 7
+      },
+      "effect": [
+        {
+          "name": "뜨거운 손",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "그을림",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "오븐에서 막 꺼낸 손으로 맞받아친다. 뜨겁다."
+    },
+    {
+      "id": "eq_blessedpauldron",
+      "name": "축복받은 견갑",
+      "grade": "희귀",
+      "slot": "방어구",
+      "stats": {
+        "hp": 120,
+        "def": 10
+      },
+      "effect": [
+        {
+          "name": "굳은 축복",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blurb": "어깨에 얹은 축복이 싸움 내내 조금씩 굳어 간다."
+    },
+    {
+      "id": "eq_balloon",
+      "name": "풍선 갑옷",
+      "grade": "희귀",
+      "slot": "방어구",
+      "stats": {
+        "hp": 110,
+        "def": 9
+      },
+      "effect": [
+        {
+          "name": "예비 풍선",
+          "when": {
+            "on": "shieldBreak"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8,
+              "fixed": true
+            }
+          ]
+        }
+      ],
+      "blurb": "하나가 터지면 안쪽 풍선이 부푼다."
+    },
+    {
+      "id": "eq_goblinhat",
+      "name": "도깨비 감투",
+      "grade": "희귀",
+      "slot": "방어구",
+      "stats": {
+        "hp": 100,
+        "def": 9,
+        "crit": 2
+      },
+      "effect": [
+        {
+          "name": "숨겨 둔 패",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "held",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "손에 패를 숨겨 두면 감투가 몸까지 감춰 준다."
+    },
+    {
+      "id": "eq_safetybelt",
+      "name": "긴급 보호 벨트",
+      "grade": "희귀",
+      "slot": "방어구",
+      "stats": {
+        "hp": 130,
+        "def": 9
+      },
+      "effect": [
+        {
+          "name": "비상 잠금",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "절대 무적",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "위험 수치에 닿으면 철컥 잠긴다."
+    },
+    {
+      "id": "eq_riotvest",
+      "name": "진압반 중량 조끼",
+      "grade": "희귀",
+      "slot": "방어구",
+      "stats": {
+        "hp": 130,
+        "def": 10
+      },
+      "effect": [
+        {
+          "name": "대열 유지",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "모나티엄 진압반의 무거운 조끼. 맞아도 대열이 안 흐트러진다."
+    },
+    {
+      "id": "eq_squishyvest",
+      "name": "말랑말랑한 조끼",
+      "grade": "전설",
+      "slot": "방어구",
+      "stats": {
+        "hp": 160,
+        "def": 14
+      },
+      "effect": [
+        {
+          "name": "말랑 저장",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "guarded",
+              "kind": "shield"
+            }
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "턴이 끝나도 남은 실드를 품에 반쯤 안고 있다."
+    },
+    {
+      "id": "eq_scalearmor",
+      "name": "비늘 갑옷",
+      "grade": "전설",
+      "slot": "방어구",
+      "stats": {
+        "hp": 170,
+        "def": 14
+      },
+      "effect": [
+        {
+          "name": "곤두선 비늘",
+          "when": {
+            "on": "shieldBreak"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blurb": "실드가 깨지는 순간 비늘이 곤두선다."
+    },
+    {
+      "id": "eq_crystalplate",
+      "name": "수정 흉갑",
+      "grade": "전설",
+      "slot": "방어구",
+      "stats": {
+        "hp": 150,
+        "def": 15
+      },
+      "effect": [
+        {
+          "name": "결정 성장",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "status",
+              "id": "결정화",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "결정이 붙어 있으면 그 위에 결정이 또 자란다."
+    }
+  ]
+}

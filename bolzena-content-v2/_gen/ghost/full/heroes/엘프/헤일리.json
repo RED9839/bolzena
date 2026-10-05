@@ -1,0 +1,775 @@
+{
+  "heroes": [
+    {
+      "id": "헤일리",
+      "name": "헤일리",
+      "nature": "순수",
+      "race": "엘프",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 700,
+      "atk": 125,
+      "def": 28,
+      "crit": 10,
+      "blurb": "엘리아스를 동맹국으로 착각하는 PTSD 장교. 턴마다 적 하나를 외계인으로 착각하고, 그 적을 치면 뒤이어 한 발 더 갈긴다.",
+      "keyword": {
+        "name": "외계인",
+        "desc": "헤일리가 외계인이라 굳게 믿는 적. 헤일리의 공격이 들어가면 추가 공격",
+        "carrier": "enemy",
+        "cap": 1,
+        "hunt": true
+      },
+      "passives": [
+        {
+          "name": "착각 순찰",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "외계인 격퇴",
+          "when": {
+            "on": "hit"
+          },
+          "fx": [
+            {
+              "k": "ifStack",
+              "id": "외계인",
+              "n": 1
+            },
+            {
+              "k": "extra",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "플랜 B",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "고통",
+            "v": 4,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "헤일리_s1",
+        "헤일리_s1",
+        "헤일리_s2",
+        "헤일리_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "헤일리_s1",
+      "name": "채찍질",
+      "hero": "헤일리",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "헤일리_s2",
+      "name": "가죽 채찍 내려치기",
+      "hero": "헤일리",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.5,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "헤일리_s3",
+      "name": "엄폐!",
+      "hero": "헤일리",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "헤일리_u1",
+      "name": "논 그라타",
+      "hero": "헤일리",
+      "unique": true,
+      "signature": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "hits": 3,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "경례 후 돌입",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "hits": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "전 함대 집중",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "hits": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "아군기지 보호작전",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "hits": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작전명 선포",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "hits": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "쓰라린 훈계",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "hits": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "경례 후 돌입",
+          "kind": "power"
+        },
+        {
+          "name": "선한 원칙주의자",
+          "kind": "ap"
+        },
+        {
+          "name": "쓰라린 훈계",
+          "kind": "weakSpot"
+        }
+      ]
+    },
+    {
+      "id": "헤일리_u2",
+      "name": "플랜 A: 정면 돌파",
+      "hero": "헤일리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "외계인",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "돌파 개시",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.56,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "외계인",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "전면 돌격",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "외계인",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "포로는 정중히",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "외계인",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "다음 작전 준비",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.74,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "외계인",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "뇌운 돌파",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "외계인",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "함장의 직감",
+          "kind": "power"
+        },
+        {
+          "name": "전면 돌격",
+          "kind": "ap"
+        },
+        {
+          "name": "작전명 선포",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_u3",
+      "name": "우주 전함 헤일리",
+      "hero": "헤일리",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "외계인",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "출항 준비",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전함 일제 사격",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "지구를 항해 중",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "함장의 직감",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "뇌운 속 항해",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "선한 원칙주의자",
+          "kind": "guard"
+        },
+        {
+          "name": "쓰라린 훈계",
+          "kind": "draw"
+        },
+        {
+          "name": "경례 후 돌입",
+          "kind": "defUp"
+        }
+      ]
+    },
+    {
+      "id": "헤일리_u4",
+      "name": "엘프군 최전선",
+      "hero": "헤일리",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.15,
+          "target": "self",
+          "run": true
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "현역 복귀",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "최전선 사령관",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "부하들을 위해",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.19,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "작전 지휘관",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.22,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "선한 원칙주의자",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "전면 돌격",
+          "kind": "atkUp"
+        },
+        {
+          "name": "작전명 선포",
+          "kind": "draw"
+        },
+        {
+          "name": "함장의 직감",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

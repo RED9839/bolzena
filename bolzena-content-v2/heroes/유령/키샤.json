@@ -1,0 +1,679 @@
+{
+  "heroes": [
+    {
+      "id": "키샤",
+      "name": "키샤",
+      "nature": "우울",
+      "race": "유령",
+      "row": "mid",
+      "role": "서포터",
+      "star": 3,
+      "hp": 570,
+      "atk": 86,
+      "def": 60,
+      "crit": 5,
+      "blurb": "엘리아스에 언더돌 문화를 연 유령 아이돌. 아군이 카드를 낼 때마다 무대 「열기」 가 오르고, 넷이 차면 앵콜 — 버린 카드 한 장이 무대로 돌아오고 파티의 기세가 오른다.",
+      "keyword": {
+        "name": "열기",
+        "desc": "손꼽는 팬들이 만든 무대의 열기",
+        "carrier": "self",
+        "cap": 4,
+        "rules": [
+          {
+            "name": "떼창 앵콜",
+            "when": {
+              "on": "stackReach",
+              "id": "열기",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "열기",
+                "all": true
+              },
+              {
+                "k": "pull",
+                "from": "discard",
+                "n": 1
+              },
+              {
+                "k": "status",
+                "id": "사기",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "무대 뒤 함성",
+          "when": {
+            "on": "play",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "고! 고! 러브 스테이지!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "열기",
+            "v": 4
+          }
+        ]
+      },
+      "starter": [
+        "키샤_s1",
+        "키샤_s1",
+        "키샤_s2",
+        "키샤_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "키샤_s1",
+      "name": "진심 하트",
+      "hero": "키샤",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "키샤_s2",
+      "name": "팬레터 낭독",
+      "hero": "키샤",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "키샤_u1",
+      "name": "궁극의 멜로디",
+      "hero": "키샤",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "회수"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.2
+        },
+        {
+          "k": "stack",
+          "id": "열기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "클라이맥스",
+          "tags": [
+            "회수"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.75
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "허밍",
+          "cost": 0,
+          "tags": [
+            "회수"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.9
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아껴 둔 후렴",
+          "tags": [
+            "회수",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "킹짱 멜로디",
+          "tags": [
+            "회수"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 멜로디",
+          "tags": [
+            "회수",
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.55
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "맑은 고음",
+          "kind": "heal"
+        },
+        {
+          "name": "빠른 템포",
+          "kind": "draw"
+        },
+        {
+          "name": "팬 서비스",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "키샤_u2",
+      "name": "체리 레드 조명봉",
+      "hero": "키샤",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "열기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "조명봉 물결",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "조명봉 하나",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "켜 둔 조명봉",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "객석 전체 점등",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 조명",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "밝은 불빛",
+          "kind": "draw"
+        },
+        {
+          "name": "재빠른 흔들기",
+          "kind": "cost"
+        },
+        {
+          "name": "응원 구호",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "키샤_u3",
+      "name": "하트 파동",
+      "hero": "키샤",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진심 파동",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "작은 하트",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "모아 둔 하트",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "연속 하트",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "hits": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 하트",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "큰 하트",
+          "kind": "power"
+        },
+        {
+          "name": "하트 눈빛",
+          "kind": "frost"
+        },
+        {
+          "name": "앵콜 요청",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "키샤_u4",
+      "name": "떼창 지진",
+      "hero": "키샤",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "열기"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "객석 대지진",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "열기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "작은 떼창",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "열기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "터지기 직전",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "열기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "전원 기립",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "열기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 떼창",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "열기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "우렁찬 함성",
+          "kind": "power"
+        },
+        {
+          "name": "쿵쿵 박자",
+          "kind": "frost"
+        },
+        {
+          "name": "열기 유지",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

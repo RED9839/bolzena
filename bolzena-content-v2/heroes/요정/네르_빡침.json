@@ -1,0 +1,754 @@
+{
+ "heroes": [
+  {
+   "id": "네르_빡침",
+   "name": "네르(빡침)",
+   "nature": "활발",
+   "race": "요정",
+   "row": "back",
+   "role": "딜러",
+   "star": 3,
+   "hp": 660,
+   "atk": 156,
+   "def": 26,
+   "crit": 10,
+   "blurb": "차원 침공 때 고문당하는 에르핀을 보고 교주와 '분노의 공명'을 일으켜 각성한 보모 네르. 본인은 성전 모드라 부르지만 다들 빡침 모드라 부른다. 교주와 여왕에게 손대는 놈은 도끼창으로 심판한다.",
+   "keyword": {
+    "name": "빡침",
+    "desc": "교주와 여왕에게 손댄 놈을 향한 분노 — 다섯이면 터진다",
+    "carrier": "self",
+    "cap": 5,
+    "per": [
+     {
+      "stat": "dealt",
+      "v": 0.12
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "분노의 공명",
+     "when": {
+      "on": "hurt"
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "빡침",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "교단의 심판",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 2.5,
+      "target": "allEnemies"
+     },
+     {
+      "k": "stack",
+      "id": "빡침",
+      "v": 3
+     },
+     {
+      "k": "atkMod",
+      "v": 0.15,
+      "run": true,
+      "target": "self"
+     }
+    ]
+   },
+   "starter": [
+    "네르_빡침_s1",
+    "네르_빡침_s1",
+    "네르_빡침_s2",
+    "네르_빡침_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "네르_빡침_s1",
+   "name": "도끼창 휘두르기",
+   "hero": "네르_빡침",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "네르_빡침_s2",
+   "name": "도끼창 내려찍기",
+   "hero": "네르_빡침",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "네르_빡침_s3",
+   "name": "보모의 팔",
+   "hero": "네르_빡침",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ]
+  },
+  {
+   "id": "네르_빡침_u1",
+   "name": "교주님한테서 손 떼!",
+   "hero": "네르_빡침",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "tags": [
+    "연계"
+   ],
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.75,
+     "target": "oneEnemy",
+     "hits": 2
+    },
+    {
+     "k": "ifStack",
+     "id": "빡침",
+     "n": 5
+    },
+    {
+     "k": "tough",
+     "v": 2
+    },
+    {
+     "k": "spend",
+     "id": "빡침",
+     "all": true
+    }
+   ],
+   "oracles": [
+    {
+     "name": "격노한 손 떼",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 5
+      },
+      {
+       "k": "tough",
+       "v": 2
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "가벼운 손 떼",
+     "cost": 0,
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.55,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 5
+      },
+      {
+       "k": "tough",
+       "v": 2
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "빡친 손 떼",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.05,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 4
+      },
+      {
+       "k": "tough",
+       "v": 2
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "삭여 둔 손 떼",
+     "tags": [
+      "연계",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 5
+      },
+      {
+       "k": "tough",
+       "v": 2
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "성전의 손 떼",
+     "tags": [
+      "연계",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 5
+      },
+      {
+       "k": "tough",
+       "v": 2
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "네르_빡침_u2",
+   "name": "거대 도끼창",
+   "hero": "네르_빡침",
+   "unique": true,
+   "cost": 3,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1.8,
+     "target": "allEnemies"
+    },
+    {
+     "k": "ifStack",
+     "id": "빡침",
+     "n": 5
+    },
+    {
+     "k": "tough",
+     "v": 2,
+     "target": "allEnemies"
+    },
+    {
+     "k": "spend",
+     "id": "빡침",
+     "all": true
+    }
+   ],
+   "oracles": [
+    {
+     "name": "격노한 도끼창",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.35,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 5
+      },
+      {
+       "k": "tough",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "가벼운 도끼창",
+     "cost": 2,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.45,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 5
+      },
+      {
+       "k": "tough",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "빡친 도끼창",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.3,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 4
+      },
+      {
+       "k": "tough",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "삭여 둔 도끼창",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.15,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 5
+      },
+      {
+       "k": "tough",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "성전의 도끼창",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.15,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifStack",
+       "id": "빡침",
+       "n": 5
+      },
+      {
+       "k": "tough",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "spend",
+       "id": "빡침",
+       "all": true
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "네르_빡침_u3",
+   "name": "성전 선포",
+   "hero": "네르_빡침",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1.2,
+     "target": "allEnemies"
+    },
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "격노한 성전",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.55,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 성전",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.95,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "빡친 성전",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.3,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "빡침",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "삭여 둔 성전",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.45,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "성전의 성전",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.45,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "네르_빡침_u4",
+   "name": "양익의 맹세",
+   "hero": "네르_빡침",
+   "unique": true,
+   "cost": 1,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "atkMod",
+     "v": 0.15,
+     "run": true,
+     "target": "self"
+    },
+    {
+     "k": "stack",
+     "id": "빡침",
+     "v": 3
+    }
+   ],
+   "oracles": [
+    {
+     "name": "격노한 맹세",
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "빡침",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "가벼운 맹세",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "빡침",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "빡친 맹세",
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "빡침",
+       "v": 4
+      }
+     ]
+    },
+    {
+     "name": "삭여 둔 맹세",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "빡침",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "성전의 맹세",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "빡침",
+       "v": 3
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "가벼운 숨결",
+     "kind": "cost",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "기세의 숨결",
+     "kind": "atkUp",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,742 @@
+{
+  "heroes": [
+    {
+      "id": "로네_시장",
+      "name": "로네(시장)",
+      "nature": "우울",
+      "race": "엘프",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 650,
+      "atk": 125,
+      "def": 28,
+      "crit": 10,
+      "blurb": "돈까스를 끝내 입에 넣지 못하는 시장. 스킬을 낼 때마다 돈까스 도시락을 돌리고, 도시락이 비워질 때마다 지지율이 올라 시청 앞 축포가 터진다.",
+      "keyword": {
+        "name": "지지율",
+        "desc": "도시락 한 그릇마다 오르는 민심. 셋이 모이면 축포가 터진다",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "사랑받는 시장",
+            "when": {
+              "on": "stackReach",
+              "id": "지지율",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "지지율",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.4,
+                "hits": 3,
+                "target": "allEnemies"
+              },
+              {
+                "k": "status",
+                "id": "사기",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "돈까스 배달",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "사랑받는 시장, 로네!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.4,
+            "hits": 4,
+            "target": "allEnemies"
+          },
+          {
+            "k": "make",
+            "id": "로네_시장_t1",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "로네_시장_s1",
+        "로네_시장_s1",
+        "로네_시장_s2",
+        "로네_시장_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "로네_시장_s1",
+      "name": "비서 호출",
+      "hero": "로네_시장",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "로네_시장_s2",
+      "name": "비서실 총출동",
+      "hero": "로네_시장",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.5,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "로네_시장_s3",
+      "name": "방탄 연단",
+      "hero": "로네_시장",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "로네_시장_t1",
+      "name": "돈까스 도시락",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.6
+        },
+        {
+          "k": "stack",
+          "id": "지지율",
+          "v": 1
+        }
+      ],
+      "hero": "로네_시장",
+      "token": true
+    },
+    {
+      "id": "로네_시장_u1",
+      "name": "돈까스 시장, 로네!",
+      "hero": "로네_시장",
+      "unique": true,
+      "signature": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "hits": 4,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "지지율",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "당선 확률 3%",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "hits": 4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "돈까스 특별시 선포",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "hits": 4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "바삭한 꿈을 꾸었습니다",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "hits": 4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "곱빼기 주문",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "hits": 4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복지 예산 집행",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "hits": 4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "당선 확률 3%",
+          "kind": "power"
+        },
+        {
+          "name": "복지 예산 집행",
+          "kind": "ap"
+        },
+        {
+          "name": "지지자들의 응원",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "로네_시장_u2",
+      "name": "배달 주문",
+      "hero": "로네_시장",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "로네_시장_t1",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "예약 주문",
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.73
+            }
+          ]
+        },
+        {
+          "name": "단체 주문",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "로네표 리더십",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.45
+            }
+          ]
+        },
+        {
+          "name": "배달 드론 증편",
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.6
+            }
+          ]
+        },
+        {
+          "name": "심야 식당",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.32
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "곱빼기 주문",
+          "kind": "guard"
+        },
+        {
+          "name": "심야 식당",
+          "kind": "draw"
+        },
+        {
+          "name": "사과는 돈까스로",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "로네_시장_u3",
+      "name": "돈까스 생각",
+      "hero": "로네_시장",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.1,
+          "target": "self",
+          "run": true
+        },
+        {
+          "k": "stack",
+          "id": "지지율",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "점심시간 카운트다운",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.13,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "평생 소원",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "지지자들의 응원",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "돈까스 정식 상상",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.14,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "그림자 속의 시장",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.12,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "복지 예산 집행",
+          "kind": "atkUp"
+        },
+        {
+          "name": "지지자들의 응원",
+          "kind": "draw"
+        },
+        {
+          "name": "당선 확률 3%",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "로네_시장_u4",
+      "name": "돈까스 모독은 용서 못 해",
+      "hero": "로네_시장",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "status",
+          "id": "잔불",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "make",
+          "id": "로네_시장_t1",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "먼저 경고했습니다",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.12,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "시장 직권 처분",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "공기 커틀릿 엄벌",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "사과는 돈까스로",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "상관을 셋이나",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 4.32,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "심야 식당",
+          "kind": "power"
+        },
+        {
+          "name": "사과는 돈까스로",
+          "kind": "ap"
+        },
+        {
+          "name": "곱빼기 주문",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

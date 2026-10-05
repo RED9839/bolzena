@@ -1,0 +1,982 @@
+{
+  "heroes": [
+    {
+      "id": "로네",
+      "name": "로네",
+      "nature": "순수",
+      "race": "엘프",
+      "row": "front",
+      "role": "탱커",
+      "star": 2,
+      "hp": 810,
+      "atk": 66,
+      "def": 66,
+      "crit": 5,
+      "blurb": "거짓말을 하면 더듬는 외교관 겸 첩보원. 두 얼굴을 바꿔 쓰며 — 외교관일 땐 파티를 감싸고, 첩보원일 땐 갑옷 박치기로 적의 강인도를 부순다.",
+      "keyword": {
+        "name": "첩보원 모드",
+        "desc": "로네의 두 얼굴. 없으면 「외교관」(받는 피해 -20% · 자신의 피해 -20%), 있으면 「첩보원」(받는 피해 +15%). 바꿀 때마다 거짓말을 더듬어 적의 행동이 늦어진다",
+        "carrier": "self",
+        "cap": 1,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.15
+          }
+        ],
+        "rules": [
+          {
+            "name": "더듬는 거짓말",
+            "when": {
+              "on": "stackReach",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "둔화",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          },
+          {
+            "name": "더듬는 거짓말",
+            "when": {
+              "on": "stackGone",
+              "id": "첩보원 모드"
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "둔화",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "외교관",
+          "when": {
+            "on": "always"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "첩보원 모드",
+              "not": true
+            }
+          ],
+          "fx": [
+            {
+              "k": "takenMod",
+              "v": -0.2,
+              "target": "self"
+            },
+            {
+              "k": "dealtMod",
+              "v": -0.2,
+              "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "첩보원",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "첩보원 모드",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "항복! 항복이에오⋯",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 3,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          },
+          {
+            "k": "shield",
+            "ratio": 3
+          }
+        ]
+      },
+      "starter": [
+        "로네_s1",
+        "로네_s1",
+        "로네_s2",
+        "로네_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "로네_s1",
+      "name": "갑옷 박치기",
+      "hero": "로네",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "로네_s2",
+      "name": "중세 판금",
+      "hero": "로네",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "로네_u1",
+      "name": "어리바리 블랙옵스",
+      "hero": "로네",
+      "unique": true,
+      "signature": true,
+      "cost": 2,
+      "type": "스킬",
+      "choices": [
+        "외교관",
+        "첩보원"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 3
+        },
+        {
+          "k": "ifChoice",
+          "n": 1
+        },
+        {
+          "k": "spend",
+          "id": "첩보원 모드",
+          "all": true
+        },
+        {
+          "k": "ifChoice",
+          "n": 2
+        },
+        {
+          "k": "stack",
+          "id": "첩보원 모드",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "외교 대사의 품위",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.9
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "2대 첩보반장",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "존재감 없는 첩보원",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.6
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "보너스가 걸린 임무",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 4.35
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "칸나의 부사수",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.6
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "외교 대사의 품위",
+          "kind": "guard"
+        },
+        {
+          "name": "공기 커틀릿",
+          "kind": "draw"
+        },
+        {
+          "name": "감봉은 안 돼요",
+          "kind": "defUp"
+        }
+      ]
+    },
+    {
+      "id": "로네_u2",
+      "name": "더듬는 거짓말",
+      "hero": "로네",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "choices": [
+        "외교관",
+        "첩보원"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.8
+        },
+        {
+          "k": "ifChoice",
+          "n": 1
+        },
+        {
+          "k": "spend",
+          "id": "첩보원 모드",
+          "all": true
+        },
+        {
+          "k": "ifChoice",
+          "n": 2
+        },
+        {
+          "k": "stack",
+          "id": "첩보원 모드",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "연습한 대사",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.34
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "갑옷 피규어 진열장",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "들통나면 박치기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.61
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "공기 커틀릿이라니",
+          "tags": [
+            "보존",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.16
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "이파스터스마",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.38
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "첩보원 모드",
+              "all": true
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "첩보원 모드",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "연습한 대사",
+          "kind": "guard"
+        },
+        {
+          "name": "갑옷 피규어",
+          "kind": "draw"
+        },
+        {
+          "name": "돈까스 공약",
+          "kind": "defUp"
+        }
+      ]
+    },
+    {
+      "id": "로네_u3",
+      "name": "소스 듬뿍 경양식",
+      "hero": "로네",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        },
+        {
+          "k": "ifStack",
+          "id": "첩보원 모드",
+          "not": true
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 2
+        },
+        {
+          "k": "ifStack",
+          "id": "첩보원 모드",
+          "n": 1
+        },
+        {
+          "k": "draw",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "점심 메뉴 확정",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "not": true
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "곱빼기 정식",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "not": true
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "돈까스 공약",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "not": true
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "치킨집 사장의 꿈",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.17
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "not": true
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "중세 갑옷의 멋",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "not": true
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "공기 커틀릿",
+          "kind": "guard"
+        },
+        {
+          "name": "감봉은 안 돼요",
+          "kind": "draw"
+        },
+        {
+          "name": "외교 대사의 품위",
+          "kind": "defUp"
+        }
+      ]
+    },
+    {
+      "id": "로네_u4",
+      "name": "로네의 건틀릿",
+      "hero": "로네",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.5,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "첩보원 모드",
+          "n": 1
+        },
+        {
+          "k": "tough",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진심 장전",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "넉백 펀치",
+          "tags": [
+            "분쇄",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "항복 권유",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.17,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "감봉은 안 돼요",
+          "tags": [
+            "분쇄",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "진심을 다한 공격",
+          "cost": 3,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.97,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "첩보원 모드",
+              "n": 1
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "갑옷 피규어",
+          "kind": "power"
+        },
+        {
+          "name": "돈까스 공약",
+          "kind": "ap"
+        },
+        {
+          "name": "연습한 대사",
+          "kind": "weakSpot"
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_ronegauntlet",
+      "name": "로네의 건틀릿",
+      "grade": "고급",
+      "slot": "방어구",
+      "stats": {
+        "hp": 57,
+        "def": 7
+      },
+      "effect": [
+        {
+          "name": "외교적 방어",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "affinity": "로네",
+      "affinityStats": {
+        "hp": 40,
+        "def": 4
+      },
+      "affinityEffect": [
+        {
+          "name": "정체 숨기기",
+          "when": {
+            "on": "always"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "첩보원 모드",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "takenMod",
+              "v": -0.1,
+              "target": "self"
+            }
+          ]
+        }
+      ],
+      "blurb": "외교 행사용 장갑. 속에 강철판이 들어 있다는 건 비밀."
+    }
+  ]
+}

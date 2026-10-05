@@ -1,0 +1,736 @@
+{
+  "heroes": [
+    {
+      "id": "다야",
+      "name": "다야",
+      "nature": "순수",
+      "race": "용족",
+      "row": "back",
+      "role": "딜러",
+      "star": 3,
+      "hp": 600,
+      "atk": 155,
+      "def": 25,
+      "crit": 10,
+      "blurb": "보석 감정이 취미인 다이아몬드의 용족. 약점을 찔러 원석을 캐내고, 원석이 둘 모이면 진품 다이아로 친다 — 혼자면 그냥 유리다.",
+      "keyword": {
+        "name": "감정 의뢰",
+        "desc": "들어온 보석 감정 의뢰. 셋이면 「원석」 한 장을 손에 받는다",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "감정 완료",
+            "when": {
+              "on": "stackReach",
+              "id": "감정 의뢰",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "감정 의뢰",
+                "all": true
+              },
+              {
+                "k": "make",
+                "id": "다야_gem",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "다이아몬드 커터",
+          "when": {
+            "on": "break",
+            "mine": true
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "완벽주의",
+          "when": {
+            "on": "play",
+            "tag": "약점 공격"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "다이아 브레…츄!",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "tough",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "make",
+            "id": "다야_gem",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "다야_s1",
+        "다야_s1",
+        "다야_s2",
+        "다야_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "다야_s1",
+      "name": "보석 파편",
+      "hero": "다야",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "다야_s2",
+      "name": "다이아 비늘",
+      "hero": "다야",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "다야_u1",
+      "name": "완벽한 일격",
+      "hero": "다야",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifBreak"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "깔끔한 일격",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "완벽 그 이상",
+          "cost": 3,
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "보석 세공",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흠집 하나 없이",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "찍은 대로",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "브릴리언트 컷",
+          "kind": "power"
+        },
+        {
+          "name": "광택",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "완벽한 자세",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_u2",
+      "name": "다이아 박기",
+      "hero": "다야",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "파편",
+          "cost": 0,
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "원석 통째로",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "쐐기 다이아",
+          "tags": [
+            "약점 공격",
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "반짝이는 낙인",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다이아 비",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "단단한 결",
+          "kind": "frost"
+        },
+        {
+          "name": "반사광",
+          "kind": "power"
+        },
+        {
+          "name": "보석함",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_u3",
+      "name": "단골 손님",
+      "hero": "다야",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "다야_gem",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "감정 의뢰",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "유리를 다이아라며",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "사기 단골",
+          "fx": [
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "감정서 한 장",
+          "fx": [
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "VIP 손님",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "보석상 개업",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "돋보기",
+          "kind": "draw"
+        },
+        {
+          "name": "보증서",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "흥정",
+          "fx": [
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "유리 구슬을 다이아라며 들고 오는 단골 — 다야는 매번 사 준다."
+    },
+    {
+      "id": "다야_u4",
+      "name": "완벽해지는 소원",
+      "hero": "다야",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "잔광",
+          "v": 3
+        },
+        {
+          "k": "stack",
+          "id": "감정 의뢰",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "소원 빌기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "완벽한 용",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 4
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흠 없는 하루",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "거울 앞에서",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 5
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "작은 소원",
+          "cost": 1,
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "감정 의뢰",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "다이아 왕관",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "별똥별",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "반짝임",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "hero": "다야",
+      "token": true,
+      "id": "다야_gem",
+      "name": "원석",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "증발"
+      ],
+      "evolve": {
+        "n": 2,
+        "into": "다야_real"
+      },
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "hero": "다야",
+      "token": true,
+      "id": "다야_real",
+      "name": "진품 다이아",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "증발",
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.8,
+          "target": "oneEnemy"
+        }
+      ]
+    }
+  ]
+}

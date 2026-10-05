@@ -1,0 +1,810 @@
+{
+  "heroes": [
+    {
+      "id": "란",
+      "name": "란",
+      "nature": "순수",
+      "race": "수인",
+      "row": "back",
+      "role": "딜러",
+      "star": 3,
+      "hp": 610,
+      "atk": 156,
+      "def": 26,
+      "crit": 10,
+      "blurb": "투구꽃 독에도 잠들지 않는 몸으로 오래 떠돌던 첫 수인 엘다인.",
+      "keyword": {
+        "name": "사랑니",
+        "desc": "「사랑니 발도」 — 강인도가 반 넘게 깎인 적에게 칼을 뽑아 덤을 얹고, 그렇게 무너뜨리면 송곳니가 드러나 다음 공격 카드에 실린다.",
+        "carrier": "self",
+        "cap": 2,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.3
+          }
+        ],
+        "consumeAll": true
+      },
+      "passives": [
+        {
+          "name": "사랑니 발도",
+          "when": {
+            "on": "break",
+            "mine": true
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            },
+            {
+              "k": "nextCheaper",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "몰이 사냥",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.9,
+            "target": "oneEnemy",
+            "hits": 4
+          },
+          {
+            "k": "tough",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "란_s1",
+        "란_s1",
+        "란_s2",
+        "란_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "란_s1",
+      "name": "발도",
+      "hero": "란",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "란_s2",
+      "name": "일섬 발도",
+      "hero": "란",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "란_s3",
+      "name": "흘려 막기",
+      "hero": "란",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "란_u1",
+      "name": "아랑의 여유",
+      "hero": "란",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifFoe",
+          "id": "tough",
+          "pct": 0.5
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "사랑니",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 아랑의 여유",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 아랑의 여유",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "송곳니 아랑의 여유",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 아랑의 여유",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 아랑의 여유",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "드러난 송곳니",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "란_u2",
+      "name": "사랑니 발도술",
+      "hero": "란",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifFoe",
+          "id": "tough",
+          "pct": 0.5
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 사랑니 발도술",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "가벼운 사랑니 발도술",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "송곳니 사랑니 발도술",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "재빠른 사랑니 발도술",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 사랑니 발도술",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "드러난 송곳니",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "란_u3",
+      "name": "투구꽃 독",
+      "hero": "란",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "tough",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 3
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 투구꽃 독",
+          "fx": [
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "가벼운 투구꽃 독",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "송곳니 투구꽃 독",
+          "fx": [
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "든든한 투구꽃 독",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "복 받은 투구꽃 독",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "든든함",
+          "kind": "guard"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "드러난 송곳니",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "란_u4",
+      "name": "날선 늑대의 발톱",
+      "hero": "란",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "ifFoe",
+          "id": "tough",
+          "pct": 0.5
+        },
+        {
+          "k": "tough",
+          "v": 0.5
+        },
+        {
+          "k": "stack",
+          "id": "사랑니",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 날선 늑대의 발톱",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가벼운 날선 늑대의 발톱",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "송곳니 날선 늑대의 발톱",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재빠른 날선 늑대의 발톱",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 날선 늑대의 발톱",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "드러난 송곳니",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "사랑니",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

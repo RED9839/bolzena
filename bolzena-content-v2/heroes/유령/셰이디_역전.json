@@ -1,0 +1,679 @@
+{
+  "heroes": [
+    {
+      "id": "셰이디_역전",
+      "name": "셰이디(역전)",
+      "nature": "활발",
+      "race": "유령",
+      "row": "back",
+      "role": "서포터",
+      "star": 3,
+      "hp": 580,
+      "atk": 86,
+      "def": 58,
+      "crit": 5,
+      "blurb": "나약함을 인정하고 유령 늪의 파수꾼이 된 장난꾼. 파티를 지켜 줄 때마다 「참음」 이 쌓이고, 넷에서 참다 터지면 파티 전원이 덩달아 달려든다. 지키는 방식은 여전히 제멋대로.",
+      "keyword": {
+        "name": "참음",
+        "desc": "착한 척하느라 꾹꾹 눌러 둔 짜증",
+        "carrier": "self",
+        "cap": 4,
+        "rules": [
+          {
+            "name": "참다 터짐",
+            "when": {
+              "on": "stackReach",
+              "id": "참음",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "참음",
+                "all": true
+              },
+              {
+                "k": "status",
+                "id": "협공",
+                "v": 1
+              },
+              {
+                "k": "later",
+                "n": 1,
+                "then": [
+                  {
+                    "k": "ap",
+                    "v": 2
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "착한 척은 힘들어",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "사일런트 크래쉬",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.8,
+            "hits": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "취약",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "셰이디_역전_s1",
+        "셰이디_역전_s1",
+        "셰이디_역전_s2",
+        "셰이디_역전_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "셰이디_역전_s1",
+      "name": "파수 사슬",
+      "hero": "셰이디_역전",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_s2",
+      "name": "늪지 등불 온기",
+      "hero": "셰이디_역전",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_u1",
+      "name": "차원의 틈",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "hits": 2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "찢어진 차원",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "hits": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "작은 틈",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "hits": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "열어 둔 틈",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "hits": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "늪으로 끌어들이기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "hits": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 틈",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "hits": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "깊은 틈",
+          "kind": "power"
+        },
+        {
+          "name": "차원 바람",
+          "kind": "frost"
+        },
+        {
+          "name": "틈새 엿보기",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_u2",
+      "name": "유령 인형 샌드백",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "참음"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "샌드백 난타",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "참음"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "톡 치기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "참음"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "아껴 둔 분풀이",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "참음"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "참은 만큼",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "참음"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "축복의 인형",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "참음"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏 펀치",
+          "kind": "power"
+        },
+        {
+          "name": "인형의 비명",
+          "kind": "frost"
+        },
+        {
+          "name": "다시 참기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_u3",
+      "name": "파수꾼의 낫질",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.8
+        }
+      ],
+      "oracles": [
+        {
+          "name": "늪지 낫질",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.15
+            }
+          ]
+        },
+        {
+          "name": "가벼운 낫질",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "경계 근무",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.1
+            }
+          ]
+        },
+        {
+          "name": "등불 아래 경계",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 낫",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.05
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "예리한 낫",
+          "kind": "power"
+        },
+        {
+          "name": "든든한 등",
+          "kind": "guard"
+        },
+        {
+          "name": "순찰",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_u4",
+      "name": "내 방식대로 지키겠어",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "참음",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "고집스러운 수호",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.6
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "대충 수호",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.7
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "버티는 수호",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "파수꾼의 맹세",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 수호",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "두꺼운 등불",
+          "kind": "guard"
+        },
+        {
+          "name": "서두른 수호",
+          "kind": "cost"
+        },
+        {
+          "name": "투덜투덜",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

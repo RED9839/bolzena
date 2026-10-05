@@ -1,0 +1,776 @@
+{
+ "heroes": [
+  {
+   "id": "칸타",
+   "name": "칸타",
+   "nature": "냉정",
+   "race": "요정",
+   "row": "mid",
+   "role": "딜러",
+   "star": 2,
+   "hp": 590,
+   "atk": 115,
+   "def": 27,
+   "crit": 10,
+   "blurb": "'최강 팽이 배틀러'를 자처하는 뒷골목 팽이 도박꾼. 삼각회(스노키·피라) 시절 네르에게 사기를 쳐 감옥까지 다녀왔고, 연회장을 팽이 하우스 '칸타피아'로 바꿀 야심을 품는다. 소원은 무적의 팽이, 제일 싫은 건 애 취급. 지면 절규하며 무승부를 조른다.",
+   "keyword": {
+    "name": "판돈",
+    "desc": "다음 턴 AP 를 걸어 둔 판 — 이번 턴 안에 격파 · 처치하면 AP 로 돌려받는다",
+    "carrier": "self",
+    "cap": 1,
+    "endClear": true,
+    "rules": [
+     {
+      "name": "올인",
+      "when": {
+       "on": "kill",
+       "mine": true
+      },
+      "conds": [
+       {
+        "c": "stack",
+        "id": "판돈",
+        "n": 1
+       }
+      ],
+      "fx": [
+       {
+        "k": "ap",
+        "v": 3
+       },
+       {
+        "k": "spend",
+        "id": "판돈",
+        "all": true
+       }
+      ]
+     },
+     {
+      "name": "올인",
+      "when": {
+       "on": "break",
+       "mine": true
+      },
+      "conds": [
+       {
+        "c": "stack",
+        "id": "판돈",
+        "n": 1
+       }
+      ],
+      "fx": [
+       {
+        "k": "ap",
+        "v": 3
+       },
+       {
+        "k": "spend",
+        "id": "판돈",
+        "all": true
+       }
+      ]
+     }
+    ]
+   },
+   "passives": [],
+   "ult": {
+    "name": "탑스핀 크래쉬",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 3,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "tough",
+      "v": 2
+     },
+     {
+      "k": "ap",
+      "v": 1
+     }
+    ]
+   },
+   "starter": [
+    "칸타_s1",
+    "칸타_s1",
+    "칸타_s2",
+    "칸타_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "칸타_s1",
+   "name": "팽이 던지기",
+   "hero": "칸타",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "칸타_s2",
+   "name": "대왕팽이 던지기",
+   "hero": "칸타",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "칸타_s3",
+   "name": "팽이판 방패",
+   "hero": "칸타",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ]
+  },
+  {
+   "id": "칸타_u1",
+   "name": "올인",
+   "hero": "칸타",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "choices": [
+    "한 판",
+    "올인"
+   ],
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.6,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "ifChoice",
+     "n": 2
+    },
+    {
+     "k": "nextAp",
+     "v": -1
+    },
+    {
+     "k": "stack",
+     "id": "판돈",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "회전하는 올인",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.4,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 올인",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "올인한 올인",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "숨겨 둔 올인",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "행운의 올인",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "칸타_u2",
+   "name": "팽이 난타",
+   "hero": "칸타",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "choices": [
+    "한 판",
+    "올인"
+   ],
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.7,
+     "target": "oneEnemy",
+     "hits": 2
+    },
+    {
+     "k": "ifChoice",
+     "n": 2
+    },
+    {
+     "k": "nextAp",
+     "v": -1
+    },
+    {
+     "k": "stack",
+     "id": "판돈",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "회전하는 팽이",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 팽이",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.5,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "올인한 팽이",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.8,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "숨겨 둔 팽이",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.85,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "행운의 팽이",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.85,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "칸타_u3",
+   "name": "탑스핀 블레이드",
+   "hero": "칸타",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "tags": [
+    "약점 공격"
+   ],
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.8,
+     "target": "allEnemies"
+    },
+    {
+     "k": "dmg",
+     "ratio": 1.5,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "회전하는 탑스핀",
+     "tags": [
+      "약점 공격"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.05,
+       "target": "allEnemies"
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.95,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 탑스핀",
+     "cost": 1,
+     "tags": [
+      "약점 공격"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.65,
+       "target": "allEnemies"
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "올인한 탑스핀",
+     "tags": [
+      "약점 공격"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "allEnemies"
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.65,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "tough",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "숨겨 둔 탑스핀",
+     "tags": [
+      "약점 공격",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.95,
+       "target": "allEnemies"
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.8,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "행운의 탑스핀",
+     "tags": [
+      "약점 공격",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.95,
+       "target": "allEnemies"
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.8,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "칸타_u4",
+   "name": "소매 속 팽이",
+   "hero": "칸타",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "tags": [
+    "신속"
+   ],
+   "fx": [
+    {
+     "k": "draw",
+     "v": 2
+    },
+    {
+     "k": "status",
+     "id": "잔광",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "회전하는 소매 속 팽이",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 소매 속 팽이",
+     "cost": 0,
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "올인한 소매 속 팽이",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      },
+      {
+       "k": "tough",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "숨겨 둔 소매 속 팽이",
+     "tags": [
+      "신속",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "행운의 소매 속 팽이",
+     "tags": [
+      "신속",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

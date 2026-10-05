@@ -1,0 +1,728 @@
+{
+  "heroes": [
+    {
+      "id": "셰이디",
+      "name": "셰이디",
+      "nature": "광기",
+      "race": "유령",
+      "row": "front",
+      "role": "딜러",
+      "star": 3,
+      "hp": 720,
+      "atk": 135,
+      "def": 35,
+      "crit": 10,
+      "blurb": "역대 최고의 장난을 평생 소원으로 삼은 유령 우두머리. 공격할 때마다 적에게 「장난」 을 걸고, 셋이 다 걸린 적은 정신을 못 차리고 한 대 크게 얻어맞는다.",
+      "keyword": {
+        "name": "장난",
+        "desc": "셰이디가 걸어 둔 짓궂은 장난 — 셋이 겹치면 대형 사고",
+        "carrier": "enemy",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "역대 최고의 장난",
+            "when": {
+              "on": "stackReach",
+              "id": "장난",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "기절",
+                "v": 1,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "dmg",
+                "ratio": 1.5,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "spend",
+                "id": "장난",
+                "all": true
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "장난질",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "타임 오브 셰이디",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.7,
+            "hits": 6,
+            "target": "randomEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "장난",
+            "v": 2,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "셰이디_s1",
+        "셰이디_s1",
+        "셰이디_s3",
+        "셰이디_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "셰이디_s1",
+      "name": "사슬낫 휘두르기",
+      "hero": "셰이디",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_s2",
+      "name": "순간이동",
+      "hero": "셰이디",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "셰이디_s3",
+      "name": "사슬낫 회전베기",
+      "hero": "셰이디",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_u1",
+      "name": "불 좀 꺼줄래?",
+      "hero": "셰이디",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정전 소동",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "촛불 끄기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "꺼 둔 불",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "깜깜한 늪",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 어둠",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "어둠 속 낫",
+          "kind": "power"
+        },
+        {
+          "name": "깜짝이야",
+          "kind": "frost"
+        },
+        {
+          "name": "슬쩍 빠지기",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_u2",
+      "name": "사슬낫 네 자루",
+      "hero": "셰이디",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "hits": 4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifRandom",
+          "pct": 0.5
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "1~4호 총출동",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두 자루만",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아끼는 사슬낫",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "사슬로 칭칭",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 사슬낫",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "잘 간 날",
+          "kind": "power"
+        },
+        {
+          "name": "얽힌 사슬",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "빠른 회수",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_u3",
+      "name": "대롱대롱 매달기",
+      "hero": "셰이디",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "장난",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "거꾸로 매달기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "살짝 매달기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "매달아 두기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "빙글빙글 돌리기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 밧줄",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "튼튼한 밧줄",
+          "kind": "frost"
+        },
+        {
+          "name": "재빠른 매듭",
+          "kind": "cost"
+        },
+        {
+          "name": "깔깔깔",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰이디_u4",
+      "name": "차원 주머니",
+      "hero": "셰이디",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "장난",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "주머니 뒤집기",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "주머니 슬쩍",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꽉 찬 주머니",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "장난감 쏟아내기",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 주머니",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "깊은 주머니",
+          "kind": "draw"
+        },
+        {
+          "name": "빠른 손",
+          "kind": "cost"
+        },
+        {
+          "name": "깜짝 선물",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_shadyscythe",
+      "name": "셰이디의 차원 사슬낫",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "hp": 122,
+        "crit": 10
+      },
+      "effect": [
+        {
+          "name": "떨어지는 인형",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "every": 4
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 1.5,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "affinity": "셰이디",
+      "affinityStats": {
+        "atk": 8
+      },
+      "affinityEffect": [
+        {
+          "name": "짓궂은 인형",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "every": 4
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "차원을 가르는 사슬낫. 넷째 휘두름마다 어디선가 인형이 떨어진다."
+    }
+  ]
+}

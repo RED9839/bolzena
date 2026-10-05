@@ -1,0 +1,120 @@
+import { A, BK, AL, MU, BL, GU, HE, BF, DB, JM, AC, CH, P, E, clone, bundle } from "./lib.mjs";
+
+// 유령 늪 — 1층 유령 늪(호박밭 · 안개 늪) · 2층 셰이디의 아공간. 장난 — 뒷줄 침투(관통) · 끼워 넣기 · 쓰라림.
+const W = ["순수"]; // 누루링-유령 약점
+const L = [
+  // ── 1층 유령 늪 ─────
+  E("pumpkin_naive", "호바깅", 380, "front", "naive", "굳히기 — 유령들이 애착을 갖는 호박. 굴러와 부딪힌다.",
+    [A(100, "굴러 부딪힌다", { w: 2 }), BL(90, "껍질에 숨는다", { tough: 1 }), HE(50, "늪물을 빨아들인다")]),
+  E("blanketghost_jolly", "이불령 · 장난꾸러기", 300, "back", "jolly", "관통 · 끼워 넣기 — 가벼운 장난. 뒷줄로 스며들어 「오싹한 속삭임」.",
+    [BK(80, "이불 속으로 스며든다", { w: 2 }), AC("st_whisper", 1, "draw", "귓가에 속삭인다"), JM(1, "이불을 뒤집어씌운다")]),
+  E("pumpkin_jolly", "호바깅 · 무리", 340, "front", "jolly", "격노 — 한 유령의 호박 밭에서 떼로 자란다. 동료가 쓰러지면 사기.",
+    [A(100, "떼굴떼굴", { w: 2 }), MU(35, 3, "씨앗을 뱉는다"), BL(70, "덩굴 뒤로")],
+    { passives: [P("호박 밭", "allyDown", BF("사기", 1))] }),
+  E("blanketghost_naive", "이불령", 340, "back", "naive", "관통 · 느긋이 — 아직 모습을 갖추지 못한 어린 유령. 후열로 파고든다.",
+    [BK(100, "후열로 파고든다", { w: 2 }), DB("약화", 1, "이불 자락"), BK(140, "덮친다", { rush: 0 })]),
+  E("oldtree_gloomy", "고모구지 · 썩은 몸", 480, "front", "gloomy", "고통 · 가시 — 늪 주변에서 몸이 썩어 간다. 맞으면 썩은 즙이 튄다(턴당 둘).",
+    [A(110, "썩은 가지", { id: "고통", n: 2 }), GU(70, "뿌리를 내린다", { tough: 1 }), DB("고통", 2, "썩은 냄새")],
+    { passives: [P("썩은 즙", "hurt", { t: "thorns", v: 15 }, { limit: 2 })] }),
+  E("nependers_mad", "한입초 · 예민", 420, "front", "mad", "당기면 손해 · 깨면 끊긴다 — 늪지대에서 자라 굉장히 예민하다. 당기면 사기.",
+    [A(120, "신경질적으로 문다", { w: 2 }), CH("잎을 바짝 세운다", A(220, "삼킨다"), { brk: true }), BL(90, "잎을 닫는다")],
+    { passives: [P("예민함", "rushed", BF("사기", 1))] }),
+  E("pumpkin_mad", "호바깅 · 앙갚음", 440, "front", "mad", "가시 — 당한 만큼 돌려준다(맞을 때마다, 턴당 셋).",
+    [A(130, "들이받는다", { w: 2 }), BL(100, "앙다문 껍질"), MU(40, 3, "씨앗 난사")],
+    { passives: [P("당한 만큼", "hurt", { t: "thorns", v: 20 }, { limit: 3 })] }),
+  E("blanketghost_mad", "이불령 · 장난 중독", 380, "back", "mad", "끼워 넣기 · 관통 — 장난을 멈추지 못한다. 「오싹한 속삭임」 둘.",
+    [AC("st_whisper", 2, "draw", "장난을 친다"), BK(110, "깜짝 놀래기", { w: 2 }), JM(1, "이불 뒤집어씌우기")]),
+  E("nururingtanker_ghost", "누루링-유령 탱커", 620, "front", null, "방패(강인도 5) · 도발 — 비웃는 표정으로 공격을 유도. 당기면 파티 취약.",
+    [GU(80, "비웃는다", { tough: 1 }), A(110, "출렁 부딪힌다"), BL(120, "흐물흐물")],
+    { weak: W, tough: 5, passives: [P("비웃음", "rushed", DB("취약", 1))] }),
+  E("nururingwarrior_ghost", "누루링-유령 전사", 420, "front", null, "관통 · 깨면 끊긴다 — 장난기 심한 젤리.",
+    [BK(100, "스윽 지나간다", { w: 2 }), CH("몸을 늘인다", BK(200, "뒤에서 덮친다"), { brk: true }), BF("사기", 1, "키득키득")], { weak: W }),
+  E("nururingarcher_ghost", "누루링-유령 마법사", 300, "back", null, "디버퍼 — 장난 주문.",
+    [DB("약화", 1, "장난 주문"), BK(90, "도깨비불", { id: "고통", n: 2, w: 2 }), DB("취약", 1, "깜짝!")], { weak: W }),
+  E("nururingsupporter_ghost", "누루링-유령 서포터", 320, "back", null, "치유사 · 깃발(적 전체 사기 1).",
+    [HE(80, "젤리를 덧댄다"), BF("사기", 1, "장난을 부추긴다", { all: true }), BK(60, "톡", { w: 2 })], { weak: W }),
+  // 1층 엘리트
+  E("pumpkin_gloomy", "호바깅 · 불쌍한", 760, "front", "gloomy", "엘리트 · 디버프 감시 — 유령들도 불쌍해서 안 괴롭힌다. 디버프를 받으면 면역 1 · 회복(턴당 하나). 디버프로 굴리는 손보다 바로 치는 손.",
+    [A(140, "서럽게 들이받는다"), HE(100, "늪물을 빨아들인다"), BL(130, "웅크린다", { tough: 1 }), DB("약화", 2, "서러운 눈물")],
+    { passives: [P("불쌍해서", "debuffed", BF("면역", 1)), P("눈물 젖은 호박", "debuffed", { t: "selfHeal", v: 60 })] }),
+  E("blanketghost_cool", "이불령 · 분위기 파괴", 520, "back", "cool", "엘리트 · 스킬 감시 — 분위기를 파토낸다. 스킬 두 장째마다 다음 턴 AP -1. 스킬을 몰아 내는 손을 시험한다.",
+    [BK(120, "찬물을 끼얹는다"), JM(1, "썰렁한 농담"), DB("약화", 1, "한숨"), CH("이불을 크게 편다", AL(110, "이불 덮기"), { brk: true })],
+    { passives: [P("썰렁함", "card", JM(1), { type: "스킬", every: 2 })] }),
+  // 1층 보스 — 스피키(클론) + 호바깅 무리 둘
+  E("clone_spiky", "스피키 (클론)", 2200, "back", "naive",
+    "1층 보스 · 시험: 스킬 따라쟁이 · 손 막기 — 분실 소동의 원흉. 파티가 스킬을 두 장 낼 때마다 흉내 내어 적 전체 방어, 「트릭 오어 트릿」 은 손을 막는 카드를 쥐여 주고 호박들을 치료한다. 공격으로 밀어붙이는 손이 유리하다.",
+    [BK(120, "변장 장난"), HE(150, "트릭 오어 트릿~"), AC("st_whisper", 2, "hand", "사탕 대신 장난"), BF("피해 감소", 1, "변장한다", { all: true }), CH("호박 마차를 부른다", AL(130, "호박 행진"), { brk: true })],
+    { boss: true,
+      phase: { at: 0.5, say: "「다른 사람으로 변장할 시간~☆」", intents: [MU(40, 4, "따라 하기"), AC("st_fanletter", 1, "hand", "가짜 편지"), HE(200, "트릭 오어 트릿~☆"), BK(160, "들켰다!")] },
+      passives: [
+        P("완벽한 따라쟁이", "card", GU(60), { type: "스킬", every: 2, limit: 0 }),
+        P("호박밭 산책", "turnEnd", HE(60), { phase: [0] }),
+        P("들켜 버렸다", "broken", BF("취약", 2)),
+      ] }, { art: clone("speaki", "스피키") }),
+
+  // ── 2층 셰이디의 아공간 — 쓰라림(고통 · 균열) · 후열 암살 ─────
+  E("shadyfollowercloserange_naive", "셰이디아 극성팬", 400, "front", "naive", "도끼 모양 응원봉 — 열성적으로 휘두른다.",
+    [A(110, "응원봉을 휘두른다", { w: 2 }), BF("사기", 1, "셰이디 님!"), BL(70, "팬 깃발로 막는다")]),
+  E("shadyfollowerlongrange_naive", "셰이디아 극성팬 · 원거리", 320, "back", "naive", "관통 — 응원 소리로 후열을 친다.",
+    [BK(90, "응원 함성", { w: 2 }), AC("st_fanletter", 1, "draw", "편지를 보낸다")]),
+  E("blanketghost_gloomy", "이불령 · 우울", 360, "back", "gloomy", "고통 · 느긋이 — 이불 속에 처박힌 유령.",
+    [DB("고통", 2, "눅눅한 한숨"), BK(100, "이불째 덮친다", { rush: 0 }), HE(60, "이불 속에서 쉰다")]),
+  E("shadyfollowercloserange_mad", "극성팬 · 단검봉", 420, "front", "mad", "균열 연타 — 단검 모양 응원봉.",
+    [MU(40, 3, "단검봉 난도질", { id: "균열", per: 1, w: 2 }), A(120, "찌르기"), BF("사기", 1, "광적인 함성")]),
+  E("shadyfollowerlongrange_mad", "극성팬 · 원거리 광기", 340, "back", "mad", "관통 · 균열 — 후열로 순간이동해 찌른다.",
+    [BK(110, "순간이동 찌르기", { id: "균열", n: 2, w: 2 }), JM(1, "응원 소음")]),
+  E("shadyfollowercloserange_jolly", "극성팬 · 하이빔", 380, "front", "jolly", "재촉꾼 — 하이빔 응원봉으로 눈을 멀게 한다.",
+    [A(100, "하이빔", { id: "약화", n: 1, w: 2 }), JM(1, "번쩍!", { rush: 3 }), MU(35, 3, "응원봉 연타")]),
+  E("shadyfollowerlongrange_jolly", "극성팬 · 응원단장", 340, "back", "jolly", "깃발 — 적 전체 사기 1 · 「극성팬 편지」.",
+    [BF("사기", 1, "다 같이!", { all: true }), BK(80, "확성기", { w: 2 }), AC("st_fanletter", 1, "draw", "단체 편지")]),
+  E("shadyfollowercloserange_gloomy", "극성팬 · 진짜 도끼", 480, "front", "gloomy", "깨면 끊긴다 · 쓰라림 — 응원봉 대신 진짜 도끼.",
+    [A(130, "도끼질", { id: "고통", n: 2, w: 2 }), CH("도끼를 높이 든다", A(250, "진짜 도끼")), BL(90, "도끼 자루로 막는다")]),
+  E("shadyfollowerlongrange_cool", "극성팬 · 팬클럽 회장", 380, "back", "cool", "깃발 · 격노 — 셰이디를 따라 하며 자기 팬클럽을 만든다. 동료가 쓰러지면 적 전체 사기.",
+    [BF("결의", 1, "회원 결속", { all: true }), BK(110, "회장의 일갈", { w: 2 }), DB("취약", 1, "손가락질")],
+    { passives: [P("회원 보호", "allyDown", BF("사기", 1, "", { all: true }))] }),
+  // 2층 엘리트
+  E("shadyfollowercloserange_cool", "극성팬 · 친위대장", 700, "front", "cool", "엘리트 · 방어 감시 — 방어 위로 맞으면 더 아픈 「쓰라림」: 칠 때마다 충격 · 균열. 방어 · 실드에만 기대는 손을 시험한다.",
+    [A(140, "친위대 도끼", { id: "충격", n: 1 }), MU(45, 3, "응원봉 난타", { id: "균열", per: 1 }), BF("사기", 1, "셰이디 님을 위해!", { all: true }), BL(120, "친위대 방패", { tough: 1 })],
+    { passives: [P("쓰라림", "turnEnd", DB("균열", 1))] }),
+  E("blanketghost_cool_elite", "이불령 · 악몽", 600, "back", "cool", "엘리트 · 손 막기 — 턴 시작마다 「오싹한 속삭임」 을 손에. 손이 작은 덱 · 드로우가 적은 덱을 시험한다.",
+    [BK(120, "악몽", { id: "약화", n: 1 }), AC("st_whisper", 2, "draw", "악몽을 퍼뜨린다"), CH("이불 속 어둠", AL(120, "가위눌림"), { brk: true })],
+    { passives: [P("악몽", "turnStart", AC("st_whisper", 1, "hand"))] },
+    { art: { spine: "monsterspine/blanketghost", skin: "cool", icon: "icon_blanketghostcool", scale: 1.3 } }),
+  // 2층 보스 — 셰이디(클론) + 극성팬 둘
+  E("clone_shady", "셰이디 (클론)", 2900, "front", "mad",
+    "2층 보스 · 시험: 관통 · AP 묶기 — 혼돈의 유령. 삼지창이 방어를 건너 HP 로 꽂히고, 아공간에서는 턴마다 AP 를 묶는다. 방어로 버티는 손 · 비싼 카드 손이 막힌다 — 회복 · 실드 아닌 버팀 · 싼 카드.",
+    [BK(150, "악마의 삼지창"), AC("st_whisper", 2, "draw", "다음 장난 예고"), JM(1, "장난"), CH("시계를 거꾸로 돌린다", BK(280, "타임 오브 셰이디", { id: "취약", n: 2 }), { brk: true }), MU(50, 3, "삼지창 난무")],
+    { boss: true,
+      phase: { at: 0.55, say: "「여기는 나의 아공간이야!」", intents: [BK(170, "아공간 습격"), JM(2, "시간 멈추기"), MU(55, 4, "장난 폭풍", { id: "균열", per: 1 }), CH("아공간을 접는다", AL(160, "차원 장난"))] },
+      phase2: { at: 0.2, say: "「재밌었어~ 그럼 마지막 장난!」", intents: [CH("모든 장난을 모은다", BK(330, "타임 오브 셰이디"), { brk: true }), BK(200, "삼지창")] },
+      passives: [
+        P("다음 장난 예고", "allyDown", AC("st_whisper", 1, "hand"), { limit: 0 }),
+        P("아공간", "turnStart", JM(1), { phase: [1] }),
+        P("혼돈의 유령", "broken", BF("취약", 2), { phase: [0, 2] }),
+      ] }, { art: clone("shady", "셰이디") }),
+];
+
+const village = {
+  id: "ghost", name: "유령 늪", race: "유령",
+  line: "호박밭과 안개 낀 늪을 지나 셰이디가 연 아공간 속으로 — 장난의 땅",
+  floors: [
+    { name: "유령 늪", sub: "호박밭 · 안개 늪", land: "유령 늪", bg: { fight: "stage15_1", boss: "stage16_1", event: "stage17_1" },
+      pools: [
+        [["pumpkin_naive", "blanketghost_jolly"], ["nururingwarrior_ghost", "nururingsupporter_ghost"], ["pumpkin_naive", "blanketghost_naive"], ["pumpkin_jolly", "pumpkin_jolly"], ["oldtree_gloomy", "blanketghost_jolly"]],
+        [["pumpkin_jolly", "pumpkin_naive", "blanketghost_naive"], ["oldtree_gloomy", "nururingarcher_ghost"], ["nependers_mad", "blanketghost_jolly"], ["nururingtanker_ghost", "nururingsupporter_ghost"], ["pumpkin_mad", "blanketghost_naive"]],
+        [["pumpkin_mad", "blanketghost_mad", "pumpkin_jolly"], ["nururingtanker_ghost", "nururingwarrior_ghost", "nururingarcher_ghost"], ["nependers_mad", "oldtree_gloomy", "blanketghost_mad"], ["pumpkin_jolly", "pumpkin_jolly", "pumpkin_naive", "blanketghost_jolly"], ["nururingtanker_ghost", "pumpkin_mad", "nururingsupporter_ghost"]],
+      ],
+      elites: [["pumpkin_gloomy", "pumpkin_jolly", "pumpkin_jolly"], ["blanketghost_cool", "blanketghost_mad", "nependers_mad"], ["nururingtanker_ghost", "nururingwarrior_ghost", "nururingarcher_ghost", "nururingsupporter_ghost"], ["pumpkin_gloomy", "blanketghost_naive"]],
+      boss: ["clone_spiky", "pumpkin_jolly", "pumpkin_jolly"] },
+    { name: "셰이디의 아공간", sub: "유령들의 본거지", land: "셰이디의 아공간", bg: { fight: "stage18_1", boss: "stage19_1", event: "stage18_1" },
+      pools: [
+        [["shadyfollowercloserange_naive", "shadyfollowerlongrange_naive"], ["blanketghost_gloomy", "shadyfollowercloserange_naive"], ["shadyfollowercloserange_jolly", "shadyfollowerlongrange_naive"], ["blanketghost_gloomy", "blanketghost_mad"], ["shadyfollowercloserange_naive", "shadyfollowerlongrange_jolly"]],
+        [["shadyfollowercloserange_mad", "shadyfollowerlongrange_mad"], ["shadyfollowercloserange_jolly", "shadyfollowerlongrange_jolly", "shadyfollowerlongrange_naive"], ["nururingtanker_ghost", "shadyfollowerlongrange_mad"], ["shadyfollowercloserange_gloomy", "blanketghost_gloomy"], ["shadyfollowercloserange_mad", "blanketghost_mad", "shadyfollowerlongrange_naive"]],
+        [["shadyfollowercloserange_gloomy", "shadyfollowercloserange_mad", "shadyfollowerlongrange_cool"], ["shadyfollowercloserange_naive", "shadyfollowercloserange_jolly", "shadyfollowerlongrange_mad", "shadyfollowerlongrange_jolly"], ["nururingtanker_ghost", "shadyfollowercloserange_gloomy", "shadyfollowerlongrange_cool"], ["shadyfollowercloserange_mad", "blanketghost_gloomy", "blanketghost_mad"], ["shadyfollowercloserange_jolly", "shadyfollowerlongrange_cool", "shadyfollowerlongrange_mad"]],
+      ],
+      elites: [["shadyfollowercloserange_cool", "shadyfollowerlongrange_naive", "shadyfollowerlongrange_mad"], ["blanketghost_cool_elite", "blanketghost_gloomy"], ["shadyfollowercloserange_mad", "shadyfollowercloserange_gloomy", "shadyfollowerlongrange_jolly", "shadyfollowerlongrange_mad"], ["shadyfollowercloserange_cool", "blanketghost_mad"]],
+      boss: ["clone_shady", "shadyfollowercloserange_naive", "shadyfollowerlongrange_naive"] },
+  ],
+};
+
+export default bundle(village, L, []);

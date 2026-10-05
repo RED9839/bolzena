@@ -1,0 +1,746 @@
+{
+  "heroes": [
+    {
+      "id": "림",
+      "name": "림",
+      "nature": "우울",
+      "race": "유령",
+      "row": "front",
+      "role": "딜러",
+      "star": 3,
+      "hp": 830,
+      "atk": 129,
+      "def": 40,
+      "crit": 10,
+      "blurb": "입만 열면 아재개그로 분위기를 얼리는 질서의 2인자. 개그를 치면 적이 얼어붙어 굼떠지지만 파티도 김이 빠진다. 공격과 스킬을 같은 장수 낸 턴엔 저울이 맞아 낫 자국이 깊어진다.",
+      "keyword": {
+        "name": "낫 자국",
+        "desc": "균형을 지키는 낫이 남긴 흔적 — 깊을수록 잘 벌어진다",
+        "carrier": "enemy",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.06
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "저울이 맞으면",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "balanced"
+            }
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "그림 하베스트",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.3,
+            "hits": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "heal",
+            "ratio": 3.6
+          },
+          {
+            "k": "stack",
+            "id": "낫 자국",
+            "v": 3,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "림_s1",
+        "림_s1",
+        "림_s3",
+        "림_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "림_s1",
+      "name": "낫 베기",
+      "hero": "림",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "림_s2",
+      "name": "망령 장막",
+      "hero": "림",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "림_s3",
+      "name": "대낫 휘두르기",
+      "hero": "림",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "림_u1",
+      "name": "스크래치 사이드",
+      "hero": "림",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "낫 자국",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "깊은 할퀴기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "얕은 할퀴기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "겨눠 둔 낫",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "쌍낫 할퀴기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "hits": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 낫",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "예리한 날",
+          "kind": "power"
+        },
+        {
+          "name": "차가운 바람",
+          "kind": "frost"
+        },
+        {
+          "name": "빠른 회수",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "림_u2",
+      "name": "날아가는 기역",
+      "hero": "림",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "낫 자국",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "ㄱ자 회전",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 기역",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "접어 둔 기역",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "돌아오는 기역",
+          "tags": [
+            "회수"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 기역",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "날 선 획",
+          "kind": "power"
+        },
+        {
+          "name": "꺾인 궤적",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "다음 획",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "림_u3",
+      "name": "썰렁 개그",
+      "hero": "림",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "choices": [
+        "개그",
+        "참기"
+      ],
+      "fx": [
+        {
+          "k": "ifChoice",
+          "n": 1
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "dealtMod",
+          "v": -0.2,
+          "target": "self"
+        },
+        {
+          "k": "ifChoice",
+          "n": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.6
+        }
+      ],
+      "oracles": [
+        {
+          "name": "회심의 개그",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.8
+            }
+          ]
+        },
+        {
+          "name": "짧은 개그",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "준비한 개그",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.6
+            }
+          ]
+        },
+        {
+          "name": "아무도 안 웃음",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.6
+            }
+          ]
+        },
+        {
+          "name": "축복의 개그",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.6
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "더 썰렁하게",
+          "kind": "frost"
+        },
+        {
+          "name": "순발력",
+          "kind": "cost"
+        },
+        {
+          "name": "어색한 웃음",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "림_u4",
+      "name": "균형의 저울",
+      "hero": "림",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정확한 저울",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 저울",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "지켜 온 저울",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "질서의 무게",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 저울",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "무거운 추",
+          "kind": "defUp"
+        },
+        {
+          "name": "재빠른 눈금",
+          "kind": "draw"
+        },
+        {
+          "name": "균형 감각",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_rimscythe",
+      "name": "림의 낫",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 20,
+        "crit": 10
+      },
+      "effect": [
+        {
+          "name": "거둘 때",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ifWounded",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "extra",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "affinity": "림",
+      "affinityStats": {
+        "atk": 8
+      },
+      "affinityEffect": [
+        {
+          "name": "저울추",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blurb": "균형을 지키는 낫. 다 기운 목숨은 단숨에 거둔다."
+    }
+  ]
+}

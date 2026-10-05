@@ -1,0 +1,795 @@
+{
+ "heroes": [
+  {
+   "id": "죠안",
+   "name": "죠안",
+   "nature": "우울",
+   "race": "요정",
+   "row": "mid",
+   "role": "서포터",
+   "star": 3,
+   "hp": 720,
+   "atk": 86,
+   "def": 63,
+   "crit": 5,
+   "blurb": "꿈속 계시를 받고 깨어나 옛 교리대로 세상을 되돌리려 교단을 장악했던 고대 요정 사제. 계시를 내린 쪽에게 버려져 무너졌고, 교주에게 용서받은 뒤 신앙의 과녁을 교주 한 명으로 옮기고 세계수를 등졌다. 권능은 거의 잃었지만 빵만은 여전히 무에서 짓고, 새벽마다 말장난을 적는다.",
+   "keyword": {
+    "name": "목도",
+    "desc": "교주 곁에서 보고 들은 것 — 자리를 옮길 때마다 쌓인다",
+    "carrier": "self",
+    "cap": 3
+   },
+   "passives": [
+    {
+     "name": "서 있는 자리의 교리",
+     "when": {
+      "on": "play"
+     },
+     "conds": [
+      {
+       "c": "row",
+       "row": "front"
+      }
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 0.4
+      }
+     ]
+    },
+    {
+     "name": "서 있는 자리의 교리",
+     "when": {
+      "on": "play"
+     },
+     "conds": [
+      {
+       "c": "row",
+       "row": "mid"
+      }
+     ],
+     "limit": {
+      "per": "turn",
+      "n": 2
+     },
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "서 있는 자리의 교리",
+     "when": {
+      "on": "play"
+     },
+     "conds": [
+      {
+       "c": "row",
+       "row": "back"
+      }
+     ],
+     "limit": {
+      "per": "turn",
+      "n": 1
+     },
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "제가 목도한 것을",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.5,
+      "target": "allEnemies",
+      "base": "def"
+     },
+     {
+      "k": "shield",
+      "ratio": 3
+     },
+     {
+      "k": "stack",
+      "id": "목도",
+      "v": 2
+     }
+    ]
+   },
+   "starter": [
+    "죠안_s1",
+    "죠안_s1",
+    "죠안_s2",
+    "죠안_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "죠안_s1",
+   "name": "경건한 일격",
+   "hero": "죠안",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "죠안_s2",
+   "name": "갓 구운 빵",
+   "hero": "죠안",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 2.1
+    }
+   ]
+  },
+  {
+   "id": "죠안_u1",
+   "name": "순례의 걸음",
+   "hero": "죠안",
+   "unique": true,
+   "cost": 0,
+   "type": "스킬",
+   "choices": [
+    "앞으로",
+    "뒤로"
+   ],
+   "fx": [
+    {
+     "k": "stack",
+     "id": "목도",
+     "v": 1
+    },
+    {
+     "k": "ifChoice",
+     "n": 1
+    },
+    {
+     "k": "moveRow",
+     "id": "front"
+    },
+    {
+     "k": "ifChoice",
+     "n": 2
+    },
+    {
+     "k": "moveRow",
+     "id": "back"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "경건한 걸음",
+     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "moveRow",
+       "id": "front"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "moveRow",
+       "id": "back"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 걸음",
+     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "moveRow",
+       "id": "front"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "moveRow",
+       "id": "back"
+      }
+     ]
+    },
+    {
+     "name": "목도한 걸음",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "moveRow",
+       "id": "front"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "moveRow",
+       "id": "back"
+      }
+     ]
+    },
+    {
+     "name": "간직한 걸음",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "moveRow",
+       "id": "front"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "moveRow",
+       "id": "back"
+      }
+     ]
+    },
+    {
+     "name": "교리의 걸음",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "moveRow",
+       "id": "front"
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "moveRow",
+       "id": "back"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "죠안_u2",
+   "name": "교리를 행하고",
+   "hero": "죠안",
+   "unique": true,
+   "cost": 3,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 2
+    },
+    {
+     "k": "status",
+     "id": "피해 감소",
+     "v": 3
+    },
+    {
+     "k": "perStack",
+     "id": "목도"
+    },
+    {
+     "k": "shield",
+     "ratio": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "경건한 교리",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "perStack",
+       "id": "목도"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.55
+      }
+     ]
+    },
+    {
+     "name": "가벼운 교리",
+     "cost": 2,
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "perStack",
+       "id": "목도"
+      },
+      {
+       "k": "shield",
+       "ratio": 0.8
+      }
+     ]
+    },
+    {
+     "name": "목도한 교리",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "perStack",
+       "id": "목도"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.5
+      }
+     ]
+    },
+    {
+     "name": "간직한 교리",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "perStack",
+       "id": "목도"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.45
+      }
+     ]
+    },
+    {
+     "name": "교리의 교리",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 3
+      },
+      {
+       "k": "perStack",
+       "id": "목도"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.45
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 숨결",
+     "kind": "guard",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "죠안_u3",
+   "name": "무에서 빵을",
+   "hero": "죠안",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 4.2
+    },
+    {
+     "k": "draw",
+     "v": 2
+    },
+    {
+     "k": "stack",
+     "id": "목도",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "경건한 빵",
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 5.45
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 빵",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 3.35
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "목도한 빵",
+     "tags": [],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 5.8
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "간직한 빵",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 5.05
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "교리의 빵",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 5.05
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "포근한 숨결",
+     "kind": "heal",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "죠안_u4",
+   "name": "사슬 심판",
+   "hero": "죠안",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1.5,
+     "target": "allEnemies",
+     "base": "def"
+    },
+    {
+     "k": "status",
+     "id": "약화",
+     "v": 1,
+     "target": "allEnemies"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "경건한 사슬",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.95,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 사슬",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "목도한 사슬",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.65,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "목도",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "간직한 사슬",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.8,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "교리의 사슬",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.8,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

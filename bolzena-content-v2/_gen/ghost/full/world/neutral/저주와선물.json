@@ -1,0 +1,579 @@
+{
+  "cards": [
+    {
+      "id": "curse_chores",
+      "name": "밀린 잡일",
+      "cost": 1,
+      "type": "저주",
+      "tags": [
+        "소멸"
+      ],
+      "blurb": "치우려면 AP 1 을 내야 한다. 판 내내 덱에 남는다."
+    },
+    {
+      "id": "curse_tab",
+      "name": "외상 장부",
+      "cost": 1,
+      "type": "저주",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "payHp",
+          "v": 60
+        }
+      ],
+      "blurb": "갚지 않으면 턴 끝에 이자가 붙는다."
+    },
+    {
+      "id": "curse_paperwork",
+      "name": "야근 결재 서류",
+      "cost": 0,
+      "type": "저주",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "결재가 안 난 서류 — 손을 막고 기운을 뺀다."
+    },
+    {
+      "id": "curse_fineprint",
+      "name": "작은 글씨 조항",
+      "cost": 0,
+      "type": "저주",
+      "tags": [
+        "금기",
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "status",
+          "id": "미끄러움",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "읽지 않은 계약 조항. 뽑히면 손이 꼬인다. 지울 수 없다."
+    },
+    {
+      "id": "curse_hex",
+      "name": "저주문 자수",
+      "cost": 1,
+      "type": "저주",
+      "tags": [
+        "금기",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 3,
+          "target": "party"
+        }
+      ],
+      "blurb": "마녀 모자의 저주문. 지울 수 없다."
+    },
+    {
+      "id": "curse_grudge",
+      "name": "서열 앙금",
+      "cost": 1,
+      "type": "저주",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "서열 정리에서 진 앙금 — 손에 쥐고 있으면 몸이 굳는다."
+    },
+    {
+      "id": "curse_haunt",
+      "name": "따라온 유령",
+      "cost": 0,
+      "type": "저주",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "discard",
+          "v": 1,
+          "random": true
+        }
+      ],
+      "blurb": "늪에서 따라온 장난꾸러기 — 손에 든 것을 떨어뜨린다."
+    },
+    {
+      "id": "curse_soot",
+      "name": "눌어붙은 그을음",
+      "cost": 1,
+      "type": "저주",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "그을림",
+          "v": 2,
+          "target": "party"
+        }
+      ],
+      "blurb": "털어도 안 지는 검댕."
+    },
+    {
+      "id": "curse_debt",
+      "name": "골디의 차용증",
+      "cost": 0,
+      "type": "저주",
+      "tags": [
+        "금기",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "ap",
+          "v": -1
+        }
+      ],
+      "blurb": "황금 이자 — 뽑힐 때마다 AP 하나를 떼어 간다. 지울 수 없다."
+    },
+    {
+      "id": "curse_spore",
+      "name": "곰팡이 핀 빵",
+      "cost": 1,
+      "type": "저주",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "포자증식",
+          "v": 2,
+          "target": "party"
+        }
+      ],
+      "blurb": "버리기 아까워 챙긴 빵. 쥐고 있으면 몸이 무른다."
+    },
+    {
+      "id": "gift_cake",
+      "name": "요정 케이크",
+      "cost": 0,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "blurb": "요정들이 나눠 준 케이크."
+    },
+    {
+      "id": "gift_decree",
+      "name": "요정 여왕의 칙서",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "유일",
+        "개막",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ],
+      "blurb": "에르핀의 도장이 찍힌 칙서. 펼치면 모두가 힘을 낸다."
+    },
+    {
+      "id": "gift_amulet",
+      "name": "프리클의 부적",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "보존",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "면역",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "회피",
+          "v": 1
+        }
+      ],
+      "blurb": "뒤로만 챙겨 주는 스승의 부적."
+    },
+    {
+      "id": "gift_ration",
+      "name": "엘프 전투식량",
+      "cost": 0,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "신속",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "저장",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "맛은 없어도 칼로리는 확실하다."
+    },
+    {
+      "id": "gift_badge",
+      "name": "적성 판정서",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "유일",
+        "개막",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "계몽",
+          "v": 1
+        }
+      ],
+      "blurb": "적성 감별기가 뱉은 한 장 — 「협동 적성 우수」."
+    },
+    {
+      "id": "gift_scroll",
+      "name": "백호 비전서 사본",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "유일",
+        "개막",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        }
+      ],
+      "blurb": "티그가 베껴 쓴 비전서. 글씨가 엉망이다."
+    },
+    {
+      "id": "gift_bone",
+      "name": "개껌",
+      "cost": 0,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "신속",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "던지면 다들 쳐다본다."
+    },
+    {
+      "id": "gift_honey",
+      "name": "정령꿀 한 병",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "보존",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "초재생",
+          "v": 1
+        },
+        {
+          "k": "cleanse",
+          "v": 1
+        }
+      ],
+      "blurb": "쥬비네 군집이 모은 꿀."
+    },
+    {
+      "id": "gift_drizzle",
+      "name": "이슬비 방울",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "연쇄",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "cleanse",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 2
+        }
+      ],
+      "blurb": "우이의 이슬비 — 성난 불도 잠재운다."
+    },
+    {
+      "id": "gift_pumpkin",
+      "name": "호박 등롱",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "표식",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "blurb": "유령 늪 호박밭의 등롱. 비추는 쪽이 과녁이 된다."
+    },
+    {
+      "id": "gift_signature",
+      "name": "셰이디의 사인",
+      "cost": 0,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "유일",
+        "개막",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "극성팬이 목숨 걸고 받아 온 사인. 적이 질투한다."
+    },
+    {
+      "id": "gift_dumbbell",
+      "name": "루드의 아령",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "개전",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "칼날 벼리기",
+          "v": 1
+        }
+      ],
+      "blurb": "파.워. 한 번 들면 버틸 힘이 난다."
+    },
+    {
+      "id": "gift_melu",
+      "name": "멜루 특약",
+      "cost": 0,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "금기",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "ap",
+          "v": 2
+        },
+        {
+          "k": "payHp",
+          "v": 90
+        }
+      ],
+      "blurb": "「단, 갑은 을의 체력을 담보로…」 손은 빨라지는데 어딘가 아프다."
+    },
+    {
+      "id": "gift_riotbook",
+      "name": "진압반 방패 교범",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "개막",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "blurb": "모나티엄 진압반의 방패 대열 교범."
+    },
+    {
+      "id": "gift_diamond",
+      "name": "다이아 조각",
+      "cost": 1,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "유일",
+        "천상"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "다야가 깎다 흘린 조각. 무거운 한 수가 나가면 빛이 적의 눈을 찌른다."
+    },
+    {
+      "id": "gift_unsealedpact",
+      "name": "풀린 계약서",
+      "cost": 0,
+      "type": "스킬",
+      "gift": true,
+      "tags": [
+        "금기"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "보스를 쓰러뜨려 봉인이 풀린 계약서. 이제 공짜로 힘이 든다."
+    }
+  ]
+}

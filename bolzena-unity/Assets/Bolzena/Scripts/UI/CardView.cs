@@ -1,0 +1,385 @@
+using System.Collections;
+using Bolzena.Battle;
+using Bolzena.View;
+using TMPro;
+using UnityEngine;
+
+namespace Bolzena.UI
+{
+    // 카드 한 장 — 손패 · 신탁 창 · 더미 보기가 같은 정보 차례(카제나 카드의 차례를 따르고, 그림 · 장식 · 글꼴은 우리 것):
+    //   위: 큰 코스트 · 이름 · 종류 아이콘 + 종류      가운데: 그림이 카드 전체(둥근 모서리로 오린다 — 판 화면 W.Card 와 같은 꼴)
+    //   그림(임시 규칙 — runui Docs/카드그림.md · CardArt): 시작 카드 = 주인 사도 스탠딩 상반신, 고유 카드 = 카드 그림 표의 스킬 아이콘
+    //   (흐린 확대 바탕 + 가운데 선명한 아이콘), 교주 · 상태 카드 = 그림 없음
+    //   아래: 작은 장식 선 · 키워드 태그 줄(금 「[ 회수 / 소멸 ]」) · 효과 글(수치 하늘색) — 손패에서는 감추고 올리면 보인다(ShowDesc)
+    //   왼쪽 가장자리 띠 · 테 = 주인 사도의 성격 색(교주 금 · 상태 잿빛 보라 · 신탁 금)
+    // 신탁 카드면 뒤에 도는 빛줄기 · 금빛 테 · 떠오르는 반짝이. 자리(Target*)를 주면 매 프레임 부드럽게 따라간다(화면 시간).
+    public class CardView : MonoBehaviour
+    {
+        public CardInfo Info;
+        public Vector3 TargetPos;
+        public float TargetRot, TargetScale = 1f;
+        public float Follow = 14f;
+        public bool Playable = true;
+        public bool Hovered;
+        public bool ShowDesc = true;          // 효과 글(손패는 올렸을 때만)
+        public bool ShowPin = true;           // 오른쪽 위 사도 얼굴(손패는 손 위의 핀이 맡는다)
+        public float SlotX;                   // 손 안의 제자리 x(끌어 겨눌 때 그 자리에 띄운다)
+        SpriteRenderer rim, body, art, iconPlate, icon, descBg, glow, flash, epiGlow, band, shadeT, shadeB, typeIcon, deco, decoDot, pinRim, pin, costLine;
+        SpriteMask artMask, pinMask;
+        SpriteRenderer typeBg;
+        MeshRenderer rays;
+        Material raysMat;
+        TextMeshPro costText, nameText, typeText, tagText, descText, epiText;
+        int order;
+        float epiT, sparkT;
+        float dim = 1f, descA = 1f;
+        float alphaMul = 1f;
+        public const float W = 1.9f, H = 2.7f;
+        // 그림 창 — 카드 전체(테 안쪽)
+        const float ArtW = W - 0.07f, ArtH = H - 0.07f;
+        const float ArtY = 0f;
+        const float IconS = 1.06f, IconY = 0.27f;   // 고유 카드 아이콘(가운데 · 살짝 위)
+        /// <summary>카드 주인 사도(초상 핀 · 빛깔) — 감독이 단다.</summary>
+        public static System.Func<int, HeroState> HeroOf;
+
+        public static CardView Create(Transform parent, CardInfo info)
+        {
+            var root = Make.Node("card_" + info.Id, parent);
+            var c = root.gameObject.AddComponent<CardView>();
+            c.Build(info);
+            return c;
+        }
+
+        void Build(CardInfo info)
+        {
+            Info = info;
+            var t = transform;
+            raysMat = Res.NewMat("Bolzena/Rays");
+            raysMat.SetColor("_Color", new Color(1f, 0.8f, 0.35f, 1f));
+            raysMat.SetFloat("_Count", 16);
+            raysMat.SetFloat("_Spin", 0.12f);
+            raysMat.SetFloat("_Boost", 3f);
+            raysMat.SetFloat("_Inner", 0.2f);
+            raysMat.SetFloat("_Outer", 0.62f);
+            rays = Make.Quad("rays", t, new Vector3(0, 0.1f, 0), new Vector2(5.4f, 5.4f), raysMat, 0);
+            epiGlow = Make.Box("epiglow", t, Res.UI("card_glow"), Vector3.zero, new Vector2(2.7f, 3.5f), 0, new Color(1f, 0.82f, 0.35f, 1f), Res.SpriteMat(true, 3.5f));
+            glow = Make.Box("glow", t, Res.UI("card_glow"), Vector3.zero, new Vector2(2.5f, 3.3f), 0, new Color(0.6f, 0.9f, 1f, 0f), Res.SpriteMat(true, 1.8f));
+            rim = Make.Box("rim", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W, H), 0);
+            body = Make.Box("body", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W - 0.07f, H - 0.07f), 0, new Color(0.06f, 0.08f, 0.16f));
+            // 그림 — 카드 대부분, 둥근 모서리로 오린다(마스크 범위는 SetOrder 가 이 카드 차례에 맞춘다)
+            var mn = Make.Node("artmask", t);
+            artMask = mn.gameObject.AddComponent<SpriteMask>();
+            artMask.sprite = Res.UI("card_mask");
+            artMask.isCustomRangeActive = true;
+            { var mb = artMask.sprite.bounds.size; mn.localScale = new Vector3((W - 0.07f) / mb.x, (H - 0.07f) / mb.y, 1); }
+            art = Make.Sprite("art", t, null, Vector3.zero, 0);
+            art.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            iconPlate = Make.Box("iconplate", t, Res.UI("card_mask"), new Vector3(0, IconY, 0), new Vector2(IconS + 0.07f, IconS + 0.07f), 0);
+            iconPlate.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            icon = Make.Sprite("icon", t, null, new Vector3(0, IconY, 0), 0);
+            icon.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            band = Make.Box("band", t, Res.UI("white"), new Vector3(-W / 2 + 0.07f, 0, 0), new Vector2(0.07f, H - 0.1f), 0);
+            band.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            shadeT = Make.Box("shadeT", t, Res.UI("grad_v"), new Vector3(0, H / 2 - 0.5f, 0), new Vector2(W - 0.07f, 1.0f), 0, new Color(0.02f, 0.03f, 0.08f, 0.92f));
+            shadeT.flipY = true;          // grad_v 는 아래가 짙다 — 위 그늘은 뒤집어 위가 짙게
+            shadeT.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            shadeB = Make.Box("shadeB", t, Res.UI("grad_v"), new Vector3(0, -H / 2 + 0.85f, 0), new Vector2(W - 0.07f, 1.7f), 0, new Color(0.01f, 0.02f, 0.06f, 1f));   // 그림이 카드 전체라 글 밑을 더 짙게 · 높게
+            shadeB.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            // 효과 글 뒤 어둠 판 — 그림이 카드 전체라 흰 옷 · 밝은 그림 위에서도 글이 읽히게(올렸을 때 짙게)
+            descBg = Make.Box("descbg", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W - 0.14f, 0.6f), 0, new Color(0.01f, 0.02f, 0.06f, 0.78f));
+            descBg.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            // 위 — 큰 코스트 · 이름 · 종류
+            float x0 = -W / 2 + 0.12f, y0 = H / 2 - 0.1f;
+            costText = Make.Text("cost", t, "", new Vector3(x0 + 0.17f, y0 - 0.27f, 0), 0.5f, 0, Color.white);
+            Make.Outline(costText, 0.22f, Tone.Outline);
+            costLine = Make.Box("costline", t, Res.UI("white"), new Vector3(x0 + 0.17f, y0 - 0.55f, 0), new Vector2(0.26f, 0.025f), 0);
+            nameText = Make.Text("name", t, "", new Vector3(x0 + 0.4f, y0 - 0.16f, 0), 0.21f, 0, Color.white, TextAlignmentOptions.Left, W - 0.56f);
+            nameText.rectTransform.pivot = new Vector2(0, 0.5f);
+            nameText.enableAutoSizing = true; nameText.fontSizeMax = 2.1f; nameText.fontSizeMin = 1.3f;
+            nameText.rectTransform.sizeDelta = new Vector2(W - 0.58f, 0.3f);
+            Make.Outline(nameText, 0.25f, Tone.Outline);
+            typeBg = Make.Sliced("typebg", t, Res.UI("bar_fill_9s"), new Vector3(x0 + 0.75f, y0 - 0.47f, 0), new Vector2(0.8f, 0.24f), 0, new Color(0.02f, 0.03f, 0.08f, 0.7f));
+            typeIcon = Make.Box("typei", t, Res.UI("ic_sword"), new Vector3(x0 + 0.5f, y0 - 0.47f, 0), new Vector2(0.18f, 0.18f), 0);
+            typeText = Make.Text("type", t, "", new Vector3(x0 + 0.62f, y0 - 0.475f, 0), 0.16f, 0, Color.white, TextAlignmentOptions.Left, 1.2f);
+            typeText.rectTransform.pivot = new Vector2(0, 0.5f);
+            Make.Outline(typeText, 0.28f, Tone.Outline);
+            // 사도 얼굴 핀 — 오른쪽 위 작은 원(손패는 손 위 핀이 맡아 감춘다)
+            var fp = new Vector3(W / 2 - 0.26f, H / 2 - 0.27f, 0);
+            pinRim = Make.Box("pinring", t, Res.UI("circle"), fp, new Vector2(0.38f, 0.38f), 0);
+            var pm = Make.Node("pinmask", t, fp);
+            pinMask = pm.gameObject.AddComponent<SpriteMask>();
+            pinMask.sprite = Res.UI("circle");
+            pinMask.isCustomRangeActive = true;
+            { var mb = pinMask.sprite.bounds.size; pm.localScale = new Vector3(0.33f / mb.x, 0.33f / mb.y, 1); }
+            pin = Make.Sprite("pin", t, null, fp, 0);
+            pin.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            // 아래 — 장식 선 · 태그 줄 · 효과 글
+            deco = Make.Box("deco", t, Res.UI("band_line"), Vector3.zero, new Vector2(W * 0.55f, 0.02f), 0, new Color(1f, 0.88f, 0.6f, 0.75f));
+            decoDot = Make.Box("decod", t, Res.UI("diamond"), Vector3.zero, new Vector2(0.09f, 0.09f), 0, new Color(1f, 0.9f, 0.65f));
+            tagText = Tone.Text("tags", t, "", new Vector3(0, -H / 2 + 0.88f, 0), 0.14f, 0, Tone.Gold, TextAlignmentOptions.Center, true, W - 0.2f);
+            Make.Outline(tagText, 0.2f, Tone.Outline);
+            descText = Tone.Text("desc", t, "", Vector3.zero, 0.155f, 0, Tone.Ink, TextAlignmentOptions.Center, true, W - 0.24f);
+            descText.textWrappingMode = TextWrappingModes.Normal;
+            descText.enableAutoSizing = true; descText.fontSizeMax = 1.55f; descText.fontSizeMin = 1.12f;
+            descText.overflowMode = TextOverflowModes.Ellipsis;
+            descText.lineSpacing = -4;
+            Make.Outline(descText, 0.2f, Tone.Outline);
+            // 신탁 이름표 — 장식 선 바로 위(Refresh 가 자리를 잡는다)
+            epiText = Make.Text("epi", t, "", new Vector3(0, -0.05f, 0), 0.14f, 0, new Color(1f, 0.88f, 0.55f));
+            Make.Outline(epiText, 0.3f, Tone.Outline);
+            flash = Make.Box("flash", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W, H), 0, new Color(1, 1, 1, 0), Res.SpriteMat(true, 2f));
+            Refresh();
+            SetOrder(500);
+        }
+
+        // 틀 빛깔 = 주인 사도의 성격(톤.md 성격 색) — 종류(공격 · 스킬 · 강화)는 아이콘 · 글로 가른다.
+        // 교주 카드 = 금빛 중립, 상태 · 저주 = 어두운 잿빛 보라, 신탁(빛나는) = 금
+        public static Color RimColor(CardInfo c)
+        {
+            // 판 화면과 같은 표(Theme.NatureCard — 톤.md §1: 순수 #4CB83A · 광기 #E04848 · 냉정 #18C2E6 · 우울 #8A5CE6 · 활발 #E6C21A)
+            if (c.Epiphany) return new Color(1f, 0.82f, 0.4f);
+            if (c.Type == CardType.Status || (c.Hero < 0 && c.Unplayable)) return Bolzena.RunUI.Theme.StatusCard;
+            if (c.Hero < 0 || string.IsNullOrEmpty(c.Nature)) return Bolzena.RunUI.Theme.LeaderCard;
+            return Bolzena.RunUI.Theme.NatureCardOf(c.Nature);
+        }
+
+        public void Refresh()
+        {
+            var info = Info;
+            var rc = RimColor(info);
+            rim.color = rc;
+            var h = info.Hero >= 0 && HeroOf != null ? HeroOf(info.Hero) : null;
+            band.color = rc;
+            glow.color = new Color(Mathf.Lerp(rc.r, 1f, 0.3f), Mathf.Lerp(rc.g, 1f, 0.3f), Mathf.Lerp(rc.b, 1f, 0.3f), glow.color.a);   // 올림 빛도 성격 빛
+            SetArt(info, rc);
+            costText.text = info.Unplayable && info.Cost <= 0 ? "-" : info.Cost.ToString();
+            costLine.color = Color.Lerp(rc, Color.white, 0.4f);
+            nameText.text = info.Name;
+            typeText.text = (info.Hero >= 0 && !info.Unique && info.Type != CardType.Status ? "기본 " : "") + (info.TypeName ?? (info.Type == CardType.Attack ? "공격" : "스킬"));   // 판 화면 W.Card 와 같은 글
+            typeText.color = TypeColor(info);
+            typeText.ForceMeshUpdate();
+            typeBg.size = new Vector2(typeText.preferredWidth + 0.38f, 0.25f);
+            typeBg.transform.localPosition = new Vector3(-W / 2 + 0.12f + 0.4f + typeBg.size.x / 2, H / 2 - 0.1f - 0.47f, 0);
+            typeIcon.sprite = Res.UI(info.Type == CardType.Attack ? "ic_sword" : info.Type == CardType.Power ? "ic_up" : info.Type == CardType.Status ? "ic_skull" : "ic_shield");
+            Make.Fit(typeIcon, new Vector2(0.18f, 0.18f));
+            pin.sprite = h != null ? Face(h.Key) : null;
+            if (pin.sprite != null) Make.Fit(pin, new Vector2(0.36f, 0.36f));
+            if (h != null) pinRim.color = Color.Lerp(h.Tint, Color.white, 0.4f);
+            string tags = Tone.TagLine(info.Tags);
+            tagText.text = tags;
+            float decoY = -H / 2 + (tags.Length > 0 ? 1.06f : 0.9f);
+            deco.transform.localPosition = new Vector3(0, decoY, 0);
+            decoDot.transform.localPosition = new Vector3(0, decoY, 0);
+            epiText.transform.localPosition = new Vector3(0, decoY + 0.14f, 0);   // 신탁 이름표 — 장식 선 바로 위(그림 · 아이콘 가운데를 가리지 않게)
+            descText.text = Tone.CardText(info.Text);
+            descText.transform.localPosition = new Vector3(0, -H / 2 + (tags.Length > 0 ? 0.38f : 0.44f), 0);
+            descText.rectTransform.sizeDelta = new Vector2(W - 0.24f, tags.Length > 0 ? 0.56f : 0.68f);
+            // 어둠 판 — 글 줄 수만큼(태그 줄까지 덮는다)
+            descText.ForceMeshUpdate();
+            float th = string.IsNullOrEmpty(descText.text) ? 0 : Mathf.Min(descText.rectTransform.sizeDelta.y, descText.GetRenderedValues(true).y);
+            float bgTop = tags.Length > 0 ? -H / 2 + 0.98f : descText.transform.localPosition.y + th / 2 + 0.06f;
+            float bgBot = descText.transform.localPosition.y - th / 2 - 0.08f;
+            descBg.enabled = th > 0;
+            descBg.transform.localPosition = new Vector3(0, (bgTop + bgBot) / 2, 0);
+            Make.Fit(descBg, new Vector2(W - 0.14f, Mathf.Max(0.2f, bgTop - bgBot)));
+            epiText.text = info.Epiphany ? "신탁" : !string.IsNullOrEmpty(info.EpiphanyLabel) ? "신탁 · " + info.EpiphanyLabel : "";
+            bool epi = info.Epiphany;
+            rays.enabled = epi;
+            epiGlow.enabled = epi;
+            ApplyVisibility();
+        }
+
+        // 그림 — Info.Art: "st:<그림 키>" 스탠딩 상반신 · "ic:<아이콘>" 고유 카드 아이콘 · 그 밖은 Resources/Art 의 그림 이름(옛 꼴)
+        bool iconKind;
+        void SetArt(CardInfo info, Color rc)
+        {
+            string a = info.Art;
+            Sprite pic = null, ic = null;
+            if (a != null && a.StartsWith("st:"))
+            {
+                var key = a.Substring(3);
+                pic = Bolzena.RunUI.CardArt.Upper(key, ArtW / ArtH, 0.56f) ?? Crop(Res.Sprite("Art/" + key), ArtW / ArtH, 0.58f);
+            }
+            else if (a != null && a.StartsWith("ic:"))
+            {
+                var key = a.Substring(3);
+                ic = Bolzena.RunUI.CardArt.Icon(key);
+                pic = Bolzena.RunUI.CardArt.Blur(key);
+                if (ic == null) { pic = Crop(Res.Sprite("Art/" + key), ArtW / ArtH, 0.5f); }
+            }
+            else if (!string.IsNullOrEmpty(a)) pic = Crop(Res.Sprite("Art/" + a), ArtW / ArtH, 0.58f);
+            iconKind = ic != null;
+            art.sprite = pic;
+            art.transform.localPosition = new Vector3(0, ArtY, 0);
+            if (pic != null) Make.Fit(art, new Vector2(ArtW, ArtH));
+            icon.sprite = ic;
+            icon.enabled = iconPlate.enabled = iconKind;
+            if (iconKind) { Make.Fit(icon, new Vector2(IconS, IconS)); iconPlate.color = Color.Lerp(rc, Color.white, 0.25f); }   // 교주 카드(원작 스펠 카드 그림)도 같은 꼴
+        }
+
+        void ApplyVisibility()
+        {
+            bool pinOn = ShowPin && pin.sprite != null;
+            if (pin.enabled != pinOn) pin.enabled = pinRim.enabled = pinOn;
+        }
+
+        public static Color TypeColor(CardInfo info) =>
+            info.Type == CardType.Attack ? new Color(1f, 0.55f, 0.58f) : info.Type == CardType.Power ? new Color(0.8f, 0.68f, 1f)
+            : info.Type == CardType.Status ? new Color(0.7f, 0.7f, 0.78f) : new Color(0.55f, 0.8f, 1f);
+
+        // 정사각 그림을 창 비율로 — 넘치는 쪽을 자르고, 세로는 centerY 에 치우쳐 자른다
+        static readonly System.Collections.Generic.Dictionary<string, Sprite> crops = new System.Collections.Generic.Dictionary<string, Sprite>();
+        public static Sprite Crop(Sprite icon, float ratio, float centerY)
+        {
+            if (icon == null) return null;
+            string key = icon.name + "|" + ratio.ToString("F3") + "|" + centerY.ToString("F2");
+            if (crops.TryGetValue(key, out var sp) && sp != null) return sp;
+            var tex = icon.texture;
+            float w = tex.width, h = tex.width / ratio;
+            if (h > tex.height) { h = tex.height; w = h * ratio; }
+            float cy = Mathf.Clamp(tex.height * centerY, h / 2, tex.height - h / 2);
+            sp = Sprite.Create(tex, new Rect((tex.width - w) / 2, cy - h / 2, w, h), new Vector2(0.5f, 0.5f), 100);
+            crops[key] = sp;
+            return sp;
+        }
+
+        // 사도 얼굴(SD 머리께) — 핀 · 초상 띠 · 고학년 띠가 같이 쓴다. ratio = 가로 / 세로
+        public static Sprite Face(string key, float ratio = 1f)
+        {
+            var icon = Res.Sprite("Art/" + key);
+            if (icon == null) return null;
+            string ck = "face|" + key + "|" + ratio.ToString("F2");
+            if (crops.TryGetValue(ck, out var sp) && sp != null) return sp;
+            var tex = icon.texture;
+            float w = tex.width * (ratio >= 1.4f ? 0.84f : 0.6f), h = w / ratio;
+            if (h > tex.height * 0.7f) { h = tex.height * 0.7f; w = h * ratio; }
+            float cy = Mathf.Clamp(tex.height * 0.62f, h / 2, tex.height - h / 2);
+            sp = Sprite.Create(tex, new Rect((tex.width - w) / 2, cy - h / 2, w, h), new Vector2(0.5f, 0.5f), 100);
+            crops[ck] = sp;
+            return sp;
+        }
+
+        public void SetOrder(int o)
+        {
+            order = o;
+            rays.sortingOrder = o - 3;
+            epiGlow.sortingOrder = o - 2;
+            glow.sortingOrder = o - 1;
+            rim.sortingOrder = o;
+            body.sortingOrder = o + 1;
+            art.sortingOrder = o + 2;
+            iconPlate.sortingOrder = o + 3;
+            icon.sortingOrder = o + 4;
+            band.sortingOrder = o + 5;
+            shadeT.sortingOrder = o + 5;
+            shadeB.sortingOrder = o + 5;
+            descBg.sortingOrder = o + 6;
+            artMask.backSortingOrder = o + 1;
+            artMask.frontSortingOrder = o + 6;   // 효과 글 어둠 판(o+6)까지 둥글게 오린다
+            costText.sortingOrder = o + 7;
+            costLine.sortingOrder = o + 7;
+            nameText.sortingOrder = o + 7;
+            typeIcon.sortingOrder = o + 7;
+            typeBg.sortingOrder = o + 6;
+            typeText.sortingOrder = o + 7;
+            pinRim.sortingOrder = o + 7;
+            pin.sortingOrder = o + 8;
+            pinMask.backSortingOrder = o + 7;
+            pinMask.frontSortingOrder = o + 8;
+            deco.sortingOrder = o + 7;
+            decoDot.sortingOrder = o + 7;
+            tagText.sortingOrder = o + 7;
+            descText.sortingOrder = o + 7;
+            epiText.sortingOrder = o + 7;
+            flash.sortingOrder = o + 9;
+        }
+
+        public int Order => order;
+
+        public void Snap()
+        {
+            transform.localPosition = TargetPos;
+            transform.localRotation = Quaternion.Euler(0, 0, TargetRot);
+            transform.localScale = Vector3.one * TargetScale;
+            descA = ShowDesc ? 1 : 0;
+        }
+
+        // 하얗게 번쩍 — 신탁 변신 · 낼 때
+        public IEnumerator FlashCo(float dur = 0.35f, float peak = 1f)
+        {
+            yield return Clock.Tween(dur, t => { if (flash) Make.Alpha(flash, peak * (1 - Ease.OutCubic(t))); }, true);
+        }
+
+        public void SetFlash(float a) => Make.Alpha(flash, a);
+
+        public void SetAlpha(float a)
+        {
+            alphaMul = a;
+            raysMat.SetFloat("_Alpha", a);
+        }
+
+        void Update()
+        {
+            float dt = Time.unscaledDeltaTime;
+            float k = 1 - Mathf.Exp(-dt * Follow);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, TargetPos, k);
+            float rot = Mathf.LerpAngle(transform.localEulerAngles.z, TargetRot, k);
+            transform.localRotation = Quaternion.Euler(0, 0, rot);
+            float s = Mathf.Lerp(transform.localScale.x, TargetScale, k);
+            transform.localScale = new Vector3(s, s, 1);
+            ApplyVisibility();
+
+            // 낼 수 없으면 어둡게 · 효과 글은 보일 때만 스르르
+            dim = Mathf.MoveTowards(dim, Playable ? 1f : 0.45f, dt * 4f);
+            descA = Mathf.MoveTowards(descA, ShowDesc ? 1f : 0f, dt * 8f);
+            float a = alphaMul;
+            var rc = RimColor(Info);
+            rim.color = new Color(rc.r * dim, rc.g * dim, rc.b * dim, a);
+            Make.Alpha(body, a);
+            var dc = new Color(dim, dim, dim, a);
+            float bgk = iconKind ? 0.62f * dim : dim;   // 고유 카드의 흐린 바탕은 눌러 아이콘이 서게
+            art.color = new Color(bgk, bgk, bgk, a);
+            icon.color = dc;
+            var pc = iconPlate.color; pc.a = 0.9f * a; iconPlate.color = pc;
+            pin.color = dc;
+            typeIcon.color = dc;
+            var bc = band.color; bc.a = a; band.color = bc;
+            Make.Alpha(shadeT, 0.9f * a);
+            Make.Alpha(shadeB, (0.35f + 0.63f * descA) * a);
+            Make.Alpha(pinRim, a);
+            Make.Alpha(costLine, a);
+            Make.Alpha(typeBg, 0.7f * a);
+            costText.alpha = nameText.alpha = typeText.alpha = epiText.alpha = a;
+            costText.color = Playable ? new Color(1, 1, 1, a) : new Color(1f, 0.6f, 0.6f, a);
+            tagText.alpha = descText.alpha = descA * a;
+            Make.Alpha(deco, 0.75f * descA * a);
+            Make.Alpha(decoDot, descA * a);
+            Make.Alpha(descBg, 0.78f * descA * a);
+
+            var gc = glow.color;
+            gc.a = Mathf.MoveTowards(gc.a, Hovered && Playable ? 0.9f : 0f, dt * 6f);
+            glow.color = gc;
+
+            if (Info.Epiphany)
+            {
+                epiT += dt;
+                float pulse = 0.75f + 0.25f * Mathf.Sin(epiT * 4f);
+                var ec = epiGlow.color; ec.a = pulse * alphaMul; epiGlow.color = ec;
+                raysMat.SetFloat("_Alpha", (0.75f + 0.25f * Mathf.Sin(epiT * 2.3f)) * alphaMul);
+                sparkT -= dt;
+                if (sparkT <= 0)
+                {
+                    sparkT = 0.09f;
+                    var edge = new Vector3(Random.Range(-W / 2, W / 2), Random.Range(-H / 2, H / 2), 0);
+                    if (Random.value < 0.5f) edge.x = Mathf.Sign(edge.x) * W / 2; else edge.y = Mathf.Sign(edge.y) * H / 2;
+                    Vfx.Burst(edge, new Vfx.BurstOpt
+                    {
+                        Tex = "FX_UI_star_02", Count = 1, Speed = new Vector2(0.3f, 0.9f), Angle = 90, Spread = 50, Life = new Vector2(0.6f, 1.0f),
+                        Size = new Vector2(0.14f, 0.3f), C0 = new Color(1f, 0.9f, 0.5f), C1 = Color.white, Order = order + 9, Boost = 3.5f, Parent = transform,
+                        ShrinkTo = 0f,
+                    });
+                }
+            }
+        }
+    }
+}

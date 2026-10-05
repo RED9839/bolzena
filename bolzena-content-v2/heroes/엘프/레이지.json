@@ -1,0 +1,778 @@
+{
+  "heroes": [
+    {
+      "id": "레이지",
+      "name": "레이지",
+      "nature": "냉정",
+      "race": "엘프",
+      "row": "back",
+      "role": "딜러",
+      "star": 1,
+      "hp": 440,
+      "atk": 104,
+      "def": 23,
+      "crit": 10,
+      "blurb": "못 하는 게 없어 온갖 잡일에 불려 다니는 만능 해결사. 한 턴에 처음 내는 종류마다 그 종류의 작은 일을 덤으로 해치운다.",
+      "keyword": {
+        "name": "출동 기록",
+        "desc": "레이지가 해치운 잡일 목록. 쌓이면 레이저 한 방에 몰아 쏜다",
+        "carrier": "self",
+        "cap": 6,
+        "rules": [
+          {
+            "name": "만능 해결사",
+            "when": {
+              "on": "play",
+              "type": "강화"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "잔광",
+                "v": 1
+              },
+              {
+                "k": "stack",
+                "id": "출동 기록",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "만능 해결사",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "만능 해결사",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주의 천벌 - 레이지",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 4,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "출동 기록",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "레이지_s1",
+        "레이지_s1",
+        "레이지_s2",
+        "레이지_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "레이지_s1",
+      "name": "XG 샷",
+      "hero": "레이지",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "레이지_s2",
+      "name": "XG 풀차지 샷",
+      "hero": "레이지",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.5,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "레이지_s3",
+      "name": "서버실 차폐막",
+      "hero": "레이지",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "레이지_u1",
+      "name": "XG - 레이저",
+      "hero": "레이지",
+      "unique": true,
+      "signature": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "출동 기록"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "출동 기록",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "출근 도장",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "출동 기록",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "마개조 출력",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "출동 기록",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "선 정리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "출동 기록",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "밤샘 몰아치기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "출동 기록",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "관통 레이저",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "출동 기록",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "출근 도장",
+          "kind": "power"
+        },
+        {
+          "name": "팀 보이스",
+          "kind": "ap"
+        },
+        {
+          "name": "승률 9할",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레이지_u2",
+      "name": "유능한 것도 문제예요",
+      "hero": "레이지",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "출동 기록",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "또 저예요?",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "부서 총동원",
+          "tags": [
+            "연계",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.92,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "진압반 편입",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "잡일 총무는 사양",
+          "tags": [
+            "연계",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.92,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "안전모와 용접 고글",
+          "cost": 3,
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "안전모와 용접 고글",
+          "kind": "power"
+        },
+        {
+          "name": "하루 할당량",
+          "kind": "ap"
+        },
+        {
+          "name": "밤샘 몰아치기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레이지_u3",
+      "name": "리그 오브 엘프 90.1%",
+      "hero": "레이지",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "출동 기록",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "랭크 게임",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.72
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "한타 집중",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "팀 보이스",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.44
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "하루 할당량",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.74
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "승률 9할",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.44
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "팀 보이스",
+          "kind": "guard"
+        },
+        {
+          "name": "승률 9할",
+          "kind": "draw"
+        },
+        {
+          "name": "출근 도장",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레이지_u4",
+      "name": "용접 야근",
+      "hero": "레이지",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.12,
+          "target": "self",
+          "run": true
+        },
+        {
+          "k": "stack",
+          "id": "출동 기록",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "야근 각",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.16,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "철야 작업",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.12,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "도와 달라는 말",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.14,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "종이접기까지",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.17,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "소원은 자유시간",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.14,
+              "target": "self",
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "하루 할당량",
+          "kind": "atkUp"
+        },
+        {
+          "name": "밤샘 몰아치기",
+          "kind": "draw"
+        },
+        {
+          "name": "안전모와 용접 고글",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

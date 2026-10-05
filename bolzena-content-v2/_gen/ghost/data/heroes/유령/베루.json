@@ -1,0 +1,666 @@
+{
+  "heroes": [
+    {
+      "id": "베루",
+      "name": "베루",
+      "nature": "우울",
+      "race": "유령",
+      "row": "mid",
+      "role": "딜러",
+      "star": 1,
+      "hp": 520,
+      "atk": 104,
+      "def": 25,
+      "crit": 10,
+      "blurb": "남의 흠만 쏙쏙 찾아 험하게 늘어지는 결점의 유령. 베루가 친 적에게는 「흠」 이 남고, 흠 붙은 적을 치는 아군 공격은 한 장마다 약점으로 꽂힌다.",
+      "keyword": {
+        "name": "흠",
+        "desc": "베루가 물고 늘어진 결점 — 아군 공격이 거기로 꽂힌다",
+        "carrier": "enemy",
+        "cap": 3,
+        "weakens": true,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.05
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "흠 하나 물고",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주의 천벌 - 베루",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "stack",
+            "id": "흠",
+            "v": 3
+          },
+          {
+            "k": "dmg",
+            "ratio": 4,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "베루_s1",
+        "베루_s1",
+        "베루_s3",
+        "베루_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "베루_s1",
+      "name": "손도끼",
+      "hero": "베루",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "베루_s2",
+      "name": "숨기",
+      "hero": "베루",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "베루_s3",
+      "name": "손도끼 내려찍기",
+      "hero": "베루",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "베루_u1",
+      "name": "도끼 날아가요~",
+      "hero": "베루",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "흠",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "도끼 회오리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "도끼 하나",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "숨겨 둔 도끼",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "도끼 두 자루",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "hits": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 도끼",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "무거운 도끼",
+          "kind": "power"
+        },
+        {
+          "name": "흠 찾기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "도끼 줍기",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "베루_u2",
+      "name": "흠 하나 물고",
+      "hero": "베루",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "흠",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "물고 늘어지기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "살짝 물기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "벼르던 흠",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "끝까지 물기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 흠",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "험한 말",
+          "kind": "power"
+        },
+        {
+          "name": "트집",
+          "kind": "frost"
+        },
+        {
+          "name": "다음 흠",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "베루_u3",
+      "name": "친구 계약서",
+      "hero": "베루",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "흠",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "잔광",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "3년 계약",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "하루 계약",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "품에 든 계약서",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "갱신 조항",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 계약",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "빼곡한 약관",
+          "kind": "frost"
+        },
+        {
+          "name": "빠른 도장",
+          "kind": "cost"
+        },
+        {
+          "name": "친구 하자",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베루_u4",
+      "name": "메죵 등 뒤",
+      "hero": "베루",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "흠",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "든든한 등",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "살짝 숨기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "늘 숨는 자리",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "등 뒤에서 째려보기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 등",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "넓은 등",
+          "kind": "guard"
+        },
+        {
+          "name": "재빠른 숨기",
+          "kind": "draw"
+        },
+        {
+          "name": "울먹",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

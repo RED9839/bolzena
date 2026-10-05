@@ -1,0 +1,681 @@
+{
+ "heroes": [
+  {
+   "id": "우이",
+   "name": "우이",
+   "nature": "활발",
+   "row": "mid",
+   "role": "서포터",
+   "star": 3,
+   "hp": 660,
+   "atk": 86,
+   "def": 63,
+   "crit": 5,
+   "blurb": "견디기 힘든 걸 덮어 주는 이슬비 정령. 손에 든 싫은 카드를 비에 씻어 내고 개굴비를 남긴다 — 셋을 덮으면 파티의 아픔이 씻겨 간다.",
+   "keyword": {
+    "name": "외면",
+    "desc": "보슬비로 덮어 둔 싫은 것. 셋이면 파티의 아픔이 씻겨 내려간다",
+    "carrier": "self",
+    "cap": 3,
+    "rules": [
+     {
+      "name": "말하는 대로",
+      "when": {
+       "on": "stackReach",
+       "id": "외면",
+       "n": 3
+      },
+      "fx": [
+       {
+        "k": "cleanse",
+        "v": 2
+       },
+       {
+        "k": "heal",
+        "ratio": 1
+       },
+       {
+        "k": "spend",
+        "id": "외면",
+        "all": true
+       }
+      ]
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "싫은 건 안 보면 돼",
+     "when": {
+      "on": "drawn",
+      "who": "any",
+      "type": "상태"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 2
+     },
+     "fx": [
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "에루의 우산",
+     "when": {
+      "on": "exhaust"
+     },
+     "limit": {
+      "per": "turn",
+      "n": 2
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "말하는대로!",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "cleanse",
+      "v": 3
+     },
+     {
+      "k": "heal",
+      "ratio": 2
+     },
+     {
+      "k": "status",
+      "id": "면역",
+      "v": 1
+     }
+    ]
+   },
+   "race": "정령",
+   "starter": [
+    "우이_s1",
+    "우이_s1",
+    "우이_s2",
+    "우이_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "우이_s1",
+   "name": "빗방울",
+   "hero": "우이",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "우이_s2",
+   "name": "보슬보슬",
+   "hero": "우이",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 1.2
+    }
+   ]
+  },
+  {
+   "id": "우이_u1",
+   "name": "보슬비로 덮기",
+   "hero": "우이",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "signature": true,
+   "fx": [
+    {
+     "k": "burn",
+     "v": 1
+    },
+    {
+     "k": "make",
+     "id": "우이_t1",
+     "v": 1
+    },
+    {
+     "k": "cleanse",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "장대비로 덮기",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 2
+      },
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 2
+      },
+      {
+       "k": "cleanse",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "이슬비",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 1
+      },
+      {
+       "k": "cleanse",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "빗소리",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 1.2
+      }
+     ]
+    },
+    {
+     "name": "여우비",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 2
+      },
+      {
+       "k": "cleanse",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "무지개",
+     "fx": [
+      {
+       "k": "burn",
+       "v": 1
+      },
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "촉촉한 땅",
+     "kind": "heal"
+    },
+    {
+     "name": "빗방울 소리",
+     "kind": "draw"
+    },
+    {
+     "name": "작은 구름",
+     "kind": "cost"
+    }
+   ]
+  },
+  {
+   "id": "우이_u2",
+   "name": "소나기",
+   "hero": "우이",
+   "unique": true,
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.45,
+     "target": "randomEnemy",
+     "hits": 3
+    },
+    {
+     "k": "stack",
+     "id": "외면",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "여름 소나기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.61,
+       "target": "randomEnemy",
+       "hits": 3
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "우박",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.5,
+       "target": "randomEnemy",
+       "hits": 3
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "randomEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "빗줄기",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.54,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "보슬비 한 줌",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.35,
+       "target": "randomEnemy",
+       "hits": 3
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "물웅덩이 첨벙",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.45,
+       "target": "randomEnemy",
+       "hits": 3
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 0.6
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "굵은 빗방울",
+     "kind": "power"
+    },
+    {
+     "name": "가벼운 구름",
+     "kind": "cost"
+    },
+    {
+     "name": "차가운 비",
+     "kind": "frost"
+    }
+   ]
+  },
+  {
+   "id": "우이_u3",
+   "name": "모른 척",
+   "hero": "우이",
+   "unique": true,
+   "cost": 0,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "cleanse",
+     "v": 1
+    },
+    {
+     "k": "draw",
+     "v": 1
+    },
+    {
+     "k": "stack",
+     "id": "외면",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "못 본 척",
+     "fx": [
+      {
+       "k": "cleanse",
+       "v": 2
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "딴청",
+     "fx": [
+      {
+       "k": "cleanse",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "우산 쓰기",
+     "fx": [
+      {
+       "k": "cleanse",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 1.46
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "콧노래",
+     "fx": [
+      {
+       "k": "cleanse",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "흐린 날",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "cleanse",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "외면",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "맑게 갠 하늘",
+     "kind": "draw"
+    },
+    {
+     "name": "물장구",
+     "kind": "ap"
+    },
+    {
+     "name": "이슬",
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 0.4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "우이_u4",
+   "name": "개굴개굴 합창",
+   "hero": "우이",
+   "unique": true,
+   "cost": 1,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "make",
+     "id": "우이_t1",
+     "v": 2
+    },
+    {
+     "k": "status",
+     "id": "면역",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "개구리 합창단",
+     "fx": [
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "면역",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "작은 개구리",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "면역",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "에루와 함께",
+     "fx": [
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "면역",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "장마철",
+     "fx": [
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "면역",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "초재생",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "비 오는 아침",
+     "tags": [
+      "개막"
+     ],
+     "fx": [
+      {
+       "k": "make",
+       "id": "우이_t1",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "면역",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "신나는 노래",
+     "kind": "atkUp"
+    },
+    {
+     "name": "개구리 우비",
+     "kind": "defUp"
+    },
+    {
+     "name": "짧은 노래",
+     "kind": "cost"
+    }
+   ]
+  },
+  {
+   "id": "우이_t1",
+   "name": "개굴비",
+   "cost": 0,
+   "type": "스킬",
+   "tags": [
+    "소멸"
+   ],
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 0.8
+    },
+    {
+     "k": "draw",
+     "v": 1
+    }
+   ],
+   "blurb": "개구리 우산 아래로 내리는 다정한 비.",
+   "hero": "우이",
+   "token": true
+  }
+ ]
+}

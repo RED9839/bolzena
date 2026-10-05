@@ -1,0 +1,741 @@
+{
+ "heroes": [
+  {
+   "id": "폴랑",
+   "name": "폴랑",
+   "nature": "광기",
+   "race": "요정",
+   "row": "back",
+   "role": "서포터",
+   "star": 3,
+   "hp": 580,
+   "atk": 86,
+   "def": 58,
+   "crit": 5,
+   "blurb": "요정 왕국 에르피엔의 경비대장으로, 네르와 함께 왕국의 양날개로 꼽힌다. 한때 롤렛의 이간질에 넘어가 반란을 일으켰지만 지금은 에르핀에게 광적으로 충성한다. '셋이서 120도로 둘러싸 패기'라는 전통 전술을 신봉한다.",
+   "keyword": {
+    "name": "포위",
+    "desc": "셋이서 120도로 둘러싼 적 — 한 턴에 셋이 차면 포위 완성",
+    "carrier": "enemy",
+    "cap": 3,
+    "endClear": true,
+    "rules": [
+     {
+      "name": "포위 완성",
+      "when": {
+       "on": "stackReach",
+       "id": "포위",
+       "n": 3
+      },
+      "limit": {
+       "per": "turn",
+       "n": 1
+      },
+      "fx": [
+       {
+        "k": "status",
+        "id": "취약",
+        "v": 2
+       },
+       {
+        "k": "status",
+        "id": "둔화",
+        "v": 1
+       },
+       {
+        "k": "draw",
+        "v": 1
+       }
+      ]
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "120도 포위",
+     "when": {
+      "on": "hit",
+      "who": "any"
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "로얄 스트레이트",
+    "cost": 150,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "heal",
+      "ratio": 1.8
+     },
+     {
+      "k": "status",
+      "id": "기절",
+      "v": 1
+     }
+    ]
+   },
+   "starter": [
+    "폴랑_s1",
+    "폴랑_s1",
+    "폴랑_s2",
+    "폴랑_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "폴랑_s1",
+   "name": "머스킷 사격",
+   "hero": "폴랑",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "폴랑_s2",
+   "name": "야전 붕대",
+   "hero": "폴랑",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 2.1
+    }
+   ]
+  },
+  {
+   "id": "폴랑_u1",
+   "name": "120도 삼각 편대",
+   "hero": "폴랑",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "tags": [
+    "연계"
+   ],
+   "fx": [
+    {
+     "k": "stack",
+     "id": "포위",
+     "v": 2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "피해 감소",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "정렬된 삼각 편대",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 삼각 편대",
+     "cost": 0,
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "포위하는 삼각 편대",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 4,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "대기 중인 삼각 편대",
+     "tags": [
+      "연계",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "왕국의 삼각 편대",
+     "tags": [
+      "연계",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "넘치는 숨결",
+     "kind": "ap",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "폴랑_u2",
+   "name": "일제 사격",
+   "hero": "폴랑",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "allEnemies",
+     "base": "def"
+    },
+    {
+     "k": "stack",
+     "id": "포위",
+     "v": 1,
+     "target": "allEnemies"
+    },
+    {
+     "k": "status",
+     "id": "약화",
+     "v": 1,
+     "target": "allEnemies"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "정렬된 일제 사격",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.3,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 일제 사격",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.8,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "포위하는 일제 사격",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.25,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "대기 중인 일제 사격",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "왕국의 일제 사격",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "폴랑_u3",
+   "name": "요정 왕국에 경례",
+   "hero": "폴랑",
+   "unique": true,
+   "cost": 3,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 1
+    },
+    {
+     "k": "heal",
+     "ratio": 3.6
+    },
+    {
+     "k": "status",
+     "id": "협공",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "정렬된 경례",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 5.15
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 경례",
+     "cost": 2,
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 2.9
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "포위하는 경례",
+     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      },
+      {
+       "k": "heal",
+       "ratio": 5.4
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "대기 중인 경례",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 4.75
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "왕국의 경례",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 4.75
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "포근한 숨결",
+     "kind": "heal",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "폴랑_u4",
+   "name": "경비대장 폴랑입니다",
+   "hero": "폴랑",
+   "unique": true,
+   "cost": 2,
+   "type": "스킬",
+   "tags": [
+    "개전"
+   ],
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    },
+    {
+     "k": "status",
+     "id": "협공",
+     "v": 1
+    },
+    {
+     "k": "ap",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "정렬된 경비대장",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.1
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "ap",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "가벼운 경비대장",
+     "cost": 1,
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.6
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 1
+      },
+      {
+       "k": "ap",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "포위하는 경비대장",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "ap",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "대기 중인 경비대장",
+     "tags": [
+      "개전",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.9
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "ap",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "왕국의 경비대장",
+     "tags": [
+      "개전",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.9
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      },
+      {
+       "k": "ap",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "단단한 숨결",
+     "kind": "guard",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

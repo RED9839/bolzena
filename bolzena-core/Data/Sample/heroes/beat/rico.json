@@ -1,0 +1,727 @@
+{
+  "heroes": [
+    {
+      "id": "rico",
+      "name": "리코타",
+      "nature": "냉정",
+      "race": "수인",
+      "row": "front",
+      "role": "탱커",
+      "style": "박자형",
+      "star": 3,
+      "hp": 900,
+      "atk": 90,
+      "def": 70,
+      "crit": 5,
+      "blurb": "코스 요리를 한 접시씩 이어 내는 요리사. 차례가 끊기면 처음부터 다시 낸다.",
+      "keyword": {
+        "name": "코스",
+        "desc": "한 접시씩 이어 내는 코스 요리",
+        "carrier": "self",
+        "cap": 3,
+        "wipe": true,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ],
+        "rules": [
+          {
+            "name": "코스",
+            "when": {
+              "on": "stackGone",
+              "id": "코스"
+            },
+            "fx": [
+              {
+                "k": "block",
+                "ratio": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "풀코스",
+          "when": {
+            "on": "play",
+            "seq": [
+              "공격",
+              "스킬",
+              "강화"
+            ],
+            "who": "any"
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5,
+              "target": "party"
+            }
+          ]
+        },
+        {
+          "name": "맞불",
+          "when": {
+            "on": "hurt"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "셰프의 특선",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.2,
+            "base": "def",
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "불굴",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "rico_s1",
+        "rico_s1",
+        "rico_s2",
+        "rico_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "rico_s1",
+      "name": "도마 찍기",
+      "hero": "rico",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "코스",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "rico_s2",
+      "name": "냄비 뚜껑",
+      "hero": "rico",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "block",
+          "ratio": 2.0
+        }
+      ]
+    },
+    {
+      "id": "rico_s3",
+      "name": "간 보기",
+      "hero": "rico",
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "ifLink"
+        },
+        {
+          "k": "stack",
+          "id": "코스",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "rico_u1",
+      "name": "풀코스 서빙",
+      "hero": "rico",
+      "cost": 2,
+      "type": "공격",
+      "unique": true,
+      "signature": true,
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "코스"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "코스",
+          "all": true
+        },
+        {
+          "k": "tough",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "곁들임",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "메인 디시",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            },
+            {
+              "k": "tough",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "남김없이",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "따끈할 때",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            },
+            {
+              "k": "block",
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "name": "주방장 추천",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "코스"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "한 숟갈 더",
+          "kind": "power"
+        },
+        {
+          "name": "남은 소스",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "보온 뚜껑",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rico_u2",
+      "name": "뜨거운 철판",
+      "hero": "rico",
+      "cost": 1,
+      "type": "스킬",
+      "unique": true,
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5,
+          "target": "party"
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "달군 철판",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.1,
+              "target": "party"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "철판 볶음",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.0,
+              "target": "party"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "튀는 기름",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5,
+              "target": "party"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "지글지글",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6,
+              "target": "party"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "불 조절",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5,
+              "target": "party"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rico_u3",
+      "name": "디저트 타임",
+      "hero": "rico",
+      "cost": 1,
+      "type": "강화",
+      "unique": true,
+      "fx": [
+        {
+          "k": "defMod",
+          "v": 0.15,
+          "run": true,
+          "target": "self"
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "푸딩",
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "케이크 한 판",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "식후 차",
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아이스크림",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "후식 코스",
+          "fx": [
+            {
+              "k": "defMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rico_u4",
+      "name": "주방장 특선",
+      "hero": "rico",
+      "cost": 1,
+      "type": "공격",
+      "unique": true,
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifPrev",
+          "type": "스킬"
+        },
+        {
+          "k": "stack",
+          "id": "코스",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "오늘의 특선",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPrev",
+              "type": "스킬"
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두 접시",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifPrev",
+              "type": "스킬"
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "단골 손님",
+          "tags": [
+            "연계",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPrev",
+              "type": "스킬"
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "푸짐한 한 상",
+          "cost": 2,
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifPrev",
+              "type": "스킬"
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "빠른 서빙",
+          "tags": [
+            "연계",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPrev",
+              "type": "스킬"
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,707 @@
+{
+  "heroes": [
+    {
+      "id": "델리아",
+      "name": "델리아",
+      "nature": "순수",
+      "race": "수인",
+      "row": "front",
+      "role": "딜러",
+      "star": 3,
+      "hp": 900,
+      "atk": 119,
+      "def": 46,
+      "crit": 10,
+      "blurb": "언니 그윈을 따라 엘리아스 수인 마을에 자리 잡은 꼬마 펭귄.",
+      "keyword": {
+        "name": "미끄럼",
+        "desc": "「필살 미끄럼 돌진」 — 적을 격파하면 그 기세로 미끄러져 다른 적을 들이받는다. 미끄러진 만큼 쌓여 큰 배치기에 실린다.",
+        "carrier": "self",
+        "cap": 3
+      },
+      "passives": [
+        {
+          "name": "필살 미끄럼 돌진",
+          "when": {
+            "on": "break",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 0.8,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "도와줘 친구들아!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "미끄럼",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "델리아_s1",
+        "델리아_s1",
+        "델리아_s2",
+        "델리아_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "델리아_s1",
+      "name": "펭귄 박치기",
+      "hero": "델리아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "델리아_s2",
+      "name": "대왕 펭귄 박치기",
+      "hero": "델리아",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "델리아_s3",
+      "name": "뒤뚱 방어",
+      "hero": "델리아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "델리아_u1",
+      "name": "델리아 화났어!",
+      "hero": "델리아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 델리아 화났어!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "가벼운 델리아 화났어!",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "미끄러지는 델리아 화났어!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 델리아 화났어!",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 델리아 화났어!",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "얼음 위 질주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "델리아_u2",
+      "name": "가방 속 민초",
+      "hero": "델리아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1
+        },
+        {
+          "k": "stack",
+          "id": "미끄럼",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 가방 속 민초",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.3
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 가방 속 민초",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.9
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "미끄러지는 가방 속 민초",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 가방 속 민초",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.25
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 가방 속 민초",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.25
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "따뜻한 손",
+          "kind": "heal"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "얼음 위 질주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "델리아_u3",
+      "name": "이글루 배치기",
+      "hero": "델리아",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "미끄럼"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "미끄럼",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 이글루 배치기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "미끄럼"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "미끄럼",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "가벼운 이글루 배치기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "미끄럼"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "미끄럼",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "미끄러지는 이글루 배치기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "미끄럼"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "미끄럼",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "재빠른 이글루 배치기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "미끄럼"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "미끄럼",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 이글루 배치기",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "미끄럼"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "미끄럼",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "얼음 위 질주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "델리아_u4",
+      "name": "일어나! 탐험 가야지!",
+      "hero": "델리아",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "잔광",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "미끄럼",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 일어나! 탐험 가야지!",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 일어나! 탐험 가야지!",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "미끄러지는 일어나! 탐험 가야지!",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 일어나! 탐험 가야지!",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 일어나! 탐험 가야지!",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "얼음 위 질주",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

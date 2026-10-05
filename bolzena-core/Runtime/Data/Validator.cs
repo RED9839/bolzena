@@ -1,0 +1,482 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Bolzena.Core
+{
+    /// <summary>
+    /// 콘텐츠 검사 — 잘못 쓴 데이터를 전투에 들이기 전에 잡는다. 읽히지 않는 것이 조용히 안 도는 일이 없게.
+    /// Errors 는 고쳐야 하는 것(없는 id · 모르는 효과 · 빠진 값), Warnings 는 규칙(docs/18)에서 벗어난 것.
+    /// </summary>
+    public sealed class Validator
+    {
+        public readonly List<string> Errors = new();
+        public readonly List<string> Warnings = new();
+        readonly GameData d;
+        readonly HashSet<string> keywords;
+
+        static readonly HashSet<string> TARGETS = new() { "oneEnemy", "allEnemies", "randomEnemy", "topEnemy", "lowEnemy", "self", "oneAlly", "allAllies", "otherAllies", "party", "auto", "otherEnemy", "nextEnemy", "slowestEnemy", "markedEnemy", "strongestAlly" };
+        static readonly HashSet<string> ALLY_TARGETS = new() { "self", "oneAlly", "allAllies", "otherAllies" };
+        static readonly HashSet<string> WHEN_ON = new() { "fightStart", "turnStart", "turnEnd", "play", "guard", "break", "kill", "hurt", "lowHp", "rush", "ult", "debuff", "overheal", "stackReach", "stackGone", "reserveGone", "switch", "rhythm", "always",
+            "discard", "pay", "exhaust", "huntDown", "blocked", "spend", "link", "crit", "make",
+            "drawn", "shuffle", "extra", "hit", "shieldBreak", "foeShieldBreak", "foeGuard", "foeAct", "foeActBefore", "endure", "unwound" };
+        static readonly HashSet<string> CONDS = new() { "stack", "hp", "hpMin", "status", "foes", "foesMax", "row", "playedMin", "playedMax", "ownNone", "apLeft", "gauge", "guarded", "rushed", "hurtLast", "killedLast", "firstTurn", "targetBroken",
+            "repeat", "held", "spent", "balanced", "debuffs", "paid", "wounded", "onlyMe", "ally", "inDebt", "heldCards", "idleLast", "typeNew" };
+        static readonly HashSet<string> INTENTS = new() { "attack", "back", "attackAll", "multi", "charge", "block", "guard", "heal", "buff", "debuff", "jam", "addCard", "summon",
+            "count", "cardDebuff", "handCost", "reshuffle", "autoPlay", "shift" };
+        static readonly HashSet<string> FOE_ON = new() { "fightStart", "turnStart", "turnEnd", "hurt", "lowHp", "allyDown", "card", "rushed", "debuffed", "broken", "recover",
+            "death", "guardBreak", "act", "afterDraw" };
+        static readonly HashSet<string> OUT_K = new() { "none", "gold", "hp", "maxHp", "remove", "dupe", "unique", "neutral", "equip", "flash", "shin", "noShin", "shinNow", "shinPick", "curse", "gift", "scout", "shopGift", "rewardFlash", "next", "mindBreak" };
+        static readonly HashSet<string> BLESS_KIND = new() { "power", "cost", "weakSpot", "frost", "ap", "draw", "heal", "guard", "atkUp", "defUp" };
+        static readonly HashSet<string> PER_STAT = new() { "dealt", "taken", "atk", "def", "crit", "guard", "dot", "hot", "tough" };
+        static readonly HashSet<string> CARRIERS = new() { "self", "enemy", "ally", "hero" };
+        static readonly HashSet<string> PILES = new() { "draw", "discard", "gone", "hand" };
+
+        Validator(GameData d)
+        {
+            this.d = d;
+            keywords = new HashSet<string>(d.Heroes.Values.SelectMany(h => h.AllKeywords).Select(k => k.Name).Where(n => n != null));
+        }
+
+        public static Validator Check(GameData d)
+        {
+            var v = new Validator(d);
+            v.Run();
+            return v;
+        }
+
+        public bool Ok => Errors.Count == 0;
+        public override string ToString() => string.Join("\n", Errors.Select(e => "오류 " + e).Concat(Warnings.Select(w => "주의 " + w)));
+
+        void E(string s) => Errors.Add(s);
+        void W(string s) => Warnings.Add(s);
+
+        void Run()
+        {
+            foreach (var g in d.Heroes.Values.SelectMany(h => h.AllKeywords.Select(k => (h, k))).Where(x => x.k.Name != null).GroupBy(x => x.k.Name).Where(g => g.Count() > 1))
+                E($"고유 효과 「{g.Key}」 를 여럿이 쓴다({string.Join(" · ", g.Select(x => x.h.Id))}) — 고유 효과 이름은 사도 사이에서 겹치면 안 된다");
+            foreach (var h in d.Heroes.Values) Hero(h);
+            foreach (var c in d.Cards.Values) Card(c);
+            foreach (var e in d.Enemies.Values) Enemy(e);
+            foreach (var v in d.Villages.Values) Village(v);
+            var ids = new HashSet<string>();
+            foreach (var e in d.Events) { if (!ids.Add(e.Id)) E($"이벤트 {e.Id}: id 가 겹친다"); Event(e); }
+            foreach (var e in d.Equips.Values) Equip(e);
+        }
+
+        // ── 효과 조각 ──────────────────────────────────────────────────
+        void FxList(string at, List<Fx> fx)
+        {
+            if (fx == null) { E($"{at}: fx 가 없다"); return; }
+            int effects = 0;
+            for (int i = 0; i < fx.Count; i++)
+            {
+                var f = fx[i];
+                string w = $"{at} fx[{i}] {f.K}";
+                if (f.K == null || !FxK.All.Contains(f.K)) { E($"{w}: 모르는 효과 조각"); continue; }
+                if (f.Target != null && !TARGETS.Contains(f.Target) && !(f.Target.StartsWith("hero:") && d.Hero(f.Target.Substring(5)) != null)) E($"{w}: 모르는 대상 {f.Target}");
+                if (f.Who != null && f.Who != "self" && f.Who != "other" && d.Hero(f.Who) == null) E($"{w}: who 는 self · other · 사도 id");
+                if (f.Else != null) FxList(w + " else", f.Else);
+                switch (f.K)
+                {
+                    case FxK.Dmg: if (!(f.Ratio > 0)) E($"{w}: ratio 가 없다"); if (f.Base != null && f.Base != "def") E($"{w}: base 는 def 만"); effects++; break;
+                    case FxK.Block: case FxK.Shield: case FxK.Heal: if (!(f.Ratio > 0)) E($"{w}: ratio 가 없다"); effects++; break;
+                    case FxK.Status:
+                        if (f.Id == null || !R.ALL_ST.Contains(f.Id)) E(R.IsCardSt(f.Id) ? $"{w}: 「{f.Id}」 는 카드에 붙는 상태 — cardStatus 로" : $"{w}: 모르는 상태 {f.Id}");
+                        if (f.V <= 0) E($"{w}: v(겹)가 없다");
+                        // 층 — 이로운 · 해로운 효과는 파티 층(대상 「파티」 = 안 적음). 개인 층(구속)만 「자신」
+                        if (f.Id != null && R.ALL_ST.Contains(f.Id) && !R.IsBadSt(f.Id) && f.Target != null)
+                        {
+                            if (!R.IsHeroSt(f.Id) && ALLY_TARGETS.Contains(f.Target)) E($"{w}: {f.Id} 는 파티 층 상태 — 대상은 「파티」(안 적으면 파티 · 파티원 전원에게 든다). 「{f.Target}」 은 개인 층(구속)만");
+                            if (R.IsHeroSt(f.Id) && f.Target == "party") E($"{w}: {f.Id} 는 개인 층 상태 — 대상은 「자신」 · 「아군 1명」 · 「아군」");
+                        }
+                        effects++; break;
+                    case FxK.CardStatus:
+                        if (string.IsNullOrEmpty(f.Id) || (R.ALL_ST.Contains(f.Id) && !R.IsCardSt(f.Id))) E($"{w}: 카드에 붙는 상태(독 · 봉쇄 · 침체 · 빙결 · 탐구심 · 비용) 또는 데이터가 지은 카드 값 이름이어야 한다 — 「{f.Id}」");
+                        if (f.To != null && f.To != "this" && f.To != "hand" && f.To != "draw" && f.To != "pulled") E($"{w}: to 는 this · hand · draw · pulled");
+                        if (f.V == 0) E($"{w}: v 가 없다");
+                        if (f.V < 0 && R.IsCardSt(f.Id)) E($"{w}: {f.Id} 는 음수로 걸 수 없다(비용 · 카드 값만)");
+                        effects++; break;
+                    case FxK.IfKill: case FxK.IfBreak: case FxK.IfAllHeroes: break;
+                    case FxK.Roll: if (f.N < 2 || f.N > 6) E($"{w}: n 은 2~6(셋 중 하나면 3)"); break;
+                    case FxK.IfRoll: if (f.N < 1) E($"{w}: n 은 1 이상(굴린 눈)"); if (!fx.Take(i).Any(x => x.K == FxK.Roll)) E($"{w}: 앞에 roll 이 있어야 한다"); break;
+                    case FxK.IfPrevSame: case FxK.IfLastMine: case FxK.IfPulled: case FxK.IfShield: case FxK.IfDebt: case FxK.IfTypeNew: break;
+                    case FxK.IfInHand: if (d.Card(f.Id) == null) E($"{w}: 카드가 없다 — {f.Id}"); break;
+                    case FxK.IfBond: if (f.N < 1 || f.N > 5) E($"{w}: n 은 1~5"); break;
+                    case FxK.Recast: if (!(f.Ratio > 0 && f.Ratio <= 1)) E($"{w}: ratio 는 0~1"); effects++; break;
+                    case FxK.CostMod: if (f.V == 0) E($"{w}: v(±비용)가 없다"); effects++; break;
+                    case FxK.AddTag: if (f.Id == null || Array.IndexOf(Tag.All, f.Id) < 0) E($"{w}: 태그 이름이어야 한다 — 「{f.Id}」"); break;
+                    case FxK.CutHit: if (!(f.V > 0 && f.V <= 1)) E($"{w}: v 는 0~1(깎을 비율)"); effects++; break;
+                    case FxK.ClearDebt: effects++; break;
+                    case FxK.HealMod: if (f.V == 0 || Math.Abs(f.V) > 3) E($"{w}: v 는 비율(0.5 = +50%)"); effects++; break;
+                    case FxK.IfWounded: if (f.Target != null && f.Target != "oneEnemy" && f.Target != "party") E($"{w}: target 은 party(기본) · oneEnemy"); break;
+                    case FxK.PerTag: if (f.Id == null || Array.IndexOf(Tag.All, f.Id) < 0) E($"{w}: 태그 이름이어야 한다 — 「{f.Id}」"); break;
+                    case FxK.Drain: if (!(f.Ratio > 0 && f.Ratio <= 1)) E($"{w}: ratio 는 0~1(준 피해의 비율)"); effects++; break;
+                    case FxK.Extra: if (!(f.Ratio > 0)) E($"{w}: ratio 가 없다"); if (f.Base != null && f.Base != "def") E($"{w}: base 는 def 만"); effects++; break;
+                    case FxK.Transform: if (d.Card(f.Id) == null) E($"{w}: 바뀔 카드가 없다 — {f.Id}"); if (f.From != null && f.From != "hand" && !f.From.StartsWith("@") && d.Card(f.From) == null) E($"{w}: from 은 카드 id · hand(거르개와) · @종류 — {f.From}"); effects++; break;
+                    case FxK.IfChoice: if (f.N != 1 && f.N != 2) E($"{w}: n 은 1 · 2(갈래)"); break;
+                    case FxK.IfRandom: if (!(f.Pct > 0 && f.Pct < 1)) E($"{w}: pct 는 0~1(확률)"); break;
+                    case FxK.IfHand: if (f.N < 0) E($"{w}: n 은 0 이상(손패 n 장 이하)"); break;
+                    case FxK.IfPile: case FxK.PerPile: if (f.From != null && !PILES.Contains(f.From)) E($"{w}: from 은 draw · discard · gone · hand"); if (f.K == FxK.IfPile && f.N <= 0) E($"{w}: n 이 없다"); break;
+                    case FxK.IfNth: if (f.N <= 0) E($"{w}: n 이 없다(1 이상)"); break;
+                    case FxK.IfStreak: if (f.N < 2) E($"{w}: n 은 2 이상(같은 사도 카드를 잇달아 n 장째)"); break;
+                    case FxK.IfFoe: if (f.Id != "broken" && f.Id != "tough" && f.Id != "guarded" && f.Id != "attack") E($"{w}: id 는 broken · tough · guarded · attack"); break;
+                    case FxK.IfCardSt: case FxK.PerCardSt: if (string.IsNullOrEmpty(f.Id)) E($"{w}: id(카드 값 이름)가 없다"); break;
+                    case FxK.PerPlayed: if (f.Id != null && Array.IndexOf(Tag.All, f.Id) < 0) E($"{w}: id 는 태그 이름(없으면 낸 카드 전부)"); break;
+                    case FxK.PerEvent: break;
+                    case FxK.Later: case FxK.AfterCards: case FxK.Trap:
+                        if (f.Then == null || f.Then.Count == 0) E($"{w}: then(안에 든 효과)이 없다"); else FxList(w + " then", f.Then);
+                        if (f.K != FxK.Trap && f.N <= 0) E($"{w}: n 이 없다(턴 · 장수)");
+                        effects++; break;
+                    case FxK.Confuse: case FxK.AutoPlay: case FxK.CastOther: case FxK.Dispel: effects++; break;
+                    case FxK.Pull: case FxK.ExileFrom:
+                        if (f.From != null && !PILES.Contains(f.From) && !(f.K == FxK.ExileFrom && f.From == "pulled")) E($"{w}: from 은 draw · discard · gone · hand (exileFrom 은 pulled 도)");
+                        if (f.K == FxK.Pull && f.To != null && f.To != "hand" && f.To != "top") E($"{w}: to 는 hand · top");
+                        if (f.At != null && f.At != "top" && f.At != "bottom" && f.At != "random") E($"{w}: at 은 top · bottom · random");
+                        effects++; break;
+                    case FxK.MoveRow: if (Array.IndexOf(R.ROWS, f.Id) < 0) E($"{w}: id 는 front · mid · back"); effects++; break;
+                    case FxK.GrowRun: if (f.Id != null && f.Id != "atk" && f.Id != "def" && f.Id != "crit") E($"{w}: id 는 atk · def · crit"); if (f.V == 0) E($"{w}: v 가 없다"); effects++; break;
+                    case FxK.Stack: case FxK.Spend:
+                        if (f.Id == null || !keywords.Contains(f.Id)) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」");
+                        if (f.K == FxK.Spend && !f.All && f.V <= 0) E($"{w}: v 또는 all 이 필요하다");
+                        if (f.K == FxK.Stack && f.V <= 0) E($"{w}: v 가 없다");
+                        effects++; break;
+                    case FxK.IfStack: case FxK.PerStack:
+                        if (f.Id == null || !keywords.Contains(f.Id)) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」");
+                        break;
+                    case FxK.Make: if (d.Card(f.Id) == null) E($"{w}: 만들 카드가 없다 — {f.Id}"); if (f.To != null && f.To != "hand" && f.To != "draw" && f.To != "top" && f.To != "discard") E($"{w}: to 는 hand · draw · top · discard"); effects++; break;
+                    case FxK.IfPrev: if (f.Type != "공격" && f.Type != "스킬" && f.Type != "강화") E($"{w}: type 은 공격 · 스킬 · 강화"); break;
+                    case FxK.When: if (Array.IndexOf(FxK.WHEN_ON, f.On) < 0) E($"{w}: on 은 {string.Join(" · ", FxK.WHEN_ON)}"); break;
+                    case FxK.IfRhythm: if (f.N <= 0) E($"{w}: n 이 없다"); break;
+                    case FxK.Draw: case FxK.Ap: case FxK.NextCheaper: case FxK.Gauge: case FxK.Tough: case FxK.RushDown: case FxK.Hasten: case FxK.PayHp:
+                        if (f.V == 0) E($"{w}: v 가 없다"); effects++; break;
+                    case FxK.Discard: case FxK.SpendRhythm: if (!f.All && f.V <= 0) E($"{w}: v 또는 all 이 필요하다"); effects++; break;
+                    case FxK.DealtMod: case FxK.TakenMod: case FxK.AtkMod: case FxK.DefMod: case FxK.CritMod:
+                        if (f.V == 0) E($"{w}: v 가 없다"); if (Math.Abs(f.V) > 3) E($"{w}: v 는 비율(0.1 = 10%)"); effects++; break;
+                    case FxK.IfHeld: case FxK.IfSpent: case FxK.IfDebuffs: if (f.N <= 0) E($"{w}: n 이 없다(1 이상)"); break;
+                    case FxK.IfPlayedMax: if (f.N < 0) E($"{w}: n 은 0 이상"); break;
+                    case FxK.IfApLeft: if (f.N <= 0) E($"{w}: n 이 없다(1 이상)"); break;
+                    case FxK.NextAp: if (f.V == 0) E($"{w}: v 가 없다(다음 턴 AP ±v)"); effects++; break;
+                    case FxK.Burn: if (!f.All && f.V <= 0) E($"{w}: v 또는 all 이 필요하다"); effects++; break;
+                    case FxK.Reflect: if (!(f.Ratio > 0)) E($"{w}: ratio 가 없다(받은 피해의 비율)"); effects++; break;
+                    case FxK.PerPaid: if (f.Per < 0) E($"{w}: per 는 양수(HP 몇 마다)"); break;
+                    case FxK.IfHp: if (!(f.Pct > 0 && f.Pct < 1)) E($"{w}: pct 는 0~1(0.5 = 50% 이하)"); break;
+                    case FxK.Feed: if (f.V <= 0) E($"{w}: v 가 없다"); effects++; break;
+                    default: if (!FxK.Conditions.Contains(f.K) && !FxK.Pers.Contains(f.K)) effects++; break;
+                }
+                if (FxK.Pers.Contains(f.K) && !(i + 1 < fx.Count && (fx[i + 1].K == FxK.Dmg || fx[i + 1].K == FxK.Block || fx[i + 1].K == FxK.Shield || fx[i + 1].K == FxK.Heal)))
+                    E($"{w}: 「1개당」 바로 뒤에는 피해 · 방어 · 실드 · 회복이 와야 한다");
+            }
+            if (effects > 3) W($"{at}: 효과가 {effects}개 — 카드당 셋까지(docs/18 §3)");
+        }
+
+        void Tags(string at, List<string> tags)
+        {
+            foreach (var t in tags ?? new List<string>())
+            {
+                var (id, n) = Tag.Parse(t);
+                if (Array.IndexOf(Tag.All, id) < 0) E($"{at}: 모르는 태그 「{t}」");
+                if (n > 0 && id != Tag.Exhaust && id != Tag.Recall) E($"{at}: 수가 붙는 태그는 소멸 · 회수뿐 — 「{t}」");
+                if (n > 0 && Tag.Counted.TryGetValue(id, out var ok) && Array.IndexOf(ok, n) < 0) W($"{at}: 「{t}」 — 사전의 수는 {id} {string.Join(" · ", ok)}");
+            }
+        }
+
+        void Rule(string at, PassiveRule r)
+        {
+            if (r.When == null || r.When.On == null || !WHEN_ON.Contains(r.When.On)) E($"{at}: 모르는 언제 「{r.When?.On}」");
+            if (r.When != null)
+            {
+                if ((r.When.On == "stackReach" || r.When.On == "stackGone") && (r.When.Id == null || !keywords.Contains(r.When.Id))) E($"{at}: 키워드가 아니다 — 「{r.When.Id}」");
+                if (r.When.On == "stackReach" && r.When.N <= 0) E($"{at}: stackReach 에 n 이 없다");
+                if (r.When.On == "rhythm" && r.When.N <= 0) E($"{at}: rhythm 에 n 이 없다");
+                if (r.When.On == "lowHp" && !(r.When.Pct > 0 && r.When.Pct < 1)) E($"{at}: lowHp 의 pct 는 0~1");
+                if (r.When.Seq != null && (r.When.Seq.Count < 2 || r.When.Seq.Count > 3)) E($"{at}: seq 는 종류 2~3");
+                if (r.When.On == "huntDown" && r.When.Id != null && !keywords.Contains(r.When.Id)) E($"{at}: 키워드가 아니다 — 「{r.When.Id}」");
+                if (r.When.Fresh && r.When.On != "debuff") E($"{at}: fresh 는 debuff 에만");
+                if (r.When.Repeat && r.When.On != "play") E($"{at}: repeat 는 play 에만");
+                if (r.When.Who != null && r.When.Who != "any" && r.When.Who != "other") E($"{at}: who 는 any · other");
+                if (r.When.Who == "other" && !new[] { "play", "spend", "link", "crit", "make", "hit", "drawn", "extra", "unwound" }.Contains(r.When.On)) E($"{at}: who other 는 play · spend · link · crit · make · hit · drawn · extra · unwound 에만");
+                if (r.When.CardSt != null && r.When.On != "play") E($"{at}: cardSt 는 play 에만");
+                foreach (var c in r.Conds) if (c.C == "ally" && d.Hero(c.Id) == null) W($"{at}: 조건 ally 의 사도 {c.Id} 가 없다");
+                if (r.When.Guarded && r.When.On != "hurt") E($"{at}: guarded 는 hurt 에만");
+                if (r.When.Marked != null && (!keywords.Contains(r.When.Marked) || d.CarrierOf(r.When.Marked) != "hero")) E($"{at}: marked 는 사도 표시(carrier hero) 고유 효과 이름 — 「{r.When.Marked}」");
+                if (r.When.Tag != null && Array.IndexOf(Tag.All, r.When.Tag) < 0) E($"{at}: 모르는 태그 「{r.When.Tag}」");
+            }
+            foreach (var c in r.Conds) if (c.C == null || !CONDS.Contains(c.C)) E($"{at}: 모르는 조건 「{c.C}」");
+            if (r.Limit != null && r.Limit.Per != "turn" && r.Limit.Per != "fight") E($"{at}: limit.per 는 turn · fight");
+            FxList(at, r.Fx);
+        }
+
+        // ── 사도 ───────────────────────────────────────────────────────
+        void Hero(HeroDef h)
+        {
+            string at = $"사도 {h.Id}{d.At("hero", h.Id)}";
+            if (string.IsNullOrEmpty(h.Name)) E($"{at}: name 이 없다");
+            if (Array.IndexOf(R.ROLES, h.Role) < 0) E($"{at}: role 은 탱커 · 서포터 · 딜러");
+            if (h.Nature != null && Array.IndexOf(R.NATURES, h.Nature) < 0) E($"{at}: 모르는 성격 {h.Nature}");
+            if (Array.IndexOf(R.ROWS, h.Row) < 0) E($"{at}: row 는 front · mid · back");
+            if (h.Hp <= 0 || h.Atk <= 0) E($"{at}: hp · atk 가 없다");
+            foreach (var id in h.Starter) { var c = d.Card(id); if (c == null) E($"{at}: 없는 시작 카드 {id}"); else if (c.Hero != h.Id) E($"{at}: 시작 카드 {id} 의 주인이 다르다"); }
+            if (h.Starter.Count == 0) W($"{at}: 시작 카드가 없다");
+            if (h.Ult != null) { if (h.Ult.Cost <= 0 || h.Ult.Cost > R.GAUGE_MAX) E($"{at}: 고학년 cost 는 1~{R.GAUGE_MAX}"); FxList(at + " 고학년", h.Ult.Fx); }
+            if (!h.AllKeywords.Any()) W($"{at}: 고유 효과(keyword)가 없다 — 사도마다 자기 고유 효과를 하나씩");
+            foreach (var k in h.AllKeywords)
+            {
+                if (string.IsNullOrEmpty(k.Name)) E($"{at}: 키워드 name 이 없다");
+                else if (R.ALL_ST.Contains(k.Name) || R.IsCardSt(k.Name) || Array.IndexOf(Tag.All, k.Name) >= 0) E($"{at}: 고유 효과 이름 「{k.Name}」 이 엔진 키워드(상태 · 태그)와 같다 — 새 이름으로");
+                else if (!Used(h, k.Name)) W($"{at}: 고유 효과 「{k.Name}」 이 어디에도 안 쓰인다(카드 · 패시브 · 고학년 · 규칙의 stack · spend · ifStack · perStack · payWith …)");
+                if (!CARRIERS.Contains(k.Carrier)) E($"{at}: 키워드 carrier 는 self · enemy · ally · hero");
+                if (k.Wrap && k.Cap == null) E($"{at}: wrap(순환)은 cap 이 있어야 한다");
+                if (k.Weakens && k.Carrier != "enemy") E($"{at}: weakens 는 적에게 거는 표식(carrier enemy)에만");
+                if (k.Guard && k.Carrier != "self" && k.Carrier != "hero") E($"{at}: guard(소환물)는 carrier self · hero 에만");
+                if (k.Cut > 0 && (!k.Guard || k.Cut > 1)) E($"{at}: cut 은 guard 와 같이(0~1)");
+                if (k.TagWhile != null && Array.IndexOf(Tag.All, k.TagWhile) < 0) E($"{at}: tagWhile 은 태그 이름 — 「{k.TagWhile}」");
+                if (k.Spread && k.Carrier != "self") E($"{at}: spread 는 carrier self 에만");
+                foreach (var p in k.Per) { if (p.From != null && (p.From != "owner" || k.Carrier != "enemy")) E($"{at}: per.from 은 owner(적 표식)만"); if (p.Stat == "tough" && k.Carrier != "enemy") E($"{at}: per stat tough 는 적 표식에만"); }
+                foreach (var p in k.Per) if (!PER_STAT.Contains(p.Stat)) E($"{at}: 키워드 1개당 — 모르는 stat {p.Stat}");
+                if (k.Reserve && !k.Decays) W($"{at}: 예약 키워드는 「적의 차례가 끝나면 N 감소」 와 같이 쓴다");
+                if (k.Hunt && k.Carrier != "enemy") E($"{at}: 찍기(hunt)는 적에게 거는 표식(carrier enemy)에만");
+                if (k.Per.Where(p => p.Stat != "dot" && p.Stat != "hot").Any(p => Math.Abs(p.V) * (k.Cap ?? 1) > (k.Consumes ? 1.0 : 0.6) + 1e-9))
+                    W($"{at}: 키워드 1개당 % × 최대 겹이 상한(+60%, 발동하면 사라지면 +100%)을 넘는다");
+                foreach (var r in k.Rules) Rule($"{at} 키워드 규칙", r);
+            }
+            for (int i = 0; i < h.Passives.Count; i++) Rule($"{at} 패시브[{i}] {h.Passives[i].Name}", h.Passives[i]);
+            if (h.Passives.Select(p => p.Name).Distinct().Count() > 2) W($"{at}: 패시브는 둘까지(docs/18 §3)");
+        }
+
+        /// <summary>그 사도의 고유 효과가 데이터 어딘가에서 쓰이나(stack · spend · ifStack · perStack · xStack · payWith · marked · 규칙의 id).</summary>
+        bool Used(HeroDef h, string name)
+        {
+            bool InFx(IEnumerable<Fx> fx) => fx != null && fx.Any(f => (f.Id == name && (f.K == FxK.Stack || f.K == FxK.Spend || f.K == FxK.IfStack || f.K == FxK.PerStack)) || f.XStack == name || f.K == FxK.Feed || InFx(f.Then));
+            bool InRules(IEnumerable<PassiveRule> rs) => rs != null && rs.Any(r => InFx(r.Fx) || r.When.Id == name || r.When.Marked == name || r.Conds.Any(c => c.Id == name));
+            var cards = d.Cards.Values.Where(c => c.Hero == h.Id).ToList();
+            return cards.Any(c => InFx(c.Fx) || c.PayWith == name || c.Oracles.Any(o => InFx(o.Fx)) || c.Blesses.Any(b => InFx(b.Fx)))
+                || InRules(h.Passives) || (h.Ult != null && InFx(h.Ult.Fx)) || h.AllKeywords.Any(k => InRules(k.Rules))
+                || d.Equips.Values.Any(e => InRules(e.Effect) || InRules(e.AffinityEffect));
+        }
+
+        // ── 카드 ───────────────────────────────────────────────────────
+        void Card(CardDef c)
+        {
+            string at = $"카드 {c.Id}{d.At("card", c.Id)}";
+            if (string.IsNullOrEmpty(c.Name)) E($"{at}: name 이 없다");
+            if (Array.IndexOf(R.CARD_TYPES, c.Type) < 0) E($"{at}: type 은 공격 · 스킬 · 강화 · 상태 · 저주");
+            if (c.Cost < 0) E($"{at}: cost 가 음수");
+            if (c.Hero != null && d.Hero(c.Hero) == null) E($"{at}: 없는 사도 {c.Hero}");
+            if (c.Id.EndsWith(GameData.PLAIN) || c.Id.EndsWith(GameData.COPY)) E($"{at}: id 끝에 ~ · ^ 를 쓰지 않는다(엔진이 쓴다)");
+            Tags(at, c.Tags);
+            FxList(at, c.Fx);
+            if (c.Fx.Count == 0 && !c.Tags.Contains(Tag.Unplayable) && c.Type != "저주" && c.Type != "상태") W($"{at}: 효과가 없다");
+            if (c.Fx.Any(f => f.XHits) && !c.X) E($"{at}: xHits 는 X 코스트 카드에만");
+            if (c.Oracles.Count != 0 && c.Oracles.Count != 5) E($"{at}: 신탁은 다섯(①~⑤) — 지금 {c.Oracles.Count}");
+            if (c.Unique && c.Hero != null && c.Oracles.Count == 0) W($"{at}: 고유 카드에 신탁이 없다");
+            for (int i = 0; i < c.Oracles.Count; i++) { var o = c.Oracles[i]; Tags($"{at} 신탁{i + 1}", o.Tags); FxList($"{at} 신탁{i + 1}", o.Fx); if (string.IsNullOrEmpty(o.Name)) E($"{at} 신탁{i + 1}: name 이 없다"); }
+            if (c.Oracles.Count == 5) OracleRules(c);
+            if (c.Blesses.Count > 3) E($"{at}: 축복은 셋까지");
+            foreach (var b in c.Blesses)
+            {
+                if (b.Kind != null && !BLESS_KIND.Contains(b.Kind)) E($"{at} 축복 {b.Name}: 모르는 kind {b.Kind}");
+                if (b.Tags.Any(t => Tag.Parse(t).id == Tag.Exhaust)) E($"{at} 축복 {b.Name}: 축복에 소멸을 달지 않는다");
+                Tags($"{at} 축복", b.Tags); FxList($"{at} 축복 {b.Name}", b.Fx);
+            }
+            if (c.Neutral && (c.Grade == null || !R.SHOP_GRADE_WEIGHT.ContainsKey(c.Grade))) E($"{at}: 교주 카드는 grade(일반 · 고급 · 희귀 · 전설)가 있어야 한다");
+            if (c.Neutral && c.Price <= 0) E($"{at}: 교주 카드는 price 가 있어야 한다");
+            // 사도 고유 효과 틀 · 키워드 사전
+            if (c.Token && c.Hero == null) E($"{at}: token(사도 전용 생성 카드)은 hero 가 있어야 한다");
+            if (c.Token && c.Unique) E($"{at}: token 은 고유 카드가 아니다(unique 빼기)");
+            if (c.Token && d.Heroes.Values.Any(h => h.Starter.Contains(c.Id))) E($"{at}: token 은 시작 덱에 넣지 않는다");
+            if (c.Evolve != null && (c.Evolve.Into == null || d.Card(c.Evolve.Into) == null)) E($"{at}: evolve.into 카드가 없다");
+            if (c.Evolve != null && c.Evolve.N < 2) E($"{at}: evolve.n 은 2 이상");
+            if (c.BondCard != null && d.Card(c.BondCard) == null) E($"{at}: bondCard(강해진 카드)가 없다 — {c.BondCard}");
+            if (c.Tags.Contains(Tag.Bond) && c.BondCard == null) W($"{at}: 결속 카드에 bondCard(겹친 수 3 이상의 강해진 카드)가 없다");
+            if (c.Tags.Contains(Tag.Bond) && c.Hero == null) E($"{at}: 결속은 사도 카드에만");
+            if (c.Becomes != null && d.Card(c.Becomes) == null) E($"{at}: becomes(금기 카드)가 없다 — {c.Becomes}");
+            if (c.Tags.Contains(Tag.SealedTaboo) && c.Becomes == null) E($"{at}: 봉인된 금기는 becomes(보스를 처치하면 바뀔 금기 카드)가 있어야 한다");
+            if (c.PayRate < 0) E($"{at}: payRate 는 1 이상");
+            if (c.PayWith != null && (c.Hero == null || !d.Hero(c.Hero)?.AllKeywords.Any(k => k.Name == c.PayWith && (k.Carrier ?? "self") == "self") == true)) E($"{at}: payWith 는 그 사도의 고유 효과(carrier self) 이름 — 「{c.PayWith}」");
+            if (c.Choices != null && c.Choices.Count != 2) E($"{at}: choices 는 갈래 이름 둘");
+            if (c.Choices != null && !c.Fx.Any(f => f.K == FxK.IfChoice)) W($"{at}: choices 가 있는데 효과에 ifChoice 가 없다");
+        }
+
+        /// <summary>
+        /// 신탁 규칙(docs/18 §3) — ① 코스트 기준 값어치가 기본의 1.15배 이상 ② 코스트를 올렸으면 값어치 합 1.6배 이상
+        /// ③ 기본에 없는 소멸은 2배 넘는 한 방에만 · 코스트를 내린 신탁엔 안 붙인다 · 카드당 하나. 어기면 주의(값어치는 대충의 셈이다).
+        /// </summary>
+        void OracleRules(CardDef c)
+        {
+            var b = d.View(c.Id);
+            double vb = Math.Max(0.05, CardValue.CardWorth(b));
+            int gones = 0;
+            for (int n = 1; n <= 5; n++)
+            {
+                var o = d.View(c.Id, n);
+                double vo = CardValue.CardWorth(o);
+                double r = (vo / CardValue.BaseValue(o.X ? 3 : o.Cost)) / (vb / CardValue.BaseValue(b.X ? 3 : b.Cost));
+                string at = $"카드 {c.Id}{d.At("card", c.Id)} 신탁{n} 「{c.Oracles[n - 1].Name}」";
+                if (r < 1.15) W($"{at}: 기본보다 낫지 않다(코스트 기준 {r:0.00}배 · 1.15배 이상)");
+                if (o.Cost > b.Cost && vo / vb < 1.6) W($"{at}: 코스트를 올렸으면 값어치가 기본의 1.6배 이상(지금 {vo / vb:0.00}배)");
+                bool gone = o.TagN(Tag.Exhaust) == 0 && b.TagN(Tag.Exhaust) != 0;
+                if (gone) { gones++; if (o.Cost < b.Cost) W($"{at}: 코스트를 내린 신탁에 소멸을 붙이지 않는다"); else if (vo / 0.7 / vb < 2) W($"{at}: 기본에 없는 소멸은 2배 넘는 한 방에만"); }
+            }
+            if (gones > 1) W($"카드 {c.Id}: 소멸 신탁이 {gones}개 — 카드당 하나까지");
+        }
+
+        // ── 적 ─────────────────────────────────────────────────────────
+        void Intent(string at, Intent it, bool passive)
+        {
+            if (it == null) { E($"{at}: 수가 없다"); return; }
+            bool known = INTENTS.Contains(it.T) || (passive && (it.T == "thorns" || it.T == "selfHeal" || it.T == "revive" || it.T == "feign"));
+            if (!known) { E($"{at}: 모르는 수 {it.T}"); return; }
+            if ((it.T == "attack" || it.T == "back" || it.T == "attackAll" || it.T == "multi" || it.T == "block" || it.T == "guard" || it.T == "heal" || it.T == "jam") && it.V <= 0) E($"{at}: {it.T} 에 v 가 없다");
+            if (it.T == "charge") { if (it.Next == null) E($"{at}: charge 에 next 가 없다"); else Intent(at + " next", it.Next, false); }
+            if ((it.T == "buff" || it.T == "debuff") && (it.Id == null || !R.ALL_ST.Contains(it.Id))) E($"{at}: 모르는 상태 {it.Id}");
+            if (it.T == "addCard") { var c = d.Card(it.Id); if (c == null) E($"{at}: 없는 카드 {it.Id}"); else if (!c.IsStatusCard) W($"{at}: 끼워 넣는 카드는 상태 카드여야 한다 — {it.Id}"); if (it.To != null && it.To != "draw" && it.To != "discard" && it.To != "hand") E($"{at}: to 는 draw · discard · hand"); }
+            if (it.Id != null && (it.T == "attack" || it.T == "back" || it.T == "attackAll" || it.T == "multi") && !R.ALL_ST.Contains(it.Id)) E($"{at}: 모르는 상태 {it.Id}");
+            if (it.T == "summon" && d.Enemy(it.Id) == null) E($"{at}: 세울 적이 없다 — {it.Id}");
+            if (it.T == "cardDebuff" && !R.IsCardSt(it.Id)) E($"{at}: cardDebuff 의 id 는 카드에 붙는 상태(독 · 봉쇄 · 침체 · 빙결)");
+            if (it.T == "cardDebuff" && it.To != null && it.To != "hand" && it.To != "draw") E($"{at}: cardDebuff 의 to 는 hand · draw");
+            if (it.T == "handCost" && it.V == 0) E($"{at}: handCost 에 v(±비용)가 없다");
+            if (it.T == "reshuffle" && it.Id != null && d.Card(it.Id) == null) E($"{at}: reshuffle 에 넣을 카드가 없다 — {it.Id}");
+            if (it.T == "shift" && it.Next == null) E($"{at}: shift 에 next(바뀔 수)가 없다");
+            if (it.T == "shift" && it.Next != null) Intent(at + " next", it.Next, false);
+            if (it.If?.Counter != null && it.If.N <= 0) E($"{at}: if.counter 에 n 이 없다");
+            if (it.If != null && it.If.Allies == null && it.If.PartyBlock == null && it.If.SelfBlock == null && it.If.Counter == null) E($"{at}: if 에 allies · partyBlock · selfBlock · counter 가운데 하나가 있어야 한다");
+            if (it.Rush != null && it.Rush != 0 && it.Rush < R.ENEMY_RUSH_MIN) W($"{at}: rush 는 0 또는 {R.ENEMY_RUSH_MIN} 이상(엔진이 올린다)");
+        }
+
+        void Enemy(EnemyDef e)
+        {
+            string at = $"적 {e.Id}{d.At("enemy", e.Id)}";
+            if (string.IsNullOrEmpty(e.Name)) E($"{at}: name 이 없다");
+            if (e.Hp <= 0) E($"{at}: hp 가 없다");
+            if (e.Row != "front" && e.Row != "back") E($"{at}: row 는 front · back");
+            if (e.Nature != null && Array.IndexOf(R.NATURES, e.Nature) < 0) E($"{at}: 모르는 성격 {e.Nature}");
+            if (e.Weak != null) foreach (var w in e.Weak) if (Array.IndexOf(R.NATURES, w) < 0) E($"{at}: 모르는 약점 성격 {w}");
+            if (e.Nature == null && (e.Weak == null || e.Weak.Count == 0)) W($"{at}: 성격도 약점도 없다 — 약점 공격이 안 걸린다");
+            if (e.Pick != "cycle" && e.Pick != "shuffle") E($"{at}: pick 은 cycle · shuffle");
+            if (e.Intents.Count == 0) E($"{at}: intents 가 없다");
+            for (int i = 0; i < e.Intents.Count; i++) Intent($"{at} 수[{i}]", e.Intents[i], false);
+            if (e.Open != null) Intent($"{at} open", e.Open, false);
+            foreach (var (ph, name) in new[] { (e.Phase, "phase"), (e.Phase2, "phase2") })
+            {
+                if (ph == null) continue;
+                if (!(ph.At > 0 && ph.At < 1)) E($"{at} {name}: at 은 0~1");
+                if (ph.Intents.Count == 0) E($"{at} {name}: intents 가 없다");
+                for (int i = 0; i < ph.Intents.Count; i++) Intent($"{at} {name}[{i}]", ph.Intents[i], false);
+            }
+            if (e.Phase2 != null && e.Phase == null) E($"{at}: phase2 는 phase 뒤에");
+            var cnames = new HashSet<string>();
+            foreach (var c in e.Counters)
+            {
+                string ca = $"{at} 쌓이는 수치 {c.Name}";
+                if (string.IsNullOrEmpty(c.Name)) { E($"{at}: 쌓이는 수치에 name 이 없다"); continue; }
+                if (!cnames.Add(c.Name)) E($"{ca}: 이름이 겹친다");
+                if (R.ALL_ST.Contains(c.Name) || R.IsCardSt(c.Name)) E($"{ca}: 엔진 상태 이름과 같다 — 새 이름으로");
+                if (c.Max <= 0 || c.Start < 0 || c.Start > c.Max) E($"{ca}: start 0~max · max 1 이상");
+                if (c.At > 0 && c.Act == null) E($"{ca}: at 이 있으면 act(그때 할 수)가 있어야 한다");
+                if (c.Act != null) { if (c.At <= 0) E($"{ca}: act 가 있으면 at(문턱)이 있어야 한다"); Intent(ca + " act", c.Act, true); }
+                if (c.Mode != null && c.Mode != "now" && c.Mode != "next" && c.Mode != "replace") E($"{ca}: mode 는 now · next · replace");
+                if (c.CardType != null && !new[] { "공격", "스킬", "강화", "!공격", "!스킬", "!강화" }.Contains(c.CardType)) E($"{ca}: cardType 은 공격 · 스킬 · 강화 (앞에 ! 면 그것이 아닌 것)");
+                if (c.Dealt == 0 && c.Taken == 0 && c.Flat == 0 && c.At == 0 && !c.StunAtZero) W($"{ca}: 하는 일이 없다(dealt · taken · flat · at · stunAtZero)");
+            }
+            foreach (var r in e.Rare)
+            {
+                if (r.Id == null || !R.RARES.ContainsKey(r.Id)) E($"{at}: 모르는 희귀종 덧붙임 「{r.Id}」 — {string.Join(" · ", R.RARES.Keys)}");
+                if ((r.Id == "reshuffle" || r.Id == "anxietyHits") && (r.Card == null || d.Card(r.Card) == null)) E($"{at}: 희귀종 {r.Id} 에 card(상태 카드)가 없다");
+                if (r.Id == "actDebuff" && r.St != null && r.St != "취약" && r.St != "약화") E($"{at}: 희귀종 actDebuff 의 st 는 취약 · 약화");
+            }
+            if (e.ToughTaken < 0 || e.ToughTaken > 2) E($"{at}: toughTaken 은 0~2(받는 강인도 피해 배율)");
+            foreach (var p in e.Passives)
+            {
+                if (p.On == null || !FOE_ON.Contains(p.On)) E($"{at} 패시브 {p.Name}: 모르는 on {p.On}");
+                if (string.IsNullOrEmpty(p.Name)) E($"{at}: 패시브 name 이 없다(횟수를 이름으로 센다)");
+                if (p.On == "lowHp" && !(p.At > 0 && p.At < 1)) E($"{at} 패시브 {p.Name}: lowHp 의 at 은 0~1");
+                if (p.Who != null && (p.On != "allyDown" || d.Enemy(p.Who) == null)) E($"{at} 패시브 {p.Name}: who 는 allyDown 의 적 id");
+                Intent($"{at} 패시브 {p.Name}", p.Do, true);
+            }
+        }
+
+        // ── 마을 ───────────────────────────────────────────────────────
+        void Foes(string at, List<string> ids)
+        {
+            if (ids == null || ids.Count == 0) { E($"{at}: 적이 없다"); return; }
+            foreach (var id in ids) if (d.Enemy(id) == null) E($"{at}: 없는 적 {id}");
+        }
+
+        void Village(VillageDef v)
+        {
+            string at = $"마을 {v.Id}{d.At("village", v.Id)}";
+            if (v.Floors.Count != 2) E($"{at}: 층은 둘(바깥 · 안쪽)");
+            for (int i = 0; i < v.Floors.Count; i++)
+            {
+                var f = v.Floors[i]; string fa = $"{at} {i + 1}층";
+                if (f.Pools.Count != 3) E($"{fa}: pools 는 세기 셋(약 · 중 · 강)");
+                for (int t = 0; t < f.Pools.Count; t++) { if (f.Pools[t].Count == 0) E($"{fa} 세기{t}: 싸움이 없다"); foreach (var p in f.Pools[t]) Foes($"{fa} 세기{t}", p); }
+                if (f.Elites.Count == 0) W($"{fa}: 엘리트가 없다(강 세기를 쓴다)");
+                foreach (var p in f.Elites) Foes($"{fa} 엘리트", p);
+                Foes($"{fa} 보스", f.Boss);
+                if (!f.BossElite && f.Boss.Count > 0 && !f.Boss.Any(id => d.Enemy(id)?.Boss == true)) W($"{fa}: 보스 칸에 boss 적이 없다 — bossElite 를 쓰나?");
+            }
+        }
+
+        // ── 이벤트 ─────────────────────────────────────────────────────
+        void Outs(string at, List<Outcome> outs)
+        {
+            foreach (var o in outs ?? new List<Outcome>())
+            {
+                if (o.K == null || !OUT_K.Contains(o.K)) { E($"{at}: 모르는 결과 {o.K}"); continue; }
+                if ((o.K == "equip" || o.K == "shopGift") && Array.IndexOf(R.GRADES, o.Grade) < 0) E($"{at}: {o.K} 의 grade");
+                if (o.K == "equip" && o.Slot != null && Array.IndexOf(R.SLOTS, o.Slot) < 0) E($"{at}: 모르는 칸 {o.Slot}");
+                if (o.K == "neutral" && o.Grade != null && Array.IndexOf(R.GRADES, o.Grade) < 0) E($"{at}: 교주 카드 grade");
+                if (o.K == "curse") { var c = d.Card(o.Id); if (c == null || !c.IsCurse) E($"{at}: 골칫거리(저주 카드)가 아니다 — {o.Id}"); }
+                if (o.K == "gift") { var c = d.Card(o.Id); if (c == null || !c.Gift) E($"{at}: 선물 카드(gift)가 아니다 — {o.Id}"); }
+                if (o.K == "next" && o.Next == null) E($"{at}: next 의 내용이 없다");
+                if (o.K == "flash" && o.All) E($"{at}: flash 의 all(다섯 중 고르기)은 없앴다 — 신탁은 늘 무작위 셋 가운데 하나(2026-10-05)");
+                if (o.K == "next" && o.Next?.Buff != null) foreach (var b in o.Next.Buff.Keys) if (!R.ALL_ST.Contains(b)) E($"{at}: 모르는 상태 {b}");
+            }
+        }
+
+        void Event(EventDef e)
+        {
+            string at = $"이벤트 {e.Id}{d.At("event", e.Id)}";
+            if (string.IsNullOrEmpty(e.Name)) E($"{at}: name 이 없다");
+            if (e.Options.Count == 0) E($"{at}: 선택지가 없다");
+            if (e.Pool != "공용" && !d.Villages.Values.SelectMany(v => v.Floors).Any(f => f.Land == e.Pool)) W($"{at}: 땅 「{e.Pool}」 이 어느 마을에도 없다");
+            Outs(at + " 떠나기", e.LeaveOut);
+            for (int i = 0; i < e.Options.Count; i++)
+            {
+                var o = e.Options[i]; string oa = $"{at} 선택지[{i}]";
+                if (string.IsNullOrEmpty(o.Label)) E($"{oa}: label 이 없다");
+                Outs(oa, o.Out);
+                if (o.Hero != null) foreach (var h in o.Hero) if (d.Hero(h) == null) W($"{oa}: 없는 사도 {h}");
+                if (o.Gamble != null)
+                {
+                    double sum = o.Gamble.Sum(g => g.P);
+                    if (Math.Abs(sum - 1) > 0.01) E($"{oa}: gamble 의 p 합이 1 이 아니다({sum:0.##})");
+                    foreach (var g in o.Gamble) Outs(oa + " gamble", g.Out);
+                }
+                if (o.Judge != null) { if (o.Judge.By != "atk-max" && o.Judge.By != "hp-party") E($"{oa}: judge.by 는 atk-max · hp-party"); Outs(oa + " 성공", o.Judge.Pass); Outs(oa + " 실패", o.Judge.Fail); }
+                if (o.Fight != null)
+                {
+                    if (o.Fight.ByLand != null) foreach (var kv in o.Fight.ByLand) Foes($"{oa} 싸움({kv.Key})", kv.Value);
+                    else Foes(oa + " 싸움", o.Fight.Enemies);
+                    Outs(oa + " 이기면", o.Fight.Win);
+                }
+                if (o.Price != null) Outs(oa + " price", o.Price.Out);
+                if (o.When != null && o.When != "hp30") E($"{oa}: when 은 hp30 만");
+            }
+        }
+
+        // ── 장비 ───────────────────────────────────────────────────────
+        void Equip(EquipDef e)
+        {
+            string at = $"장비 {e.Id}{d.At("equip", e.Id)}";
+            if (string.IsNullOrEmpty(e.Name)) E($"{at}: name 이 없다");
+            if (Array.IndexOf(R.SLOTS, e.Slot) < 0) E($"{at}: slot 은 무기 · 방어구 · 장신구");
+            if (Array.IndexOf(R.GRADES, e.Grade) < 0) E($"{at}: grade 는 일반 · 고급 · 희귀 · 전설");
+            if (e.Affinity != null && d.Hero(e.Affinity) == null) W($"{at}: 애착 사도 {e.Affinity} 가 없다");
+            for (int i = 0; i < e.Effect.Count; i++) Rule($"{at} 효과[{i}]", e.Effect[i]);
+            for (int i = 0; i < e.AffinityEffect.Count; i++) Rule($"{at} 애착[{i}]", e.AffinityEffect[i]);
+        }
+    }
+}

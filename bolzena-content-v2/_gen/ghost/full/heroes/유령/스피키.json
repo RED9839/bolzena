@@ -1,0 +1,756 @@
+{
+  "heroes": [
+    {
+      "id": "스피키",
+      "name": "스피키",
+      "nature": "순수",
+      "race": "유령",
+      "row": "back",
+      "role": "서포터",
+      "star": 2,
+      "hp": 450,
+      "atk": 64,
+      "def": 55,
+      "crit": 5,
+      "blurb": "남을 흉내 내 보는 이의 인식을 비트는 따라쟁이 유령. 다른 아군이 카드를 낼 때마다 「변장」 이 쌓이고, 스피키 카드는 변장을 써서 손에 든 아군 카드의 효과를 대신 꺼내 쓴다.",
+      "keyword": {
+        "name": "변장",
+        "desc": "방금 본 아군을 흉내 낸 어설픈 분장 — 보는 이에게는 완벽해 보인다",
+        "carrier": "self",
+        "cap": 3
+      },
+      "passives": [
+        {
+          "name": "완벽한 따라쟁이",
+          "when": {
+            "on": "play",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "트릭 오어 트릿~☆",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          },
+          {
+            "k": "heal",
+            "ratio": 3
+          },
+          {
+            "k": "stack",
+            "id": "변장",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "스피키_s1",
+        "스피키_s1",
+        "스피키_s2",
+        "스피키_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "스피키_s1",
+      "name": "주문 발사",
+      "hero": "스피키",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "스피키_s2",
+      "name": "사탕 나눠주기",
+      "hero": "스피키",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "스피키_u1",
+      "name": "펌킨 매직",
+      "hero": "스피키",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1
+        },
+        {
+          "k": "ifStack",
+          "id": "변장",
+          "n": 1
+        },
+        {
+          "k": "castOther"
+        },
+        {
+          "k": "spend",
+          "id": "변장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "호박 마술쇼",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "손장난 마술",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.75
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "숨겨 둔 마술",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.35
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두 번 흉내",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther"
+            }
+          ]
+        },
+        {
+          "name": "축복의 호박",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.3
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "호박 등불",
+          "kind": "guard"
+        },
+        {
+          "name": "잽싼 손",
+          "kind": "draw"
+        },
+        {
+          "name": "분장 고치기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스피키_u2",
+      "name": "사제장 대리",
+      "hero": "스피키",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 2
+        },
+        {
+          "k": "ifStack",
+          "id": "변장",
+          "n": 1
+        },
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "그럴듯한 설교",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "짧은 설교",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대리 직함",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "진짜인 척",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복 기도",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "엄숙한 목소리",
+          "kind": "defUp"
+        },
+        {
+          "name": "서두르는 사제",
+          "kind": "cost"
+        },
+        {
+          "name": "믿음의 증표",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스피키_u3",
+      "name": "호박 바구니",
+      "hero": "스피키",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        },
+        {
+          "k": "stack",
+          "id": "변장",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "꽉 찬 바구니",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.05
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 바구니",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.05
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아껴 둔 사탕",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.9
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "친구 몫까지",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.4
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 사탕",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.8
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "큰 사탕",
+          "kind": "heal"
+        },
+        {
+          "name": "덤 사탕",
+          "kind": "draw"
+        },
+        {
+          "name": "호박 친구",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스피키_u4",
+      "name": "한 번 맞아보실래요오?",
+      "hero": "스피키",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifStack",
+          "id": "변장",
+          "n": 1
+        },
+        {
+          "k": "castOther",
+          "id": "공격"
+        },
+        {
+          "k": "spend",
+          "id": "변장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진심 펀치",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.05,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther",
+              "id": "공격"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 펀치",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther",
+              "id": "공격"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "참았던 펀치",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther",
+              "id": "공격"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흉내 낸 필살기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther",
+              "id": "공격"
+            }
+          ]
+        },
+        {
+          "name": "축복 펀치",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "변장",
+              "n": 1
+            },
+            {
+              "k": "castOther",
+              "id": "공격"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "험한 입",
+          "kind": "power"
+        },
+        {
+          "name": "얄미운 웃음",
+          "kind": "frost"
+        },
+        {
+          "name": "다시 한 번",
+          "kind": "draw"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,766 @@
+{
+  "heroes": [
+    {
+      "id": "요미",
+      "name": "요미",
+      "nature": "우울",
+      "race": "미스틱",
+      "row": "mid",
+      "role": "딜러",
+      "star": 3,
+      "hp": 720,
+      "atk": 146,
+      "def": 29,
+      "crit": 10,
+      "blurb": "누구도 모시지 않는 달을 홀로 섬겨 온 사제. 턴마다 달이 그믐 → 초승 → 반달 → 보름으로 차오르고, 스킬로 기도하면 한 칸 앞당긴다.",
+      "keyword": {
+        "name": "달의 위상",
+        "desc": "달의 위상 — 1 그믐(요미 고유 카드가 AP 1 돌려줌) · 2 초승 · 3 반달(드로우 1을 덧붙임) · 4 보름(요미 피해 +60% · 보름이 뜨면 파티 치유). 턴 시작마다 한 칸, 4를 넘으면 그믐으로",
+        "carrier": "self",
+        "cap": 4,
+        "wrap": true,
+        "rules": [
+          {
+            "name": "보름달",
+            "when": {
+              "on": "stackReach",
+              "id": "달의 위상",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.6
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "달의 순환",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "만월의 사제",
+          "when": {
+            "on": "always"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "달의 위상",
+              "n": 4
+            }
+          ],
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.6,
+              "target": "self"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "지극정성의 마중",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "ap",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "요미_s1",
+        "요미_s1",
+        "요미_s2",
+        "요미_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "요미_s1",
+      "name": "달빛 탄",
+      "hero": "요미",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "요미_s2",
+      "name": "만월 탄",
+      "hero": "요미",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "요미_s3",
+      "name": "사제의 베일",
+      "hero": "요미",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "요미_u1",
+      "name": "달빛 사격",
+      "hero": "요미",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "signature": true,
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.25,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "달의 위상",
+          "n": 1,
+          "max": 1
+        },
+        {
+          "k": "ap",
+          "v": 1
+        },
+        {
+          "k": "ifStack",
+          "id": "달의 위상",
+          "n": 2,
+          "max": 3
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "달이 어떤 얼굴이든 사제의 손은 흔들리지 않는다",
+      "oracles": [
+        {
+          "name": "은빛 사격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 2,
+              "max": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "희미한 달빛",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 2,
+              "max": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "달무리",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 2,
+              "max": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "달빛 표적",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 2,
+              "max": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "달 아래 대기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 2,
+              "max": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "은빛 탄",
+          "kind": "power"
+        },
+        {
+          "name": "달그림자",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "밤하늘",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "요미_u2",
+      "name": "그믐의 화살",
+      "hero": "요미",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "ifStack",
+          "id": "달의 위상",
+          "n": 1,
+          "max": 1
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "blurb": "달이 숨은 밤의 화살은 보이지 않는다",
+      "oracles": [
+        {
+          "name": "칠흑의 화살",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "그림자 화살",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흩어지는 별",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "밤의 장막",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기다린 밤",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "달의 위상",
+              "n": 1,
+              "max": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "어둠",
+          "kind": "power"
+        },
+        {
+          "name": "달 없는 밤",
+          "kind": "cost"
+        },
+        {
+          "name": "서늘한 바람",
+          "kind": "frost"
+        }
+      ]
+    },
+    {
+      "id": "요미_u3",
+      "name": "달을 섬기는 기도",
+      "hero": "요미",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "달의 위상",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "아무도 모시지 않는 달에게, 오늘도 홀로",
+      "oracles": [
+        {
+          "name": "간절한 기도",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "밤샘 기도",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "달빛 축복",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "사제의 베일",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "묵상",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "은방울",
+          "kind": "draw"
+        },
+        {
+          "name": "달빛 한 줄기",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "제단",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "요미_u4",
+      "name": "홀로 섬긴 사제",
+      "hero": "요미",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "달의 위상",
+          "v": 1
+        },
+        {
+          "k": "atkMod",
+          "v": 0.15,
+          "run": true,
+          "target": "self"
+        }
+      ],
+      "blurb": "모시는 이 없어도 달은 차오른다",
+      "oracles": [
+        {
+          "name": "만월의 서약",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 1
+            },
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "작은 서약",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "사제의 인내",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 1
+            },
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "달의 가호",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 1
+            },
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "첫 기도",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "사제의 각오",
+          "kind": "atkUp"
+        },
+        {
+          "name": "새벽 예배",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "촛불",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

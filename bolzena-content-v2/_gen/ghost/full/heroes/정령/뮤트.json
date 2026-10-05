@@ -1,0 +1,803 @@
+{
+ "heroes": [
+  {
+   "id": "뮤트",
+   "name": "뮤트",
+   "nature": "순수",
+   "row": "back",
+   "role": "서포터",
+   "star": 3,
+   "hp": 500,
+   "atk": 86,
+   "def": 58,
+   "crit": 5,
+   "blurb": "나타와 뒤섞여 머릿속에서 늘 회의 중. 턴의 첫 카드가 공격이면 뮤트가, 스킬이면 나타가 그 턴 의장을 맡는다.",
+   "keywords": [
+    {
+     "name": "뮤트 의장",
+     "desc": "이번 턴 회의는 뮤트가 이끈다 — 뮤트 카드가 적을 무르게 만든다",
+     "carrier": "self",
+     "cap": 1,
+     "endClear": true,
+     "rules": [
+      {
+       "name": "뮤트 의장",
+       "when": {
+        "on": "play",
+        "who": "any",
+        "nth": 1,
+        "type": "공격"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "뮤트 의장",
+         "v": 1
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "나타 의장",
+     "desc": "이번 턴 회의는 나타가 이끈다 — 뮤트 카드가 파티를 지킨다",
+     "carrier": "self",
+     "cap": 1,
+     "endClear": true,
+     "rules": [
+      {
+       "name": "나타 의장",
+       "when": {
+        "on": "play",
+        "who": "any",
+        "nth": 1,
+        "type": "스킬"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "나타 의장",
+         "v": 1
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "passives": [
+    {
+     "name": "뮤트의 발언",
+     "when": {
+      "on": "play"
+     },
+     "conds": [
+      {
+       "c": "stack",
+       "id": "뮤트 의장",
+       "n": 1
+      }
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "나타의 발언",
+     "when": {
+      "on": "play"
+     },
+     "conds": [
+      {
+       "c": "stack",
+       "id": "나타 의장",
+       "n": 1
+      }
+     ],
+     "fx": [
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "기초적인 해킹",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "status",
+      "id": "취약",
+      "v": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "피해 감소",
+      "v": 2
+     },
+     {
+      "k": "draw",
+      "v": 2
+     }
+    ]
+   },
+   "race": "정령",
+   "starter": [
+    "뮤트_s1",
+    "뮤트_s1",
+    "뮤트_s2",
+    "뮤트_s2"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "뮤트_s1",
+   "name": "데이터 스트림",
+   "hero": "뮤트",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "뮤트_s2",
+   "name": "나타의 복구 코드",
+   "hero": "뮤트",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 1.2
+    }
+   ]
+  },
+  {
+   "id": "뮤트_u1",
+   "name": "안건 상정",
+   "hero": "뮤트",
+   "unique": true,
+   "cost": 0,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "draw",
+     "v": 1
+    },
+    {
+     "k": "ifStack",
+     "id": "뮤트 의장"
+    },
+    {
+     "k": "status",
+     "id": "취약",
+     "v": 1,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "ifStack",
+     "id": "나타 의장"
+    },
+    {
+     "k": "shield",
+     "ratio": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "긴급 안건",
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "shield",
+       "ratio": 1
+      }
+     ]
+    },
+    {
+     "name": "강한 반대",
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.5
+      }
+     ]
+    },
+    {
+     "name": "회의록",
+     "tags": [
+      "보존",
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "shield",
+       "ratio": 1
+      }
+     ]
+    },
+    {
+     "name": "의사봉",
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.4
+      }
+     ]
+    },
+    {
+     "name": "나타의 수정안",
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "빠른 결론",
+     "kind": "draw"
+    },
+    {
+     "name": "든든한 의견",
+     "kind": "guard"
+    },
+    {
+     "name": "사전 협의",
+     "tags": [
+      "개전"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "뮤트_u2",
+   "name": "강제 종료",
+   "hero": "뮤트",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "ifStack",
+     "id": "뮤트 의장"
+    },
+    {
+     "k": "status",
+     "id": "취약",
+     "v": 2,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "전원 차단",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.97,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "재부팅",
+     "cost": 1,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.76,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "블루스크린",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.4,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "과부하",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.86,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "작업 관리자",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "뮤트 의장"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "강제 입력",
+     "kind": "power"
+    },
+    {
+     "name": "빠른 단축키",
+     "kind": "cost"
+    },
+    {
+     "name": "취약점 공략",
+     "kind": "weakSpot"
+    }
+   ]
+  },
+  {
+   "id": "뮤트_u3",
+   "name": "방화벽",
+   "hero": "뮤트",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 1.8
+    },
+    {
+     "k": "ifStack",
+     "id": "나타 의장"
+    },
+    {
+     "k": "status",
+     "id": "피해 감소",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "이중 방화벽",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.43
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "백신",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.8
+      },
+      {
+       "k": "cleanse",
+       "v": 1
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "복구 지점",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.8
+      },
+      {
+       "k": "heal",
+       "ratio": 0.8
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "보안 패치",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.6
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "철벽 서버",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2
+      },
+      {
+       "k": "status",
+       "id": "실드 유지",
+       "v": 1
+      },
+      {
+       "k": "ifStack",
+       "id": "나타 의장"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "튼튼한 코드",
+     "kind": "guard"
+    },
+    {
+     "name": "자동 저장",
+     "kind": "draw"
+    },
+    {
+     "name": "가벼운 패치",
+     "kind": "cost"
+    }
+   ]
+  },
+  {
+   "id": "뮤트_u4",
+   "name": "만장일치",
+   "hero": "뮤트",
+   "unique": true,
+   "cost": 1,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "stack",
+     "id": "뮤트 의장",
+     "v": 1
+    },
+    {
+     "k": "stack",
+     "id": "나타 의장",
+     "v": 1
+    },
+    {
+     "k": "status",
+     "id": "사기",
+     "v": 1
+    }
+   ],
+   "oracles": [
+    {
+     "name": "완벽한 합의",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "뮤트 의장",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "나타 의장",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "빠른 표결",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "stack",
+       "id": "뮤트 의장",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "나타 의장",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "두 자아의 화해",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "뮤트 의장",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "나타 의장",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "면역",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "합동 연설",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "뮤트 의장",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "첫 안건",
+     "tags": [
+      "개막"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "뮤트 의장",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "나타 의장",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "날카로운 논리",
+     "kind": "atkUp"
+    },
+    {
+     "name": "차분한 목소리",
+     "kind": "defUp"
+    },
+    {
+     "name": "짧은 회의",
+     "kind": "cost"
+    }
+   ]
+  }
+ ]
+}

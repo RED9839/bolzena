@@ -1,0 +1,137 @@
+{
+  "heroes": [
+    {
+      "id": "erpin",
+      "name": "에르핀",
+      "nature": "활발",
+      "race": "요정",
+      "row": "mid",
+      "role": "서포터",
+      "star": 3,
+      "hp": 700,
+      "atk": 90,
+      "def": 45,
+      "crit": 5,
+      "blurb": "에르피엔의 요정. 스킬을 낼 때마다 날개에서 가루가 흩날리고, 가루가 차면 반짝 별이 손에 떨어진다. (키워드 사전 본보기 — 생성 카드형 고유 효과)",
+      "keyword": {
+        "name": "요정 가루",
+        "desc": "날개에서 흩날리는 반짝이 가루. 다섯이 모이면 「반짝 별」 이 된다",
+        "carrier": "self",
+        "cap": 5,
+        "rules": [
+          {
+            "name": "요정 가루",
+            "when": { "on": "stackReach", "id": "요정 가루", "n": 5 },
+            "fx": [
+              { "k": "spend", "id": "요정 가루", "all": true },
+              { "k": "make", "id": "erpin_star", "v": 1 }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "날갯짓",
+          "when": { "on": "play", "type": "스킬" },
+          "limit": { "per": "turn", "n": 2 },
+          "fx": [ { "k": "stack", "id": "요정 가루", "v": 1 } ]
+        }
+      ],
+      "ult": {
+        "name": "요정 여왕의 축제",
+        "cost": 200,
+        "fx": [
+          { "k": "status", "id": "사기", "v": 2 },
+          { "k": "status", "id": "회피", "v": 1 },
+          { "k": "make", "id": "erpin_star", "v": 1 }
+        ]
+      },
+      "starter": [ "erpin_s1", "erpin_s1", "erpin_s2", "erpin_s2" ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "erpin_s1", "name": "날개 털기", "hero": "erpin", "cost": 1, "type": "공격",
+      "fx": [
+        { "k": "dmg", "ratio": 0.9, "target": "oneEnemy" },
+        { "k": "stack", "id": "요정 가루", "v": 1 }
+      ]
+    },
+    {
+      "id": "erpin_s2", "name": "반짝 보호막", "hero": "erpin", "cost": 1, "type": "스킬",
+      "fx": [
+        { "k": "shield", "ratio": 1.2 },
+        { "k": "status", "id": "결의", "v": 1 }
+      ]
+    },
+    {
+      "id": "erpin_star", "name": "반짝 별", "hero": "erpin", "token": true, "cost": 0, "type": "공격",
+      "tags": [ "소멸" ],
+      "evolve": { "n": 2, "into": "erpin_bigstar" },
+      "fx": [
+        { "k": "dmg", "ratio": 0.6, "target": "oneEnemy" },
+        { "k": "ifKill" },
+        { "k": "stack", "id": "요정 가루", "v": 2 }
+      ]
+    },
+    {
+      "id": "erpin_bigstar", "name": "큰 반짝 별", "hero": "erpin", "token": true, "cost": 0, "type": "공격",
+      "tags": [ "소멸", "약점 공격" ],
+      "fx": [
+        { "k": "dmg", "ratio": 1.5, "target": "oneEnemy" },
+        { "k": "status", "id": "다음 턴 드로우", "v": 1 }
+      ]
+    },
+    {
+      "id": "erpin_u1", "name": "요정 왕관 놀이", "hero": "erpin", "unique": true, "cost": 1, "type": "스킬",
+      "tags": [ "보존" ],
+      "choices": [ "왕관", "방패" ],
+      "fx": [
+        { "k": "ifChoice", "n": 1 },
+        { "k": "status", "id": "사기", "v": 1 },
+        { "k": "ifChoice", "n": 2 },
+        { "k": "shield", "ratio": 1.6 }
+      ],
+      "oracles": [
+        { "name": "큰 왕관", "fx": [ { "k": "ifChoice", "n": 1 }, { "k": "status", "id": "사기", "v": 2 }, { "k": "ifChoice", "n": 2 }, { "k": "shield", "ratio": 2.0 } ] },
+        { "name": "가벼운 놀이", "cost": 0, "fx": [ { "k": "ifChoice", "n": 1 }, { "k": "status", "id": "사기", "v": 1 }, { "k": "ifChoice", "n": 2 }, { "k": "shield", "ratio": 1.4 } ] },
+        { "name": "반짝 왕관", "fx": [ { "k": "ifChoice", "n": 1 }, { "k": "status", "id": "사기", "v": 1 }, { "k": "stack", "id": "요정 가루", "v": 2 }, { "k": "ifChoice", "n": 2 }, { "k": "shield", "ratio": 2.0 } ] },
+        { "name": "단단한 방패", "tags": [ "보존" ], "fx": [ { "k": "ifChoice", "n": 1 }, { "k": "status", "id": "사기", "v": 1 }, { "k": "ifChoice", "n": 2 }, { "k": "shield", "ratio": 1.6 }, { "k": "status", "id": "실드 유지", "v": 1 } ] },
+        { "name": "축복 놀이", "tags": [ "보존", "축복" ], "fx": [ { "k": "ifChoice", "n": 1 }, { "k": "status", "id": "사기", "v": 1 }, { "k": "draw", "v": 1 }, { "k": "ifChoice", "n": 2 }, { "k": "shield", "ratio": 1.8 } ] }
+      ]
+    },
+    {
+      "id": "erpin_u2", "name": "가루 폭풍", "hero": "erpin", "unique": true, "cost": 1, "type": "공격",
+      "tags": [ "열정" ],
+      "fx": [
+        { "k": "perStack", "id": "요정 가루" },
+        { "k": "dmg", "ratio": 0.3, "target": "allEnemies" },
+        { "k": "spend", "id": "요정 가루", "all": true },
+        { "k": "ifKill" },
+        { "k": "draw", "v": 1 }
+      ],
+      "oracles": [
+        { "name": "모래바람", "tags": [ "열정" ], "fx": [ { "k": "perStack", "id": "요정 가루" }, { "k": "dmg", "ratio": 0.4, "target": "allEnemies" }, { "k": "spend", "id": "요정 가루", "all": true }, { "k": "ifKill" }, { "k": "draw", "v": 1 } ] },
+        { "name": "아껴 날리기", "tags": [ "열정" ], "fx": [ { "k": "perStack", "id": "요정 가루" }, { "k": "dmg", "ratio": 0.4, "target": "allEnemies" }, { "k": "spend", "id": "요정 가루", "v": 2 }, { "k": "ifKill" }, { "k": "draw", "v": 1 } ] },
+        { "name": "회오리", "cost": 2, "tags": [ "열정" ], "fx": [ { "k": "perStack", "id": "요정 가루" }, { "k": "dmg", "ratio": 0.6, "target": "allEnemies" }, { "k": "spend", "id": "요정 가루", "all": true }, { "k": "status", "id": "취약", "v": 1, "target": "allEnemies" } ] },
+        { "name": "별가루", "tags": [ "열정" ], "fx": [ { "k": "perStack", "id": "요정 가루" }, { "k": "dmg", "ratio": 0.3, "target": "allEnemies" }, { "k": "spend", "id": "요정 가루", "all": true }, { "k": "make", "id": "erpin_star", "v": 1 } ] },
+        { "name": "눈부신 가루", "tags": [ "열정", "약점 공격" ], "fx": [ { "k": "perStack", "id": "요정 가루" }, { "k": "dmg", "ratio": 0.35, "target": "allEnemies" }, { "k": "spend", "id": "요정 가루", "all": true }, { "k": "ifKill" }, { "k": "draw", "v": 1 } ] }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_fairycrown", "name": "요정 왕관", "grade": "희귀", "slot": "장신구",
+      "stats": { "hp": 40, "def": 4 },
+      "effect": [
+        { "name": "반짝임", "when": { "on": "extra", "who": "any" }, "limit": { "per": "turn", "n": 1 }, "fx": [ { "k": "status", "id": "결의", "v": 1 } ] }
+      ],
+      "affinity": "erpin",
+      "affinityStats": { "atk": 6 },
+      "affinityEffect": [
+        { "name": "여왕의 가루", "when": { "on": "turnStart" }, "fx": [ { "k": "stack", "id": "요정 가루", "v": 1 } ] }
+      ],
+      "blurb": "작은 왕관. 아군이 추가 공격하면 반짝인다."
+    }
+  ]
+}

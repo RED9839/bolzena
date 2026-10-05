@@ -1,0 +1,606 @@
+{
+  "heroes": [
+    {
+      "id": "아사나",
+      "name": "아사나",
+      "nature": "우울",
+      "race": "마녀",
+      "row": "front",
+      "role": "탱커",
+      "star": 3,
+      "hp": 1000,
+      "atk": 90,
+      "def": 67,
+      "crit": 5,
+      "blurb": "볼-요가 전도사. 스킬로 숨을 고르면 명상에 들어 파티가 덜 다치고, 명상을 깨는 첫 일격은 두 배로 무겁다.",
+      "keyword": {
+        "name": "명상",
+        "desc": "명상 자세 — 아사나가 스킬 카드를 내면 들어간다. 그동안 파티가 받는 피해가 줄고, 아사나의 다음 공격 카드에 모은 힘이 실린 뒤 풀린다",
+        "carrier": "self",
+        "cap": 1,
+        "consumeAll": true,
+        "per": [
+          {
+            "stat": "taken",
+            "v": -0.25
+          },
+          {
+            "stat": "dealt",
+            "v": 1
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "명상 시간",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명상",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "명상 시간",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.25,
+            "target": "allEnemies",
+            "base": "def",
+            "hits": 6
+          },
+          {
+            "k": "heal",
+            "ratio": 3
+          },
+          {
+            "k": "stack",
+            "id": "명상",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "아사나_s1",
+        "아사나_s1",
+        "아사나_s2",
+        "아사나_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "아사나_s1",
+      "name": "요가 킥",
+      "hero": "아사나",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "base": "def"
+        }
+      ]
+    },
+    {
+      "id": "아사나_s2",
+      "name": "나무 자세",
+      "hero": "아사나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "아사나_u1",
+      "name": "볼-요가 시간",
+      "hero": "아사나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "signature": true,
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.6
+        },
+        {
+          "k": "heal",
+          "ratio": 0.7
+        }
+      ],
+      "blurb": "숨 들이쉬고… 볼을 부풀리고… 내쉬고",
+      "oracles": [
+        {
+          "name": "깊은 호흡",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "heal",
+              "ratio": 0.95
+            }
+          ]
+        },
+        {
+          "name": "가벼운 스트레칭",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "단체 요가",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "heal",
+              "ratio": 0.7
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "명상 음악",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.7
+            },
+            {
+              "k": "heal",
+              "ratio": 0.75
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "요가 매트",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.9
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "고요한 마음",
+          "kind": "guard"
+        },
+        {
+          "name": "요가 블록",
+          "kind": "heal"
+        },
+        {
+          "name": "매트 깔기",
+          "tags": [
+            "개전"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아사나_u2",
+      "name": "고요한 일격",
+      "hero": "아사나",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "blurb": "명상을 깨는 단 한 번의 동작",
+      "oracles": [
+        {
+          "name": "천천히, 깊게",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "짧은 동작",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "균형의 일격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전신 동작",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "기다린 일격",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "단전의 힘",
+          "kind": "power"
+        },
+        {
+          "name": "흐름",
+          "kind": "frost"
+        },
+        {
+          "name": "간결한 동작",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "아사나_u3",
+      "name": "호흡 고르기",
+      "hero": "아사나",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "들숨 넷, 날숨 넷",
+      "oracles": [
+        {
+          "name": "긴 호흡",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복식 호흡",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "맑은 정신",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "명상 준비",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "잠깐 쉬기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "평온",
+          "kind": "draw"
+        },
+        {
+          "name": "따뜻한 차",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "조용한 방",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아사나_u4",
+      "name": "볼-요가 전도",
+      "hero": "아사나",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        }
+      ],
+      "blurb": "함께하면 모두가 말랑해진다",
+      "oracles": [
+        {
+          "name": "요가 교실",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "혼자 요가",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "평정심",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "굳건한 자세",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아침 요가",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "유연함",
+          "kind": "defUp"
+        },
+        {
+          "name": "새벽 수련",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "요가 볼",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

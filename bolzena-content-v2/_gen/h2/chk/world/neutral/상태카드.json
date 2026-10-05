@@ -1,0 +1,479 @@
+{
+  "cards": [
+    {
+      "id": "st_dizzy",
+      "name": "어지럼",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "ap",
+          "v": -1
+        }
+      ],
+      "blurb": "뽑히자마자 AP 를 하나 빼앗는다. 내면 치워진다."
+    },
+    {
+      "id": "st_chatter",
+      "name": "왁자지껄",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "blurb": "손 한 칸을 막고, 턴이 끝나면 흩어진다."
+    },
+    {
+      "id": "st_note",
+      "name": "모자 속 쪽지",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "payHp",
+          "v": 90
+        }
+      ],
+      "blurb": "AP 1 을 내 치우지 않으면 턴 끝에 파티가 아프다."
+    },
+    {
+      "id": "st_slime",
+      "name": "끈적한 점액",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "미끄러움",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "치우지 않으면 다음에 낸 카드에 손패가 미끄러져 떨어진다."
+    },
+    {
+      "id": "st_thread",
+      "name": "엉킨 실",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "손상",
+          "v": 2,
+          "target": "party"
+        }
+      ],
+      "blurb": "AP 1 을 내 풀지 않으면 실드가 반으로 준다."
+    },
+    {
+      "id": "st_sugar",
+      "name": "설탕 범벅",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "손상",
+          "v": 1,
+          "target": "party"
+        },
+        {
+          "k": "status",
+          "id": "미끄러움",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "녹아 붙은 설탕 — 털어 내지 않으면 실드도 손도 미끄러진다."
+    },
+    {
+      "id": "st_herb",
+      "name": "약초 가루",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "뽑히자마자 재채기 — 약화 1, 손 한 칸을 막는다."
+    },
+    {
+      "id": "st_needle",
+      "name": "원한의 바늘",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "균열",
+          "v": 2,
+          "target": "party"
+        }
+      ],
+      "blurb": "인형이 실에 꿴 원한 — 뽑아 버리지 않으면 살이 갈라진다(출혈)."
+    },
+    {
+      "id": "st_signal",
+      "name": "통제 신호",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "뽑히자마자 취약 1, 손 한 칸을 막는다(불안)."
+    },
+    {
+      "id": "st_overheat",
+      "name": "과열 경고",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "그을림",
+          "v": 3,
+          "target": "party"
+        }
+      ],
+      "blurb": "회로가 달아오른다 — 꺼 두지 않으면 적이 움직일 때마다 덴다(화상)."
+    },
+    {
+      "id": "st_wastewater",
+      "name": "폐수 얼룩",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2,
+          "target": "party"
+        }
+      ],
+      "blurb": "공장 폐수 — 닦아 내지 않으면 스며든다."
+    },
+    {
+      "id": "st_kibble",
+      "name": "사료 한 줌",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "사료스탕스가 던진 사료 — 먹어 치우지 않으면 기운이 빠진다."
+    },
+    {
+      "id": "st_howl",
+      "name": "울부짖음",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "discard",
+          "v": 1,
+          "random": true
+        }
+      ],
+      "blurb": "뽑히자마자 손패 한 장이 무작위로 떨어진다(불안)."
+    },
+    {
+      "id": "st_ember",
+      "name": "불티",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "그을림",
+          "v": 2,
+          "target": "party"
+        }
+      ],
+      "blurb": "성난 불의 정령이 흩뿌린 불티(화상)."
+    },
+    {
+      "id": "st_gust",
+      "name": "돌풍",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "status",
+          "id": "미끄러움",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "산꼭대기 바람 — 뽑히면 손에 쥔 것이 하나 채여 갈 참이다."
+    },
+    {
+      "id": "st_whisper",
+      "name": "오싹한 속삭임",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "귓가에 속삭임 — 뽑히자마자 약화 1(불안)."
+    },
+    {
+      "id": "st_fanletter",
+      "name": "극성팬 편지",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "응징",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "답장을 안 하면 다음에 몸을 가릴 때 파티가 다친다."
+    },
+    {
+      "id": "st_rubble",
+      "name": "돌무더기",
+      "cost": 2,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "blurb": "무너진 동굴 돌 — 치우려면 AP 2 를 내야 한다."
+    },
+    {
+      "id": "st_lava",
+      "name": "용암 방울",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "그을림",
+          "v": 3,
+          "target": "party"
+        }
+      ],
+      "blurb": "바닥에서 튄 용암 — 떨어내지 않으면 살이 탄다(화상)."
+    },
+    {
+      "id": "st_cut",
+      "name": "베인 상처",
+      "cost": 1,
+      "type": "상태",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "payHp",
+          "v": 60
+        },
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "status",
+          "id": "포자증식",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "뽑히면 상처가 벌어지고, 싸매지 않으면 턴 끝에 피가 난다(출혈)."
+    },
+    {
+      "id": "st_scald",
+      "name": "덴 자국",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "사용 불가"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2,
+          "target": "party"
+        }
+      ],
+      "blurb": "낼 수도 없고 사라지지도 않는다. 손에 남을 때마다 욱신거린다(화상)."
+    },
+    {
+      "id": "st_jitters",
+      "name": "안절부절",
+      "cost": 0,
+      "type": "상태",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "draw"
+        },
+        {
+          "k": "status",
+          "id": "미끄러움",
+          "v": 1,
+          "target": "party"
+        }
+      ],
+      "blurb": "뽑히면 손이 떨린다 — 다음 카드에 한 장이 떨어진다(불안)."
+    }
+  ]
+}

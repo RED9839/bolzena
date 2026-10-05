@@ -1,0 +1,643 @@
+{
+  "heroes": [
+    {
+      "id": "베니",
+      "name": "베니",
+      "nature": "활발",
+      "race": "수인",
+      "row": "front",
+      "role": "딜러",
+      "star": 2,
+      "hp": 810,
+      "atk": 119,
+      "def": 38,
+      "crit": 10,
+      "blurb": "사료스탕스의 먹보 곰.",
+      "keyword": {
+        "name": "한 입",
+        "desc": "「먹고 나면 힘」 — 적이 쓰러질 때마다(누가 쓰러뜨리든) 한 입. 1개당 자신의 피해가 오르고 공격 카드 한 장에 모두 쓴다.",
+        "carrier": "self",
+        "cap": 2,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.5
+          }
+        ],
+        "consumeAll": true
+      },
+      "passives": [
+        {
+          "name": "먹고 나면 힘",
+          "when": {
+            "on": "kill"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "베니는 너희를 베어",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "베니_s1",
+        "베니_s1",
+        "베니_s2",
+        "베니_s3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "베니_s1",
+      "name": "곰 앞발",
+      "hero": "베니",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "베니_s2",
+      "name": "곰 앞발 내려찍기",
+      "hero": "베니",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "베니_s3",
+      "name": "두꺼운 털가죽",
+      "hero": "베니",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "베니_u1",
+      "name": "생선 꿀~꺽!",
+      "hero": "베니",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.2
+        },
+        {
+          "k": "stack",
+          "id": "한 입",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 생선 꿀~꺽!",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.55
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 생선 꿀~꺽!",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.1
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "배부른 생선 꿀~꺽!",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.45
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 생선 꿀~꺽!",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 생선 꿀~꺽!",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "따뜻한 손",
+          "kind": "heal"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "든든한 한 끼",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베니_u2",
+      "name": "힘으로 하는 공사",
+      "hero": "베니",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 힘으로 하는 공사",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "가벼운 힘으로 하는 공사",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "배부른 힘으로 하는 공사",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 힘으로 하는 공사",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 힘으로 하는 공사",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "든든한 한 끼",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베니_u3",
+      "name": "사료스탕스 뽀너스",
+      "hero": "베니",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "한 입",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 사료스탕스 뽀너스",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 사료스탕스 뽀너스",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "배부른 사료스탕스 뽀너스",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "든든한 사료스탕스 뽀너스",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "복 받은 사료스탕스 뽀너스",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "기운 북돋기",
+          "kind": "ap"
+        },
+        {
+          "name": "한 장 더",
+          "kind": "draw"
+        },
+        {
+          "name": "든든한 한 끼",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베니_u4",
+      "name": "배고픈 곰의 도끼",
+      "hero": "베니",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘준 배고픈 곰의 도끼",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 배고픈 곰의 도끼",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "배부른 배고픈 곰의 도끼",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재빠른 배고픈 곰의 도끼",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰뚫는 배고픈 곰의 도끼",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "힘껏",
+          "kind": "power"
+        },
+        {
+          "name": "급소 노리기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "든든한 한 끼",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

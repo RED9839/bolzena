@@ -1,0 +1,707 @@
+{
+  "heroes": [
+    {
+      "id": "바롱",
+      "name": "바롱",
+      "nature": "냉정",
+      "race": "유령",
+      "row": "front",
+      "role": "딜러",
+      "star": 3,
+      "hp": 700,
+      "atk": 125,
+      "def": 35,
+      "crit": 10,
+      "blurb": "토끼 인형을 꿰매며 거짓말과 이간질을 즐기는 착각의 유령. 적 하나에게 「뒷담」 을 쌓아 기를 꺾고, 셋이 차면 그 적이 엉뚱한 동료를 치게 만든다.",
+      "keyword": {
+        "name": "뒷담",
+        "desc": "바롱이 속삭인 거짓말 — 들은 적은 동료를 의심한다",
+        "carrier": "enemy",
+        "hunt": true,
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": -0.1
+          }
+        ],
+        "rules": [
+          {
+            "name": "이간질",
+            "when": {
+              "on": "stackReach",
+              "id": "뒷담",
+              "n": 3
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "confuse",
+                "target": "oneEnemy"
+              },
+              {
+                "k": "status",
+                "id": "약화",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "소문 퍼뜨리기",
+          "when": {
+            "on": "huntDown",
+            "id": "뒷담"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 2,
+              "target": "topEnemy"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "유령불 부르기",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "뒷담",
+            "v": 3
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "바롱_s1",
+        "바롱_s1",
+        "바롱_s3",
+        "바롱_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "바롱_s1",
+      "name": "유령 손톱",
+      "hero": "바롱",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "바롱_s2",
+      "name": "으흐흐 흐릿해지기",
+      "hero": "바롱",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "바롱_s3",
+      "name": "한 맺힌 할퀴기",
+      "hero": "바롱",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "바롱_u1",
+      "name": "뒷담까기 인형",
+      "hero": "바롱",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "뒷담",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "수다쟁이 인형",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 인형",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "품에 둔 인형",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두 배로 부풀리기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 인형",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "날 선 바늘",
+          "kind": "power"
+        },
+        {
+          "name": "귓속말",
+          "kind": "frost"
+        },
+        {
+          "name": "한 땀 더",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바롱_u2",
+      "name": "사람 사이 갈라놓기",
+      "hero": "바롱",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "뒷담",
+          "v": 2
+        },
+        {
+          "k": "confuse"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "깊은 이간",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 3
+            },
+            {
+              "k": "confuse"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "짧은 이간",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 2
+            },
+            {
+              "k": "confuse"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "묵혀 둔 이간",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 3
+            },
+            {
+              "k": "confuse"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "모두를 의심하게",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 2
+            },
+            {
+              "k": "confuse"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "축복의 이간",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 3
+            },
+            {
+              "k": "confuse"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "그럴듯한 거짓말",
+          "kind": "draw"
+        },
+        {
+          "name": "재빠른 혀",
+          "kind": "cost"
+        },
+        {
+          "name": "흐린 눈",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바롱_u3",
+      "name": "못 날리기",
+      "hero": "바롱",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "hits": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "뒷담",
+          "n": 1
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "녹슨 못 세례",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "뒷담",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "못 하나",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "뒷담",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아껴 둔 못",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "뒷담",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "저주받은 못",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "hits": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "뒷담",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 못",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "hits": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "뒷담",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "날카로운 못",
+          "kind": "power"
+        },
+        {
+          "name": "약한 곳 찌르기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "뒤틀린 못",
+          "kind": "frost"
+        }
+      ]
+    },
+    {
+      "id": "바롱_u4",
+      "name": "토끼 인형 꿰매기",
+      "hero": "바롱",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "stack",
+          "id": "뒷담",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "촘촘한 바느질",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.75
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대충 꿰매기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿰매 둔 인형",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "주인님이 보고 있다",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 바느질",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.55
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "두꺼운 솜",
+          "kind": "guard"
+        },
+        {
+          "name": "재빠른 바늘",
+          "kind": "draw"
+        },
+        {
+          "name": "인형의 속삭임",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

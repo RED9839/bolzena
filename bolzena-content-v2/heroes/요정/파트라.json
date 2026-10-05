@@ -1,0 +1,759 @@
+{
+ "heroes": [
+  {
+   "id": "파트라",
+   "name": "파트라",
+   "nature": "냉정",
+   "race": "요정",
+   "row": "front",
+   "role": "딜러",
+   "star": 1,
+   "hp": 600,
+   "atk": 104,
+   "def": 26,
+   "crit": 10,
+   "blurb": "최고의 파티셰를 꿈꾸는 민트초코 광신도. 베이커 거리 에슈르의 빵집에서 제빵을 배우며 알바하고, 신메뉴마다 민트를 넣는다. 요리를 우습게 보는 사도를 싫어하고 주방에 서면 누구보다 진지해진다. 냉정 뽑기마다 줄줄이 나와 '파트러쉬'로 불린다.",
+   "keyword": {
+    "name": "민트",
+    "desc": "어떤 반죽에든 들어가는 민트 — 넷이 차면 구워진다",
+    "carrier": "enemy",
+    "cap": 4,
+    "rules": [
+     {
+      "name": "구워짐",
+      "when": {
+       "on": "stackReach",
+       "id": "민트",
+       "n": 4
+      },
+      "fx": [
+       {
+        "k": "dmg",
+        "ratio": 1.5,
+        "target": "oneEnemy"
+       },
+       {
+        "k": "status",
+        "id": "약화",
+        "v": 2
+       },
+       {
+        "k": "spend",
+        "id": "민트",
+        "all": true,
+        "target": "oneEnemy"
+       }
+      ]
+     }
+    ]
+   },
+   "passives": [
+    {
+     "name": "민트 반죽",
+     "when": {
+      "on": "hit"
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "ult": {
+    "name": "교주의 천벌 - 파트라",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 3.5,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "tough",
+      "v": 2
+     },
+     {
+      "k": "stack",
+      "id": "민트",
+      "v": 3,
+      "target": "oneEnemy"
+     }
+    ]
+   },
+   "starter": [
+    "파트라_s1",
+    "파트라_s1",
+    "파트라_s2",
+    "파트라_s3"
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "파트라_s1",
+   "name": "뒤집개 치기",
+   "hero": "파트라",
+   "cost": 1,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "파트라_s2",
+   "name": "왕뒤집개 내려치기",
+   "hero": "파트라",
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 2.2,
+     "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "파트라_s3",
+   "name": "앞치마 가드",
+   "hero": "파트라",
+   "cost": 1,
+   "type": "스킬",
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 2
+    }
+   ]
+  },
+  {
+   "id": "파트라_u1",
+   "name": "민트머겅!",
+   "hero": "파트라",
+   "unique": true,
+   "cost": 3,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 3,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "stack",
+     "id": "민트",
+     "v": 2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "고통",
+     "v": 2
+    }
+   ],
+   "oracles": [
+    {
+     "name": "상큼한 민트머겅",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.9,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "가벼운 민트머겅",
+     "cost": 2,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.4,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "민트 듬뿍 민트머겅",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.75,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "숙성한 민트머겅",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.6,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "축복의 민트머겅",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.6,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "파트라_u2",
+   "name": "민트 반죽 치대기",
+   "hero": "파트라",
+   "unique": true,
+   "cost": 2,
+   "type": "공격",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 1,
+     "target": "oneEnemy",
+     "hits": 2
+    },
+    {
+     "k": "status",
+     "id": "균열",
+     "v": 2
+    },
+    {
+     "k": "ifChain"
+    },
+    {
+     "k": "stack",
+     "id": "민트",
+     "v": 2,
+     "target": "oneEnemy"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "상큼한 반죽",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.3,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "status",
+       "id": "균열",
+       "v": 2
+      },
+      {
+       "k": "ifChain"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 반죽",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.8,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "status",
+       "id": "균열",
+       "v": 2
+      },
+      {
+       "k": "ifChain"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "민트 듬뿍 반죽",
+     "tags": [],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.25,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "status",
+       "id": "균열",
+       "v": 2
+      },
+      {
+       "k": "ifChain"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "숙성한 반죽",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "status",
+       "id": "균열",
+       "v": 2
+      },
+      {
+       "k": "ifChain"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "축복의 반죽",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.2,
+       "target": "oneEnemy",
+       "hits": 2
+      },
+      {
+       "k": "status",
+       "id": "균열",
+       "v": 2
+      },
+      {
+       "k": "ifChain"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "세찬 숨결",
+     "kind": "power",
+     "fx": []
+    },
+    {
+     "name": "틈새 노리기",
+     "kind": "weakSpot",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "파트라_u3",
+   "name": "중불까지 키워주세요",
+   "hero": "파트라",
+   "unique": true,
+   "cost": 2,
+   "type": "강화",
+   "fx": [
+    {
+     "k": "atkMod",
+     "v": 0.2,
+     "run": true,
+     "target": "self"
+    },
+    {
+     "k": "stack",
+     "id": "민트",
+     "v": 2,
+     "target": "allEnemies"
+    }
+   ],
+   "oracles": [
+    {
+     "name": "상큼한 중불",
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "가벼운 중불",
+     "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "민트 듬뿍 중불",
+     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "숙성한 중불",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "축복의 중불",
+     "tags": [
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "가벼운 숨결",
+     "kind": "cost",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "기세의 숨결",
+     "kind": "atkUp",
+     "fx": []
+    }
+   ]
+  },
+  {
+   "id": "파트라_u4",
+   "name": "샤샤와 소풍 도시락",
+   "hero": "파트라",
+   "unique": true,
+   "cost": 1,
+   "type": "스킬",
+   "tags": [
+    "연계"
+   ],
+   "fx": [
+    {
+     "k": "stack",
+     "id": "민트",
+     "v": 2,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "heal",
+     "ratio": 1.5
+    }
+   ],
+   "oracles": [
+    {
+     "name": "상큼한 소풍 도시락",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "heal",
+       "ratio": 2.35
+      }
+     ]
+    },
+    {
+     "name": "가벼운 소풍 도시락",
+     "cost": 0,
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "heal",
+       "ratio": 1.15
+      }
+     ]
+    },
+    {
+     "name": "민트 듬뿍 소풍 도시락",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "heal",
+       "ratio": 1.65
+      }
+     ]
+    },
+    {
+     "name": "숙성한 소풍 도시락",
+     "tags": [
+      "연계",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "heal",
+       "ratio": 2
+      }
+     ]
+    },
+    {
+     "name": "축복의 소풍 도시락",
+     "tags": [
+      "연계",
+      "축복"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "민트",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "heal",
+       "ratio": 2
+      }
+     ]
+    }
+   ],
+   "blesses": [
+    {
+     "name": "포근한 숨결",
+     "kind": "heal",
+     "fx": []
+    },
+    {
+     "name": "번뜩이는 숨결",
+     "kind": "draw",
+     "fx": []
+    },
+    {
+     "name": "버티는 숨결",
+     "kind": "defUp",
+     "fx": []
+    }
+   ]
+  }
+ ]
+}

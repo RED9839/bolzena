@@ -1,0 +1,723 @@
+{
+  "heroes": [
+    {
+      "id": "레테",
+      "name": "레테",
+      "nature": "냉정",
+      "race": "유령",
+      "row": "front",
+      "role": "탱커",
+      "star": 2,
+      "hp": 810,
+      "atk": 79,
+      "def": 58,
+      "crit": 5,
+      "blurb": "레이저 포인터로 싫은 기억을 지우는 망각의 유령. 레테 카드를 낼 때마다 적의 버프 한 겹을 번쩍 지워 그만큼 실드로 바꾸고, 지운 것이 쌓이면 파티를 해로운 것에서 지킨다.",
+      "keyword": {
+        "name": "지운 기억",
+        "desc": "레이저로 지워 낸 기억 조각 — 레테가 실드로 바꿔 쥔다",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "guard",
+            "v": 0.06
+          }
+        ],
+        "rules": [
+          {
+            "name": "말끔한 망각",
+            "when": {
+              "on": "stackReach",
+              "id": "지운 기억",
+              "n": 5
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "지운 기억",
+                "all": true
+              },
+              {
+                "k": "status",
+                "id": "면역",
+                "v": 1
+              },
+              {
+                "k": "shield",
+                "ratio": 1.5
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "번쩍 리셋",
+          "when": {
+            "on": "play"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "dispel",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "기습 플래시 팡",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.5,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "지운 기억",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "레테_s1",
+        "레테_s1",
+        "레테_s2",
+        "레테_s2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "레테_s1",
+      "name": "포인터 휘두르기",
+      "hero": "레테",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "레테_s2",
+      "name": "유령 가드",
+      "hero": "레테",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "레테_u1",
+      "name": "뉴럴 링크 스따트",
+      "hero": "레테",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.4
+        },
+        {
+          "k": "cleanse",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "지운 기억",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "깊은 링크",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.5
+            },
+            {
+              "k": "cleanse",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "짧은 링크",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.05
+            },
+            {
+              "k": "cleanse",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "대기 중인 링크",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.25
+            },
+            {
+              "k": "cleanse",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "병동 전체 리셋",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3
+            },
+            {
+              "k": "cleanse",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 링크",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.1
+            },
+            {
+              "k": "cleanse",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "두꺼운 막",
+          "kind": "guard"
+        },
+        {
+          "name": "빠른 접속",
+          "kind": "cost"
+        },
+        {
+          "name": "차분한 기억",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레테_u2",
+      "name": "포인터 4연타",
+      "hero": "레테",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "hits": 4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "dispel",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "포인터 난타",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dispel",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "포인터 두 번",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dispel",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "쥐고 있던 포인터",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dispel",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "포인터 5연타",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "hits": 5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dispel",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "축복의 포인터",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "hits": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dispel",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "강한 출력",
+          "kind": "power"
+        },
+        {
+          "name": "눈부심",
+          "kind": "frost"
+        },
+        {
+          "name": "빠른 손목",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "레테_u3",
+      "name": "눈앞의 레이저",
+      "hero": "레테",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "지운 기억"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.3
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "초점 레이저",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.45
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "약한 레이저",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.25
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "충전된 레이저",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기억째 지우기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 레이저",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "출력 최대",
+          "kind": "power"
+        },
+        {
+          "name": "눈앞이 하얘짐",
+          "kind": "frost"
+        },
+        {
+          "name": "반사판",
+          "kind": "guard"
+        }
+      ]
+    },
+    {
+      "id": "레테_u4",
+      "name": "병상 곁",
+      "hero": "레테",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "불굴",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "지운 기억",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "밤샘 간호",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "잠깐 들르기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "지키는 자리",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "아픈 기억은 두고",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "축복의 간호",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "따뜻한 손",
+          "kind": "defUp"
+        },
+        {
+          "name": "서둘러 오기",
+          "kind": "cost"
+        },
+        {
+          "name": "조용한 자장가",
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
