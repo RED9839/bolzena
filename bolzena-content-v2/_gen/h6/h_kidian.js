@@ -8,7 +8,7 @@ L.hero({
   id: '키디언', name: '키디언', nature: '우울', row: 'front', role: '딜러', star: 3, hp: 750, atk: 144, def: 35, crit: 10,
   blurb: '흑요석의 용족 닌자. 적이 격파되어 무너진 틈에 그림자처럼 파고들어 마무리하고, 쓰러진 적을 딛고 다음 칼을 바로 꺼낸다.',
   keyword: {
-    name: KW, desc: '무너진 틈을 노리는 그림자. 적이 격파되면 +2 — 1개당 키디언의 피해 +25%, 키디언이 공격 카드를 내면 모두 사라진다', carrier: 'self', cap: 2, consumeAll: true,
+    name: KW, desc: '무너진 틈을 노리는 그림자 — 격파되면 쌓이고, 공격 카드 한 장에 모두 쓴다', carrier: 'self', cap: 2, consumeAll: true,
     per: [{ stat: 'dealt', v: 0.25 }],
   },
   passives: [

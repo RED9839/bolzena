@@ -8,10 +8,10 @@ L.hero({
   id: '아네트', name: '아네트', nature: '광기', row: 'mid', role: '서포터', star: 3, hp: 580, atk: 75, def: 60, crit: 5,
   blurb: '결투를 붙이고 판정하는 싸움 구경꾼 석류석 용족. 아군 하나를 챔피언으로 찍어 두고, 챔피언이 칠 때마다 관중석이 들끓는다.',
   keyword: {
-    name: KW, desc: '아네트가 찍은 오늘의 챔피언. 이 아군이 공격 카드를 낼 때마다 「관중 함성」 +1', carrier: 'hero', cap: 1,
+    name: KW, desc: '아네트가 찍은 챔피언 — 이 아군이 공격할 때마다 관중이 함성을 지른다', carrier: 'hero', cap: 1,
   },
   keywords: [{
-    name: CH, desc: '관중석의 함성. 셋이면 모두 써서 사기 1 · 협공 1', carrier: 'self', cap: 3,
+    name: CH, desc: '관중석의 함성 — 셋이면 사기 · 협공', carrier: 'self', cap: 3,
     rules: [{ name: '최강자는 누구냐!', when: { on: 'stackReach', id: CH, n: 3 }, fx: [spend(CH, 'all'), st('사기', 1), st('협공', 1)] }],
   }],
   passives: [

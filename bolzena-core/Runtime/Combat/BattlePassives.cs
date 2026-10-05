@@ -27,7 +27,7 @@ namespace Bolzena.Core
             {
                 var h = Data.Hero(u.Key);
                 var rules = new List<RuleRt>();
-                rules.AddRange(h.Passives.Select(r => new RuleRt { R = r }));
+                rules.AddRange(h.Passives.Select(r => new RuleRt { R = r, Own = true }));
                 foreach (var kd in h.AllKeywords)
                 {
                     Kw[kd.Name] = new KwRt { Def = kd, Owner = u.Key };
@@ -65,7 +65,7 @@ namespace Bolzena.Core
         public double StatMod(Unit u, string stat)
         {
             if (u == null) return 0;
-            double v = 0;
+            double v = FormMod(u, stat);
             foreach (var m in u.Mods) if (m.Stat == stat) v += m.V;
             if (u.Side == Side.Party && u.BodyRef != null && Always.TryGetValue(u.Key, out var al))
                 foreach (var m in al)
@@ -248,11 +248,17 @@ namespace Bolzena.Core
                 {
                     if (owner.Dead || Over != null) continue;
                     if (!Passives.TryGetValue(owner.Key, out var rules)) continue;
-                    for (int i = 0; i < rules.Count; i++)
+                    // 변신 — 그 변신의 패시브를 뒤에 더하고(replace 면 사도 자신의 패시브를 끈다)
+                    var fd = Forms.Count > 0 ? FormDefOf(owner.Key) : null;
+                    var frules = fd != null ? FormRules(fd) : null;
+                    int total = rules.Count + (frules?.Count ?? 0);
+                    for (int i = 0; i < total; i++)
                     {
-                        var rt = rules[i]; var r = rt.R;
+                        bool fr = i >= rules.Count;
+                        var rt = fr ? frules[i - rules.Count] : rules[i]; var r = rt.R;
+                        if (!fr && rt.Own && fd != null && fd.Replace) continue;
                         if (!Matches(owner, r.When, ev, info, rt.KwOf)) continue;
-                        string id = $"{owner.Key}|{i}";
+                        string id = fr ? $"{owner.Key}|form:{fd.Id}|{i - rules.Count}" : $"{owner.Key}|{i}";
                         if (firing.Contains(id)) continue;
                         // 「적에게 디버프를 걸면」 — 한 번의 일에 한 번
                         if (ONCE_PER_ACT.Contains(ev) && info.Seq != 0) { string dk = id + "|" + ev; if (Counts.TryGetValue(dk, out var dv) && dv == info.Seq) continue; Counts[dk] = info.Seq; }
@@ -297,6 +303,7 @@ namespace Bolzena.Core
                         finally { firing.Remove(id); gearSrc = gs0; }
                     }
                 }
+                if (Forms.Count > 0 && Over == null) FormUntil(ev, info);
             }
             finally { depth--; }
         }

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Spine.Unity;
 using TMPro;
@@ -97,7 +97,7 @@ namespace Bolzena.RunUI
                 if (hasSave)
                     Stage.Hot["new"] = MenuItem(menu, Theme.S("ic_spark"), "새 모험", "지금 판을 버리고 사도 셋을 새로 고릅니다", new Color(0.95f, 0.75f, 0.35f), () =>
                         Confirm("지금 판을 버릴까요?", "이어하던 판은 사라집니다. 새 마을로 떠납니다.", "버리고 떠납니다", () => { RunPort.ClearSave(); NewAdventure(); }, true));
-                Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "사도 도감", $"{Roster.All.Count}명의 능력 · 카드 · 장비", Theme.Hex("7FE0B4"), () => Dex(Lobby));
+                Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", $"사도 {Roster.All.Count}명 · 적 · 장비 · 교주 카드", Theme.Hex("7FE0B4"), () => Dex(Lobby));
                 Stage.Hot["settings"] = MenuItem(menu, Theme.S("ic_cog"), "설정", "소리 · 움직임 · 글자 · 화면", Theme.Hex("B9A8FF"), () => SettingsPanel(false));
 
                 // 마을 목록

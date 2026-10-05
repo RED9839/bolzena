@@ -1,6 +1,6 @@
 # 볼제나 원본 에셋에서 시범에 쓰는 것만 유니티 프로젝트로 복사한다(원본은 읽기만).
 # python Tools/copy_assets.py
-import json, os, shutil
+import json, os, shutil, sys
 from PIL import Image
 
 SRC = r"C:\projects\볼제나\assets"
@@ -41,11 +41,10 @@ for src, name in SPINE.items():
         elif f.endswith(".atlas"):
             cp(f"{sd}/{f}", f"{dd}/{f}.txt")
         elif f.endswith(".png"):
-            im = np.asarray(Image.open(f"{sd}/{f}").convert("RGBA")).astype(np.float32)
-            a = im[..., 3:4]
-            rgb = np.where(a > 0, im[..., :3] * 255.0 / np.maximum(a, 1), 0)
-            out = np.concatenate([np.clip(rgb, 0, 255), a], axis=-1).astype(np.uint8)
-            Image.fromarray(out, "RGBA").save(f"{dd}/{f}")
+            # PMA → 곧은 알파 + 번짐 채움(runui Tools~/spine_straight.py — 흰 테두리 없게)
+            sys.path.insert(0, "C:/projects/bolzena-runui/Tools~")
+            import spine_straight
+            spine_straight.convert(f"{sd}/{f}", f"{dd}/{f}")
 
 # 배경
 for b in ["stage3_2", "stage3_3"]:

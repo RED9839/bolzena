@@ -19,6 +19,7 @@ namespace Bolzena.Fx.EditorTools
         static string Out => Data + "/Resources/" + FxLibrary.Root;
 
         public static int Converted, Failed, Approx, Skipped3d, Baked;
+        static string texDir = "fx";
         public static readonly List<string> Problems = new List<string>();
 
         [MenuItem("Bolzena/Fx — 원작 이펙트 변환")]
@@ -70,10 +71,67 @@ namespace Bolzena.Fx.EditorTools
                 foreach (var n in (List<object>)h["ult"]) he.Ult.Add((string)n);
                 lib.Heroes.Add(he);
             }
+            ImportMore(lib);
+            // 고학년 몸짓 표(읽기만) — 런타임이 Resources 로 읽게 옮긴다
+            var um = Path.GetFullPath("Packages/com.bolzena.fx/Runtime/Motion/ult_motion.json");
+            if (File.Exists(um)) { File.Copy(um, Out + "/ult_motion.json", true); AssetDatabase.ImportAsset(Out + "/ult_motion.json"); Debug.Log("[FxImport] 고학년 몸짓 표 ult_motion.json"); }
             EditorUtility.SetDirty(lib);
             AssetDatabase.SaveAssets();
             Debug.Log($"[FxImport] 사도 {lib.Heroes.Count}명 · 이펙트 {Converted}개 변환 · 실패 {Failed} · 근사(이미터) {Approx} · 입체 메시로 뺀 이미터 {Skipped3d} · 구운 낱장 {Baked}");
             foreach (var p in Problems.Take(40)) Debug.Log("[FxImport] ! " + p);
+        }
+
+        // ── 카드 · 공용 이펙트(Tools/fx_extract_more.py → Src/fx2) ── 고학년 색인(Src/fx)에 갈래를 더한다
+        static void ImportMore(FxLibraryAsset lib)
+        {
+            lib.Common.Clear();
+            var ip = Src + "/fx2/index.json";
+            if (!File.Exists(ip)) { Debug.Log("[FxImport] 카드 · 공용 이펙트 없음(Src/fx2) — Tools/fx_extract_more.py"); return; }
+            var idx = (Dictionary<string, object>)MiniJson.Parse(File.ReadAllText(ip));
+            var effects = (Dictionary<string, object>)idx["effects"];
+            var have = new HashSet<string>(lib.Effects.Select(e => e.Name));
+            var perOwner = new Dictionary<string, Dictionary<string, object>>();
+            int n0 = Converted;
+            texDir = "fx2";
+            AssetDatabase.StartAssetEditing();
+            try
+            {
+                foreach (var kv in effects)
+                {
+                    var name = kv.Key;
+                    if (have.Contains(name)) continue;          // 고학년 쪽에 이미 있다(궁극기가 없어 스킬로 메운 사도)
+                    var info = (Dictionary<string, object>)kv.Value;
+                    var owner = (string)info["hero"];
+                    if (!perOwner.TryGetValue(owner, out var all))
+                    {
+                        var p = Src + "/fx2/" + owner + "/fx.json";
+                        all = File.Exists(p) ? (Dictionary<string, object>)MiniJson.Parse(File.ReadAllText(p)) : new Dictionary<string, object>();
+                        perOwner[owner] = all;
+                    }
+                    var entry = new FxLibraryAsset.Entry { Name = name, Hero = owner, Dur = F(info, "dur", 1), Emitters = (int)F(info, "n", 0), Baked = false };
+                    if (!all.TryGetValue(name, out var body)) { Failed++; Problems.Add(name + ": fx2 fx.json 에 없음"); continue; }
+                    try { MakeEffect(name, owner, (Dictionary<string, object>)body); Converted++; lib.Effects.Add(entry); have.Add(name); }
+                    catch (Exception ex) { Failed++; Problems.Add(name + ": " + ex.Message); }
+                }
+            }
+            finally { AssetDatabase.StopAssetEditing(); texDir = "fx"; }
+            var heroes = (Dictionary<string, object>)idx["heroes"];
+            var byKey = lib.Heroes.ToDictionary(h => h.Key);
+            List<string> L(Dictionary<string, object> h, string k) => h.TryGetValue(k, out var o) && o is List<object> l ? l.Select(x => (string)x).Where(have.Contains).ToList() : new List<string>();
+            foreach (var kv in heroes)
+            {
+                var h = (Dictionary<string, object>)kv.Value;
+                if (!byKey.TryGetValue(kv.Key, out var he))
+                {
+                    he = new FxLibraryAsset.Hero { Key = kv.Key, Art = (string)h["name"], From = "" };
+                    lib.Heroes.Add(he); byKey[kv.Key] = he;
+                }
+                he.Attack = L(h, "attack"); he.Power = L(h, "power"); he.Skill = L(h, "skill"); he.Sig = L(h, "sig");
+            }
+            if (idx.TryGetValue("common", out var co) && co is Dictionary<string, object> cd)
+                foreach (var kv in cd)
+                    lib.Common.Add(new FxLibraryAsset.Group { Kind = kv.Key, Names = ((List<object>)kv.Value).Select(x => (string)x).Where(have.Contains).ToList() });
+            Debug.Log($"[FxImport] 카드 · 공용 이펙트 {Converted - n0}개 변환 · 공용 갈래 {lib.Common.Count}");
         }
 
         static T LoadOrCreate<T>(string path) where T : ScriptableObject
@@ -269,7 +327,7 @@ namespace Bolzena.Fx.EditorTools
             var e = new FxEmitter();
             e.N = S(d, "n");
             e.TexPath = S(d, "tex");
-            if (e.TexPath != null) e.Tex = AssetDatabase.LoadAssetAtPath<Texture2D>(Src + "/fx/" + e.TexPath);
+            if (e.TexPath != null) e.Tex = AssetDatabase.LoadAssetAtPath<Texture2D>(Src + "/" + texDir + "/" + e.TexPath);
             e.Add = F(d, "add", 0) != 0;
             e.Tint = C4(d, "tint", Color.white);
             e.Dur = F(d, "dur", 0);

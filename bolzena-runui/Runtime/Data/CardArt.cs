@@ -6,30 +6,54 @@ namespace Bolzena.RunUI
 {
     // 카드 · 사도 그림(임시 규칙 — Docs/카드그림.md). 판 화면(W.Card)과 전투 화면(CardView)이 같이 쓴다.
     //   시작 카드(사도의 기본 카드) = 그 사도 스탠딩의 상반신(카드 비율로 자른다)
-    //   고유 카드               = 카드 그림 표(Resources/RunUI/cardart.json)의 원작 스킬 아이콘 — 흐린 확대 바탕 + 가운데 선명한 아이콘
+    //   고유 · 생성 카드          = 카드 그림 표(Resources/RunUI/cardart.json)의 "pics" — 카드와 어울리는 원작 그림(사도마다 대조 시트로 골랐다 · Tools~/cardpic_picks.json)
+    //                             표에 없거나 어울리는 그림이 없으면 "cards" 의 원작 스킬 아이콘 — 흐린 확대 바탕 + 가운데 선명한 아이콘
     //   교주 · 상태 · 저주 · 선물 = 장비 · 교주 카드 그림 표(Resources/RunUI/itemart.json)의 원작 아이콘 — 없으면 종류 무늬
     //   장비                    = 같은 표의 장비 아이콘(Equip)
     // 그림 파일(원작, git 밖)은 Tools~/copy_assets.py 가 Resources/RunArt/Standing · Skill 로 복사한다. 없으면 null — 화면이 SD 초상 · 무늬로 떨어진다.
     public static class CardArt
     {
-        public enum Kind { None, Standing, Icon }
+        public enum Kind { None, Standing, Icon, Pic }
 
-        static Dictionary<string, string> icons, itemCards, itemEquips;
+        static Dictionary<string, string> icons, pics, itemCards, itemEquips;
         static Dictionary<string, float[]> meta;
 
         static Dictionary<string, string> Icons()
         {
             if (icons != null) return icons;
-            icons = new Dictionary<string, string>();
+            icons = new Dictionary<string, string>(); pics = new Dictionary<string, string>();
             var ta = Resources.Load<TextAsset>("RunUI/cardart");
             if (ta == null) { Debug.LogWarning("[CardArt] cardart.json 없음 — Tools~/build_cardart.py"); return icons; }
             try
             {
                 var o = MiniJson.Object(ta.text, "cards");
                 foreach (var kv in o) icons[kv.Key] = kv.Value;
+                if (ta.text.Contains("\"pics\""))
+                    foreach (var kv in MiniJson.Object(ta.text, "pics")) pics[kv.Key] = kv.Value;
             }
             catch (Exception e) { Debug.LogWarning("[CardArt] 표를 못 읽었습니다: " + e.Message); }
             return icons;
+        }
+
+        /// <summary>고유 · 생성 카드의 원작 그림 이름(표에 없으면 null). id 는 신탁 꼬리가 붙어도 된다.</summary>
+        public static string PicOf(string cardId)
+        {
+            if (string.IsNullOrEmpty(cardId)) return null;
+            Icons();
+            var b = Core.GameData.BaseId(cardId);
+            return pics.TryGetValue(cardId, out var n) || (b != cardId && pics.TryGetValue(b, out n)) ? n : null;
+        }
+
+        /// <summary>원작 그림 한 장 — 카드 그림 창 비율(0.71)로 미리 잘라 둔 것(Tools~/copy_assets.py → RunArt/CardPic). 없으면 null.</summary>
+        public static Sprite Pic(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return null;
+            string key = "pic|" + name;
+            if (crops.TryGetValue(key, out var s)) return s;
+            var tex = Resources.Load<Texture2D>("RunArt/CardPic/" + name);
+            if (tex != null) { tex.wrapMode = TextureWrapMode.Clamp; s = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100); s.name = "cardpic " + name; }
+            crops[key] = s;
+            return s;
         }
 
         // 장비 · 교주 카드(상태 · 저주 · 선물) 그림 표 — Resources/RunUI/itemart.json(Tools~/build_itemart.py)
@@ -77,10 +101,13 @@ namespace Bolzena.RunUI
         }
 
         /// <summary>카드 그림 종류 — heroArt 는 주인 사도의 그림 키(roster art), 없으면 교주 · 상태 카드.</summary>
+        //   시작 카드(사도의 기본 카드)는 늘 스탠딩 — 그림 표(pics · cards)에는 고유 · 생성 카드만 있다
         public static Kind Of(string cardId, string heroArt, bool unique)
         {
             if (string.IsNullOrEmpty(heroArt)) return Icon(IconOf(cardId)) != null ? Kind.Icon : Kind.None;   // 교주 · 상태 · 저주 · 선물 — 표에 그림이 있으면 아이콘 꼴
+            if (Pic(PicOf(cardId)) != null) return Kind.Pic;
             if (unique) return IconOf(cardId) != null && Icon(IconOf(cardId)) != null ? Kind.Icon : Kind.None;
+            if (IconOf(cardId) != null && Icon(IconOf(cardId)) != null) return Kind.Icon;   // 생성 카드에 고른 원작 스킬 아이콘
             return Standing(heroArt) != null ? Kind.Standing : Kind.None;
         }
 
@@ -123,9 +150,11 @@ namespace Bolzena.RunUI
         /// 스탠딩의 위쪽을 ratio(가로/세로) 로 자른 그림 — frac 은 그림 높이의 몇 할을 담을지(0.5 = 상반신, 0.8 = 무릎께).
         /// 가로 가운데 · 위 끝은 머리 자리(_meta.json — 자동 판정 + Tools~/standing_fix.json). 그림이 좁아 비율을 못 채우면 높이를 줄인다.
         /// </summary>
-        public static Sprite Upper(string art, float ratio, float frac)
+        public static Sprite Upper(string art, float ratio, float frac, bool snapFirst = true)
         {
             if (string.IsNullOrEmpty(art)) return null;
+            // 스탠딩 맞춤 표에 있는 사도는 스파인 첫 프레임을 표대로 구운 그림(StandingSnap) — 중심 · 머리 · 크기(안 B)가 화면마다 같다
+            if (snapFirst) { var snap = StandingSnap.Upper(art, ratio, frac); if (snap != null) return snap; }
             string key = art + "|" + ratio.ToString("F3") + "|" + frac.ToString("F2");
             if (crops.TryGetValue(key, out var s)) return s;
             if (!Content(art, out var tex, out var r, out var hx, out var tp)) { crops[key] = null; return null; }

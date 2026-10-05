@@ -23,10 +23,11 @@ namespace Bolzena.Core
         /// <summary>성격 — 사도는 사도 데이터, 적은 적 데이터.</summary>
         public string NatureOf(Unit u) => u?.Nature;
 
-        /// <summary>적의 약점 성격 — 적힌 weak, 없으면 상성에서(그 성격을 이기는 성격).</summary>
+        /// <summary>적의 약점 성격 — 판의 적 속성이 있으면(사도 클론 빼고) 그것을 이기는 성격, 없으면 적힌 weak, 그것도 없으면 상성에서(그 성격을 이기는 성격).</summary>
         public List<string> WeakOf(Unit e)
         {
             var d = Data.Enemy(e.Key);
+            if (EnemyNature != null && e?.Nature != null && d?.Clone == null) return R.WeakTo(e.Nature);
             if (d?.Weak != null && d.Weak.Count > 0) return d.Weak;
             return d?.Nature != null ? R.WeakTo(d.Nature) : new List<string>();
         }
@@ -150,6 +151,7 @@ namespace Bolzena.Core
             if (u.Side == Side.Party && d > 0) Talk(u, "hit");
             if (u.Hp <= 0) { Kill(u); return; }
             if (u.Side == Side.Enemy && from != null && from.Side == Side.Party && !o.Dot && (d > 0 || guard > 0)) CounterEvent(u, "hit");
+            if (u.Side == Side.Enemy && guard > 0) Say($"{u.Name}: 실드가 {guard} 막음 (남은 실드 {u.Block + u.Shield})");
             if (u.Side == Side.Enemy && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && !u.Dead) { FoePassives("guardBreak", u); Emit("foeShieldBreak", new EmitInfo { Target = u, By = from?.Side == Side.Party ? from.Key : Acting, V = guard }); }
             if (u.Side == Side.Party && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && from != null && from.Side == Side.Enemy) Emit("shieldBreak", new EmitInfo { Who = u, From = from, Target = from, V = guard, By = ShieldBy });
             if (u.Side == Side.Enemy && o.Card && from != null && from.Side == Side.Party && (d > 0 || guard > 0) && !u.Dead) Emit("hit", new EmitInfo { By = from.Key, Target = u, V = d + guard, Seq = ActSeq, Weak = IsWeakHit(from, u, o.Tags) });
@@ -209,10 +211,14 @@ namespace Bolzena.Core
             if (tt > 0) n *= tt;
             if (HasRare(e, "toughGuard", out _)) n *= 0.8;
             double from = e.Tough;
-            e.Tough = Math.Max(0, e.Tough - n);
+            double left = e.Tough - n;
+            e.Tough = left < 1e-6 ? 0 : Math.Round(left * R.TOUGH.Grid) / R.TOUGH.Grid;   // 1/3 · 1/6 을 여러 번 빼면 남는 소수 찌꺼기(1e-15)가 격파를 막았다
+            ToughDealt += from - e.Tough;
             HitCue(e, "tough", new Cue { From = from, To = e.Tough });
+            Say($"{e.Name}: 강인도 {from:0.##} → {e.Tough:0.##} / {e.ToughMax:0.##}");
             if (e.Tough > 0) return;
             e.Broken = true;
+            Breaks++;
             BreakSeq = ActSeq;
             GainAp(R.TOUGH.Ap);
             e.Sealed = true;

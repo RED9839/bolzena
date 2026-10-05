@@ -30,6 +30,8 @@ namespace Bolzena.Battle
 
         // 미리보기 — 내 보면 적마다 얼마나(없으면 null 칸). 판은 안 바뀐다
         IReadOnlyList<PreviewFoe> PreviewCard(int handIndex, int targetEnemy);
+        /// <summary>그 사도(파티 몇 번째)가 그 적을 치면 약점 공격인가(성격 · 공명은 늘 · 적 표식).</summary>
+        bool WeakFor(int hero, int enemy);
         PreviewParty PreviewPartyOf(int handIndex);
         IReadOnlyList<PreviewFoe> PreviewUlt(int hero, int targetEnemy);
 

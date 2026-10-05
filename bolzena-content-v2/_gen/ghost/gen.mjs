@@ -106,7 +106,7 @@ const H = {};
 H['스피키'] = {
   blurb: '남을 흉내 내 보는 이의 인식을 비트는 따라쟁이 유령. 다른 아군이 카드를 낼 때마다 「변장」 이 쌓이고, 스피키 카드는 변장을 써서 손에 든 아군 카드의 효과를 대신 꺼내 쓴다.',
   start: ['주문 발사', '사탕 나눠주기'],
-  keyword: { name: '변장', desc: '방금 본 아군을 흉내 낸 어설픈 분장 — 보는 이에게는 완벽해 보인다', carrier: 'self', cap: 3 },
+  keyword: { name: '변장', desc: '방금 본 아군을 흉내 낸 분장 — 쓰면 그 아군 카드를 대신 낸다', carrier: 'self', cap: 3 },
   passives: [
     { name: '완벽한 따라쟁이', when: { on: 'play', who: 'other' }, limit: { per: 'turn', n: 2 }, fx: [stack('변장', 1)] },
   ],
@@ -136,7 +136,7 @@ H['스피키'] = {
 H['사리'] = {
   blurb: '누가 무엇을 하든 맞장구치며 포즈까지 따라 하는 리액션 장인. 아군이 공격할 때마다 「맞장구」 가 쌓이고, 사리의 공격은 맞장구를 몽땅 털어 한 마디 촌철살인을 박는다.',
   start: ['낫 휘두르기', '흐릿해지기', '빙글빙글 사슬낫'],
-  keyword: { name: '맞장구', desc: '아군이 칠 때마다 「그렇지!」 — 모아 두었다가 제 공격에 실어 보낸다', carrier: 'self', cap: 4, per: [{ stat: 'dealt', v: 0.1 }] },
+  keyword: { name: '맞장구', desc: '아군이 칠 때마다 「그렇지!」 — 모아서 제 공격에 실어 보낸다', carrier: 'self', cap: 4, per: [{ stat: 'dealt', v: 0.1 }] },
   passives: [
     { name: '최고의 조연', when: { on: 'play', who: 'other', type: '공격' }, limit: { per: 'turn', n: 3 }, fx: [stack('맞장구', 1)] },
   ],
@@ -199,7 +199,7 @@ H['레테'] = {
   blurb: '레이저 포인터로 싫은 기억을 지우는 망각의 유령. 레테 카드를 낼 때마다 적의 버프 한 겹을 번쩍 지워 그만큼 실드로 바꾸고, 지운 것이 쌓이면 파티를 해로운 것에서 지킨다.',
   start: ['포인터 휘두르기', '유령 가드'],
   keyword: {
-    name: '지운 기억', desc: '레이저로 지워 낸 기억 조각 — 레테가 실드로 바꿔 쥔다', carrier: 'self', cap: 5,
+    name: '지운 기억', desc: '레이저로 지운 기억 조각 — 레테가 실드로 바꿔 쥔다', carrier: 'self', cap: 5,
     per: [{ stat: 'guard', v: 0.06 }],
     rules: [{ name: '말끔한 망각', when: { on: 'stackReach', id: '지운 기억', n: 5 }, fx: [spendAll('지운 기억'), st('면역', 1), shield(1.0)] }],
   },
@@ -232,7 +232,7 @@ H['에스피'] = {
   blurb: '남의 꿈을 훔쳐보며 대리만족하는 유령. 카드가 뽑힐 때마다 「꿈 일기」 를 적고, 셋이 차면 다음 장면을 미리 끌어온다. 꿈을 엿본 카드는 뽑히는 순간 적의 기운을 꺾는다.',
   start: ['촛불 튕기기', '달콤한 꿈'],
   keyword: {
-    name: '꿈 일기', desc: '훔쳐본 꿈을 몰래 적어 둔 일기장', carrier: 'self', cap: 3,
+    name: '꿈 일기', desc: '훔쳐본 꿈을 적은 일기 — 자신의 카드가 뽑힐 때마다 한 줄', carrier: 'self', cap: 3,
     rules: [{ name: '다음 화 미리보기', when: { on: 'stackReach', id: '꿈 일기', n: 3 }, fx: [spendAll('꿈 일기'), draw(2)] }],
   },
   passives: [
@@ -265,7 +265,7 @@ H['셰이디'] = {
   blurb: '역대 최고의 장난을 평생 소원으로 삼은 유령 우두머리. 공격할 때마다 적에게 「장난」 을 걸고, 셋이 다 걸린 적은 정신을 못 차리고 한 대 크게 얻어맞는다.',
   start: ['사슬낫 휘두르기', '순간이동', '사슬낫 회전베기'],
   keyword: {
-    name: '장난', desc: '셰이디가 걸어 둔 짓궂은 장난 — 셋이 겹치면 대형 사고', carrier: 'enemy', cap: 3,
+    name: '장난', desc: '셰이디의 짓궂은 장난 — 셋이 겹치면 대형 사고', carrier: 'enemy', cap: 3,
     rules: [{ name: '역대 최고의 장난', when: { on: 'stackReach', id: '장난', n: 3 }, fx: [st('기절', 1, 'oneEnemy'), dmg(1.5), spendAll('장난')] }],
   },
   passives: [
@@ -296,7 +296,7 @@ H['셰이디'] = {
 H['앨리스'] = {
   blurb: '타로로 남의 미래를 봐 주다 슬쩍 골려 먹는 점술사 유령. 턴마다 카드 한 장을 펼쳐 파티의 기세나 적의 불운을 점치고, 쌓인 「행운」 을 한 방에 몰아 쓴다.',
   start: ['카드 날리기', '운명 회피', '카드 한 벌 날리기'],
-  keyword: { name: '행운', desc: '타로가 점지한 운 — 앨리스의 손끝을 날카롭게 한다', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: 0.1 }] },
+  keyword: { name: '행운', desc: '타로가 점지한 운 — 손끝이 날카로워진다', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: 0.1 }] },
   passives: [
     { name: '아르카나 한 장', when: { on: 'turnStart' }, fx: [{ k: 'ifRandom', pct: 0.3 }, st('사기', 1), { k: 'ifRandom', pct: 0.4 }, st('취약', 1, 'allEnemies'), { k: 'ifRandom', pct: 0.5 }, stack('행운', 1)] },
   ],
@@ -325,7 +325,7 @@ H['앨리스'] = {
 H['림_혼돈'] = {
   blurb: '혼돈의 빈자리를 대신 떠안은 질서의 유령. 공격은 과녁을 고르지 못하고 아무나 베지만 그만큼 세다. 적이 여럿일 때 「혼돈」 이 차오르면 한 번에 다 쓸어 버린다 — 맞으면 꿀밤 한 방에 정신이 돌아온다.',
   start: ['혼돈의 낫', '그림자 숨기', '혼돈의 대낫'],
-  keyword: { name: '혼돈', desc: '어설프게 흉내 낸 혼돈의 기운 — 꿀밤 한 방이면 흩어진다', carrier: 'self', cap: 3 },
+  keyword: { name: '혼돈', desc: '어설프게 흉내 낸 혼돈 — 꿀밤 한 방이면 흩어진다', carrier: 'self', cap: 3 },
   passives: [
     { name: '어엿한 혼돈', when: { on: 'play', type: '공격' }, conds: [{ c: 'foes', n: 2 }], fx: [stack('혼돈', 1)] },
     { name: '꿀밤', when: { on: 'hurt' }, fx: [spendAll('혼돈')] },
@@ -386,7 +386,7 @@ H['벨라'] = {
   blurb: '소설 속 주인공이 현실로 걸어 나온 유령 소녀. 파티가 위태로울수록 「존속」 이 쌓여 실드도 공격도 단단해지고, 셋이 모이면 쓰러질 한 대를 버텨 내 존재를 증명한다.',
   start: ['유령 손짓', '반투명 가드'],
   keyword: {
-    name: '존속', desc: '나는 여기 있다 — 위기가 깊을수록 또렷해지는 존재감', carrier: 'self', cap: 5,
+    name: '존속', desc: '나는 여기 있다 — 위기일수록 또렷해지는 존재감', carrier: 'self', cap: 5,
     per: [{ stat: 'guard', v: 0.1 }, { stat: 'dealt', v: 0.1 }],
     rules: [{ name: '존재의 증명', when: { on: 'stackReach', id: '존속', n: 3 }, limit: { per: 'fight', n: 1 }, fx: [st('끈기', 1)] }],
   },
@@ -419,7 +419,7 @@ H['셀리네'] = {
   blurb: '남의 화난 표정을 수집하는 엘튜버 유령. 적을 약 올릴 때마다 「표정」 이 모이고, 둘이 차면 「화난 얼굴」 한 장을 갤러리에서 꺼내 다시 약을 올린다.',
   start: ['하트 탄', '팬서비스 가드'],
   keyword: {
-    name: '표정', desc: '약 올린 상대의 찡그린 얼굴 — 갤러리에 한 장씩 모은다', carrier: 'self', cap: 2,
+    name: '표정', desc: '약 올린 상대의 찡그린 얼굴 — 디버프를 걸 때마다 한 장, 둘이면 「화난 얼굴」', carrier: 'self', cap: 2,
     rules: [{ name: '화난 얼굴 갤러리', when: { on: 'stackReach', id: '표정', n: 2 }, fx: [spendAll('표정'), make('셀리네_t1', 1)] }],
   },
   passives: [
@@ -454,7 +454,7 @@ H['스피키_메이드'] = {
   blurb: '메이드 크레페의 일을 통째로 뒤집어쓴 꼬마 유령. 카드를 낼 때마다 고장 난 청소기가 버린 더미를 한 장씩 빨아들이고, 「잡동사니」 셋이 차면 이상한 우연으로 일이 술술 풀린다.',
   start: ['먼지털이 휘두르기', '호박 쟁반 방패', '먼지털이 대회전'],
   keyword: {
-    name: '잡동사니', desc: '청소기 먼지통에 쌓인 것들 — 셋이면 뜻밖의 행운', carrier: 'self', cap: 3,
+    name: '잡동사니', desc: '청소기 먼지통에 쌓인 것 — 셋이면 뜻밖의 행운', carrier: 'self', cap: 3,
     rules: [{ name: '이상한 우연', when: { on: 'stackReach', id: '잡동사니', n: 3 }, fx: [spendAll('잡동사니'), ap(1), draw(1)] }],
   },
   passives: [
@@ -486,7 +486,7 @@ H['셰이디_역전'] = {
   blurb: '나약함을 인정하고 유령 늪의 파수꾼이 된 장난꾼. 파티를 지켜 줄 때마다 「참음」 이 쌓이고, 넷에서 참다 터지면 파티 전원이 덩달아 달려든다. 지키는 방식은 여전히 제멋대로.',
   start: ['파수 사슬', '늪지 등불 온기'],
   keyword: {
-    name: '참음', desc: '착한 척하느라 꾹꾹 눌러 둔 짜증', carrier: 'self', cap: 4,
+    name: '참음', desc: '착한 척하느라 눌러 둔 짜증 — 넷이면 터진다', carrier: 'self', cap: 4,
     rules: [{ name: '참다 터짐', when: { on: 'stackReach', id: '참음', n: 4 }, fx: [spendAll('참음'), st('협공', 1), { k: 'later', n: 1, then: [ap(2)] }] }],
   },
   passives: [
@@ -520,7 +520,7 @@ H['셰이디_역전'] = {
 H['시온더다크불릿'] = {
   blurb: '자칭 검은 마탄의 사수, 실상은 편의점 야간 알바. 스킬로 적에게 「좌표」 를 찍어 두면 다음 턴 손에 「진혼의 마탄」 이 장전되고, 좌표 찍힌 적은 아군 공격이 약점으로 박힌다.',
   start: ['저격', '그림자 속으로', '관통 저격'],
-  keyword: { name: '좌표', desc: '검은 마탄의 사수가 잡아 둔 과녁 — 찍힌 적은 급소가 드러난다', carrier: 'enemy', hunt: true, cap: 2, weakens: true },
+  keyword: { name: '좌표', desc: '마탄의 사수가 잡아 둔 과녁 — 찍힌 적은 급소가 드러난다', carrier: 'enemy', hunt: true, cap: 2, weakens: true },
   passives: [
     { name: '좌표 잡기', when: { on: 'play', type: '스킬' }, limit: { per: 'turn', n: 1 }, fx: [stack('좌표', 1), { k: 'later', n: 1, then: [make('시온더다크불릿_t1', 1)] }] },
   ],
@@ -552,7 +552,7 @@ H['시온더다크불릿'] = {
 H['림'] = {
   blurb: '입만 열면 아재개그로 분위기를 얼리는 질서의 2인자. 개그를 치면 적이 얼어붙어 굼떠지지만 파티도 김이 빠진다. 공격과 스킬을 같은 장수 낸 턴엔 저울이 맞아 낫 자국이 깊어진다.',
   start: ['낫 베기', '망령 장막', '대낫 휘두르기'],
-  keyword: { name: '낫 자국', desc: '균형을 지키는 낫이 남긴 흔적 — 깊을수록 잘 벌어진다', carrier: 'enemy', cap: 5, per: [{ stat: 'taken', v: 0.06 }] },
+  keyword: { name: '낫 자국', desc: '균형을 지키는 낫의 흔적 — 깊을수록 잘 벌어진다', carrier: 'enemy', cap: 5, per: [{ stat: 'taken', v: 0.06 }] },
   passives: [
     { name: '저울이 맞으면', when: { on: 'turnEnd' }, conds: [{ c: 'balanced' }], fx: [dmg(0.6, 'allEnemies'), stack('낫 자국', 1, 'allEnemies')] },
   ],
@@ -587,7 +587,7 @@ H['키샤'] = {
   blurb: '엘리아스에 언더돌 문화를 연 유령 아이돌. 아군이 카드를 낼 때마다 무대 「열기」 가 오르고, 넷이 차면 앵콜 — 버린 카드 한 장이 무대로 돌아오고 파티의 기세가 오른다.',
   start: ['진심 하트', '팬레터 낭독'],
   keyword: {
-    name: '열기', desc: '손꼽는 팬들이 만든 무대의 열기', carrier: 'self', cap: 4,
+    name: '열기', desc: '팬들이 만든 무대의 열기 — 다른 아군이 카드를 낼 때마다 오른다', carrier: 'self', cap: 4,
     rules: [{ name: '떼창 앵콜', when: { on: 'stackReach', id: '열기', n: 4 }, fx: [spendAll('열기'), { k: 'pull', from: 'discard', n: 1 }, st('사기', 1)] }],
   },
   passives: [

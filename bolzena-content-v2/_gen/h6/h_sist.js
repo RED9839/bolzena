@@ -6,7 +6,7 @@ L.hero({
   id: '시스트', name: '시스트', nature: '광기', row: 'mid', role: '딜러', star: 3, hp: 580, atk: 125, def: 28, crit: 10,
   blurb: '힘 대신 돈으로 가치를 증명하는 자수정의 용족 밀수꾼. 쓰러뜨리고 깨뜨린 만큼 장부에 금화가 쌓이고, 비싼 물건은 금화로만 판다.',
   keyword: {
-    name: KW, desc: '장부에 적힌 금화. 적을 격파 · 처치하면 쌓이고, 1개당 시스트의 피해 +5% — 「금화로만」 파는 카드의 비용이 된다', carrier: 'self', cap: 6,
+    name: KW, desc: '장부에 적힌 금화 — 격파 · 처치로 쌓이고, 「금화로만」 파는 카드의 값이 된다', carrier: 'self', cap: 6,
     per: [{ stat: 'dealt', v: 0.05 }],
     rules: [
       { name: '장사 수완', when: { on: 'kill' }, fx: [stk(KW, 2)] },

@@ -14,12 +14,44 @@
 
 ```sh
 python <bolzena-fx>/Tools/fx_prepare.py --project <유니티 프로젝트> --heroes all   # 이펙트 · 구운 낱장(webp→png) · 소리(Opus→WAV) · 소리 색인
+python <bolzena-fx>/Tools/fx_extract_more.py --project <유니티 프로젝트>           # 카드 · 공용 이펙트(원작 번들 → Src/fx2, 1477개 · 약 1.5분)
+#   일꾼 수는 메모리로 정한다: 하나로 10개 해 보고(일꾼 하나 ≈ 1GB) 합계 --mem-limit(기본 32GB) 안에서. 이미 한 것은 캐시(--cache)로 건너뛴다
 "Unity.exe" -batchmode -quit -projectPath <프로젝트> -executeMethod Bolzena.Fx.EditorTools.FxImport.ImportAll
 ```
 - 결과는 `Assets/BolzenaFxData/`(원작 에셋 — **.gitignore 에 넣을 것**).
   - `Resources/BolzenaFx/FxLibrary.asset` 색인 · `Effects/<이름>.asset`(FxEffect) · `Baked/<이름>.asset`(FxSheet) · `FxParticle.mat`(셰이더를 빌드에 싣는 본)
   - `Resources/BolzenaAudio/sfx|voice/…wav` · `audio_index.json` · `BolzenaMixer.mixer`(Master ← Sfx[압축기] · Voice)
 - `--heroes` 는 소리 · 목소리만 줄인다(이펙트는 늘 전부 — 134명 604개).
+
+## ★ 전투가 부를 것(통합 API) — `FxBattle.cs` · `FxRules.cs` · `Spine/SpineFx.cs`
+
+```csharp
+using Bolzena.Fx;
+// 유닛 → FxActor (스파인이면 원작 자리 본 Point_Bottom · Middle · Top · Front · Attack1 · Skill1 · Ult1 까지)
+FxActor me = SpineFx.Actor(unitView.Skeleton, "에르핀", party: true);           // 그림 한 장이면 FxActor.Of(transform, height, party)
+List<FxActor> foes = enemies.Select(e => SpineFx.Actor(e.Skeleton, e.Key, false)).ToList();
+
+BolzenaFx.Prewarm(new[] { "에르핀", "벨라", "티그", "힐데" });                     // 싸움을 열 때 한 번(고학년 · 카드 · 맞음 · 공용 + 소리)
+
+// 고학년 — plan 은 SpineMotion.PlanUlt(…). onHit(i) 이 i 번째 타격 시각에 불린다(숫자 · 체력 · 맞음 이펙트는 거기서)
+FxCall c = BolzenaFx.Ult("에르핀", me, foes, i => Land(i), SpineFx.Sync(plan, dashFrom, dashTo), aoe: card.IsAoe);
+// 카드 — plan 은 SpineMotion.PlanCard(…). 원작 평타(Attack1) · 센 공격(Attack2) · 스킬(Skill1) · 시그니처 이펙트, 없으면 이펙트 없이 시각만
+FxCall c2 = BolzenaFx.Card("에르핀", me, foes, SpineFx.Sync(plan), i => Land(i), aoe: false);
+// 맞는 순간(onHit 안에서) — 웹판 sparkFx: 갈래 낱장 + 치명 · 세게(고학년 첫 타격) 덧불. sound 를 주면 BolzenaAudio.Land 까지
+BolzenaFx.Hit(foes[0], MotionTables.HitKindHero(dmgType, backRow), heavy, crit, ult, first: i == 0,
+              sound: new BolzenaAudio.HitInfo { K = "hurt", Side = "enemy", V = dmg, Crit = crit }, byHero: "에르핀");
+// 공용 — heal · shield · shieldHit · buff · debuff · break(격파) · kill(쓰러짐) · oracle(신탁) · revive
+BolzenaFx.Common("shield", me);
+c.Stop(); bool done = c.Done; int firstHit = c.HitAt;  // c.HitTimes 전부
+BolzenaFx.Sound = false;   // 전투가 소리를 따로 낸다면
+```
+- 시각: 맞는 시각 = 때리는 순간(스파인 이벤트) + 투사체 몫(330ms, 투사체가 있으면) + 60ms, 여러 번 때리는 창의 이벤트마다 한 번 더(웹판 그대로). 이벤트를 모르면 고학년 `UltFx.ImpactMs` · 카드 `FxRules.CARD_HIT`(260).
+- 자리(웹판 + 원작 본): 고학년은 시전자 발밑 → 첫 대상 발밑(전체 공격 = 살아 있는 대상 발밑 가운데, 폭 = 무리 폭 + 1.4로 벌림, 달려가면 부딪치는 자리) ·
+  카드 투사체는 시전 본(Point_Attack1 · Skill1 …, 없으면 총구 · Front)에서 대상 몸(Point_Middle)으로 · 카드 타격 프리팹(_hit)은 대상 몸 · 맞음은 Point_Middle 을 그림 폭 12% · 높이 10% 흩어 ·
+  격파는 머리(Point_Top) · 나머지 공용은 발밑 · 이름에 camera/screen/bg 가 든 것은 화면 가운데 · 아군 쪽 판(`_a` · heal · buff · revival)은 시전자 쪽.
+- 숫자는 모두 `FxRules`(맞음 배율 · 흩음 · 덧불 · HIT_AFTER · CARD_HIT · CARD_MAX · 공용 갈래 표 COMMON). 카드 이펙트 고르기는 `FxRules.CardPlan`(동작 → attack/power/skill/sig 갈래, 같은 이름 번호 판은 하나, 모으기 2 · 투사체 1 · 시전자 2 · 대상 3).
+- 원작 「공용 회복 · 실드 · 신탁」 프리팹은 없다 — 증강(augment) · 다른 사도의 것을 빌렸다(후보는 `FxLibrary.Common(kind)`, 고른 것은 `FxRules.COMMON`).
+- 무대는 풀에서 되쓴다(`FxRun.PoolMax` 64). 쥔 `FxRun` 은 `Gen` 이 바뀌면 끝난 것.
 
 ## 1. 이펙트
 

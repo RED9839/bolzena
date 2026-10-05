@@ -55,6 +55,8 @@ namespace Bolzena.Core
         {
             foreach (var g in d.Heroes.Values.SelectMany(h => h.AllKeywords.Select(k => (h, k))).Where(x => x.k.Name != null).GroupBy(x => x.k.Name).Where(g => g.Count() > 1))
                 E($"고유 효과 「{g.Key}」 를 여럿이 쓴다({string.Join(" · ", g.Select(x => x.h.Id))}) — 고유 효과 이름은 사도 사이에서 겹치면 안 된다");
+            foreach (var g in d.Heroes.Values.SelectMany(h => (h.Forms ?? new List<FormDef>()).Select(f => (h, f))).Where(x => x.f.Id != null).GroupBy(x => x.f.Id).Where(g => g.Count() > 1))
+                E($"변신 id 「{g.Key}」 가 겹친다({string.Join(" · ", g.Select(x => x.h.Id))}) — 변신 id 는 사도 사이에서 겹치면 안 된다");
             foreach (var h in d.Heroes.Values) Hero(h);
             foreach (var c in d.Cards.Values) Card(c);
             foreach (var e in d.Enemies.Values) Enemy(e);
@@ -162,6 +164,8 @@ namespace Bolzena.Core
                     case FxK.PerPaid: if (f.Per < 0) E($"{w}: per 는 양수(HP 몇 마다)"); break;
                     case FxK.IfHp: if (!(f.Pct > 0 && f.Pct < 1)) E($"{w}: pct 는 0~1(0.5 = 50% 이하)"); break;
                     case FxK.Feed: if (f.V <= 0) E($"{w}: v 가 없다"); effects++; break;
+                    case FxK.Form: if (d.Form(f.Id) == null) E($"{w}: 없는 변신 — 「{f.Id}」(사도의 forms id)"); effects++; break;
+                    case FxK.FormEnd: break;
                     default: if (!FxK.Conditions.Contains(f.K) && !FxK.Pers.Contains(f.K)) effects++; break;
                 }
                 if (FxK.Pers.Contains(f.K) && !(i + 1 < fx.Count && (fx[i + 1].K == FxK.Dmg || fx[i + 1].K == FxK.Block || fx[i + 1].K == FxK.Shield || fx[i + 1].K == FxK.Heal)))
@@ -242,6 +246,94 @@ namespace Bolzena.Core
             }
             for (int i = 0; i < h.Passives.Count; i++) Rule($"{at} 패시브[{i}] {h.Passives[i].Name}", h.Passives[i]);
             if (h.Passives.Select(p => p.Name).Distinct().Count() > 2) W($"{at}: 패시브는 둘까지(docs/18 §3)");
+            foreach (var f in h.Forms ?? new List<FormDef>()) Form(h, f, at);
+            // 그 사도의 고학년 · 카드가 부르는 변신은 그 사도의 것이어야 한다
+            var mine = new HashSet<string>((h.Forms ?? new List<FormDef>()).Select(f => f.Id).Where(x => x != null));
+            IEnumerable<Fx> Walk(IEnumerable<Fx> fx) => (fx ?? Enumerable.Empty<Fx>()).SelectMany(f => new[] { f }.Concat(Walk(f.Then)).Concat(Walk(f.Else)));
+            var calls = Walk(h.Ult?.Fx).Concat(h.Passives.SelectMany(r => Walk(r.Fx)))
+                .Concat(d.Cards.Values.Where(c => c.Hero == h.Id).SelectMany(c => Walk(c.Fx).Concat(c.Oracles.SelectMany(o => Walk(o.Fx))).Concat(c.Blesses.SelectMany(b => Walk(b.Fx)))))
+                .Where(f => f.K == FxK.Form).Select(f => f.Id)
+                .Concat(h.AllKeywords.Where(k => k.OnMax != null).Select(k => k.OnMax.Form)).ToList();
+            foreach (var k in h.AllKeywords.Where(k => k.OnMax != null))
+            {
+                if (k.Cap == null || k.Cap <= 0 || k.Mode || k.Wrap) E($"{at}: 「{k.Name}」 onMax 는 최대(cap)가 있는 쌓이는 고유 효과에만(mode · wrap 아님)");
+                if ((k.Carrier ?? "self") != "self") E($"{at}: 「{k.Name}」 onMax 는 carrier self 에만");
+                if (k.Consumes) W($"{at}: 「{k.Name}」 onMax — 발동하면 사라지는 고유 효과는 최대까지 잘 안 찬다");
+            }
+            foreach (var id in calls.Distinct()) if (id != null && d.Form(id) != null && !mine.Contains(id)) E($"{at}: 다른 사도의 변신 「{id}」 을 부른다 — 변신은 제 것만");
+            foreach (var id in mine) if (!calls.Contains(id)) W($"{at}: 변신 「{id}」 을 부르는 효과(form)가 없다 — 고학년에 {{ k: \"form\", id }} 로");
+            // 값어치 — 변신을 든 고학년이 다른 고학년들보다 크게 세거나 약하지 않게(변신 값은 CardValue.FormValue)
+            if (h.Ult != null && h.Ult.Fx.Any(f => f.K == FxK.Form))
+            {
+                double mineV = UltWorth(h);
+                var others = d.Heroes.Values.Where(x => x.Ult != null && !x.Ult.Fx.Any(f => f.K == FxK.Form)).Select(x => CardValue.ValueOf(x.Ult.Fx)).OrderBy(x => x).ToList();
+                if (others.Count >= 5)
+                {
+                    double med = others[others.Count / 2], top = others[others.Count * 9 / 10];
+                    if (mineV > top * 1.15) W($"{at}: 변신을 든 고학년 값어치 {mineV:0.00} — 다른 고학년 상위 10%({top:0.00})의 1.15배를 넘는다(너무 세다)");
+                    if (mineV < med * 1.15) W($"{at}: 변신을 든 고학년 값어치 {mineV:0.00} — 다른 고학년 가운데값({med:0.00})의 1.15배보다 낮다(변신하는 만큼 세야)");
+                }
+            }
+        }
+
+        /// <summary>고학년 값어치 — 변신(form)은 CardValue.FormValue 로 센다.</summary>
+        double UltWorth(HeroDef h) =>
+            CardValue.ValueOf(h.Ult.Fx.Where(f => f.K != FxK.Form).ToList()) + h.Ult.Fx.Where(f => f.K == FxK.Form).Sum(f => CardValue.FormValue(d.Form(f.Id), d, h.Id));
+
+        static readonly HashSet<string> FORM_STATS = new() { "dealt", "taken", "atk", "def", "crit", "guard", "heal" };
+
+        /// <summary>변신 하나 — 이름 · 지속 · 풀리는 계기 · 능력치 · 카드 바꾸기(값어치 1.15~1.8배) · 덤 · 패시브 · 풀릴 때.</summary>
+        void Form(HeroDef h, FormDef f, string at0)
+        {
+            string at = $"{at0} 변신 {f.Id}";
+            if (string.IsNullOrEmpty(f.Id)) E($"{at}: id 가 없다");
+            if (string.IsNullOrEmpty(f.Name)) E($"{at}: name 이 없다");
+            else if (keywords.Contains(f.Name) || R.ALL_ST.Contains(f.Name) || R.IsCardSt(f.Name) || Array.IndexOf(Tag.All, f.Name) >= 0) E($"{at}: 이름 「{f.Name}」 이 고유 효과 · 상태 · 태그와 같다 — 칩 설명이 겹친다");
+            if (f.Turns < 0) E($"{at}: turns 는 0(전투 끝까지) 이상");
+            if (f.Turns > 6) W($"{at}: turns {f.Turns} — 길면 0(전투 끝까지)으로");
+            if (f.Until != null)
+            {
+                if (f.Until.On == null || !WHEN_ON.Contains(f.Until.On) || f.Until.On == "always") E($"{at}: until 의 on 이 맞지 않다 — 「{f.Until.On}」");
+                if ((f.Until.On == "stackReach" || f.Until.On == "stackGone") && (f.Until.Id == null || !keywords.Contains(f.Until.Id))) E($"{at}: until 키워드가 아니다 — 「{f.Until.Id}」");
+            }
+            foreach (var kv in f.Mods ?? new Dictionary<string, double>())
+            {
+                if (!FORM_STATS.Contains(kv.Key)) E($"{at}: mods 의 능력치는 {string.Join(" · ", FORM_STATS)} — 「{kv.Key}」");
+                if (kv.Value == 0 || Math.Abs(kv.Value) > 1) E($"{at}: mods {kv.Key} 는 비율(0.2 = +20%, 1 이하)");
+            }
+            foreach (var kv in f.Cards ?? new Dictionary<string, string>())
+            {
+                var a = d.Card(kv.Key); var b = d.Card(kv.Value);
+                if (a == null || a.Hero != h.Id) { E($"{at}: cards 의 「{kv.Key}」 는 이 사도의 카드가 아니다"); continue; }
+                if (b == null) { E($"{at}: 변신판 카드가 없다 — {kv.Value}"); continue; }
+                if (b.Hero != h.Id) E($"{at}: 변신판 카드 {kv.Value} 의 주인이 다르다");
+                if (!b.Token) E($"{at}: 변신판 카드 {kv.Value} 는 token(덱에 안 드는 카드)이어야 한다");
+                // 값어치 — 변신판은 신탁처럼 코스트 기준 1.15배 이상, 1.8배 이하(너무 세지 않게)
+                var va = d.View(a.Id); var vb = d.View(b.Id);
+                double r = (CardValue.CardWorth(vb) / CardValue.BaseValue(vb.X ? 3 : vb.Cost)) / (Math.Max(0.05, CardValue.CardWorth(va)) / CardValue.BaseValue(va.X ? 3 : va.Cost));
+                if (r < 1.15) W($"{at}: 변신판 「{b.Name}」 이 「{a.Name}」 보다 낫지 않다(코스트 기준 {r:0.00}배 · 1.15배 이상)");
+                if (r > 1.8) W($"{at}: 변신판 「{b.Name}」 이 「{a.Name}」 의 {r:0.00}배 — 1.8배 이하로");
+            }
+            for (int i = 0; i < (f.Bonus?.Count ?? 0); i++)
+            {
+                var b = f.Bonus[i]; string bt = $"{at} bonus[{i}]";
+                if (b.Card != null && d.Card(b.Card)?.Hero != h.Id) E($"{bt}: card 는 이 사도의 카드 id — 「{b.Card}」");
+                if (b.Type != null && Array.IndexOf(R.CARD_TYPES, b.Type) < 0) E($"{bt}: 모르는 type {b.Type}");
+                if (b.Tag != null && Array.IndexOf(Tag.All, b.Tag) < 0) E($"{bt}: 모르는 태그 「{b.Tag}」");
+                if (b.Ratio < 0 || b.Ratio > 2) E($"{bt}: ratio 는 피해 배율(1.2 = ×1.2, 2 이하)");
+                if (b.Ratio == 0 && (b.Fx == null || b.Fx.Count == 0) && (b.Tags == null || b.Tags.Count == 0)) E($"{bt}: ratio · fx · tags 가운데 하나는 있어야 한다");
+                Tags(bt, b.Tags);
+                if (b.Fx != null && b.Fx.Count > 0) FxList(bt, b.Fx);
+            }
+            for (int i = 0; i < (f.Passives?.Count ?? 0); i++)
+            {
+                var r = f.Passives[i];
+                if (r.When?.On == "always") E($"{at} 패시브[{i}]: 변신의 「항상」 은 mods 로");
+                Rule($"{at} 패시브[{i}] {r.Name}", r);
+            }
+            if (f.Off != null && f.Off.Count > 0) FxList($"{at} 풀릴 때", f.Off);
+            if (f.Off != null && f.Off.Any(x => x.K == FxK.Form || x.K == FxK.FormEnd)) E($"{at}: 풀릴 때(off)에 form · formEnd 를 쓰지 않는다");
+            if (f.Mods == null && f.Cards == null && (f.Bonus == null || f.Bonus.Count == 0) && (f.Passives == null || f.Passives.Count == 0)) W($"{at}: 바뀌는 것이 없다(mods · cards · bonus · passives)");
         }
 
         /// <summary>그 사도의 고유 효과가 데이터 어딘가에서 쓰이나(stack · spend · ifStack · perStack · xStack · payWith · marked · 규칙의 id).</summary>
@@ -264,6 +356,7 @@ namespace Bolzena.Core
             if (c.Cost < 0) E($"{at}: cost 가 음수");
             if (c.Hero != null && d.Hero(c.Hero) == null) E($"{at}: 없는 사도 {c.Hero}");
             if (c.Id.EndsWith(GameData.PLAIN) || c.Id.EndsWith(GameData.COPY)) E($"{at}: id 끝에 ~ · ^ 를 쓰지 않는다(엔진이 쓴다)");
+            if (c.Id.Contains(GameData.OWNER)) E($"{at}: id 에 @ 를 쓰지 않는다(교주 카드 주인 표시)");
             Tags(at, c.Tags);
             FxList(at, c.Fx);
             if (c.Fx.Count == 0 && !c.Tags.Contains(Tag.Unplayable) && c.Type != "저주" && c.Type != "상태") W($"{at}: 효과가 없다");
@@ -333,6 +426,7 @@ namespace Bolzena.Core
             if (it.T == "addCard") { var c = d.Card(it.Id); if (c == null) E($"{at}: 없는 카드 {it.Id}"); else if (!c.IsStatusCard) W($"{at}: 끼워 넣는 카드는 상태 카드여야 한다 — {it.Id}"); if (it.To != null && it.To != "draw" && it.To != "discard" && it.To != "hand") E($"{at}: to 는 draw · discard · hand"); }
             if (it.Id != null && (it.T == "attack" || it.T == "back" || it.T == "attackAll" || it.T == "multi") && !R.ALL_ST.Contains(it.Id)) E($"{at}: 모르는 상태 {it.Id}");
             if (it.T == "summon" && d.Enemy(it.Id) == null) E($"{at}: 세울 적이 없다 — {it.Id}");
+            if (it.NoTough && it.T != "summon") E($"{at}: noTough 는 수 summon(강인도 없는 소환물)에만");
             if (it.T == "cardDebuff" && !R.IsCardSt(it.Id)) E($"{at}: cardDebuff 의 id 는 카드에 붙는 상태(독 · 봉쇄 · 침체 · 빙결)");
             if (it.T == "cardDebuff" && it.To != null && it.To != "hand" && it.To != "draw") E($"{at}: cardDebuff 의 to 는 hand · draw");
             if (it.T == "handCost" && it.V == 0) E($"{at}: handCost 에 v(±비용)가 없다");
@@ -386,6 +480,8 @@ namespace Bolzena.Core
                 if (r.Id == "actDebuff" && r.St != null && r.St != "취약" && r.St != "약화") E($"{at}: 희귀종 actDebuff 의 st 는 취약 · 약화");
             }
             if (e.ToughTaken < 0 || e.ToughTaken > 2) E($"{at}: toughTaken 은 0~2(받는 강인도 피해 배율)");
+            if (e.Clone != null) { var ch = d.Hero(e.Clone); if (ch == null) E($"{at}: clone 은 사도 키 — 없는 사도 {e.Clone}"); else if (e.Nature != null && ch.Nature != null && e.Nature != ch.Nature) E($"{at}: 클론 성격 {e.Nature} 이 사도 {e.Clone} 의 성격 {ch.Nature} 와 다르다"); }
+            if (e.Tough != 0 && e.Tough < R.TOUGH.Min) E($"{at}: tough 는 {R.TOUGH.Min} 이상(모든 적의 강인도 최소치 — 잔챙이 포함. 강인도 없는 소환물은 수 summon 의 noTough 로)");
             foreach (var p in e.Passives)
             {
                 if (p.On == null || !FOE_ON.Contains(p.On)) E($"{at} 패시브 {p.Name}: 모르는 on {p.On}");

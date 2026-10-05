@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +8,9 @@ namespace Bolzena.RunUI
     /// <summary>
     /// 화면 설정 — 창 모드 · 해상도 · 프레임 제한 · 수직동기. 판 화면 설정 창과 전투 화면 설정 창이 함께 쓴다(값은 PlayerPrefs 한 벌).
     ///   화면 모드(다른 PC 게임과 같은 세 가지): 0 창 모드 · 1 테두리 없는 창 모드(FullScreenWindow — 기본값) · 2 전체 화면(ExclusiveFullScreen — Windows 만)
-    ///   테두리 없는 창 모드는 늘 모니터를 꽉 채운다 — 해상도를 고르면 그리는 크기(렌더 해상도)만 바뀐다(유니티 동작).
+    ///   테두리 없는 창 모드는 늘 모니터를 꽉 채운다 — 화면(백버퍼)은 늘 모니터 해상도로 두고, 고른 해상도는 3D 렌더 배율(RenderScale)로만 쓴다.
+    ///   (예전엔 백버퍼를 고른 크기로 줄여 유니티가 모니터로 늘려 그렸다 — 판 화면 글까지 모두 뭉개졌다. 이제 판 화면 · 글은 늘 모니터 해상도로 또렷하고,
+    ///    전투 장면만 RenderScaleHook(쓰는 쪽이 URP renderScale · 업스케일 필터를 건다)으로 낮춰 그린다.)
     ///   해상도: 0 모니터 해상도 · 1 HD 1280×720 · 2 FHD 1920×1080 · 3 WQHD 2560×1440 · 4 4K (UHD) 3840×2160
     ///   모니터보다 큰 해상도는 잠긴다(Fits). 창 모드에서는 고른 크기가 작업 영역을 넘으면 비율을 지켜 줄여서 가운데에 놓는다.
     /// 부팅 때 LoadAndApply() 를 한 번 부른다. 명령줄에 -screen-width · -screen-height · -screen-fullscreen · -window-mode · -popupwindow
@@ -101,6 +103,26 @@ namespace Bolzena.RunUI
         public static int FpsIndex => Mathf.Clamp(PlayerPrefs.GetInt(KFps, 1), 0, FrameCaps.Count - 1);
         public static bool VSync => PlayerPrefs.GetInt(KVsync, 0) == 1;
 
+        /// <summary>지금 3D 렌더 배율(0.25~1) — 테두리 없는 창 모드에서 모니터보다 작은 해상도를 고르면 1 미만.</summary>
+        public static float RenderScale { get; private set; } = 1f;
+
+        /// <summary>렌더 배율을 실제로 거는 손(URP 를 아는 쪽이 부팅 때 단다) — 배율이 바뀔 때마다 불린다.</summary>
+        public static Action<float> RenderScaleHook;
+
+        static void SetRenderScale(float k)
+        {
+            RenderScale = Mathf.Clamp(k, 0.25f, 1f);
+            RenderScaleHook?.Invoke(RenderScale);
+        }
+
+        /// <summary>이 모드 · 해상도의 렌더 배율 — 테두리 없는 창 모드만 고른 높이 ÷ 모니터 높이, 나머지는 1.</summary>
+        static float ScaleFor(int modeIndex, int presetIndex)
+        {
+            if (Modes[modeIndex].Mode != WindowMode.Borderless) return 1f;
+            var s = SizeOf(presetIndex); var m = Monitor;
+            return m.y > 0 ? Mathf.Min(1f, s.y / (float)m.y) : 1f;   // 높이 비 — 21:9 모니터에 16:9 를 골라도 화면 비는 모니터 그대로
+        }
+
         /// <summary>모니터 해상도(창이 있는 모니터).</summary>
         public static Vector2Int Monitor
         {
@@ -139,7 +161,7 @@ namespace Bolzena.RunUI
 
         /// <summary>지금 화면 한 줄 — 「1920×1080 · 전체화면」.</summary>
         public static string Describe() => Web ? $"{Screen.width}×{Screen.height} · {(Screen.fullScreen ? "전체 화면" : "브라우저 창")}"
-                                               : $"{Screen.width}×{Screen.height} · {Modes[ModeIndex].Name}";
+                                               : $"{Screen.width}×{Screen.height} · {Modes[ModeIndex].Name}" + (RenderScale < 0.999f ? $" · 그리기 {Mathf.RoundToInt(Screen.height * RenderScale)}p" : "");
 
         // ── 웹(WebGL) — 창 모드 · 해상도는 브라우저가 정한다. 설정 창은 「전체 화면」 켜고 끄기만 보인다 ──
         /// <summary>웹 빌드인가 — 설정 창이 창 모드 · 해상도 칸을 숨기고 전체 화면 스위치를 낸다.</summary>
@@ -172,7 +194,7 @@ namespace Bolzena.RunUI
         {
             var before = new Snapshot
             {
-                W = Screen.width, H = Screen.height, Mode = Screen.fullScreenMode,
+                W = Screen.width, H = Screen.height, Mode = Screen.fullScreenMode, Scale = RenderScale,
                 HadSaved = PlayerPrefs.HasKey(KPreset), SavedMode = PlayerPrefs.GetInt(KMode, DefaultMode), SavedPreset = PlayerPrefs.GetInt(KPreset, DefaultPreset),
             };
             if (!SetScreen(modeIndex, presetIndex)) return false;
@@ -203,6 +225,7 @@ namespace Bolzena.RunUI
             trial = false;
             var s = snap;
             Screen.SetResolution(s.W, s.H, s.Mode);
+            SetRenderScale(s.Scale);
             if (s.Mode == FullScreenMode.Windowed) Run(CenterWindow(new Vector2Int(s.W, s.H)));
             if (s.HadSaved) { PlayerPrefs.SetInt(KMode, s.SavedMode); PlayerPrefs.SetInt(KPreset, s.SavedPreset); }
             else { PlayerPrefs.DeleteKey(KMode); PlayerPrefs.DeleteKey(KPreset); }
@@ -232,19 +255,24 @@ namespace Bolzena.RunUI
         public static void LoadAndApply()
         {
             ApplyFrames();
-            if (Web || CommandLineSetsScreen()) return;   // 웹은 브라우저 크기를 따른다
+            // 점검용 — -display 모드,해상도(저장 안 함). 예: -display 1,1 = 테두리 없는 창 모드 · HD
+            int tm = -1, tp = -1;
+            var ta = Environment.GetCommandLineArgs();
+            int ti = Array.IndexOf(ta, "-display");
+            if (ti >= 0 && ti + 1 < ta.Length) { var sp = ta[ti + 1].Split(','); if (sp.Length == 2) { int.TryParse(sp[0], out tm); int.TryParse(sp[1], out tp); } }
+            if (Web || (tm < 0 && CommandLineSetsScreen())) return;   // 웹은 브라우저 크기를 따른다
             // 저장이 없으면 기본(테두리 없는 창 모드 · 모니터 해상도) — 저장하지는 않는다
-            int mode = Mathf.Clamp(PlayerPrefs.GetInt(KMode, DefaultMode), 0, Modes.Count - 1);
-            int preset = Mathf.Clamp(PlayerPrefs.GetInt(KPreset, DefaultPreset), 0, Presets.Count - 1);
+            int mode = Mathf.Clamp(tm >= 0 ? tm : PlayerPrefs.GetInt(KMode, DefaultMode), 0, Modes.Count - 1);
+            int preset = Mathf.Clamp(tp >= 0 ? tp : PlayerPrefs.GetInt(KPreset, DefaultPreset), 0, Presets.Count - 1);
             if (!ModeAvailable(mode)) mode = 1;
             if (!Fits(preset)) preset = 0;          // 모니터를 바꿨다 — 모니터 해상도로
             var want = Target(mode, preset);
-            if (Screen.width == want.x && Screen.height == want.y && Screen.fullScreenMode == Modes[mode].Unity) return;
+            if (Screen.width == want.x && Screen.height == want.y && Screen.fullScreenMode == Modes[mode].Unity) { SetRenderScale(ScaleFor(mode, preset)); return; }
             SetScreen(mode, preset);
         }
 
         // ── 속 ──
-        struct Snapshot { public int W, H; public FullScreenMode Mode; public bool HadSaved; public int SavedMode, SavedPreset; }
+        struct Snapshot { public int W, H; public FullScreenMode Mode; public bool HadSaved; public int SavedMode, SavedPreset; public float Scale; }
         static Snapshot snap;
         static bool trial;
         static int trialMode, trialPreset;
@@ -264,6 +292,7 @@ namespace Bolzena.RunUI
         static Vector2Int Target(int modeIndex, int presetIndex)
         {
             var s = SizeOf(presetIndex);
+            if (Modes[modeIndex].Mode == WindowMode.Borderless) return Monitor;   // 백버퍼는 늘 모니터 해상도 — 고른 해상도는 렌더 배율로(ScaleFor)
             if (Modes[modeIndex].Mode != WindowMode.Windowed) return s;
             var wa = WorkArea();
             float k = Mathf.Min(1f, (wa.width - 16f) / s.x, (wa.height - 48f) / s.y);
@@ -284,8 +313,10 @@ namespace Bolzena.RunUI
             if (!ModeAvailable(modeIndex) || !Fits(presetIndex)) return false;
             var size = Target(modeIndex, presetIndex);
             var mode = Modes[modeIndex].Unity;
-            Debug.Log($"[Display] {size.x}×{size.y} · {Modes[modeIndex].Name} ({Presets[presetIndex].Name})");
+            float k = ScaleFor(modeIndex, presetIndex);
+            Debug.Log($"[Display] {size.x}×{size.y} · {Modes[modeIndex].Name} ({Presets[presetIndex].Name}) · 렌더 배율 {k:F2}");
             Screen.SetResolution(size.x, size.y, mode);
+            SetRenderScale(k);
             if (mode == FullScreenMode.Windowed) Run(CenterWindow(size));
             return true;
         }

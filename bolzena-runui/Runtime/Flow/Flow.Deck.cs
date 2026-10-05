@@ -149,7 +149,7 @@ namespace Bolzena.RunUI
         {
             var v = P.View(id);
             var def = P.Data.Card(id);
-            var (body, close, _) = Stage.ModalBox("cardzoom", 1180, Theme.C(700, 690), v?.Name ?? id, def?.Blurb ?? (v?.Hero != null ? Roster.OfCore(v.Hero).ko + "의 카드" : "교주 카드"));
+            var (body, close, _) = Stage.ModalBox("cardzoom", 1180, Theme.C(700, 690), v?.Name ?? id, def?.Blurb ?? (v?.Def.Hero != null ? Roster.OfCore(v.Def.Hero).ko + "의 카드" : v?.Owner != null ? $"교주 카드 · {Roster.OfCore(v.Owner).ko} 덱" : "교주 카드"));
             float cw = Theme.C(330, 300);
             var card = W.Card(body, this, id, cw); card.At(0, 0.5f, 10, 0, cw, cw * 1.4f);
             var right = Ui.Rect("right", body).Fill(cw + 40, 0, 6, 0);
@@ -160,6 +160,31 @@ namespace Bolzena.RunUI
                 var t = Ui.Text(content, text, size, c, TextAlignmentOptions.TopLeft);
                 t.textWrappingMode = TextWrappingModes.Normal;
                 var fit = t.gameObject.AddComponent<ContentSizeFitter>(); fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            }
+            // 이 카드의 낱말 — 키워드 · 상태 · 고유 효과 · 생성 카드 판을 세로로(카드 글의 밑줄 낱말과 같은 판)
+            var terms = v != null ? CardTerms.Of(P.Data, P.Text, v, P.Text.Card(v)) : new List<CardTerms.Term>();
+            if (terms.Count > 0)
+            {
+                W.Section(content, "낱말", "카드 글의 밑줄 낱말 — 올리거나 누르면 그 자리에도 뜬다", 36);
+                float bw = Mathf.Min(1180, Stage.Size.x - 32) - 40 - cw - 40 - 6 - 14;
+                int ti = 0;
+                foreach (var t0 in terms)
+                {
+                    var t = t0;
+                    if (t.IsCard)
+                    {
+                        var cv = P.View(t.CardId);
+                        t = new CardTerms.Term { Name = t0.Name, CardId = t0.CardId, Rel = t0.Rel, Kind = t0.Rel != null ? "카드 · " + t0.Rel : "만들어지는 카드",
+                            Body = cv != null ? $"<color={Theme.SubTag}>{W.TypeLabel(cv.Type)} · 비용 {(cv.X ? "X" : cv.Cost.ToString())}</color>  {P.Text.Card(cv)}" : null };
+                    }
+                    var holder = Ui.Rect("term" + ti, content);
+                    RectTransform bx = null;
+                    bx = TermPop.Box(holder, t, bw, () => { if (holder && bx) { holder.Pref(-1, bx.sizeDelta.y); LayoutRebuilder.MarkLayoutForRebuild(content); } });
+                    holder.Pref(-1, bx.sizeDelta.y);
+                    var more = bx.GetComponentInChildren<Btn>();
+                    if (more != null) Stage.Hot["zoom.more" + ti] = more;
+                    ti++;
+                }
             }
             if (def != null && def.Oracles.Count > 0)
             {

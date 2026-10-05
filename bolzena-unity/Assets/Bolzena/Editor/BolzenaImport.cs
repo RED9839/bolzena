@@ -33,11 +33,38 @@ namespace Bolzena.EditorTools
             }
         }
 
+        // 사도 소리(고학년 효과음 · 목소리 — 135명, 원본 WAV) — 빌드가 붓지 않게 모노 · Vorbis 60%
+        void OnPreprocessAudio()
+        {
+            var p = assetPath.Replace("\\", "/");
+            if (!(p.Contains("/Resources/Voice/") || p.Contains("/Resources/Sfx/hero/"))) return;
+            var ai = (AudioImporter)assetImporter;
+            ai.forceToMono = true;
+            var st = ai.defaultSampleSettings;
+            st.compressionFormat = AudioCompressionFormat.Vorbis;
+            st.quality = 0.6f;
+            st.loadType = AudioClipLoadType.DecompressOnLoad;
+            ai.defaultSampleSettings = st;
+        }
+
         void OnPreprocessTexture()
         {
             var p = assetPath.Replace('\\', '/');
             if (!p.StartsWith("Assets/Bolzena/Resources/")) return;
             var ti = (TextureImporter)assetImporter;
+            if (p.Contains("/Resources/Spine/st_"))
+            {
+                // 스탠딩 스파인(135명 · 아틀라스 2억 픽셀) — BC7 이면 빌드가 200MB 넘게 붓는다. 크런치(DXT5) · 최대 2048
+                Compress(ti, true);
+                var pc = ti.GetPlatformTextureSettings("Standalone");
+                pc.overridden = false;
+                ti.SetPlatformTextureSettings(pc);
+                ti.textureCompression = TextureImporterCompression.Compressed;
+                ti.crunchedCompression = true;
+                ti.compressionQuality = 60;
+                ti.maxTextureSize = 2048;
+                return;
+            }
             if (p.Contains("/Resources/Spine/")) { Compress(ti, true); return; }   // 스파인 아틀라스 — 설정은 spine-unity 가, 압축만 여기서
             bool ui = p.Contains("/Resources/UI/");
             ti.mipmapEnabled = ui && !p.EndsWith("/white.png");   // 단색 조각은 밉맵 없이(화면 크기로 늘려 덮개로 쓴다)

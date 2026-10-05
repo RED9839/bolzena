@@ -285,6 +285,7 @@ namespace Bolzena.Demo
             yield return WaitInput();
             yield return Wait(0.3f);
             Shot("battle_start", 0);
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-toughshots") >= 0) { yield return ToughShots(); yield break; }
 
             // ── 1턴 — 화면 둘러보기 ──
             // 카드 올려 두기 → 풀이 툴팁
@@ -386,6 +387,11 @@ namespace Bolzena.Demo
                 Shot("party_deck", 0);
                 var deck = Modal.Open != null ? Modal.Open.GetComponentsInChildren<CardView>() : new CardView[0];
                 if (deck.Length > 2) { yield return Click(deck[2].transform.position, 0.2f); yield return Wait(0.4f); Shot("party_card_zoom", 0); yield return Click(new Vector2(6, 3.5f), 0.1f); }
+                // 생성 카드가 있는 카드(「케이크」 1장 생성 …) — 확대 옆에 그 카드를 작은 카드로
+                var mk = System.Array.Find(deck, c => c.Info != null && c.Info.Terms != null && c.Info.Terms.Exists(t => t.Kind == "card"));
+                if (mk != null) { yield return Wait(0.3f); var md = Modal.Open; if (md != null) md.gameObject.SetActive(false); CardZoom.Show(d.UiRoot, mk.Info, new Vector3(-3f, 0.2f, 0)); yield return Wait(0.5f); Shot("party_card_zoom_make", 0); yield return Wait(0.2f); CardZoom.Hide(); if (md != null) md.gameObject.SetActive(true); }
+                var pv = FindAnyObjectByType<PartyUi>();   // 맨 끝 교주 카드 묶음(주인 사도 빛깔 · 핀)
+                if (pv != null) { yield return Wait(0.3f); pv.ScrollToEnd(); yield return Wait(0.5f); Shot("party_deck_end", 0); yield return Wait(0.3f); }
             }
             yield return Click(new Vector2(0, -4.3f), 0.1f, true);
             // 왼쪽 위 초상을 눌러 — 같은 창의 전투원 탭(그 사도에 금 테)
@@ -517,6 +523,91 @@ namespace Bolzena.Demo
             }
             yield return Wait(6.5f);
             if (perf) { Debug.Log("[Perf] 전체 " + Stat(allMs)); Debug.Log("[Perf] 고학년 " + Stat(ultMs)); }
+            Debug.Log("[Demo] 끝 — " + shotNo + "장");
+            Application.Quit();
+        }
+
+        // -toughshots: 강인도 막대만 짧게 — 약점 아닌 카드 겨눔(1/3 예고) · 부분 칸 · 약점 카드 겨눔(아이콘 빛) · 상세 창 · 격파 · 격파 상태 · 일어남
+        int AttackBy(bool weak, int target)
+        {
+            var e = d.Battle.Snapshot.Enemies[target];
+            for (int i = 0; i < d.Hand.Cards.Count; i++)
+            {
+                var c = d.Hand.Cards[i].Info;
+                if (!d.Battle.CanPlay(i, out _) || c.Target != TargetKind.Enemy || c.Type != CardType.Attack || c.Epiphany) continue;
+                bool w = c.Nature != null && (c.Nature == "공명" || e.Weak.Contains(c.Nature));
+                if (w == weak) return i;
+            }
+            return -1;
+        }
+
+        IEnumerator InfoShot(int target, string name)
+        {
+            yield return WaitInput();
+            yield return Click(EnemyCenter(target), 0.2f, true);
+            yield return Wait(0.6f);
+            Shot(name, 0);
+            yield return Wait(0.2f);
+            if (Modal.Open != null) Modal.Open.Close();   // 바깥 누르기는 턴 끝 단추에 닿을 수 있어 바로 닫는다
+            yield return Wait(0.4f);
+        }
+
+        // 겨눌 적 — 살아 있고 격파 안 된 적 가운데 HP 가 가장 많은 적(격파 전에 쓰러지지 않게)
+        int ToughTarget()
+        {
+            var es = d.Battle.Snapshot.Enemies;
+            int best = -1;
+            for (int i = 0; i < es.Count; i++) if (!es[i].Dead && (best < 0 || es[i].Hp > es[best].Hp)) best = i;
+            return best < 0 ? 0 : best;
+        }
+
+        IEnumerator ToughShots()
+        {
+            int T = ToughTarget();
+            int n = 0;
+            bool partial = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-toughweakfirst") >= 0, weakAim = false;   // 약점 먼저(격파까지 빨리)
+            for (int turn = 0; turn < 10 && !d.Over; turn++)
+            {
+                for (int k = 0; k < 8 && !d.Over; k++)
+                {
+                    yield return WaitInput();
+                    var e = d.Battle.Snapshot.Enemies[T];
+                    if (e.Broken) break;
+                    if (e.Dead) { T = ToughTarget(); e = d.Battle.Snapshot.Enemies[T]; if (e.Dead) break; }
+                    int pick = !partial ? AttackBy(false, T) : -1;
+                    if (pick < 0) pick = AttackBy(true, T);
+                    if (pick < 0) pick = AttackBy(false, T);
+                    if (pick < 0) break;
+                    bool w = AttackBy(true, T) == pick;
+                    string pv = !partial && !w ? "t_aim_third" : !weakAim && w ? "t_aim_weak" : null;
+                    if (!w) partial = true; else weakAim = true;
+                    n++;
+                    Debug.Log($"[Demo] 강인도 {d.Battle.Snapshot.Enemies[T].ToughV:0.00}/{d.Battle.Snapshot.Enemies[T].ToughMaxV:0.00} ← {d.Hand.Cards[pick].Info.Name}({d.Hand.Cards[pick].Info.Nature}) 약점={w}");
+                    yield return Tap(pick, T, pv);
+                    yield return Wait(0.15f);
+                    Shot("t_after" + n, 0);
+                    var e2 = d.Battle.Snapshot.Enemies[T];
+                    Debug.Log($"[Demo] → 강인도 {e2.ToughV:0.00} 격파={e2.Broken}");
+                    if (n == 1 && !e2.Broken) yield return InfoShot(T, "t_info_partial");
+                    if (e2.Broken) break;
+                }
+                if (d.Over) break;
+                if (d.Battle.Snapshot.Enemies[T].Broken)
+                {
+                    yield return Wait(0.9f);
+                    Shot("t_broken", 0);
+                    yield return InfoShot(T, "t_info_broken");
+                    yield return MoveTo(new Vector2(0, -6), 0.2f);
+                    yield return EndTurn();
+                    yield return Wait(0.5f);
+                    Shot("t_recover", 0);
+                    yield return Wait(0.8f);
+                    Shot("t_recover_full", 0);
+                    break;
+                }
+                yield return EndTurn();
+            }
+            yield return Wait(0.5f);
             Debug.Log("[Demo] 끝 — " + shotNo + "장");
             Application.Quit();
         }

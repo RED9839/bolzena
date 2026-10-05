@@ -337,7 +337,12 @@ namespace Bolzena.Core
                                         bool once = ctx.Toughed.Add(t);
                                         bool glow = once && ctx.Type == "공격" && GlowUse();
                                         // 강인도 피해는 카드 한 장이 적 하나에 한 번(카제나 단위 — AP 1 당 1/3칸)
-                                        if (once) ToughHit(t, R.ToughDmg(ctx.Cost, IsWeakHit(owner, t, ctx.HitTags), (f.Target ?? "oneEnemy") == "allEnemies") + (glow ? R.TOUGH.Glow : 0));
+                                        if (once)
+                                        {
+                                            bool weak = IsWeakHit(owner, t, ctx.HitTags);
+                                            if (t.ToughMax > 0 && !t.Broken) { ToughHits++; if (weak) ToughWeakHits++; }
+                                            ToughHit(t, R.ToughDmg(ctx.Cost, weak, dTarget == "allEnemies") + (glow ? R.TOUGH.Glow : 0));
+                                        }
                                         if (once && !t.Dead) Mark(owner, t, ctx);
                                     }
                                     else if (first) (ctx.Toughed ??= new HashSet<Unit>()).Add(t);
@@ -385,7 +390,18 @@ namespace Bolzena.Core
                             }
                             break;
                         }
-                    case FxK.Strip: foreach (var t in Resolve(ctx, f.Target ?? "oneEnemy")) { t.Block = 0; t.Shield = 0; } break;
+                    case FxK.Strip:
+                        foreach (var t in Resolve(ctx, f.Target ?? "oneEnemy").ToList())
+                        {
+                            int lost = t.Block + t.Shield;
+                            t.Block = 0; t.Shield = 0;
+                            if (lost <= 0) continue;
+                            LoseGuardCue(t, lost);
+                            Say($"{t.Name}: 실드 파괴 (-{lost})");
+                            if (t.Side == Side.Enemy && !t.Dead) { FoePassives("guardBreak", t); Emit("foeShieldBreak", new EmitInfo { Target = t, By = owner?.Key ?? Acting, V = lost }); }
+                            if (Over != null) return;
+                        }
+                        break;
 
                     // ── 증감 ──
                     case FxK.DealtMod:
@@ -462,7 +478,7 @@ namespace Bolzena.Core
                         break;
 
                     default:
-                        if (!FxV2(f, ctx, ref gate) && !FxKit(f, ctx, ref gate)) throw new InvalidOperationException($"모르는 효과 조각: {f.K}");
+                        if (!FxV2(f, ctx, ref gate) && !FxKit(f, ctx, ref gate) && !FxForm(f, ctx)) throw new InvalidOperationException($"모르는 효과 조각: {f.K}");
                         if (Over != null) return;
                         break;
                 }
@@ -770,6 +786,7 @@ namespace Bolzena.Core
                 StatusCue(holder, $"{id} +{after - before}", true);
                 Emit("stackReach", new EmitInfo { Id = id, Before = before, After = after, Owner = ownerKey, Target = holder });
                 if (Kw.TryGetValue(id, out var kw) && kw.Def.Mode && before <= 0 && Over == null) KwSwitch(kw, holder);
+                if (kw != null && kw.Def.OnMax != null && Over == null) FormOnMax(kw, before, after);
             }
             else if (before > 0 && after <= 0) KwGone(id, Kw.TryGetValue(id, out var k2) ? k2.Owner : ownerKey, holder, false);
         }

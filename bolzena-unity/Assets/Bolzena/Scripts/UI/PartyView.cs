@@ -123,8 +123,8 @@ namespace Bolzena.UI
             var pas = new List<(string head, string text, string who, bool gold)>();
             foreach (var h in s.Heroes)
             {
-                if (!string.IsNullOrEmpty(h.KeywordName)) pas.Add(($"「{h.KeywordName}」 <color={Tone.GoldTag}>{h.KeywordStacks}</color>", h.KeywordText, h.Key, true));
-                foreach (var p in h.Passives) pas.Add((null, p, h.Key, false));
+                if (!string.IsNullOrEmpty(h.KeywordName)) pas.Add(($"「{h.KeywordName}」 <color={Tone.GoldTag}>{h.KeywordStacks}</color>", h.KeywordShort ?? h.KeywordText, h.Key, true));   // 두 줄 칸 — 짧은 글
+                foreach (var p in h.PassivesShort.Count > 0 ? h.PassivesShort : h.Passives) pas.Add((null, p, h.Key, false));
                 foreach (var g in h.Gear) if (g.Id != null && !string.IsNullOrEmpty(g.Text)) pas.Add((g.Name, g.Text, h.Key, false));
             }
             Column(R, mid + 0.3f, r - 0.1f, y0, k, "적용 중인 패시브", "적용 중인 패시브가 없습니다.", pas.Count, (i, x, w, y) => PassiveRow(R, pas[i].head, pas[i].text, pas[i].who, x, w, y, k));
@@ -163,7 +163,7 @@ namespace Bolzena.UI
             var ic = new Vector3(x + 0.24f * k, top - 0.24f * k, 0);
             Make.Box("cib", R, Res.UI("circle"), ic, new Vector2(0.44f, 0.44f) * k, OC + 1, new Color(kc.r * 0.25f, kc.g * 0.25f, kc.b * 0.25f, 0.95f));
             var icon = ChipRow.IconOf(c);
-            if (icon != null) Make.Box("ci", R, Res.UI(icon), ic, new Vector2(0.3f, 0.3f) * k, OC + 2);
+            if (icon != null) Make.Box("ci", R, ChipRow.IconSprite(icon), ic, new Vector2(0.3f, 0.3f) * k, OC + 2);
             T("cv", R, c.Value, ic + new Vector3(0.2f, -0.16f, 0) * k, 0.13f * k, Color.white, TextAlignmentOptions.Center, false, 1f, 2);
             float right = x + w;
             var from = c.From != null ? c.From : who != null ? new List<string> { who } : null;
@@ -279,10 +279,10 @@ namespace Bolzena.UI
             if (opened.Contains(idx))
             {
                 Band(R, x, w, ref y, k, "고학년 · " + h.UltName);
-                var u = T("ut", R, h.UltText, new Vector3(x + 0.1f, y - 0.04f, 0), Tone.Sm * k, Tone.Ink, TextAlignmentOptions.TopLeft, true, w - 0.2f);
+                var u = T("ut", R, string.IsNullOrEmpty(h.UltShort) ? h.UltText : h.UltShort, new Vector3(x + 0.1f, y - 0.04f, 0), Tone.Sm * k, Tone.Ink, TextAlignmentOptions.TopLeft, true, w - 0.2f);
                 u.textWrappingMode = TextWrappingModes.Normal; u.rectTransform.sizeDelta = new Vector2(w - 0.2f, 2); u.ForceMeshUpdate();
                 y -= u.preferredHeight + 0.12f;
-                foreach (var p in h.Passives)
+                foreach (var p in h.PassivesShort.Count > 0 ? h.PassivesShort : h.Passives)
                 {
                     if (y - 0.3f * k < floor) break;
                     var pt = T("pt", R, "· " + p, new Vector3(x + 0.1f, y - 0.02f, 0), Tone.Cap * k, Tone.Sub, TextAlignmentOptions.TopLeft, true, w - 0.2f);
@@ -354,6 +354,16 @@ namespace Bolzena.UI
             float bottom = PileUi.Grid(cards, PileUi.Grouped(list, s), s, x0, cw, gap, y, cols, OC, k, made, heads);
             scrollMax = Mathf.Max(0, -Tone.HalfH + 0.3f - bottom);
             top = y + 0.2f;
+            Clip();
+        }
+
+        /// <summary>카드 목록을 맨 끝까지 내린다(데모 캡처 — 맨 끝 교주 카드 묶음).</summary>
+        public void ScrollToEnd()
+        {
+            if (scrollMax <= 0 || cards == null) return;
+            scroll = scrollMax;
+            cards.localPosition = new Vector3(0, scroll, 0);
+            foreach (var c in made) if (c) c.TargetPos = c.transform.localPosition;
             Clip();
         }
 

@@ -178,7 +178,8 @@ namespace Bolzena.EditorTools
         static void AlwaysIncludedShaders()
         {
             var names = new[] { "Bolzena/Sprite", "Bolzena/FocusLines", "Bolzena/Rays", "Bolzena/Ring", "TextMeshPro/Distance Field", "TextMeshPro/Mobile/Distance Field",
-                                "Spine/Skeleton Fill", "Spine/Skeleton", "Spine/SkeletonGraphic", "UI/Default" };
+                                "Spine/Skeleton Fill", "Spine/Skeleton", "Spine/SkeletonGraphic", "UI/Default",
+                                "TextMeshPro/Sprite" };   // 카드 글 속 아이콘(runui CardTerms — 생성 카드 표시)
             var gs = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset")[0];
             var so = new SerializedObject(gs);
             var arr = so.FindProperty("m_AlwaysIncludedShaders");
@@ -231,7 +232,9 @@ namespace Bolzena.EditorTools
             cam.allowHDR = true;
             var data = camGo.AddComponent<UniversalAdditionalCameraData>();
             data.renderPostProcessing = true;
-            data.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+            // 화면 AA 는 끈다 — 스파인 · 스프라이트 가장자리는 알파로 이미 부드럽고, SMAA 는 월드 글(전투 HUD · 띠 · 카드 글)의 가장자리를 다시 흐려
+            // 저해상도(1280×720 · 1600×900)에서 작은 글이 뭉개졌다. 판 화면(uGUI 덮개)은 후처리 뒤에 그려져 원래 또렷했다.
+            data.antialiasing = AntialiasingMode.None;
             camGo.AddComponent<AudioListener>();
             var game = new GameObject("Game");
             game.AddComponent<BattleDirector>();
@@ -336,7 +339,8 @@ namespace Bolzena.EditorTools
                 scenes = new[] { RunScenePath, ScenePath },
                 locationPathName = BuildPath,
                 target = BuildTarget.StandaloneWindows64,
-                options = BuildOptions.None,
+                // LZ4HC — 스탠딩 스파인 135명(.skel 180MB, 표정 동작이 많다)이 들어오며 빌드가 붓는다. 압축하면 skel 은 4할로 준다
+                options = BuildOptions.CompressWithLz4HC,
             };
             var report = BuildPipeline.BuildPlayer(opts);
             var s = report.summary;

@@ -112,7 +112,7 @@ Unit b.Pool             // 파티 한 몸 — Hp · MaxHp · Block · Shield · 
 List<Unit> b.Party      // 사도 — Key · Name · Idx · Row · Role · Nature · Atk · Def · Crit · Mods(증감) · Status(사도 층: 사기)
                         //        Hp/Block/Shield/Dead 는 Pool 을 가리킨다
 List<Unit> b.Enemies    // 적 — Key · Name · Idx · Row · Hp · MaxHp · Block · Shield · Status · Mods · Dead · Boss
-                        //      Intent(수) · Tough · ToughMax · Broken · Sealed(다음 차례 못 움직임) · RushCnt · Phased
+                        //      Intent(수) · Tough · ToughMax(소수 — 1/3 · 1/6 눈금) · Broken · Sealed(다음 차례 못 움직임) · RushCnt · Phased
 List<string> b.Hand, b.Draw, b.Discard, b.Gone          // 카드 id(Draw 의 끝이 다음에 뽑힐 카드)
 int    b.St(Unit u, string id)          // 상태 겹(사기는 사도마다, 나머지는 파티 몸)
 int    b.StackOf(string heroKey, string kw)   // 자기 주머니 키워드 겹. 표식(적 · 아군)은 b.St(holder, kw)
@@ -133,13 +133,38 @@ int    b.BondOf(string cardId)          // 결속 겹친 수(1~5) — 3 이상�
 bool   b.IsFrozen(string cardId)        // 빙결 — 이번 턴 낼 수 없다(b.CanPlay 도 까닭을 준다)
 List<string> b.Removed                  // 「제거」 로 덱에서 뺄 카드(run.AfterFight 가 뺀다)
 Dictionary<string,Stats> b.GrowthGain   // 이 싸움의 판 단위 성장(run.AfterFight 가 RunState.Growth 에)
-List<string> b.WeakOf(Unit e)           // 약점 성격
+List<string> b.WeakOf(Unit e)           // 약점 성격(판의 적 속성이 있으면 그것을 이기는 성격 하나)
 bool   b.IsWeakHit(Unit from, Unit to, HashSet<string> tags)
+bool   b.WeakFor(Unit hero, Unit e)     // 그 사도가 치면 약점인가(성격 · 공명은 늘 · 적 표식) — 약점 표시용
+string b.EnemyNature                    // 판의 적 속성(null = 적마다 데이터 성격)
+ToughView b.ToughViewOf(Unit e)         // 강인도 화면 값 { double Left, Max; int Pips(=Max 올림); bool None(강인도 없음 = Max 0 → 막대를 숨긴다), Broken(격파 상태), Resting(다음 차례 쉼); string Nature; List<string> Weak; double Fill(i)(i 번째 칸 0~1) }
+   // 강인도 없음 = 보스가 noTough 수로 세운 소환물(격파 안 됨). 그 밖의 적은 최대 3 이상. 사도 클론의 Nature 는 판의 적 속성이 아니라 그 사도 성격(EnemyDef.Clone).
+   // 단위 = 약점 공격 비용 1. 약점 아니면 1/3 · 0코 1/6 이 깎이니 칸을 정수로 반올림하지 말고 Fill(i) 로 칸마다 채워 그린다.
+   // 미리보기 PreviewFoe.Tough 도 소수(1/3 = 0.333…) — 「◆-1/3」 처럼 소수로 보인다. tough 쪽지 From · To 도 소수.
+int    b.ToughHits, b.ToughWeakHits, b.Breaks; double b.ToughDealt   // 이 싸움 통계(시뮬 · 시험 — 저장 안 함)
 List<string> b.Log                      // 기록(한국어 한 줄씩)
 List<(string hero,string type)> b.PlayLog   // 이번 턴 낸 카드(잇기 · 앞이 … 표시)
 int    b.SeqStep(When w, string heroKey)    // 「차례로 내면」 패시브 진행(칩)
 Dictionary<string,List<RuleRt>> b.Passives  // 사도마다 걸린 규칙(패시브 · 키워드 규칙 · 장비)
 ```
+
+### 변신(form) — 모습 + 능력
+
+고학년 등의 효과 `form` 으로 사도가 **변신 상태**가 된다(개인 층 — 그 사도에게만). 데이터 틀은 [데이터.md](데이터.md) §16.
+
+```csharp
+bool     b.InForm(string heroKey)          // 변신 중인가
+FormView b.FormOf(string heroKey)          // 아니면 null — { Hero, Id, Name, Skin, Anim, Left(남은 내 턴, 0 = 전투 끝까지), UntilFightEnd }
+string   b.FormSkin(string heroKey)        // 모습 키(스파인 스킨) — 변신 중이 아니면 null(기본 모습). 애니 접두어는 FormOf(..).Anim
+FormDef  b.FormDefOf(string heroKey)       // 지금 든 변신의 정의(글: text.Form(def) · text.Short(def))
+Dictionary<string,FormRt> b.Forms          // 사도 키 → { Id, Left, Count } (저장된다)
+void     b.EnterForm(Unit hero, string formId) · b.EndForm(Unit hero, string why)   // 시험 · 연출 도구용(보통은 효과가 부른다)
+```
+
+- **모습** — 전투 화면은 쪽지 `formOn`(Label = 모습 키 Skin · T = 애니 접두어 Anim)을 받으면 그 사도 스파인을 그 스킨으로, `formOff` 면 기본으로. 이어하기(`Battle.Load`) 뒤에는 사도마다 `b.FormSkin(key)` 로 맞춘다.
+- **카드** — 손 · 더미의 카드 id 는 그대로다. `b.CardOf(id)` 가 변신판 모습(이름 · 코스트 · 글 · 효과)을 주니 카드는 늘 `b.CardOf` 로 그린다. 변신판 그림은 `b.CardOf(id).Def.Id`(바꾼 카드의 id — `GameData.BaseId(id)` 는 원래 카드). 변신이 들거나 풀릴 때 손의 카드마다 쪽지 `card`(hand → hand, Label `"form"`) — 그 카드를 다시 그린다.
+- **칩** — `b.StatusViews(사도)` 에 `StatusView.Form == true` 칩(Id = 변신 이름 · Stacks = 남은 턴, 0 = 전투 끝까지). 설명은 `text.Tips()[이름]`.
+- 같은 변신을 다시 쓰면 지속이 처음으로(`formOn` 이 다시 온다, `formOff` 없음). 다른 변신이면 `formOff`(Label `switch`) → `formOn`.
 
 ### 이벤트(연출 쪽지) — `Cue`
 
@@ -156,6 +181,7 @@ Dictionary<string,List<RuleRt>> b.Passives  // 사도마다 걸린 규칙(패시
 | `heal` | 회복 | V · From → To · Over(넘친 몫) |
 | `block` · `shield` | 방어 · 실드 얻음 | V |
 | `status` | 상태 걸림 · 꼬리표 | Id(「취약」 · 「반격!」 · 「AP +1」 · 「공격력 +10%」 · 「「마탄」 +1」 …) · Up(좋은 일) |
+| `unguard` | **방어 · 실드를 잃음**(맞아서 깎인 것 말고) — 적의 차례 시작에 적 방어가 사라짐 · 「실드 전부 파괴」 | V(잃은 양) · To(남은 방어+실드) |
 | `tough` | 강인도 바뀜 | From → To · Up(되찾음) |
 | `break` | **격파** | V(얻은 AP) |
 | `die` | 적 쓰러짐 | |
@@ -166,6 +192,8 @@ Dictionary<string,List<RuleRt>> b.Passives  // 사도마다 걸린 규칙(패시
 | `over` | 전투 끝 | Id("win" · "lose") |
 | `summon` | 적이 새로 섰다(적의 수 summon) | Name — `b.Enemies[c.Idx]` 가 그 적 |
 | `revive` | 쓰러진 적이 되살아났다(재 속 · 가사) | V(HP) · Name |
+| `formOn` | **사도가 변신했다**(같은 변신이면 지속 갱신) | Hero · Id(변신 id) · Name · **Label(모습 키 Skin)** · T(애니 접두어 Anim) · V(턴, 0 = 전투 끝까지) |
+| `formOff` | **변신이 풀렸다** | Hero · Id · Name · Label(까닭 — time 지속이 다함 · until 풀리는 계기 · card 효과 formEnd · switch 다른 변신) |
 
 카드를 내면: `card`(hand → play) → `act` → (효과의 hurt · tough · break · status …) → `card`(play → discard/gone/hand).
 즉시 행동은 `act` 의 `Rush == true`. 고학년은 `act` 의 `Anim == "ult"`.
@@ -183,7 +211,18 @@ Battle b    = Battle.Load(GameData data, string json, List<Cue> cues = null);
 
 ```csharp
 string Run.RollVillage(GameData d, double r01)   // 모험 시작 — 마을 하나(파티를 고르기 전에 보인다)
-Run    Run.New(GameData d, List<string> party, long seed, string village = null, Dictionary<string,string> rows = null)
+string Run.RollNature(GameData d, string village, double r01)   // 모험 시작 — 그 마을에서 고를 수 있는 적 속성 하나(마을과 함께 보인다). 옛 RollNature(r01) 은 마을을 모를 때만
+List<string> Run.NaturesFor(GameData d, string village)         // 그 마을에서 고를 수 있는 속성 — 클론 보스 자리 수만큼 그 종족 · 그 성격 사도가 있는 것(공명 빼고)
+string Run.NatureBySeed(GameData d, string village, long seed)  // 속성을 안 준 판은 씨앗으로(고를 수 있는 것 가운데)
+List<List<string>> Run.PickBosses(GameData d, string village, string nature, long seed)   // 층마다 보스 줄 — 클론 자리를 그 성격 사도의 클론으로
+List<(int floor,int idx,string id)> Run.CloneSlots(d, village) · List<string> Run.CloneCandidates(d, village, nature, int floor = -1)   // floor 를 주면 그 층 성급만
+bool Run.StarFits(int floor, int star)   // 보스 성급 — 1층(floor 0) 1~2성 · 2층 3성. 그 층 성급 사도가 없으면 그 층만 다른 성급(PickBosses)
+Run    Run.New(GameData d, List<string> party, long seed, string village = null, Dictionary<string,string> rows = null, string enemyNature = null)
+string run.EnemyNature   // 판의 적 속성 = run.S.EnemyNature(저장 · 이어하기에 남는다) — 이 판 모든 적의 성격(두 보스 클론도 그 성격 사도). 약점 성격 = R.WeakTo(run.EnemyNature). null = 옛 저장
+List<List<string>> run.Bosses   // 층마다 보스 줄(적 id) = run.S.Bosses(새 판에 정함 · 저장에 남는다). 옛 저장이면 마을 데이터
+List<string> run.BossHeroes     // 층마다 보스 클론의 사도 키 — 판 시작 화면(마을 · 속성과 함께)이 그 사도 그림 · 이름으로 미리 보인다
+   // 빌린 몸 클론: 클론 데이터가 없는 사도는 id 「clone~사도키~몸」(GameData.CloneId) — data.Enemy(id) 가 만들어 준다(이름 「X (클론)」 · Nature · Clone = 사도, Art 는 비어 있다 → Clone 의 사도 그림을 쓴다)
+   // 「클론인가」 는 id 꼴(clone_) 말고 data.Enemy(id).Clone != null 로 본다
 string run.Save();   Run Run.Load(GameData d, string json)
 RunState run.S       // 판의 모든 것(읽기 · 저장): Village · Party · PartyHp · PartyMaxHp · Deck · Flash · Shin · Gold · Gauge
                      //   Gear[사도][칸] · Bag(정할 장비) · Floor(0·1) · Node · Done("clear") · Map · Reward · Shop · Camp · Event · NextFight …
@@ -235,7 +274,8 @@ string run.CampTrain(int n)              // Train.Picks 가운데 신탁 번호
 
 ```csharp
 ShopState run.RollShop()                 // Items[i] { Id, Kind("neutral" · "equip"), Price, Sold, Delivery }
-string run.Buy(int idx)                  // 장비면 Bag 에(산 것은 팔 수 없다 — 껴야 한다)
+string run.Buy(int idx, string heroKey = null)   // 장비면 Bag 에(산 것은 팔 수 없다 — 껴야 한다). 교주 카드는 heroKey 사도 덱에(없으면 PendingNeutral 줄)
+string run.PendingNeutral;  string run.AssignNeutral(string heroKey)   // 주인 고르기 — 상점 · 이벤트 · 보상 어디서 얻든
 int    run.RerollPrice;  string run.RerollShop()
 int    run.RemovePrice;  string run.RemoveCard(string cardId)   // 한 번 들를 때 한 번
 ```
@@ -288,6 +328,28 @@ MetaSim.Run(data, rounds, seed, hpx, dmgx, threads) → MetaSim.Result;  MetaSim
 ---
 
 ## 바뀐 것
+
+- **v2.3(2026-10-05 여섯째) — 변신(form).** 덧붙이기만. 효과 `form`(id) · `formEnd` · `HeroDef.Forms`(`FormDef` · `FormBonus`) · `GameData.Form(id)` · `GameData.HeroOfForm(id)`.
+  전투: `b.InForm` · `b.FormOf`(+ `FormView`) · `b.FormSkin` · `b.FormDefOf` · `b.Forms`(+ `FormRt`, 저장 `BattleSave.Forms`) · `b.EnterForm` · `b.EndForm` · `b.FormKeyOf`(봇 캐시) · 쪽지 `formOn` · `formOff` · card 쪽지 Label `form` · `StatusView.Form` · `RuleRt.Own` · `RuleRt.Form`.
+  글: `text.Form(f)` · `text.Short(f)` · `text.Detail(f)` · `Short(UltDef)` 는 변신을 자르지 않는다 · `Hero` · `HeroShort` · `Tips` · `Chips`. 값어치: `CardValue.FormValue(f, data, hero)` · `CardValue.FORM_VAL`.
+  계기 둘: 효과 `form`(고학년 등 — 다시 쓰면 지속 갱신) · 고유 효과 `keyword.onMax { form, consume }`(`KwOnMax` — 최대에 닿으면, 이미 그 변신이면 아무 일 없음).
+  `b.CardOf(id)` 가 변신 중인 사도의 카드를 변신판 모습으로 준다(같은 API, 변신이 없으면 그대로). 스키마(`Docs/schema`)에 `forms` · `form` · `formEnd`.
+
+- **v2.2(2026-10-05 다섯째) — 교주 카드 주인 사도.** 덧붙이기만(기본값 인자라 옛 호출 그대로 됨).
+  덱의 교주 카드는 `「카드id@사도키」`(꼬리는 뒤: `n_x@rico^`). 전투에서 그 카드는 **주인 사도의 카드**로 낸다 — 피해 = 주인 공격력, 실드 · 회복 = 주인 방어력, 연계 · 「다른 사도 카드」 · 사도별 묶음 · 구속도 주인 기준.
+  `GameData.OWNER`("@") · `GameData.OwnerOf(id)` · `GameData.WithOwner(id, hero)` · `GameData.NoOwner(id)` · `GameData.BaseId` 는 주인도 뗀다(그림 찾기 그대로).
+  `CardView.Owner`(교주 카드의 주인, 사도 카드는 null) · `CardView.Hero` = Owner ?? 사도 · `CardView.Neutral`. `data.View(id, flash, owner)` — id 에 주인이 없을 때 볼 사도(전투는 첫 사도).
+  판: `string run.PendingNeutral`(주인 기다리는 교주 카드 id, 없으면 null) · `string run.AssignNeutral(heroKey)` · `string run.GainCard(id, heroKey = null)` · `run.Buy(idx, heroKey = null)` · `run.ResolvePending(value, heroKey = null)` · `RunState.NeutralWait`.
+  heroKey 없이 얻으면(상점 · 이벤트 card · gift · 은총) 줄에 선다 — 화면은 `PendingNeutral` 이 있으면 사도를 고르게 하고 `AssignNeutral`. 옛 저장의 주인 없는 교주 카드는 불러올 때 첫 사도 것으로(신탁 · 축복 · 카드 값도 따라감).
+  봇: `RunBot.PickOwner(run, cardId)` — 피해 카드는 공격력 1위, 실드 · 회복은 방어력 1위, 그 밖은 서포터(없으면 카드가 가장 적은 사도). 검사: 카드 id 에 `@` 금지.
+  화면 목록(CardOrder)은 정의(`data.Card(id).Hero == null`)로 교주 묶음을 가르니 그대로 맨 끝 — 주인 표시는 `GameData.OwnerOf(id)` 또는 `run.ViewOf(id).Owner`.
+
+- **v2.2(2026-10-05 다섯째) — 강인도 · 판의 적 속성**. 덧붙이기만: `Run.RollNature` · `Run.NatureBySeed` · `Run.New(…, enemyNature)` · `run.EnemyNature` · `RunState.EnemyNature` · `BattleSetup.EnemyNature` · `b.EnemyNature` ·
+  `b.ToughViewOf(e)`(+ `ToughView`) · `b.WeakFor` · `b.ToughHits` · `b.ToughWeakHits` · `b.Breaks` · `b.ToughDealt` · `Run.RollNature(d, village, r01)` · `Run.NaturesFor` · `Run.NatureBySeed(d, village, seed)` · `Run.PickBosses`(1층 1~2성 · 2층 3성) · `Run.StarFits` · `Run.CloneSlots` · `Run.CloneCandidates` · `run.Bosses` · `run.BossHeroes` · `RunState.Bosses` · `GameData.CloneId` · `GameData.CLONE_MARK` · `R.FOE_NATURES` · `R.TOUGH.EliteMinion` · `R.TOUGH.Grid` · `R.TOUGH.Min`(3) · `ToughView.None` · `EnemyDef.Clone` · `Intent.NoTough` · `b.FoeNature(def)`. 지운 것: `R.TOUGH.Hit` · `R.TOUGH.Weak`(안 쓰던 옛 값).
+  **규칙이 바뀐 것**: 새 판은 적 속성이 하나(1층 · 2층 일반 · 엘리트 · 소환 · 두 보스 — 보스는 그 마을 종족에서 그 성격 사도의 클론을 골라 세우고, 클론은 제 사도 성격 그대로라 판 전체가 한 성격) · 강인도 최소 3(보스의 noTough 소환물만 0) · 강인도 기본 칸 일반 4 · 엘리트 6 · 보스 10 · 엘리트 싸움의 여린 적 +1 · 강인도를 깎은 뒤 1/60 눈금으로(1/6 을 여러 번 빼면 1e-15 가 남아 격파가 안 나던 것을 고침) ·
+  광역 판정은 퍼짐으로 넓어진 공격도.
+  **적 실드**: 적의 방어(Block)는 적의 차례가 **시작될 때 한꺼번에** 사라진다(가호=실드 보존이면 남고 1 감소 · 실드 유지면 반) — 예전엔 적마다 제 행동 직전에 지워 앞 적이 준 「적 전체 방어」 를 뒤 적이 곧바로 잃었다. 사라짐 · 「실드 전부 파괴」 는 쪽지 `unguard`(새로), 파괴는 `guardBreak` 적 패시브 · `foeShieldBreak` 계기도 돈다. 결정화의 고정 실드(Shield)는 남는다.
+  화면이 적 방어를 쪽지로 더해 셀 땐 `unguard` 의 To 로 맞추고, 확실하게는 `turn` · `foeTurn` 쪽지마다 `b.Enemies[i].Block + Shield` 로 다시 맞춘다. 기록에 「이름: 강인도 a → b / 최대」 한 줄. 강인도 단위 표는 데이터.md §15.
 
 - **v2.1(2026-10-05 넷째)** — 덧붙이기만. 신탁 고르기 창: `List<OracleOption> b.EpiphanyOptions(cardId)`(전투) · `run.FlashOptions(FlashOffer)`(이벤트 · 캠프) — `OracleOption { int N; string Name, Text, Shin, BlessName, BlessText; bool Blessed }`(고른 것의 차례 번호를 `b.ApplyEpiphany` · 번호 N 을 `run.ResolvePending` · `run.CampTrain` 에).
   `FlashOffer.Shins`(후보마다 축복) · `run.RollOracles(cardId, not)` · `run.OfferOf(cardId, not, swap)` · `R.ORACLE_PICKS`(3) · `R.ORACLE_BLESS`(0.15, `R.DIVINE` 도 이 값).

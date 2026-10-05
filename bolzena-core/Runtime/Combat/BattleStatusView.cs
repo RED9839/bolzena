@@ -13,6 +13,8 @@ namespace Bolzena.Core
         public string Layer;
         /// <summary>사도 고유 효과(키워드)의 겹인가 · 적의 쌓이는 수치인가.</summary>
         public bool Keyword, Counter;
+        /// <summary>변신 칩(사도 개인 층) — Id 는 변신 이름, Stacks 는 남은 턴(0 = 전투 끝까지). 자세한 것은 b.FormOf(사도 키).</summary>
+        public bool Form;
         public List<StatusSource> Sources = new();
     }
 
@@ -27,8 +29,38 @@ namespace Bolzena.Core
         public int Stacks;
     }
 
+    /// <summary>
+    /// 적 강인도 화면 값(b.ToughViewOf). 단위 = 약점 공격 AP 1 — 1코 약점 공격 한 장이 1, 약점이 아니면 1/3 깎는다.
+    /// Left · Max 는 소수(1/3 · 1/6 눈금)라 칸(Pips = Max 올림)을 그릴 땐 칸마다 채운 비율(Fill)로 그린다 — 정수로 반올림하면 1/3 이 안 보인다.
+    /// </summary>
+    public sealed class ToughView
+    {
+        public double Left, Max;
+        /// <summary>칸 수(Max 올림).</summary>
+        public int Pips;
+        /// <summary>격파 상태(이번 턴 · 적의 다음 차례를 쉬고 다음 내 턴에 강인도가 다시 찬다) · 다음 차례를 못 움직임.</summary>
+        public bool Broken, Resting;
+        /// <summary>적의 성격(판의 적 속성이면 그것) · 약점 성격.</summary>
+        public string Nature;
+        public List<string> Weak = new();
+        /// <summary>강인도 없음(Max 0 — 강인도 없는 소환물). 격파되지 않는다 — 막대를 숨긴다.</summary>
+        public bool None => Max <= 0;
+        /// <summary>i 번째 칸(0부터)이 찬 비율 0~1.</summary>
+        public double Fill(int i) => Broken ? 0 : Math.Max(0, Math.Min(1, Left - i));
+    }
+
     public sealed partial class Battle
     {
+        /// <summary>적 강인도 화면 값 — 남은 · 최대 · 칸 · 격파 상태 · 성격 · 약점(ToughView).</summary>
+        public ToughView ToughViewOf(Unit e) => e == null ? null : new ToughView
+        {
+            Left = e.Broken ? 0 : e.Tough, Max = e.ToughMax, Pips = (int)Math.Ceiling(e.ToughMax - 1e-6), Broken = e.Broken, Resting = e.Sealed,
+            Nature = e.Nature, Weak = e.Side == Side.Enemy ? WeakOf(e).ToList() : new List<string>(),
+        };
+
+        /// <summary>그 사도가 그 적을 치면 약점 공격인가(태그 없이 — 성격 · 공명 · 적 표식). 카드 태그까지 보려면 IsWeakHit.</summary>
+        public bool WeakFor(Unit hero, Unit e) => IsWeakHit(hero, e, null);
+
         /// <summary>지금 도는 장비 효과의 출처(장비 패시브가 거는 상태).</summary>
         string gearSrc;
 
@@ -116,6 +148,8 @@ namespace Bolzena.Core
                     var owner = Kw.TryGetValue(kv.Key, out var k) ? k.Owner : u.Key;
                     o.Add(new StatusView { Id = kv.Key, Stacks = kv.Value, Layer = "hero", Keyword = true, Sources = new List<StatusSource> { new StatusSource { Kind = "hero", Hero = owner, Stacks = kv.Value } } });
                 }
+            var fv = FormOf(u.Key);
+            if (fv != null) o.Add(new StatusView { Id = fv.Name, Stacks = fv.Left, Layer = "hero", Form = true, Sources = new List<StatusSource> { new StatusSource { Kind = "hero", Hero = u.Key, Stacks = fv.Left } } });
             return o;
         }
     }

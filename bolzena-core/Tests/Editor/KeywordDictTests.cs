@@ -185,9 +185,10 @@ namespace Bolzena.Core.Tests
         [Test] public void 구속은_그_사도의_카드_말고는_AP를_받지_않는다()
         {
             var d = D("[{id:'apn', name:'교주 AP', cost:0, type:'스킬', grade:'일반', price:50, fx:[{k:'ap', v:1}]}, {id:'apa', name:'가 AP', hero:'a', cost:0, type:'스킬', fx:[{k:'ap', v:1}]}]");
-            var b = K.Fight(d, new[] { "a" }, new[] { "dummy" }); K.Hand(b, "apn", "apa");
+            // 교주 카드는 주인 사도의 카드다 — 다른 사도(b)에게 넣은 교주 카드는 구속을 못 뚫는다
+            var b = K.Fight(d, new[] { "a", "b" }, new[] { "dummy" }); K.Hand(b, "apn@b", "apa");
             b.Party[0].Status["구속"] = 1;
-            K.Play(b, "apn"); Assert.AreEqual(3, b.Ap);
+            K.Play(b, "apn@b"); Assert.AreEqual(3, b.Ap);
             K.Play(b, "apa"); Assert.AreEqual(4, b.Ap);
             Assert.AreEqual(0, b.St(b.Pool, "구속"), "구속은 개인 층");
         }

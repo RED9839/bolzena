@@ -41,6 +41,9 @@ namespace Bolzena.Fx
 
         public string Name;
         public bool IsDone { get; private set; }
+        // 세대 — 무대는 풀에서 되쓰인다. 쥐고 있던 FxRun 의 Gen 이 바뀌었으면 그 재생은 이미 끝난 것
+        public int Gen { get; private set; }
+        static int gens;
         public float T => t;
         public float Duration => sheet != null ? sheet.Frames / Mathf.Max(1, sheet.Fps) : (fx != null ? fx.Dur : 0);
 
@@ -89,21 +92,43 @@ namespace Bolzena.Fx
         static float ScreenArea { get { var c = Camera.main; return c != null && c.orthographic ? 4 * c.orthographicSize * c.orthographicSize * c.aspect : 16 * 9; } }                 // 화면에 동시에 뜨는 입자 수(웹판 600 — 유니티는 넉넉히)
 
         // ── 만들기 ──
+        // 다 돈 무대는 꺼 두었다가 되쓴다(게임오브젝트 · 메시 · 재질 배열) — 고학년 한 벌이 이펙트 수십 개를 틀어도 만들기 · 부수기가 없다
+        static readonly Stack<FxRun> idle = new Stack<FxRun>();
+        public static int PoolMax = 64;
+        public static int Pooled => idle.Count;
+
         internal static FxRun Create(string name, FxEffect fx, FxSheet sheet, FxPlayOptions o)
         {
-            var go = new GameObject("fx:" + name);
-            if (o.Parent) go.transform.SetParent(o.Parent, false);
-            var r = go.AddComponent<FxRun>();
+            FxRun r = null;
+            while (idle.Count > 0 && r == null) r = idle.Pop();   // 장면이 바뀌며 부서진 것은 건너뛴다
+            GameObject go;
+            if (r != null)
+            {
+                go = r.gameObject;
+                go.name = "fx:" + name;
+                go.transform.SetParent(o.Parent ? o.Parent : null, false);
+                r.ResetState();
+                go.SetActive(true);
+            }
+            else
+            {
+                go = new GameObject("fx:" + name);
+                if (o.Parent) go.transform.SetParent(o.Parent, false);
+                r = go.AddComponent<FxRun>();
+                r.mesh = new Mesh();
+                r.mesh.MarkDynamic();
+                go.GetComponent<MeshFilter>().sharedMesh = r.mesh;
+            }
             r.Name = name;
+            r.Gen = ++gens;
             r.fx = fx;
             r.sheet = sheet;
             r.o = o;
-            r.mesh = new Mesh { name = name };
-            r.mesh.MarkDynamic();
-            go.GetComponent<MeshFilter>().sharedMesh = r.mesh;
+            r.mesh.name = name;
             r.mr = go.GetComponent<MeshRenderer>();
             r.mr.sortingOrder = o.Order;
             if (!string.IsNullOrEmpty(o.SortingLayer)) r.mr.sortingLayerName = o.SortingLayer;
+            else r.mr.sortingLayerID = 0;
             r.mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             r.mr.receiveShadows = false;
             r.flip = o.Flip ? -1 : 1;
@@ -236,7 +261,25 @@ namespace Bolzena.Fx
             IsDone = true;
             foreach (var em in ems) { Live -= em.Parts.Count; foreach (var q in em.Parts) pool.Push(q); em.Parts.Clear(); }
             try { o.Done?.Invoke(this); } catch (Exception ex) { Debug.LogException(ex); }
-            Destroy(gameObject);
+            if (idle.Count >= PoolMax) { Destroy(gameObject); return; }
+            mesh.Clear();
+            gameObject.SetActive(false);
+            if (o.Parent) transform.SetParent(null, false);   // 부모가 부서져도 남게
+            idle.Push(this);
+        }
+
+        void ResetState()
+        {
+            IsDone = false;
+            t = 0; k = 0; dx = dy = 0; ys = sx = fade = spread = 1;
+            moving = false; ems = null; matCount = -1;
+            mesh.Clear();
+        }
+
+        // 지금 도는 것을 모두 걷는다(장면을 닫을 때 · 시험). fadeSec 0 이면 다음 프레임에 걷힌다
+        public static void StopAll(float fadeSec = 0)
+        {
+            foreach (var r in FindObjectsByType<FxRun>(FindObjectsSortMode.None)) if (!r.IsDone) r.Stop(fadeSec);
         }
 
         void UpdateOrigin()

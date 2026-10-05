@@ -9,7 +9,7 @@ export const heroesB = [
 {
   hero: { id: '시저', name: '시저', nature: '냉정', row: 'mid', role: '서포터', star: 3, hp: 600, atk: 86, def: 60, crit: 5,
     blurb: '좋은 걸 맛보게 한 뒤 빼앗는 빌런 지망생. 사기를 빌려주고 두 턴 뒤 거둬 가며 적을 약하게 만든다 — 그 사이 적을 쓰러뜨리면 빚은 없던 일.',
-    keyword: { name: '빌려준 맛', desc: '시저가 빌려준 사기. 두 턴 뒤 거둬 간다(그 사이 적을 처치하면 탕감)', carrier: 'self', cap: 4 },
+    keyword: { name: '빌려준 맛', desc: '시저가 빌려준 사기 — 두 턴 뒤 거둬 간다(그 사이 처치하면 탕감)', carrier: 'self', cap: 4 },
     passives: [
       { name: '다 먹었으면 됐어', when: { on: 'kill' }, conds: [{ c: 'stack', id: '빌려준 맛', n: 1 }], fx: [SP('빌려준 맛', 'all')] },
     ],
@@ -58,7 +58,7 @@ export const heroesB = [
 {
   hero: { id: '멜루나', name: '멜루나', nature: '냉정', row: 'back', role: '서포터', star: 3, hp: 530, atk: 86, def: 58, crit: 5,
     blurb: '법의 빈틈으로 회사를 굴리는 멜론 회장. 이번 턴 AP 를 묻어 두면 두 턴 뒤 두 배로 돌아오고, 그 사이 적을 쓰러뜨리면 수익이 붙는다.',
-    keyword: { name: '수익', desc: '투자하는 동안 적을 처치해 붙은 이자. 투자가 돌아올 때 AP 로 더 받는다', carrier: 'self', cap: 3 },
+    keyword: { name: '수익', desc: '투자하는 동안 처치로 붙은 이자 — 투자가 돌아올 때 AP 로 더 받는다', carrier: 'self', cap: 3 },
     passives: [
       { name: '이자 수익', when: { on: 'kill' }, limit: { per: 'turn', n: 1 }, fx: [K('수익', 1), DRAW(1)] },
     ],
@@ -108,7 +108,7 @@ export const heroesB = [
 {
   hero: { id: '이프리트', name: '이프리트', nature: '광기', row: 'front', role: '딜러', star: 2, hp: 700, atk: 109, def: 38, crit: 10,
     blurb: '장작과 새까맣게 탄 음식을 좋아하는 불의 정령. 손패를 장작으로 태울수록 다음 일격이 뜨거워진다.',
-    keyword: { name: '장작', desc: '태워 넣은 땔감. 1개당 이프리트의 다음 공격 카드 피해 +30%, 쓰면 사라진다', carrier: 'self', cap: 3, consumeAll: true, per: [{ stat: 'dealt', v: 0.3 }] },
+    keyword: { name: '장작', desc: '태워 넣은 땔감 — 다음 공격 카드 한 장에 실린다', carrier: 'self', cap: 3, consumeAll: true, per: [{ stat: 'dealt', v: 0.3 }] },
     passives: [
       { name: '장작 넣기', when: { on: 'exhaust', who: 'any' }, limit: { per: 'turn', n: 3 }, fx: [K('장작', 1)] },
     ],
@@ -157,7 +157,7 @@ export const heroesB = [
 {
   hero: { id: '우이', name: '우이', nature: '활발', row: 'mid', role: '서포터', star: 3, hp: 660, atk: 86, def: 63, crit: 5,
     blurb: '견디기 힘든 걸 덮어 주는 이슬비 정령. 손에 든 싫은 카드를 비에 씻어 내고 개굴비를 남긴다 — 셋을 덮으면 파티의 아픔이 씻겨 간다.',
-    keyword: { name: '외면', desc: '보슬비로 덮어 둔 싫은 것. 셋이면 파티의 아픔이 씻겨 내려간다', carrier: 'self', cap: 3,
+    keyword: { name: '외면', desc: '보슬비로 덮어 둔 싫은 것 — 셋이면 파티의 아픔이 씻겨 간다', carrier: 'self', cap: 3,
       rules: [{ name: '말하는 대로', when: { on: 'stackReach', id: '외면', n: 3 }, fx: [F('cleanse', { v: 2 }), HL(1.0), SP('외면', 'all')] }] },
     passives: [
       { name: '싫은 건 안 보면 돼', when: { on: 'drawn', who: 'any', type: '상태' }, limit: { per: 'turn', n: 2 }, fx: [F('make', { id: '우이_t1', v: 1 })] },
@@ -209,7 +209,7 @@ export const heroesB = [
 {
   hero: { id: '미로', name: '미로', nature: '활발', row: 'front', role: '탱커', star: 3, hp: 1000, atk: 75, def: 76, crit: 5,
     blurb: '거울 속에서 지켜보며 응원하는 정령. 파티를 친 적에게 시선을 꽂아 그 적의 공격을 무디게 하고, 시선이 쌓인 적일수록 거울 조각이 깊이 박힌다.',
-    keyword: { name: '시선', desc: '거울 속에서 지켜보는 눈. 1개당 그 적이 주는 피해 -10%', carrier: 'enemy', cap: 3, per: [{ stat: 'dealt', v: -0.1 }] },
+    keyword: { name: '시선', desc: '거울 속에서 지켜보는 눈 — 맞을 때마다 그 적에게 하나', carrier: 'enemy', cap: 3, per: [{ stat: 'dealt', v: -0.1 }] },
     passives: [
       { name: '지켜보고 있어요', when: { on: 'hurt', guarded: true }, fx: [K('시선', 1, E1)] },
     ],
@@ -258,7 +258,7 @@ export const heroesB = [
 {
   hero: { id: '아르코', name: '아르코', nature: '활발', row: 'mid', role: '딜러', star: 3, hp: 720, atk: 135, def: 28, crit: 10,
     blurb: '춤밖에 모르는 적포도 스트리트 댄서. 같은 결의 카드를 잇달아 이으면 스텝이 쌓이고, 세 번째 스텝에 브레이크가 터진다.',
-    keyword: { name: '스텝', desc: '박자에 맞춰 밟은 스텝. 셋이면 브레이크', carrier: 'self', cap: 3,
+    keyword: { name: '스텝', desc: '박자에 맞춰 밟은 스텝 — 셋이면 브레이크', carrier: 'self', cap: 3,
       rules: [{ name: '브레이크', when: { on: 'stackReach', id: '스텝', n: 3 }, fx: [D(0.6, E1, { hits: 2 }), AP(1), SP('스텝', 'all')] }] },
     passives: [
       { name: '댄스배틀', when: { on: 'play', type: '공격' }, conds: [{ c: 'playedMin', n: 3 }], limit: { per: 'turn', n: 1 }, fx: [K('스텝', 1)] },
@@ -308,7 +308,7 @@ export const heroesB = [
 {
   hero: { id: '쥬비', name: '쥬비', nature: '활발', row: 'mid', role: '딜러', star: 2, hp: 550, atk: 115, def: 27, crit: 10,
     blurb: '하나의 정신을 나눠 쓰는 꿀벌 군집. 턴마다 벌이 모여들어 쥬비의 공격을 따라 쏘고, 파티가 다치면 벌이 흩어진다.',
-    keyword: { name: '벌', desc: '쥬비를 따라다니는 꿀벌 떼. 쥬비가 공격 카드를 내면 1마리당 한 번 더 쏜다', carrier: 'self', cap: 8,
+    keyword: { name: '벌', desc: '쥬비를 따라다니는 꿀벌 떼 — 공격 카드를 내면 마리 수만큼 쏜다', carrier: 'self', cap: 8,
       rules: [
         { name: '꿀 도둑 처단', when: { on: 'kill', mine: true }, fx: [K('벌', 2)] },
         { name: '흩어지는 벌', when: { on: 'hurt' }, limit: { per: 'turn', n: 1 }, fx: [SP('벌', 1)] },
@@ -363,7 +363,7 @@ export const heroesB = [
 {
   hero: { id: '오로라', name: '오로라', nature: '우울', row: 'front', role: '탱커', star: 3, hp: 900, atk: 75, def: 70, crit: 5,
     blurb: '혼자 남겨지는 걸 두려워하는 다정한 방패. 아군이 카드를 낼 때마다 빛무리가 짙어지고, 셋이 함께 움직인 턴엔 극광이 한 겹 더 내려앉는다.',
-    keyword: { name: '빛무리', desc: '곁에 있는 이들이 남긴 빛. 1개당 오로라가 주는 실드 +15%', carrier: 'self', cap: 3, per: [{ stat: 'guard', v: 0.15 }] },
+    keyword: { name: '빛무리', desc: '곁에 있는 이들이 남긴 빛 — 쌓일수록 실드가 두꺼워진다', carrier: 'self', cap: 3, per: [{ stat: 'guard', v: 0.15 }] },
     passives: [
       { name: '혼자 두지 않아', when: { on: 'play', who: 'other' }, limit: { per: 'turn', n: 2 }, fx: [K('빛무리', 1)] },
       { name: '외롭지 않게', when: { on: 'turnStart' }, conds: [{ c: 'stack', id: '빛무리', n: 3 }], fx: [DRAW(1), SH(0.6), SP('빛무리', 1)] },
@@ -414,9 +414,9 @@ export const heroesB = [
   hero: { id: '블랑셰', name: '블랑셰', nature: '우울', row: 'mid', role: '딜러', star: 3, hp: 650, atk: 125, def: 28, crit: 15,
     blurb: '감정 대신 머리의 장미가 빛나는 배우. 공격할 때마다 푸른 장미가, 약점을 찌를 때마다 붉은 장미가 피고, 두 빛깔이 다 피면 커튼콜이 올라온다.',
     keywords: [
-      { name: '붉은 장미', desc: '약점을 찌른 연기에 피는 장미', carrier: 'self', cap: 2,
+      { name: '붉은 장미', desc: '약점을 찌른 연기에 피는 장미 — 푸른 장미와 둘씩이면 커튼콜', carrier: 'self', cap: 2,
         rules: [{ name: '커튼콜', when: { on: 'stackReach', id: '붉은 장미', n: 2 }, conds: [{ c: 'stack', id: '푸른 장미', n: 2 }], fx: [SP('붉은 장미', 'all'), SP('푸른 장미', 'all'), F('make', { id: '블랑셰_t1', v: 1 })] }] },
-      { name: '푸른 장미', desc: '담담한 연기에 피는 장미', carrier: 'self', cap: 2,
+      { name: '푸른 장미', desc: '담담한 연기에 피는 장미 — 붉은 장미와 둘씩이면 커튼콜', carrier: 'self', cap: 2,
         rules: [{ name: '커튼콜', when: { on: 'stackReach', id: '푸른 장미', n: 2 }, conds: [{ c: 'stack', id: '붉은 장미', n: 2 }], fx: [SP('붉은 장미', 'all'), SP('푸른 장미', 'all'), F('make', { id: '블랑셰_t1', v: 1 })] }] },
     ],
     passives: [

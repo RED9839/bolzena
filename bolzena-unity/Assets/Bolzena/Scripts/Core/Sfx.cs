@@ -13,6 +13,8 @@ namespace Bolzena
         readonly Dictionary<string, float> lastAt = new Dictionary<string, float>();
         readonly Dictionary<string, AudioClip[]> voices = new Dictionary<string, AudioClip[]>();
         public static float Volume = 0.8f;
+        /// <summary>점검(-ultaudit) — 실제로 튼 소리 이름(효과음 키 · 「voice:사도/클립」). 못 찾은 것은 「!」를 붙인다.</summary>
+        public static System.Action<string> OnPlayed;
 
         static Sfx Ensure()
         {
@@ -31,6 +33,7 @@ namespace Bolzena
         {
             var me = Ensure();
             var clip = Res.Clip(key.Contains("/") ? "Sfx/" + key : "Sfx/" + key);
+            OnPlayed?.Invoke(clip == null ? "!" + key : key);
             if (clip == null) return;
             float now = Clock.Now;
             if (me.lastAt.TryGetValue(key, out var t) && now - t < 0.045f) return;
@@ -42,6 +45,30 @@ namespace Bolzena
             if (src == null) src = me.pool[0];
             src.pitch = pitch * (jitter ? Random.Range(0.96f, 1.04f) : 1f);
             src.PlayOneShot(clip, vol * k * Volume);
+        }
+
+        // 따로 쥐는 소리 — 고학년 칸 소리처럼 몸짓이 끝나면 줄여 끊어야 하는 것(PlayOneShot 은 따로 못 줄인다). 못 틀면 null
+        public static AudioSource PlayHeld(string key, float vol = 1f)
+        {
+            var me = Ensure();
+            var clip = Res.Clip("Sfx/" + key);
+            OnPlayed?.Invoke(clip == null ? "!" + key : key);
+            if (clip == null) return null;
+            var src = me.gameObject.AddComponent<AudioSource>();
+            src.playOnAwake = false; src.spatialBlend = 0;
+            src.clip = clip; src.volume = vol * Volume;
+            src.Play();
+            Destroy(src, clip.length + 0.1f);
+            return src;
+        }
+
+        // 줄여 끊기 — sec 동안 0 으로(웹판 sfx.js 꼬리 규칙과 같은 생각). 이미 끝난 것은 그대로
+        public static System.Collections.IEnumerator FadeOut(AudioSource s, float sec)
+        {
+            if (s == null || !s.isPlaying) yield break;
+            float v0 = s.volume, t = 0;
+            while (s != null && t < sec) { t += Time.unscaledDeltaTime; s.volume = v0 * (1 - t / sec); yield return null; }
+            if (s != null) s.Stop();
         }
 
         // 미리 불러 두기 — 첫 고학년에서 목소리 묶음을 처음 풀며 멈칫하지 않게
@@ -71,8 +98,10 @@ namespace Bolzena
                 me.voice.clip = hits[Random.Range(0, hits.Count)];
                 me.voice.volume = 0.9f * Volume;
                 me.voice.Play();
+                OnPlayed?.Invoke("voice:" + hero + "/" + me.voice.clip.name);
                 return;
             }
+            OnPlayed?.Invoke("!voice:" + hero);
         }
     }
 }

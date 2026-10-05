@@ -8,7 +8,7 @@ module.exports = {
   // ── 탱커 ───────────────────────────────────────────
   '이드_재활': {
     blurb: '넘어져도 다시 일어서는 이드. 맞을 때마다 쌓이는 악몽을, 스킬을 낼 때 정면으로 마주해 방패와 파동으로 바꾼다.',
-    kw: { name: '악몽', desc: '파티가 다칠 때마다 되살아나는 나쁜 꿈. 이드(재활)가 스킬을 내면 모두 마주한다', carrier: 'self', cap: 5 },
+    kw: { name: '악몽', desc: '파티가 다칠 때마다 쌓이는 나쁜 꿈 — 이드(재활)가 스킬을 내면 실드와 피해로 몰아낸다', carrier: 'self', cap: 5 },
     passives: [
       { name: '악몽을 마주하다', when: { on: 'hurt' }, fx: [K('악몽', 1)] },
       { name: '악몽을 마주하다', when: { on: 'play', type: '스킬' }, conds: [{ c: 'stack', id: '악몽', n: 1 }], fx: [PER('악몽'), SH(0.3), PER('악몽'), DFA(0.2), SP('악몽')] },
@@ -25,7 +25,7 @@ module.exports = {
   '로네': {
     blurb: '거짓말을 하면 더듬는 외교관 겸 첩보원. 두 얼굴을 바꿔 쓰며 — 외교관일 땐 파티를 감싸고, 첩보원일 땐 갑옷 박치기로 적의 강인도를 부순다.',
     kw: {
-      name: '첩보원 모드', desc: '로네의 두 얼굴. 없으면 「외교관」(받는 피해 -20% · 자신의 피해 -20%), 있으면 「첩보원」(받는 피해 +15%). 바꿀 때마다 거짓말을 더듬어 적의 행동이 늦어진다',
+      name: '첩보원 모드', desc: '두 얼굴 — 없으면 외교관(덜 맞고 덜 친다), 있으면 첩보원. 바꿀 때마다 적이 늦어진다',
       carrier: 'self', cap: 1, per: [{ stat: 'taken', v: 0.15 }],
       rules: [
         { name: '더듬는 거짓말', when: { on: 'stackReach', id: '첩보원 모드', n: 1 }, fx: [S('둔화', 1, O)] },
@@ -47,9 +47,9 @@ module.exports = {
   },
   '알레트': {
     blurb: '칸나 반장 말만 듣는 충견형 하사. 반장님이 공격하면 그 앞을 방패로 막고, 명령을 셋 받으면 반격으로 되갚는다.',
-    kw: { name: '반장님', desc: '알레트가 명령만 기다리는 아군. 반장님이 공격 카드를 내면 알레트가 방패를 든다', carrier: 'hero', cap: 1 },
+    kw: { name: '반장님', desc: '알레트가 따르는 아군 — 반장님이 공격하면 알레트가 방패를 든다', carrier: 'hero', cap: 1 },
     kws: [{
-      name: '명령 수행', desc: '반장님의 공격 하나하나가 명령이다. 셋이 모이면 반격 태세', carrier: 'self', cap: 3,
+      name: '명령 수행', desc: '반장님의 공격 하나하나가 명령 — 셋이면 반격 태세', carrier: 'self', cap: 3,
       rules: [{ name: '반장님 명령이라면', when: { on: 'stackReach', id: '명령 수행', n: 3 }, fx: [SP('명령 수행'), S('반격', 1)] }],
     }],
     passives: [
@@ -68,7 +68,7 @@ module.exports = {
   },
   '이드': {
     blurb: '세상 전부를 자기가 꾸는 꿈이라 여기는 영원살이. 손에 들어온 카드마다 꿈결이 번져 방패가 되고, 버려진 꿈은 다음 턴의 손패로 돌아온다.',
-    kw: { name: '꿈결', desc: '이드의 카드가 뽑힐 때마다 번지는 꿈. 모이면 한꺼번에 방패가 된다', carrier: 'self', cap: 5 },
+    kw: { name: '꿈결', desc: '이드의 카드가 뽑힐 때마다 번지는 꿈 — 모아서 한꺼번에 방패로', carrier: 'self', cap: 5 },
     passives: [
       { name: '함께 꾸는 꿈', when: { on: 'drawn' }, limit: { per: 'turn', n: 2 }, fx: [SH(0.3), K('꿈결', 1)] },
       { name: '함께 꾸는 꿈', when: { on: 'discard' }, limit: { per: 'turn', n: 1 }, fx: [S('다음 턴 드로우', 1)] },
@@ -84,7 +84,7 @@ module.exports = {
   },
   '헤일리_멀쩡': {
     blurb: '망상에서 걸어 나와 진짜 전장을 지휘하는 헤일리. 적의 공격을 실드로 받아낼 때마다 훈장이 늘고, 훈장 하나로 다음 수를 앞당긴다.',
-    kw: { name: '극복의 훈장', desc: '받아낸 공격 하나하나가 훈장이 된다. 턴 시작에 하나를 달아 첫 카드를 가볍게', carrier: 'self', cap: 3 },
+    kw: { name: '극복의 훈장', desc: '다 막아 낸 공격 하나하나가 훈장 — 턴 시작에 하나를 달아 첫 카드를 가볍게', carrier: 'self', cap: 3 },
     passives: [
       { name: '극복의 훈장', when: { on: 'blocked' }, fx: [K('극복의 훈장', 1)] },
       { name: '전군 전진', when: { on: 'turnStart' }, conds: [{ c: 'stack', id: '극복의 훈장', n: 1 }], fx: [SP('극복의 훈장', 1), X('nextCheaper', { v: 1 })] },
@@ -100,7 +100,7 @@ module.exports = {
   },
   '마에스트로2호': {
     blurb: '온갖 연료로 움직이는 로봇. 파티에 실드가 쌓일 때마다 배터리가 차고, 공격 한 번에 배터리를 몽땅 쏟아붓는다.',
-    kw: { name: '배터리', desc: '실드를 얻을 때마다 차오르는 전력(치유로는 안 찬다). 1개당 마에스트로 2호의 피해 +10%, 카드 한 장에 모두 쏟는다', carrier: 'self', cap: 10, consumeAll: true, per: [{ stat: 'dealt', v: 0.1 }] },
+    kw: { name: '배터리', desc: '무엇이든 연료로 — 실드를 얻을 때마다 차고(치유로는 안 참), 카드 한 장에 모두 쏟는다', carrier: 'self', cap: 10, consumeAll: true, per: [{ stat: 'dealt', v: 0.1 }] },
     passives: [
       { name: '무엇이든 연료로', when: { on: 'guard', kind: 'shield' }, limit: { per: 'turn', n: 4 }, fx: [K('배터리', 1)] },
     ],
@@ -117,7 +117,7 @@ module.exports = {
   // ── 딜러 ───────────────────────────────────────────
   '헤일리': {
     blurb: '엘리아스를 동맹국으로 착각하는 PTSD 장교. 턴마다 적 하나를 외계인으로 착각하고, 그 적을 치면 뒤이어 한 발 더 갈긴다.',
-    kw: { name: '외계인', desc: '헤일리가 외계인이라 굳게 믿는 적. 헤일리의 공격이 들어가면 추가 공격', carrier: 'enemy', cap: 1, hunt: true },
+    kw: { name: '외계인', desc: '헤일리가 외계인이라 믿는 적 — 헤일리가 치면 추가 공격', carrier: 'enemy', cap: 1, hunt: true },
     passives: [
       { name: '착각 순찰', when: { on: 'turnStart' }, fx: [K('외계인', 1, R)] },
       { name: '외계인 격퇴', when: { on: 'hit' }, fx: [IFS('외계인'), X('extra', { ratio: 0.5, target: O })] },
@@ -135,7 +135,7 @@ module.exports = {
   '캐시': {
     blurb: '모든 것에 「히익」 떠는 겁쟁이. 적이 움직일 때마다 놀라 전기가 차오르고, 다음 한 방에 몽땅 지져 버린다.',
     kw: {
-      name: '충전', desc: '적이 움직일 때마다 놀라서 차오르는 전기. 1개당 캐시의 피해 +30%, 카드 한 장에 모두 쓴다. 셋이 차면 적을 지져 약화', carrier: 'self', cap: 3, consumeAll: true, per: [{ stat: 'dealt', v: 0.3 }],
+      name: '충전', desc: '적이 움직일 때마다 놀라서 차는 전기 — 카드 한 장에 모두 쓰고, 셋이면 적을 지진다', carrier: 'self', cap: 3, consumeAll: true, per: [{ stat: 'dealt', v: 0.3 }],
       rules: [{ name: '과충전', when: { on: 'stackReach', id: '충전', n: 3 }, fx: [S('약화', 1, O)] }],
     },
     passives: [
@@ -152,7 +152,7 @@ module.exports = {
   },
   '엘레나': {
     blurb: '모든 발명품에 자폭 기능을 다는 괴짜 시장. 스킬을 낼 때마다 드론이 뜨고, 턴 끝마다 드론이 쏘고, 공격할 때 한 기씩 날려 버린다.',
-    kw: { name: '드론', desc: '엘레나의 발명품. 1기당 턴 끝에 공격력 30% 피해. 공격 카드를 내면 한 기가 자폭한다', carrier: 'self', cap: 3, per: [{ stat: 'dot', ratio: 0.3 }] },
+    kw: { name: '드론', desc: '엘레나의 발명품 — 턴이 끝날 때마다 쏘고, 공격 카드를 내면 한 기가 자폭한다', carrier: 'self', cap: 3, per: [{ stat: 'dot', ratio: 0.3 }] },
     passives: [
       { name: '드론 출격', when: { on: 'play', type: '스킬' }, limit: { per: 'turn', n: 2 }, fx: [K('드론', 1)] },
       { name: '쓸데없는 자폭 기능', when: { on: 'play', type: '공격' }, conds: [{ c: 'stack', id: '드론', n: 1 }], limit: { per: 'turn', n: 1 }, fx: [DA(0.8), SP('드론', 1)] },
@@ -168,7 +168,7 @@ module.exports = {
   },
   '아이시아': {
     blurb: '악덕 CEO 행세가 번번이 남 좋은 일로 끝나는 회장님. 적을 쓰러뜨리고 넘친 피해가 파티를 치유하고, 그 선행이 장부에 쌓인다.',
-    kw: { name: '선행 장부', desc: '본의 아니게 남 좋은 일을 한 기록. 공격 카드에 쏟아 피해를 키운다', carrier: 'self', cap: 5 },
+    kw: { name: '선행 장부', desc: '본의 아니게 한 선행 — 처치할 때마다 쌓여 「해고야!」에 실린다', carrier: 'self', cap: 5 },
     passives: [
       { name: '의도치 않은 선행', when: { on: 'kill', mine: true }, fx: [X('perEvent', { per: 20 }), HL(0.4), K('선행 장부', 1)] },
       { name: '기부천사', when: { on: 'kill', mine: true }, conds: [{ c: 'hpMin', pct: 0.95 }], fx: [SH(1.6)] },
@@ -185,7 +185,7 @@ module.exports = {
   '레이지': {
     blurb: '못 하는 게 없어 온갖 잡일에 불려 다니는 만능 해결사. 한 턴에 처음 내는 종류마다 그 종류의 작은 일을 덤으로 해치운다.',
     kw: {
-      name: '출동 기록', desc: '레이지가 해치운 잡일 목록. 쌓이면 레이저 한 방에 몰아 쏜다', carrier: 'self', cap: 6,
+      name: '출동 기록', desc: '해치운 잡일 목록 — 모아서 레이저 한 방에 몰아 쏜다', carrier: 'self', cap: 6,
       rules: [{ name: '만능 해결사', when: { on: 'play', type: '강화' }, limit: { per: 'turn', n: 1 }, fx: [S('잔광', 1), K('출동 기록', 1)] }],
     },
     passives: [
@@ -204,7 +204,7 @@ module.exports = {
   '리뉴아': {
     blurb: '규격에 딱 맞는 1초를 사랑하는 시간 여행자. 남은 AP 를 딱 맞춰 쓸 때 카드가 한 번 더 울리고, 초침이 세 번 돌면 다음 턴이 길어진다.',
     kw: {
-      name: '초침', desc: '딱 맞게 흘려보낸 1초. 셋이 돌면 다음 턴 AP +1', carrier: 'self', cap: 3,
+      name: '초침', desc: '딱 맞게 흘려보낸 1초 — 조율로 쌓고, 셋이면 다음 턴 AP', carrier: 'self', cap: 3,
       rules: [{ name: '규격에 딱 맞는 1초', when: { on: 'stackReach', id: '초침', n: 3 }, fx: [SP('초침'), X('nextAp', { v: 1 })] }],
     },
     passives: [],
@@ -219,7 +219,7 @@ module.exports = {
   },
   '하이디': {
     blurb: '세상 최고의 특종은 자기 자신인 기자. 특종감으로 찍은 적은 모두의 표적이 되고, 쓰러지면 셀카 한 장이 1면 기사가 된다.',
-    kw: { name: '특종감', desc: '하이디가 쫓는 특종. 걸린 적은 받는 피해 +25%. 쓰러지면 「특종 기사」 를 쓰고 다음 특종감을 찾는다', carrier: 'enemy', cap: 1, hunt: true, per: [{ stat: 'taken', v: 0.25 }] },
+    kw: { name: '특종감', desc: '하이디가 쫓는 특종 — 쓰러지면 「특종 기사」를 쓰고 다음 특종을 찾는다', carrier: 'enemy', cap: 1, hunt: true, per: [{ stat: 'taken', v: 0.25 }] },
     passives: [
       { name: '목표 포착!', when: { on: 'fightStart' }, fx: [K('특종감', 1, 'topEnemy')] },
       { name: '셀카 한 장', when: { on: 'huntDown', id: '특종감' }, fx: [X('make', { id: '하이디_t1', v: 1 }), K('특종감', 1, 'topEnemy')] },
@@ -237,7 +237,7 @@ module.exports = {
   },
   '칸나': {
     blurb: '명령엔 칼 같고 휴가 신청서는 늘 반려되는 진압반장. 아군이 적을 격파할 때마다 양자폭탄 충전이 빨라지고, 쏘고 나면 반려 도장이 하나 더 쌓인다.',
-    kw: { name: '반려 도장', desc: '또 반려된 휴가 신청서. 1개당 칸나의 피해 +10%', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.1 }] },
+    kw: { name: '반려 도장', desc: '또 반려된 휴가 신청서 — 고학년 스킬을 쓸 때마다 쌓여 자신의 피해가 오른다', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.1 }] },
     passives: [
       { name: '양자폭탄 결재', when: { on: 'break' }, fx: [X('gauge', { v: 25 })] },
       { name: '휴가 신청서 반려', when: { on: 'ult' }, fx: [K('반려 도장', 1), X('nextAp', { v: 1 }), DRAW(1)] },
@@ -253,7 +253,7 @@ module.exports = {
   },
   '타이다': {
     blurb: '일은 떠넘기고 한 방 쏠 때만 진심인 경비원. 제 카드가 버려질 때마다 땡땡이를 치며 남의 카드를 가볍게 해 주고, 쌓인 땡땡이를 한 방에 쏟는다.',
-    kw: { name: '땡땡이', desc: '떠넘기고 쉰 만큼 아껴 둔 힘. 1개당 타이다의 피해 +30%, 카드 한 장에 모두 쓴다', carrier: 'self', cap: 3, consumeAll: true, per: [{ stat: 'dealt', v: 0.3 }] },
+    kw: { name: '땡땡이', desc: '떠넘기고 쉰 만큼 아낀 힘 — 카드 한 장에 모두 쓴다', carrier: 'self', cap: 3, consumeAll: true, per: [{ stat: 'dealt', v: 0.3 }] },
     passives: [
       { name: '일 떠넘기기', when: { on: 'discard' }, limit: { per: 'turn', n: 2 }, fx: [K('땡땡이', 1), X('nextCheaper', { v: 1 })] },
       { name: '짱박힐 시간', when: { on: 'turnStart' }, fx: [K('땡땡이', 1)] },
@@ -270,7 +270,7 @@ module.exports = {
   '로네_시장': {
     blurb: '돈까스를 끝내 입에 넣지 못하는 시장. 스킬을 낼 때마다 돈까스 도시락을 돌리고, 도시락이 비워질 때마다 지지율이 올라 시청 앞 축포가 터진다.',
     kw: {
-      name: '지지율', desc: '도시락 한 그릇마다 오르는 민심. 셋이 모이면 축포가 터진다', carrier: 'self', cap: 3,
+      name: '지지율', desc: '도시락 한 그릇마다 오르는 민심 — 셋이면 축포', carrier: 'self', cap: 3,
       rules: [{ name: '사랑받는 시장', when: { on: 'stackReach', id: '지지율', n: 3 }, fx: [SP('지지율'), DH(0.4, 3, A), S('사기', 1)] }],
     },
     passives: [
@@ -288,7 +288,7 @@ module.exports = {
   },
   '리스티': {
     blurb: '곰인형 속 AI 글러브와 함께하는 해커. 공격할 때마다 콤보가 이어지며 고학년 게이지가 차고, 고학년 한 번이면 적의 다음 행동을 통째로 해킹한다.',
-    kw: { name: '콤보', desc: '이어 붙인 입력. 1개당 리스티의 피해 +8%', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.08 }] },
+    kw: { name: '콤보', desc: '이어 붙인 입력 — 공격할 때마다 쌓이고, 자신의 카드를 안 낸 턴엔 끊긴다', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.08 }] },
     passives: [
       { name: '글러브 해킹', when: { on: 'play', type: '공격' }, fx: [X('gauge', { v: 8 }), K('콤보', 1)] },
       { name: '콤보 끊김', when: { on: 'turnEnd' }, conds: [{ c: 'ownNone' }], fx: [SP('콤보')] },
@@ -307,7 +307,7 @@ module.exports = {
   '아멜리아': {
     blurb: '시장님 일을 도맡는 자타공인 최고의 비서. 스킬을 내면 손의 다른 아군 카드 한 장을 대신 처리하고(카드는 손에 남는다), 결재가 넷 모이면 일정을 앞당긴다.',
     kw: {
-      name: '결재 서류', desc: '아군이 일을 할 때마다 올라오는 서류. 넷이 모이면 한꺼번에 처리해 AP 1', carrier: 'self', cap: 4,
+      name: '결재 서류', desc: '아군이 일할 때마다 올라오는 서류 — 넷이면 한꺼번에 처리해 AP', carrier: 'self', cap: 4,
       rules: [{ name: '일괄 결재', when: { on: 'stackReach', id: '결재 서류', n: 4 }, fx: [SP('결재 서류'), AP(1)] }],
     },
     passives: [
@@ -325,7 +325,7 @@ module.exports = {
   },
   '힐데': {
     blurb: '「더 센 병이 돌아야 내가 필요해진다」 는 의사. 파티가 부상일 때 처방이 두 배로 들고, 부상 속에서 낸 처방마다 기운을 북돋운다.',
-    kw: { name: '처방전', desc: '위급할 때 써 둔 처방. 모아 두면 큰 치유가 된다', carrier: 'self', cap: 3 },
+    kw: { name: '처방전', desc: '부상일 때 써 둔 처방 — 모아서 큰 치유로', carrier: 'self', cap: 3 },
     passives: [
       { name: '더 센 병이 돌아야', when: { on: 'play', type: '스킬' }, conds: [{ c: 'wounded' }], limit: { per: 'fight', n: 3 }, fx: [S('사기', 1), K('처방전', 1)] },
       { name: '과잉진료 금지', when: { on: 'turnStart' }, conds: [{ c: 'wounded' }], limit: { per: 'turn', n: 1 }, fx: [K('처방전', 1)] },
@@ -341,7 +341,7 @@ module.exports = {
   },
   '아멜리아_R41': {
     blurb: '제 손으로 만든 병기가 통제를 벗어난 「이 몸」. 스킬을 낼 때마다 시제품이 떨어지고, 시험 가동이 셋 쌓이면 완성품이 나온다 — 시제품은 가끔 오작동한다.',
-    kw: { name: '시험 가동', desc: '시제품을 무사히 쏜 횟수. 셋이면 다음부터 완성품', carrier: 'self', cap: 3 },
+    kw: { name: '시험 가동', desc: '시제품을 무사히 쏜 횟수 — 셋이면 다음부터 완성품', carrier: 'self', cap: 3 },
     passives: [
       { name: '이 몸의 시제품', when: { on: 'play', type: '스킬' }, limit: { per: 'turn', n: 1 }, fx: [IFS('시험 가동', 3, { not: true }), X('make', { id: '아멜리아_R41_t1', v: 1 }), IFS('시험 가동', 3), X('make', { id: '아멜리아_R41_t2', v: 1 })] },
     ],
@@ -360,7 +360,7 @@ module.exports = {
   },
   '오르': {
     blurb: '자재난 속에서도 우주선을 띄운 노력파 발명가. 어떤 카드든 소멸하면 자재로 주워 모으고, 스킬을 낼 때 자재 셋으로 발명품을 뚝딱 만든다.',
-    kw: { name: '자재', desc: '사라진 카드에서 주워 모은 부품. 셋이면 발명품 하나', carrier: 'self', cap: 6 },
+    kw: { name: '자재', desc: '사라진 카드에서 주운 부품 — 셋이면 발명품 하나', carrier: 'self', cap: 6 },
     passives: [
       { name: '필요는 발명의 어머니', when: { on: 'exhaust', who: 'any' }, fx: [K('자재', 1)] },
       { name: '발명품 조립', when: { on: 'play', type: '스킬' }, conds: [{ c: 'stack', id: '자재', n: 3 }], limit: { per: 'turn', n: 1 }, fx: [SP('자재', 3), X('make', { id: '오르_t1', v: 1 })] },
@@ -378,7 +378,7 @@ module.exports = {
   '페스타': {
     blurb: '규칙과 통제를 혐오하는 무정부주의 락커. 파티가 공격과 스킬을 번갈아 낼 때마다 반항심이 끓어오르고, 셋이 차면 모두가 같이 친다.',
     kw: {
-      name: '반항', desc: '정해진 박자를 깨는 쾌감. 공격과 스킬이 바뀔 때마다 +1, 셋이면 협공 1', carrier: 'self', cap: 3,
+      name: '반항', desc: '정해진 박자를 깨는 쾌감 — 공격과 스킬을 번갈아 내면 쌓이고, 셋이면 협공', carrier: 'self', cap: 3,
       rules: [{ name: '나락도 락이다', when: { on: 'stackReach', id: '반항', n: 3 }, fx: [SP('반항'), S('협공', 1)] }],
     },
     passives: [

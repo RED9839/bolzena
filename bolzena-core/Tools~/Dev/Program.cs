@@ -51,7 +51,10 @@ static class Program
                     return errs.Count == 0 ? 0 : 1;
                 }
             case "hero":
-                foreach (var h in rest.Count > 0 ? rest.ToList() : data.Heroes.Keys.ToList()) { Console.WriteLine(Sheet(data, tx, h)); Console.WriteLine(); }
+                {
+                    bool brief = Flag("short");   // --short: 짧은 글(CardText.Short)만
+                    foreach (var h in rest.Count > 0 ? rest.ToList() : data.Heroes.Keys.ToList()) { Console.WriteLine(brief ? (data.Hero(h) != null ? tx.HeroShort(data.Hero(h)) : $"(사도 없음: {h})") : Sheet(data, tx, h)); Console.WriteLine(); }
+                }
                 return 0;
             case "cards":
                 {
@@ -62,17 +65,18 @@ static class Program
                 }
             case "fight":
                 {
-                    // fight 사도,사도,사도 적,적 [씨앗] [--floor 1|2] — 똑똑한 봇이 싸운다(기록 전부). 적 배율은 그 층의 일반 싸움
-                    int floor = int.Parse(Opt("floor", "1")) - 1;
+                    // fight 사도,사도,사도 적,적 [씨앗] [--floor 1|2] [--nature 성격(판의 적 속성)] — 똑똑한 봇이 싸운다(기록 전부). 적 배율은 그 층의 일반 싸움
+                    int floor = int.Parse(Opt("floor", "1")) - 1; string nat = Opt("nature");
                     if (rest.Count < 2) { Console.WriteLine("fight 사도,사도,사도 적,적 [씨앗] [--floor 1]"); return 1; }
                     var party = rest[0].Split(',').ToList(); var foes = rest[1].Split(',').ToList();
                     long seed = rest.Count > 2 ? long.Parse(rest[2]) : 1;
                     var sc = R.FoeScale(floor);
-                    var b = Battle.Start(data, new BattleSetup { Party = party, Deck = data.BuildDeck(party), Enemies = foes, Seed = seed, EnemyHp = sc.hp, EnemyDmg = sc.dmg });
+                    var b = Battle.Start(data, new BattleSetup { Party = party, Deck = data.BuildDeck(party), Enemies = foes, Seed = seed, EnemyHp = sc.hp, EnemyDmg = sc.dmg, EnemyNature = nat });
                     var bots = new Bots(data);
                     while (b.Over == null && b.Turn < 40) { bots.SmartPlay(b); if (b.Over == null) b.EndTurn(); }
                     foreach (var l in b.Log) Console.WriteLine(l);
                     Console.WriteLine($"결과 {b.Over ?? "40턴 넘음"} · {b.Turn}턴 · 파티 HP {Math.Max(0, b.Pool.Hp)}/{b.Pool.MaxHp}");
+                    Console.WriteLine($"강인도 — 깎은 카드 {b.ToughHits}(약점 {b.ToughWeakHits}) · 깎은 양 {b.ToughDealt:0.##} · 격파 {b.Breaks}");
                     return 0;
                 }
             case "run":
@@ -129,8 +133,30 @@ static class Program
                     Console.WriteLine($"→ {Path.GetFullPath(outp)} · {rows.Sum(r => r.N)}판 · {(DateTime.Now - t0).TotalSeconds:0}초");
                     return 0;
                 }
+            case "natures":
+                {
+                    // natures [씨앗] — 마을 × 적 속성: 고를 수 있나 · 그 속성의 보스 클론(빌린 몸이면 「몸」)
+                    long seed = rest.Count > 0 ? long.Parse(rest[0]) : 1;
+                    foreach (var v in data.Villages.Values.OrderBy(x => x.Id, StringComparer.Ordinal))
+                    {
+                        var ok = Run.NaturesFor(data, v.Id);
+                        Console.WriteLine($"{v.Id}({v.Race}) — 클론 자리 {Run.CloneSlots(data, v.Id).Count} · 고를 수 있는 속성 {string.Join(" · ", ok)}");
+                        foreach (var n in R.FOE_NATURES)
+                        {
+                            var c1 = Run.CloneCandidates(data, v.Id, n, 0); var c2 = Run.CloneCandidates(data, v.Id, n, 1);
+                            string bs = ok.Contains(n) ? string.Join(" / ", Run.PickBosses(data, v.Id, n, seed).Select(l => string.Join("+", l.Select(id => { var e = data.Enemy(id); return e?.Clone == null ? id : e.Clone + $"{data.Hero(e.Clone)?.Star}성" + (Run.StarFits(Run.PickBosses(data, v.Id, n, seed).FindIndex(l => l.Contains(id)), data.Hero(e.Clone)?.Star ?? 3) ? "" : "*예외") + (id.StartsWith(GameData.CLONE_MARK) ? "(빌린 몸 " + id.Split('~')[2] + ")" : ""); })))) : "못 고름";
+                            Console.WriteLine($"  {n} 1층 후보(1~2성) {c1.Count}({string.Join(",", c1)}) · 2층 후보(3성) {c2.Count}({string.Join(",", c2)}) → 씨앗 {seed}: {bs}");
+                            if (ok.Contains(n))
+                            {
+                                var kinds = Enumerable.Range(1, 200).Select(s2 => string.Join(" / ", Run.PickBosses(data, v.Id, n, s2).Select(l => string.Join("+", l.Select(id => data.Enemy(id)?.Clone).Where(x => x != null))))).Distinct().ToList();
+                                Console.WriteLine($"      씨앗 1~200 에서 나온 보스 조합 {kinds.Count}가지: {string.Join(" · ", kinds.Take(8))}{(kinds.Count > 8 ? " …" : "")}");
+                            }
+                        }
+                    }
+                    return 0;
+                }
             default:
-                Console.WriteLine("명령: check [--hero id] [--quiet] · hero [id …] · cards [--hero id] · fight 사도,… 적,… [씨앗] [--floor 1] · run 사도,… [씨앗] [--village id] · sim [판] [--with 사도] [--hp] [--dmg] [--seed] · report [바퀴] [--pairs 판] [--comps 판] [--top 30] [--out] · solo [--err 2] [--min 300] [--max 3000] [--hero 키] [--out]");
+                Console.WriteLine("명령: check [--hero id] [--quiet] · hero [id …] · cards [--hero id] · fight 사도,… 적,… [씨앗] [--floor 1] [--nature 광기] · run 사도,… [씨앗] [--village id] · sim [판] [--with 사도] [--hp] [--dmg] [--seed] · report [바퀴] [--pairs 판] [--comps 판] [--top 30] [--out] · solo [--err 2] [--min 300] [--max 3000] [--hero 키] [--out]");
                 Console.WriteLine("데이터: --data 경로(폴더 · 파일, 거듭 쓰거나 ; 로 여럿). 없으면 Data/Sample");
                 return 1;
         }

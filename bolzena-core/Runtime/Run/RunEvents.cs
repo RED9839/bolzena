@@ -105,7 +105,7 @@ namespace Bolzena.Core
             if (rm != null && S.Deck.Count <= Math.Max(1, rm.N)) return "뺄 카드가 모자랍니다";
             if (rm != null && rm.Basic && !S.Deck.Any(IsBasic)) return "뺄 시작 카드가 없습니다";
             if (ops.Any(x => x.K == "dupe") && !S.Deck.Any(DupeOk)) return "복제할 고유 카드가 없습니다";
-            if (ops.Any(x => x.K == "gift" && OnlyCard(x.Id) && S.Deck.Contains(x.Id))) return "유일 — 이미 덱에 있는 카드입니다";
+            if (ops.Any(x => x.K == "gift" && OnlyCard(x.Id) && HasCard(x.Id))) return "유일 — 이미 덱에 있는 카드입니다";
             if (MindBroken && ops.Any(x => x.K == "remove" || x.K == "dupe" || x.K == "unique" || x.K == "neutral" || x.K == "flash" || x.K == "gift")) return MIND;
             return null;
         }
@@ -232,8 +232,8 @@ namespace Bolzena.Core
                         }
                     case "curse": S.Deck.Add(o.Id); E.Log.Add($"{tx.Outcome(o)} — 덱에"); break;
                     case "gift":
-                        if (OnlyCard(o.Id) && S.Deck.Contains(o.Id)) { E.Log.Add($"「{Data.Card(o.Id).Name}」 — 유일, 이미 덱에 있습니다"); break; }
-                        S.Deck.Add(o.Id); E.Log.Add($"「{Data.Card(o.Id).Name}」 — 덱에"); break;
+                        if (OnlyCard(o.Id) && HasCard(o.Id)) { E.Log.Add($"「{Data.Card(o.Id).Name}」 — 유일, 이미 덱에 있습니다"); break; }
+                        GainCard(o.Id); E.Log.Add($"「{Data.Card(o.Id).Name}」 — 덱에"); break;
                     case "mindBreak": S.MindBreak = Math.Max(S.MindBreak, Math.Max(1, o.N)); E.Log.Add($"정신 붕괴 — 다음 {Math.Max(1, o.N)} 싸움이 끝날 때까지 카드 얻기 · 신탁 · 제거를 못 한다"); break;
                     case "scout": S.Scout = true; E.Log.Add("지도 공개 — 다음 이벤트 칸에서 둘 중 하나를 고릅니다"); break;
                     case "shopGift": S.ShopGift = o.Grade; E.Log.Add($"다음 상점에서 {o.Grade} 장비 하나를 공짜로 받습니다"); break;
@@ -249,8 +249,7 @@ namespace Bolzena.Core
 
         List<string> NeutralOffer(string grade, int n)
         {
-            var has = new HashSet<string>(S.Deck);
-            var pool = Data.NeutralIds().Where(id => (grade == null || Data.Card(id).Grade == grade) && !(OnlyCard(id) && has.Contains(id))).ToList();
+            var pool = Data.NeutralIds().Where(id => (grade == null || Data.Card(id).Grade == grade) && !(OnlyCard(id) && HasCard(id))).ToList();
             var outs = new List<string>();
             while (outs.Count < n && pool.Count > 0) { int i = RndInt(pool.Count); outs.Add(pool[i]); pool.RemoveAt(i); }
             return outs;
@@ -258,9 +257,9 @@ namespace Bolzena.Core
 
         /// <summary>
         /// 고르는 것을 하나씩 푼다 — Pending[0] 에 대한 값(카드 id · 신탁 번호(int) · gambleChoice 번호(int)). value 가 null 이면 건너뛴다(받지 않는다).
-        /// 못 고르면 까닭.
+        /// 못 고르면 까닭. heroKey — card 로 교주 카드를 받을 때 넣을 사도(없으면 주인 고르기 줄 → PendingNeutral · AssignNeutral).
         /// </summary>
-        public string ResolvePending(object value)
+        public string ResolvePending(object value, string heroKey = null)
         {
             var E = S.Event;
             var p = E?.Pending.FirstOrDefault();
@@ -303,7 +302,7 @@ namespace Bolzena.Core
                         if (id == null) { E.Log.Add($"{p.Label} — 받지 않았습니다"); break; }
                         if (!p.Cards.Contains(id)) return "고를 수 없는 카드입니다";
                         var why = PowerWhy(id); if (why != null) return why;
-                        S.Deck.Add(id);
+                        GainCard(id, heroKey);
                         E.Log.Add($"「{Data.Card(id).Name}」 — 덱에");
                         break;
                     }

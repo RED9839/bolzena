@@ -18,6 +18,11 @@ namespace Bolzena.RunUI
         public Stage Stage;
         public RunPort P;
         public IFightScreen FightScreen;
+        /// <summary>이번 판 적 속성 — 모험을 시작할 때(마을과 함께) 정하고, 마을 공개 · 편성에 보이고, 판을 열 때 넘긴다. null 이면 보이지 않는다.</summary>
+        public string FoeNature;
+        /// <summary>이번 판 씨앗 · 층마다 보스 줄 — 마을 공개에서 미리 고르고 같은 씨앗으로 판을 연다(화면의 보스 = 실제 보스).</summary>
+        public long FoeSeed;
+        public System.Collections.Generic.List<System.Collections.Generic.List<string>> FoeBosses;
         /// <summary>전투 화면(FightScreen)에 싸움을 넘겨 두고 돌아오기를 기다리는 중.</summary>
         public bool Fighting { get; private set; }
         public static Flow Me { get; private set; }
@@ -48,13 +53,16 @@ namespace Bolzena.RunUI
         {
             if (!P.Ready) { Toast.Show("콘텐츠 데이터가 없습니다 — 마을 · 사도 셋이 있어야 떠납니다"); return; }
             string village = P.RollVillage();
+            FoeSeed = DateTime.Now.Ticks & 0x7fffffff;
+            FoeNature = P.RollFoeNature(village);
+            FoeBosses = P.PickBosses(village, FoeNature, FoeSeed);
             VillageReveal(village, () => Party(village));
         }
 
         public void StartRun(System.Collections.Generic.List<string> party, string village)
         {
             RunPort.ClearSave();
-            P.NewRun(party, village, DateTime.Now.Ticks & 0x7fffffff);
+            P.NewRun(party, village, FoeNature != null ? FoeSeed : DateTime.Now.Ticks & 0x7fffffff, FoeNature);
             MapStep();
         }
 

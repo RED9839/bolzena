@@ -15,6 +15,8 @@ namespace Bolzena.Core
         public int? PartyHp, PartyMaxHp;
         public long Seed = 1;
         public bool NoNature;
+        /// <summary>판의 적 속성 — 주면 이 싸움의 모든 적(소환 포함)의 성격 · 약점을 이것으로 맞춘다(RunState.EnemyNature). 없으면 적 데이터 그대로.</summary>
+        public string EnemyNature;
         /// <summary>사도마다 장비 능력치 줄(HP 는 파티 최대 HP 에 이미 들어 있다 — 여기선 공격 · 방어 · 치명만).</summary>
         public Dictionary<string, Stats> Gear;
         /// <summary>사도마다 장비 효과(패시브로 돈다).</summary>
@@ -88,6 +90,8 @@ namespace Bolzena.Core
         public int NextCheaper;
         public string Over;
         public bool NoNature, Preview;
+        /// <summary>판의 적 속성(BattleSetup.EnemyNature) — null 이면 적마다 데이터 성격.</summary>
+        public string EnemyNature;
         public int? PreviewPick;
 
         public Dictionary<string, int> Flash = new();
@@ -154,6 +158,9 @@ namespace Bolzena.Core
         /// <summary>바로 앞에 낸 카드의 주인(적 패시브 「같은 사도 카드를 연달아」).</summary>
         public string LastHero;
         public int BreakSeq, DealtSeq, DealtAct;
+        /// <summary>통계(저장 안 함 — 시뮬 · 시험) — 카드가 강인도를 깎은 횟수 · 그 가운데 약점 공격 · 깎은 강인도 합 · 격파 수.</summary>
+        public int ToughHits, ToughWeakHits, Breaks;
+        public double ToughDealt;
         /// <summary>이번 턴 낸 카드마다 태그(맨 이름) — 「이번 턴 낸 X 카드 수」.</summary>
         public List<List<string>> PlayTags = new();
         /// <summary>예약 효과(later · afterCards) — 때가 되면 돈다.</summary>
@@ -208,12 +215,13 @@ namespace Bolzena.Core
 
             double hpx = st.EnemyHp ?? R.ENEMY_HP, dmgx = st.EnemyDmg ?? 1;
             EnemyHpx = hpx; EnemyDmgx = dmgx; EliteFight = st.Elite;
+            EnemyNature = string.IsNullOrEmpty(st.EnemyNature) ? null : st.EnemyNature;
             for (int i = 0; i < st.Enemies.Count; i++)
             {
                 var e = Data.Enemy(st.Enemies[i]) ?? throw new ArgumentException($"없는 적: {st.Enemies[i]}");
                 int ehp = Num.Round(e.Hp * hpx);
                 double tm = ToughOf(e, st.Elite);
-                var u = new Unit { Side = Side.Enemy, Key = e.Id, Name = e.Name, Idx = i, Row = e.Row ?? "front", Nature = e.Nature, Boss = e.Boss, Dmgx = dmgx, Tough = tm, ToughMax = tm };
+                var u = new Unit { Side = Side.Enemy, Key = e.Id, Name = e.Name, Idx = i, Row = e.Row ?? "front", Nature = FoeNature(e), Boss = e.Boss, Dmgx = dmgx, Tough = tm, ToughMax = tm };
                 u.MaxHp = ehp; u.Hp = ehp;
                 Enemies.Add(u);
                 InitCounters(u);
@@ -256,8 +264,16 @@ namespace Bolzena.Core
             OpeningPlays();
         }
 
-        public double ToughOf(EnemyDef e, bool elite) =>
-            e.Tough > 0 ? e.Tough : e.Boss ? R.TOUGH.Boss : elite ? R.TOUGH.Elite : R.TOUGH.Fight;
+        /// <summary>적의 성격 — 사도 클론은 그 사도의 성격 그대로, 나머지는 판의 적 속성(있으면) · 없으면 데이터.</summary>
+        public string FoeNature(EnemyDef e) => e.Clone != null ? (Data.Hero(e.Clone)?.Nature ?? e.Nature) : EnemyNature ?? e.Nature;
+
+        /// <summary>적의 강인도 칸 — 데이터 tough(없으면 일반 · 엘리트 · 보스 기본). 엘리트 싸움에 선 여린 적(엘리트 몸보다 작은 칸)은 +EliteMinion. 최소 R.TOUGH.Min(3).</summary>
+        public double ToughOf(EnemyDef e, bool elite)
+        {
+            double t = e.Tough > 0 ? e.Tough : e.Boss ? R.TOUGH.Boss : elite ? R.TOUGH.Elite : R.TOUGH.Fight;
+            if (elite && !e.Boss && t < R.TOUGH.Elite) t += R.TOUGH.EliteMinion;
+            return Math.Max(R.TOUGH.Min, t);
+        }
 
         // ── 복사(봇 · 미리보기) ──────────────────────────────────────
         /// <summary>판을 통째로 복사한다 — 기록 · 연출 쪽지 · 구독은 빼고. 난수는 rng(없으면 지금 것을 베낀다).</summary>
@@ -292,6 +308,7 @@ namespace Bolzena.Core
             s.CostMods = CostMods.Select(x => x.Copy()).ToList(); s.PlayedPrev = new(PlayedPrev); s.BattleVals = new(BattleVals);
             s.Later = Later.Select(x => x.Copy()).ToList();
             s.GrowthGain = GrowthGain.ToDictionary(kv => kv.Key, kv => kv.Value + new Stats());
+            s.Forms = Forms.ToDictionary(kv => kv.Key, kv => kv.Value.Copy());   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다
             return s;
         }
 
@@ -363,6 +380,10 @@ namespace Bolzena.Core
         public PassiveRule R;
         public string KwOf;
         public bool Gear;
+        /// <summary>사도 자신의 패시브(HeroDef.Passives) — 변신 replace 가 끄는 것.</summary>
+        public bool Own;
+        /// <summary>변신이 덧붙인 규칙이면 그 변신 id.</summary>
+        public string Form;
     }
 
     public sealed class AlwaysMod

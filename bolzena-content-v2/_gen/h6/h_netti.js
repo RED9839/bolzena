@@ -7,7 +7,7 @@ L.hero({
   id: '네티', name: '네티', nature: '광기', row: 'front', role: '탱커', star: 3, hp: 900, atk: 75, def: 76, crit: 5,
   blurb: '유물만 보면 눈이 도는 도굴꾼 용족. 드릴로 버린 더미 밑바닥까지 파 내려가, 묻혀 있던 카드를 캐 손에 올린다.',
   keyword: {
-    name: KW, desc: '파 내려간 깊이. 셋이면 버린 더미 맨 아래 카드 1장을 캐 손으로 올리고 실드를 얻는다', carrier: 'self', cap: 3,
+    name: KW, desc: '파 내려간 깊이 — 셋이면 버린 더미 맨 아래 카드를 캐 올린다', carrier: 'self', cap: 3,
     rules: [{ name: '유물이다용!', when: { on: 'stackReach', id: KW, n: 3 }, fx: [spend(KW, 'all'), dig(1), sh(0.8)] }],
   },
   passives: [

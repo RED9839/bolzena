@@ -60,7 +60,7 @@ namespace Bolzena.Core
         public double CardVal(Battle s, string id)
         {
             int fl = s.Flash.TryGetValue(id, out var n) ? n : 0;
-            string key = id + ":" + fl;
+            string key = id + ":" + fl + (s.Forms.Count > 0 ? ":" + s.FormKeyOf(id) : "");   // 변신 중이면 그 사도 카드는 변신판 모습
             if (cvCache.TryGetValue(key, out var v)) return v;
             var c = s.CardOf(id);
             v = c == null ? 0 : c.IsCurse || c.IsStatus ? -1 : CardValue.ValueOf(c);
@@ -81,7 +81,7 @@ namespace Bolzena.Core
             bool on = oc != null && last != null && (oc.K == FxK.IfLink ? c.Hero != null && last.Value.hero == c.Hero : last.Value.type == oc.Type);
             if (!on && !rh) return CardVal(s, id);
             int? n = rh ? s.St(s.Pool, R.RHYTHM) : (int?)null;
-            string key = id + ":" + (s.Flash.TryGetValue(id, out var f) ? f : 0) + ":live" + (on ? 1 : 0) + (rh ? ":r" + n : "");
+            string key = id + ":" + (s.Flash.TryGetValue(id, out var f) ? f : 0) + ":live" + (on ? 1 : 0) + (rh ? ":r" + n : "") + (s.Forms.Count > 0 ? ":" + s.FormKeyOf(id) : "");
             if (cvCache.TryGetValue(key, out var v)) return v;
             v = CardValue.ValueOf(c, on, n);
             cvCache[key] = v;

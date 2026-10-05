@@ -283,11 +283,12 @@ namespace Bolzena.RunUI
             var pic = Ui.Img(rt, Theme.Round, Theme.NavyWell, "pic");
             pic.rectTransform.At(0.5f, 1, 0, -8 * k, 102 * k, 102 * k);
             pic.gameObject.AddComponent<RectMask2D>();
-            if (h.Icon != null)
+            var face = CardArt.Upper(h.art, 1f, 0.34f);   // 기본 스탠딩의 머리 · 어깨(없으면 초상)
+            if (face != null || h.Icon != null)
             {
-                var im = Ui.Img(pic.rectTransform, h.Icon, Color.white, "icon");
-                im.rectTransform.Fill(-4, -10, -4, 0);
-                im.preserveAspect = true;
+                var im = Ui.Img(pic.rectTransform, face ?? h.Icon, Color.white, "icon");
+                if (face != null) im.rectTransform.Fill();
+                else { im.rectTransform.Fill(-4, -10, -4, 0); im.preserveAspect = true; }
                 if (!h.Playable && !st.Dex) im.color = new Color(0.55f, 0.55f, 0.6f);
             }
             var tone = Ui.Img(rt, Theme.Round, Theme.NatureOf(h.nature), "tone");
@@ -385,14 +386,20 @@ namespace Bolzena.RunUI
             {
                 var d = P.Data.Hero(h.CoreId);
                 string body = "";
-                if (d.Keyword != null) body += $"<color=#F2CF7A>키워드</color>  {P.Text.Keyword(d.Keyword)}\n";
-                if (d.Passives.Count > 0) body += $"<color=#F2CF7A>패시브</color>  {P.Text.Passives(d.Passives)}\n";
-                if (d.Ult != null) body += $"<color=#F2CF7A>고학년</color>  {P.Text.Ult(d.Ult)}\n";
+                // 짧은 글(CardText.Short) — 자세히는 사도 상세의 고유 효과 탭
+                if (d.Keyword != null) body += $"<color=#F2CF7A>키워드</color>  「{d.Keyword.Name}」 {P.Text.Short(d.Keyword)}\n";
+                if (d.Passives.Count > 0) body += $"<color=#F2CF7A>패시브</color>  {P.Text.ShortPassives(d.Passives)}\n";
+                if (d.Ult != null) body += $"<color=#F2CF7A>고학년</color>  「{d.Ult.Name}」 {P.Text.Short(d.Ult)}\n";
                 body += $"<color=#F2CF7A>시작 카드</color>  {string.Join(" · ", d.Starter.Select(id => P.Data.Card(id)?.Name ?? id))}\n";
                 body += $"<color=#F2CF7A>고유 카드</color>  {string.Join(" · ", P.Data.UniquesOf(d.Id).Select(id => P.Data.Card(id)?.Name ?? id))}";
                 var bt = Ui.Text(box.transform, body, Theme.FsSm, Theme.Ink, TextAlignmentOptions.TopLeft);
                 bt.Pref(-1, 120, -1, 1);
                 bt.enableAutoSizing = true; bt.fontSizeMin = 11; bt.fontSizeMax = Theme.FsSm;
+                // 자세히 — 고유 효과 · 패시브 · 고학년 판(판마다 짧은 글 + 자세히)
+                var mr = Ui.Rect("more", box.transform); mr.Pref(-1, 34);
+                Ui.Row(mr, 0, TextAnchor.MiddleLeft, null, false, false);
+                var tc = TraitsChip(mr, d.Id, "자세히");
+                Stage.Hot["info.traits"] = tc;
             }
             else
             {

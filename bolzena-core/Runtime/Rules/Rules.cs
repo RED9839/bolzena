@@ -184,13 +184,23 @@ namespace Bolzena.Core
         // ── 강인도 · 격파 ────────────────────────────────────────────
         public static class TOUGH
         {
-            public const double Fight = 4, Elite = 5, Boss = 6, Hit = 0.5, Weak = 0.5, Glow = 1;
+            /// <summary>
+            /// 적 데이터에 tough 가 없을 때의 칸(2026-10-05 다시 — Docs/데이터.md §15 강인도 기준): 일반 4 · 엘리트 6 · 보스 10.
+            /// 단위 = 약점 공격 AP 1. 엘리트 싸움에 같이 선 여린 적(칸이 Elite 보다 작은)은 EliteMinion 만큼 더.
+            /// 잔광은 강인도 피해 +Glow.
+            /// </summary>
+            public const double Fight = 4, Elite = 6, Boss = 10, EliteMinion = 1, Glow = 1;
+            /// <summary>모든 적의 최대 강인도 최소치(사용자 규칙 2026-10-05 — 소환물 · 잔챙이 포함). 데이터가 이보다 작으면 검사 오류, 엔진도 이 아래로 세우지 않는다.</summary>
+            public const double Min = 3;
             public const int Ap = 1;
+            /// <summary>소수 찌꺼기를 지우는 눈금(1/60 — 1/2 · 1/3 · 1/4 · 1/5 · 1/6 · ×0.8 이 다 맞아떨어진다).</summary>
+            public const double Grid = 60;
         }
 
         /// <summary>
-        /// 강인도 피해(카드가 적 하나를 처음 칠 때) — 카제나 단위(Docs/키워드.md §1): 단일 공격 AP 1 당 1/3칸 · 비용 0 은 1/6칸 · 광역은 그 절반 ·
-        /// 약점 공격은 AP 1 당 1칸(0코는 1/2칸). 2026-10-05 — 옛 「카드마다 0.5 + 약점 0.5」 를 바꿨다.
+        /// 강인도 피해(카드가 적 하나를 처음 칠 때) — 사용자 확정 단위(Docs/키워드.md §1): 약점 공격은 카드 비용 1 당 1 · 약점이 아니면 그 1/3.
+        /// 비용 0 은 비용 1/2 로 친다(약점 1/2 · 아니면 1/6) · 광역(allEnemies)은 대상마다 절반 · X 는 낸 AP · 고학년은 비용 2.
+        /// 2026-10-05 — 옛 「카드마다 0.5 + 약점 0.5」 를 바꿨다.
         /// </summary>
         public static double ToughDmg(int cost, bool weak, bool area)
         {
@@ -207,6 +217,8 @@ namespace Bolzena.Core
         public static readonly string[] NATURES = { "순수", "광기", "냉정", "활발", "우울", "공명" };
         public const double NATURE_DMG = 0.10;
         public const double NATURE_DEF = 0.05;
+        /// <summary>판의 적 속성으로 뽑는 성격 — 공명은 뺀다(공명 적은 약점이 없다).</summary>
+        public static readonly string[] FOE_NATURES = { "순수", "광기", "냉정", "활발", "우울" };
         public static List<string> WeakTo(string nature) => BEATS.Where(kv => kv.Value == nature).Select(kv => kv.Key).ToList();
         public static int NatureEdge(string attacker, string defender)
         {

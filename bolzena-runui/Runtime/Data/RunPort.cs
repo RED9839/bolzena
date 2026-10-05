@@ -70,13 +70,21 @@ namespace Bolzena.RunUI
 
         // ── 새 판 · 마을 ──
         public string RollVillage() => Run.RollVillage(Data, Rnd.NextDouble());
+        /// <summary>이번 판 적 속성 — 마을과 함께 무작위 하나(그 마을에서 고를 수 있는 것 — core Run.NaturesFor). 판의 모든 적 · 두 보스가 이 성격이 된다.</summary>
+        public string RollFoeNature(string village) => Run.RollNature(Data, village, Rnd.NextDouble());
+        /// <summary>그 마을 · 속성 · 씨앗으로 고른 층마다 보스 줄 — 같은 씨앗으로 NewRun 하면 run.Bosses 와 같다.</summary>
+        public List<List<string>> PickBosses(string village, string nature, long seed) => Run.PickBosses(Data, village, nature, seed);
+        /// <summary>판에서 이 적이 띨 성격 — 판의 적 속성(보스도 같다 — 보스는 그 속성 사도 클론), 없으면 제 성격.</summary>
+        public static string NatureIn(EnemyDef e, string foeNature) => !string.IsNullOrEmpty(foeNature) ? foeNature : e?.Nature;
+        /// <summary>그 성격의 약점(그 성격을 이기는 성격).</summary>
+        public static List<string> WeakTo(string nature) => string.IsNullOrEmpty(nature) ? new List<string>() : Bolzena.Core.R.WeakTo(nature);
         public VillageDef Village(string id) => id != null && Data.Villages.TryGetValue(id, out var v) ? v : Data.Villages.Values.FirstOrDefault();
         public List<VillageDef> Villages => Data.Villages.Values.ToList();
 
-        public void NewRun(List<string> party, string village, long seed)
+        public void NewRun(List<string> party, string village, long seed, string foeNature = null)
         {
             var rows = party.ToDictionary(k => k, k => Data.Hero(k)?.Row ?? "mid");
-            Run = Run.New(Data, party, seed, village, rows);
+            Run = Run.New(Data, party, seed, village, rows, foeNature);
         }
 
         public bool Has => Run != null;
@@ -193,7 +201,7 @@ namespace Bolzena.RunUI
             if (fresh || S.Shop == null || S.Shop.Floor != S.Floor || S.Shop.At != at) Run.RollShop();
             return S.Shop;
         }
-        public string Buy(int i) => Run.Buy(i);
+        public string Buy(int i, string heroKey = null) => Run.Buy(i, heroKey);
         public int RerollPrice => Run.RerollPrice;
         public string Reroll() => Run.RerollShop();
         public int RemovePrice => Run.RemovePrice;
@@ -225,6 +233,27 @@ namespace Bolzena.RunUI
         // ── 카드 ──
         public CardView View(string id) => Run != null ? Run.ViewOf(id) : Data.View(id);
         public string CardLine(string id) { var v = View(id); return v != null ? Text.Card(v) : id; }
+
+        // ── 교주 카드 주인 사도(덱에 넣을 때 고른 사도 — 틀 색 · 핀 · 위력) ──
+        //   core: 덱의 교주 카드 id 는 「카드id@사도키」(복제 꼬리는 뒤 「n_x@rico^」). 카드를 얻은 뒤 PendingNeutral 이 있으면 고르기 창 → AssignNeutral.
+        /// <summary>교주 카드(id)의 주인 사도 core 키 — 없으면 null(금빛 중립).</summary>
+        public string LeaderOwner(string id) => GameData.OwnerOf(id);
+        /// <summary>주인 사도를 기다리는 교주 카드 id(맨 앞 하나) — 없으면 null.</summary>
+        public string PendingNeutral => Run?.PendingNeutral;
+        /// <summary>기다리는 교주 카드를 그 사도 덱에 넣는다. 못 넣으면 까닭.</summary>
+        public string AssignNeutral(string heroKey) => Run.AssignNeutral(heroKey);
+        /// <summary>교주 카드를 그 사도의 카드로 본 모습(고르기 창 미리보기).</summary>
+        public CardView ViewAs(string id, string heroKey) => Data.View(GameData.NoOwner(id), 0, heroKey);
+
+        /// <summary>사도의 지금 공격력 · 방어력(기본 + 장비).</summary>
+        public (int atk, int def) AtkDef(string hero)
+        {
+            var d = Data.Hero(hero);
+            int atk = d?.Atk ?? Roster.OfCore(hero)?.atk ?? 0, def = d?.Def ?? Roster.OfCore(hero)?.def ?? 0;
+            if (Run != null && S.Party.Contains(hero))
+                foreach (var e in GearOf(hero).Values) { var s = StatsOf(e, hero); if (s != null) { atk += s.Atk; def += s.Def; } }
+            return (atk, def);
+        }
 
         // ── 저장 · 이어하기 ──
         [Serializable] class SaveFile { public string run; public string where; public string kind; }

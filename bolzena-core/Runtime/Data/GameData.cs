@@ -158,14 +158,64 @@ namespace Bolzena.Core
         public static T FromJson<T>(string s) => JsonConvert.DeserializeObject<T>(s, Json);
 
         // ── 찾기 ──────────────────────────────────────────────────────
-        public static string BaseId(string id) =>
-            id != null && id.Length > 1 && (id.EndsWith(PLAIN) || id.EndsWith(COPY)) ? id.Substring(0, id.Length - 1) : id;
+        /// <summary>카드 정의 id — 꼬리(~ · ^)와 주인(@사도)을 뗀 것. 그림 찾기 · 「같은 카드」 비교.</summary>
+        public static string BaseId(string id)
+        {
+            var s = Untail(id);
+            int at = s?.IndexOf(OWNER) ?? -1;
+            return at > 0 ? s.Substring(0, at) : s;
+        }
         public static bool IsCopy(string id) => id != null && id.EndsWith(COPY);
         public static bool IsPlain(string id) => id != null && id.EndsWith(PLAIN);
+        static string Untail(string id) => id != null && id.Length > 1 && (id.EndsWith(PLAIN) || id.EndsWith(COPY)) ? id.Substring(0, id.Length - 1) : id;
+
+        /// <summary>교주 카드 인스턴스의 주인 — 덱의 id 가 「카드@사도」(꼬리는 그 뒤: 「n_x@rico^」). 주인을 정한 교주 카드는 그 사도의 카드로 낸다.</summary>
+        public const string OWNER = "@";
+        /// <summary>id 에 적힌 주인 사도(없으면 null).</summary>
+        public static string OwnerOf(string id)
+        {
+            var s = Untail(id);
+            int at = s?.IndexOf(OWNER) ?? -1;
+            return at > 0 && at < s.Length - 1 ? s.Substring(at + 1) : null;
+        }
+        /// <summary>주인을 붙인(바꾼) id — 꼬리(~ · ^)는 그대로.</summary>
+        public static string WithOwner(string id, string heroKey)
+        {
+            if (id == null) return null;
+            string tail = IsCopy(id) ? COPY : IsPlain(id) ? PLAIN : "";
+            return BaseId(id) + (heroKey != null ? OWNER + heroKey : "") + tail;
+        }
+        /// <summary>주인만 뗀 id(꼬리는 그대로) — 「덱에 한 장」(유일) 비교.</summary>
+        public static string NoOwner(string id) => WithOwner(id, null);
 
         public CardDef Card(string id) => id != null && Cards.TryGetValue(BaseId(id), out var c) ? c : null;
         public HeroDef Hero(string id) => id != null && Heroes.TryGetValue(id, out var h) ? h : null;
-        public EnemyDef Enemy(string id) => id != null && Enemies.TryGetValue(id, out var e) ? e : null;
+        public EnemyDef Enemy(string id) => id == null ? null : Enemies.TryGetValue(id, out var e) ? e : id.StartsWith(CLONE_MARK, StringComparison.Ordinal) ? made.GetOrAdd(id, MakeClone) : null;
+
+        // ── 빌린 몸 클론 ───────────────────────────────────────────────
+        /// <summary>클론 데이터가 없는 사도의 보스 클론 id — 「clone~사도키~몸」(몸 = 그 자리 원래 클론 적 id). Enemy(id) 가 그 자리에서 만든다.</summary>
+        public const string CLONE_MARK = "clone~";
+        public static string CloneId(string heroKey, string bodyId) => CLONE_MARK + heroKey + "~" + bodyId;
+        readonly System.Collections.Concurrent.ConcurrentDictionary<string, EnemyDef> made = new();
+
+        /// <summary>
+        /// 빌린 몸 클론 — 몸(원래 클론)의 체력 · 수 · 판 · 패시브 · 강인도는 그대로, 이름 · 성격 · clone 은 그 사도. 약점(weak)은 지운다(성격에서).
+        /// 그림(Art)은 비운다 — 화면은 Clone(사도 키)으로 그 사도 그림을 찾는다.
+        /// </summary>
+        EnemyDef MakeClone(string id)
+        {
+            var p = id.Substring(CLONE_MARK.Length).Split('~');
+            if (p.Length != 2) return null;
+            var h = Hero(p[0]);
+            if (h == null || !Enemies.TryGetValue(p[1], out var body)) return null;
+            var e = FromJson<EnemyDef>(ToJson(body));
+            e.Id = id; e.Name = h.Name + " (클론)"; e.Nature = h.Nature; e.Clone = h.Id; e.Weak = null; e.Art = null;
+            e.Blurb = h.Name + "(클론) — " + body.Name + " 의 수를 빌려 쓰는 클론. " + body.Blurb;
+            return e;
+        }
+        /// <summary>변신 정의(id 는 사도 사이에서 겹치지 않는다) — 없으면 null. HeroOfForm 은 그 변신을 가진 사도.</summary>
+        public FormDef Form(string id) => id == null ? null : Heroes.Values.SelectMany(h => h.Forms ?? new List<FormDef>()).FirstOrDefault(f => f.Id == id);
+        public HeroDef HeroOfForm(string id) => id == null ? null : Heroes.Values.FirstOrDefault(h => h.Forms != null && h.Forms.Any(f => f.Id == id));
         public EquipDef Equip(string id) => id != null && Equips.TryGetValue(id, out var e) ? e : null;
         public EventDef Event(string id) => Events.FirstOrDefault(e => e.Id == id);
 
@@ -211,21 +261,25 @@ namespace Bolzena.Core
         }
 
         // ── 카드의 실제 모습(신탁을 얹은 것) ─────────────────────────────
-        readonly Dictionary<(string, int), CardView> views = new();
+        readonly Dictionary<(string, int, string), CardView> views = new();
 
-        /// <summary>그 카드 id 의 지금 모습 — flash 는 신탁 번호(1~5, 0 이면 기본).</summary>
-        public CardView View(string id, int flash = 0)
+        /// <summary>
+        /// 그 카드 id 의 지금 모습 — flash 는 신탁 번호(1~5, 0 이면 기본).
+        /// owner — id 에 주인이 없는 교주 카드(옛 저장 · 손으로 짠 덱)를 누구 카드로 볼지(전투는 첫 사도). id 에 주인이 있으면 그것이 이긴다.
+        /// </summary>
+        public CardView View(string id, int flash = 0, string owner = null)
         {
             if (id == null) return null;
             if (IsPlain(id)) flash = 0;
             lock (views)   // 시뮬은 여러 스레드가 같은 데이터를 본다
             {
-                if (views.TryGetValue((id, flash), out var v)) return v;
+                if (views.TryGetValue((id, flash, owner), out var v)) return v;
                 var c = Card(id);
                 if (c == null) return null;
-                v = new CardView(id, c, flash > 0 && flash <= c.Oracles.Count ? c.Oracles[flash - 1] : null, flash);
+                v = new CardView(id, c, flash > 0 && flash <= c.Oracles.Count ? c.Oracles[flash - 1] : null, flash,
+                    c.Neutral ? OwnerOf(id) ?? owner : null);
                 v.Target = TargetOf(v.Fx);
-                views[(id, flash)] = v;
+                views[(id, flash, owner)] = v;
                 return v;
             }
         }
@@ -246,9 +300,19 @@ namespace Bolzena.Core
         public readonly List<string> Tags;
         public readonly List<Fx> Fx;
 
-        public CardView(string id, CardDef def, OracleDef oracle, int flashN)
+        /// <summary>교주 카드의 주인 사도(덱에 넣을 때 고른 사도) — 사도 카드 · 주인 없는 교주 카드는 null. 카드 색 · 핀은 이 사도로.</summary>
+        public readonly string Owner;
+
+        /// <summary>모습을 덧입힌 카드(변신 중 카드 덤) — 다른 것은 그대로, 태그 · 효과만 바꾼다.</summary>
+        internal CardView(CardView b, List<string> tags, List<Fx> fx)
         {
-            Id = id; Def = def; Oracle = oracle; FlashN = oracle != null ? flashN : 0;
+            Id = b.Id; Def = b.Def; Oracle = b.Oracle; FlashN = b.FlashN; Owner = b.Owner; Cost = b.Cost; Type = b.Type;
+            Tags = tags; Fx = fx;
+        }
+
+        public CardView(string id, CardDef def, OracleDef oracle, int flashN, string owner = null)
+        {
+            Id = id; Def = def; Oracle = oracle; FlashN = oracle != null ? flashN : 0; Owner = owner;
             Cost = oracle?.Cost ?? def.Cost;
             Type = oracle != null && oracle.Power ? "강화" : def.Type;
             var tags = oracle != null ? oracle.Tags.ToList() : def.Tags.ToList();
@@ -260,7 +324,10 @@ namespace Bolzena.Core
         /// <summary>화면이 대상을 물어야 하나 — "적" · "아군" · "없음"(GameData.TargetOf).</summary>
         public string Target { get; internal set; }
         public string Name => Def.Name;
-        public string Hero => Def.Hero;
+        /// <summary>이 카드를 내는 사도 — 사도 카드면 그 사도, 교주 카드면 주인(Owner). 피해 · 실드 · 연계 · 「다른 사도 카드」 가 이것을 본다.</summary>
+        public string Hero => Owner ?? Def.Hero;
+        /// <summary>교주 카드인가(주인이 있어도).</summary>
+        public bool Neutral => Def.Neutral;
         public bool X => Def.X;
         public bool Unique => Def.Unique;
         public bool Signature => Def.Signature;

@@ -112,6 +112,7 @@ namespace Bolzena.Core
             {
                 TickMods();
                 foreach (var g in DecayKeywords()) KwGone(g.kw.Id, g.kw.Owner, g.holder, true);
+                FormTick();   // 변신 — 턴으로 재는 것은 1 줄이고 다하면 풀린다(뽑기 전에 — 새 손은 본래 모습)
             }
             if (Turn > 1) ReviveTick();
             // 격파된 적은 내 턴이 다시 오면 일어선다

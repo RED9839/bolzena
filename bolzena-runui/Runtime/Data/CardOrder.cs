@@ -63,7 +63,8 @@ namespace Bolzena.RunUI
                     .OrderBy(id => data.Card(id)?.Unique == true ? 1 : 0)                                   // 기본 → 고유
                     .ThenBy(id => StarterIndex(hd, id))                                                     // 기본 카드는 Starter 순서
                     .ThenBy(id => defIndex.TryGetValue(GameData.BaseId(id), out var di) ? di : int.MaxValue) // 카드 정의 순서
-                    .ThenBy(id => id, StringComparer.Ordinal)                                               // 같은 카드는 나란히
+                    .ThenBy(id => GameData.OwnerOf(id) is string o && heroIndex.TryGetValue(o, out var oi) ? oi : -1)   // 교주 카드는 주인 편성 순서(주인 없으면 앞)
+                    .ThenBy(id => id, StringComparer.Ordinal)                                              // 같은 카드는 나란히
                     .ToList();
             }
             return groups

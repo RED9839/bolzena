@@ -44,12 +44,36 @@ namespace Bolzena.Fx
             return heroesByArt.TryGetValue(key.ToLowerInvariant(), out h) ? h : null;
         }
 
-        // kind: "ult" — 고학년 이펙트(궁극기가 없는 사도는 스킬로 메운 것). 그 밖의 갈래는 아직 없다
+        // kind: "ult" 고학년(궁극기가 없는 사도는 스킬로 메운 것) · "attack" 평타 · "power" 센 공격(Attack2) · "skill" 스킬 · "sig" 시그니처
         public static string[] Get(string heroKey, string kind = "ult")
         {
             var h = HeroOf(heroKey);
-            if (h == null || kind != "ult") return Empty;
-            return h.Ult.ToArray();
+            if (h == null) return Empty;
+            var l = ListOf(h, kind);
+            return l == null ? Empty : l.ToArray();
+        }
+
+        static List<string> ListOf(FxLibraryAsset.Hero h, string kind)
+        {
+            switch (kind)
+            {
+                case "ult": return h.Ult;
+                case "attack": return h.Attack;
+                case "power": return h.Power;
+                case "skill": return h.Skill;
+                case "sig": return h.Sig;
+                default: return null;
+            }
+        }
+
+        public static bool Has(string heroKey, string kind) { var h = HeroOf(heroKey); var l = h != null ? ListOf(h, kind) : null; return l != null && l.Count > 0; }
+
+        // 공용 갈래의 후보들(FxRules.COMMON 이 고른다) — 없으면 빈 배열
+        public static string[] Common(string kind)
+        {
+            if (!Load() || kind == null) return Empty;
+            foreach (var g in index.Common) if (g.Kind == kind) return g.Names.ToArray();
+            return Empty;
         }
 
         public static bool HasUlt(string heroKey) { var h = HeroOf(heroKey); return h != null && h.Ult.Count > 0; }
@@ -92,9 +116,10 @@ namespace Bolzena.Fx
         public static void Preload(IEnumerable<string> names) { foreach (var n in names) { if (Sheet(n) == null) Effect(n); } }
         public static void PreloadUlt(string heroKey) => Preload(Get(heroKey));
         // 읽기 + 텍스처 올리기 + 셰이더 준비까지(BolzenaFx.Prewarm) — 첫 재생에 멈칫하지 않게. 공용 타격 이펙트도 같이
-        public static int Prewarm(string heroKey, bool hits = true)
+        public static int Prewarm(string heroKey, bool hits = true, bool cards = false)
         {
             var names = new List<string>(Get(heroKey));
+            if (cards) foreach (var k in new[] { "attack", "power", "skill", "sig" }) names.AddRange(Get(heroKey, k));
             if (hits) foreach (var l in MotionTables.HIT_FX.Values) names.AddRange(l);
             int n = BolzenaFx.Prewarm(names);
             // 코드도 데운다(Mono JIT) — 화면 밖에서 한 번 틀고 바로 걷는다. 고학년 차례 셈도 한 번

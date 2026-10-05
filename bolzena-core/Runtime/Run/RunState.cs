@@ -12,6 +12,10 @@ namespace Bolzena.Core
         public long Seed;
         public uint RngState;
         public string Village;
+        /// <summary>판의 적 속성 — 새 판에 마을과 함께 무작위로 하나(공명 빼고). 이 판의 모든 적(일반 · 엘리트 · 보스 · 소환)의 성격 · 약점이 이것. null = 옛 저장(적 데이터 성격 그대로).</summary>
+        public string EnemyNature;
+        /// <summary>층마다 보스 줄(적 id) — 새 판에 적 속성에 맞춰 사도 클론을 고른다(Run.PickBosses). null = 옛 저장(마을 데이터 그대로).</summary>
+        public List<List<string>> Bosses;
         public List<string> Party = new();
         public Dictionary<string, string> Rows = new();
         public int PartyHp, PartyMaxHp;
@@ -62,6 +66,11 @@ namespace Bolzena.Core
         public Dictionary<string, Stats> Growth = new();
         /// <summary>카드 값(카드 인스턴스 카운터 — 소장 가치 · 충전 …) — 카드 id → 이름 → 값. 싸움을 넘어 남는다.</summary>
         public Dictionary<string, Dictionary<string, int>> CardVals = new();
+        /// <summary>
+        /// 주인 사도를 기다리는 교주 카드(카드 id, 들어온 차례) — 얻었지만 어느 사도 덱에 넣을지 아직 안 골랐다.
+        /// 화면은 Run.PendingNeutral 이 있으면 사도를 고르게 하고 Run.AssignNeutral 로 넣는다. 덱의 교주 카드는 「id@사도」.
+        /// </summary>
+        public List<string> NeutralWait = new();
     }
 
     public sealed class MapNode

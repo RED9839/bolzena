@@ -14,14 +14,16 @@
    "blurb": "220V 콘센트를 사랑하는 번개 정령. 주먹을 내지를 때마다 제 몸에 전류를 꽂아 다음 주먹을 무겁게 한다 — 그 값은 파티 HP 로 치른다.",
    "keyword": {
     "name": "과충전",
-    "desc": "제 몸에 꽂아 둔 220V. 다음 공격 카드 한 장이 그만큼 무거워지고 빠져나간다",
+    "desc": "제 몸에 꽂은 220V — 쌓일수록 주먹이 무거워지고, 셋이 차면 「최대 출력」",
     "carrier": "self",
-    "cap": 1,
-    "consumeAll": true,
+    "cap": 3,
+    "onMax": {
+     "form": "라이카_최대출력"
+    },
     "per": [
      {
       "stat": "dealt",
-      "v": 0.5
+      "v": 0.2
      }
     ]
    },
@@ -83,6 +85,36 @@
      }
     ]
    },
+   "forms": [
+    {
+     "id": "라이카_최대출력",
+     "name": "최대 출력",
+     "desc": "「최대 출력!」 — 220V 가 몸에 꽉 차 주먹이 눈에 안 보이게 빨라진다. 멈출 수 없고, 다 쓰면 방전",
+     "turns": 2,
+     "cards": {
+      "라이카_s1": "라이카_f1"
+     },
+     "bonus": [
+      {
+       "type": "공격",
+       "fx": [
+        {
+         "k": "extra",
+         "ratio": 0.3
+        }
+       ]
+      }
+     ],
+     "off": [
+      {
+       "k": "spend",
+       "id": "과충전",
+       "all": true
+      }
+     ],
+     "anim": "Idle_Change"
+    }
+   ],
    "race": "정령",
    "starter": [
     "라이카_s1",
@@ -104,6 +136,23 @@
      "k": "dmg",
      "ratio": 1,
      "target": "oneEnemy"
+    }
+   ]
+  },
+  {
+   "id": "라이카_f1",
+   "name": "최대 출력 펀치",
+   "hero": "라이카",
+   "token": true,
+   "cost": 1,
+   "type": "공격",
+   "blurb": "최대 출력의 찌릿 펀치 — 한 번 낼 주먹이 두 번 들어간다",
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.65,
+     "target": "oneEnemy",
+     "hits": 2
     }
    ]
   },
@@ -300,7 +349,7 @@
     },
     {
      "k": "tough",
-     "v": 1,
+     "v": 0.5,
      "target": "allEnemies"
     }
    ],
@@ -321,7 +370,7 @@
       },
       {
        "k": "tough",
-       "v": 1,
+       "v": 0.5,
        "target": "allEnemies"
       }
      ]
@@ -343,7 +392,7 @@
       },
       {
        "k": "tough",
-       "v": 1,
+       "v": 0.5,
        "target": "allEnemies"
       }
      ]
@@ -364,7 +413,7 @@
       },
       {
        "k": "tough",
-       "v": 1,
+       "v": 0.5,
        "target": "allEnemies"
       }
      ]
@@ -386,7 +435,7 @@
       },
       {
        "k": "tough",
-       "v": 2,
+       "v": 1.5,
        "target": "allEnemies"
       }
      ]
@@ -407,7 +456,7 @@
       },
       {
        "k": "tough",
-       "v": 1,
+       "v": 0.5,
        "target": "allEnemies"
       }
      ]

@@ -45,6 +45,14 @@ namespace Bolzena
             new[] { new Vector3(2.1f, -0.8f, 0), new Vector3(4.1f, -0.38f, 0), new Vector3(6.1f, -0.85f, 0) },
         };
         static readonly Vector3 BossPos = new Vector3(3.9f, -0.95f, 0);
+
+        // 적 자리 — 셋까지는 표, 넷 이상은 앞뒤로 엇갈려 고르게 편다(전에는 넷째부터 셋째 자리에 겹쳐 섰다 — 고학년 점검의 도마뱀 둘)
+        static Vector3 EnemySlot(int n, int i)
+        {
+            if (n <= 3) return EnemyPosN[Mathf.Max(1, n) - 1][i];
+            float x = 1.9f + i * (5.0f / (n - 1));
+            return new Vector3(x, i % 2 == 0 ? -0.85f : -0.3f, 0);
+        }
         const float UnitScale = 0.3f;
 
         void Awake()
@@ -63,11 +71,13 @@ namespace Bolzena
 
         void Start()
         {
+            if (Demo.UltAudit.On) Demo.UltAudit.Prepare();      // 점검 차림을 전투를 만들기 전에
             Build();
             // 사람 실행 — 가짜 손가락은 늘 끈 채로 시작한다(데모 · 봇이 켠 채 남으면 진짜 마우스를 읽지 않는다)
             PointerInput.Simulated = false;
             PointerInput.SimHeld = PointerInput.SimRight = false;
-            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-demo") >= 0)
+            if (Demo.UltAudit.On) Demo.UltAudit.Attach(this);                 // 고학년 점검(-ultaudit) — 사도마다 고학년 한 번
+            else if (Array.IndexOf(Environment.GetCommandLineArgs(), "-demo") >= 0)
             {
                 if (BattleBridge.Fight != null)                                 // 한 판 데모 — 판에서 넘어온 싸움
                 {
@@ -115,6 +125,13 @@ namespace Bolzena
             ScreenRoot = Make.Node("Screen", null);
             UiRoot = Make.Node("UI", null);
             Vfx.Field = FieldRoot;
+            // 원작 이펙트(com.bolzena.fx) — 싸움터 아래에 · 싸움터 좌표로. 소리는 이 전투의 Sfx 가 낸다(두 번 나지 않게 패키지 소리는 끈다)
+            Bolzena.Fx.BolzenaFx.Parent = FieldRoot;
+            Bolzena.Fx.BolzenaFx.Sound = false;
+            Bolzena.Fx.BolzenaFx.Calm = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-nofx") >= 0;   // 원작 이펙트 끄고 재 보기(점검)
+            Bolzena.Fx.BolzenaFx.UltOrder = 325; Bolzena.Fx.BolzenaFx.CardOrder = 150; Bolzena.Fx.BolzenaFx.CommonOrderAdd = -150;
+            Bolzena.Fx.BolzenaFx.ScreenCenter = () => FieldRoot ? FieldRoot.InverseTransformPoint(Camera.main ? Camera.main.transform.position : Vector3.zero) : Vector3.zero;
+            Bolzena.Fx.BolzenaFx.TopY = () => { var c = Camera.main; if (!FieldRoot || !c || !c.orthographic) return null; return FieldRoot.InverseTransformPoint(c.transform.position + new Vector3(0, c.orthographicSize, 0)).y - Bolzena.Fx.FxRules.TOP_PAD; };
             Vfx.Screen = ScreenRoot;
 
             // 배경 — 흔들림 · 줌에 모자라지 않게 화면보다 크게
@@ -133,8 +150,13 @@ namespace Bolzena
             else
             {
                 var data = CoreBattle.LoadData();
-                Battle = new CoreBattle(data, CoreBattle.Fixture.FromArgs(data) ?? CoreBattle.Fixture.Pilot(data));
+                var cb = new CoreBattle(data, CoreBattle.Fixture.Override?.Invoke(data) ?? CoreBattle.Fixture.FromArgs(data) ?? CoreBattle.Fixture.Pilot(data));
+                Battle = cb;
+                if (cb.Fx.Note != null) Debug.Log("[Pilot] " + cb.Fx.Note);
+                var fbg = BattleBridge.BgSprite(cb.Fx.Bg);
+                if (fbg != null) { bg.sprite = fbg; FitBg(); }
             }
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-artaudit") >= 0) { Look.Audit(); Application.Quit(0); return; }   // 그림 감사만 하고 끝
             var evs0 = Battle.Begin();
             pendingBegin = evs0;
             var s = Battle.Snapshot;
@@ -143,6 +165,7 @@ namespace Bolzena
                 var h = s.Heroes[i];
                 var u = UnitView.Create(FieldRoot, "hero_" + h.Key, h.Key, "Normal", true, UnitScale, HeroPos[i], 40 + i * 2);
                 u.Ref = UnitRef.Party(i);
+                u.FxKey = h.Id;
                 Heroes.Add(u);
             }
             // 앞줄이 위에 오게(발이 낮을수록 앞)
@@ -176,6 +199,8 @@ namespace Bolzena
         void Preload(BattleSnapshot s)
         {
             var keys = new List<string>();
+            Bolzena.Fx.BolzenaFx.Prewarm(System.Linq.Enumerable.Select(s.Heroes, h => h.Id), sounds: false);
+            foreach (var hv in Heroes) { hv.PrewarmTravel(); HeroClips(hv.name.Replace("hero_", "")); }   // 고학년 순간에 재지 않게(몸짓 이동 · 소리 목록)   // 원작 이펙트 — 파티의 고학년 · 카드 · 맞음 · 공용
             foreach (var h in s.Heroes) { keys.Add("st_" + h.Key); Sfx.Preload(h.Key); foreach (Motion m in Enum.GetValues(typeof(Motion))) { HeroSfx(h.Key, m, true); HeroSfx(h.Key, m, false); } }
             if (Battle is CoreBattle cb) keys.AddRange(cb.SpineKeys());
             foreach (var k in keys)
@@ -515,8 +540,27 @@ namespace Bolzena
                 else if (Hand.Lifted) foes = Battle.PreviewCard(Hand.Held, FirstAliveEnemy());
                 if (Hand.Lifted || Hand.Aim >= 0) party = Battle.PreviewPartyOf(Hand.Held);
             }
+            // 겨눈 카드 · 고학년 주인의 성격 — 적 머리 위 약점 아이콘이 빛난다(공명은 늘 · 「약점 공격」 카드도)
+            string aimNat = null;
+            int aimHero = -1;
+            bool weakTag = false;
+            if (UltSel >= 0) { aimHero = UltSel; aimNat = UltSel < Battle.Snapshot.Heroes.Count ? Battle.Snapshot.Heroes[UltSel].Nature : null; }
+            else if (Hand.Held >= 0 && Hand.Held < Hand.Cards.Count)
+            {
+                var ci = Hand.Cards[Hand.Held].Info;
+                aimHero = ci.Owner >= 0 ? ci.Owner : ci.Hero;
+                aimNat = ci.Nature;
+                weakTag = ci.Tags != null && (ci.Tags.Contains("약점") || ci.Tags.Contains("약점 공격"));
+            }
             for (int i = 0; i < EnemyHuds.Count; i++)
-                if (EnemyHuds[i] != null) EnemyHuds[i].SetPreview(foes != null && i < foes.Count ? foes[i] : null);
+            {
+                if (EnemyHuds[i] == null) continue;
+                var pf = foes != null && i < foes.Count ? foes[i] : null;
+                EnemyHuds[i].SetPreview(pf);
+                // 약점인가는 core 가 정한다(WeakFor — 성격 · 공명은 늘 · 적 표식) + 카드의 「약점 공격」
+                bool weak = pf != null && (weakTag || Battle.WeakFor(aimHero, i));
+                EnemyHuds[i].SetAim(weak ? aimNat : null, weak);
+            }
             Hud.SetPreview(party);
             if (foes != null || party != null) Emit("preview");
         }
@@ -524,7 +568,7 @@ namespace Bolzena
         void ClearPreview()
         {
             pvKey = (-9, -9, false, -9, -9);
-            foreach (var h in EnemyHuds) if (h != null) h.SetPreview(null);
+            foreach (var h in EnemyHuds) if (h != null) { h.SetPreview(null); h.SetAim(null, false); }
             Hud.SetPreview(null);
         }
 
@@ -566,10 +610,18 @@ namespace Bolzena
             {
                 int i = Enemies.Count;
                 var es = s.Enemies[i];
+                // 빈 자리 — 소환 자리 중 지금 선 적들과 가장 먼 곳(차례로 고르면 이미 선 적과 겹칠 수 있었다)
                 var pos = SummonPos[summoned++ % SummonPos.Length];
-                var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, UnitScale * 1.0f, pos, 34 - i * 2);
+                float bestD = -1;
+                foreach (var cand in SummonPos)
+                {
+                    float d = float.MaxValue;
+                    foreach (var en in Enemies) if (en != null && en.gameObject.activeSelf) d = Mathf.Min(d, Vector2.Distance(cand, en.Home));
+                    if (d > bestD) { bestD = d; pos = cand; }
+                }
+                var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, UnitScale * 1.0f, pos, 34 - i * 2, Look.EnemyIconAs(es.Id, es.Nature), es.Name, Look.IsStandIn(es.Id));
                 u.Ref = UnitRef.Enemy(i);
-                u.Mood = (es.Skin ?? "").Replace("Skin_", "");
+                u.Mood = (es.Skin ?? "").Replace("Skin_", "").Replace("Joly", "Jolly");   // 판 성격 애니(Attack1_1_Cool …) — 오리카 오타 스킨도
                 Enemies.Add(u);
                 var hud = EnemyHud.Attach(u, es, i);
                 int ii = i;
@@ -709,7 +761,7 @@ namespace Bolzena
                     var cv = Hand.Find(e.Card.Id);
                     if (cv == null) break;
                     Hand.Remove(cv);
-                    StartCoroutine(CardUse(cv, Heroes[Mathf.Clamp(e.Card.Hero, 0, Heroes.Count - 1)]));
+                    StartCoroutine(CardUse(cv, Heroes[Mathf.Clamp(e.Card.Hero >= 0 ? e.Card.Hero : e.Card.Owner, 0, Heroes.Count - 1)]));
                     Sfx.Play("card_play", 0.4f);
                     yield return Clock.WaitU(0.12f);
                     break;
@@ -729,12 +781,15 @@ namespace Bolzena
                     Hud.SetSnapshot(s);
                     break;
                 }
+                case EventKind.Form:
+                    yield return FormFx(e);
+                    break;
                 case EventKind.Recover:
                 {
                     int i = e.Target.Index;
                     if (i >= EnemyHuds.Count || EnemyHuds[i] == null) break;
                     EnemyHuds[i].SetBroken(false);
-                    EnemyHuds[i].SetTough(e.HpAfter, false);
+                    EnemyHuds[i].SetTough(e.FAfter, false);
                     Enemies[i].Idle();
                     Vfx.Word(Enemies[i].Top + new Vector3(0, 0.3f, 0), "회복", 0.4f, new Color(0.85f, 0.95f, 1f), new Color(0, 0.1f, 0.25f));
                     yield return Clock.Wait(0.35f);
@@ -756,7 +811,7 @@ namespace Bolzena
         // 카드 이동 쪽지 Label → 낱말(최소 연출 — 카드 위에 떠오른다)
         static readonly Dictionary<string, string> LabelKo = new Dictionary<string, string>
         {
-            ["forget"] = "망각", ["remove"] = "제거", ["bond"] = "결속", ["evolve"] = "진화", ["transform"] = "변신", ["pull"] = "끌어옴",
+            ["form"] = "변신", ["forget"] = "망각", ["remove"] = "제거", ["bond"] = "결속", ["evolve"] = "진화", ["transform"] = "변신", ["pull"] = "끌어옴",
             ["burn"] = "소멸", ["evaporate"] = "증발", ["recall"] = "회수", ["make"] = "생성", ["connect"] = "연결",
         };
 
@@ -777,7 +832,8 @@ namespace Bolzena
                     Sfx.Play("block_gain", 0.6f);
                     foreach (var h in Heroes)
                     {
-                        Vfx.Glow(h.Center, 2.6f, new Color(0.45f, 0.75f, 1f, 0.8f), 0.45f, 2.4f, "FX_IN_Ring_ShockWave_03", 120);
+                        if (Bolzena.Fx.BolzenaFx.Common("shield", h.Fx) == null)   // 원작 실드(이드) — 없으면 자체 고리
+                            Vfx.Glow(h.Center, 2.6f, new Color(0.45f, 0.75f, 1f, 0.8f), 0.45f, 2.4f, "FX_IN_Ring_ShockWave_03", 120);
                         h.Flash(new Color(0.6f, 0.85f, 1f), 0.3f, 0.6f);
                     }
                     var at = Heroes[Mathf.Clamp(e.Target.Index, 0, Heroes.Count - 1)].Top + new Vector3(0, 0.2f, 0);
@@ -789,6 +845,13 @@ namespace Bolzena
                 int i = e.Target.Index;
                 if (i >= EnemyHuds.Count || EnemyHuds[i] == null) return;
                 EnemyHuds[i].SetBlock(e.BlockAfter);
+                if (e.Value < 0)
+                {
+                    // 방어 · 실드가 사라짐 — 방패 조각이 흩어지고 「방어 사라짐」
+                    EnemyHuds[i].ShieldBreak();
+                    Sfx.Play("block_hit", 0.45f, 0.8f);
+                    Vfx.Word(Enemies[i].Top + new Vector3(0, 0.2f, 0), "방어 -" + (-e.Value), 0.34f, new Color(0.7f, 0.8f, 0.95f), new Color(0, 0.05f, 0.15f));
+                }
                 if (e.Value > 0)
                 {
                     Sfx.Play("block_gain", 0.5f);
@@ -813,7 +876,7 @@ namespace Bolzena
                 yield return Clock.Wait(0.3f);
                 Hud.SetTurn(s.Turn, s.Wave, s.WaveCount);
                 Emit("boss_banner_start");
-                yield return Banners.Boss(ScreenRoot, b.Key, b.Skin, b.Name, "구역 보스  ·  강인도 " + b.MaxTough);
+                yield return Banners.Boss(ScreenRoot, b.Key, b.Skin, b.Name, (b.ToughMaxV > 0 ? "구역 보스  ·  강인도 " + EnemyHud.Thirds(b.ToughMaxV) : "구역 보스"));
             }
             int n = s.Enemies.Count;
             int bossI = s.Enemies.FindIndex(x => x.Boss);
@@ -823,12 +886,12 @@ namespace Bolzena
                 var es = s.Enemies[i];
                 Vector3 pos;
                 if (es.Boss) pos = n == 1 ? BossPos : new Vector3(3.3f, -1.45f, 0);
-                else if (bossI >= 0) { pos = k == 0 ? new Vector3(6.3f, -0.95f, 0) : new Vector3(6.7f, -1.6f, 0); k++; }
-                else pos = EnemyPosN[Mathf.Clamp(n, 1, 3) - 1][Mathf.Min(i, 2)];
+                else if (bossI >= 0) { pos = k == 0 ? new Vector3(6.3f, -0.95f, 0) : k == 1 ? new Vector3(6.7f, -1.6f, 0) : new Vector3(1.5f + (k - 2) * 0.9f, -1.6f + (k % 2) * 0.5f, 0); k++; }
+                else pos = EnemySlot(n, i);
                 float sc = es.Boss ? UnitScale * 1.0f : UnitScale * 1.1f;
-                var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, sc, pos, es.Boss ? 30 : 36 - i * 2);
+                var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, sc, pos, es.Boss ? 30 : 36 - i * 2, Look.EnemyIconAs(es.Id, es.Nature), es.Name, Look.IsStandIn(es.Id));
                 u.Ref = UnitRef.Enemy(i);
-                u.Mood = (es.Skin ?? "").Replace("Skin_", "");
+                u.Mood = (es.Skin ?? "").Replace("Skin_", "").Replace("Joly", "Jolly");   // 판 성격 애니(Attack1_1_Cool …) — 오리카 오타 스킨도
                 Enemies.Add(u);
                 var hud = EnemyHud.Attach(u, es, i);
                 int ii = i;
@@ -883,7 +946,8 @@ namespace Bolzena
             }
             skipPlayed = info.Id;
             var evs = Battle.PlayCard(handIndex, target, choice, branch);
-            StartCoroutine(CardUse(cv, Heroes[Mathf.Clamp(info.Hero, 0, Heroes.Count - 1)]));
+            if (choice >= 0) Bolzena.Fx.BolzenaFx.Common("oracle", Heroes[Mathf.Clamp(info.Hero >= 0 ? info.Hero : info.Owner, 0, Heroes.Count - 1)].Fx);   // 신탁을 골랐다
+            StartCoroutine(CardUse(cv, Heroes[Mathf.Clamp(info.Hero >= 0 ? info.Hero : info.Owner, 0, Heroes.Count - 1)]));
             Sfx.Play("card_play", 0.5f);
             Sfx.Play(info.Type == CardType.Attack ? "card_swing" : "card_skill", 0.4f);
             yield return Clock.WaitU(0.12f);

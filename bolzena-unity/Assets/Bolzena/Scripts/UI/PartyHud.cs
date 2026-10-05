@@ -27,7 +27,9 @@ namespace Bolzena.UI
         SpriteRenderer autoKnob, autoTrack, autoIcon, clockRing;
         public System.Action<int> OnHero;           // 왼쪽 위 초상을 누름 — 사도 정보
         public BattleSnapshot Snap;                 // 툴팁이 읽는 지금 모습
-        readonly List<SpriteRenderer> segs = new List<SpriteRenderer>();
+        SpriteRenderer gaugeFill, gaugeLead, gaugeBg;
+        TextMeshPro gaugeMaxText;
+        readonly List<(int need, SpriteRenderer line, TextMeshPro num)> ticks = new List<(int, SpriteRenderer, TextMeshPro)>();
         readonly List<Portrait> portraits = new List<Portrait>();
         readonly List<(Transform t, TextMeshPro n)> heads = new List<(Transform, TextMeshPro)>();
         public readonly List<UltButton> Ults = new List<UltButton>();
@@ -40,8 +42,10 @@ namespace Bolzena.UI
         const float StripY = 3.78f, StripW = 1.5f, StripDx = 1.62f;
         static readonly Vector3 TurnAt = new Vector3(-7.42f, 0.62f, 0), DeckAt = new Vector3(-7.45f, -0.5f, 0);
         static readonly Vector3 DiscAt = new Vector3(7.45f, -0.5f, 0), GoneAt = new Vector3(7.45f, 0.42f, 0);
-        static readonly Vector3 GaugeAt = new Vector3(-7.5f, -1.95f, 0);
-        const float UltX = -6.38f, UltY0 = -2.28f, UltDy = 0.72f;
+        // 고학년 — 왼쪽 열: 「고학년」 · 큰 %(실제 값) · 「/ 최대」 → 세로 막대(부드러운 채움 + 사도마다 필요치 눈금). 오른쪽: 사도 띠 셋
+        static readonly Vector3 GaugeAt = new Vector3(-7.42f, -1.86f, 0);
+        const float GBarX = -7.3f, GBarTop = -2.32f, GBarBot = -4.16f, GBarW = 0.2f;
+        const float UltX = -5.86f, UltY0 = -2.62f, UltDy = 0.74f;
         static readonly Vector3 ApAt = new Vector3(0, -3.92f, 0), HandAt = new Vector3(0, -4.34f, 0);
         static readonly Vector3 EndAt = new Vector3(7.02f, -3.58f, 0);
         const float EndD = 1.22f;
@@ -164,14 +168,30 @@ namespace Bolzena.UI
 
             // ── 왼쪽 아래 — 고학년 게이지(큰 % + 세로 칸) · 고학년 띠 셋 ──
             Make.Box("fadeBL", bl, Res.UI("hud_fade"), new Vector3(-6.4f, -3.0f, 0), new Vector2(3.6f, 3.4f), O - 6, new Color(1, 1, 1, 0.55f));
-            Txt("glbl", bl, "고학년", GaugeAt + new Vector3(0, 0.28f, 0), 0.12f, O + 3, Tone.Sub, TextAlignmentOptions.Center, 0.24f);
-            gaugeText = Txt("gval", bl, "", GaugeAt, 0.34f, O + 3, Tone.Gold, TextAlignmentOptions.Center, 0.22f);
-            int nSeg = Mathf.Clamp(gaugeMax / 50, 3, 8);
-            for (int i = 0; i < nSeg; i++)
-                segs.Add(Make.Sliced("seg" + i, bl, Res.UI("bar_fill_9s"), GaugeAt + new Vector3(0, -0.36f - (nSeg - 1 - i) * 0.24f, 0), new Vector2(0.32f, 0.16f), O + 2));
-            var gz = Make.Node("gzone", bl, GaugeAt + new Vector3(0, -0.36f - nSeg * 0.12f, 0));
-            TipZone.Add(gz, new Vector2(0.8f, nSeg * 0.24f + 0.9f), () => Tip.Head("고학년 게이지") +
-                $"  {gauge}% / {gaugeMax}%\n파티가 함께 쓰는 게이지 — 카드에 쓴 AP 1 마다 10%. 칸 하나 = 50%. 사도마다 고학년 값만큼 차면 그 띠가 반짝입니다.", 2);
+            // 공용 게이지 머리 — 원작 공용 고학년 아이콘(사도 하나에 묶이지 않는 자리), 없으면 글
+            var ulIc = Res.Sprite("Art/ultimate_icon_common3");
+            if (ulIc != null) Make.Box("glbl", bl, ulIc, GaugeAt + new Vector3(0, 0.36f, 0), new Vector2(0.34f, 0.34f), O + 3);
+            else Txt("glbl", bl, "고학년", GaugeAt + new Vector3(0, 0.3f, 0), Tone.Cap, O + 3, Tone.Sub, TextAlignmentOptions.Center, 0.24f);
+            gaugeText = Txt("gval", bl, "", GaugeAt, 0.4f, O + 3, Tone.Gold, TextAlignmentOptions.Center, 0.22f);
+            gaugeMaxText = Txt("gmax", bl, "", GaugeAt + new Vector3(0, -0.3f, 0), Tone.Cap, O + 3, Tone.Dim, TextAlignmentOptions.Center, 0.24f);
+            // 세로 막대 — 바탕 · 부드러운 채움(아래부터) · 채움 끝 빛
+            float gH = GBarTop - GBarBot, gMid = (GBarTop + GBarBot) / 2;
+            gaugeBg = Make.Sliced("gbg", bl, Res.UI("bar_bg_9s"), new Vector3(GBarX, gMid, 0), new Vector2(GBarW + 0.06f, gH + 0.06f), O + 1, new Color(0.06f, 0.08f, 0.16f, 0.92f));
+            gaugeFill = Make.Sliced("gfill", bl, Res.UI("bar_fill_9s"), new Vector3(GBarX, GBarBot, 0), new Vector2(GBarW, 0.05f), O + 2, new Color(0.45f, 0.8f, 1f));
+            gaugeLead = Make.Box("glead", bl, Res.UI("soft"), new Vector3(GBarX, GBarBot, 0), new Vector2(0.62f, 0.2f), O + 3, new Color(0.8f, 0.95f, 1f, 0.8f), Res.SpriteMat(true, 1.6f));
+            // 사도마다 필요치 눈금(같은 값은 하나로) — 막대를 가로지르는 선 + 왼쪽에 값
+            var needs = new SortedSet<int>();
+            foreach (var hh in s.Heroes) if (hh.UltMax > 0 && hh.UltMax <= gaugeMax) needs.Add(hh.UltMax);
+            foreach (var n in needs)
+            {
+                float y = GBarBot + gH * n / gaugeMax;
+                var ln = Make.Box("tick" + n, bl, Res.UI("white"), new Vector3(GBarX, y, 0), new Vector2(GBarW + 0.16f, 0.025f), O + 4, new Color(1, 1, 1, 0.55f));
+                var nt = Txt("tickv" + n, bl, n.ToString(), new Vector3(GBarX - 0.2f, y, 0), 0.115f, O + 4, Tone.Sub, TextAlignmentOptions.Right, 0.3f);
+                ticks.Add((n, ln, nt));
+            }
+            var gz = Make.Node("gzone", bl, new Vector3(GaugeAt.x, (GaugeAt.y + 0.4f + GBarBot) / 2, 0));
+            TipZone.Add(gz, new Vector2(0.9f, GaugeAt.y + 0.5f - GBarBot), () => Tip.Head("고학년 게이지") +
+                $"  {gauge}% / {gaugeMax}%\n파티가 함께 쓰는 게이지 — 카드에 쓴 AP 1 마다 +10%. 막대의 눈금은 사도마다 고학년에 드는 값, 그 선을 넘으면 그 사도 띠가 반짝입니다.", 2);
             for (int i = 0; i < s.Heroes.Count; i++)
                 Ults.Add(UltButton.Create(bl, s.Heroes[i], i, new Vector3(UltX, UltY0 - i * UltDy, 0)));
 
@@ -428,14 +448,26 @@ namespace Bolzena.UI
             var hand = BattleDirector.I != null ? BattleDirector.I.Hand : null;
             int hc = hand != null ? hand.Cards.Count : 0;
             handText.text = $"{hc:00}<color={Tone.DimTag}>/{Bolzena.Core.R.HAND_MAX:00}</color>";
-            // 고학년 게이지 — 큰 % · 칸(하나 50%)
-            gaugeShown = Mathf.MoveTowards(gaugeShown, gauge, Time.unscaledDeltaTime * 200f);
-            gaugeText.text = Mathf.RoundToInt(gaugeShown) + "<size=50%>%</size>";
-            float per = gaugeMax / (float)Mathf.Max(1, segs.Count);
-            for (int i = 0; i < segs.Count; i++)
+            // 고학년 게이지 — 큰 %(실제 값) · 부드러운 세로 채움 · 필요치 눈금
+            gaugeShown = Mathf.MoveTowards(gaugeShown, gauge, Time.unscaledDeltaTime * Mathf.Max(120f, Mathf.Abs(gauge - gaugeShown) * 4f));
+            gaugeText.text = Mathf.RoundToInt(gaugeShown) + "<size=45%>%</size>";
+            gaugeMaxText.text = "/ " + gaugeMax + "%";
             {
-                float f = Mathf.Clamp01((gaugeShown - i * per) / per);
-                segs[i].color = f >= 1 ? new Color(0.62f, 0.88f, 1f) : f > 0 ? new Color(0.62f, 0.88f, 1f, 0.35f + 0.4f * f) : new Color(0.2f, 0.24f, 0.34f, 0.9f);
+                float gH = GBarTop - GBarBot, gf = Mathf.Clamp01(gaugeShown / gaugeMax), fh = gH * gf;
+                bool any = false;
+                foreach (var u in Ults) if (u.State != null && !u.State.Dead && gaugeShown >= u.State.UltMax) any = true;
+                gaugeFill.enabled = fh > 0.02f;
+                if (gaugeFill.enabled) { gaugeFill.size = new Vector2(GBarW, Mathf.Max(0.05f, fh)); gaugeFill.transform.localPosition = new Vector3(GBarX, GBarBot + fh / 2, 0); }
+                gaugeFill.color = any ? Color.Lerp(new Color(0.45f, 0.8f, 1f), new Color(1f, 0.82f, 0.45f), 0.55f + 0.15f * Mathf.Sin(Clock.Now * 3f)) : new Color(0.45f, 0.8f, 1f);
+                gaugeLead.enabled = gaugeFill.enabled && gf < 0.999f;
+                gaugeLead.transform.localPosition = new Vector3(GBarX, GBarBot + fh, 0);
+                var lc = gaugeLead.color; lc.a = 0.55f + 0.25f * Mathf.Sin(Clock.Now * 4f); gaugeLead.color = lc;
+                foreach (var (need, line, num) in ticks)
+                {
+                    bool on = gaugeShown >= need;
+                    line.color = on ? new Color(1f, 0.86f, 0.5f) : new Color(1, 1, 1, 0.55f);
+                    num.color = on ? Tone.Gold : Tone.Sub;
+                }
             }
             for (int i = 0; i < Ults.Count; i++) Ults[i].Gauge = gaugeShown;
             // 사도 머리 위 키워드 표시
@@ -466,6 +498,10 @@ namespace Bolzena.UI
     public static class Slant
     {
         public static SpriteRenderer Face(string name, Transform p, string heroKey, Vector3 at, Vector2 size, int order, float centerX = 0)
+            => Face(name, p, CardView.Face(heroKey, size.x / size.y), at, size, order, centerX);
+
+        // 그림을 바로 받는 판 — 고학년 띠의 원작 볼따구(icon_graduateskill_<키>)
+        public static SpriteRenderer Face(string name, Transform p, Sprite sp, Vector3 at, Vector2 size, int order, float centerX = 0)
         {
             var node = Make.Node(name, p, at);
             var mask = node.gameObject.AddComponent<SpriteMask>();
@@ -475,10 +511,12 @@ namespace Bolzena.UI
             mask.backSortingOrder = order - 1;
             var b = mask.sprite.bounds.size;
             node.localScale = new Vector3(size.x / b.x, size.y / b.y, 1);
-            var sp = CardView.Face(heroKey, size.x / size.y);
             if (sp == null) return null;
             var f = Make.Sprite("face", p, sp, at + new Vector3(centerX, 0, 0), order);
-            Make.Fit(f, size);
+            // 가로세로 같은 배율로 칸을 덮는다(넘친 곳은 마스크가 오림) — 네모 볼따구를 띠 비율로 늘리면 찌그러진다
+            var sb = sp.bounds.size;
+            float k = Mathf.Max(size.x / sb.x, size.y / sb.y);
+            f.transform.localScale = new Vector3(k, k, 1);
             f.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
             return f;
         }
@@ -521,7 +559,8 @@ namespace Bolzena.UI
             var h = state;
             if (h == null) return null;
             var s = Tip.Head(h.Name) + "  " + Tip.Dim($"{h.Role} · {h.Nature}");
-            if (!string.IsNullOrEmpty(h.KeywordName)) s += "\n" + $"<color={Tone.GoldTag}>{h.KeywordName}</color> {h.KeywordStacks}" + (string.IsNullOrEmpty(h.KeywordText) ? "" : "\n" + h.KeywordText);
+            if (!string.IsNullOrEmpty(h.KeywordName)) s += "\n" + $"<color={Tone.GoldTag}>{h.KeywordName}</color> {h.KeywordStacks}" + (string.IsNullOrEmpty(h.KeywordShort) ? "" : "\n" + h.KeywordShort)
+                + (string.IsNullOrEmpty(h.KeywordText) || h.KeywordText == h.KeywordShort ? "" : "\n" + Tip.Dim("자세히 — " + h.KeywordText));   // 짧은 글 + 자세히
             s += "\n" + Tip.Dim("누르면 사도 정보");
             return s;
         }
@@ -559,10 +598,11 @@ namespace Bolzena.UI
         public bool Selected;
         public float Gauge;
         SpriteRenderer face, glow, rim, spark, fillBar;
-        TextMeshPro label, costText;
+        TextMeshPro label, costText, nameText, stateText;
         public bool Ready;
         const int O = 570;
-        public const float SW = 1.48f, SH = 0.56f;
+        public const float SW = 2.4f, SH = 0.64f;
+        const float FaceW = 0.92f;          // 오른쪽 초상 너비 — 왼쪽은 값 상자 · 고학년 이름 · 남은 양
         public const float D = 0.9f;                 // 정보 창 자리 잡기용 대략 크기
 
         public static UltButton Create(Transform parent, HeroState h, int idx, Vector3 pos)
@@ -573,14 +613,30 @@ namespace Bolzena.UI
             b.glow = Make.Box("glow", t, Res.UI("soft"), Vector3.zero, new Vector2(SW * 1.5f, SH * 2.4f), O - 2, new Color(1f, 0.8f, 0.4f, 0), Res.SpriteMat(true, 1.6f));
             b.rim = Make.Box("rim", t, Res.UI("slant"), Vector3.zero, new Vector2(SW + 0.06f, SH + 0.06f), O - 1, new Color(1, 1, 1, 0.25f));
             Make.Box("bg", t, Res.UI("slant"), Vector3.zero, new Vector2(SW, SH), O, new Color(0.04f, 0.06f, 0.13f, 0.92f));
-            b.face = Slant.Face("face", t, h.Key, new Vector3(0.12f, 0, 0), new Vector2(SW - 0.24f, SH), O + 1);
+            // 얼굴 — 원작 고학년 단추의 볼따구(Art/icon_graduateskill_<키>), 없으면 초상 얼굴
+            var gs = Res.Sprite("Art/icon_graduateskill_" + h.Key);
+            b.face = gs != null ? Slant.Face("face", t, gs, new Vector3(SW / 2 - FaceW / 2 - 0.04f, 0, 0), new Vector2(FaceW, SH), O + 1)
+                                : Slant.Face("face", t, h.Key, new Vector3(SW / 2 - FaceW / 2 - 0.04f, 0, 0), new Vector2(FaceW, SH), O + 1);
             // 차오름 — 띠 아래 가는 줄
-            b.fillBar = Make.Box("fill", t, Res.UI("white"), new Vector3(0, -SH / 2 + 0.02f, 0), new Vector2(SW - 0.1f, 0.035f), O + 3, Tone.Gold);
-            // 값 상자 — 왼쪽(비용)
-            var cb = new Vector3(-SW / 2 + 0.2f, 0.06f, 0);
-            Make.Sliced("costbg", t, Res.UI("cell_9s"), cb, new Vector2(0.36f, 0.32f), O + 3);
-            b.costText = Make.Text("cost", t, (h.UltMax / 10).ToString(), cb + new Vector3(0, -0.005f, 0), Tone.Md, O + 4, Color.white);
+            b.fillBar = Make.Box("fill", t, Res.UI("white"), new Vector3(0, -SH / 2 + 0.025f, 0), new Vector2(SW - 0.1f, 0.04f), O + 3, Tone.Gold);
+            // 값 상자 — 왼쪽 위(이 사도 고학년에 드는 게이지, 실제 %)
+            var cb = new Vector3(-SW / 2 + 0.38f, 0.13f, 0);
+            Make.Sliced("costbg", t, Res.UI("cell_9s"), cb, new Vector2(0.62f, 0.28f), O + 3);
+            b.costText = Make.Text("cost", t, h.UltMax + "<size=60%>%</size>", cb + new Vector3(0, -0.005f, 0), Tone.Body, O + 4, Color.white);
             Make.Outline(b.costText, 0.25f, Tone.Outline);
+            // 남은 양(또는 「사용 가능」) — 값 상자 아래
+            b.stateText = Make.Text("ustate", t, "", new Vector3(-SW / 2 + 0.74f, 0.13f, 0), Tone.Cap, O + 4, Tone.Sub, TextAlignmentOptions.Left);
+            b.stateText.rectTransform.pivot = new Vector2(0, 0.5f);
+            b.stateText.rectTransform.sizeDelta = new Vector2(SW - FaceW - 0.76f, 0.2f);
+
+            b.stateText.textWrappingMode = TextWrappingModes.NoWrap;
+            Make.Outline(b.stateText, 0.3f, Tone.Outline);
+            // 고학년 이름 — 띠 안 아랫줄(초상 왼쪽까지)
+            b.nameText = Make.Text("uname", t, h.UltName ?? "", new Vector3(-SW / 2 + 0.1f, -0.14f, 0), Tone.Cap, O + 4, Tone.Sub, TextAlignmentOptions.Left);
+            b.nameText.rectTransform.pivot = new Vector2(0, 0.5f);
+            b.nameText.rectTransform.sizeDelta = new Vector2(SW - FaceW - 0.12f, 0.2f);
+            b.nameText.textWrappingMode = TextWrappingModes.NoWrap; b.nameText.overflowMode = TextOverflowModes.Ellipsis;
+            Make.Outline(b.nameText, 0.3f, Tone.Outline);
             b.spark = Make.Box("spark", t, Res.UI("ic_spark"), new Vector3(SW / 2 - 0.16f, SH / 2 - 0.08f, 0), new Vector2(0.3f, 0.3f), O + 4, Color.white, Res.SpriteMat(false, 1.5f));
             b.label = Make.Text("label", t, "대상 선택", new Vector3(SW / 2 + 0.1f, 0, 0), Tone.Cap, O + 4, Tone.Gold, TextAlignmentOptions.Left);
             b.label.rectTransform.pivot = new Vector2(0, 0.5f);
@@ -614,7 +670,9 @@ namespace Bolzena.UI
         {
             var h = State;
             if (h == null) return null;
-            var s = Tip.Head($"{h.Name} · 「{h.UltName}」") + "\n" + h.UltText + "\n" + Tip.Dim($"게이지 {h.Ult}% / {h.UltMax}% (파티 공용 — 카드에 쓴 AP 1 마다 10% · 띠 왼쪽 숫자 = 칸 수 ×10%)");
+            // 짧은 글(CardText.Short) 먼저, 자세히(효과 전부)는 흐리게 아래
+            string body = string.IsNullOrEmpty(h.UltShort) ? h.UltText : h.UltShort + (h.UltText != h.UltShort ? "\n" + Tip.Dim("자세히 — " + h.UltText) : "");
+            var s = Tip.Head($"{h.Name} · 「{h.UltName}」") + "\n" + body + "\n" + Tip.Dim($"게이지 {Mathf.RoundToInt(Gauge)}% / 필요 {h.UltMax}%" + " (파티 공용 — 카드에 쓴 AP 1 마다 +10%)");
             s += "\n\n" + Tip.Dim(Ready ? "눌러서 고르고, 적(또는 다시 이 띠)을 눌러 쓴다 · 단축키 Z X C" : "게이지가 모자랍니다") + "\n" + Tip.Dim("오른쪽 클릭 · 길게 누르기 — 사도 정보");
             return s;
         }
@@ -634,7 +692,10 @@ namespace Bolzena.UI
             c.a = Selected ? 0.6f : Ready ? 0.16f + 0.1f * Mathf.Sin(Clock.Now * 4f) : 0f;
             glow.color = c;
             if (face) face.color = Ready || Selected ? Color.white : new Color(0.45f, 0.47f, 0.55f);
-            costText.color = Ready ? Tone.Gold : Tone.Sub;
+            costText.color = Ready ? Tone.Gold : Tone.Ink;
+            stateText.text = State != null && State.Dead ? "쓰러짐" : Ready ? "사용 가능" : "";   // 남은 양은 적지 않는다(사용자 2026-10-05)
+            stateText.color = Ready ? new Color(1f, 0.86f, 0.5f, 0.8f + 0.2f * Mathf.Sin(Clock.Now * 5f)) : new Color(0.62f, 0.85f, 1f);
+            nameText.color = Ready ? new Color(1f, 0.92f, 0.75f) : Tone.Sub;
             float sx = Mathf.MoveTowards(transform.localScale.x, Selected ? 1.06f : 1f, Time.unscaledDeltaTime * 2f);
             transform.localScale = new Vector3(sx, sx, 1);
         }

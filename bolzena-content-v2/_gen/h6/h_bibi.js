@@ -6,7 +6,7 @@ L.hero({
   id: '비비', name: '비비', nature: '순수', row: 'front', role: '탱커', star: 3, hp: 990, atk: 84, def: 79, crit: 5,
   blurb: '은의 용족 행세를 하는 수은의 용족 귀족. 보호막을 든 채 재채기를 참아 두었다가, 누가 막을 깨면 그 적에게 수은을 뿜는다.',
   keyword: {
-    name: KW, desc: '보호막 뒤에서 참아 둔 수은 재채기. 파티 실드가 적의 공격에 깨지면 1 써서 그 적에게 뿜는다', carrier: 'self', cap: 3,
+    name: KW, desc: '파티 실드가 적에게 깨지면 하나 써서 그 적에게 되쏜다(막은 양 비례)', carrier: 'self', cap: 3,
     rules: [
       { name: '수은 재채기', when: { on: 'shieldBreak' }, conds: [{ c: 'stack', id: KW, n: 1 }], limit: { per: 'turn', n: 2 },
         fx: [K('perEvent', { per: 100 }), dDef(0.3)] },

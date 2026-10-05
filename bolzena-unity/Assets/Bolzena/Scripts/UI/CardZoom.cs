@@ -42,9 +42,27 @@ namespace Bolzena.UI
             if (note != null) terms.Insert(0, new Term("지금은 못 냅니다", note, "no"));
             foreach (var t in terms)
             {
+                if (t.Kind == "card" && t.Card != null)
+                {
+                    // 생성 카드 — 이름 줄 + 작은 카드(코스트 · 이름 · 종류 · 효과 글)
+                    float cs = 0.62f * k, chh = CardView.H * cs;
+                    var hd = Tone.Text("h", panels, "<color=#8FD3FF>▣</color> " + t.Word, new Vector3(0.2f, y - 0.14f, 0), Tone.Md * k, O + 3, Tone.Ink, TextAlignmentOptions.TopLeft, false, PanelW * k);
+                    var sub = Tone.Text("s", panels, t.Text, new Vector3(0.2f, y - 0.14f - 0.3f * k, 0), Tone.Cap * k, O + 3, Tone.Sub, TextAlignmentOptions.TopLeft, false, PanelW * k);
+                    float top = 0.14f + 0.3f * k + 0.26f * k;
+                    var mini = CardView.Create(panels, t.Card);
+                    mini.ShowDesc = true; mini.ShowPin = false; mini.Playable = true;
+                    mini.TargetScale = cs; mini.TargetRot = 0; mini.TargetPos = new Vector3(PanelW * k / 2, y - top - chh / 2, 0);
+                    mini.Snap(); mini.SetOrder(O + 4);
+                    float hc = top + chh + 0.16f;
+                    Make.Sliced("bg", panels, Res.UI("bar_fill_9s"), new Vector3(PanelW * k / 2, y - hc / 2, 0), new Vector2(PanelW * k, hc), O + 1, new Color(0.03f, 0.04f, 0.08f, 1f));
+                    Make.Box("top", panels, Res.UI("white"), new Vector3(PanelW * k / 2, y - 0.012f, 0), new Vector2(PanelW * k - 0.1f, 0.024f), O + 2, new Color(0.56f, 0.83f, 1f, 0.8f));
+                    y -= hc + 0.08f;
+                    continue;
+                }
                 bool bad = t.Kind == "no" || (t.Kind == "status" && Bolzena.Core.R.IsBadSt(t.Word));
                 var head = Tone.Text("h", panels, t.Word, new Vector3(0.2f, y - 0.14f, 0), Tone.Md * k, O + 3, t.Kind == "flash" ? Tone.Gold : Tone.Ink, TextAlignmentOptions.TopLeft, false, PanelW * k);
-                var body = Tone.Text("b", panels, Hilite(t.Text), new Vector3(0.2f, y - 0.14f - 0.34f * k, 0), Tone.Sm * k, O + 3, Tone.Sub, TextAlignmentOptions.TopLeft, true, (PanelW - 0.4f) * k);
+                string bodyText = Hilite(t.Text) + (string.IsNullOrEmpty(t.Detail) || t.Detail == t.Text ? "" : "\n<size=88%><color=" + Tone.DimTag + ">자세히 — </color>" + Hilite(t.Detail) + "</size>");
+                var body = Tone.Text("b", panels, bodyText, new Vector3(0.2f, y - 0.14f - 0.34f * k, 0), Tone.Sm * k, O + 3, Tone.Sub, TextAlignmentOptions.TopLeft, true, (PanelW - 0.4f) * k);
                 body.textWrappingMode = TextWrappingModes.Normal;
                 body.lineSpacing = -2;
                 body.rectTransform.sizeDelta = new Vector2((PanelW - 0.4f) * k, 10);

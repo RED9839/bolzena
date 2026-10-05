@@ -6,7 +6,7 @@ L.hero({
   id: '실피르', name: '실피르', nature: '우울', row: 'mid', role: '딜러', star: 2, hp: 590, atk: 115, def: 27, crit: 10,
   blurb: '루드와 티격태격하는 사파이어의 용족, 자칭 2인자. 다른 아군이 공격 카드를 낼 때마다 기록을 세어 두었다가, 제 공격으로 그 기록을 넘으면 기세가 오른다.',
   keyword: {
-    name: KW, desc: '다른 아군이 세운 기록. 다른 아군이 공격 카드를 내면 +1, 둘 이상일 때 실피르가 공격 카드를 내면 모두 써서 AP +1 · 사기 1', carrier: 'self', cap: 3,
+    name: KW, desc: '다른 아군의 공격 기록 — 둘 이상일 때 실피르가 공격하면 모두 써서 AP · 사기', carrier: 'self', cap: 3,
   },
   passives: [
     { name: '넘버 투', when: { on: 'play', who: 'other', type: '공격' }, limit: { per: 'turn', n: 2 }, fx: [stk(KW, 1)] },

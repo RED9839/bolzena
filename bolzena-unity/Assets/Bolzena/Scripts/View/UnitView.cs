@@ -29,8 +29,11 @@ namespace Bolzena.View
         Vector3 offset, knock;
         SpriteRenderer shadow;
         float heightCache = -1;
+        SpriteRenderer iconArt;              // 스킨이 없는 적 — 스파인 대신 정지 아이콘(또는 이름 판)
+        float iconW;
 
-        public static UnitView Create(Transform parent, string name, string spineFolder, string skin, bool faceRight, float scale, Vector3 pos, int order)
+        /// <param name="icon">적만 — 요청한 스킨이 그 스파인에 없을 때 대신 세울 정지 아이콘(Resources/Art/Monster). "" 이면 이름 판. null 이면 옛 규칙(옷 입히기).</param>
+        public static UnitView Create(Transform parent, string name, string spineFolder, string skin, bool faceRight, float scale, Vector3 pos, int order, string icon = null, string label = null, bool standIn = false)
         {
             var root = Make.Node(name, parent, pos);
             var v = root.gameObject.AddComponent<UnitView>();
@@ -45,7 +48,13 @@ namespace Bolzena.View
             v.Sa = SkeletonAnimation.NewSkeletonAnimationGameObject(v.data);
             v.Sa.transform.SetParent(v.Art, false);
             v.Sa.transform.localScale = new Vector3(scale, scale, 1);
-            if (!string.IsNullOrEmpty(skin) && v.data.GetSkeletonData(true).FindSkin(skin) != null)
+            var sdata = v.data.GetSkeletonData(true);
+            bool skinMissing = icon != null && !string.IsNullOrEmpty(skin) && !HasSkin(sdata, skin);
+            // 제 스파인이 없어 대역이 선 적 — 원작 아이콘이 있으면 대역 대신 아이콘(확실한 그림만)
+            if (standIn && !string.IsNullOrEmpty(icon) && Res.Sprite("Art/Monster/" + icon) != null) { skinMissing = true; Debug.Log($"[Look] {name}: 제 스파인 없음 — 대역 대신 아이콘 {icon}"); }
+            else if (skinMissing)
+                Debug.LogWarning($"[Look] 스킨 없음 {name}: {spineFolder} 에 「{skin}」 이 없다 — 추측 그림 대신 " + (icon.Length > 0 ? "아이콘 " + icon : "이름 판"));
+            if (!string.IsNullOrEmpty(skin) && sdata.FindSkin(skin) != null)
             {
                 v.Sa.Skeleton.SetSkin(skin);
                 v.Sa.Skeleton.SetSlotsToSetupPose();
@@ -62,9 +71,37 @@ namespace Bolzena.View
             v.mpb = new MaterialPropertyBlock();
             v.Idle();
             v.Sa.AnimationState.Update(Random.value * 1.5f);
+            if (skinMissing) v.UseIcon(icon, label);
             float sw = Mathf.Max(1.4f, v.Width() * 0.75f);
             Make.Fit(v.shadow, new Vector2(sw, sw * 0.28f));
             return v;
+        }
+
+        static bool HasSkin(SkeletonData d, string skin)
+        {
+            if (d.FindSkin(skin) != null) return true;
+            foreach (var k in d.Skins) if (string.Equals(k.Name, skin, System.StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
+        }
+
+        // 스파인 몸은 그대로 두고(뼈 · 몸짓 자리) 그리지 않는다 — 그 자리에 정지 아이콘 · 이름 판
+        void UseIcon(string icon, string label)
+        {
+            mr.enabled = false;
+            var sp = string.IsNullOrEmpty(icon) ? null : Res.Sprite("Art/Monster/" + icon);
+            const float S = 1.7f;
+            if (sp != null)
+            {
+                iconArt = Make.Box("icon", Art, sp, new Vector3(0, S * 0.55f, 0), new Vector2(S, S), BaseOrder);
+                iconW = S;
+                heightCache = S * 1.1f;
+                return;
+            }
+            iconArt = Make.Sliced("plate", Art, Res.UI("bar_fill_9s"), new Vector3(0, 0.7f, 0), new Vector2(1.6f, 0.5f), BaseOrder, new Color(0.06f, 0.08f, 0.16f, 0.9f));
+            var t = Make.Text("name", Art, label ?? name, new Vector3(0, 0.7f, 0), 0.2f, BaseOrder + 1, Color.white);
+            Make.Outline(t, 0.3f, new Color(0, 0, 0, 0.9f));
+            iconW = 1.6f;
+            heightCache = 1.4f;
         }
 
         // ── 동작 ──
@@ -93,27 +130,81 @@ namespace Bolzena.View
 
         public void Idle()
         {
-            var n = Has("Idle") ? "Idle" : Resolve("Idle");
+            var n = IdleName();
             if (n != null) Sa.AnimationState.SetAnimation(0, n, true);
+        }
+
+        // ── 변신 ── 스킨은 따로 없고 변신 동작(꼬리 _DreamForm · _Change)이 그림을 바꾼다. 변신 중엔 언제나 꼬리 동작(있으면)만 튼다
+        public string FormTail;
+        public string F(string anim)
+        {
+            if (FormTail == null || anim == null || anim.EndsWith("_" + FormTail)) return anim;
+            var f = anim + "_" + FormTail;
+            return Has(f) ? f : anim;
+        }
+        string IdleName() { var n = Has("Idle") ? "Idle" : Resolve("Idle"); return F(n); }
+
+        // 변신 들고 남 — 하던 몸짓(고학년 끝 자세 = 변신 모습)은 그대로 두고 그 뒤의 쉬는 동작만 바꾼다. 풀리면 본 Idle 로 섞기 0.2초
+        public void SetForm(string tail)
+        {
+            FormTail = tail;
+            if (!SpineArt) return;
+            var st = Sa.AnimationState;
+            var cur = st.GetCurrent(0);
+            var idle = IdleName();
+            if (idle == null) return;
+            if (cur != null && !cur.Loop)
+            {
+                var e = cur;
+                while (e.Next != null && !e.Next.Loop) e = e.Next;
+                st.ClearNext(e);
+                st.AddAnimation(0, idle, true, 0).MixDuration = tail != null ? 0f : 0.2f;
+            }
+            else st.SetAnimation(0, idle, true).MixDuration = tail != null ? 0.1f : 0.2f;
         }
 
         // 한 번 하고 쉬는 동작으로. 길이(초, 속도 반영)를 돌려준다
         public float Play(string anim, float speed = 1f, bool thenIdle = true)
         {
             if (anim == null) return 0;
-            var e = Sa.AnimationState.SetAnimation(0, anim, false);
+            var e = Sa.AnimationState.SetAnimation(0, F(anim), false);
             e.TimeScale = speed;
             e.MixDuration = 0.08f;
             if (thenIdle)
             {
-                var idle = Has("Idle") ? "Idle" : Resolve("Idle");
+                var idle = IdleName();
                 if (idle != null) Sa.AnimationState.AddAnimation(0, idle, true, 0).MixDuration = 0.2f;
             }
             return e.Animation.Duration / Mathf.Max(0.01f, speed);
         }
 
+        public Spine.SkeletonData SkelData => data != null ? data.GetSkeletonData(true) : null;
+        public bool SpineArt => Sa != null && Sa.gameObject.activeSelf;
+
+        /// <summary>조각을 이어 튼다(고학년 — 에르핀 1_1 → 1_2_Loop ×2 → 1_3). 전체 길이(초, 속도 반영)를 돌려준다.</summary>
+        public float PlayChain(string first, IList<string> chain, float speed = 1f)
+        {
+            if (first == null) return 0;
+            var e = Sa.AnimationState.SetAnimation(0, F(first), false);
+            e.TimeScale = speed; e.MixDuration = 0.08f;
+            float total = e.Animation.Duration;
+            if (chain != null)
+                foreach (var n in chain)
+                {
+                    var a = data.GetSkeletonData(true).FindAnimation(F(n));
+                    if (a == null) continue;
+                    var c = Sa.AnimationState.AddAnimation(0, a, false, 0);
+                    c.TimeScale = speed; c.MixDuration = 0;
+                    total += a.Duration;
+                }
+            var idle = IdleName();
+            if (idle != null) Sa.AnimationState.AddAnimation(0, idle, true, 0).MixDuration = 0.2f;
+            return total / Mathf.Max(0.01f, speed);
+        }
+
         public void Loop(string anim)
         {
+            anim = F(anim);
             if (anim != null && Has(anim)) Sa.AnimationState.SetAnimation(0, anim, true).MixDuration = 0.15f;
         }
 
@@ -174,14 +265,94 @@ namespace Bolzena.View
         }
 
         /// <summary>지금 그려진 그림의 경계(월드) — 판정 상자에 쓴다. Height() 는 처음 잰 값을 붙들어 두어(등장 · 웅크림 때 재면) 그림보다 작을 수 있다.</summary>
-        public Bounds ArtBounds => mr.bounds;
+        public Bounds ArtBounds => iconArt != null ? iconArt.bounds : mr.bounds;
 
-        public float Width() =>Mathf.Clamp(mr.bounds.size.x / transform.lossyScale.x, 0.8f, 6f);
+        public float Width() => iconArt != null ? iconW : Mathf.Clamp(mr.bounds.size.x / transform.lossyScale.x, 0.8f, 6f);
 
         // 몸 가운데(싸움터 좌표) — 맞는 자리
         public Vector3 Center => Bone("Point_Middle", new Vector3(0, Height() * 0.42f, 0));
         public Vector3 Top => Bone("Point_Top", new Vector3(0, Height() * 0.85f, 0));
         public Vector3 Feet => transform.localPosition + Art.localPosition;
+
+        // 원작 이펙트(com.bolzena.fx) 쪽 몸 — 자리는 모두 싸움터 좌표(BolzenaFx.Parent = FieldRoot).
+        // 원작 SD 의 자리 본(Point_Bottom · Middle · Top · Front · Attack1 · Skill1 · Ult1 …)을 그대로 쓴다. 고학년 · 카드 · 맞음 · 공용이 여기를 본다
+        Bolzena.Fx.FxActor fx;
+        readonly Dictionary<string, string> pointBones = new Dictionary<string, string>();
+        public string FxKey;                 // 사도 id(에르핀) · 적 키 — 총구 표(MotionTables.MUZZLE)를 찾는다
+        public Bolzena.Fx.FxActor Fx
+        {
+            get
+            {
+                if (fx != null) return fx;
+                System.Func<Vector3?> muzzle = null;
+                if (SpineArt && Facing)
+                {
+                    var m = Bolzena.Fx.SpineMotion.Muzzle(Sa, FxKey);
+                    if (m != null) muzzle = () => { var w = m(); return w.HasValue && this ? transform.parent.InverseTransformPoint(w.Value) : (Vector3?)null; };
+                }
+                fx = new Bolzena.Fx.FxActor
+                {
+                    FeetAt = () => this ? Feet : Vector3.zero, Height = Height(), Party = Facing, Key = FxKey ?? name,
+                    Point = PointAt, Muzzle = muzzle,
+                };
+                return fx;
+            }
+        }
+
+        // 몸짓이 스스로 앞으로 가는 거리(싸움터 단위) — 조각들을 처음 자세에서 이어 돌려 몸(Point_Middle, 없으면 뿌리 아래 첫 뼈)이
+        // 앞(적 쪽)으로 가장 멀리 간 만큼. 순간이동 · 뛰어들기처럼 애니가 제 몸을 옮기는 고학년은 크다(그러면 따로 달려가지 않는다)
+        readonly Dictionary<string, float> travelCache = new Dictionary<string, float>();
+        public float Travel(IList<string> names)
+        {
+            float best = 0;
+            if (names != null) foreach (var n in names) best = Mathf.Max(best, TravelOne(n));
+            return best;
+        }
+
+        // 조각 하나 — 처음 자세에서 돌려 본 몸의 앞쪽 최대 이동(싸움터 단위). 싸움을 열 때 미리 재 둔다(PrewarmTravel)
+        public float TravelOne(string n)
+        {
+            if (!SpineArt || n == null) return 0;
+            if (travelCache.TryGetValue(n, out var got)) return got;
+            var sd = data.GetSkeletonData(true);
+            var a = sd.FindAnimation(n);
+            if (a == null) return travelCache[n] = 0;
+            var sk = new Skeleton(sd);
+            sk.SetToSetupPose(); sk.UpdateWorldTransform();
+            var b = sk.FindBone("Point_Middle") ?? (sk.RootBone.Children.Count > 0 ? sk.RootBone.Children.Items[0] : sk.RootBone);
+            float x0 = b.WorldX, best = 0;
+            for (float t = 0; t <= a.Duration + 1e-4f; t += 1f / 15f)
+            {
+                sk.SetToSetupPose();
+                a.Apply(sk, t, t, false, null, 1f, MixBlend.Setup, MixDirection.In);
+                sk.UpdateWorldTransform();
+                best = Mathf.Max(best, -(b.WorldX - x0));   // 원작 SD 는 왼쪽을 본다 — 앞 = -x
+            }
+            return travelCache[n] = best * Scale;
+        }
+
+        public void PrewarmTravel()
+        {
+            if (!SpineArt) return;
+            foreach (var a in data.GetSkeletonData(true).Animations)
+                if (a.Name.StartsWith("Ultimate", System.StringComparison.OrdinalIgnoreCase)) TravelOne(a.Name);
+        }
+
+        // 자리 본 「Point_<p>」(없으면 그것으로 시작하는 본 — Point_Attack1_Shot · 뒤가 _T 인 대상 표시는 빼고). 그림 한 장이면 null
+        Vector3? PointAt(string p)
+        {
+            if (!this || !SpineArt || Sa.Skeleton == null) return null;
+            if (!pointBones.TryGetValue(p, out var bn))
+            {
+                string want = "Point_" + p;
+                bn = Sa.Skeleton.FindBone(want) != null ? want : null;
+                if (bn == null)
+                    foreach (var b in Sa.Skeleton.Bones)
+                        if (b.Data.Name.StartsWith(want, System.StringComparison.OrdinalIgnoreCase) && !b.Data.Name.EndsWith("_T")) { bn = b.Data.Name; break; }
+                pointBones[p] = bn;
+            }
+            return bn != null ? Bone(bn, Vector3.zero) : (Vector3?)null;
+        }
 
         public void SetOrder(int order)
         {

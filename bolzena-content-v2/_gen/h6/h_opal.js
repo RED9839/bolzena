@@ -6,7 +6,7 @@ L.hero({
   id: '오팔', name: '오팔', nature: '순수', row: 'mid', role: '서포터', star: 3, hp: 660, atk: 75, def: 60, crit: 5,
   blurb: '금방 울음을 터뜨리는 아기 오팔 용. 파티가 다친 다음 날마다 눈물이 맺히고, 셋이 맺히면 보석이 되어 파티를 감싼다.',
   keyword: {
-    name: KW, desc: '다친 다음 날 맺히는 오팔빛 눈물. 셋이 맺히면 모두 써서 AP +1 · 결정화 2', carrier: 'self', cap: 3,
+    name: KW, desc: '다친 다음 날 맺히는 눈물 — 셋이면 AP · 결정화', carrier: 'self', cap: 3,
     rules: [{ name: '보석이 되다', when: { on: 'stackReach', id: KW, n: 3 }, fx: [spend(KW, 'all'), ap(1), st('결정화', 2)] }],
   },
   passives: [

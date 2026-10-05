@@ -7,7 +7,7 @@ L.hero({
   id: '제이드', name: '제이드', nature: '냉정', row: 'mid', role: '딜러', star: 3, hp: 700, atk: 125, def: 28, crit: 10,
   blurb: '절판 도서를 모으고 누구에게도 빌려주지 않는 비취의 용족 책벌레. 아끼는 책은 손에 쥔 채 넘길수록 값이 오르고, 꺼내 휘두를 때 그 값을 다 쓴다.',
   keyword: {
-    name: KW, desc: '손에 쥐고 넘긴 책의 값. 1개당 제이드의 피해 +30%, 제이드가 공격 카드를 내면 모두 사라진다', carrier: 'self', cap: 3, consumeAll: true,
+    name: KW, desc: '손에 쥐고 넘긴 책의 값 — 턴마다 쌓이고, 공격 카드 한 장에 모두 쓴다', carrier: 'self', cap: 3, consumeAll: true,
     per: [{ stat: 'dealt', v: 0.3 }],
   },
   passives: [

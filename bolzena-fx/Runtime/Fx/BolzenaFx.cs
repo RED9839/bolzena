@@ -8,7 +8,7 @@ namespace Bolzena.Fx
     //   BolzenaFx.Play("fx_erpin_ultimate_ground_1", new FxPlayOptions { At = feet, Flip = false });
     //   BolzenaFx.PlayUlt(this, "에르핀", new UltOptions { From = casterFeet, To = targetFeet, Impact = 1300 });
     // 구운 낱장(FxSheet)이 그 이름에 있으면 그것을, 없으면 파티클 판(FxEffect)을 튼다.
-    public static class BolzenaFx
+    public static partial class BolzenaFx
     {
         // 원작 1단위 → 월드 단위. 웹판은 1단위 = 16px 에 유닛 키 150px 쯤 — 유닛 키가 1.5 월드인 싸움터면 0.16
         public static float UnitWorld = 0.16f;
@@ -20,6 +20,10 @@ namespace Bolzena.Fx
         // 더하기 · 알파 입자의 HDR 배율 — 1 이면 웹판 색 그대로. 블룸 문턱(1.15) 위로 올라간 몫만 번진다
         public static float AddBoost = 1.25f, AlphaBoost = 1f;
         public static string ShaderName = "Bolzena/FxParticle";
+        // 화면 가운데(월드) — 화면 전체 이펙트(카메라 · 배경 낱말)가 여기. 싸움터 카메라가 Camera.main 이 아니면 바꿔 끼운다
+        public static Func<Vector3> ScreenCenter = () => { var c = Camera.main; return c != null ? new Vector3(c.transform.position.x, c.transform.position.y, 0) : Vector3.zero; };
+        // 이펙트 위끝(월드 y) — 높이 짜인 이펙트가 화면 꼭대기로 나가지 않게. 기본은 Camera.main 위끝 - FxRules.TOP_PAD
+        public static Func<float?> TopY = () => { var c = Camera.main; return c != null && c.orthographic ? c.transform.position.y + c.orthographicSize - FxRules.TOP_PAD : (float?)null; };
 
         static Shader shader;
         static Material baseMat;

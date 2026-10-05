@@ -70,13 +70,13 @@ namespace Bolzena.Core
 
         /// <summary>적을 세운다(소환) — 그 싸움의 체력 · 피해 배율 그대로. 살아 있는 적이 MAX_FOES 면 안 선다.</summary>
         public const int MAX_FOES = 5;
-        Unit Summon(string id, Unit by = null)
+        Unit Summon(string id, Unit by = null, bool noTough = false)
         {
             var d = Data.Enemy(id);
             if (d == null || AliveEnemies().Count >= MAX_FOES) return null;
             int ehp = Num.Round(d.Hp * EnemyHpx);
-            double tm = ToughOf(d, EliteFight);
-            var u = new Unit { Side = Side.Enemy, Key = d.Id, Name = d.Name, Idx = Enemies.Count, Row = d.Row ?? "front", Nature = d.Nature, Boss = d.Boss, Dmgx = EnemyDmgx, Tough = tm, ToughMax = tm };
+            double tm = noTough ? 0 : ToughOf(d, EliteFight);   // 강인도 없는 소환물(수 summon 의 noTough)
+            var u = new Unit { Side = Side.Enemy, Key = d.Id, Name = d.Name, Idx = Enemies.Count, Row = d.Row ?? "front", Nature = FoeNature(d), Boss = d.Boss, Dmgx = EnemyDmgx, Tough = tm, ToughMax = tm };
             u.MaxHp = ehp; u.Hp = ehp;
             u.Summoner = by?.Idx ?? -1;
             Enemies.Add(u);
@@ -152,14 +152,33 @@ namespace Bolzena.Core
             }
         }
 
-        void EnemyPhase()
+        /// <summary>
+        /// 적의 방어는 적의 차례가 시작될 때 한꺼번에 사라진다(내 턴 동안은 남는다) — 가호(실드 보존)면 그대로 · 실드 유지면 반.
+        /// 결정화의 고정 실드(Shield)는 남는다. 사라진 몫은 쪽지 unguard(V = 잃은 양 · To = 남은 방어+실드).
+        /// 2026-10-05 — 예전엔 적마다 제가 움직이기 직전에 지워, 앞 적이 「적 전체 방어」 로 준 방어를 뒤 적이 곧바로 잃었다.
+        /// </summary>
+        void FoeGuardFade()
         {
             foreach (var e in AliveEnemies())
             {
-                if (e.Dead) continue;
-                if (e.Block > 0 && St(e, "실드 보존") > 0) AddSt(e, "실드 보존", -1);
-                else if (e.Block > 0 && St(e, "실드 유지") > 0) { e.Block = (int)Math.Floor(e.Block * R.SV("실드 유지")); AddSt(e, "실드 유지", -1); }
+                if (e.Block <= 0) continue;
+                int was = e.Block;
+                if (St(e, "실드 보존") > 0) { AddSt(e, "실드 보존", -1); continue; }
+                if (St(e, "실드 유지") > 0) { e.Block = (int)Math.Floor(e.Block * R.SV("실드 유지")); AddSt(e, "실드 유지", -1); }
                 else e.Block = 0;
+                if (was > e.Block) LoseGuardCue(e, was - e.Block);
+            }
+        }
+
+        /// <summary>방어 · 실드를 잃었다(사라짐 · 파괴) — 쪽지 unguard.</summary>
+        void LoseGuardCue(Unit u, int lost) => Cue("unguard", u, new Cue { V = lost, To = u.Block + u.Shield });
+
+        void EnemyPhase()
+        {
+            FoeGuardFade();
+            foreach (var e in AliveEnemies())
+            {
+                if (e.Dead) continue;
                 if (e.Sealed)
                 {
                     e.Sealed = false;
@@ -264,7 +283,7 @@ namespace Bolzena.Core
             double from = x.Tough;
             x.Tough = Math.Min(x.ToughMax, x.Tough + n);
             Cue("tough", x, new Cue { From = from, To = x.Tough, Up = true });
-            Say($"{x.Name}: 강인도 +{x.Tough - from}");
+            Say($"{x.Name}: 강인도 +{x.Tough - from:0.##}");
         }
 
         void FoeAct(Unit e, Intent it, string say)
@@ -333,7 +352,7 @@ namespace Bolzena.Core
                         Say($"{e.Name}: {say} → 파티 ({d}){(it.Id != null ? $" · {it.Id} {Math.Max(1, it.N)}" : "")}");
                         break;
                     }
-                case "block": FoeBlock(e, it.V); Say($"{e.Name}: {say}"); break;
+                case "block": { int bv = FoeBlock(e, it.V); Say($"{e.Name}: {say} (방어 +{bv} → {e.Block + e.Shield})"); break; }
                 case "buff":
                     foreach (var x in it.All ? AliveEnemies() : new List<Unit> { e }) { AddSt(x, it.Id, it.V, "enemy:" + e.Idx); StatusCue(x, it.Id, true); }
                     Say($"{e.Name}: {say} ({(it.All ? "적 전체 " : "")}{it.Id} +{it.V})");
@@ -356,7 +375,7 @@ namespace Bolzena.Core
                         for (int k = 0; k < n; k++)
                         {
                             if (it.Max > 0 && AliveEnemies().Count(x => x.Key == it.Id) >= it.Max) break;
-                            if (Summon(it.Id, e) != null) made++;
+                            if (Summon(it.Id, e, it.NoTough) != null) made++;
                         }
                         Say($"{e.Name}: {say} ({Data.Enemy(it.Id)?.Name ?? it.Id} {made}{(made < n ? $" — 자리가 없어 {n - made} 못 세움" : "")})");
                         break;

@@ -184,11 +184,11 @@ namespace Bolzena.UI
             {
                 var c = Cards[i];
                 if (i == drag) continue;
-                int hero = c.Info.Hero;
+                int hero = c.Info.Hero >= 0 ? c.Info.Hero : c.Info.Owner;   // 교주 카드는 넣은 사도의 핀
                 if (hero < 0) continue;
                 int prev = i - 1;
                 if (prev == drag) prev--;
-                if (prev >= 0 && Cards[prev].Info.Hero == hero && i != up && prev != up) continue;
+                if (prev >= 0 && (Cards[prev].Info.Hero >= 0 ? Cards[prev].Info.Hero : Cards[prev].Info.Owner) == hero && i != up && prev != up) continue;
                 var hs = CardView.HeroOf != null ? CardView.HeroOf(hero) : null;
                 if (hs == null) continue;
                 if (used >= pins.Count) { pins.Add(null); pinKeys.Add(null); }

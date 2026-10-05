@@ -7,7 +7,7 @@ L.hero({
   id: '실비아', name: '실비아', nature: '광기', row: 'front', role: '탱커', star: 3, hp: 1040, atk: 84, def: 79, crit: 5,
   blurb: '은의 용족 공녀. 무례한 손님에게 티파티 초대장을 건네고, 그 손님이 손을 올리기 직전 부채로 손등을 탁 친다.',
   keyword: {
-    name: KW, desc: '실비아의 티파티 초대장. 한 번에 한 손님만 — 초대받은 적이 공격하려 하면 실비아가 먼저 꾸짖는다', carrier: 'enemy', cap: 1, hunt: true,
+    name: KW, desc: '한 번에 한 손님 — 초대받은 적이 공격하려 하면 실비아가 먼저 꾸짖는다', carrier: 'enemy', cap: 1, hunt: true,
   },
   passives: [
     { name: '숙녀의 접대', when: { on: 'foeActBefore', type: '공격' }, conds: [{ c: 'stack', id: KW, n: 1 }], limit: { per: 'turn', n: 2 },

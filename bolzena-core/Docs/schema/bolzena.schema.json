@@ -111,7 +111,9 @@
       "costMod",
       "addTag",
       "cutHit",
-      "clearDebt"
+      "clearDebt",
+      "form",
+      "formEnd"
      ],
      "description": "효과 조각 종류 — Docs/데이터.md §2"
     },
@@ -962,6 +964,13 @@
     },
     "spread": {
      "type": "boolean"
+    },
+    "onMax": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": { "form": { "type": "string" }, "consume": { "type": "boolean" } },
+     "required": [ "form" ],
+     "description": "최대(cap)에 닿으면 그 사도가 변신(데이터.md §16)"
     }
    },
    "required": [
@@ -1066,6 +1075,13 @@
      "items": {
       "$ref": "#/$defs/keyword"
      }
+    },
+    "forms": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/form"
+     },
+     "description": "변신 — 효과 { k: form, id } 로 든다(Docs/데이터.md 변신)"
     }
    },
    "required": [
@@ -1076,6 +1092,45 @@
     "atk",
     "def"
    ]
+  },
+  "form": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "desc": { "type": "string" },
+    "turns": { "type": "integer", "minimum": 0, "description": "내 턴 N 번 — 0 이면 전투 끝까지" },
+    "until": { "$ref": "#/$defs/when" },
+    "mods": {
+     "type": "object",
+     "propertyNames": { "enum": [ "dealt", "taken", "atk", "def", "crit", "guard", "heal" ] },
+     "additionalProperties": { "type": "number" }
+    },
+    "cards": { "type": "object", "additionalProperties": { "type": "string" }, "description": "카드 id → 변신판 카드 id(token)" },
+    "bonus": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "card": { "type": "string" },
+       "type": { "enum": [ "공격", "스킬", "강화" ] },
+       "tag": { "type": "string" },
+       "unique": { "type": "boolean" },
+       "ratio": { "type": "number" },
+       "fx": { "$ref": "#/$defs/fxList" },
+       "tags": { "$ref": "#/$defs/tags" }
+      }
+     }
+    },
+    "passives": { "type": "array", "items": { "$ref": "#/$defs/rule" } },
+    "replace": { "type": "boolean" },
+    "off": { "$ref": "#/$defs/fxList" },
+    "skin": { "type": "string", "description": "모습 키 — 스파인 스킨(화면이 읽는다)" },
+    "anim": { "type": "string", "description": "애니 접두어(화면이 읽는다)" }
+   },
+   "required": [ "id", "name" ]
   },
   "intent": {
    "type": "object",

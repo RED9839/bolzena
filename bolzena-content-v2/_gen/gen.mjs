@@ -104,7 +104,7 @@ const H = [];
 
 // 1 에르핀(왕도) — 곧은 왕도(표적형)
 H.push({ id: '에르핀_왕도', adj: ['곧은', '가뿐한', '왕도의', '아껴 둔', '대관식의'],
-  keyword: { name: '왕도', desc: '여왕이 곧게 걷는 길 — 같은 적만 잇달아 칠수록 그 적이 무너진다', carrier: 'enemy', hunt: true, cap: 5, per: [{ stat: 'taken', v: 0.1 }],
+  keyword: { name: '왕도', desc: '여왕이 곧게 걷는 길 — 같은 적을 잇달아 칠수록 그 적이 무너진다', carrier: 'enemy', hunt: true, cap: 5, per: [{ stat: 'taken', v: 0.1 }],
     rules: [P('왕도의 끝', { on: 'huntDown' }, [ST('사기', 1)], { limit: T1 })] },
   passives: [P('곧은 왕도', { on: 'hit' }, [K('왕도', 1, 'oneEnemy')])],
   ult: { fx: [D(0.6, 'oneEnemy', { hits: 8 }), TG(2), K('왕도', 3, 'oneEnemy')] },
@@ -118,7 +118,7 @@ H.push({ id: '에르핀_왕도', adj: ['곧은', '가뿐한', '왕도의', '아�
 
 // 2 마요(멋짐) — 최고의 수집품(카드 변화형 → 진열품 덤)
 H.push({ id: '마요_멋짐', adj: ['번쩍이는', '가벼운', '진열된', '아끼는', '축복받은'],
-  keyword: { name: '진열품', desc: '가장 아끼는 수집품을 꺼내 들었다 — 다음 피해 한 번이 세진다(+50%)', carrier: 'self', cap: 1, consumeAll: true, per: [{ stat: 'dealt', v: 0.5 }] },
+  keyword: { name: '진열품', desc: '가장 아끼는 수집품 — 다음 피해 한 번이 세진다', carrier: 'self', cap: 1, consumeAll: true, per: [{ stat: 'dealt', v: 0.5 }] },
   passives: [P('최고의 수집품', { on: 'fightStart' }, [K('진열품', 1)]), P('자랑 이어 가기', { on: 'play', type: '스킬' }, [K('진열품', 1)], { limit: T2 })],
   ult: { fx: [D(1.0, 'allEnemies'), ST('약화', 1, 'allEnemies'), K('진열품', 1)] },
   syn: () => K('진열품', 1),
@@ -131,7 +131,7 @@ H.push({ id: '마요_멋짐', adj: ['번쩍이는', '가벼운', '진열된', '�
 
 // 3 에르핀 — 무전취식(대가형)
 H.push({ id: '에르핀', adj: ['배부른', '가벼운', '외상의', '몰래 둔', '왕관의'],
-  keyword: { name: '외상', desc: '갚을 생각 없는 밥값 장부 — 처치하면 탕감된다', carrier: 'self', cap: 2 },
+  keyword: { name: '외상', desc: '갚을 생각 없는 밥값 — 큰 카드를 낼 때마다 쌓이고, 처치하면 탕감돼 AP', carrier: 'self', cap: 2 },
   passives: [
     P('무전취식', { on: 'kill', mine: true }, [MK('에르핀_cake', 1), IS('외상', 1), SPA('외상'), AP(1)], { limit: T1 }),
     P('큰 주문', { on: 'play', minCost: 2 }, [K('외상', 1)]),
@@ -148,7 +148,7 @@ H.push({ id: '에르핀', adj: ['배부른', '가벼운', '외상의', '몰래 �
 
 // 4 캬롯 — 사탕수수 텃밭(생성 카드형)
 H.push({ id: '캬롯', adj: ['무성한', '가벼운', '텃밭의', '아껴 둔', '햇살의'],
-  keyword: { name: '텃밭', desc: '새싹이 자라는 동안 쌓이는 정원의 기운 — 새싹을 심으면 처음부터', carrier: 'self', cap: 3 },
+  keyword: { name: '텃밭', desc: '새싹이 자라는 동안 쌓이는 기운 — 새싹을 심으면 처음부터', carrier: 'self', cap: 3 },
   passives: [
     P('사탕수수 텃밭', { on: 'play', type: '스킬' }, [MK('캬롯_sprout', 1, 'draw'), SPA('텃밭')], { limit: T1 }),
     P('일등 정원사', { on: 'turnStart' }, [K('텃밭', 1)]),
@@ -165,7 +165,7 @@ H.push({ id: '캬롯', adj: ['무성한', '가벼운', '텃밭의', '아껴 둔'
 
 // 5 큐이 — 몰래 오이 심기(아군 연동형으로)
 H.push({ id: '큐이', adj: ['싱싱한', '가벼운', '덩굴진', '절여 둔', '축복의'],
-  keyword: { name: '오이', desc: '몰래 심어 둔 오이 — 붙은 아군이 카드를 내면 한 입 먹고 떨어진다', carrier: 'hero', cap: 2 },
+  keyword: { name: '오이', desc: '몰래 심은 오이 — 붙은 아군이 카드를 내면 한 입 먹고 떨어진다', carrier: 'hero', cap: 2 },
   passives: [P('몰래 오이 심기', { on: 'play', marked: '오이' }, [HE(0.4), DR(1), SPV('오이', 1, 'oneAlly')], { limit: T2 })],
   ult: { fx: [HE(6.0), K('오이', 2, 'otherAllies')] },
   syn: () => K('오이', 1, 'oneAlly'),
@@ -179,7 +179,7 @@ H.push({ id: '큐이', adj: ['싱싱한', '가벼운', '덩굴진', '절여 둔'
 // 6 리코타 — 풀코스(순서형)
 const COURSE = '풀코스';
 H.push({ id: '리코타', adj: ['진한', '가벼운', '코스의', '숙성한', '축복의'],
-  keyword: { name: '코스', desc: '한 턴의 식탁 — 0코 전채, 1코 본식, 2코 이상 메인이 차례로 나오면 완성', carrier: 'self', cap: 2, endClear: true,
+  keyword: { name: '코스', desc: '한 턴의 식탁 — 0코 → 1코 → 2코 이상 카드를 차례로 내면 완성', carrier: 'self', cap: 2, endClear: true,
     rules: [
       P(COURSE, { on: 'play', who: 'any', maxCost: 0 }, [K('코스', 1)], { conds: [{ c: 'stack', id: '코스', n: 1, not: true }] }),
       P(COURSE, { on: 'play', who: 'any', minCost: 1, maxCost: 1 }, [K('코스', 1)], { conds: [{ c: 'stack', id: '코스', n: 1 }] }),
@@ -198,7 +198,7 @@ H.push({ id: '리코타', adj: ['진한', '가벼운', '코스의', '숙성한',
 // 7 칸타 — 올인(대가형)
 const ALLIN = '올인';
 H.push({ id: '칸타', adj: ['회전하는', '가벼운', '올인한', '숨겨 둔', '행운의'],
-  keyword: { name: '판돈', desc: '다음 턴 AP 를 걸어 둔 판 — 이번 턴 안에 격파 · 처치하면 AP 로 돌려받는다', carrier: 'self', cap: 1, endClear: true,
+  keyword: { name: '판돈', desc: '다음 턴 AP 를 건 판 — 이번 턴 안에 격파 · 처치하면 AP 로 돌려받는다', carrier: 'self', cap: 1, endClear: true,
     rules: [
       P(ALLIN, { on: 'kill', mine: true }, [AP(3), SPA('판돈')], { conds: [{ c: 'stack', id: '판돈', n: 1 }] }),
       P(ALLIN, { on: 'break', mine: true }, [AP(3), SPA('판돈')], { conds: [{ c: 'stack', id: '판돈', n: 1 }] }),
@@ -231,7 +231,7 @@ H.push({ id: '파트라', adj: ['상큼한', '가벼운', '민트 듬뿍', '숙�
 
 // 9 클로에 — 세바스티안 바느질(생성 카드형 · 결속)
 H.push({ id: '클로에', adj: ['촘촘한', '가벼운', '한 땀의', '접어 둔', '축복의'],
-  keyword: { name: '바늘땀', desc: '세바스티안에게 한 땀씩 꿰매 넣는 권능 — 둘이면 천 조각이 된다', carrier: 'self', cap: 2,
+  keyword: { name: '바늘땀', desc: '세바스티안에게 한 땀씩 꿰매는 권능 — 둘이면 천 조각', carrier: 'self', cap: 2,
     rules: [P('세바스티안 바느질', { on: 'stackReach', id: '바늘땀', n: 2 }, [SPA('바늘땀'), MK('클로에_cloth', 1)])] },
   passives: [P('재단사의 손', { on: 'play', type: '스킬' }, [K('바늘땀', 1)])],
   ult: { fx: [D(0.6, 'randomEnemy', { hits: 7 }), ST('둔화', 1, 'allEnemies'), MK('클로에_cloth', 2)] },
@@ -249,7 +249,7 @@ H.push({ id: '클로에', adj: ['촘촘한', '가벼운', '한 땀의', '접어 
 
 // 10 로니 — 석양의 결투(표적형)
 H.push({ id: '로니', adj: ['날랜', '가벼운', '현상수배', '물고 있던', '보안관의'],
-  keyword: { name: '무법자', desc: '보안관이 점찍은 현상범 — 움직이기 직전에 로니가 먼저 쏜다', carrier: 'enemy', hunt: true, cap: 1,
+  keyword: { name: '무법자', desc: '보안관이 점찍은 현상범 — 움직이기 직전 로니가 먼저 쏜다', carrier: 'enemy', hunt: true, cap: 1,
     rules: [
       P('다음 현상범', { on: 'fightStart' }, [K('무법자', 1, 'topEnemy')]),
       P('다음 현상범', { on: 'huntDown' }, [ST('사기', 1), K('무법자', 1, 'topEnemy')]),
@@ -266,7 +266,7 @@ H.push({ id: '로니', adj: ['날랜', '가벼운', '현상수배', '물고 있�
 
 // 11 스키아 — 지켜 온 침묵(손패형)
 H.push({ id: '스키아', adj: ['벼락 같은', '가벼운', '참아 온', '깊이 묻은', '사제의'],
-  keyword: { name: '침묵', desc: '참고 또 참은 말 — 둘이 차면 다음 턴 AP 가 된다', carrier: 'self', cap: 3,
+  keyword: { name: '침묵', desc: '참고 또 참은 말 — 둘이면 AP 가 된다', carrier: 'self', cap: 3,
     rules: [P('지켜 온 침묵', { on: 'stackReach', id: '침묵', n: 2 }, [SPV('침묵', 2), AP(1)], { limit: T1 })] },
   passives: [],
   ult: { fx: [D(0.6, 'oneEnemy', { hits: 4 }), ST('기절', 1), K('침묵', 2)] },
@@ -279,9 +279,9 @@ H.push({ id: '스키아', adj: ['벼락 같은', '가벼운', '참아 온', '깊
 
 // 12 네르 — 보모의 기도(아군 연동형)
 H.push({ id: '네르', adj: ['든든한', '가벼운', '기도하는', '졸면서 둔', '세계수의'],
-  keyword: { name: '기도', desc: '돌볼 아이를 지켜보며 모은 기도 — 적이 칠 때 한 대를 무르게 한다', carrier: 'self', cap: 3,
+  keyword: { name: '기도', desc: '돌볼 아이를 지켜보며 모은 기도 — 적이 치기 직전 한 대를 무르게 한다', carrier: 'self', cap: 3,
     rules: [P('기도가 닿다', { on: 'spend', id: '기도' }, [ST('사기', 1)], { limit: T1 })] },
-  keywords: [{ name: '돌볼 아이', desc: '네르가 먹여 키우는 아이 — 이 아군이 카드를 내면 기도가 쌓인다', carrier: 'hero', cap: 1 }],
+  keywords: [{ name: '돌볼 아이', desc: '네르가 돌보는 아군 — 이 아군이 카드를 내면 기도가 쌓인다', carrier: 'hero', cap: 1 }],
   passives: [
     P('보모의 기도', { on: 'play', marked: '돌볼 아이' }, [K('기도', 1)], { limit: T3 }),
     P('졸다가 기도', { on: 'foeActBefore', type: '공격' }, [SPV('기도', 1), ST('피해 감소', 1)], { conds: [{ c: 'stack', id: '기도', n: 1 }] }),
@@ -297,7 +297,7 @@ H.push({ id: '네르', adj: ['든든한', '가벼운', '기도하는', '졸면�
 
 // 13 폴랑 — 120도 포위(아군 연동형)
 H.push({ id: '폴랑', adj: ['정렬된', '가벼운', '포위하는', '대기 중인', '왕국의'],
-  keyword: { name: '포위', desc: '셋이서 120도로 둘러싼 적 — 한 턴에 셋이 차면 포위 완성', carrier: 'enemy', cap: 3, endClear: true,
+  keyword: { name: '포위', desc: '셋이서 둘러싼 적 — 한 턴에 셋이 차면 포위 완성', carrier: 'enemy', cap: 3, endClear: true,
     rules: [P('포위 완성', { on: 'stackReach', id: '포위', n: 3 }, [ST('취약', 1), ST('둔화', 1), DR(1)], { limit: T1 })] },
   passives: [P('120도 포위', { on: 'hit', who: 'any' }, [K('포위', 1, 'oneEnemy')])],
   ult: { fx: [D(1.2, 'allEnemies'), HE(1.8), ST('기절', 1)] },
@@ -311,7 +311,7 @@ H.push({ id: '폴랑', adj: ['정렬된', '가벼운', '포위하는', '대기 �
 
 // 14 마요 — 움직이지 않는 수집품(쌓아 터뜨리기)
 H.push({ id: '마요', adj: ['음침한', '가벼운', '마취된', '모셔 둔', '수집가의'],
-  keyword: { name: '마취', desc: '독침에 굳어 가는 수집 후보 — 쌓일수록 무르고, 셋이 차면 한동안 움직이지 못한다', carrier: 'enemy', cap: 3, per: [{ stat: 'taken', v: 0.1 }],
+  keyword: { name: '마취', desc: '독침에 굳어 가는 수집 후보 — 쌓일수록 무르고, 셋이면 굼떠진다', carrier: 'enemy', cap: 3, per: [{ stat: 'taken', v: 0.1 }],
     rules: [P('완전 마취', { on: 'stackReach', id: '마취', n: 3 }, [ST('둔화', 2)], { limit: T1 })] },
   passives: [P('움직이지 않는 수집품', { on: 'hit' }, [K('마취', 1, 'oneEnemy')])],
   ult: { fx: [D(0.5, 'randomEnemy', { hits: 8 }), K('마취', 2, 'allEnemies')] },
@@ -325,7 +325,7 @@ H.push({ id: '마요', adj: ['음침한', '가벼운', '마취된', '모셔 둔'
 
 // 15 네르(빡침) — 분노의 공명(피격 반응형)
 H.push({ id: '네르_빡침', adj: ['격노한', '가벼운', '빡친', '삭여 둔', '성전의'],
-  keyword: { name: '빡침', desc: '교주와 여왕에게 손댄 놈을 향한 분노 — 다섯이면 터진다', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.12 }] },
+  keyword: { name: '빡침', desc: '교주와 여왕에게 손댄 놈을 향한 분노 — 맞을 때마다 쌓이고 다섯이면 터진다', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.12 }] },
   passives: [P('분노의 공명', { on: 'hurt' }, [K('빡침', 1)])],
   ult: { fx: [D(2.5, 'allEnemies'), K('빡침', 3), ATK(0.15)] },
   syn: () => K('빡침', 1),
@@ -340,7 +340,7 @@ H.push({ id: '네르_빡침', adj: ['격노한', '가벼운', '빡친', '삭여 
 
 // 16 에슈르(마도) — 연구 노트(더미 조작형)
 H.push({ id: '에슈르_마도', adj: ['증폭된', '가벼운', '기록된', '덮어 둔', '마도의'],
-  keyword: { name: '노트', desc: '사라진 마법을 적어 둔 연구 기록 — 셋이 되면 한 장을 되살린다', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.12 }],
+  keyword: { name: '노트', desc: '사라진 마법의 연구 기록 — 소멸할 때마다 쌓이고, 셋이면 한 장을 되살린다', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.12 }],
     rules: [P('증명 완료', { on: 'stackReach', id: '노트', n: 3 }, [{ k: 'pull', from: 'gone', to: 'top', n: 1 }])] },
   passives: [P('연구 노트', { on: 'exhaust' }, [K('노트', 1)])],
   ult: { fx: [D(1.5, 'allEnemies'), K('노트', 2), ATK(0.15)] },
@@ -354,7 +354,7 @@ H.push({ id: '에슈르_마도', adj: ['증폭된', '가벼운', '기록된', '�
 
 // 17 슈팡 — 과속 배달(순서형)
 H.push({ id: '슈팡', adj: ['총알 같은', '가벼운', '과속한', '쟁여 둔', '배송의'],
-  keyword: { name: '배송', desc: '한 턴에 몰아치는 과속 배달 건수 — 셋째 건에서 소포가 날아간다', carrier: 'self', cap: 3, endClear: true,
+  keyword: { name: '배송', desc: '한 턴에 몰아치는 과속 배달 — 신속 카드로 쌓고, 셋째 건에 소포가 날아간다', carrier: 'self', cap: 3, endClear: true,
     rules: [P('소포 투척', { on: 'stackReach', id: '배송', n: 3 }, [D(0.8, 'randomEnemy'), ST('다음 턴 드로우', 1), SPA('배송')], { limit: T1 })] },
   passives: [P('과속 배달', { on: 'play', who: 'any', tag: '신속' }, [K('배송', 1)])],
   ult: { fx: [D(1.5, 'allEnemies'), ST('약화', 2, 'allEnemies'), ST('피해 감소', 2)] },
@@ -386,7 +386,7 @@ H.push({ id: '마리', adj: ['큼직한', '가벼운', '도화선의', '숨겨 �
 // 19 카렌 — 생방송 구독자(자원형)
 const SUB = '생방송 구독자';
 H.push({ id: '카렌', adj: ['화제의', '가벼운', '떡상한', '예약된', '축복의'],
-  keyword: { name: '구독자', desc: '샐러드 사건 뒤 다시 모으는 시청자 — 볼수록 힘이 나고, 다섯마다 떡상', carrier: 'self', cap: 10, per: [{ stat: 'dealt', v: 0.05 }],
+  keyword: { name: '구독자', desc: '다시 모으는 시청자 — 볼수록 힘이 나고 다섯마다 떡상, 쓰러질 듯하면 빠진다', carrier: 'self', cap: 10, per: [{ stat: 'dealt', v: 0.05 }],
     rules: [
       P(SUB, { on: 'fightStart' }, [K('구독자', 2)]),
       P(SUB, { on: 'kill', mine: true }, [K('구독자', 2)]),
@@ -426,7 +426,7 @@ H.push({ id: '죠안', adj: ['경건한', '가벼운', '목도한', '간직한',
 
 // 21 샤샤 — 멋대로 텀블러(손패형)
 H.push({ id: '샤샤', adj: ['콸콸', '가벼운', '수압 센', '담아 둔', '정령의'],
-  keyword: { name: '수압', desc: '텀블러 안에서 차오르는 물 — 물줄기에 실어 쏜다', carrier: 'self', cap: 3 },
+  keyword: { name: '수압', desc: '텀블러에 차오르는 물 — 물줄기에 실어 쏜다', carrier: 'self', cap: 3 },
   passives: [P('멋대로 텀블러', { on: 'turnEnd' }, [{ k: 'autoPlay', n: 1, id: '탄환' }, SH(0.5), K('수압', 1)])],
   ult: { fx: [D(0.5, 'oneEnemy', { hits: 6 }), ST('둔화', 1), K('수압', 2)] },
   syn: () => K('수압', 1),
@@ -439,7 +439,7 @@ H.push({ id: '샤샤', adj: ['콸콸', '가벼운', '수압 센', '담아 둔', 
 
 // 22 에슈르 — 빵집 아니고 마법학교(카드 변화형 · 두 갈래)
 H.push({ id: '에슈르', adj: ['갓 구운', '가벼운', '부푼', '발효시킨', '교장의'],
-  keyword: { name: '빵 센디오', desc: '빵이냐 마법이냐 고를 때마다 부푸는 반죽 — 셋이면 둘 다', carrier: 'self', cap: 3,
+  keyword: { name: '빵 센디오', desc: '빵이냐 마법이냐 — 카드를 낼 때마다 부풀고, 셋이면 둘 다', carrier: 'self', cap: 3,
     rules: [P('빵과 마법', { on: 'stackReach', id: '빵 센디오', n: 3 }, [HE(1.0), ST('고통', 2), SPA('빵 센디오')])] },
   passives: [P('빵집 아니고 마법학교', { on: 'play' }, [K('빵 센디오', 1)])],
   ult: { fx: [D(3.0), D(1.0, 'allEnemies'), ST('기절', 1)] },

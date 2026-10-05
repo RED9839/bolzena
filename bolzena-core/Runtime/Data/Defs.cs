@@ -125,6 +125,8 @@ namespace Bolzena.Core
         public const string Roll = "roll", IfRoll = "ifRoll", IfPrevSame = "ifPrevSame", IfInHand = "ifInHand", IfBond = "ifBond", IfLastMine = "ifLastMine",
             IfPulled = "ifPulled", IfShield = "ifShield", IfDebt = "ifDebt", IfTypeNew = "ifTypeNew",
             Recast = "recast", CostMod = "costMod", AddTag = "addTag", CutHit = "cutHit", ClearDebt = "clearDebt";
+        // 변신(2026-10-05 여섯째) — 그 사도가 변신 상태가 된다(HeroDef.Forms 의 id) · 지금 변신을 푼다
+        public const string Form = "form", FormEnd = "formEnd";
 
         public static readonly HashSet<string> Conditions = new() { IfBroken, IfTune, IfChain, IfLink, IfPrev, IfRhythm, IfSwitched, IfStack, When,
             IfRepeat, IfHeld, IfPlayedMax, IfApLeft, IfSpent, IfBalanced, IfHunted, IfDebuffs, IfHp, IfKill, IfBreak, IfWounded,
@@ -149,6 +151,7 @@ namespace Bolzena.Core
             IfChoice, IfRandom, IfHand, IfPile, IfNth, IfStreak, IfAllHeroes, IfFoe, IfCardSt, PerPlayed, PerPile, PerCardSt, PerEvent,
             Later, AfterCards, Trap, Confuse, AutoPlay, CastOther, Pull, ExileFrom, Dispel, MoveRow, GrowRun,
             Roll, IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, Recast, CostMod, AddTag, CutHit, ClearDebt, HealMod,
+            Form, FormEnd,
         };
         public static string ModStat(string k) => k switch
         {
@@ -289,6 +292,49 @@ namespace Bolzena.Core
         /// <summary>시작 덱(카드 id) — 보통 넉 장.</summary>
         public List<string> Starter = new();
         public string Blurb;
+        /// <summary>변신(고학년 등의 효과 form 으로 들어간다) — 모습 · 능력이 바뀌는 상태. id 는 모든 사도 사이에서 겹치면 안 된다.</summary>
+        public List<FormDef> Forms = new();
+    }
+
+    /// <summary>
+    /// 변신 하나 — 효과 { k: "form", id } 로 그 사도가 이 상태가 된다(개인 층 — 그 사도에게만). 지속(turns 턴 · 0 이면 전투 끝까지) ·
+    /// 풀리는 계기(until) · 그동안 바뀌는 것(mods 능력치 · cards 카드 바꾸기 · bonus 카드 덤 · passives 덧붙임/교체) · 풀릴 때(off).
+    /// 같은 변신을 변신 중에 다시 쓰면 지속을 처음으로 되돌린다(겹치지 않는다). 다른 변신이면 앞의 것을 풀고(off 가 돈다) 새로.
+    /// </summary>
+    public sealed class FormDef
+    {
+        public string Id;
+        public string Name;
+        /// <summary>한 줄 설명(사람이 읽는 것).</summary>
+        public string Desc;
+        /// <summary>지속 — 그 사도의 내 턴 N 번(든 턴 포함, N+1 번째 내 턴 시작에 풀린다). 0 이면 전투 끝까지(until · formEnd 로만 풀린다).</summary>
+        public int Turns;
+        /// <summary>이 일이 나면 풀린다(패시브의 when 과 같은 꼴 — stackGone · play · hurt …). 없으면 지속으로만.</summary>
+        public When Until;
+        /// <summary>그동안 그 사도의 능력치 증감 — dealt · taken · atk · def · crit · guard · heal → 비율(0.2 = +20%).</summary>
+        public Dictionary<string, double> Mods;
+        /// <summary>카드 바꾸기 — 그 사도의 카드 id → 변신판 카드 id(token). 손 · 더미의 카드 id 는 그대로, 전투가 그 카드를 변신판으로 본다(풀리면 돌아온다).</summary>
+        public Dictionary<string, string> Cards;
+        /// <summary>카드 덤 — 거르개에 맞는 그 사도의 카드에 피해 배율 · 효과 · 태그를 더한다.</summary>
+        public List<FormBonus> Bonus = new();
+        /// <summary>그동안 더 도는 패시브(when always 는 안 된다 — 능력치는 mods).</summary>
+        public List<PassiveRule> Passives = new();
+        /// <summary>그동안 그 사도의 원래 패시브(passives)를 끈다(고유 효과 규칙 · 장비 효과는 그대로).</summary>
+        public bool Replace;
+        /// <summary>풀릴 때 도는 효과(그 사도가 한다). 전투가 끝나 풀리는 것은 돌지 않는다.</summary>
+        public List<Fx> Off = new();
+        /// <summary>모습 키 — 스파인 스킨 이름 · 애니 접두어(화면이 읽는다, 엔진은 안 본다). 모르면 "?".</summary>
+        public string Skin, Anim;
+    }
+
+    /// <summary>변신 중 카드 덤 — card(그 카드 id) · type · unique · tag 거르개(모두 맞아야), ratio(피해 배율 ×) · fx(뒤에 덧붙임) · tags(덧붙임).</summary>
+    public sealed class FormBonus
+    {
+        public string Card, Type, Tag;
+        public bool Unique;
+        public double Ratio;
+        public List<Fx> Fx = new();
+        public List<string> Tags = new();
     }
 
     /// <summary>고학년 스킬 — 게이지를 써서 AP 없이.</summary>
@@ -339,6 +385,8 @@ namespace Bolzena.Core
         public string TagWhile, TagType;
         /// <summary>겹이 0 이면 그 사도의 공격 카드가 적 1명 대신 적 전체를 친다.</summary>
         public bool Spread;
+        /// <summary>최대(cap)에 닿으면 그 사도가 변신한다(carrier self) — 고학년이 아닌 계기의 변신.</summary>
+        public KwOnMax OnMax;
         /// <summary>1개당 …</summary>
         public List<PerStat> Per = new();
         /// <summary>규칙 문장(「X」가 N개가 되면 · 사라지면 · 다 닳으면 …).</summary>
@@ -347,6 +395,16 @@ namespace Bolzena.Core
         [Newtonsoft.Json.JsonIgnore] public int? CapOrMode => Mode ? 1 : Cap;
         [Newtonsoft.Json.JsonIgnore] public bool Consumes => ConsumeAll || Consume > 0;
         [Newtonsoft.Json.JsonIgnore] public bool Decays => DecayAll || Decay > 0;
+    }
+
+    /// <summary>
+    /// 「최대에 닿으면 변신」 — form(그 사도의 변신 id) · consume(닿은 겹을 다 쓴다 — 기본 false: 겹은 남고 변신의 off 가 치운다).
+    /// 이미 그 변신 중이면 아무 일 없다(고학년과 달리 갱신하지 않는다 — 꽉 찬 자원이 다시 차오를 때마다 갱신되면 변신이 끝나지 않는다).
+    /// </summary>
+    public sealed class KwOnMax
+    {
+        public string Form;
+        public bool Consume;
     }
 
     /// <summary>「1개당 …」 — stat: dealt · taken · atk · def · crit(v 는 비율) · dot(턴 끝 공격력 ratio 피해) · hot(턴 끝 방어력 ratio 회복).</summary>
@@ -459,6 +517,8 @@ namespace Bolzena.Core
         public int Hp;
         public string Row = "front";
         public string Nature;
+        /// <summary>사도 클론 — 그 사도 키. 클론은 판의 적 속성에 맞추지 않고 그 사도의 성격 그대로(사용자 2026-10-05).</summary>
+        public string Clone;
         /// <summary>약점 성격 — 없으면 상성에서.</summary>
         public List<string> Weak;
         /// <summary>강인도 칸 — 0 이면 보통 · 엘리트 · 보스 기본(R.TOUGH).</summary>
@@ -592,6 +652,8 @@ namespace Bolzena.Core
         public IntentIf If;
         /// <summary>summon — 같은 적이 이만큼 살아 있으면 더 세우지 않는다(0 = 제한 없음).</summary>
         public int Max;
+        /// <summary>summon — 세운 소환물은 강인도가 없다(최대 0 — 격파되지 않고 화면은 강인도 막대를 숨긴다). 강인도 최소치 3 의 유일한 예외(사용자 2026-10-05).</summary>
+        public bool NoTough;
 
         [Newtonsoft.Json.JsonIgnore] public int WOr1 => W <= 0 ? 1 : W;
     }

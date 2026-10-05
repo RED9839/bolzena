@@ -25,6 +25,9 @@ namespace Bolzena.Core
         public string Where;
         public int Fights, Turns, Gold, Deck;
         public Dictionary<string, (int n, int turns, int win)> Kinds = new();
+        /// <summary>강인도 통계 — 카드가 강인도를 깎은 횟수 · 그 가운데 약점 · 격파 수. 싸움 종류(fight · elite · boss …)마다 격파 수.</summary>
+        public int ToughHits, ToughWeakHits, Breaks;
+        public Dictionary<string, int> BreaksBy = new();
     }
 
     /// <summary>
@@ -44,6 +47,33 @@ namespace Bolzena.Core
         double HpRatio(Run run) => (double)run.S.PartyHp / Math.Max(1, run.S.PartyMaxHp);
         double DeckEff(Run run, string id) => CardValue.Efficiency(run.ViewOf(id));
         double CardEff(string id, int n = 0) => CardValue.Efficiency(data.View(id, n));
+
+        // ── 교주 카드 주인 ──
+        /// <summary>
+        /// 교주 카드를 누구 덱에 넣을까 — 피해 카드는 공격력이 가장 높은 사도, 실드 · 방어 · 회복 카드는 방어력이 가장 높은 사도,
+        /// 그 밖(버프 · 드로우 · AP)은 서포터, 없으면 덱에 카드가 가장 적은 사도(장비 · 성장 포함 능력치로 잰다).
+        /// </summary>
+        public string PickOwner(Run run, string cardId)
+        {
+            var c = data.View(cardId);
+            var party = run.S.Party;
+            if (c == null || party.Count == 0) return party.FirstOrDefault();
+            var gear = run.GearStats();
+            Stats Of(string k) { var h = data.Hero(k); var s = new Stats { Atk = h?.Atk ?? 0, Def = h?.Def ?? 0 }; if (gear.TryGetValue(k, out var g)) s = s + g; if (run.S.Growth.TryGetValue(k, out var gr)) s = s + gr; return s; }
+            bool Has(params string[] ks) => c.Fx.Any(f => ks.Contains(f.K));
+            if (Has(FxK.Dmg, FxK.Extra)) return party.OrderByDescending(k => Of(k).Atk).First();
+            if (Has(FxK.Shield, FxK.Block, FxK.Heal)) return party.OrderByDescending(k => Of(k).Def).First();
+            var sup = party.FirstOrDefault(k => data.Hero(k)?.Role == "서포터");
+            if (sup != null) return sup;
+            return party.OrderBy(k => run.S.Deck.Count(id => run.ViewOf(id).Hero == k)).First();
+        }
+
+        /// <summary>주인을 기다리는 교주 카드를 모두 넣는다.</summary>
+        void SettleNeutrals(Run run)
+        {
+            int guard = 0;
+            while (run.PendingNeutral != null && guard++ < 20) run.AssignNeutral(PickOwner(run, run.PendingNeutral));
+        }
 
         // ── 장비 ──
         public double GearScore(Run run, string id, string k)
@@ -95,7 +125,10 @@ namespace Bolzena.Core
             outr.Fights++; outr.Turns += st.Turn;
             outr.Kinds.TryGetValue(kind, out var kk);
             outr.Kinds[kind] = (kk.n + 1, kk.turns + st.Turn, kk.win + (st.Over == "win" ? 1 : 0));
+            outr.ToughHits += st.ToughHits; outr.ToughWeakHits += st.ToughWeakHits; outr.Breaks += st.Breaks;
+            outr.BreaksBy.TryGetValue(kind, out var kb); outr.BreaksBy[kind] = kb + st.Breaks;
             run.AfterFight(st);
+            SettleNeutrals(run);
             if (st.Over != "win") return false;
             if (loot != null)
             {
@@ -188,7 +221,7 @@ namespace Bolzena.Core
             foreach (var x in order) if (x.it.Kind == "equip" && x.v > 0.5 && run.S.Gold >= x.it.Price) { run.Buy(x.i); ManageGear(run, true); }
             var w = WorstCard(run);
             if (w != null && run.S.Gold >= run.RemovePrice && (IsBasic(w) || data.Card(w).IsCurse ? run.S.Deck.Count > 6 : run.S.Deck.Count > 8 && DeckEff(run, w) < 1.0)) run.RemoveCard(w);
-            foreach (var x in order) if (x.it.Kind == "neutral" && !x.it.Sold && CardEff(x.it.Id) >= 1.1 && run.S.Gold >= x.it.Price) run.Buy(x.i);
+            foreach (var x in order) if (x.it.Kind == "neutral" && !x.it.Sold && CardEff(x.it.Id) >= 1.1 && run.S.Gold >= x.it.Price) run.Buy(x.i, PickOwner(run, x.it.Id));
         }
 
         // ── 이벤트 ──
@@ -286,7 +319,7 @@ namespace Bolzena.Core
                             break;
                         }
                 }
-                var why = run.ResolvePending(val);
+                var why = run.ResolvePending(val, p.K == "card" && val is string cid ? PickOwner(run, cid) : null);
                 if (why != null && run.S.Event.Pending.Count > 0) run.S.Event.Pending.RemoveAt(0);
             }
         }
@@ -312,6 +345,7 @@ namespace Bolzena.Core
                 run.AfterEventFight(true);
             }
             ResolvePending(run, P.SmartOut);
+            SettleNeutrals(run);
             run.LeaveEvent();
             ManageGear(run, P.SmartOut);
             return true;

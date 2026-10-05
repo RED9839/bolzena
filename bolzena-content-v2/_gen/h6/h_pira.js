@@ -8,7 +8,7 @@ L.hero({
   id: '피라', name: '피라', nature: '광기', row: 'back', role: '서포터', star: 3, hp: 600, atk: 86, def: 58, crit: 5,
   blurb: '위조 금화를 끊고 진짜 화금석을 찾는 황철석의 용족 연금술사. 스킬을 쓸 때마다 손의 기본 카드를 금으로 도금한다 — 번쩍이지만 한 번 쓰면 벗겨진다.',
   keyword: {
-    name: KW, desc: '도금이 벗겨지며 남은 화금석 가루. 도금한 카드를 낼 때마다 쌓이고, 피라의 큰 한 방이 쓴다', carrier: 'self', cap: 5,
+    name: KW, desc: '도금이 벗겨지며 남은 가루 — 도금한 카드로 쌓고, 큰 한 방이 쓴다', carrier: 'self', cap: 5,
   },
   passives: [
     { name: '도금', when: { on: 'play', type: '스킬' }, limit: { per: 'turn', n: 2 }, fx: gild(1) },

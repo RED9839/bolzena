@@ -42,7 +42,7 @@ namespace Bolzena.Core
             if (who == "other" && (c.Hero == null || (owner != null && c.Hero == owner.Key))) return false;
             if (who != null && who != "self" && who != "other" && c.Hero != who) return false;
             if (unique && !c.Unique) return false;
-            if (basic && !(c.Hero != null && !c.Unique && !GameData.IsCopy(id) && !GameData.IsPlain(id) && !c.Def.Token)) return false;
+            if (basic && !(c.Def.Hero != null && !c.Unique && !GameData.IsCopy(id) && !GameData.IsPlain(id) && !c.Def.Token)) return false;
             if (tag != null && !HasTagB(id, tag)) return false;
             return true;
         }

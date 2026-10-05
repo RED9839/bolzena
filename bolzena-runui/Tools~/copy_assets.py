@@ -62,6 +62,18 @@ for f in os.listdir(f"{SRC}/uiicons"):
     if f.endswith(".png"):
         cp(f"{SRC}/uiicons/{f}", f"{DST}/RunArt/Icons/{f}")
 cp(f"{SRC}/currency/CurrencyIcon_0008.png", f"{DST}/RunArt/Icons/gold.png")
+# 원작 상태 아이콘(iconsrc/stateicons/StateIcon_N, 64) — 전투 상태 칩이 뜻이 확실한 것만 쓴다(Docs/상태칩.md · bolzena-unity ChipRow.Original)
+for f in os.listdir(f"{SRC}/iconsrc/stateicons"):
+    if f.startswith("StateIcon_") and f[10:-4].isdigit():
+        cp(f"{SRC}/iconsrc/stateicons/{f}", f"{DST}/RunArt/State/{f}")
+# 성격 아이콘은 512 판으로 덮는다(Tools~/nature512.py — 128 보석 + 원작 512 글리프, 4K 에서 선명하게)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import nature512
+for ko in nature512.NAT:
+    dst = f"{DST}/RunArt/Icons/성격_{ko}.png"
+    if Image.open(dst).size[0] < 512:
+        nature512.make(ko, dst)
+        print("성격 512", ko)
 
 
 # 스파인 — .skel → .skel.bytes, .atlas → .atlas.txt. 그림은 PMA → 곧은 알파(Linear 색 공간에서 바래지 않게 — bolzena-unity 와 같은 규칙)
@@ -77,10 +89,9 @@ def spine(src_dir, name):
         elif f.endswith(".atlas"):
             shutil.copyfile(s, f"{dd}/{f}.txt")
         elif f.endswith(".png"):
-            im = np.asarray(Image.open(s).convert("RGBA")).astype(np.float32)
-            a = im[..., 3:4]
-            rgb = np.where(a > 0, im[..., :3] * 255.0 / np.maximum(a, 1), 0)
-            Image.fromarray(np.concatenate([np.clip(rgb, 0, 255), a], axis=-1).astype(np.uint8), "RGBA").save(f"{dd}/{f}")
+            # PMA → 곧은 알파 + 번짐 채움(Tools~/spine_straight.py) — 그냥 나누면 낮은 알파 가장자리가 원색 점 · 흰 테두리로 번진다
+            import spine_straight
+            spine_straight.convert(s, f"{dd}/{f}")
     print("스파인", name)
 
 
@@ -92,6 +103,11 @@ for key in ["erpin", "goldy", "sist", "alice", "jubee"]:
         p = f"{SRC}/standing/{key}"
     if os.path.isdir(p):
         spine(p, "st_" + key)
+# 코어 샘플의 판에 데려가는 사도(편성 큰 카드 · 사도 상세 · 목록 · 주인 고르기가 스파인으로 움직인다) — 원본 폴더는 한글 이름, 그림 키는 roster.json 의 art
+for folder, art in [("리코타", "ricota"), ("캬롯", "kyarot"), ("시온더다크불릿", "xxionx")]:
+    p = f"{SRC}/spine/standing/{folder}"
+    if os.path.isdir(p):
+        spine(p, "st_" + art)
 # 스탠딩 렌더(웹판 .shots/standing-webp/<이름>.webp — 스파인 Idle_1 · Normal 한 장) → RunArt/Standing/<그림 키>.png
 #   사도 상세 · 편성 큰 카드 · 사도 목록 · 시작 카드 그림이 쓴다. 투명 가장자리를 잘라(위 = 머리 끝) 긴 변 1024 까지 줄이고,
 #   2의 거듭제곱 판의 왼쪽 위에 붙인다(크런치 압축이 먹게 — 남는 자리는 투명).
@@ -171,11 +187,23 @@ from PIL import ImageFilter
 table = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Runtime", "Resources", "RunUI", "cardart.json"), encoding="utf-8"))["cards"]
 ni = 0
 for name in sorted(set(table.values())):
-    src = f"{SRC}/skillicons/{name}.png"
+    # 「…__f」 = 좌우 뒤집기 · 「…__t」 = 뒤집기 + 금빛 틴트(한 사도 안에서 같은 아이콘이 겹칠 때 — Tools~/cardpic_dedupe.py)
+    var = name[-3:] if name.endswith(("__f", "__t")) else ""
+    src = f"{SRC}/skillicons/{name[:-3] if var else name}.png"
     dst = f"{DST}/RunArt/Skill/{name}.png"
     if not os.path.exists(src) or os.path.exists(dst.replace(".png", "_blur.png")):
         continue
-    cp(src, dst)
+    if var:
+        from PIL import ImageOps
+        vi = ImageOps.mirror(Image.open(src).convert("RGBA"))
+        if var == "__t":
+            gold = Image.new("RGBA", vi.size, (255, 196, 90, 255))
+            vi = Image.composite(Image.blend(vi, gold, 0.32), vi, vi.getchannel("A"))
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        vi.save(dst)
+        src = dst
+    else:
+        cp(src, dst)
     im = Image.open(src).convert("RGB")
     # 가운데를 카드 비율(0.70)로 잘라 키우고 크게 흐린다 → 작게 줄여 둔다(늘려 깔면 더 부드럽다)
     cw = int(im.height * 0.70)
@@ -184,6 +212,41 @@ for name in sorted(set(table.values())):
     im.save(dst.replace(".png", "_blur.png"))
     ni += 1
 print("카드 아이콘", ni, "새로")
+
+# 고학년 아이콘 — 원작이 고학년(궁극기) 단추 · 스킬 창에 쓰는 사도별 「볼따구」 얼굴(skillicons/Icon_GraduateSkill_<사도>, 128 불투명 네모)
+#   사도 상세 「고학년」 칸이 RunArt/Skill/icon_graduateskill_<art> 를 쓴다(원 마스크로 오린다). 135명 모두 있다.
+#   ultimate_icon_common3 = 원작 공용 고학년 아이콘(에르핀 볼따구 · 케이크) — 사도 그림이 없을 때 대신 쓴다.
+ng = 0
+for name in [f"icon_graduateskill_{h['art']}" for h in roster if h.get("art")] + ["ultimate_icon_common3"]:
+    src, dst = f"{SRC}/skillicons/{name}.png", f"{DST}/RunArt/Skill/{name}.png"
+    if os.path.exists(src) and not os.path.exists(dst):
+        cp(src, dst)
+        ng += 1
+print("고학년 아이콘", ng, "새로")
+
+# 고유 · 생성 카드 원작 그림 — 짝 표(Tools~/cardpic_picks.json, 사도마다 대조 시트로 골랐다)의 그림을 카드 그림 창 비율(364×512)로 잘라 굽는다.
+#   원본(cardart_src, 1000×1400 · 930MB)은 넣지 않는다. 짝 표에서 빠진 옛 그림은 지운다(Resources 는 통째로 빌드에 들어간다).
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cardpic
+picdir = f"{DST}/RunArt/CardPic"
+want = {}
+for cid, p in cardpic.load().items():
+    if p.get("file"):
+        want[cardpic.name_of(p)] = p
+np_ = 0
+for name, p in sorted(want.items()):
+    dst = f"{picdir}/{name}.png"
+    if not os.path.exists(dst) and cardpic.bake(p, dst):
+        np_ += 1
+gone = 0
+if os.path.isdir(picdir):
+    for f in os.listdir(picdir):
+        if f.endswith(".png") and f[:-4] not in want:
+            os.remove(os.path.join(picdir, f))
+            if os.path.exists(os.path.join(picdir, f + ".meta")):
+                os.remove(os.path.join(picdir, f + ".meta"))
+            gone += 1
+print("카드 원작 그림", np_, "새로 ·", gone, "지움 ·", len(want), "장")
 # 장비 · 교주 카드(상태 · 저주 · 선물) 그림 — itemart.json(Tools~/build_itemart.py) 에 적힌 원작 아이콘만
 #   RunArt/Item/<이름>.png(256 판 가운데 — 128 짜리 재화 아이콘은 그대로) · <이름>_blur.png(카드 바탕용 흐린 그림)
 items = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Runtime", "Resources", "RunUI", "itemart.json"), encoding="utf-8"))

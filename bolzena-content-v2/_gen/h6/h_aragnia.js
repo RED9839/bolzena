@@ -6,7 +6,7 @@ L.hero({
   id: '아라그니아', name: '아라그니아', nature: '냉정', row: 'mid', role: '서포터', star: 3, hp: 680, atk: 75, def: 60, crit: 5,
   blurb: '산호를 씹어 모래섬 왕국을 쌓는 진주의 용족 여왕. 스킬마다 섬이 한 층 오르고, 파티가 다치면 섬이 무너지며 층마다 단단한 모래벽을 남긴다.',
   keyword: {
-    name: KW, desc: '산호 모래로 쌓은 작은 왕국. 1층마다 파티 받는 피해 -4%, 파티가 HP 를 잃으면 무너져 층마다 고정 실드를 남긴다', carrier: 'self', cap: 5,
+    name: KW, desc: '모래로 쌓은 왕국 — 층마다 덜 아프고, 맞으면 무너져 층마다 고정 실드', carrier: 'self', cap: 5,
     per: [{ stat: 'taken', v: -0.04, who: 'allies' }],
     rules: [{ name: '모래섬 붕괴', when: { on: 'hurt' }, conds: [{ c: 'stack', id: KW, n: 1 }], limit: { per: 'turn', n: 1 },
       fx: [per(KW), L.sh(0.4, { fixed: true }), spend(KW, 'all')] }],

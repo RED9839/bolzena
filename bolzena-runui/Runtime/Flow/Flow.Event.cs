@@ -138,9 +138,13 @@ namespace Bolzena.RunUI
             {
                 var (fight, why) = P.Choose(picked);
                 if (why != null) { Toast.Show(why); return; }
-                P.Save("event");
-                if (fight) { FightStop(); return; }
-                BuildEvent(root, -1);
+                // 이벤트가 준 교주 카드는 누구 덱에 넣을지 고른 뒤
+                PickOwners(() =>
+                {
+                    P.Save("event");
+                    if (fight) { FightStop(); return; }
+                    BuildEvent(root, -1);
+                });
             }, 0, "ok");
             ok.GetComponent<RectTransform>().At(1, 0, -6, optH - 96, 96, 96);
             ok.Bg.sprite = Theme.S("circle");
@@ -194,8 +198,7 @@ namespace Bolzena.RunUI
                 var why = P.Resolve(v);
                 if (why != null) { Toast.Show(why); return; }
                 closeM();
-                P.Save("event");
-                BuildEvent(root, -1);
+                PickOwners(() => { P.Save("event"); BuildEvent(root, -1); });
             }
             if (p.K == "flash" && p.Offer != null)
             {

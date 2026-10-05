@@ -25,6 +25,10 @@ namespace Bolzena.Battle
             public List<int> WaveGauge = new List<int>();             // 웨이브를 열 때 게이지를 적어도 이만큼(시범 — 고학년을 보이려고)
             public List<string> Glow = new List<string>();            // 이 전투에서 빛나는 카드(카드 신탁)
             public long Seed = 7;
+            public string EnemyNature;                                 // 판의 적 속성(모든 적의 성격을 이것으로) — null 이면 데이터 그대로
+            public string Bg;                                          // 싸움터 배경(마을 층의 fight 배경)
+            public string Note;                                        // 무엇으로 차렸는지(로그)
+            public static System.Func<GameData, Fixture> Override;     // 점검 모드(-ultaudit)가 사도마다 차림을 넣는다
 
             // 명령줄로 차림 — -party 사도,사도,사도 -foes 적,적 (전투만 따로 띄워 볼 때 · 입력 재현). 없으면 null
             public static Fixture FromArgs(GameData d)
@@ -39,13 +43,61 @@ namespace Bolzena.Battle
                 foreach (var h in f.Party)
                     f.Deck.AddRange(d.Cards.Values.Where(c => c.Hero == h && c.Unique).Select(c => c.Id).OrderBy(x => x, StringComparer.Ordinal));
                 f.Waves.Add(foes.Split(',').ToList());
+                f.EnemyNature = Arg("-nature");
+                // -wavehp 배율: 적 체력 배율(시험 캡처 — 격파까지 버티게)
+                if (double.TryParse(Arg("-wavehp"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var whp)) f.WaveHp.Add(whp);
                 // -glow: 고유 카드를 모두 빛나게(신탁 창 시험)
                 if (Array.IndexOf(a, "-glow") >= 0) f.Glow.AddRange(f.Deck.Where(id => (d.Card(id)?.Unique ?? false) && d.Card(id).Oracles.Count > 0).Distinct());
                 return f;
             }
 
+            /// <summary>
+            /// -battle 시험 차림(v2 콘텐츠) — 무작위 마을 하나 · 그 마을에서 고를 수 있는 판 속성 하나 · 그 마을 1층 일반 한 줄(1웨이브) + 엘리트 한 줄(2웨이브),
+            /// 파티는 그 속성의 약점 성격 사도 하나 + 다른 둘. -seed 숫자로 같은 차림을 다시 연다. 콘텐츠에 마을이 없으면 옛 시범(Pilot).
+            /// </summary>
+            public static Fixture V2(GameData d)
+            {
+                if (d.Villages.Count == 0 || d.Heroes.Count < 3) return null;
+                var a = Environment.GetCommandLineArgs();
+                int si = Array.IndexOf(a, "-seed");
+                long seed = si >= 0 && si < a.Length - 1 && long.TryParse(a[si + 1], out var sv) ? sv : DateTime.Now.Ticks & 0x7fffffff;
+                var rng = new System.Random((int)(seed & 0x7fffffff));
+                var vills = d.Villages.Keys.OrderBy(x => x, StringComparer.Ordinal).ToList();
+                var vid = vills[rng.Next(vills.Count)];
+                var v = d.Villages[vid];
+                var fl = v.Floors[0];
+                string nat = Bolzena.Core.Run.RollNature(d, vid, rng.NextDouble());
+                var weak = R.WeakTo(nat);
+                var heroes = d.Heroes.Values.OrderBy(h => h.Id, StringComparer.Ordinal).ToList();
+                var weakOnes = heroes.Where(h => weak.Contains(h.Nature)).ToList();
+                var first = weakOnes.Count > 0 ? weakOnes[rng.Next(weakOnes.Count)] : heroes[rng.Next(heroes.Count)];
+                var rest = heroes.Where(h => h.Id != first.Id && h.Name != first.Name).OrderBy(_ => rng.Next()).Take(2).ToList();
+                var f = new Fixture { Party = new List<string> { rest[0].Id, first.Id, rest[1].Id }, Seed = seed, EnemyNature = nat };
+                f.Deck = d.BuildDeck(f.Party);
+                foreach (var h in f.Party)
+                {
+                    var u = d.Cards.Values.Where(c => c.Hero == h && c.Unique && c.Oracles.Count > 0).Select(c => c.Id).OrderBy(x => x, StringComparer.Ordinal).FirstOrDefault();
+                    if (u != null) f.Deck.Add(u);
+                }
+                var glow = f.Deck.FirstOrDefault(id => (d.Card(id)?.Unique ?? false) && d.Card(id).Oracles.Count > 0);
+                if (glow != null) f.Glow.Add(glow);
+                var neutral = d.NeutralIds().Take(2).ToList();
+                for (int i = 0; i < neutral.Count; i++) f.Deck.Add(GameData.WithOwner(neutral[i], f.Party[1 + i]));
+                var pools = fl.Pools.SelectMany(p => p).Where(l => l.Count > 0).ToList();
+                if (pools.Count > 0) f.Waves.Add(pools[rng.Next(pools.Count)].ToList());
+                if (fl.Elites.Count > 0) f.Waves.Add(fl.Elites[rng.Next(fl.Elites.Count)].ToList());
+                if (f.Waves.Count == 0) return null;
+                f.WaveHp.Add(0.85); f.WaveHp.Add(0.8);
+                f.WaveGauge.Add(200); f.WaveGauge.Add(R.GAUGE_MAX);
+                f.Bg = fl.Bg != null && fl.Bg.TryGetValue("fight", out var bg) ? bg : null;
+                f.Note = $"마을 {v.Name} · 판 속성 {nat}(약점 {string.Join("·", weak)}) · 파티 {string.Join(", ", f.Party)} · 적 {string.Join(" / ", f.Waves.Select(w => string.Join(",", w)))} · 씨앗 {seed}";
+                return f;
+            }
+
             public static Fixture Pilot(GameData d)
             {
+                var v2 = d.Hero("rico") == null ? V2(d) : null;
+                if (v2 != null) return v2;
                 // 코어 샘플(rico · carrot · sion) 또는 콘텐츠 폴더(리코타 · 캬롯 · 시온더다크불릿 — 웹판 키)
                 bool sample = d.Hero("rico") != null;
                 var f = new Fixture { Party = sample ? new List<string> { "rico", "carrot", "sion" } : new List<string> { "리코타", "캬롯", "시온더다크불릿" } };
@@ -55,6 +107,9 @@ namespace Bolzena.Battle
                                   : f.Party.Take(2).Reverse().Select(h => d.Cards.Values.Where(c => c.Hero == h && c.Unique && c.Oracles.Count > 0).Select(c => c.Id).OrderBy(x => x, StringComparer.Ordinal).FirstOrDefault()).Where(x => x != null).ToList();
                 foreach (var u in uniq) if (d.Card(u) != null) f.Deck.Add(u);
                 if (uniq.Count > 0 && d.Card(uniq[0]) != null) f.Glow.Add(uniq[0]);
+                // 시범 — 교주 카드 둘을 주인 사도와 함께(「카드@사도」 — 틀 빛깔 · 핀이 그 사도)
+                var neutral = d.NeutralIds().Take(2).ToList();
+                for (int i = 0; i < neutral.Count; i++) f.Deck.Add(GameData.WithOwner(neutral[i], f.Party[1 + i]));
                 f.Waves.Add(sample ? new List<string> { "fairy_close", "fairy_long" } : new List<string> { "fairymobcloserange_naive", "fairymoblongrange_jolly" });
                 f.Waves.Add(new List<string> { sample ? "curburus" : "clone_carrot" });
                 f.WaveHp.Add(0.85); f.WaveHp.Add(0.55);
@@ -113,6 +168,7 @@ namespace Bolzena.Battle
             foreach (var w in fx.Waves) foreach (var id in w) yield return Look.Enemy(id, data.Enemy(id)?.Boss ?? false).spine;
         }
         public CoreFight Fight => b;
+        public Fixture Fx => fx;
 
         // ── 열기 ──────────────────────────────────────────────────────
         CoreFight StartWave(int w, int partyHp, int gauge, Dictionary<string, Glow> glow)
@@ -121,7 +177,7 @@ namespace Bolzena.Battle
             {
                 Party = fx.Party.ToList(), Deck = fx.Deck.ToList(), Enemies = fx.Waves[w].ToList(),
                 Seed = fx.Seed + w * 101, EnemyHp = w < fx.WaveHp.Count ? fx.WaveHp[w] : (double?)null,
-                Gauge = Math.Max(gauge, w < fx.WaveGauge.Count ? fx.WaveGauge[w] : 0), Glow = glow,
+                Gauge = Math.Max(gauge, w < fx.WaveGauge.Count ? fx.WaveGauge[w] : 0), Glow = glow, EnemyNature = fx.EnemyNature,
             };
             if (partyHp >= 0) st.PartyHp = partyHp;
             cues.Clear();
@@ -257,7 +313,10 @@ namespace Bolzena.Battle
 
         // ── 미리보기 ──────────────────────────────────────────────────
         static List<PreviewFoe> Map(List<Bolzena.Core.PreviewFoe> l) =>
-            l?.Select(x => x == null ? null : new PreviewFoe { Hp = x.Hp, Guard = x.Guard, Kill = x.Kill, Max = x.Max, Break = x.Brk, Tough = (int)Math.Round(x.Tough) }).ToList();
+            l?.Select(x => x == null ? null : new PreviewFoe { Hp = x.Hp, Guard = x.Guard, Kill = x.Kill, Max = x.Max, Break = x.Brk, ToughV = (float)x.Tough }).ToList();
+
+        /// <summary>그 사도(파티 몇 번째)가 그 적을 치면 약점 공격인가 — 성격 · 공명(늘) · 적 표식(core WeakFor).</summary>
+        public bool WeakFor(int hero, int enemy) => hero >= 0 && hero < b.Party.Count && enemy >= 0 && enemy < b.Enemies.Count && b.WeakFor(b.Party[hero], b.Enemies[enemy]);
 
         public IReadOnlyList<PreviewFoe> PreviewCard(int i, int target) => over ? null : Map(b.PreviewCard(i, target));
 
@@ -280,6 +339,19 @@ namespace Bolzena.Battle
         }
 
         void SetGuard(CSide side, int idx, int v) => guard[side == CSide.Party ? "P" : "E" + idx] = Math.Max(0, v);
+
+        // 적 방어 · 실드를 엔진 값(Block + Shield)으로 다시 맞춘다 — 쪽지 없이 바뀐 실드가 화면에 남지 않게(턴 · 적 차례마다)
+        void ResyncGuards(List<BattleEvent> evs)
+        {
+            for (int i = 0; i < b.Enemies.Count; i++)
+            {
+                var e = b.Enemies[i];
+                int g = e.Dead ? 0 : e.Block + e.Shield;
+                if (g == Guard(CSide.Enemy, i)) continue;
+                SetGuard(CSide.Enemy, i, g);
+                evs.Add(new BattleEvent { Kind = EventKind.Block, Target = UnitRef.Enemy(i), Value = 0, BlockAfter = g });
+            }
+        }
 
         int RepHero(int idx)
         {
@@ -371,10 +443,10 @@ namespace Bolzena.Battle
                     case "tough":
                         if (c.Up)
                         {
-                            if (c.From <= 0.001) evs.Add(new BattleEvent { Kind = EventKind.Recover, Target = UnitRef.Enemy(c.Idx), HpAfter = (int)Math.Ceiling(c.To) });
-                            else evs.Add(new BattleEvent { Kind = EventKind.Toughness, Target = UnitRef.Enemy(c.Idx), HpAfter = (int)Math.Ceiling(c.To - 0.001), Up = true });
+                            if (c.From <= 0.001) evs.Add(new BattleEvent { Kind = EventKind.Recover, Target = UnitRef.Enemy(c.Idx), FAfter = (float)c.To });
+                            else evs.Add(new BattleEvent { Kind = EventKind.Toughness, Target = UnitRef.Enemy(c.Idx), FAfter = (float)c.To, Up = true });
                         }
-                        else evs.Add(new BattleEvent { Kind = EventKind.Toughness, Target = UnitRef.Enemy(c.Idx), Value = (int)Math.Round(c.From - c.To), HpAfter = (int)Math.Ceiling(c.To - 0.001) });
+                        else evs.Add(new BattleEvent { Kind = EventKind.Toughness, Target = UnitRef.Enemy(c.Idx), FAfter = (float)c.To });
                         break;
                     case "break":
                         evs.Add(new BattleEvent { Kind = EventKind.Break, Target = UnitRef.Enemy(c.Idx), Value = c.V });
@@ -396,9 +468,28 @@ namespace Bolzena.Battle
                         evs.Add(new BattleEvent { Kind = EventKind.Block, Target = UnitRef.Party(0), Value = 0, BlockAfter = b.Pool.Block + b.Pool.Shield });
                         evs.Add(new BattleEvent { Kind = EventKind.ApChanged, Value = b.Ap });
                         shownAp = b.Ap;
+                        ResyncGuards(evs);
                         break;
+                    case "formOn":
+                    case "formOff":
+                    {
+                        int hi = b.Party.FindIndex(p => p.Key == c.Hero);
+                        evs.Add(new BattleEvent { Kind = EventKind.Form, Actor = UnitRef.Party(Math.Max(0, hi)), Text = c.K == "formOn" ? "on" : "off", Say = c.Name, Anim = c.K == "formOn" ? c.T : c.Label, Value = c.V });
+                        break;
+                    }
                     case "talk":
                         evs.Add(new BattleEvent { Kind = EventKind.Talk, Actor = UnitRef.Party(RepHero(c.Idx)), Text = c.Moment });
+                        break;
+                    case "unguard":
+                    {
+                        // 방어 · 실드가 사라짐(적 차례 시작 · 「실드 전부 파괴」) — V 잃은 양, To 남은 방어+실드
+                        int left = (int)Math.Round(c.To);
+                        SetGuard(c.Side, c.Idx, left);
+                        evs.Add(new BattleEvent { Kind = EventKind.Block, Target = Ref(c), Value = -Math.Max(1, c.V), BlockAfter = left, Text = "unguard" });
+                        break;
+                    }
+                    case "foeTurn":
+                        ResyncGuards(evs);
                         break;
                 }
             }
@@ -428,7 +519,7 @@ namespace Bolzena.Battle
             else if (from == "hand" && to == "play")
             {
                 var ci = Info(b.CardOf(c.CardId), null);
-                evs.Add(new BattleEvent { Kind = EventKind.CardPlayed, Card = ci, Actor = UnitRef.Party(Math.Max(0, ci.Hero)) });
+                evs.Add(new BattleEvent { Kind = EventKind.CardPlayed, Card = ci, Actor = UnitRef.Party(Math.Max(0, ci.Hero >= 0 ? ci.Hero : ci.Owner)) /* 교주 카드는 넣은 사도가 낸다 */ });
             }
             else if (from == "hand" && to == "discard")
                 evs.Add(new BattleEvent { Kind = EventKind.Discard, Card = new CardInfo { Id = c.CardId }, Text = c.Label });
@@ -502,26 +593,40 @@ namespace Bolzena.Battle
 
         static CardType TypeOf(string t) => t == "공격" ? CardType.Attack : t == "스킬" ? CardType.Skill : t == "강화" ? CardType.Power : CardType.Status;
 
-        CardInfo Info(CardView cv, int? handIdx)
+        CardInfo Info(CardView cv, int? handIdx, int depth = 0)
         {
             if (cv == null) return new CardInfo { Id = "?", Name = "?" };
-            int hero = cv.Hero != null ? b.Party.FindIndex(u => u.Key == cv.Hero) : -1;
+            // 사도 카드의 주인(Def.Hero) · 교주 카드를 넣은 사도(core CardView.Owner — 덱 id 「카드@사도」). cv.Hero 는 Owner ?? Def.Hero 라
+            // 교주 카드를 사도 카드로 읽지 않게 둘을 나눈다(그림 · 더미 차례는 교주 카드 그대로, 틀 빛깔 · 핀만 주인 사도)
+            int hero = cv.Def.Hero != null ? b.Party.FindIndex(u => u.Key == cv.Def.Hero) : -1;
+            int owner = cv.Owner != null ? b.Party.FindIndex(u => u.Key == cv.Owner) : -1;
             var type = TypeOf(cv.Type);
             bool dmg = cv.Fx.Any(f => f.K == FxK.Dmg);
             bool allDmg = cv.Fx.Any(f => f.K == FxK.Dmg && f.Target == "allEnemies");
             var info = new CardInfo
             {
-                Id = cv.Id, Name = cv.Name, Hero = hero, HeroName = hero >= 0 ? b.Party[hero].Name : cv.IsStatus ? "상태" : cv.IsCurse ? "저주" : "교주",
+                Id = cv.Id, Name = cv.Name, Hero = hero, HeroName = hero >= 0 ? b.Party[hero].Name : owner >= 0 ? $"교주({b.Party[owner].Name})" : cv.IsStatus ? "상태" : cv.IsCurse ? "저주" : "교주",
                 Cost = handIdx != null ? b.CostOf(cv.Id, handIdx) : cv.Cost, Type = type, TypeName = cv.Type,
                 Target = cv.Target == "적" ? TargetKind.Enemy : cv.Target == "아군" ? TargetKind.Ally : allDmg ? TargetKind.AllEnemies : TargetKind.None,
-                Text = Fmt(text.Card(cv)), Art = Look.CardArt(cv.Hero, GameData.BaseId(cv.Id), cv.Unique, cv.Type),
+                Text = Fmt(text.Card(cv)), Art = Look.CardArt(cv.Def.Hero, GameData.BaseId(cv.Id), cv.Unique, cv.Type),
                 Motion = type == CardType.Attack ? (cv.Cost >= 2 ? Motion.Attack2 : Motion.Attack1) : dmg ? Motion.Skill1 : Motion.None,
                 Hit = Look.Hero(cv.Hero).Hit, Epiphany = b.GlowOf(cv.Id) != null,
                 EpiphanyLabel = cv.Oracle != null ? cv.Oracle.Name : null, Tags = cv.Tags.ToList(), Unplayable = cv.HasTag(Bolzena.Core.Tag.Unplayable),
-                Unique = cv.Unique, Nature = hero >= 0 ? b.Party[hero].Nature : null,
+                Unique = cv.Unique, Owner = owner, Nature = hero >= 0 ? b.Party[hero].Nature : owner >= 0 ? b.Party[owner].Nature : null,
                 Choices = cv.Choices != null && cv.Choices.Count == 2 ? cv.Choices.ToList() : null,
             };
-            info.Terms = Terms.ForCard(text.Card(cv), cv.Tags, w => b.Kw.TryGetValue(w, out var kw) ? (kw.Id, text.Keyword(kw.Def)) : ((string, string)?)null);
+            info.Terms = Terms.ForCard(text.Card(cv), cv.Tags, w => b.Kw.TryGetValue(w, out var kw) ? (kw.Id, Fmt(text.Short(kw.Def))) : ((string, string)?)null);
+            // 사도 고유 효과 — 짧은 글 + 자세히, 생성 카드 — 작은 카드(runui CardTerms: make · transform · 진화 · 결속 · 금기)
+            var cterms = Bolzena.RunUI.CardTerms.Of(data, text, cv);
+            foreach (var tm in info.Terms) if (b.Kw.TryGetValue(tm.Word, out var kw2)) tm.Detail = Fmt(text.Detail(kw2.Def));
+            if (depth == 0)
+                foreach (var ct in cterms)
+                    if (ct.IsCard)
+                    {
+                        var gv = data.View(ct.CardId);
+                        if (gv != null) info.Terms.Add(new Term(ct.Name, "이 카드가 만드는 카드", "card") { Card = Info(gv, null, depth + 1) });
+                    }
+            info.Text = Bolzena.RunUI.CardTerms.Mark(info.Text, cterms);   // 글 속 낱말 밑줄 · 색(판 화면 W.Card 와 같은 표)
             if (cv.Oracle != null) info.Terms.Insert(0, new Term("신탁 · " + cv.Oracle.Name, "이 판에서 붙은 신탁 — 카드 글이 바뀐 모습입니다", "flash"));
             if (info.Epiphany) info.Terms.Insert(0, new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고릅니다(이번에는 코스트 0)", "flash"));
             return info;
@@ -563,7 +668,7 @@ namespace Bolzena.Battle
                 if (kv.Value == 0) continue;
                 if (b.Kw.TryGetValue(kv.Key, out var kw))
                 {
-                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = $"「{kv.Key}」 {kv.Value} — {text.Keyword(kw.Def)}" });
+                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = $"「{kv.Key}」 {kv.Value} — {Fmt(text.Short(kw.Def))}", Detail = Fmt(text.Detail(kw.Def)) });
                     continue;
                 }
                 bool bad = R.BAD_ST.Contains(kv.Key) || kv.Key == R.STUN;
@@ -572,7 +677,16 @@ namespace Bolzena.Battle
             if (hero && b.Stacks.TryGetValue(u.Key, out var bag))
                 foreach (var kv in bag)
                     if (kv.Value != 0 && b.Kw.TryGetValue(kv.Key, out var kw))
-                        res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = $"「{kv.Key}」 {kv.Value} — {text.Keyword(kw.Def)}" });
+                        res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = $"「{kv.Key}」 {kv.Value} — {Fmt(text.Short(kw.Def))}", Detail = Fmt(text.Detail(kw.Def)) });
+            // 변신 칩 — 이름 · 남은 턴(0 = 전투 끝까지)
+            if (hero)
+            {
+                FormView fv = null;
+                try { fv = b.FormOf(u.Key); } catch (Exception) { }
+                if (fv != null)
+                    res.Insert(0, new StatusChip { Id = fv.Name, Value = fv.Left > 0 ? fv.Left.ToString() : "", Turns = fv.Left > 0 ? fv.Left : -1, Kind = "buff",
+                        Text = $"변신 「{fv.Name}」 · {(fv.Left > 0 ? fv.Left + "턴" : "전투 끝까지")}" });
+            }
             return res;
         }
 
@@ -607,13 +721,13 @@ namespace Bolzena.Battle
                     var look = Look.Hero(u.Key);
                     var hs = new HeroState
                     {
-                        Key = look.Art, Id = u.Key, Name = u.Name, Tint = look.Tint, UltName = h?.Ult?.Name, UltText = h?.Ult != null ? Fmt(text.Fx(h.Ult.Fx)) : "",
+                        Key = look.Art, Id = u.Key, Name = u.Name, Tint = look.Tint, UltName = h?.Ult?.Name, UltText = h?.Ult != null ? Fmt(text.Fx(h.Ult.Fx)) : "", UltShort = h?.Ult != null ? Fmt(text.Short(h.Ult)) : "",
                         Atk = u.Atk, Def = u.Def, Crit = u.Crit, AtkNow = b.AtkNow(u), DefNow = b.DefNow(u), CritNow = u.Crit + Mathf.RoundToInt((float)b.StatMod(u, "crit") * 100),
                         Role = u.Role, Nature = u.Nature, Row = u.Row, Blurb = h?.Blurb, Ult = b.Gauge, UltMax = h?.Ult?.Cost ?? 999, Dead = u.Dead,
-                        KeywordName = h?.Keyword?.Name, KeywordText = h?.Keyword != null ? Fmt(text.Keyword(h.Keyword)) : null,
+                        KeywordName = h?.Keyword?.Name, KeywordText = h?.Keyword != null ? Fmt(text.Detail(h.Keyword)) : null, KeywordShort = h?.Keyword != null ? Fmt(text.Short(h.Keyword)) : null,
                         KeywordStacks = h?.Keyword != null ? b.StackOf(u.Key, h.Keyword.Name) : 0,
                     };
-                    if (h != null) foreach (var r in h.Passives) hs.Passives.Add(Fmt(text.Rule(r)));
+                    if (h != null) foreach (var r in h.Passives) { hs.Passives.Add(Fmt(text.Detail(r))); hs.PassivesShort.Add((r.Name ?? "패시브") + " — " + Fmt(text.Short(r))); }
                     hs.Chips = ChipsOf(u, true);
                     hs.Race = h?.Race;
                     try
@@ -637,16 +751,17 @@ namespace Bolzena.Battle
                 foreach (var e in b.Enemies)
                 {
                     var def = data.Enemy(e.Key);
-                    var (spine, skin) = Look.Enemy(e.Key, e.Boss);
+                    var (spine, skin) = Look.EnemyAs(e.Key, e.Boss, e.Nature);   // 판 속성(통일된 성격)의 스킨
                     var it = e.Intent;
                     int? shown = b.IntentHit(e);
+                    var tv = b.ToughViewOf(e);   // 강인도 · 격파 · 성격 · 약점 — 소수 그대로(1/3 · 1/6)
                     var es = new EnemyState
                     {
                         Key = spine, Skin = skin, Id = e.Key, Name = e.Name, Boss = e.Boss, Hp = Math.Max(0, e.Hp), MaxHp = e.MaxHp, Block = e.Block + e.Shield,
-                        Tough = (int)Math.Ceiling(e.Tough - 0.001), MaxTough = (int)Math.Ceiling(e.ToughMax - 0.001), Broken = e.Broken, Sealed = e.Sealed, Dead = e.Dead,
+                        ToughV = (float)tv.Left, ToughMaxV = (float)tv.Max, Broken = tv.Broken, Resting = tv.Resting, Sealed = e.Sealed, Dead = e.Dead,
                         Intent = e.Broken || e.Dead ? IntentKind.None : KindOf(it), IntentValue = shown ?? it?.V ?? 0, IntentHits = it != null && it.T == "multi" ? Math.Max(1, it.N) : 1,
                         IntentText = it != null ? text.Intent(it, shown) : "", IntentSay = it?.Say, RushNeed = b.RushOf(e), RushCnt = e.RushCnt, RushedTurn = e.RushedTurn,
-                        Nature = e.Nature, Blurb = def?.Blurb, Weak = b.WeakOf(e) ?? new List<string>(),
+                        Nature = tv.Nature, Blurb = def?.Blurb, Weak = tv.Weak ?? new List<string>(),
                     };
                     if (def != null) foreach (var p in def.Passives) es.Passives.Add(p.Name + (p.Do != null ? " — " + text.Intent(p.Do) : ""));
                     es.Chips = ChipsOf(e, false);

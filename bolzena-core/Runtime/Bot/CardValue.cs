@@ -79,6 +79,8 @@ namespace Bolzena.Core
                     case FxK.Extra: v += f.Ratio * f.HitsOr1 * 0.83 * per * Area(f.Target ?? "oneEnemy"); per = 1; break;
                     case FxK.CardStatus: v += f.Id == "탐구심" ? 0.2 * Math.Max(1, f.V) : 0.15; break;
                     case FxK.Transform: v += 0.4; break;
+                    case FxK.Form: v += FORM_VAL; break;   // 대충 — 검사는 FormValue 로 정확히
+                    case FxK.FormEnd: break;
                     case FxK.Later: case FxK.AfterCards: v += 0.8 * ValueOf(f.Then); break;
                     case FxK.Trap: v += 0.6 * ValueOf(f.Then); break;
                     case FxK.Confuse: v += 0.6; break;
@@ -189,6 +191,47 @@ namespace Bolzena.Core
             if (ex == 0) v *= 0.7; else if (ex > 0) v *= ex >= 3 ? 0.9 : 0.85;
             int rc = c.TagN(Tag.Recall);
             if (rc >= 0) v += 0.15 * Math.Min(3, Math.Max(1, rc));
+            return v;
+        }
+
+        /// <summary>효과 form 한 조각의 대충의 값(데이터 없이 셀 때).</summary>
+        public const double FORM_VAL = 1.0;
+        /// <summary>변신 동안 카드 한 장이 손에 들 확률(턴마다, 대충).</summary>
+        const double FORM_DRAWN = 0.45;
+
+        /// <summary>
+        /// 변신 하나의 값어치 — 지속 T 턴(전투 끝까지면 4) 동안: 능력치(증감과 같은 셈) + 바뀐 카드의 값 차이 × 뽑힐 확률 + 카드 덤 + 덧붙인 패시브(턴마다 반쯤) − 끈 패시브 + 풀릴 때.
+        /// 정밀하지 않다 — 크게 어긋난 변신을 찾는 체.
+        /// </summary>
+        public static double FormValue(FormDef f, GameData d, string heroId)
+        {
+            if (f == null) return 0;
+            double T = f.Turns > 0 ? Math.Min(f.Turns, 4) : 4, v = 0;
+            if (f.Mods != null) foreach (var kv in f.Mods) v += (kv.Key == "taken" ? -kv.Value : kv.Value) * 2 * T;
+            if (f.Cards != null && d != null)
+                foreach (var kv in f.Cards)
+                {
+                    var a = d.View(kv.Key); var b = d.View(kv.Value);
+                    if (a == null || b == null) continue;
+                    v += (CardWorth(b) - CardWorth(a)) * T * FORM_DRAWN;
+                }
+            if (f.Bonus != null && d != null)
+            {
+                var h = d.Hero(heroId);
+                var ids = (h?.Starter ?? new List<string>()).Concat(d.UniquesOf(heroId)).ToList();
+                foreach (var b in f.Bonus)
+                    foreach (var id in ids)
+                    {
+                        var c = d.View(id);
+                        if (c == null || (b.Card != null && b.Card != id) || (b.Type != null && c.Type != b.Type) || (b.Unique && !c.Unique) || (b.Tag != null && !c.HasTag(b.Tag))) continue;
+                        double w = c.Unique ? 0.5 : 1;
+                        double dmg = b.Ratio > 0 ? ValueOf(c.Fx.Where(x => x.K == FxK.Dmg || x.K == FxK.Extra).ToList()) * (b.Ratio - 1) : 0;
+                        v += (dmg + ValueOf(b.Fx ?? new List<Fx>(), b.Tags)) * w * T * FORM_DRAWN;
+                    }
+            }
+            foreach (var r in f.Passives ?? new List<PassiveRule>()) v += ValueOf(r.Fx) * T * 0.5;
+            if (f.Replace && d?.Hero(heroId) is HeroDef hd) foreach (var r in hd.Passives) v -= ValueOf(r.Fx) * T * 0.5;
+            v += ValueOf(f.Off ?? new List<Fx>());
             return v;
         }
 

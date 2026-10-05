@@ -7,7 +7,7 @@ L.hero({
   id: '다야', name: '다야', nature: '순수', row: 'back', role: '딜러', star: 3, hp: 600, atk: 155, def: 25, crit: 10,
   blurb: '보석 감정이 취미인 다이아몬드의 용족. 약점을 찔러 원석을 캐내고, 원석이 둘 모이면 진품 다이아로 친다 — 혼자면 그냥 유리다.',
   keyword: {
-    name: KW, desc: '들어온 보석 감정 의뢰. 셋이면 「원석」 한 장을 손에 받는다', carrier: 'self', cap: 3,
+    name: KW, desc: '들어온 보석 감정 의뢰 — 셋이면 「원석」 한 장', carrier: 'self', cap: 3,
     rules: [{ name: '감정 완료', when: { on: 'stackReach', id: KW, n: 3 }, fx: [spend(KW, 'all'), make(GEM, 1)] }],
   },
   passives: [

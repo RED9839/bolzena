@@ -10,7 +10,7 @@ export const heroesA = [
 {
   hero: { id: '라이카', name: '라이카', nature: '순수', row: 'front', role: '딜러', star: 3, hp: 830, atk: 137, def: 40, crit: 10,
     blurb: '220V 콘센트를 사랑하는 번개 정령. 주먹을 내지를 때마다 제 몸에 전류를 꽂아 다음 주먹을 무겁게 한다 — 그 값은 파티 HP 로 치른다.',
-    keyword: { name: '과충전', desc: '제 몸에 꽂아 둔 220V. 다음 공격 카드 한 장이 그만큼 무거워지고 빠져나간다', carrier: 'self', cap: 1, consumeAll: true,
+    keyword: { name: '과충전', desc: '제 몸에 꽂은 220V — 다음 공격 카드 한 장이 무거워진다', carrier: 'self', cap: 1, consumeAll: true,
       per: [{ stat: 'dealt', v: 0.5 }] },
     passives: [
       { name: '220V 과충전', when: { on: 'play', type: '공격' }, conds: [{ c: 'hpMin', pct: 0.3 }], limit: { per: 'turn', n: 2 },
@@ -61,7 +61,7 @@ export const heroesA = [
 {
   hero: { id: '나이아', name: '나이아', nature: '순수', row: 'mid', role: '서포터', star: 3, hp: 600, atk: 75, def: 60, crit: 5,
     blurb: '인사 대신 물총부터 쏘는 외로운 수문장. 물총을 맞은 아군이 이번 턴 카드를 내면 물줄기나 물보라가 따라붙는다.',
-    keywords: [{ name: '물총', desc: '나이아가 쏜 물에 젖은 아군. 이번 턴 그 아군이 카드를 내면 물이 따라간다', carrier: 'hero', cap: 1, endClear: true }],
+    keywords: [{ name: '물총', desc: '나이아가 쏜 물에 젖은 아군 — 이번 턴 그 아군이 카드를 내면 물이 따라간다', carrier: 'hero', cap: 1, endClear: true }],
     passives: [
       { name: '물줄기', when: { on: 'play', marked: '물총', type: '공격' }, limit: { per: 'turn', n: 2 }, fx: [F('extra', { ratio: 0.6, target: E1 })] },
       { name: '물보라', when: { on: 'play', marked: '물총', type: '스킬' }, limit: { per: 'turn', n: 2 }, fx: [SH(0.6)] },
@@ -111,7 +111,7 @@ export const heroesA = [
 {
   hero: { id: '아일라', name: '아일라', nature: '순수', row: 'mid', role: '서포터', star: 3, hp: 660, atk: 86, def: 60, crit: 5,
     blurb: '화산섬의 정령. 맞을 때마다 빠직이 차오르고, 다섯이 차면 섬을 뒤엎는 대분화가 터진다 — 명상으로 식힐지, 터뜨릴지.',
-    keyword: { name: '빠직', desc: '참고 있는 화. 다섯이 차면 대분화가 터진다', carrier: 'self', cap: 5,
+    keyword: { name: '빠직', desc: '참고 있는 화 — 다섯이면 대분화', carrier: 'self', cap: 5,
       rules: [{ name: '대분화', when: { on: 'stackReach', id: '빠직', n: 5 }, fx: [D(2.0, EA), F('payHpPct', { v: 0.06 }), SP('빠직', 'all')] }] },
     passives: [
       { name: '부글부글', when: { on: 'hurt', guarded: true }, limit: { per: 'turn', n: 3 }, fx: [K('빠직', 1)] },
@@ -217,7 +217,7 @@ export const heroesA = [
 {
   hero: { id: '빅우드', name: '빅우드', nature: '순수', row: 'front', role: '탱커', star: 2, hp: 930, atk: 66, def: 61, crit: 5,
     blurb: '얻어맞으면서도 웃는 나무 정령. 맞을 때마다 나이테가 늘고, 나이테가 두꺼울수록 그가 거는 실드도 두꺼워진다.',
-    keyword: { name: '나이테', desc: '맞으며 늘어난 나이테. 1개당 빅우드가 주는 실드 +10%', carrier: 'self', cap: 5, per: [{ stat: 'guard', v: 0.1 }] },
+    keyword: { name: '나이테', desc: '맞으며 늘어난 나이테 — 쌓일수록 실드가 두꺼워진다', carrier: 'self', cap: 5, per: [{ stat: 'guard', v: 0.1 }] },
     passives: [
       { name: '거기 말고 여기', when: { on: 'hurt', guarded: true }, limit: { per: 'turn', n: 3 }, fx: [K('나이테', 1)] },
       { name: '오래된 나무', when: { on: 'play' }, conds: [{ c: 'stack', id: '나이테', n: 5 }], fx: [ST('결정화', 2), SP('나이테', 'all')] },
@@ -267,7 +267,7 @@ export const heroesA = [
 {
   hero: { id: '가비아', name: '가비아', nature: '순수', row: 'mid', role: '서포터', star: 2, hp: 640, atk: 64, def: 63, crit: 5,
     blurb: '목소리를 키우면 땅이 울리는 대지의 정령. 카드를 속삭임으로 낼지 외침으로 낼지 고른다 — 외침은 두 배지만 목청이 차오른다.',
-    keyword: { name: '목청', desc: '외치고 난 목. 차오르면 땅이 울리고 손이 미끄러진다', carrier: 'self', cap: 1,
+    keyword: { name: '목청', desc: '외치고 난 목 — 외침을 고르면 차고, 땅이 울리지만 손이 미끄러진다', carrier: 'self', cap: 1,
       rules: [{ name: '지진', when: { on: 'stackReach', id: '목청', n: 1 }, fx: [TOUGH(1, EA), ST('미끄러움', 1, 'party'), SP('목청', 'all')] }] },
     passives: [
       { name: '조용한 대지', when: { on: 'turnEnd' }, conds: [{ c: 'ownNone' }], fx: [SH(1.0)] },
@@ -317,7 +317,7 @@ export const heroesA = [
 {
   hero: { id: '우이_기억', name: '우이(기억)', nature: '냉정', row: 'back', role: '서포터', star: 3, hp: 580, atk: 95, def: 61, crit: 5,
     blurb: '지웠던 불행한 기억을 안고 돌아온 본체. 카드가 소멸할 때마다 되찾은 기억이 쌓여 손끝이 단단해지고, 제 카드가 사라질 땐 파티의 아픔 하나를 씻어 낸다.',
-    keyword: { name: '되찾은 기억', desc: '사라진 카드에서 건져 올린 기억. 1개당 우이(기억)의 피해 · 실드 +10%', carrier: 'self', cap: 6,
+    keyword: { name: '되찾은 기억', desc: '사라진 카드에서 건져 올린 기억', carrier: 'self', cap: 6,
       per: [{ stat: 'dealt', v: 0.1 }, { stat: 'guard', v: 0.1 }] },
     passives: [
       { name: '도망치지 않는 기억', when: { on: 'exhaust', who: 'any' }, limit: { per: 'turn', n: 3 }, fx: [K('되찾은 기억', 1)] },
@@ -368,7 +368,7 @@ export const heroesA = [
 {
   hero: { id: '니콜', name: '니콜', nature: '냉정', row: 'back', role: '딜러', star: 3, hp: 500, atk: 145, def: 25, crit: 10,
     blurb: '완벽을 강요하는 감독. 고유 카드는 내고 나면 손으로 돌아와 테이크를 쌓고, 세 번째 테이크에 「오케이 컷」 이 나온다.',
-    keyword: { name: '테이크', desc: '다시 찍은 횟수. 1개당 니콜의 피해 +15%, 셋이면 「오케이 컷」', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: 0.15 }],
+    keyword: { name: '테이크', desc: '다시 찍은 횟수 — 쌓일수록 세지고, 셋이면 「오케이 컷」', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: 0.15 }],
       rules: [{ name: '오케이 컷', when: { on: 'stackReach', id: '테이크', n: 3 }, fx: [SP('테이크', 'all'), F('make', { id: '니콜_t1', v: 1 })] }] },
     passives: [
       { name: '한 번 더 갑니다', when: { on: 'play', type: '공격' }, limit: { per: 'turn', n: 1 }, fx: [K('테이크', 1)] },
@@ -419,7 +419,7 @@ export const heroesA = [
 {
   hero: { id: '실라', name: '실라', nature: '냉정', row: 'back', role: '딜러', star: 3, hp: 550, atk: 145, def: 25, crit: 10,
     blurb: '정면 승부엔 강하고 기습엔 약한 바람의 맏언니. 한 적을 정면으로 마주 보고 쏠수록 그 적은 바람에 깎여 무너진다.',
-    keyword: { name: '정면 승부', desc: '실라와 정면으로 마주 선 적. 1개당 받는 피해 +10%', carrier: 'enemy', cap: 3, hunt: true, per: [{ stat: 'taken', v: 0.1 }] },
+    keyword: { name: '정면 승부', desc: '실라와 정면으로 마주 선 적', carrier: 'enemy', cap: 3, hunt: true, per: [{ stat: 'taken', v: 0.1 }] },
     passives: [
       { name: '맞바람', when: { on: 'play', type: '공격' }, fx: [K('정면 승부', 1, E1)] },
       { name: '기습엔 약해', when: { on: 'hurt', guarded: true }, conds: [{ c: 'firstTurn' }], limit: { per: 'fight', n: 1 }, fx: [ST('둔화', 1, E1)] },
@@ -469,7 +469,7 @@ export const heroesA = [
 {
   hero: { id: '잉클', name: '잉클', nature: '냉정', row: 'back', role: '딜러', star: 3, hp: 550, atk: 145, def: 25, crit: 10,
     blurb: '세상에 한 획 긋기가 소원인 먹물 정령. 공격할 때마다 적 전체에 먹이 번지고, 스킬로 번진 먹을 한 획에 긋는다.',
-    keyword: { name: '번짐', desc: '적에게 스며든 먹물. 1개당 받는 피해 +5%', carrier: 'enemy', cap: 5, per: [{ stat: 'taken', v: 0.05 }] },
+    keyword: { name: '번짐', desc: '적에게 스며든 먹물', carrier: 'enemy', cap: 5, per: [{ stat: 'taken', v: 0.05 }] },
     passives: [
       { name: '먹물 튀기기', when: { on: 'play', type: '공격' }, fx: [K('번짐', 1, EA)] },
     ],

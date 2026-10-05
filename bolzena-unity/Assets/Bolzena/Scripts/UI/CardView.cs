@@ -7,11 +7,11 @@ using UnityEngine;
 namespace Bolzena.UI
 {
     // 카드 한 장 — 손패 · 신탁 창 · 더미 보기가 같은 정보 차례(카제나 카드의 차례를 따르고, 그림 · 장식 · 글꼴은 우리 것):
-    //   위: 큰 코스트 · 이름 · 종류 아이콘 + 종류      가운데: 그림이 카드 전체(둥근 모서리로 오린다 — 판 화면 W.Card 와 같은 꼴)
+    //   위: 큰 코스트 · 이름 · 종류 아이콘 + 종류(「공격」 · 「스킬」 · 「강화」)      가운데: 그림이 카드 전체(둥근 모서리로 오린다 — 판 화면 W.Card 와 같은 꼴)
     //   그림(임시 규칙 — runui Docs/카드그림.md · CardArt): 시작 카드 = 주인 사도 스탠딩 상반신, 고유 카드 = 카드 그림 표의 스킬 아이콘
     //   (흐린 확대 바탕 + 가운데 선명한 아이콘), 교주 · 상태 카드 = 그림 없음
     //   아래: 작은 장식 선 · 키워드 태그 줄(금 「[ 회수 / 소멸 ]」) · 효과 글(수치 하늘색) — 손패에서는 감추고 올리면 보인다(ShowDesc)
-    //   왼쪽 가장자리 띠 · 테 = 주인 사도의 성격 색(교주 금 · 상태 잿빛 보라 · 신탁 금)
+    //   왼쪽 가장자리 띠 · 테 = 주인 사도의 성격 색(교주 카드는 넣은 사도의 성격 — 주인이 없으면 금 · 상태 잿빛 보라 · 신탁 금)
     // 신탁 카드면 뒤에 도는 빛줄기 · 금빛 테 · 떠오르는 반짝이. 자리(Target*)를 주면 매 프레임 부드럽게 따라간다(화면 시간).
     public class CardView : MonoBehaviour
     {
@@ -24,7 +24,7 @@ namespace Bolzena.UI
         public bool ShowDesc = true;          // 효과 글(손패는 올렸을 때만)
         public bool ShowPin = true;           // 오른쪽 위 사도 얼굴(손패는 손 위의 핀이 맡는다)
         public float SlotX;                   // 손 안의 제자리 x(끌어 겨눌 때 그 자리에 띄운다)
-        SpriteRenderer rim, body, art, iconPlate, icon, descBg, glow, flash, epiGlow, band, shadeT, shadeB, typeIcon, deco, decoDot, pinRim, pin, costLine;
+        SpriteRenderer rim, body, art, iconPlate, icon, descBg, glow, flash, epiGlow, band, shadeT, shadeB, typeIcon, deco, decoDot, pinRim, pin;
         SpriteMask artMask, pinMask;
         SpriteRenderer typeBg;
         MeshRenderer rays;
@@ -92,7 +92,6 @@ namespace Bolzena.UI
             float x0 = -W / 2 + 0.12f, y0 = H / 2 - 0.1f;
             costText = Make.Text("cost", t, "", new Vector3(x0 + 0.17f, y0 - 0.27f, 0), 0.5f, 0, Color.white);
             Make.Outline(costText, 0.22f, Tone.Outline);
-            costLine = Make.Box("costline", t, Res.UI("white"), new Vector3(x0 + 0.17f, y0 - 0.55f, 0), new Vector2(0.26f, 0.025f), 0);
             nameText = Make.Text("name", t, "", new Vector3(x0 + 0.4f, y0 - 0.16f, 0), 0.21f, 0, Color.white, TextAlignmentOptions.Left, W - 0.56f);
             nameText.rectTransform.pivot = new Vector2(0, 0.5f);
             nameText.enableAutoSizing = true; nameText.fontSizeMax = 2.1f; nameText.fontSizeMin = 1.3f;
@@ -139,7 +138,7 @@ namespace Bolzena.UI
             // 판 화면과 같은 표(Theme.NatureCard — 톤.md §1: 순수 #4CB83A · 광기 #E04848 · 냉정 #18C2E6 · 우울 #8A5CE6 · 활발 #E6C21A)
             if (c.Epiphany) return new Color(1f, 0.82f, 0.4f);
             if (c.Type == CardType.Status || (c.Hero < 0 && c.Unplayable)) return Bolzena.RunUI.Theme.StatusCard;
-            if (c.Hero < 0 || string.IsNullOrEmpty(c.Nature)) return Bolzena.RunUI.Theme.LeaderCard;
+            if ((c.Hero < 0 && c.Owner < 0) || string.IsNullOrEmpty(c.Nature)) return Bolzena.RunUI.Theme.LeaderCard;   // 교주 카드는 넣은 사도(Owner)의 성격 — 주인이 없을 때만 금빛 중립
             return Bolzena.RunUI.Theme.NatureCardOf(c.Nature);
         }
 
@@ -148,23 +147,23 @@ namespace Bolzena.UI
             var info = Info;
             var rc = RimColor(info);
             rim.color = rc;
-            var h = info.Hero >= 0 && HeroOf != null ? HeroOf(info.Hero) : null;
+            int who = info.Hero >= 0 ? info.Hero : info.Owner;   // 교주 카드는 넣은 사도의 얼굴 핀
             band.color = rc;
             glow.color = new Color(Mathf.Lerp(rc.r, 1f, 0.3f), Mathf.Lerp(rc.g, 1f, 0.3f), Mathf.Lerp(rc.b, 1f, 0.3f), glow.color.a);   // 올림 빛도 성격 빛
             SetArt(info, rc);
             costText.text = info.Unplayable && info.Cost <= 0 ? "-" : info.Cost.ToString();
-            costLine.color = Color.Lerp(rc, Color.white, 0.4f);
             nameText.text = info.Name;
-            typeText.text = (info.Hero >= 0 && !info.Unique && info.Type != CardType.Status ? "기본 " : "") + (info.TypeName ?? (info.Type == CardType.Attack ? "공격" : "스킬"));   // 판 화면 W.Card 와 같은 글
+            typeText.text = info.TypeName ?? (info.Type == CardType.Attack ? "공격" : info.Type == CardType.Power ? "강화" : "스킬");   // 「공격」 · 「스킬」 · 「강화」 그대로(머리말 없이 — 판 화면 W.TypeLabel 과 같은 글)
             typeText.color = TypeColor(info);
             typeText.ForceMeshUpdate();
             typeBg.size = new Vector2(typeText.preferredWidth + 0.38f, 0.25f);
             typeBg.transform.localPosition = new Vector3(-W / 2 + 0.12f + 0.4f + typeBg.size.x / 2, H / 2 - 0.1f - 0.47f, 0);
             typeIcon.sprite = Res.UI(info.Type == CardType.Attack ? "ic_sword" : info.Type == CardType.Power ? "ic_up" : info.Type == CardType.Status ? "ic_skull" : "ic_shield");
             Make.Fit(typeIcon, new Vector2(0.18f, 0.18f));
+            var h = who >= 0 && HeroOf != null ? HeroOf(who) : null;
             pin.sprite = h != null ? Face(h.Key) : null;
             if (pin.sprite != null) Make.Fit(pin, new Vector2(0.36f, 0.36f));
-            if (h != null) pinRim.color = Color.Lerp(h.Tint, Color.white, 0.4f);
+            if (h != null) pinRim.color = info.Hero >= 0 ? Color.Lerp(h.Tint, Color.white, 0.4f) : Color.Lerp(rc, Color.white, 0.35f);
             string tags = Tone.TagLine(info.Tags);
             tagText.text = tags;
             float decoY = -H / 2 + (tags.Length > 0 ? 1.06f : 0.9f);
@@ -189,7 +188,7 @@ namespace Bolzena.UI
             ApplyVisibility();
         }
 
-        // 그림 — Info.Art: "st:<그림 키>" 스탠딩 상반신 · "ic:<아이콘>" 고유 카드 아이콘 · 그 밖은 Resources/Art 의 그림 이름(옛 꼴)
+        // 그림 — Info.Art: "st:<그림 키>" 스탠딩 상반신 · "pc:<그림>" 고유 · 생성 카드 원작 그림(창 비율로 미리 자른 것) · "ic:<아이콘>" 고유 카드 아이콘 · 그 밖은 Resources/Art 의 그림 이름(옛 꼴)
         bool iconKind;
         void SetArt(CardInfo info, Color rc)
         {
@@ -200,6 +199,8 @@ namespace Bolzena.UI
                 var key = a.Substring(3);
                 pic = Bolzena.RunUI.CardArt.Upper(key, ArtW / ArtH, 0.56f) ?? Crop(Res.Sprite("Art/" + key), ArtW / ArtH, 0.58f);
             }
+            else if (a != null && a.StartsWith("pc:"))
+                pic = Bolzena.RunUI.CardArt.Pic(a.Substring(3));
             else if (a != null && a.StartsWith("ic:"))
             {
                 var key = a.Substring(3);
@@ -277,7 +278,6 @@ namespace Bolzena.UI
             artMask.backSortingOrder = o + 1;
             artMask.frontSortingOrder = o + 6;   // 효과 글 어둠 판(o+6)까지 둥글게 오린다
             costText.sortingOrder = o + 7;
-            costLine.sortingOrder = o + 7;
             nameText.sortingOrder = o + 7;
             typeIcon.sortingOrder = o + 7;
             typeBg.sortingOrder = o + 6;
@@ -347,7 +347,6 @@ namespace Bolzena.UI
             Make.Alpha(shadeT, 0.9f * a);
             Make.Alpha(shadeB, (0.35f + 0.63f * descA) * a);
             Make.Alpha(pinRim, a);
-            Make.Alpha(costLine, a);
             Make.Alpha(typeBg, 0.7f * a);
             costText.alpha = nameText.alpha = typeText.alpha = epiText.alpha = a;
             costText.color = Playable ? new Color(1, 1, 1, a) : new Color(1f, 0.6f, 0.6f, a);

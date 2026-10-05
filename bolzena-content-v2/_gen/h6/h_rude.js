@@ -6,7 +6,7 @@ L.hero({
   id: '루드', name: '루드', nature: '활발', row: 'front', role: '탱커', star: 3, hp: 950, atk: 101, def: 67, crit: 5,
   blurb: '근육으로 다 해결하는 루비의 용족 헬창. 쉬지 않고 자기 카드만 잇달아 내면 세트가 쌓여 실드가 두꺼워진다 — 다른 사람이 끼어들면 세트가 끊긴다.',
   keyword: {
-    name: KW, desc: '쉬지 않고 이어 가는 세트. 루드가 카드를 낼 때마다 +1, 다른 사도의 카드가 나가거나 턴이 끝나면 끊긴다. 2세트째부터 실드가 붙고, 4세트면 결의 1', carrier: 'self', cap: 4, wipe: true, endClear: true,
+    name: KW, desc: '쉬지 않고 이어 가는 세트 — 루드의 카드를 잇달아 낼수록 실드가 붙고, 넷째에 결의', carrier: 'self', cap: 4, wipe: true, endClear: true,
     rules: [
       { name: '2세트', when: { on: 'stackReach', id: KW, n: 2 }, fx: [sh(0.3)] },
       { name: '3세트', when: { on: 'stackReach', id: KW, n: 3 }, fx: [sh(0.6)] },

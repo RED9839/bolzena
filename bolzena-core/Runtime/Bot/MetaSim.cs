@@ -24,6 +24,9 @@ namespace Bolzena.Core
             public Dictionary<string, (int n, double win)> Villages = new();
             public double[] Fell = new double[2];
             public double AvgTurnsFight, AvgTurnsBoss;
+            /// <summary>격파 — 판당 · 싸움 종류(fight · elite · boss)마다 싸움당. 강인도를 깎은 카드 가운데 약점 공격 비율(%).</summary>
+            public double BreaksPerRun, WeakPct;
+            public Dictionary<string, double> BreaksPerFight = new();
         }
 
         static readonly Dictionary<string, string> LETTER = new() { ["탱커"] = "T", ["서포터"] = "S", ["딜러"] = "D" };
@@ -80,6 +83,7 @@ namespace Bolzena.Core
             void Add(Dictionary<string, int[]> m, string k, bool win) { if (!m.TryGetValue(k, out var x)) m[k] = x = new int[2]; x[0]++; if (win) x[1]++; }
             int wins = 0; var fell = new int[2];
             int fT = 0, fN = 0, bT = 0, bN = 0;
+            int brk = 0, th = 0, tw = 0; var bk = new Dictionary<string, int[]>();
             foreach (var j in jobs)
             {
                 var r = res[j.i];
@@ -87,6 +91,13 @@ namespace Bolzena.Core
                 Add(vil, r.Village, r.Clear);
                 foreach (var k in j.party) Add(hero, k, r.Clear);
                 Add(comp, string.Concat(j.party.Select(k => LETTER.TryGetValue(d.Hero(k).Role, out var l) ? l : "?").OrderBy(x => "TSD".IndexOf(x))), r.Clear);
+                brk += r.Breaks; th += r.ToughHits; tw += r.ToughWeakHits;
+                foreach (var kv in r.Kinds)
+                {
+                    string g = kv.Key.Substring(kv.Key.IndexOf(':') + 1);
+                    if (!bk.TryGetValue(g, out var a)) bk[g] = a = new int[2];
+                    a[0] += kv.Value.n; a[1] += r.BreaksBy.TryGetValue(kv.Key, out var b) ? b : 0;
+                }
                 foreach (var kv in r.Kinds) { if (kv.Key.EndsWith(":boss")) { bT += kv.Value.turns; bN += kv.Value.n; } else if (kv.Key.EndsWith(":fight")) { fT += kv.Value.turns; fN += kv.Value.n; } }
             }
             return new Result
@@ -97,6 +108,8 @@ namespace Bolzena.Core
                 Villages = vil.ToDictionary(kv => kv.Key, kv => (kv.Value[0], Pct(kv.Value[1], kv.Value[0]))),
                 Fell = fell.Select(n => Pct(n, jobs.Count)).ToArray(),
                 AvgTurnsFight = fN > 0 ? (double)fT / fN : 0, AvgTurnsBoss = bN > 0 ? (double)bT / bN : 0,
+                BreaksPerRun = jobs.Count > 0 ? (double)brk / jobs.Count : 0, WeakPct = Pct(tw, th),
+                BreaksPerFight = bk.ToDictionary(kv => kv.Key, kv => kv.Value[0] > 0 ? (double)kv.Value[1] / kv.Value[0] : 0),
             };
         }
 
@@ -419,6 +432,7 @@ namespace Bolzena.Core
             sb.AppendLine($"메타 통계 — smart 봇 {r.Runs}판(바퀴 {r.Rounds}) · 전체 완주 {r.Clear:0.0}% · {r.Sec:0}초{(r.Hpx != 1 || r.Dmgx != 1 ? $" · 적 체력 ×{r.Hpx} 피해 ×{r.Dmgx}" : "")}");
             sb.AppendLine($"  마을  {string.Join(" · ", r.Villages.Select(kv => $"{d.Villages[kv.Key].Name} {kv.Value.win:0.0}%({kv.Value.n}판)"))} · 쓰러진 층 1층 {r.Fell[0]:0.0}% · 2층 {r.Fell[1]:0.0}%");
             sb.AppendLine($"  평균 턴 — 일반 싸움 {r.AvgTurnsFight:0.0} · 보스 {r.AvgTurnsBoss:0.0}");
+            sb.AppendLine($"  격파 — 판당 {r.BreaksPerRun:0.0} · 싸움당 {string.Join(" · ", r.BreaksPerFight.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))} · 강인도 깎은 카드 가운데 약점 공격 {r.WeakPct:0}%");
             sb.AppendLine("편성(역할 셋)");
             foreach (var kv in r.Comps.OrderByDescending(x => x.Value.win)) sb.AppendLine($"  {kv.Key}  {kv.Value.win,5:0}%  ({kv.Value.n}판)");
             sb.AppendLine("사도");

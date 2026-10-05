@@ -7,7 +7,7 @@ L.hero({
   id: '리츠', name: '리츠', nature: '광기', row: 'front', role: '딜러', star: 3, hp: 880, atk: 119, def: 40, crit: 10,
   blurb: '소심하고 공손한 은둔 고수 용족. 먼저 맞기 전까진 몸을 사리지만, 적이 손을 대는 순간 버튼이 눌려 반말로 박살을 낸다.',
   keyword: {
-    name: KW, desc: '먼저 맞았으니 이제 박살 내도 될 명분. 1개당 리츠의 피해 +25%, 리츠의 턴이 끝나면 1 감소', carrier: 'self', cap: 2, endDecay: 1,
+    name: KW, desc: '먼저 맞았으니 박살 낼 명분 — 맞으면 쌓여 자신의 피해가 오른다', carrier: 'self', cap: 2, endDecay: 1,
     per: [{ stat: 'dealt', v: 0.25 }],
   },
   passives: [

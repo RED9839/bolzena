@@ -11,11 +11,11 @@ const Bt = (name, tags) => ({ name, tags });
     name: '셰럼', nature: '순수', race: '마녀', row: 'front', role: '탱커', star: 3, hp: 860, atk: 75, def: 76, crit: 5,
     blurb: '궁정 서기관 마녀. 파티가 맞은 장면까지 받아 적고, 원고가 차면 몰래 쓰던 소설 속 인물이 차례로 걸어 나온다.',
     keyword: {
-      name: W, desc: '현실로 튀어나온 원고 — 파티가 다친 장면을 받아 적은 쪽수. 셋이 차면 「연재 회차」 가 넘어간다', carrier: 'self', cap: 3,
+      name: W, desc: '현실로 튀어나온 원고 — 파티가 다칠 때마다 한 쪽, 셋이면 연재 회차가 넘어간다', carrier: 'self', cap: 3,
       rules: [{ name: '탈고', when: { on: 'stackReach', id: W, n: 3 }, fx: [SPA(W), STK(R, 1)] }],
     },
     keywords: [{
-      name: R, desc: '소설 속 인물이 등장하는 차례 — 1회 어둠 정령 · 2회 기사 · 3회 공주, 그다음은 처음부터', carrier: 'self', cap: 3,
+      name: R, desc: '회차마다 원고 속 인물 카드가 나온다 — 셋째 회차 뒤 처음부터', carrier: 'self', cap: 3,
       rules: [
         { name: '1회: 어둠 정령', when: { on: 'stackReach', id: R, n: 1 }, fx: [MK('셰럼_t1')] },
         { name: '2회: 기사', when: { on: 'stackReach', id: R, n: 2 }, fx: [MK('셰럼_t2')] },
@@ -57,7 +57,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('아야', {
     name: '아야', nature: '냉정', race: '마녀', row: 'mid', role: '딜러', star: 3, hp: 720, atk: 146, def: 29, crit: 10,
     blurb: '영원살이 마녀 자매의 맏이. 탄환마다 서리를 묻혀 두고, 그 적이 무너지는 순간 눈꽃으로 피워 낸다.',
-    keyword: { name: K, desc: '눈꽃 개화 — 탄환에 묻은 서리. 걸린 적의 공격이 무뎌지고, 그 적이 격파되면 꽃처럼 터져 적 전체로 번진다', carrier: 'enemy', cap: 5, per: [{ stat: 'dealt', v: -0.05 }] },
+    keyword: { name: K, desc: '눈꽃 개화 — 공격으로 묻히는 서리. 묻은 적은 약해지고, 격파되면 적 전체로 터진다', carrier: 'enemy', cap: 5, per: [{ stat: 'dealt', v: -0.05 }] },
     passives: [
       { name: '서리 탄환', when: { on: 'play', type: '공격' }, fx: [STK(K, 1, 'oneEnemy')] },
       { name: '눈꽃 개화', when: { on: 'break' }, fx: [PERS(K), D(0.35, 'allEnemies'), SPA(K)] },
@@ -91,7 +91,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('벨벳', {
     name: '벨벳', nature: '냉정', race: '마녀', row: 'front', role: '탱커', star: 3, hp: 980, atk: 84, def: 64, crit: 5,
     blurb: '근력 강화 마법 하나로 고위 마녀가 된 근육파. 체력을 깎아 근육에 붓고, 불어난 근육으로 맞고 때린다.',
-    keyword: { name: K, desc: '근력 강화 마법 — 체력을 치르고 키운 근육. 쌓일수록 벨벳의 주먹이 세지고 파티가 덜 아프다', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.12 }, { stat: 'taken', v: -0.04 }] },
+    keyword: { name: K, desc: '근력 강화 마법 — HP 를 치러 키우는 근육. 쌓일수록 세지고 덜 아프다', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.12 }, { stat: 'taken', v: -0.04 }] },
     passives: [{ name: '근육은 배신하지 않는다', when: { on: 'stackReach', id: K, n: 5 }, limit: { per: 'fight', n: 1 }, fx: [ST('불굴', 1)] }],
     ult: { name: '마법: 원심 분리', cost: 250, fx: [DD(0.3, 'allEnemies', { hits: 5 }), ST('둔화', 1, 'allEnemies'), STK(K, 2)] },
     ...START.tank('주먹 한 방', '이두근 가드'),
@@ -122,7 +122,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('프리클', {
     name: '프리클', nature: '냉정', race: '마녀', row: 'mid', role: '딜러', star: 3, hp: 640, atk: 135, def: 28, crit: 10,
     blurb: '마녀 왕궁의 참모. 적 앞에 가시 덫을 깔아 두고, 계획이 어긋나도 덫은 거두지 않는다 — 다음 공격까지 기다릴 뿐.',
-    keyword: { name: K, desc: '적 앞에 깔아 둔 가시 덫. 그 적이 공격하려는 순간 걸린 만큼 터지고, 공격이 아니면 다음 공격까지 남아 기다린다', carrier: 'enemy', cap: 4 },
+    keyword: { name: K, desc: '적 앞에 깔아 둔 덫 — 그 적이 공격하기 직전 쌓인 만큼 터진다', carrier: 'enemy', cap: 4 },
     passives: [
       { name: '덫 작동', when: { on: 'foeActBefore', type: '공격' }, conds: [{ c: 'stack', id: K }], fx: [PERS(K), D(1.1), ST('둔화', 1, 'oneEnemy'), SPA(K)] },
     ],
@@ -156,7 +156,7 @@ const Bt = (name, tags) => ({ name, tags });
     name: '피코라', nature: '냉정', race: '마녀', row: 'back', role: '서포터', star: 3, hp: 580, atk: 75, def: 58, crit: 5,
     blurb: '스티커 만들기가 낙인 패셔니스타 마녀. 반짝 · 하트 · 별 · 해골 넷을 다 모으면 한정판 세트가 된다.',
     keyword: {
-      name: K, desc: '한정 스티커 수집 — 피코라가 카드를 낼 때마다 한 장씩 붙인다. 넷이 모이면 「한정판 세트」', carrier: 'self', cap: 4,
+      name: K, desc: '한정 스티커 수집 — 카드를 낼 때마다 한 장, 넷이면 한정판 세트', carrier: 'self', cap: 4,
       rules: [{ name: '한정판 세트', when: { on: 'stackReach', id: K, n: 4 }, fx: [ST('사기', 1), ST('피해 감소', 2), SPA(K)] }],
     },
     passives: [{ name: '스티커 붙이기', when: { on: 'play' }, fx: [STK(K, 1)] }],
@@ -189,7 +189,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('롤렛', {
     name: '롤렛', nature: '광기', race: '마녀', row: 'back', role: '딜러', star: 3, hp: 550, atk: 145, def: 25, crit: 10,
     blurb: '판을 슬쩍 굴리는 트릭스터 마녀. 손에서 한 장을 흘려 보내는 순간, 다음 마술봉이 훨씬 세게 들어간다.',
-    keyword: { name: K, desc: '바꿔치기 — 롤렛의 효과로 손패를 흘려 보내면 준비되는 트릭. 다음 롤렛 공격 카드의 피해가 오르고 사라진다', carrier: 'self', cap: 1, consumeAll: true, per: [{ stat: 'dealt', v: 0.6 }] },
+    keyword: { name: K, desc: '자신의 카드가 버려지면 준비되는 트릭 — 다음 공격 카드 한 장에 실린다', carrier: 'self', cap: 1, consumeAll: true, per: [{ stat: 'dealt', v: 0.6 }] },
     passives: [{ name: '소매 속 트릭', when: { on: 'discard' }, fx: [STK(K, 1)] }],
     ult: { name: '관객을 사로잡는 트릭스터', cost: 250, fx: [D(1.6, 'allEnemies'), ST('기절', 1, 'randomEnemy'), STK(K, 1)] },
     ...START.dealer('마술봉', '마술봉 대공연', '트릭 망토'),
@@ -221,7 +221,7 @@ const Bt = (name, tags) => ({ name, tags });
     name: '벨리타', nature: '광기', race: '마녀', row: 'back', role: '딜러', star: 3, hp: 550, atk: 145, def: 25, crit: 10,
     blurb: '마녀 여왕. 비밀 창고의 초콜릿을 몰래 꺼내 먹으며 힘을 내지만, 당이 차오르면 손이 떨린다.',
     keyword: {
-      name: K, desc: '비밀 간식 창고 — 몰래 먹은 초콜릿의 당. 오를수록 벨리타의 마력이 세지고, 셋이면 당쇼크', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: 0.1 }],
+      name: K, desc: '비밀 간식 창고 — 몰래 먹은 초콜릿. 오를수록 세지고, 셋이면 당쇼크', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: 0.1 }],
       rules: [{ name: '당쇼크', when: { on: 'stackReach', id: K, n: 3 }, fx: [ST('사기', 1), { k: 'later', n: 1, then: [{ k: 'cardStatus', id: '봉쇄', v: 1, to: 'hand', n: 2 }] }, SPA(K)] }],
     },
     passives: [{ name: '몰래 초콜릿', when: { on: 'turnStart' }, fx: [MK('벨리타_t1')] }],
@@ -260,7 +260,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('레비_졸업', {
     name: '레비(졸업)', nature: '활발', race: '마녀', row: 'front', role: '탱커', star: 3, hp: 1000, atk: 75, def: 76, crit: 5,
     blurb: '인턴을 마치고 정식 사원이 된 레비. 소원은 오직 정시 퇴근 — 일을 빨리 끝낼수록 남는 시간이 방패가 된다.',
-    keyword: { name: K, desc: '정시 퇴근 — 종극 카드로 하루를 끝내면 찍히는 도장. 턴이 끝날 때 남은 AP 만큼 실드로 바뀐다', carrier: 'self', cap: 1 },
+    keyword: { name: K, desc: '정시 퇴근 — 종극 카드로 찍고, 턴이 끝날 때 남은 AP 만큼 실드로 바꾼다', carrier: 'self', cap: 1 },
     passives: [{ name: '정시 퇴근', when: { on: 'turnEnd' }, conds: [{ c: 'stack', id: K }], fx: [{ k: 'perApLeft' }, SH(0.7), SPA(K)] }],
     ult: { name: '열정 넘치는 신입', cost: 200, fx: [DD(0.2, 'allEnemies', { hits: 5 }), ST('둔화', 2, 'allEnemies'), ST('실드 유지', 1)] },
     ...START.tank('빗자루 후리기', '사원증 가드'),
@@ -291,7 +291,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('마카샤', {
     name: '마카샤', nature: '활발', race: '마녀', row: 'mid', role: '서포터', star: 3, hp: 570, atk: 86, def: 60, crit: 5,
     blurb: '수다쟁이 책략관 마녀. 흘린 말 속에 적의 결말이 이미 적혀 있고, 맞아떨어진 예언은 다음 결말의 재료가 된다.',
-    keyword: { name: K, desc: '줄줄 새는 예언 — 맞아떨어진 예언의 수. 「적혀 있던 결말」 이 이것을 몽땅 꺼내 쓴다', carrier: 'self', cap: 5 },
+    keyword: { name: K, desc: '줄줄 새는 예언 — 모아 두면 「적혀 있던 결말」이 몽땅 꺼내 쓴다', carrier: 'self', cap: 5 },
     passives: [{ name: '수다 속 결말', when: { on: 'stackReach', id: K, n: 3 }, limit: { per: 'turn', n: 1 }, fx: [DR(1)] }],
     ult: { name: '마녀의 움직이는 집', cost: 200, fx: [DD(1.2, 'allEnemies'), ST('취약', 2, 'allEnemies'), STK(K, 2)] },
     ...START.support('절굿공이 톡', '안개 약초차'),
@@ -329,7 +329,7 @@ const Bt = (name, tags) => ({ name, tags });
     name: '스노키', nature: '우울', race: '마녀', row: 'front', role: '탱커', star: 3, hp: 920, atk: 101, def: 67, crit: 5,
     blurb: '두유 유통 조직의 전 두목, 지금은 경호원 겸 오른팔. 동료가 주먹을 내밀 때마다 두유 한 병씩 건넨다.',
     keyword: {
-      name: K, desc: '두유 배달 — 다른 아군이 공격 카드를 낼 때마다 건네는 두유. 한 턴에 세 병째면 경호 태세(반격)', carrier: 'self', cap: 3, endClear: true,
+      name: K, desc: '두유 배달 — 다른 아군이 공격할 때마다 한 병, 한 턴에 세 병이면 반격', carrier: 'self', cap: 3, endClear: true,
       rules: [{ name: '세 병째', when: { on: 'stackReach', id: K, n: 3 }, fx: [ST('반격', 1)] }],
     },
     passives: [{ name: '두유 배달', when: { on: 'play', who: 'other', type: '공격' }, limit: { per: 'turn', n: 3 }, fx: [SH(0.4), STK(K, 1)] }],
@@ -362,7 +362,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('아사나', {
     name: '아사나', nature: '우울', race: '마녀', row: 'front', role: '탱커', star: 3, hp: 1000, atk: 90, def: 67, crit: 5,
     blurb: '볼-요가 전도사. 스킬로 숨을 고르면 명상에 들어 파티가 덜 다치고, 명상을 깨는 첫 일격은 두 배로 무겁다.',
-    keyword: { name: K, desc: '명상 자세 — 아사나의 고유 스킬 카드로 들어간다. 그동안 파티가 받는 피해가 줄고, 아사나의 다음 공격 카드에 모은 힘이 실린 뒤 풀린다', carrier: 'self', cap: 1, consumeAll: true, per: [{ stat: 'taken', v: -0.05 }, { stat: 'dealt', v: 0.6 }] },
+    keyword: { name: K, desc: '명상 자세 — 고유 스킬로 들어가 덜 아프고, 다음 공격 카드에 힘을 싣고 풀린다', carrier: 'self', cap: 1, consumeAll: true, per: [{ stat: 'taken', v: -0.05 }, { stat: 'dealt', v: 0.6 }] },
     ult: { name: '명상 시간', cost: 250, fx: [DD(0.25, 'allEnemies', { hits: 6 }), HE(2.0), STK(K, 1)] },
     ...START.tank('요가 킥', '나무 자세'),
     uniques: [
@@ -394,7 +394,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('포셔', {
     name: '포셔', nature: '우울', race: '마녀', row: 'back', role: '서포터', star: 3, hp: 580, atk: 75, def: 58, crit: 5,
     blurb: '맛은 무시, 효과는 확실한 약장수 마녀. 진하게 달인 약은 잘 듣지만 쓴맛이 덱에 남는다.',
-    keyword: { name: K, desc: '잘 듣는 약일수록 — 진하게 달인 약이 남긴 약효. 쌓일수록 턴이 끝날 때마다 파티를 조금씩 회복한다', carrier: 'self', cap: 5, per: [{ stat: 'hot', ratio: 0.15 }] },
+    keyword: { name: K, desc: '잘 듣는 약일수록 — 카드를 만들 때마다 쌓여 턴이 끝날 때 파티를 회복한다', carrier: 'self', cap: 5, per: [{ stat: 'hot', ratio: 0.15 }] },
     passives: [{ name: '약효 남기기', when: { on: 'make' }, fx: [STK(K, 1)] }],
     ult: { name: '감자 고구마!', cost: 150, fx: [ST('기절', 1, 'oneEnemy'), ST('기절', 1, 'randomEnemy'), STK(K, 1)] },
     ...START.support('약병 투척', '초록 물약'),
@@ -444,7 +444,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('레비', {
     name: '레비', nature: '우울', race: '마녀', row: 'mid', role: '딜러', star: 2, hp: 590, atk: 125, def: 27, crit: 10,
     blurb: '약화 포션으로 괴력을 눌러 두고 사는 인턴 마녀. 스킬로 봉인을 하나씩 풀다 보면, 다 풀린 단도가 적 전체를 벤다.',
-    keyword: { name: K, desc: '눌러 둔 괴력 — 약화 포션으로 걸어 둔 봉인. 하나마다 레비의 피해가 줄고, 다 풀리면 고유 공격 카드가 적 전체로 번진 뒤 하나가 다시 걸린다', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: -0.05 }] },
+    keyword: { name: K, desc: '눌러 둔 괴력 — 스킬 카드로 봉인을 풀고, 다 풀리면 고유 공격 카드가 적 전체로 번진다(그 뒤 1 다시)', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: -0.05 }] },
     passives: [
       { name: '포션 복용', when: { on: 'fightStart' }, fx: [STK(K, 2)] },
       { name: '봉인 풀기', when: { on: 'play', type: '스킬' }, fx: [SP(K, 1)] },
@@ -484,7 +484,7 @@ const Bt = (name, tags) => ({ name, tags });
     name: '바리에', nature: '우울', race: '마녀', row: 'back', role: '서포터', star: 2, hp: 460, atk: 64, def: 55, crit: 5,
     blurb: '「정숙해주세요오」 도서관 사서 마녀. 버린 더미에서 쓸 만한 책을 당일 대출해 손에 돌려 주고, 도장이 차면 서가를 정리한다.',
     keyword: {
-      name: K, desc: '당일 반납 — 버린 더미에서 카드를 대출할 때 찍는 도장. 셋이 차면 서가 정리', carrier: 'self', cap: 3,
+      name: K, desc: '당일 반납 — 버린 더미에서 카드를 대출할 때마다 찍고, 셋이면 서가 정리', carrier: 'self', cap: 3,
       rules: [{ name: '서가 정리', when: { on: 'stackReach', id: K, n: 3 }, fx: [ST('다음 턴 드로우', 2), HE(0.8), SPA(K)] }],
     },
     ult: { name: '당일 반납해주세요오', cost: 200, fx: [{ k: 'pull', from: 'discard', n: 2 }, STK(K, 2), { k: 'atkMod', v: 0.15, run: true, target: 'oneAlly' }] },
@@ -517,7 +517,7 @@ const Bt = (name, tags) => ({ name, tags });
     name: '요미', nature: '우울', race: '미스틱', row: 'mid', role: '딜러', star: 3, hp: 720, atk: 146, def: 29, crit: 10,
     blurb: '누구도 모시지 않는 달을 홀로 섬겨 온 사제. 턴마다 달이 그믐 → 초승 → 반달 → 보름으로 차오르고, 스킬로 기도하면 한 칸 앞당긴다.',
     keyword: {
-      name: K, desc: '달의 위상 — 1 그믐(요미 고유 카드가 AP 1 돌려줌) · 2 초승 · 3 반달(드로우 1을 덧붙임) · 4 보름(요미 피해 +60% · 보름이 뜨면 파티 치유). 턴 시작마다 한 칸, 4를 넘으면 그믐으로', carrier: 'self', cap: 4, wrap: true,
+      name: K, desc: '턴마다 한 칸 도는 달 — 1 그믐(고유 카드 AP +1) · 2~3 초승 · 반달(드로우 1) · 4 보름(피해 +60%)', carrier: 'self', cap: 4, wrap: true,
       rules: [{ name: '보름달', when: { on: 'stackReach', id: K, n: 4 }, fx: [HE(0.6)] }],
     },
     passives: [
@@ -553,7 +553,7 @@ const Bt = (name, tags) => ({ name, tags });
   hero('비비_신성', {
     name: '비비(신성)', nature: '공명', race: '미스틱', row: 'mid', role: '딜러', star: 3, hp: 720, atk: 135, def: 29, crit: 10,
     blurb: '새 세계수가 된 비비. 동료가 함께 움직일수록 빛이 짙어지고, 셋이 다 손을 내민 턴에는 그 빛이 파티의 사기가 된다.',
-    keyword: { name: K, desc: '다정한 세상 — 이번 턴 다른 아군이 카드를 낼 때마다 쌓이는 온기. 하나마다 비비(신성)의 피해가 오르고, 턴이 끝나면 사라진다', carrier: 'self', cap: 3, endClear: true, per: [{ stat: 'dealt', v: 0.2 }] },
+    keyword: { name: K, desc: '이번 턴 다른 아군이 카드를 낼 때마다 쌓이는 온기 — 자신의 피해가 오른다', carrier: 'self', cap: 3, endClear: true, per: [{ stat: 'dealt', v: 0.2 }] },
     passives: [{ name: '함께 걷는 세상', when: { on: 'play', who: 'other' }, limit: { per: 'turn', n: 3 }, fx: [STK(K, 1)] }],
     ult: { name: '모든 이를 굽어살피리', cost: 300, fx: [D(2.5, 'allEnemies'), ST('피해 감소', 3), ST('사기', 1)] },
     ...START.dealer('빛구슬', '빛구슬 세례', '세계수 잎사귀'),

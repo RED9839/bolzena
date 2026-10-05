@@ -7,7 +7,7 @@ const TOUGH=(v,target)=>({k:'tough',v,...(target?{target}:{})}); const CS=(id,v,
 const ed=(k,f)=>{const j=load(k);f(j,hero(j));save(k,j);};
 
 // 티그 — wipe 빼기(이번 턴 티그 공격 카드 수로), 계수 올림
-ed('티그',(j,h)=>{ delete h.keyword.wipe; h.keyword.desc='「장작 패기 반복」 — 이번 턴 티그가 공격 카드를 낼 때마다 쌓이는 손맛(턴이 끝나면 사라진다). 셋이 되면 AP 1 을 돌려받는다.';
+ed('티그',(j,h)=>{ delete h.keyword.wipe; h.keyword.desc='장작 패기 반복 — 이번 턴 공격할 때마다 쌓이고, 셋이면 AP 를 돌려받는다';
   setCard(j,'티그_u1',{fx:[D(1.5,'allEnemies'),IFS('장작 패기',1),D(1.0,'allEnemies')]});
   setCard(j,'티그_u2',{fx:[D(0.6,'oneEnemy',2),IFS('장작 패기',1),D(0.6)]});
   setCard(j,'티그_u3',{fx:[D(2.2),IFS('장작 패기',1),D(1.1),TOUGH(0.5)]}); });
@@ -23,7 +23,7 @@ ed('우로스',(j,h)=>{ h.keyword.rules=[{name:'허물',when:{on:'fightStart'},f
   setCard(j,'우로스_u4',{fx:[D(1.2,'allEnemies'),PER('순환'),D(0.5,'allEnemies')]}); });
 // 유미미 — 턴 끝마다 +1, 안 냈으면 +1 더
 ed('유미미',(j,h)=>{ h.passives=[{name:'늘어지기',when:{on:'turnEnd'},fx:[K('나른함',1)]},{name:'늘어지기',when:{on:'turnEnd'},conds:[{c:'ownNone'}],fx:[K('나른함',1)]}];
-  h.keyword.desc='「늘어지기」 — 턴 끝마다 하나, 유미미 카드를 하나도 안 낸 턴이면 하나 더 쌓이는 나른함. 1개당 자신의 피해가 오르고, 공격 카드 한 장에 모두 쏟는다.';
+  h.keyword.desc='늘어지기 — 턴 끝마다 쌓이고(쉰 턴엔 더), 공격 카드 한 장에 모두 쏟는다';
   setCard(j,'유미미_u4',{fx:[D(1.9),{k:'ifWounded',target:'oneEnemy'},D(1.9)]}); });
 // 루포 — 계획이면 강인도 더, 계수
 ed('루포',(j)=>{ setCard(j,'루포_u1',{fx:[D(0.75,'oneEnemy',3),TOUGH(0.5),IFS('계획'),TOUGH(1)]});

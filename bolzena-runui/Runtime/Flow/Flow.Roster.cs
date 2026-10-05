@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -67,8 +67,28 @@ namespace Bolzena.RunUI
         Sprite Icon(string key) => Theme.Icon(key);
 
         /// <summary>사도 그림을 rt 에 채운다 — 스탠딩(위에서 frac 만큼, rt 비율로 자름) → 없으면 미니미 SD(spine) → 초상.</summary>
-        void HeroArt(RectTransform rt, HeroInfo h, float w, float hgt, float frac, float spineH, float phase = 0, Color? tint = null)
+        void HeroArt(RectTransform rt, HeroInfo h, float w, float hgt, float frac, float spineH, float phase = 0, Color? tint = null, bool live = false, bool lazyLive = false, float tallest = 0)
         {
+            // 사도 목록 상반신 — 정지 그림. 표가 있는 사도는 스크롤 창에 들어올 때 스탠딩을 표대로 구워 넣는다(LiveStanding · StandingSnap)
+            if (lazyLive && h?.art != null)
+            {
+                var web = CardArt.Upper(h.art, w / hgt, frac, false);   // 표 · 스파인이 없을 때만 쓰는 웹판 렌더 자르기
+                bool fit = StandingFit.Has(h.art);
+                if (!fit && web == null && h.Icon != null) { var ic = Ui.Img(rt, h.Icon, tint ?? Color.white, "icon"); ic.rectTransform.At(0.5f, 1, 0, 0, w * 1.08f, w * 1.08f); ic.preserveAspect = true; return; }
+                var still = Ui.Img(rt, fit ? null : web, fit ? Color.clear : tint ?? Color.white, "standing"); still.rectTransform.Fill();
+                if (!fit) return;
+                var ls = rt.gameObject.AddComponent<LiveStanding>();
+                ls.Art = h.art; ls.W = w; ls.H = hgt; ls.Frac = frac;
+                ls.Tint = tint ?? Color.white; ls.Still = still; ls.Fallback = web;
+                return;
+            }
+            // 편성 큰 카드(셋) — 스탠딩 스파인을 실제로, 다리 기준 크기(무릎께에서 잘리게 발은 창 아래) · 머리 뼈는 창 위 2할 아래로
+            if (live && h?.art != null)
+            {
+                float leg = hgt / frac / 2.96f;   // 키/다리 중앙 2.96 — 보통 키가 창 높이/frac 이 되게
+                var sg = SpineUi.Standing(rt, h.art, w, hgt, StandMode.Knee, tallest);   // 표(standing_fit.json · 안 B) — 셋 모두 같은 배율 · 바닥선(기준 = 셋 가운데 가장 큰 사도)
+                if (sg != null) { sg.AnimationState.Update(phase); if (tint != null) sg.color = tint.Value; return; }
+            }
             var up = h?.art != null ? CardArt.Upper(h.art, w / hgt, frac) : null;
             if (up != null)
             {
@@ -135,7 +155,7 @@ namespace Bolzena.RunUI
                 var party = st.Slots.Select(k => Roster.ByKey(k).CoreId).ToList();
                 var rows = Enumerable.Range(0, 3).ToDictionary(i => party[i], i => RowKey[i]);
                 RunPort.ClearSave();
-                P.NewRun(party, st.Village, DateTime.Now.Ticks & 0x7fffffff);
+                P.NewRun(party, st.Village, FoeNature != null ? FoeSeed : DateTime.Now.Ticks & 0x7fffffff, FoeNature);
                 foreach (var kv in rows) P.S.Rows[kv.Key] = kv.Value;
                 MapStep();
             }, 0, "go");
@@ -193,7 +213,7 @@ namespace Bolzena.RunUI
             var halo = Ui.Img(rt, Theme.S("soft"), Color.Lerp(nc, Color.white, 0.4f).A(0.28f), "halo"); halo.rectTransform.At(0.5f, 0.5f, 0, 40, w * 1.3f, w * 1.3f);
             var mask = Ui.Img(rt, Theme.Round, Color.white, "mask"); mask.rectTransform.Fill(3, 3, 3, 3); mask.gameObject.AddComponent<Mask>().showMaskGraphic = false;
             // 스탠딩 — 무릎께까지(카드가 키가 크다)
-            HeroArt(mask.rectTransform, hero, w - 6, h - 6, 0.72f, Mathf.Min(h * 0.46f, 300), i * 0.37f);
+            HeroArt(mask.rectTransform, hero, w - 6, h - 6, 0.72f, Mathf.Min(h * 0.46f, 300), i * 0.37f, null, true, false, StandingFit.Tallest(st.Slots.Where(x => x != null).Select(x => Roster.ByKey(x)?.art)));
             var shade = Ui.Img(rt, Theme.S("fade_down"), Color.black.A(0.72f), "shade"); shade.rectTransform.Band(0, h * 0.32f, 3, 3, 3);
             var shadeT = Ui.Img(rt, Theme.S("fade_top"), Color.black.A(0.35f), "shadeT"); shadeT.rectTransform.Band(1, 120, 3, 3, -3);
             // 왼쪽 위 세로 아이콘 열 — 역할 · 성격 · 본래 줄
@@ -208,6 +228,13 @@ namespace Bolzena.RunUI
             var zoom = Btn.Icon(rt, Theme.S("ic_zoom"), () => HeroDetail(key, st.Slots.Where(x => x != null).ToList(), () => BuildPartyLight(root, st)), 44, "zoom");
             zoom.GetComponent<RectTransform>().At(1, 1, -10, -10, 44, 44);
             Stage.Hot["zoom" + i] = zoom;
+            // 고유 효과 · 패시브 · 고학년 — 짧은 글 판(누르면, 판마다 자세히)
+            if (hero.Playable)
+            {
+                var tc = TraitsChip(rt, hero.CoreId, "고유 효과", "traits" + i);
+                var trt = tc.GetComponent<RectTransform>(); trt.anchorMin = trt.anchorMax = trt.pivot = new Vector2(1, 1); trt.anchoredPosition = new Vector2(-62, -15);
+                Stage.Hot["party.traits" + i] = tc;
+            }
             // 왼쪽 아래 큰 줄 이름 · 오른쪽 아래 장비 칸(빈 칸)
             var rowT = Ui.Title(rt, $"<size=45%>자리 {i + 1}</size>\n{RowKo[i]}", Theme.Fs2xl, Color.white, TextAlignmentOptions.BottomLeft);
             rowT.rectTransform.At(0, 0, 16, 10, 160, 80); rowT.lineSpacing = -22; rowT.Outline(0.22f);
@@ -246,10 +273,19 @@ namespace Bolzena.RunUI
                 if (val != null) { var r = Ui.Text(b.transform, val, Theme.FsSm, Theme.Sub, TextAlignmentOptions.MidlineRight); r.rectTransform.Fill(0, 0, 14, 0); r.textWrappingMode = TextWrappingModes.NoWrap; }
             }
             Band("층의 모습", f.Sub, "ic_flag");
-            Band("보스", null, "ic_crown");
-            var bossRow = Ui.Rect("boss", body); bossRow.Pref(-1, 78);
-            Ui.Row(bossRow, 10, TextAnchor.MiddleLeft, new RectOffset(4, 0, 0, 0), false, false);
-            foreach (var id in f.Boss.Distinct()) FoeCell(bossRow, id, true);
+            if (!string.IsNullOrEmpty(FoeNature))
+            {
+                // 이번 판 적 속성 + 층 보스 초상 — 약점에 맞춰 파티를 짜도록
+                FoeNatureBand(body, FoeNature);
+                BossCardsRow(body, v, FoeNature, w);
+            }
+            else
+            {
+                Band("보스", null, "ic_crown");
+                var bossRow = Ui.Rect("boss", body); bossRow.Pref(-1, 78);
+                Ui.Row(bossRow, 10, TextAnchor.MiddleLeft, new RectOffset(4, 0, 0, 0), false, false);
+                foreach (var id in f.Boss.Distinct()) FoeCell(bossRow, id, true);
+            }
             var foes = f.Pools.SelectMany(p => p).SelectMany(x => x).Concat(f.Elites.SelectMany(x => x)).Distinct().Where(id => !f.Boss.Contains(id)).ToList();
             Band("나오는 적", foes.Count + "종", "ic_skull");
             var foeGrid = Ui.Rect("foes", body); foeGrid.Pref(-1, Theme.C(176, 92));
@@ -264,11 +300,12 @@ namespace Bolzena.RunUI
         {
             var e = P.Data.Enemy(id);
             var cell = Ui.Rect("foe " + id, parent); cell.Pref(70, boss ? 78 : 80); cell.sizeDelta = new Vector2(70, 80);
-            var nc = Theme.NatureCardOf(e?.Nature);
+            string nat = RunPort.NatureIn(e, FoeNature);   // 이번 판은 모든 적(보스도)이 판의 적 속성
+            var nc = Theme.NatureCardOf(nat);
             var disc = Ui.Img(cell, Theme.S("circle"), Color.Lerp(Theme.NavyWell, nc, 0.35f), "disc"); disc.rectTransform.At(0.5f, 1, 0, 0, 56, 56);
             var ring = Ui.Img(disc.transform, Theme.S("ring"), (boss ? Theme.Gold : Theme.Edge).A(0.8f), "ring"); ring.rectTransform.Fill();
             var ic = Ui.Img(disc.transform, Theme.S(boss ? "ic_crown" : "ic_skull"), Color.white.A(0.9f), "ic"); ic.rectTransform.Fill(14, 14, 14, 14); ic.preserveAspect = true;
-            var ni = Icon("성격_" + e?.Nature);
+            var ni = Icon("성격_" + nat);
             if (ni != null) { var nb = Ui.Img(disc.transform, ni, Color.white, "nat"); nb.rectTransform.At(1, 0, 6, -6, 22, 22); nb.preserveAspect = true; }
             var nm = Ui.Text(cell, e?.Name ?? id, Theme.FsCap - 1, Theme.Ink, TextAlignmentOptions.Top); nm.rectTransform.At(0.5f, 1, 0, -58, 76, 22);
             nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 9; nm.fontSizeMax = Theme.FsCap - 1;
@@ -304,7 +341,7 @@ namespace Bolzena.RunUI
             RosterHead(layer, "사도 목록", Close);
 
             // 위 오른쪽 — 빠른 편성 · 정렬 · (도감) 교주 카드 · 장비
-            var tr = Ui.Rect("tools", layer).At(1, 1, -Theme.Gutter, -20, 900, 52);
+            var tr = Ui.Rect("tools", layer).At(1, 1, -Theme.Gutter, -20, 1240, 52);
             Ui.Row(tr, 10, TextAnchor.MiddleRight, null, false, true);
             if (!dex)
             {
@@ -387,6 +424,9 @@ namespace Bolzena.RunUI
             var dl = Ui.Title(drt, "상세 정보", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight); dl.rectTransform.Fill(50, 0, 26, 0);
             detail.Interactable = fh != null; detail.Why = "사도를 먼저 고르세요";
             Stage.Hot["list.detail"] = detail;
+            // 도감 — 검색 칸(이름 · 초성 · 괄호 이름, 도감마다 따로 기억)
+            if (dex) DexSearch(tr, "사도", content, area, n => n.StartsWith("hero ") && Roster.ByKey(n.Substring(5)) is HeroInfo hi0 ? new[] { hi0.ko, hi0.key } : null,
+                fh == null ? info : null, n => $"{n}명 · 누르면 상세 정보");
             if (!dex)
             {
                 bool inParty = fh != null && st.Slots.Contains(fh.key);
@@ -441,11 +481,11 @@ namespace Bolzena.RunUI
             var glow = Ui.Img(rt, Theme.S("fade_top"), (locked ? Theme.Dim : nc).A(0.45f), "glow"); glow.rectTransform.Fill(2, 2, 2, 2);
             var mask = Ui.Img(rt, Theme.Round, Color.white, "mask"); mask.rectTransform.Fill(2, 2, 2, 2); mask.gameObject.AddComponent<Mask>().showMaskGraphic = false;
             // 스탠딩 상반신(없으면 초상)
-            HeroArt(mask.rectTransform, h, 150 * k - 4, 214 * k - 4, 0.5f, 0, 0, locked ? new Color(0.5f, 0.5f, 0.56f) : (Color?)null);
+            HeroArt(mask.rectTransform, h, 150 * k - 4, 214 * k - 4, 0.5f, 0, (idx * 0.29f) % 2f, locked ? new Color(0.5f, 0.5f, 0.56f) : (Color?)null, false, true);
             var shade = Ui.Img(rt, Theme.S("fade_down"), Color.black.A(0.8f), "shade"); shade.rectTransform.Band(0, 86 * k, 2, 2, 2);
             var col = Ui.Rect("icons", rt).At(0, 1, 6, -6, 24 * k, 120 * k);
             Ui.Col(col, 3, TextAnchor.UpperLeft, null, false, false);
-            foreach (var key in new[] { "역할_" + h.role, "성격_" + h.nature, "종족_" + h.race })
+            foreach (var key in new[] { "역할_" + h.role, "성격_" + h.nature })   // 종족 아이콘은 싣지 않는다(사용자 요청)
             {
                 var sp = Icon(key); if (sp == null) continue;
                 var ic = Ui.Img(col, sp, locked ? Color.white.A(0.6f) : Color.white, key); ic.Pref(24 * k, 24 * k); ic.preserveAspect = true;
@@ -496,7 +536,11 @@ namespace Bolzena.RunUI
                 var b = Btn.Make(rc, null, BtnStyle.Ghost, () => Go(k2, tab), 0, "face " + k2);
                 b.Bg.sprite = Theme.Round; b.SetColor(Color.Lerp(Theme.NavyWell, NatureCol(hh), 0.35f));
                 b.Pref(70, 70);
-                var im = Ui.Img(b.transform, hh.Icon, Color.white, "ic"); im.rectTransform.Fill(2, 0, 2, 4); im.preserveAspect = true;
+                // 기본 스탠딩의 머리 · 어깨(없으면 초상)
+                var face = CardArt.Upper(hh.art, 1f, 0.34f);
+                var clip = Ui.Img(b.transform, Theme.Round, Color.white, "clip"); clip.rectTransform.Fill(3, 3, 3, 3); clip.gameObject.AddComponent<Mask>().showMaskGraphic = false;
+                var im = Ui.Img(clip.rectTransform, face ?? hh.Icon, Color.white, "ic");
+                if (face != null) im.rectTransform.Fill(); else { im.rectTransform.Fill(-1, -3, -1, 1); im.preserveAspect = true; }
                 var r0 = Ui.Img(b.transform, Theme.Frame, NatureCol(hh).A(0.7f), "rim"); r0.rectTransform.Fill();
                 if (k2 == key) { cur = fi; var br = Ui.Img(b.transform, Theme.S("frame_thick", 24), Theme.Gold, "on"); br.rectTransform.Fill(-4, -4, -4, -4); }
                 Stage.Hot["detail.face" + fi++] = b;
@@ -546,8 +590,17 @@ namespace Bolzena.RunUI
             plate.rectTransform.localRotation = Quaternion.Euler(0, 0, -9);
             var pr = Ui.Img(plate.rectTransform, Theme.Frame, Color.Lerp(nc, Color.white, 0.3f).A(0.8f), "rim"); pr.rectTransform.Fill();
             var glow = Ui.Img(fig, Theme.S("soft"), Color.Lerp(nc, Color.white, 0.5f).A(0.35f), "glow"); glow.rectTransform.At(0.5f, 0.5f, 0, 40, 620, 620);
-            var full = CardArt.Standing(h.art);
-            if (full != null)
+            // 원작 스탠딩 스파인을 실제로(Idle_1 · Normal) — 다리 기준 크기 · 골반이 가운데 · 발은 바닥선(StandingFit). 없으면 정지 그림
+            float figW0 = Mathf.Max(420, Stage.Size.x - (Theme.Gutter + 84 + 14 + 150 + 20) - Theme.Gutter - panelW - 20);   // 가운데 칸 너비(상세 메뉴 · 오른쪽 판을 뺀 것)
+            var live = SpineUi.Standing(fig, h.art, figW0, stageH, StandMode.Full, 0, 4);   // 기준 키 = 표 95%(가장 큰 사도 쪽) — 작은 사도는 작게
+            if (live != null)
+            {
+                var sh = Ui.Img(fig, Theme.S("fade_down"), Theme.Night.A(0.75f), "foot"); sh.rectTransform.Band(0, 90, -40, -40, -6);
+                Tw.Rise(live.rectTransform, 0.04f, 24, 0.45f);
+            }
+            var full = live == null ? CardArt.Standing(h.art) : null;
+            if (live != null) { }
+            else if (full != null)
             {
                 float figH = stageH + 10, figW = figH * full.rect.width / full.rect.height;
                 var im = Ui.Img(fig, full, Color.white, "standing"); im.rectTransform.At(0.5f, 0, 0, -6, figW, figH); im.preserveAspect = true;
@@ -645,10 +698,14 @@ namespace Bolzena.RunUI
             float sideW2 = Mathf.Clamp(stageW - gridW - 16, sideW, Theme.C(420, 300));   // 넓은 화면이면 판도 넓게
             side.sizeDelta = new Vector2(sideW2, 0); side.anchoredPosition = new Vector2(Mathf.Min(gridW + 16, stageW - sideW2), 0);   // 카드 옆에 붙인다
             Ui.Col(side, 14, TextAnchor.UpperCenter, new RectOffset(0, 0, 6, 0), true, false);
-            void Hex(string head, Sprite pic, Color tint, string big, string name, string desc)
+            int hi = 0;
+            void Hex(string head, Sprite pic, Color tint, string big, string name, string desc, string detail = null)
             {
                 var box = NavyBox(side, head); box.Pref(-1, Theme.C(250, 214));
-                var ht = Ui.Title(box, head, Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center); ht.rectTransform.Band(1, 28, 8, 8, -10);
+                bool hasMore = !string.IsNullOrEmpty(detail) && detail != desc;
+                // 머리 글 — 왼쪽 위 「자세히」 · 오른쪽 위 게이지 알약 사이 가운데
+                var ht = Ui.Title(box, head, Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center); ht.rectTransform.Band(1, 28, hasMore ? 96 : 8, big != null ? 90 : hasMore ? 96 : 8, -10);
+                ht.textWrappingMode = TextWrappingModes.NoWrap; ht.enableAutoSizing = true; ht.fontSizeMin = 12; ht.fontSizeMax = Theme.FsMd;
                 var cell = Ui.Img(box, Theme.S("tile_glow"), tint, "cell"); cell.rectTransform.At(0.5f, 1, 0, -40, 120, 96);
                 var disc = Ui.Img(box, Theme.S("circle"), Color.Lerp(Theme.NavyWell, tint, 0.35f), "disc"); disc.rectTransform.At(0.5f, 1, 0, -46, 84, 84);
                 var dm = Ui.Rect("m", disc.rectTransform).Fill(); disc.gameObject.AddComponent<Mask>().showMaskGraphic = true;
@@ -661,12 +718,24 @@ namespace Bolzena.RunUI
                 }
                 var nm = Ui.Title(box, name, Theme.FsLg, Theme.Gold, TextAlignmentOptions.Center); nm.rectTransform.Band(1, 30, 10, 10, -136);
                 nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 12; nm.fontSizeMax = Theme.FsLg;
-                var ds = Ui.Text(box, desc, Theme.FsCap, Theme.Sub, TextAlignmentOptions.Top); ds.rectTransform.Fill(12, 10, 12, 168);
-                ds.enableAutoSizing = true; ds.fontSizeMin = 9; ds.fontSizeMax = Theme.FsCap;
+                // 칸은 짧은 글 — 「자세히 ▾」를 누르면 칸 옆에 자세한 글 판(TermPop)
+                bool has = !string.IsNullOrEmpty(detail) && detail != desc;
+                var ds = Ui.Text(box, "", Theme.FsCap + 1, Theme.Ink, TextAlignmentOptions.Top); ds.rectTransform.Fill(12, 8, 12, Theme.C(166, 160));
+                ds.enableAutoSizing = true; ds.fontSizeMin = 9; ds.fontSizeMax = Theme.FsCap + 1;
+                TermPop.MarkAndAttach(ds, desc, CardTerms.OfText(P.Data, P.Text, desc, d.Id), Stage.ToastLayer, (p, id, w) => W.Card(p, this, id, w, "termcard"));
+                if (has)
+                {
+                    var mb = TermPop.MoreChip(box, false, "more");
+                    var mrt = mb.GetComponent<RectTransform>(); mrt.anchorMin = mrt.anchorMax = mrt.pivot = new Vector2(0, 1); mrt.anchoredPosition = new Vector2(8, -8);
+                    var term = new CardTerms.Term { Name = name, Body = detail, Kind = head, Hero = head == "고유 효과" };
+                    mb.OnClick = () => PopTerms(mrt, new[] { term });
+                    Stage.Hot["detail.hexmore" + hi] = mb;
+                }
+                hi++;
             }
-            if (d.Ult != null) Hex("고학년", h.Icon, NatureCol(h), d.Ult.Cost + "%", d.Ult.Name, P.Text.Fx(d.Ult.Fx));
+            if (d.Ult != null) Hex("고학년", CardArt.Icon("icon_graduateskill_" + h.art) ?? CardArt.Icon("ultimate_icon_common3") ?? h.Icon, NatureCol(h), d.Ult.Cost + "%", d.Ult.Name, P.Text.Short(d.Ult), P.Text.Detail(d.Ult));   // 원작 고학년 「볼따구」 얼굴(copy_assets.py)
             var kw = d.AllKeywords.FirstOrDefault();
-            if (kw != null) Hex("고유 효과", null, Theme.Gold, null, kw.Name, P.Text.Keyword(kw));
+            if (kw != null) Hex("고유 효과", null, Theme.Gold, null, kw.Name, P.Text.Short(kw), P.Text.Detail(kw));
         }
 
         void DetailTraits(RectTransform stage, HeroInfo h, Core.HeroDef d)
@@ -676,26 +745,38 @@ namespace Bolzena.RunUI
             var content = Ui.Scroll(area, out var sr);
             ScrollBar(area, sr);
             Ui.Col(content, 10, TextAnchor.UpperLeft, new RectOffset(0, 18, 0, 10), true, false);
-            void Block(string title, string text)
+            // 기본은 짧은 글(CardText.Short) — 「자세히 ▾」를 누르면 그 자리에서 자세한 글(Detail)로. 글 속 키워드 · 생성 카드는 밑줄 · 설명 판
+            int bi = 0;
+            void Block(string title, string text, string detail = null, bool terms = true)
             {
                 if (string.IsNullOrEmpty(text)) return;
                 W.Section(content, title, null, 38);
-                var t = Ui.Text(content, text, Theme.FsBody, Theme.Ink, TextAlignmentOptions.TopLeft);
-                t.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-                t.lineSpacing = 6;
+                var t = ShortMore(content, text, detail, Theme.FsBody, Theme.Ink, d?.Id, "trait" + bi, terms: terms);
+                var more = t.transform.parent.GetComponentInChildren<Btn>();
+                if (more != null) Stage.Hot["detail.more" + bi] = more;
+                bi++;
             }
             if (d != null)
             {
-                foreach (var kw in d.AllKeywords) Block("키워드 · " + kw.Name, P.Text.Keyword(kw));
-                if (d.Passives.Count > 0) Block("패시브", P.Text.Passives(d.Passives));
-                if (d.Ult != null) Block("고학년", P.Text.Ult(d.Ult));
+                foreach (var kw in d.AllKeywords) Block("키워드 · " + kw.Name, P.Text.Short(kw), P.Text.Detail(kw));
+                string last = null;
+                foreach (var r in d.Passives)
+                {
+                    // 같은 이름 둘째 규칙부터는 앞 칸의 자세히에 붙인다(짧은 글은 ShortPassives 처럼 한 줄)
+                    if (r.Name != null && r.Name == last) continue;
+                    var same = d.Passives.Where(x => x.Name != null && x.Name == r.Name).ToList();
+                    string detail = same.Count > 1 ? string.Join("\n", same.Select(x => P.Text.Detail(x))) : P.Text.Detail(r);
+                    Block("패시브 · " + (r.Name ?? "패시브"), P.Text.Short(r) + (same.Count > 1 ? " 등" : ""), detail);
+                    last = r.Name;
+                }
+                if (d.Ult != null) Block("고학년 · " + d.Ult.Name, P.Text.Short(d.Ult), P.Text.Detail(d.Ult));
             }
             else
             {
                 Block("키워드", h.keyword);
                 Block("고학년", h.ult);
             }
-            Block("이야기", h.blurb);
+            Block("이야기", h.blurb, terms: false);   // 소개 글은 게임 용어가 아니다 — 「처치」 · 「제자」 같은 보통 낱말에 밑줄을 걸지 않는다
         }
     }
 }

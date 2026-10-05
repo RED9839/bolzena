@@ -22,9 +22,11 @@ namespace Bolzena.Core
         /// <summary>이 전투에서 그 카드가 실제로 무엇인가 — 신탁을 골랐으면 바뀐 쪽.</summary>
         public CardView CardOf(string id)
         {
-            var v = Data.View(id, Flash.TryGetValue(id, out var n) ? n : 0);
+            var v = Data.View(id, Flash.TryGetValue(id, out var n) ? n : 0, Party.Count > 0 ? Party[0].Key : null);   // 주인 없는 교주 카드(옛 저장)는 첫 사도의 카드
             // 결속 — 겹친 수가 3 이상이면 사도마다 정한 「강해진 카드」 의 모습
-            if (v != null && Bond.Count > 0 && v.Def.BondCard != null && Bond.TryGetValue(id, out var b) && b >= 3) return Data.View(v.Def.BondCard) ?? v;
+            if (v != null && Bond.Count > 0 && v.Def.BondCard != null && Bond.TryGetValue(id, out var b) && b >= 3) v = Data.View(v.Def.BondCard) ?? v;
+            // 변신 — 그 사도가 변신 중이면 변신판 모습(카드 바꾸기 · 덤)
+            if (Forms.Count > 0) v = FormCard(id, v);
             return v;
         }
 
@@ -184,7 +186,7 @@ namespace Bolzena.Core
             var g = GlowOf(cardId);
             if (g == null || choice < 0 || choice >= g.Count) return null;
             Glow.Remove(cardId);
-            Cue("epiphany", (Data.Card(cardId).Hero != null ? HeroUnit(Data.Card(cardId).Hero) : null) ?? PartyRep(), new Cue { CardId = cardId, Id = g.Kind, V = choice, Hero = g.Hero });
+            Cue("epiphany", HeroUnit(CardOf(cardId)?.Hero) ?? PartyRep(),new Cue { CardId = cardId, Id = g.Kind, V = choice, Hero = g.Hero });
             if (g.Kind == "card")
             {
                 var o = g.Picks[choice];

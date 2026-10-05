@@ -139,7 +139,7 @@ namespace Bolzena.UI
                 var ic = new Vector3(Pad + 0.2f, top - 0.2f, 0);
                 Make.Box("cib", st.T, Res.UI("circle"), ic, new Vector2(0.38f, 0.38f), OC, new Color(kc.r * 0.25f, kc.g * 0.25f, kc.b * 0.25f, 0.95f));
                 var icon = ChipRow.IconOf(c);
-                if (icon != null) Make.Box("ci", st.T, Res.UI(icon), ic, new Vector2(0.26f, 0.26f), OC + 1);
+                if (icon != null) Make.Box("ci", st.T, ChipRow.IconSprite(icon), ic, new Vector2(0.26f, 0.26f), OC + 1);
                 else if (!string.IsNullOrEmpty(c.Id)) Tone.Text("cil", st.T, c.Id.Substring(0, 1), ic, 0.16f, OC + 1, Color.Lerp(Color.white, kc, 0.5f));
                 var sv = Tone.Text("cv", st.T, c.Value, ic + new Vector3(0.17f, -0.14f, 0), 0.12f, OC + 2, Color.white, TextAlignmentOptions.Center, false, 1f, 0.35f);
                 // 오른쪽 — 건 사도 초상 알약(여럿이면 나란히)
@@ -189,7 +189,7 @@ namespace Bolzena.UI
         }
 
         // 접힌 줄 — 「▶ 이름  짧은 풀이…」, 누르면 펼친다
-        static void Fold(Stack st, string key, string name, string text, Action redraw, string nameColor = null)
+        static void Fold(Stack st, string key, string name, string text, Action redraw, string nameColor = null, string shortText = null)
         {
             bool isOpen = open.Contains(key);
             float top = st.Y;
@@ -201,7 +201,7 @@ namespace Bolzena.UI
             }
             else
             {
-                var t = st.Para(head + (string.IsNullOrEmpty(text) ? "" : $"  <size=86%><color={Tone.SubTag}>{Plain(text)}</color></size>"), Pad, Wd - Pad * 2, Tone.Body, Tone.Ink, true, 0.06f);
+                var t = st.Para(head + (string.IsNullOrEmpty(shortText ?? text) ? "" : $"  <size=86%><color={Tone.SubTag}>{Plain(shortText ?? text)}</color></size>"), Pad, Wd - Pad * 2, Tone.Body, Tone.Ink, true, 0.06f);
                 t.textWrappingMode = TextWrappingModes.NoWrap;
                 t.overflowMode = TextOverflowModes.Ellipsis;
                 t.rectTransform.sizeDelta = new Vector2(Wd - Pad * 2, t.rectTransform.sizeDelta.y);
@@ -298,7 +298,20 @@ namespace Bolzena.UI
                 Make.Box("rb", st.T, Res.UI("circle"), rc, new Vector2(rd, rd), OC, new Color(0.04f, 0.06f, 0.13f, 0.95f));
                 var ring = Tone.Ring("ring", st.T, rc, rd, 0.06f, OC + 1, ready ? new Color(1f, 0.86f, 0.5f) : new Color(0.78f, 0.68f, 0.48f), new Color(1, 1, 1, 0.14f));
                 ring.Set(ready ? 1 : h.UltMax > 0 ? Mathf.Min(0.999f, (float)h.Ult / h.UltMax) : 0);
-                Make.Box("rbolt", st.T, Res.UI("ic_bolt"), rc, new Vector2(0.26f, 0.26f), OC + 2, ready ? Color.white : new Color(0.7f, 0.7f, 0.75f));
+                // 가운데 — 그 사도의 원작 볼따구(원 안으로 오림). 덜 찼으면 회색. 그림이 없으면 번개
+                var gface = Res.Sprite("Art/icon_graduateskill_" + h.Key);
+                if (gface != null)
+                {
+                    var mk = Make.Node("rmask", st.T, rc);
+                    var m = mk.gameObject.AddComponent<SpriteMask>();
+                    m.sprite = Res.UI("circle");
+                    m.isCustomRangeActive = true; m.frontSortingOrder = OC + 3; m.backSortingOrder = OC + 1;
+                    var mb = m.sprite.bounds.size;
+                    mk.localScale = new Vector3((rd - 0.12f) / mb.x, (rd - 0.12f) / mb.y, 1);
+                    var gf = Make.Box("rface", st.T, gface, rc, new Vector2(rd - 0.12f, rd - 0.12f), OC + 2, ready ? Color.white : new Color(0.55f, 0.55f, 0.6f));
+                    gf.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+                }
+                else Make.Box("rbolt", st.T, Res.UI("ic_bolt"), rc, new Vector2(0.26f, 0.26f), OC + 2, ready ? Color.white : new Color(0.7f, 0.7f, 0.75f));
                 float ux = Pad + rd + 0.16f, uw = Wd - ux - Pad;
                 st.Para($"<color={Tone.GoldTag}>{h.UltName}</color>", ux, uw - 1.6f, Tone.Lg, Tone.Ink, false, 0.03f);
                 PillR(st.T, Wd - Pad, ut - 0.16f, ready ? "쓸 수 있음" : $"{h.Ult}% / {h.UltMax}%", ready ? new Color(0.2f, 0.5f, 0.34f) : new Color(0.22f, 0.25f, 0.34f), Color.white);
@@ -309,13 +322,13 @@ namespace Bolzena.UI
                 if (!string.IsNullOrEmpty(h.KeywordName))
                 {
                     st.Head("고유 효과");
-                    Fold(st, h.Key + "|kw", $"「{h.KeywordName}」 <color={Tone.GoldTag}>{h.KeywordStacks}</color>", h.KeywordText, redraw, Tone.GoldTag);
+                    Fold(st, h.Key + "|kw", $"「{h.KeywordName}」 <color={Tone.GoldTag}>{h.KeywordStacks}</color>", h.KeywordText, redraw, Tone.GoldTag, h.KeywordShort);   // 접힘 = 짧은 글 · 펼침 = 자세히
                 }
                 if (h.Chips.Count > 0) { st.Head("상태"); StatusRows(st, h.Chips, h.Key, redraw); }
                 if (h.Passives.Count > 0)
                 {
                     st.Head("패시브");
-                    for (int p = 0; p < h.Passives.Count; p++) { var (n, t) = Split(h.Passives[p]); Fold(st, h.Key + "|p" + p, n, t, redraw); }
+                    for (int p = 0; p < h.Passives.Count; p++) { var (n, t) = Split(h.Passives[p]); string sh = p < h.PassivesShort.Count ? Split(h.PassivesShort[p]).text : null; Fold(st, h.Key + "|p" + p, n, t, redraw, null, sh); }
                 }
             });
         }
@@ -342,30 +355,55 @@ namespace Bolzena.UI
                 PillR(st.T, Wd - Pad, top - 0.26f, e.Dead ? "쓰러짐" : e.Broken ? "격파" : pct >= 0.7f ? "건강" : pct >= 0.3f ? "부상" : "위험",
                     e.Broken ? new Color(0.62f, 0.5f, 0.12f) : pct >= 0.7f ? new Color(0.2f, 0.55f, 0.36f) : pct >= 0.3f ? new Color(0.6f, 0.48f, 0.16f) : new Color(0.62f, 0.18f, 0.22f), Color.white, 0.15f);
                 float ry = st.Y - 0.13f;
-                Make.Box("nat", st.T, Res.UI("circle"), new Vector3(Pad + 0.09f, ry, 0), new Vector2(0.18f, 0.18f), OC, Tone.Nature(e.Nature));
+                EnemyHud.WeakBadge(Make.Node("nat", st.T, new Vector3(Pad + 0.11f, ry, 0)), e.Nature, 0.24f, OC);
                 Tone.Text("natn", st.T, e.Nature, new Vector3(Pad + 0.28f, ry, 0), Tone.Body, OC, Tone.Ink, TextAlignmentOptions.Left, true);
-                if (e.Weak.Count > 0)
+                bool toughless = e.ToughMaxV <= 0.001f;
+                if (e.Weak.Count > 0 && !toughless)
                 {
                     float wx = Wd - Pad;
-                    for (int k = e.Weak.Count - 1; k >= 0; k--) { Make.Box("wk" + k, st.T, Res.UI("circle"), new Vector3(wx - 0.09f, ry, 0), new Vector2(0.18f, 0.18f), OC, Tone.Nature(e.Weak[k])); wx -= 0.26f; }
-                    var wt = Tone.Text("wkt", st.T, "약점 " + string.Join(" ", e.Weak), new Vector3(wx - 0.04f, ry, 0), Tone.Sm, OC, Tone.Sub, TextAlignmentOptions.Right, true);
+                    // 약점 속성 — 머리 위와 같은 성격 아이콘(판 화면 RunArt) + 이름
+                    for (int k = e.Weak.Count - 1; k >= 0; k--)
+                    {
+                        var wn = Tone.Text("wkn" + k, st.T, e.Weak[k], new Vector3(wx, ry, 0), Tone.Body, OC, Tone.Nature(e.Weak[k]), TextAlignmentOptions.Right, true);
+                        wn.ForceMeshUpdate();
+                        wx -= wn.preferredWidth + 0.17f;
+                        EnemyHud.WeakBadge(Make.Node("wk" + k, st.T, new Vector3(wx, ry, 0)), e.Weak[k], 0.26f, OC);
+                        wx -= 0.2f;
+                    }
+                    var wt = Tone.Text("wkt", st.T, "약점 속성", new Vector3(wx - 0.02f, ry, 0), Tone.Sm, OC, Tone.Sub, TextAlignmentOptions.Right, true);
                     wt.ForceMeshUpdate();
-                    Make.Box("wki", st.T, Res.UI("ic_info"), new Vector3(wx - 0.18f - wt.preferredWidth, ry, 0), new Vector2(0.18f, 0.18f), OC, new Color(0.85f, 0.88f, 1f));
+                    TipZone.Add(wt, new Vector2(wt.preferredWidth + (Wd - Pad - wx), 0.3f), () => EnemyHud.WeakTip(e.Weak), 6, new Vector2((Wd - Pad - wx) / 2, 0));
                 }
                 st.Y = ry - 0.24f;
                 HpBar(st, Pad, Wd - Pad * 2, e.Hp, e.MaxHp, e.Block, new Color(0.9f, 0.27f, 0.34f));
-                float py = st.Y - 0.06f;
-                for (int t = 0; t < e.MaxTough; t++)
-                    Make.Box("tp" + t, st.T, Res.UI(t < e.Tough && !e.Broken ? "pip_on" : "pip_off"), new Vector3(Pad + 0.09f + t * 0.19f, py, 0), new Vector2(0.17f, 0.17f), OC);
-                Tone.Text("tt", st.T, e.Broken ? "<color=#ffd65a>격파됨</color> — 다음 차례를 쉰다" : $"강인도 {e.Tough} / {e.MaxTough}",
-                    new Vector3(Pad + 0.09f + e.MaxTough * 0.19f + 0.08f, py, 0), Tone.Sm, OC, Tone.Sub, TextAlignmentOptions.Left, true);
+                // 강인도 — 머리 위와 같은 칸 막대(1/3 칸도), 오른쪽에 값, 밑에 격파 설명 한 줄
+                float py = st.Y - 0.1f;
+                float tmax = e.ToughMaxV;
+                if (tmax > 0)
+                {
+                    float tw = Mathf.Min(Wd - Pad * 2 - 1.7f, 0.62f * Mathf.Ceil(tmax) + 0.5f);
+                    var tb = ToughBar.Create(st.T, new Vector3(Pad + tw / 2, py, 0), tw, 0.11f, tmax, OC, false);
+                    tb.Set(e.ToughV, false);
+                    tb.SetBroken(e.Broken, false);
+                    Tone.Text("tt", st.T, e.Broken ? "<color=#ffd65a>격파됨</color>  <size=85%>— 이번 차례를 쉰다</size>"
+                        : $"강인도 <color=#d9c9ff>{EnemyHud.Thirds(e.ToughV)}</color> <color={Tone.DimTag}>/ {EnemyHud.Thirds(tmax)}</color>",
+                        new Vector3(Pad + tw + 0.14f, py, 0), Tone.Sm, OC, Tone.Sub, TextAlignmentOptions.Left, true);
+                    py -= 0.24f;
+                    Tone.Text("tn", st.T, e.Broken ? "다음 차례가 오면 일어나 강인도가 다시 가득 찬다" : "격파되면 1턴 동안 행동하지 못한다 · 격파한 쪽 AP +1",
+                        new Vector3(Pad, py, 0), Tone.Cap, OC, Tone.Sub, TextAlignmentOptions.Left, true, Wd - Pad * 2);
+                }
+                else
+                {
+                    // 강인도가 없는 적(보스가 부르는 몹) — 막대 대신 한 줄
+                    Tone.Text("tt", st.T, "강인도 없음 — 격파되지 않습니다", new Vector3(Pad, py, 0), Tone.Sm, OC, Tone.Dim, TextAlignmentOptions.Left, true, Wd - Pad * 2);
+                }
                 st.Y = py - 0.2f;
 
                 // 다음 행동 칸
                 st.Head("다음 행동");
                 float it = st.Y;
                 if (e.Dead) st.Para("쓰러졌다", Pad, Wd - Pad * 2, Tone.Body, Tone.Dim);
-                else if (e.Broken || e.Intent == IntentKind.None) st.Para(e.Broken ? "격파 — 이번 차례는 쉰다. 받는 피해가 늘어난다." : "할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
+                else if (e.Broken || e.Intent == IntentKind.None) st.Para(e.Broken ? "격파 — 1턴 동안 행동하지 못한다(격파한 쪽 AP +1)." : "할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
                 else
                 {
                     var k = e.Intent;

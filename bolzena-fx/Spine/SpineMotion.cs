@@ -36,6 +36,7 @@ namespace Bolzena.Fx
         public string Group;                 // 사도 소리 갈래 attack · power · skill · ult
         public List<SoundEvent> Snd = new List<SoundEvent>();
         public MotionPick? Motion;
+        public UltWay Table;                 // 고학년 몸짓 표(ult_motion.json)에서 온 계획이면 그 갈래 — 이동 · 소리 · 전체 길이
         public int CutMs;
         public float From;
         public IEnumerable<string> Names { get { if (Anim != null) yield return Anim; foreach (var c in Chain) yield return c; } }
@@ -175,6 +176,15 @@ namespace Bolzena.Fx
         // 고학년 — 조각을 잇되 갈래는 하나(way, 없으면 무작위)
         public static ActPlan PlanUlt(SkeletonData d, string heroKey, int? way = null)
         {
+            // 표가 있으면 원작 갈래 그대로(NextAni 순서 · 고리 횟수까지 펼친 조각) — 갈래를 여기서 나누지 않는다
+            var tw = UltMotion.Ways(heroKey);
+            if (tw != null)
+            {
+                int ti = way.HasValue ? ((way.Value % tw.Count) + tw.Count) % tw.Count : UnityEngine.Random.Range(0, tw.Count);
+                var w = tw[ti];
+                var names = w.Names.Where(n => Has(d, n)).ToList();
+                if (names.Count > 0) return FromTable(d, w, names, new UltPick(ti, tw.Count));
+            }
             if (!Has(d, "Ultimate1_1")) return PlanNames(d, heroKey, new List<string> { Has(d, "Skill1_1") ? "Skill1_1" : "Attack1_1" }, "ult", null, true);   // 웹판 actName 그대로
             var ways = WaysOf(d, "Ultimate1");
             int i = way.HasValue ? ((way.Value % ways.Count) + ways.Count) % ways.Count : UnityEngine.Random.Range(0, ways.Count);
@@ -198,6 +208,20 @@ namespace Bolzena.Fx
             p.Motion = m;
             p.CutMs = m.CutMs;
             p.From = m.From;
+            return p;
+        }
+
+        static ActPlan FromTable(SkeletonData d, UltWay w, List<string> names, UltPick pick)
+        {
+            var p = new ActPlan { Group = "ult", Pick = pick, Table = w, Anim = names[0], Chain = names.Skip(1).ToList() };
+            float off = 0;
+            foreach (var n in names)
+            {
+                foreach (var e in Events(d, n))
+                    if (e.Name == "SFX" && Num(e.S) > 0) p.Snd.Add(new SoundEvent { N = (int)Num(e.S), T = Mathf.RoundToInt(1000 * (off + e.Time)) });
+                off += Duration(d, n);
+            }
+            p.S = new StrikeInfo { At = w.At, End = Math.Max(w.At, w.End), Marks = w.Marks.Count > 0 ? new List<int>(w.Marks) : new List<int> { w.At }, Total = Math.Max(w.MotionMs, Mathf.RoundToInt(off * 1000)) };
             return p;
         }
 

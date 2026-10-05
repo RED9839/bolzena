@@ -246,20 +246,19 @@
       "id": "n_charm",
       "name": "치명적인 매력",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "grade": "전설",
       "price": 180,
       "fx": [
         {
-          "k": "status",
-          "id": "협공",
-          "v": 2
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         },
         {
           "k": "status",
-          "id": "약화",
-          "v": 1,
-          "target": "allEnemies"
+          "id": "협공",
+          "v": 2
         }
       ],
       "oracles": [
@@ -267,21 +266,25 @@
           "name": "윙크",
           "fx": [
             {
-              "k": "status",
-              "id": "협공",
-              "v": 3
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "협공",
+              "v": 3
             }
           ]
         },
         {
           "name": "넋을 놓게",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
             {
               "k": "status",
               "id": "협공",
@@ -299,43 +302,33 @@
           "name": "팬서비스",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
               "k": "status",
               "id": "협공",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
               "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
           "name": "반한 눈빛",
-          "tags": [
-            "보존"
-          ],
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
             {
               "k": "status",
               "id": "협공",
               "v": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
             }
           ]
         },
@@ -344,15 +337,14 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "협공",
+              "v": 1
             }
           ]
         }
@@ -360,7 +352,7 @@
       "blesses": [
         {
           "name": "향수",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "미소",
@@ -530,7 +522,7 @@
       "id": "n_potion",
       "name": "수상한 물약",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "tags": [
         "개막",
         "소멸"
@@ -538,6 +530,11 @@
       "grade": "전설",
       "price": 210,
       "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "allEnemies"
+        },
         {
           "k": "status",
           "id": "고통",
@@ -560,6 +557,11 @@
           ],
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
               "k": "status",
               "id": "고통",
               "v": 7,
@@ -581,21 +583,20 @@
           ],
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
               "k": "status",
               "id": "고통",
-              "v": 5,
+              "v": 6,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "고통 각인",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -603,10 +604,14 @@
         {
           "name": "부작용 없음",
           "tags": [
-            "개막",
-            "소멸"
+            "개막"
           ],
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
             {
               "k": "status",
               "id": "고통",
@@ -616,12 +621,6 @@
             {
               "k": "status",
               "id": "고통 각인",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "취약",
               "v": 1,
               "target": "allEnemies"
             }
@@ -635,6 +634,11 @@
           ],
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
               "k": "status",
               "id": "고통",
               "v": 5,
@@ -644,12 +648,6 @@
               "k": "status",
               "id": "고통 각인",
               "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "균열",
-              "v": 3,
               "target": "allEnemies"
             }
           ]
@@ -662,6 +660,11 @@
             "소멸"
           ],
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
             {
               "k": "status",
               "id": "고통",
@@ -680,7 +683,7 @@
       "blesses": [
         {
           "name": "마개",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "흔들기",
@@ -1114,7 +1117,7 @@
       "id": "n_picnic",
       "name": "파스텔빛 소풍",
       "cost": 2,
-      "type": "강화",
+      "type": "공격",
       "tags": [
         "유일"
       ],
@@ -1122,14 +1125,13 @@
       "price": 240,
       "fx": [
         {
-          "k": "status",
-          "id": "고동",
-          "v": 1
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "allEnemies"
         },
         {
-          "k": "status",
-          "id": "초재생",
-          "v": 2
+          "k": "heal",
+          "ratio": 1
         }
       ],
       "oracles": [
@@ -1137,14 +1139,13 @@
           "name": "꽃잎 바람",
           "fx": [
             {
-              "k": "status",
-              "id": "고동",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             }
           ]
         },
@@ -1152,9 +1153,13 @@
           "name": "맛있는 간식",
           "fx": [
             {
-              "k": "status",
-              "id": "고동",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
@@ -1170,14 +1175,13 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "고동",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "draw",
@@ -1189,19 +1193,18 @@
           "name": "엘다인과 함께",
           "fx": [
             {
-              "k": "status",
-              "id": "고동",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
               "id": "사기",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -1210,14 +1213,13 @@
           "cost": 1,
           "fx": [
             {
-              "k": "status",
-              "id": "고동",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.7
             }
           ]
         }
@@ -1225,7 +1227,7 @@
       "blesses": [
         {
           "name": "바구니",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "지름길 소풍",
@@ -1236,7 +1238,7 @@
           "fx": [
             {
               "k": "status",
-              "id": "결정화",
+              "id": "초재생",
               "v": 1
             }
           ]
@@ -1248,7 +1250,7 @@
       "id": "n_surprise",
       "name": "깜짝 상자",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "tags": [
         "개막",
         "소멸"
@@ -1263,8 +1265,13 @@
           "target": "randomEnemy"
         },
         {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "allEnemies"
+        },
+        {
           "k": "tough",
-          "v": 2,
+          "v": 1,
           "target": "allEnemies"
         }
       ],
@@ -1283,8 +1290,13 @@
               "target": "randomEnemy"
             },
             {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
               "k": "tough",
-              "v": 3,
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -1292,8 +1304,7 @@
         {
           "name": "리본을 풀면",
           "tags": [
-            "개막",
-            "소멸"
+            "개막"
           ],
           "fx": [
             {
@@ -1303,13 +1314,12 @@
               "target": "randomEnemy"
             },
             {
-              "k": "tough",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.6,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "취약",
+              "k": "tough",
               "v": 1,
               "target": "allEnemies"
             }
@@ -1329,14 +1339,13 @@
               "target": "randomEnemy"
             },
             {
-              "k": "tough",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 1,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
+              "k": "tough",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
@@ -1355,14 +1364,13 @@
               "target": "randomEnemy"
             },
             {
-              "k": "tough",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.8,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
+              "k": "tough",
+              "v": 1.5,
               "target": "allEnemies"
             }
           ]
@@ -1382,8 +1390,13 @@
               "target": "randomEnemy"
             },
             {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
               "k": "tough",
-              "v": 1,
+              "v": 0.5,
               "target": "allEnemies"
             }
           ]
@@ -1392,7 +1405,7 @@
       "blesses": [
         {
           "name": "포장지",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "용수철",
@@ -1531,9 +1544,8 @@
       "price": 140,
       "fx": [
         {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 2
+          "k": "shield",
+          "ratio": 1.4
         },
         {
           "k": "status",
@@ -1549,9 +1561,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "status",
@@ -1567,9 +1578,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 3
+              "k": "shield",
+              "ratio": 2.1
             },
             {
               "k": "status",
@@ -1585,9 +1595,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "status",
@@ -1602,15 +1611,14 @@
           ]
         },
         {
-          "name": "먼저 움직인다",
+          "name": "먼저 버틴다",
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "status",
@@ -1619,9 +1627,8 @@
             },
             {
               "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "피해 감소",
+              "v": 2
             }
           ]
         },
@@ -1633,9 +1640,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.1
             },
             {
               "k": "status",
@@ -1648,7 +1654,7 @@
       "blesses": [
         {
           "name": "선두 깃발",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "발 빠른 선봉",
@@ -1659,7 +1665,7 @@
           "fx": [
             {
               "k": "status",
-              "id": "결의",
+              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -1676,13 +1682,12 @@
       "price": 140,
       "fx": [
         {
-          "k": "status",
-          "id": "사기",
-          "v": 1
+          "k": "shield",
+          "ratio": 1.2
         },
         {
           "k": "status",
-          "id": "피해 감소",
+          "id": "사기",
           "v": 1
         }
       ],
@@ -1691,14 +1696,13 @@
           "name": "정중앙",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.2
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "id": "사기",
+              "v": 2
             }
           ]
         },
@@ -1706,14 +1710,13 @@
           "name": "가운데가 편해",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.9
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "id": "사기",
+              "v": 1
             }
           ]
         },
@@ -1721,13 +1724,12 @@
           "name": "양쪽 챙기기",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.2
             },
             {
               "k": "status",
-              "id": "피해 감소",
+              "id": "사기",
               "v": 1
             },
             {
@@ -1743,13 +1745,12 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.2
             },
             {
               "k": "status",
-              "id": "피해 감소",
+              "id": "사기",
               "v": 1
             },
             {
@@ -1764,6 +1765,10 @@
           "cost": 0,
           "fx": [
             {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
               "k": "status",
               "id": "사기",
               "v": 1
@@ -1774,7 +1779,7 @@
       "blesses": [
         {
           "name": "가운데 자리",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "엄지 척",
@@ -1797,7 +1802,7 @@
       "id": "n_rearguard",
       "name": "후발대",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "tags": [
         "보존"
       ],
@@ -1805,15 +1810,15 @@
       "price": 140,
       "fx": [
         {
-          "k": "status",
-          "id": "표식",
-          "v": 2,
+          "k": "dmg",
+          "ratio": 1,
           "target": "oneEnemy"
         },
         {
           "k": "status",
-          "id": "피해 감소",
-          "v": 1
+          "id": "표식",
+          "v": 2,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
@@ -1824,15 +1829,15 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "표식",
-              "v": 3,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "id": "표식",
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -1843,15 +1848,15 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "표식",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "id": "표식",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -1866,15 +1871,15 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "표식",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "id": "표식",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
@@ -1891,19 +1896,19 @@
           ],
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
               "k": "status",
               "id": "표식",
               "v": 2,
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "shield",
+              "ratio": 1
             }
           ]
         },
@@ -1915,15 +1920,15 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "표식",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "id": "표식",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -1931,7 +1936,7 @@
       "blesses": [
         {
           "name": "망원경",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "지름길",
@@ -1948,27 +1953,23 @@
           ]
         }
       ],
-      "blurb": "늦게 와도 할 일은 있다. 뒤에서 과녁을 찍어 준다."
+      "blurb": "늦게 와도 할 일은 있다. 뒤에서 과녁을 찍고 한 발."
     },
     {
       "id": "n_safehit",
       "name": "안 아프게 맞는 법",
       "cost": 1,
-      "type": "강화",
-      "tags": [
-        "유일"
-      ],
+      "type": "스킬",
       "grade": "희귀",
       "price": 160,
       "fx": [
         {
-          "k": "status",
-          "id": "불굴",
-          "v": 1
+          "k": "shield",
+          "ratio": 1.4
         },
         {
           "k": "status",
-          "id": "회피",
+          "id": "불굴",
           "v": 1
         }
       ],
@@ -1977,6 +1978,10 @@
           "name": "굴러서 받기",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
               "k": "status",
               "id": "불굴",
               "v": 1
@@ -1984,7 +1989,7 @@
             {
               "k": "status",
               "id": "회피",
-              "v": 2
+              "v": 1
             }
           ]
         },
@@ -1992,13 +1997,12 @@
           "name": "힘 빼기",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 2
+              "k": "shield",
+              "ratio": 2.1
             },
             {
               "k": "status",
-              "id": "회피",
+              "id": "불굴",
               "v": 1
             }
           ]
@@ -2007,13 +2011,12 @@
           "name": "낙법",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "status",
-              "id": "회피",
+              "id": "불굴",
               "v": 1
             },
             {
@@ -2030,13 +2033,12 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "status",
-              "id": "회피",
+              "id": "불굴",
               "v": 1
             },
             {
@@ -2050,6 +2052,10 @@
           "cost": 0,
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.1
+            },
+            {
               "k": "status",
               "id": "불굴",
               "v": 1
@@ -2060,7 +2066,7 @@
       "blesses": [
         {
           "name": "보호대",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "요령",
@@ -2088,9 +2094,8 @@
       "price": 140,
       "fx": [
         {
-          "k": "status",
-          "id": "초재생",
-          "v": 2
+          "k": "heal",
+          "ratio": 1.2
         },
         {
           "k": "cleanse",
@@ -2102,9 +2107,8 @@
           "name": "손 잡아 주기",
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.2
             },
             {
               "k": "cleanse",
@@ -2121,9 +2125,8 @@
           "name": "괜찮아",
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 3
+              "k": "heal",
+              "ratio": 1.9
             },
             {
               "k": "cleanse",
@@ -2138,9 +2141,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.2
             },
             {
               "k": "cleanse",
@@ -2157,9 +2159,8 @@
           "name": "따뜻한 차",
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.2
             },
             {
               "k": "cleanse",
@@ -2176,9 +2177,8 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.9
             },
             {
               "k": "cleanse",
@@ -2190,7 +2190,7 @@
       "blesses": [
         {
           "name": "손난로",
-          "kind": "draw"
+          "kind": "heal"
         },
         {
           "name": "다정한 말",
@@ -2201,8 +2201,8 @@
           "fx": [
             {
               "k": "status",
-              "id": "결정화",
-              "v": 1
+              "id": "초재생",
+              "v": 2
             }
           ]
         }
@@ -2213,17 +2213,13 @@
       "id": "n_recovery",
       "name": "효율적인 회복",
       "cost": 1,
-      "type": "강화",
-      "tags": [
-        "유일"
-      ],
+      "type": "스킬",
       "grade": "희귀",
       "price": 150,
       "fx": [
         {
-          "k": "status",
-          "id": "초재생",
-          "v": 2
+          "k": "heal",
+          "ratio": 1
         },
         {
           "k": "status",
@@ -2236,9 +2232,8 @@
           "name": "계획된 휴식",
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 3
+              "k": "heal",
+              "ratio": 1.7
             },
             {
               "k": "status",
@@ -2251,9 +2246,8 @@
           "name": "단단한 회복",
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
@@ -2266,9 +2260,8 @@
           "name": "회복 일지",
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
@@ -2288,9 +2281,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
@@ -2299,8 +2291,8 @@
             },
             {
               "k": "status",
-              "id": "결의",
-              "v": 1
+              "id": "초재생",
+              "v": 2
             }
           ]
         },
@@ -2309,9 +2301,8 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.8
             },
             {
               "k": "status",
@@ -2324,7 +2315,7 @@
       "blesses": [
         {
           "name": "식단표",
-          "kind": "draw"
+          "kind": "heal"
         },
         {
           "name": "지름길",
@@ -2518,13 +2509,8 @@
       "price": 140,
       "fx": [
         {
-          "k": "nextCheaper",
-          "v": 1
-        },
-        {
-          "k": "status",
-          "id": "초재생",
-          "v": 1
+          "k": "heal",
+          "ratio": 1
         },
         {
           "k": "draw",
@@ -2539,13 +2525,8 @@
           ],
           "fx": [
             {
-              "k": "nextCheaper",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "draw",
@@ -2560,13 +2541,8 @@
           ],
           "fx": [
             {
-              "k": "nextCheaper",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.6
             },
             {
               "k": "draw",
@@ -2582,16 +2558,16 @@
           ],
           "fx": [
             {
-              "k": "nextCheaper",
+              "k": "heal",
+              "ratio": 1
+            },
+            {
+              "k": "draw",
               "v": 1
             },
             {
               "k": "status",
               "id": "초재생",
-              "v": 2
-            },
-            {
-              "k": "draw",
               "v": 2
             }
           ]
@@ -2603,16 +2579,15 @@
           ],
           "fx": [
             {
-              "k": "nextCheaper",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "nextCheaper",
               "v": 1
             }
           ]
@@ -2625,8 +2600,8 @@
           ],
           "fx": [
             {
-              "k": "nextCheaper",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.8
             },
             {
               "k": "draw",
@@ -2638,7 +2613,7 @@
       "blesses": [
         {
           "name": "포인트",
-          "kind": "draw"
+          "kind": "heal"
         },
         {
           "name": "할인",
@@ -2982,20 +2957,20 @@
       "id": "n_nat_mad",
       "name": "성격의 카드[광기]",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "grade": "고급",
       "price": 120,
       "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
         {
           "k": "status",
           "id": "고통",
           "v": 3,
           "target": "oneEnemy"
-        },
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
         }
       ],
       "oracles": [
@@ -3003,15 +2978,15 @@
           "name": "미친 웃음",
           "fx": [
             {
-              "k": "status",
-              "id": "고통",
-              "v": 5,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "사기",
-              "v": 1
+              "id": "고통",
+              "v": 5,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -3019,15 +2994,15 @@
           "name": "광기 전염",
           "fx": [
             {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
+              "k": "dmg",
+              "ratio": 0.7,
               "target": "allEnemies"
             },
             {
               "k": "status",
-              "id": "사기",
-              "v": 1
+              "id": "고통",
+              "v": 3,
+              "target": "allEnemies"
             }
           ]
         },
@@ -3035,15 +3010,15 @@
           "name": "폭주 직전",
           "fx": [
             {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
+              "k": "dmg",
+              "ratio": 1.6,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "사기",
-              "v": 2
+              "id": "고통",
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -3051,15 +3026,15 @@
           "name": "눈이 돌아",
           "fx": [
             {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "사기",
-              "v": 1
+              "id": "고통",
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -3072,15 +3047,15 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
+              "k": "dmg",
+              "ratio": 0.8,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "사기",
-              "v": 1
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -3088,7 +3063,7 @@
       "blesses": [
         {
           "name": "광기 한 장",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "성급함",
@@ -3117,9 +3092,8 @@
       "price": 120,
       "fx": [
         {
-          "k": "status",
-          "id": "결의",
-          "v": 2
+          "k": "heal",
+          "ratio": 1
         },
         {
           "k": "status",
@@ -3132,9 +3106,22 @@
           "name": "맑은 눈",
           "fx": [
             {
+              "k": "heal",
+              "ratio": 1
+            },
+            {
               "k": "status",
-              "id": "결의",
-              "v": 3
+              "id": "면역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "티 없는 마음",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.8
             },
             {
               "k": "status",
@@ -3144,27 +3131,11 @@
           ]
         },
         {
-          "name": "티 없는 마음",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "면역",
-              "v": 2
-            }
-          ]
-        },
-        {
           "name": "해맑게",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
@@ -3184,9 +3155,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
@@ -3195,7 +3165,7 @@
             },
             {
               "k": "status",
-              "id": "사기",
+              "id": "결의",
               "v": 1
             }
           ]
@@ -3205,9 +3175,8 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.8
             },
             {
               "k": "status",
@@ -3220,7 +3189,7 @@
       "blesses": [
         {
           "name": "순수 한 장",
-          "kind": "draw"
+          "kind": "heal"
         },
         {
           "name": "천진함",
@@ -3247,15 +3216,14 @@
       "price": 120,
       "fx": [
         {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
           "k": "status",
           "id": "약화",
           "v": 1,
           "target": "allEnemies"
-        },
-        {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 1
         }
       ],
       "oracles": [
@@ -3263,15 +3231,14 @@
           "name": "얼음 같은 눈",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
               "k": "status",
               "id": "약화",
               "v": 2,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
             }
           ]
         },
@@ -3279,15 +3246,14 @@
           "name": "침착하게",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
               "k": "status",
               "id": "약화",
               "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
             }
           ]
         },
@@ -3295,15 +3261,14 @@
           "name": "계산 끝",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
               "k": "status",
               "id": "약화",
               "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
             },
             {
               "k": "draw",
@@ -3318,15 +3283,14 @@
           ],
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
               "k": "status",
               "id": "약화",
               "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
             },
             {
               "k": "status",
@@ -3340,15 +3304,14 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 0.9
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -3356,7 +3319,7 @@
       "blesses": [
         {
           "name": "냉정 한 장",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "효율",
@@ -3380,17 +3343,17 @@
       "id": "n_nat_lively",
       "name": "성격의 카드[활발]",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "grade": "고급",
       "price": 120,
       "fx": [
         {
-          "k": "draw",
-          "v": 2
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "협공",
+          "k": "draw",
           "v": 1
         }
       ],
@@ -3399,13 +3362,13 @@
           "name": "펄쩍",
           "fx": [
             {
-              "k": "draw",
-              "v": 3
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "draw",
+              "v": 2
             }
           ]
         },
@@ -3413,8 +3376,13 @@
           "name": "다 같이 놀자",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
               "k": "draw",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
@@ -3427,17 +3395,12 @@
           "name": "쉬지 않고",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
               "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "사기",
               "v": 1
             }
           ]
@@ -3449,16 +3412,17 @@
           ],
           "fx": [
             {
-              "k": "draw",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "협공",
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "ap",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
@@ -3468,12 +3432,12 @@
           "cost": 0,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "협공",
+              "k": "draw",
               "v": 1
             }
           ]
@@ -3482,7 +3446,7 @@
       "blesses": [
         {
           "name": "활발 한 장",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "발랄함",
@@ -3493,7 +3457,7 @@
           "fx": [
             {
               "k": "status",
-              "id": "다음 턴 드로우",
+              "id": "협공",
               "v": 1
             }
           ]
@@ -3510,10 +3474,8 @@
       "price": 120,
       "fx": [
         {
-          "k": "status",
-          "id": "균열",
-          "v": 3,
-          "target": "oneEnemy"
+          "k": "shield",
+          "ratio": 1.2
         },
         {
           "k": "status",
@@ -3526,15 +3488,19 @@
           "name": "깊은 우울",
           "fx": [
             {
-              "k": "status",
-              "id": "균열",
-              "v": 5,
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 1.2
             },
             {
               "k": "status",
               "id": "실드 유지",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "균열",
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -3542,10 +3508,28 @@
           "name": "비 오는 날",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            },
+            {
               "k": "status",
               "id": "균열",
-              "v": 3,
+              "v": 2,
               "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "이불 속",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.9
             },
             {
               "k": "status",
@@ -3555,29 +3539,11 @@
           ]
         },
         {
-          "name": "이불 속",
-          "fx": [
-            {
-              "k": "status",
-              "id": "균열",
-              "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "실드 유지",
-              "v": 2
-            }
-          ]
-        },
-        {
           "name": "혼잣말",
           "fx": [
             {
-              "k": "status",
-              "id": "균열",
-              "v": 3,
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 1.2
             },
             {
               "k": "status",
@@ -3595,10 +3561,13 @@
           "cost": 0,
           "fx": [
             {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
               "k": "status",
-              "id": "균열",
-              "v": 2,
-              "target": "oneEnemy"
+              "id": "실드 유지",
+              "v": 1
             }
           ]
         }
@@ -3606,7 +3575,7 @@
       "blesses": [
         {
           "name": "우울 한 장",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "무기력",
@@ -3629,17 +3598,13 @@
       "id": "n_bulletproof",
       "name": "방탄불괴",
       "cost": 1,
-      "type": "강화",
-      "tags": [
-        "유일"
-      ],
+      "type": "스킬",
       "grade": "고급",
       "price": 110,
       "fx": [
         {
-          "k": "status",
-          "id": "불굴",
-          "v": 1
+          "k": "shield",
+          "ratio": 1.8
         },
         {
           "k": "status",
@@ -3652,9 +3617,8 @@
           "name": "강철 피부",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.8
             },
             {
               "k": "status",
@@ -3667,9 +3631,8 @@
           "name": "뭐가 스쳤나?",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.8
             },
             {
               "k": "status",
@@ -3686,9 +3649,8 @@
           "name": "무시하기",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.8
             },
             {
               "k": "status",
@@ -3709,9 +3671,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.8
             },
             {
               "k": "status",
@@ -3730,6 +3691,10 @@
           "cost": 0,
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
               "k": "status",
               "id": "결의",
               "v": 1
@@ -3740,7 +3705,7 @@
       "blesses": [
         {
           "name": "두꺼운 옷",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "가벼운 철판",
@@ -3763,19 +3728,18 @@
       "id": "n_catchhim",
       "name": "저놈 잡아라!",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "grade": "고급",
       "price": 100,
       "fx": [
         {
-          "k": "status",
-          "id": "표식",
-          "v": 1,
+          "k": "dmg",
+          "ratio": 1,
           "target": "oneEnemy"
         },
         {
           "k": "status",
-          "id": "취약",
+          "id": "표식",
           "v": 1,
           "target": "oneEnemy"
         }
@@ -3785,15 +3749,14 @@
           "name": "현상금",
           "fx": [
             {
-              "k": "status",
-              "id": "표식",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 1,
+              "id": "표식",
+              "v": 2,
               "target": "oneEnemy"
             }
           ]
@@ -3801,6 +3764,11 @@
         {
           "name": "막다른 골목",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
             {
               "k": "status",
               "id": "표식",
@@ -3819,14 +3787,13 @@
           "name": "다 같이 쫓아가",
           "fx": [
             {
-              "k": "status",
-              "id": "표식",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "취약",
+              "id": "표식",
               "v": 1,
               "target": "oneEnemy"
             },
@@ -3843,6 +3810,11 @@
           ],
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
               "k": "status",
               "id": "표식",
               "v": 1,
@@ -3850,14 +3822,8 @@
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
               "id": "둔화",
-              "v": 1,
+              "v": 2,
               "target": "oneEnemy"
             }
           ]
@@ -3866,6 +3832,11 @@
           "name": "저기다!",
           "cost": 0,
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
             {
               "k": "status",
               "id": "표식",
@@ -3878,7 +3849,7 @@
       "blesses": [
         {
           "name": "수배지",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "지름길",
@@ -3889,7 +3860,7 @@
           "fx": [
             {
               "k": "status",
-              "id": "둔화",
+              "id": "취약",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -3902,20 +3873,18 @@
       "id": "n_scholar",
       "name": "학자",
       "cost": 1,
-      "type": "강화",
-      "tags": [
-        "유일"
-      ],
+      "type": "공격",
       "grade": "고급",
       "price": 110,
       "fx": [
         {
-          "k": "status",
-          "id": "계몽",
-          "v": 2
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         },
         {
-          "k": "draw",
+          "k": "status",
+          "id": "계몽",
           "v": 1
         }
       ],
@@ -3924,23 +3893,14 @@
           "name": "밤새 읽기",
           "fx": [
             {
-              "k": "status",
-              "id": "계몽",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "좋은 마법사",
-          "fx": [
-            {
               "k": "status",
               "id": "계몽",
-              "v": 3
+              "v": 1
             },
             {
               "k": "draw",
@@ -3949,15 +3909,31 @@
           ]
         },
         {
-          "name": "논문 한 편",
+          "name": "좋은 마법사",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
             {
               "k": "status",
               "id": "계몽",
-              "v": 2
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "논문 한 편",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "계몽",
               "v": 1
             },
             {
@@ -3973,12 +3949,13 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "계몽",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "계몽",
               "v": 1
             },
             {
@@ -3993,12 +3970,13 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "계몽",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "계몽",
               "v": 1
             }
           ]
@@ -4007,7 +3985,7 @@
       "blesses": [
         {
           "name": "돋보기",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "요점 정리",
@@ -4024,20 +4002,19 @@
           ]
         }
       ],
-      "blurb": "좋은 마법사는 책벌레다."
+      "blurb": "좋은 마법사는 책벌레다. 두꺼운 책은 무기도 된다."
     },
     {
       "id": "n_bully",
       "name": "약자무시",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "grade": "고급",
       "price": 110,
       "fx": [
         {
-          "k": "status",
-          "id": "취약",
-          "v": 2,
+          "k": "dmg",
+          "ratio": 1,
           "target": "oneEnemy"
         },
         {
@@ -4052,15 +4029,20 @@
           "name": "비웃기",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 3,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "잔불",
               "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
               "target": "oneEnemy"
             }
           ]
@@ -4069,9 +4051,8 @@
           "name": "짓밟기",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 1.2,
               "target": "oneEnemy"
             },
             {
@@ -4086,9 +4067,8 @@
           "name": "약점 찌르기",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
@@ -4109,9 +4089,8 @@
           "name": "줄 세우기",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.8,
               "target": "allEnemies"
             },
             {
@@ -4127,9 +4106,8 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
@@ -4144,7 +4122,7 @@
       "blesses": [
         {
           "name": "삿대질",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "무시",
@@ -4166,17 +4144,17 @@
       "id": "n_strongman",
       "name": "차력 시범",
       "cost": 0,
-      "type": "스킬",
+      "type": "공격",
       "grade": "고급",
       "price": 100,
       "fx": [
         {
-          "k": "tough",
-          "v": 2
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "잔광",
+          "k": "tough",
           "v": 1
         }
       ],
@@ -4185,13 +4163,13 @@
           "name": "기왓장 열 장",
           "fx": [
             {
-              "k": "tough",
-              "v": 3
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "k": "tough",
+              "v": 2
             }
           ]
         },
@@ -4199,13 +4177,13 @@
           "name": "쇠사슬 끊기",
           "fx": [
             {
-              "k": "tough",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
+              "k": "tough",
+              "v": 1
             }
           ]
         },
@@ -4213,17 +4191,17 @@
           "name": "관객 호응",
           "fx": [
             {
-              "k": "tough",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "잔광",
+              "k": "tough",
               "v": 1
             },
             {
               "k": "gauge",
-              "v": 20
+              "v": 30
             }
           ]
         },
@@ -4231,14 +4209,14 @@
           "name": "맨손 격파",
           "fx": [
             {
-              "k": "tough",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.5,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "k": "tough",
+              "v": 0.5,
+              "target": "allEnemies"
             }
           ]
         },
@@ -4249,12 +4227,12 @@
           ],
           "fx": [
             {
-              "k": "tough",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "잔광",
+              "k": "tough",
               "v": 1
             },
             {
@@ -4267,7 +4245,7 @@
       "blesses": [
         {
           "name": "박수",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "기합",
@@ -4291,14 +4269,14 @@
       "id": "n_critical",
       "name": "회심의 일격",
       "cost": 0,
-      "type": "스킬",
+      "type": "공격",
       "grade": "고급",
       "price": 100,
       "fx": [
         {
-          "k": "status",
-          "id": "잔광",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
         },
         {
           "k": "status",
@@ -4312,9 +4290,9 @@
           "name": "번쩍",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
@@ -4328,9 +4306,9 @@
           "name": "틈새",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
@@ -4344,9 +4322,9 @@
           "name": "호흡 고르기",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
@@ -4364,9 +4342,9 @@
           "name": "모두에게 한 번씩",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
             },
             {
               "k": "status",
@@ -4383,9 +4361,9 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
@@ -4405,7 +4383,7 @@
       "blesses": [
         {
           "name": "조준",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "기세",
@@ -4429,17 +4407,18 @@
       "id": "n_training",
       "name": "개인 트레이닝",
       "cost": 1,
-      "type": "강화",
-      "tags": [
-        "유일"
-      ],
+      "type": "스킬",
       "grade": "고급",
       "price": 110,
       "fx": [
         {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
           "k": "status",
           "id": "결정화",
-          "v": 2
+          "v": 1
         }
       ],
       "oracles": [
@@ -4447,9 +4426,13 @@
           "name": "하루 두 번",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
               "k": "status",
               "id": "결정화",
-              "v": 3
+              "v": 2
             }
           ]
         },
@@ -4457,14 +4440,17 @@
           "name": "식단 관리",
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.2
             },
             {
               "k": "status",
-              "id": "초재생",
+              "id": "결정화",
               "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.8
             }
           ]
         },
@@ -4472,9 +4458,13 @@
           "name": "코치의 한마디",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
               "k": "status",
               "id": "결정화",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
@@ -4489,9 +4479,13 @@
           ],
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
               "k": "status",
               "id": "결정화",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
@@ -4505,6 +4499,10 @@
           "cost": 0,
           "fx": [
             {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
               "k": "status",
               "id": "결정화",
               "v": 1
@@ -4515,7 +4513,7 @@
       "blesses": [
         {
           "name": "운동복",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "단골 할인",
@@ -4679,7 +4677,7 @@
       "id": "n_leave",
       "name": "조기 퇴근",
       "cost": 0,
-      "type": "스킬",
+      "type": "공격",
       "tags": [
         "종극"
       ],
@@ -4687,14 +4685,14 @@
       "price": 100,
       "fx": [
         {
-          "k": "status",
-          "id": "저장",
-          "v": 1
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "다음 턴 드로우",
-          "v": 2
+          "v": 1
         }
       ],
       "oracles": [
@@ -4705,14 +4703,14 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "저장",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "다음 턴 드로우",
-              "v": 3
+              "v": 2
             }
           ]
         },
@@ -4723,14 +4721,19 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "저장",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "다음 턴 드로우",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
             }
           ]
         },
@@ -4741,18 +4744,13 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "저장",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "다음 턴 드로우",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "결정화",
               "v": 1
             }
           ]
@@ -4765,37 +4763,36 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "저장",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "다음 턴 드로우",
-              "v": 2
+              "v": 1
             },
             {
               "k": "gauge",
-              "v": 20
+              "v": 30
             }
           ]
         },
         {
-          "name": "출근 전 퇴근",
+          "name": "마지막 결재",
           "tags": [
-            "종극",
-            "개전"
+            "종극"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "저장",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "다음 턴 드로우",
-              "v": 2
+              "v": 1
             }
           ]
         }
@@ -4803,7 +4800,7 @@
       "blesses": [
         {
           "name": "퇴근 도장",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "야근 수당",
@@ -4820,20 +4817,25 @@
           ]
         }
       ],
-      "blurb": "내는 순간 오늘 일은 끝. 남은 기운은 내일로 챙긴다."
+      "blurb": "내는 순간 오늘 일은 끝. 문 닫기 전에 한 방 꽂고 간다."
     },
     {
       "id": "n_apprentice",
       "name": "견습 마법사",
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "grade": "일반",
       "price": 70,
       "fx": [
         {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
+        },
+        {
           "k": "status",
           "id": "공명",
-          "v": 2
+          "v": 1
         },
         {
           "k": "draw",
@@ -4845,9 +4847,14 @@
           "name": "주문 연습",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
               "k": "status",
               "id": "공명",
-              "v": 3
+              "v": 2
             },
             {
               "k": "draw",
@@ -4859,9 +4866,14 @@
           "name": "실수로 두 장",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
               "k": "status",
               "id": "공명",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
@@ -4876,18 +4888,19 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "공명",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "공명",
               "v": 1
             },
             {
               "k": "status",
               "id": "다음 턴 드로우",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -4895,17 +4908,17 @@
           "name": "스승 흉내",
           "fx": [
             {
-              "k": "status",
-              "id": "공명",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "공명",
               "v": 1
             },
             {
-              "k": "status",
-              "id": "잔광",
+              "k": "draw",
               "v": 1
             }
           ]
@@ -4914,6 +4927,11 @@
           "name": "짧은 주문",
           "cost": 0,
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
             {
               "k": "status",
               "id": "공명",
@@ -4929,7 +4947,7 @@
       "blesses": [
         {
           "name": "마법 노트",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "지팡이 휘두르기",
@@ -4961,9 +4979,8 @@
       "price": 70,
       "fx": [
         {
-          "k": "status",
-          "id": "초재생",
-          "v": 1
+          "k": "heal",
+          "ratio": 0.8
         },
         {
           "k": "cleanse",
@@ -4978,9 +4995,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.3
             },
             {
               "k": "cleanse",
@@ -4995,9 +5011,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.8
             },
             {
               "k": "cleanse",
@@ -5016,9 +5031,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.8
             },
             {
               "k": "cleanse",
@@ -5039,9 +5053,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.8
             },
             {
               "k": "cleanse",
@@ -5049,7 +5062,7 @@
             },
             {
               "k": "status",
-              "id": "면역",
+              "id": "초재생",
               "v": 2
             }
           ]
@@ -5062,9 +5075,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.8
             },
             {
               "k": "cleanse",
@@ -5081,7 +5093,7 @@
       "blesses": [
         {
           "name": "딸기 향",
-          "kind": "draw"
+          "kind": "heal"
         },
         {
           "name": "한 알 더",
@@ -5231,12 +5243,12 @@
       "price": 70,
       "fx": [
         {
-          "k": "status",
-          "id": "회피",
-          "v": 1
+          "k": "shield",
+          "ratio": 1
         },
         {
-          "k": "draw",
+          "k": "status",
+          "id": "회피",
           "v": 1
         }
       ],
@@ -5245,13 +5257,13 @@
           "name": "잔상 둘",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
               "k": "status",
               "id": "회피",
               "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
@@ -5259,13 +5271,17 @@
           "name": "비켜서기",
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
               "k": "status",
               "id": "회피",
               "v": 1
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             }
           ]
         },
@@ -5273,12 +5289,12 @@
           "name": "뒤로 돌아가기",
           "fx": [
             {
-              "k": "status",
-              "id": "회피",
-              "v": 1
+              "k": "shield",
+              "ratio": 1
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "회피",
               "v": 1
             },
             {
@@ -5296,17 +5312,12 @@
           ],
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
               "k": "status",
               "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -5315,6 +5326,10 @@
           "name": "반 박자 빠르게",
           "cost": 0,
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
             {
               "k": "status",
               "id": "회피",
@@ -5326,7 +5341,7 @@
       "blesses": [
         {
           "name": "바람",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "잰걸음",
@@ -5354,9 +5369,8 @@
       "price": 70,
       "fx": [
         {
-          "k": "status",
-          "id": "결정화",
-          "v": 1
+          "k": "shield",
+          "ratio": 1.4
         },
         {
           "k": "status",
@@ -5369,9 +5383,8 @@
           "name": "튼튼한 뼈",
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
+              "k": "shield",
+              "ratio": 2.1
             },
             {
               "k": "status",
@@ -5384,9 +5397,8 @@
           "name": "단단한 근육",
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "status",
@@ -5399,9 +5411,8 @@
           "name": "규칙적인 생활",
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "status",
@@ -5421,9 +5432,8 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "status",
@@ -5442,8 +5452,12 @@
           "cost": 0,
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.1
+            },
+            {
               "k": "status",
-              "id": "결정화",
+              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -5452,7 +5466,7 @@
       "blesses": [
         {
           "name": "맨손 체조",
-          "kind": "draw"
+          "kind": "guard"
         },
         {
           "name": "가벼운 몸",
@@ -5609,13 +5623,12 @@
       "price": 70,
       "fx": [
         {
-          "k": "status",
-          "id": "결의",
-          "v": 1
+          "k": "heal",
+          "ratio": 1
         },
         {
           "k": "status",
-          "id": "초재생",
+          "id": "결의",
           "v": 1
         }
       ],
@@ -5624,14 +5637,13 @@
           "name": "한 바퀴 더",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
-              "id": "초재생",
-              "v": 1
+              "id": "결의",
+              "v": 2
             }
           ]
         },
@@ -5639,14 +5651,13 @@
           "name": "보양식",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "heal",
+              "ratio": 1.7
             },
             {
               "k": "status",
-              "id": "초재생",
-              "v": 2
+              "id": "결의",
+              "v": 1
             }
           ]
         },
@@ -5654,13 +5665,12 @@
           "name": "줄넘기",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "heal",
+              "ratio": 1
             },
             {
               "k": "status",
-              "id": "초재생",
+              "id": "결의",
               "v": 1
             },
             {
@@ -5676,6 +5686,10 @@
           ],
           "fx": [
             {
+              "k": "heal",
+              "ratio": 1
+            },
+            {
               "k": "status",
               "id": "결의",
               "v": 1
@@ -5683,12 +5697,7 @@
             {
               "k": "status",
               "id": "초재생",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -5696,6 +5705,10 @@
           "name": "계단 오르기",
           "cost": 0,
           "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.8
+            },
             {
               "k": "status",
               "id": "결의",
@@ -5707,7 +5720,7 @@
       "blesses": [
         {
           "name": "물통",
-          "kind": "draw"
+          "kind": "heal"
         },
         {
           "name": "가벼운 발",

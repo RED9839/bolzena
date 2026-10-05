@@ -21,7 +21,14 @@ namespace Bolzena.RunUI
             bg.rectTransform.Fill();
             bg.gameObject.AddComponent<Mask>().showMaskGraphic = true;
             var ic = h?.Icon;
-            if (ic != null)
+            // 스탠딩 맞춤 표에 있는 사도는 스탠딩 머리 · 어깨(표의 중심 · 머리로 구운 것 — 상세 초상 줄 · 머리표 · 파티 HP 초상 줄 모두 같은 얼굴)
+            var head = h?.art != null && StandingFit.Has(h.art) ? StandingSnap.Upper(h.art, 1f, 0.34f) : null;
+            if (head != null)
+            {
+                var im = Ui.Img(bg.rectTransform, head, Color.white, "icon");
+                im.rectTransform.Fill();
+            }
+            else if (ic != null)
             {
                 var im = Ui.Img(bg.rectTransform, ic, Color.white, "icon");
                 im.rectTransform.Fill(-size * 0.04f, -size * 0.1f, -size * 0.04f, size * 0.02f);
@@ -242,6 +249,64 @@ namespace Bolzena.RunUI
             return t;
         }
 
+        // ── 적의 수 한 줄(적 상세 · 도감 「행동」) — 의도 아이콘 동그라미 + core 글(수치는 금빛) + 한 줄 풀이 ──
+        //   글은 core CardText.Intent 그대로, 화면은 꾸밈(아이콘 · 색 · 수치 강조)과 종류 풀이만 더한다. head = 「첫 턴」 · 「체력 50% 아래」 따위 머리표
+        static readonly System.Text.RegularExpressions.Regex IntentNum = new System.Text.RegularExpressions.Regex(@"[+\-−]?\d+(?:\.\d+)?%?");
+
+        public static (string icon, Color col, string gloss) IntentLook(Intent it)
+        {
+            Color red = Theme.Hex("FF7A86"), blue = Theme.Hex("78C6FF"), green = Theme.Good, gold = Theme.Gold, purple = Theme.Hex("C29BFF"), gray = Theme.Sub;
+            switch (it?.T)
+            {
+                case "attack": return ("ic_sword", red, "사도 하나를 친다");
+                case "back": return ("ic_sword", red, "방어 · 실드를 무시하고 사도 하나를 친다");
+                case "attackAll": return ("ic_swords", red, "파티 모두를 친다");
+                case "multi": return ("ic_swords", red, "여러 번 나눠 친다 — 한 대씩 방어가 깎인다");
+                case "charge": return ("ic_fire", gold, "이번 차례는 힘을 모으고, 다음 차례에 그 수를 한다");
+                case "block": return ("ic_shield", blue, "자기 방어를 얻는다 — 피해를 먼저 받아 낸다");
+                case "guard": return ("ic_shield", blue, "적 모두가 방어를 얻는다");
+                case "heal": return ("ic_heart", green, "적의 체력을 채운다");
+                case "selfHeal": return ("ic_heart", green, "자기 체력을 채운다");
+                case "revive": return ("ic_heart", green, "쓰러져도 다시 일어선다");
+                case "buff": return ("ic_spark", gold, it.All ? "적 모두가 이로운 효과를 얻는다" : "이로운 효과를 얻는다");
+                case "count": return ("ic_spark", gold, "이 적이 세는 수가 바뀐다");
+                case "debuff": return ("ic_skull", purple, "파티에 해로운 효과를 건다");
+                case "jam": return ("ic_lock", purple, "다음 턴에 쓸 수 있는 AP 가 줄어든다");
+                case "addCard": case "cardDebuff": case "handCost": case "reshuffle": case "autoPlay": return ("ic_deck", purple, "덱 · 손의 카드를 어지럽힌다");
+                case "summon": return ("ic_plus", gold, "적을 더 불러낸다");
+                case "shift": return ("ic_refresh", gold, "하려던 수를 바꾼다");
+                case "thorns": return ("ic_shield", red, "치면 되돌려 받는다");
+                case "feign": return ("ic_question", gray, "쓰러진 척한다");
+            }
+            return ("ic_info", gray, null);
+        }
+
+        public static RectTransform IntentRow(Transform parent, Flow f, Intent it, string head = null)
+        {
+            var (icon, col, gloss) = IntentLook(it);
+            var row = Ui.Img(parent, Theme.Round, Theme.NavyWell.A(0.55f), "intent " + it?.T);
+            row.pixelsPerUnitMultiplier = 2.2f;
+            var rt = row.rectTransform;
+            var disc = Ui.Img(rt, Theme.S("round"), Color.Lerp(Theme.NavyWell, col, 0.28f), "disc");
+            disc.rectTransform.At(0, 0.5f, 10, 0, 40, 40);
+            var ring = Ui.Img(disc.transform, Theme.S("frame_pill"), col.A(0.85f), "ring"); ring.rectTransform.Fill();
+            var g = Ui.Img(disc.transform, Theme.S(icon), col, "glyph"); g.preserveAspect = true; g.rectTransform.Fill(9, 9, 9, 9);
+            string main = IntentNum.Replace(f.P.Text.Intent(it), m => $"<color={Theme.GoldTag}>{m.Value}</color>");
+            if (head != null) main = $"<color={Theme.GoldTag}><size=86%>{head}</size></color>  " + main;
+            // 글 높이만큼 줄이 자란다(바깥 Col 이 이 줄의 선호 높이를 쓴다) — 동그라미는 배치 밖
+            disc.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            Ui.Col(rt, 1, TextAnchor.MiddleLeft, new RectOffset(62, 12, 8, 8), true, false);
+            row.Pref().minHeight = 54;
+            var t = Ui.Text(rt, main, Theme.FsBody, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+            t.textWrappingMode = TextWrappingModes.Normal;
+            if (gloss != null)
+            {
+                var s = Ui.Text(rt, gloss, Theme.FsCap, Theme.Sub, TextAlignmentOptions.MidlineLeft);
+                s.textWrappingMode = TextWrappingModes.Normal;
+            }
+            return rt;
+        }
+
         // ── 말풍선(종이) ──
         public static TextMeshProUGUI Bubble(Transform parent, string who, string line, float w, out RectTransform rt)
         {
@@ -262,10 +327,10 @@ namespace Bolzena.RunUI
         }
 
         // ── 카드(손패 밖 모든 카드 — 덱 · 보상 · 상점 · 상세 · 카드 크게) ── 200×280 기준. 전투 카드(bolzena-unity CardView)와 같은 꼴:
-        //   그림이 카드 전체(둥근 창) · 위 왼쪽 큰 비용 숫자 + 밑줄 · 이름 · 종류 알약(아이콘 + 「기본 공격」 따위) · 위 오른쪽 고유 표
+        //   그림이 카드 전체(둥근 창) · 위 왼쪽 큰 비용 숫자 · 이름 · 종류 알약(아이콘 + 「공격」 · 「스킬」 · 「강화」) · 위 오른쪽 고유 표(교주 카드는 주인 핀)
         //   아래: 장식 선(가운데 마름모) · 금빛 키워드 태그 「[ 유일 / 소멸 ]」 · 효과 글 — 그림 위 어둠 그라데이션에 얹는다
-        //   왼쪽 가장자리 띠 · 테 = 카드 주인 사도의 성격 색(Theme.NatureCard) · 교주 카드 금 · 상태 · 저주 어두운 보라. 종류는 아이콘 · 글로만.
-        //   그림(CardArt — Docs/카드그림.md): 시작 카드 = 사도 스탠딩 상반신 · 고유 카드 = 스킬 아이콘(흐린 확대 바탕 + 가운데 선명) · 교주 · 상태 = 종류 무늬
+        //   왼쪽 가장자리 띠 · 테 = 카드 주인 사도의 성격 색(Theme.NatureCard) · 교주 카드는 넣은 사도의 성격(없으면 금) · 상태 · 저주 어두운 보라. 종류는 아이콘 · 글로만.
+        //   그림(CardArt — Docs/카드그림.md): 시작 카드 = 사도 스탠딩 상반신 · 고유 · 생성 카드 = 고른 원작 그림(없으면 스킬 아이콘 — 흐린 확대 바탕 + 가운데 선명) · 교주 · 상태 = 종류 무늬
         public static Sprite TypeIcon(string type) => Theme.S(type == "공격" ? "ic_swords" : type == "강화" ? "ic_spark" : type == "상태" || type == "저주" ? "ic_skull" : "ic_moon");
 
         /// <summary>종류 글 색 — 공격 붉게 · 스킬 푸르게 · 강화 보라 · 상태 잿빛(전투 CardView.TypeColor 와 같은 값).</summary>
@@ -273,25 +338,33 @@ namespace Bolzena.RunUI
             type == "공격" ? new Color(1f, 0.55f, 0.58f) : type == "강화" ? new Color(0.8f, 0.68f, 1f)
             : type == "상태" || type == "저주" ? new Color(0.7f, 0.7f, 0.78f) : new Color(0.55f, 0.8f, 1f);
 
-        public static Color CardTint(Flow f, CardView v)
+        /// <summary>종류 글 — 모든 카드가 「공격」 · 「스킬」 · 「강화」 셋 가운데 하나(「기본 」 · 「교주 · 」 따위 머리말 없이). 상태 · 저주만 제 이름.</summary>
+        public static string TypeLabel(string type) => string.IsNullOrEmpty(type) ? "스킬" : type;
+
+        /// <summary>카드 틀 색 — 사도 카드 = 주인 성격 · 교주 카드 = 덱에 넣은 사도(owner)의 성격, 주인이 없을 때만 금빛 중립 · 상태 · 저주 = 어두운 보라.</summary>
+        public static Color CardTint(Flow f, CardView v, string owner = null)
         {
             if (v == null) return Theme.LeaderCard;
             if (v.IsStatus || v.IsCurse) return Theme.StatusCard;
-            if (v.Hero == null) return Theme.LeaderCard;
-            var hd = f.P.Data.Hero(v.Hero);
-            return Theme.NatureCardOf(hd?.Nature ?? Roster.OfCore(v.Hero)?.nature);
+            var key = v.Hero ?? owner;
+            if (key == null) return Theme.LeaderCard;
+            var hd = f.P.Data.Hero(key);
+            return Theme.NatureCardOf(hd?.Nature ?? Roster.OfCore(key)?.nature);
         }
 
-        /// <summary>view 를 주면 그 모습(신탁을 얹은 후보 따위)으로 그린다.</summary>
-        public static RectTransform Card(Transform parent, Flow f, string id, float w = 200, string name = "card", CardView view = null)
+        /// <summary>view 를 주면 그 모습(신탁을 얹은 후보 따위)으로 그린다. owner = 교주 카드를 넣은 사도(core 키) — 안 주면 판(RunPort.LeaderOwner)에 묻는다.</summary>
+        public static RectTransform Card(Transform parent, Flow f, string id, float w = 200, string name = "card", CardView view = null, string owner = null)
         {
             var P = f.P;
             var v = view ?? P.View(id);
             float k = w / 200f, h = 280 * k;
             string type = v?.Type ?? "스킬";
             bool status = v != null && (v.IsStatus || v.IsCurse);
-            Color tint = CardTint(f, v);
-            var hero = v?.Hero != null ? Roster.OfCore(v.Hero) : null;
+            // 교주 카드 주인 = core CardView.Owner(덱 id 「카드@사도」) — 없으면 넘겨받은 owner(고르기 창 미리보기), 그것도 없으면 금빛 중립
+            bool leader = v != null && v.Def.Hero == null && !status;
+            owner = leader ? v.Owner ?? owner : null;
+            Color tint = CardTint(f, v, owner);
+            var hero = v?.Def.Hero != null ? Roster.OfCore(v.Def.Hero) : null;   // 그림 · 종류의 주인(교주 카드는 주인이 있어도 교주 카드 그림)
             var bg = Ui.Img(parent, Theme.Round, Theme.NavyWell, name, true);
             bg.pixelsPerUnitMultiplier = 1.7f;   // 모서리 둥글기 ≈ 12
             var rt = bg.rectTransform;
@@ -308,6 +381,12 @@ namespace Bolzena.RunUI
             if (kind == CardArt.Kind.Standing)
             {
                 var im = Ui.Img(wr, CardArt.Upper(hero.art, (w - 4 * k) / (h - 4 * k), 0.56f), Color.white, "pic");
+                im.rectTransform.Fill();
+            }
+            else if (kind == CardArt.Kind.Pic)
+            {
+                // 고유 · 생성 카드의 원작 그림 — 그림 창 비율로 미리 잘라 둔 것(얼굴이 위 3.5할 자리)
+                var im = Ui.Img(wr, CardArt.Pic(CardArt.PicOf(id)), Color.white, "pic");
                 im.rectTransform.Fill();
             }
             else if (kind == CardArt.Kind.Icon)
@@ -333,7 +412,7 @@ namespace Bolzena.RunUI
                 // 교주 · 상태 카드 — 종류 무늬
                 var wash = Ui.Img(wr, Theme.White, Color.Lerp(Theme.NavyWell, tint, 0.22f), "wash"); wash.rectTransform.Fill();
                 var glow = Ui.Img(wr, Theme.S("soft"), tint.A(0.4f), "halo"); glow.rectTransform.At(0.5f, 0.5f, 0, 26 * k, 260 * k, 260 * k);
-                var g = Ui.Img(wr, status ? Theme.S("ic_skull") : v != null && v.Hero == null ? Theme.S("ic_crown") : TypeIcon(type), Color.Lerp(tint, Color.white, 0.2f).A(0.75f), "glyph");
+                var g = Ui.Img(wr, status ? Theme.S("ic_skull") : leader ? Theme.S("ic_crown") : TypeIcon(type), Color.Lerp(tint, Color.white, 0.2f).A(0.75f), "glyph");
                 g.rectTransform.At(0.5f, 0.5f, 0, 26 * k, 86 * k, 86 * k); g.preserveAspect = true;
             }
 
@@ -345,6 +424,13 @@ namespace Bolzena.RunUI
                 var tagHead = string.Join(" ", v.Tags.Select(t => t + "."));
                 if (full.StartsWith(tagHead)) full = full.Substring(tagHead.Length).TrimStart();
                 else full = full.Replace(tagHead, "").Trim();
+            }
+            // 글 속 낱말(키워드 · 상태 · 사도 고유 효과 · 생성 카드) — 작은 카드(150 아래)는 글이 작아 누르기 어려우니 싣지 않는다
+            List<CardTerms.Term> terms = null;
+            if (v != null && !string.IsNullOrEmpty(full) && w >= 150)
+            {
+                terms = CardTerms.Of(P.Data, P.Text, v, full);
+                full += CardTerms.Extra(full, terms);   // 글에 이름이 없는 진화 · 결속 · 금기 카드 한 줄
             }
             float descW = w - 22 * k;
             var desc = Ui.Text(rt, full, 13.5f * k, Theme.Ink, TextAlignmentOptions.Bottom, false, "desc");
@@ -369,17 +455,16 @@ namespace Bolzena.RunUI
             // ── 테(성격 색) ──
             var frame = Ui.Img(rt, Theme.S("frame", 24), tint, "frame"); frame.rectTransform.Fill();
 
-            // ── 위: 큰 비용 · 밑줄 · 이름 · 종류 알약 ──
+            // ── 위: 큰 비용 · 이름 · 종류 알약 ──
             var ct = Ui.Title(rt, v == null ? "?" : v.X ? "X" : status && v.Cost <= 0 ? "-" : v.Cost.ToString(), 44 * k, Color.white, TextAlignmentOptions.Center, "cost");
             ct.rectTransform.At(0, 1, 9 * k, -2 * k, 36 * k, 50 * k);
             ct.Outline(0.24f);
-            var cl = Ui.Img(rt, Theme.White, Color.Lerp(tint, Color.white, 0.45f), "costline"); cl.rectTransform.At(0, 1, 15 * k, -50 * k, 24 * k, 2.2f * k);
             var nm = Ui.Title(rt, v?.Name ?? id, 19 * k, Color.white, TextAlignmentOptions.MidlineLeft, "name");
-            nm.rectTransform.At(0, 1, 47 * k, -8 * k, w - 47 * k - (v != null && v.Unique ? 28 : 8) * k, 25 * k);
+            nm.rectTransform.At(0, 1, 47 * k, -8 * k, w - 47 * k - (v != null && v.Unique || owner != null ? 30 : 8) * k, 25 * k);
             nm.textWrappingMode = TextWrappingModes.NoWrap;
             nm.enableAutoSizing = true; nm.fontSizeMin = 11 * k; nm.fontSizeMax = 19 * k;
             nm.Outline(0.26f);
-            string typeText = status ? type : hero == null ? "교주 · " + type : v != null && !v.Unique ? "기본 " + type : type;
+            string typeText = TypeLabel(type);
             var pill = Ui.Img(rt, Theme.Pill, new Color(0.01f, 0.02f, 0.06f, 0.62f), "typepill");
             var tic = Ui.Img(pill.rectTransform, TypeIcon(type), TypeColor(type), "typeicon"); tic.rectTransform.At(0, 0.5f, 7 * k, 0, 13 * k, 13 * k); tic.preserveAspect = true;
             var ty = Ui.Text(pill.rectTransform, typeText, 13 * k, TypeColor(type), TextAlignmentOptions.MidlineLeft, false, "type");
@@ -391,6 +476,14 @@ namespace Bolzena.RunUI
             {
                 var star = Ui.Img(rt, Theme.S("ic_spark"), Theme.Gold, "unique");
                 star.rectTransform.At(1, 1, -8 * k, -9 * k, 20 * k, 20 * k);
+            }
+            else if (owner != null)
+            {
+                // 교주 카드 주인 핀 — 오른쪽 위 작은 초상(테 = 주인 성격 색, 전투 CardView 의 핀과 같은 자리)
+                var pin = Face(rt, Roster.OfCore(owner), 26 * k, true, "ownerpin");
+                pin.At(1, 1, -5 * k, -6 * k, 26 * k, 26 * k);
+                var ring = pin.Find("ring")?.GetComponent<Image>();
+                if (ring != null) ring.color = Color.Lerp(tint, Color.white, 0.35f);
             }
 
             // ── 아래: 장식 선(가운데 마름모) · 태그 · 효과 글 ──
@@ -408,6 +501,8 @@ namespace Bolzena.RunUI
             }
             desc.transform.SetAsLastSibling();
             desc.rectTransform.At(0.5f, 0, 0, descB, descW, descH);
+            // 글 속 낱말 — 키워드 · 상태 · 사도 고유 효과 · 생성 카드에 밑줄 · 색, 올리면(폰은 누르면) 작은 설명 판(TermPop · CardTerms)
+            if (terms != null && terms.Count > 0) TermPop.MarkAndAttach(desc, full, terms, f.Stage.ToastLayer, (p, cid, cw2) => Card(p, f, cid, cw2, "termcard"));
             desc.enableAutoSizing = need > 112 * k; desc.fontSizeMin = 8.5f * k; desc.fontSizeMax = 13.5f * k;
             desc.Outline(0.2f);
             // 신탁 표시 — 장식 선 바로 위

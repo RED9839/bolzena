@@ -8,6 +8,9 @@
 - **고학년 차례** — `UltFx`(웹판 ultPlan · playUltFx): 이름 낱말로 시전자/대상/투사체 · 준비/본 · 레이저 다시 틀기 · 총구.
 - **모션 표** — `CardMotion`(card-motion.js) · `MotionVoice`(motion-voice.js) · `MotionTables`(DASH · MUZZLE · HIT_FX · 타격 갈래),
   `SpineMotion`(waysOf · strikeOf · planAct · boneScreen).
+- **전투 통합 API**(`FxBattle` · `FxRules` · `SpineFx`) — `BolzenaFx.Ult · Card · Hit · Common · Prewarm(party)`. 고학년 134명 + 카드(평타 · 센 공격 · 스킬 · 시그니처,
+  `Tools/fx_extract_more.py` 가 원작 번들에서 1477개 더 꺼낸다) + 공용(회복 · 실드 · 격파 · 쓰러짐 · 신탁 …). 자리는 원작 SD 의 Point_* 본, 시각 · 배율은 웹판 표.
+  무대(FxRun) 풀 · 미리 데우기. 시험: fx-test `-fxsweep ult|card|common`.
 - **소리** — `BolzenaAudio`(sfx.js · voice.js 규칙, AudioSource 풀 · 믹서 Sfx[압축기]/Voice) · `SfxMap`(sfx-map.js).
 
 원작 에셋은 이 패키지에 없다 — `Tools/fx_prepare.py` 가 쓰는 프로젝트의 `Assets/BolzenaFxData`(gitignore)로 옮기고,

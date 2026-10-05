@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -287,9 +287,17 @@ namespace Bolzena.RunUI
             x.GetComponent<RectTransform>().At(1, 1, -16, -16, 44, 44);
             Stage.Hot["hero.close"] = x;
             var rule = Ui.Img(panel, Theme.White, Theme.Line, "rule"); rule.rectTransform.Band(1, 1, 24, 24, -154);
-            var body = Ui.Text(panel, d != null ? P.Text.Hero(d) : h.blurb, Theme.FsSm + 1, Theme.Ink, TextAlignmentOptions.TopLeft);
+            var body = Ui.Text(panel, d != null ? P.Text.HeroShort(d) : h.blurb, Theme.FsSm + 1, Theme.Ink, TextAlignmentOptions.TopLeft);   // 짧은 글 — 「자세히 ▼」로 자세한 글(CardText.Hero)
             body.rectTransform.Fill(32, 70, 32, 170);
             body.enableAutoSizing = true; body.fontSizeMin = 12; body.fontSizeMax = Theme.FsSm + 1;
+            if (d != null)
+            {
+                bool more = false;
+                var mb = TermPop.MoreChip(panel, false, "more");
+                mb.GetComponent<RectTransform>().At(1, 1, -72, -112, mb.GetComponent<RectTransform>().sizeDelta.x, 30);
+                mb.OnClick = () => { more = !more; body.text = more ? P.Text.Hero(d) : P.Text.HeroShort(d); body.color = more ? Theme.Sub : Theme.Ink; mb.Label.text = more ? "접기 ▲" : "자세히 ▼"; };
+                Stage.Hot["hero.more"] = mb;
+            }
             var gear = string.Join(" · ", P.GearOf(coreId).Select(kv => $"{kv.Key} {P.Data.Equip(kv.Value)?.Name}"));
             var rule2 = Ui.Img(panel, Theme.White, Theme.Line, "rule2"); rule2.rectTransform.Band(0, 1, 24, 24, 58);
             var g = Ui.Text(panel, $"<color={Theme.GoldTag}>장비</color>  " + (gear.Length > 0 ? gear : $"<color={Theme.DimTag}>없음</color>"), Theme.FsSm + 1, Theme.Ink);

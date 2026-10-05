@@ -31,7 +31,9 @@ namespace Bolzena.Battle
     // 낱말 풀이 한 줄 — 카드 툴팁 · 정보 창(kind: kw 키워드 · tag 태그 · status 상태 · flash 신탁 · no 못 냄)
     public class Term
     {
-        public string Word, Text, Kind;
+        public string Word, Text, Kind;   // Kind: kw · tag · status · flash · no · card(생성 카드 — Card 를 작은 카드로)
+        public CardInfo Card;
+        public string Detail;             // 사도 고유 효과의 자세히(CardText.Detail) — 판 아래 흐리게
         public Term(string word, string text, string kind = "kw") { Word = word; Text = text; Kind = kind; }
     }
 
@@ -42,7 +44,8 @@ namespace Bolzena.Battle
         public string Value;            // 「2」 · 「+20%」
         public int Turns = -1;          // 남은 턴(-1 이면 없음 · 전투 내내)
         public string Kind = "buff";
-        public string Text;             // 풀이(툴팁)
+        public string Text;             // 풀이(툴팁) — 짧은 글(고유 효과는 CardText.Short)
+        public string Detail;           // 자세히(고유 효과 CardText.Detail — 툴팁 아래 · 펼침). 없으면 null
         /// <summary>이 상태를 건 사도(화면 키 — 초상). 엔진이 아직 안 내면 null — 정보 창은 초상 없이 그린다.</summary>
         public List<string> From;
     }
@@ -68,7 +71,8 @@ namespace Bolzena.Battle
         public List<Term> Terms = new List<Term>();   // 카드 글에 나오는 낱말 풀이
         public bool Unplayable;
         public bool Unique;              // 고유 카드(더미 보기 차례: 사도별 기본 → 고유)
-        public string Nature;            // 주인 사도의 성격(카드 틀 빛깔) — 교주 · 상태 카드는 null
+        public int Owner = -1;           // 교주 카드를 넣은 사도(파티 몇 번째) — 틀 빛깔 · 핀이 그 사도. 주인이 없으면 -1(금빛 중립)
+        public string Nature;            // 주인 사도의 성격(카드 틀 빛깔) — 교주 카드는 넣은 사도의 성격, 주인 없는 교주 · 상태 카드는 null
         public string BlessName, BlessText;   // 신탁 선택지에 축복이 얹혔으면(15%) 그 이름 · 글
         public List<string> Choices;     // 두 갈래 카드 — 갈래 이름 둘(낼 때 고른다). 없으면 null
     }
@@ -85,15 +89,18 @@ namespace Bolzena.Battle
         public string Key;               // 스파인 · 소리 폴더 이름(ricota · kyarot …) — 화면용
         public string Id;                // 규칙 쪽 id(rico …)
         public string Name;
-        public string UltName, UltText;
+        public string UltName, UltText;  // UltText = 자세히(효과 전부)
+        public string UltShort;          // 고학년 한 줄 요약(CardText.Short) — 기본으로 보이는 글
         public UnityEngine.Color Tint;
         public int Atk, Def, Crit;       // 바탕(장비 포함)
         public int AtkNow, DefNow, CritNow;
         public string Role, Nature, Row, Blurb;
         public int Ult, UltMax;          // 게이지(파티 공용) · 이 사도 고학년 값
         public bool Dead;
-        public List<string> Passives = new List<string>();   // 패시브 한 줄씩
-        public string KeywordName, KeywordText;
+        public List<string> Passives = new List<string>();   // 패시브 한 줄씩 — 자세히(CardText.Detail)
+        public List<string> PassivesShort = new List<string>();   // 패시브 한 줄 요약 「이름 — 요약」(CardText.Short) — 기본
+        public string KeywordName, KeywordText;   // KeywordText = 자세히(CardText.Detail)
+        public string KeywordShort;               // 고유 효과 한 줄(CardText.Short) — 기본
         public int KeywordStacks;
         public List<StatusChip> Chips = new List<StatusChip>();
         public string Race;
@@ -108,7 +115,8 @@ namespace Bolzena.Battle
         public string Name;
         public bool Boss;
         public int Hp, MaxHp, Block;
-        public int Tough, MaxTough;
+        public float ToughV, ToughMaxV;  // 강인도 그대로(1/3 · 1/6 칸도 — core ToughView.Left · Max). ToughMaxV 0 = 강인도 없음(격파 안 됨)
+        public bool Resting;             // 다음 차례를 쉰다(core ToughView.Resting)
         public bool Broken, Sealed;
         public bool Dead;
         public IntentKind Intent;
@@ -138,7 +146,7 @@ namespace Bolzena.Battle
     }
 
     // 미리보기 — 카드(고학년)를 그 대상에게 내면
-    public class PreviewFoe { public int Hp, Guard; public bool Kill, Max, Break; public int Tough; }
+    public class PreviewFoe { public int Hp, Guard; public bool Kill, Max, Break; public float ToughV; }
     public class PreviewParty { public int Heal, Block, Lose, Over; }
 
     public enum EventKind
@@ -165,6 +173,7 @@ namespace Bolzena.Battle
         UltReady,       // Actor(사도)
         Intent,         // Target(적) 예고가 바뀜
         PartyHurt,      // 파티가 맞음 — Target(맞는 사도) Value 피해 · Blocked
+        Form,           // 변신 — Actor(사도) · Text on/off · Say 변신 이름 · Anim 변신 쉬는 동작(Idle_DreamForm …) · Value 턴(0 = 전투 끝까지) · off 면 Anim 에 까닭
         Talk,           // Actor(사도) 대사 때 — Text(start · hit · kill · win · down · ego)
         Victory,
         Defeat,
@@ -175,12 +184,14 @@ namespace Bolzena.Battle
         public EventKind Kind;
         public UnitRef Actor, Target;
         public int Value, HpAfter, BlockAfter, Blocked;
+        public float FAfter;             // Toughness · Recover — 남은 강인도 그대로(1/3 칸도)
         public int Hit, Hits = 1;
         public bool Crit, Boss, Up;
         public Motion Motion;
         public HitKind HitKind;
         public CardInfo Card;
         public string Text, Say;
+        public string Anim;              // Form — 변신 쉬는 동작 이름
         public override string ToString() => $"{Kind} {Actor}->{Target} v={Value} hit={Hit}/{Hits} crit={Crit} {Text}";
     }
 }

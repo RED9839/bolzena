@@ -82,14 +82,28 @@ for hid, h in sorted(heroes.items()):
                     table[c["id"]] = name
                     break
 
+# 고른 원작 그림(사도마다 대조 시트로 골랐다 — Tools~/cardpic_picks.json · cardpic_sheet.py) — 고유 · 생성 카드만, 시작 카드는 늘 스탠딩
+#   "file" = 장면 · SD · 물건 그림 → "pics"(copy_assets.py 가 RunArt/CardPic 으로 굽는다) · "icon" = 내용이 맞는 원작 스킬 아이콘 → "cards" 를 덮는다
+#   "keep" = 어울리는 그림이 없어 위 규칙의 스킬 아이콘 그대로
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cardpic
+pics = {}
+for cid, p in cardpic.load().items():
+    if p.get("file"):
+        pics[cid] = cardpic.name_of(p)
+    elif p.get("icon"):
+        table[cid] = p["icon"]
+
 out = {
     "_meta": {
-        "what": "고유 카드 → 원작 스킬 아이콘(임시 그림). 시작 카드는 사도 스탠딩, 교주 · 상태 카드는 무늬 그대로 — 이 표에 없다.",
+        "what": "cards = 고유 카드 → 원작 스킬 아이콘 · pics = 고유 · 생성 카드 → 고른 원작 그림(RunArt/CardPic, 있으면 이것이 먼저). 시작 카드는 사도 스탠딩, 교주 · 상태 카드는 무늬 그대로 — 이 표에 없다.",
         "tool": "Tools~/build_cardart.py", "doc": "Docs/카드그림.md",
-        "count": len(table), "no_art_heroes": missing,
+        "count": len(table), "no_art_heroes": missing, "pic_count": len(pics),
     },
     "cards": dict(sorted(table.items())),
+    "pics": dict(sorted(pics.items())),
 }
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-print("카드", len(table), "· 그림 없는 사도", missing)
+print("카드", len(table), "· 원작 그림", len(pics), "· 그림 없는 사도", missing)

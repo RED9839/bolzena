@@ -93,7 +93,8 @@ namespace Bolzena.RunUI
                     {
                         var why = P.Buy(idx);
                         if (why != null) { Toast.Show(why); return; }
-                        Bought(it.Kind == "neutral" ? $"「{P.Data.Card(it.Id)?.Name}」 — 덱에 넣었습니다" : $"「{P.Data.Equip(it.Id)?.Name}」 — 샀습니다");
+                        // 교주 카드는 누구 덱에 넣을지 고른 뒤(PendingNeutral → AssignNeutral)
+                        PickOwners(() => Bought(it.Kind == "neutral" ? $"「{P.Data.Card(it.Id)?.Name}」 — 덱에 넣었습니다" : $"「{P.Data.Equip(it.Id)?.Name}」 — 샀습니다"));
                     });
                     pb.GetComponent<RectTransform>().At(1, 0, -12, 12, Theme.C(128, 120), Theme.C(42, 44));
                     Stage.Hot["shop.item" + idx] = pb;
@@ -175,6 +176,12 @@ namespace Bolzena.RunUI
             var bd = Ui.Text(rt, body, Theme.FsSm, Theme.Ink, TextAlignmentOptions.TopLeft);
             bd.rectTransform.Fill(vis, Theme.C(62, 64), 12, 68);
             bd.enableAutoSizing = true; bd.fontSizeMin = 11; bd.fontSizeMax = Theme.FsSm; bd.lineSpacing = 0;
+            // 카드 글 속 낱말(키워드 · 상태 · 생성 카드) — 카드 그림이 작은 폰에서도 옆 글로 누를 수 있게
+            if (it.Kind == "neutral" && P.View(it.Id) is Core.CardView tv)
+            {
+                var terms = CardTerms.Of(P.Data, P.Text, tv, body);
+                if (terms.Count > 0) TermPop.MarkAndAttach(bd, body + CardTerms.Extra(body, terms), terms, Stage.ToastLayer, (p, id, w) => W.Card(p, this, id, w, "termcard"));
+            }
             if (it.Sold)
             {
                 var sold = Ui.Img(rt, Theme.Round, new Color(0.02f, 0.03f, 0.07f, 0.66f), "sold"); sold.rectTransform.Fill(2, 2, 2, 2);

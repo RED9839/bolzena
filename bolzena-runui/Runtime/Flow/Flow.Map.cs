@@ -19,6 +19,8 @@ namespace Bolzena.RunUI
 
         public void Map()
         {
+            // 주인을 기다리는 교주 카드(싸움 보상 · 이벤트 · 선물로 얻은 것)가 남았으면 지도 전에 사도를 고른다
+            if (P.PendingNeutral != null) { PickOwners(() => { P.Save("map"); Map(); }); return; }
             var f = P.Floor;
             Stage.SetBg(f.Bg != null && f.Bg.TryGetValue("fight", out var bg) ? bg : "stage3_2", 0.42f);
             Stage.Show("map", BuildMap, 1.4f);

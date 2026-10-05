@@ -91,7 +91,7 @@ namespace Bolzena.RunUI.EditorTools
 
         static void AlwaysIncludedShaders()
         {
-            var names = new[] { "TextMeshPro/Distance Field", "TextMeshPro/Mobile/Distance Field", "Spine/SkeletonGraphic", "UI/Default" };
+            var names = new[] { "TextMeshPro/Distance Field", "TextMeshPro/Mobile/Distance Field", "TextMeshPro/Sprite", "Spine/SkeletonGraphic", "UI/Default" };   // Sprite = 카드 글 속 카드 아이콘(CardTerms.Icons)
             var gs = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset")[0];
             var so = new SerializedObject(gs);
             var arr = so.FindProperty("m_AlwaysIncludedShaders");
@@ -173,10 +173,11 @@ namespace Bolzena.RunUI.EditorTools
             ti.textureCompression = TextureImporterCompression.CompressedHQ;
             if (p.Contains("/Sprites/")) ti.textureCompression = TextureImporterCompression.Uncompressed;
             ti.maxTextureSize = 2048;
-            if (p.Contains("/RunArt/Standing/"))
+            if (p.Contains("/RunArt/Standing/") || p.Contains("/RunArt/CardPic/"))
             {
                 // 사도 스탠딩 135장 — 목록 · 카드에서는 작게(밉맵 · 트라이리니어로 지글거리지 않게), 상세에서는 크게.
                 // 크런치 압축으로 빌드가 크게 붓지 않게 한다(그림 결이 부드러워 품질 차이가 잘 안 보인다)
+                // 카드 원작 그림(CardPic — 364×512, 고유 · 생성 카드)도 같은 설정
                 ti.mipmapEnabled = true;
                 ti.mipmapFilter = TextureImporterMipFilter.KaiserFilter;
                 ti.filterMode = FilterMode.Trilinear;
@@ -184,7 +185,7 @@ namespace Bolzena.RunUI.EditorTools
                 ti.crunchedCompression = true;
                 ti.compressionQuality = 70;
             }
-            else if (p.Contains("/RunArt/Skill/") || p.Contains("/RunArt/Item/"))
+            else if (p.Contains("/RunArt/Skill/") || p.Contains("/RunArt/Item/") || p.Contains("/RunArt/Icons/") || p.Contains("/RunArt/State/"))   // Icons: 성격 512 판 · State: 원작 상태 칩 — 작게 보일 때 지글거리지 않게
             {
                 ti.mipmapEnabled = !p.EndsWith("_blur.png");   // 아이콘은 카드가 작을 때 줄어든다 · 흐린 바탕은 늘려만 쓴다
                 ti.filterMode = FilterMode.Trilinear;

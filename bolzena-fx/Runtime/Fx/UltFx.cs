@@ -24,6 +24,10 @@ namespace Bolzena.Fx
         public int Order = 300;
         public string SortingLayer;
         public Transform Parent;
+        public Vector3? ShotFrom;            // 투사체가 떠나는 자리(시전 본 — 없으면 From)
+        public Vector3? ToBody;              // 대상 몸 가운데 — 몸에 맞는 이펙트(UltPart.Body)가 여기
+        public Action<FxRun> OnPart;         // 한 장 틀 때마다(시험 · 재기)
+        public IList<Func<Vector3>> Allies;  // 아군 발밑들 — 아군 쪽 판(UltPart.Ally)을 시전자와 함께 아군 각자에게도 튼다
     }
 
     public struct UltPick { public int I, N; public UltPick(int i, int n) { I = i; N = n; } }
@@ -36,6 +40,8 @@ namespace Bolzena.Fx
         public bool Pre;                     // 준비(모으기 · 시전) — 바로
         public bool Again;                   // 때리는 창 동안 다시 튼다(레이저 · 타격 · 베기)
         public bool Muzzle;                  // 총구에 붙는다
+        public bool Body;                    // 대상 발밑이 아니라 몸 가운데(원작 타격 프리팹 prefabeffecthit — 카드에서만)
+        public bool Ally;                    // 아군 쪽 판(_a · heal · buff · revival) — 시전자(와 UltOptions.Allies)에게
         public float Dur;
         public override string ToString() => $"{Name} [{At}{(Pre ? " pre" : "")}{(Again ? " again" : "")}{(Muzzle ? " muzzle" : "")}] {Dur:0.##}s";
     }
@@ -53,6 +59,8 @@ namespace Bolzena.Fx
         static readonly Regex MUZZLE = new Regex(@"(charge|muzzle|shot|fire|laser|lazer|beam|ray\b)");
         static readonly Regex CAST_OR_CHARGE = new Regex("(cast|charge)");
         static readonly Regex AGAIN = new Regex("(hit|slash|stab)");
+        static readonly Regex SCREEN = new Regex(@"(^|_)(camera|screen|bg|fullscreen)(_|$|\d)");   // 화면 전체(카메라 앞) — 볼제나 추가, 웹판에는 없던 갈래
+        static readonly Regex ALLY = new Regex(@"(_a$|_a_|(^|_)(heal|buff|revival)(_|$|\d))");   // 볼제나 추가(2026-10 벨라 고학년 제보)
         static readonly Regex WORD = new Regex("^fx_[a-z0-9]+_(ultimate_|ult_|skill_?|personal_?)?");
         public const int MAX_ULT = 8;
         public const int PROJ_LAG = 330;
@@ -61,10 +69,13 @@ namespace Bolzena.Fx
         static string Head(string name) => Word(name).Split('_')[0];
 
         public static List<UltPart> Plan(string heroKey, UltPick? pick = null)
+            => FxLibrary.HasUlt(heroKey) ? PlanNames(FxLibrary.Get(heroKey).ToList(), pick, MAX_ULT) : new List<UltPart>();
+
+        // 이름들로 자리 · 차례를 가른다(고학년 · 카드 같이 쓴다). max 넘으면 가장 큰 갈래 하나만
+        public static List<UltPart> PlanNames(List<string> names, UltPick? pick = null, int max = MAX_ULT)
         {
             var res = new List<UltPart>();
-            if (!FxLibrary.HasUlt(heroKey)) return res;
-            var names = FxLibrary.Get(heroKey).ToList();
+            if (names == null || names.Count == 0) return res;
             if (pick.HasValue && pick.Value.N > 1)
             {
                 var cnt = new Dictionary<string, int>();
@@ -75,24 +86,26 @@ namespace Bolzena.Fx
                 if (ways != null) { var w = ways[pick.Value.I % pick.Value.N]; names = names.Where(x => Head(x) == w).ToList(); }
             }
             // 여러 갈래면 가장 큰 갈래 하나만 — 다 틀면 화면이 엉킨다
-            if (names.Count > MAX_ULT)
+            if (names.Count > max)
             {
                 var n = new Dictionary<string, int>();
                 var order = new List<string>();
                 foreach (var x in names) { var k = Head(x); if (!n.ContainsKey(k)) { n[k] = 0; order.Add(k); } n[k]++; }
                 var top = order.OrderByDescending(k => n[k]).First();   // 같으면 먼저 나온 것(안정 정렬)
                 if (n[top] >= 3) names = names.Where(x => Head(x) == top).ToList();
-                names = names.Take(MAX_ULT).ToList();
+                names = names.Take(max).ToList();
             }
             foreach (var name in names)
             {
                 var w = Word(name);
                 bool proj = PROJ.IsMatch(w), beam = !proj && BEAM.IsMatch(w);
-                string at = proj ? "move" : beam ? "caster" : AT_TARGET.IsMatch(w) && !CAST_OR_CHARGE.IsMatch(w) ? "target" : AT_CASTER.IsMatch(w) ? "caster" : "target";
+                bool ally = ALLY.IsMatch(w);   // 아군 쪽 판(벨라 hit_a · proj_a — 적 쪽은 _e) · 회복 · 강화 — 적에게 틀면 엉뚱한 색이 겹친다
+                if (ally) { proj = false; beam = false; }
+                string at = SCREEN.IsMatch(w) ? "screen" : ally ? "caster" : proj ? "move" : beam ? "caster" : AT_TARGET.IsMatch(w) && !CAST_OR_CHARGE.IsMatch(w) ? "target" : AT_CASTER.IsMatch(w) ? "caster" : "target";
                 bool pre = !proj && PRE.IsMatch(w);
                 res.Add(new UltPart
                 {
-                    Name = name, At = at, Pre = pre, Again = !pre && (beam || AGAIN.IsMatch(w)),
+                    Name = name, At = at, Pre = pre, Again = !pre && !ally && (beam || AGAIN.IsMatch(w)), Ally = ally,
                     Muzzle = at == "caster" && MUZZLE.IsMatch(w), Dur = FxLibrary.Duration(name),
                 });
             }
@@ -103,10 +116,10 @@ namespace Bolzena.Fx
         public static int LagMs(string heroKey, UltPick? pick = null) => Plan(heroKey, pick).Any(p => p.At == "move") ? PROJ_LAG : 0;
 
         // SD 이벤트를 모를 때 본 이펙트가 터지기까지(ms) — 화면이 타격(숫자 · 체력)을 여기에 맞춘다
-        public static int ImpactMs(string heroKey)
+        public static int ImpactMs(string heroKey) => FxLibrary.HasUlt(heroKey) ? ImpactMs(Plan(heroKey)) : 0;
+        public static int ImpactMs(List<UltPart> plan)
         {
-            if (!FxLibrary.HasUlt(heroKey)) return 0;
-            var plan = Plan(heroKey);
+            if (plan == null || plan.Count == 0) return 0;
             var pre = plan.Where(p => p.Pre).ToList();
             float t = pre.Count > 0 ? 1000 * Mathf.Min(0.6f, pre.Max(p => p.Dur) * 0.5f) : 0;
             if (plan.Any(p => p.At == "move")) t += PROJ_LAG;
@@ -116,17 +129,25 @@ namespace Bolzena.Fx
         // ── 한 벌 틀기 ── 시각표를 먼저 다 세우고(ms), 전투 시계로 흘려 보내며 튼다
         public static IEnumerator Run(string heroKey, UltOptions o)
         {
-            if (BolzenaFx.Calm || !FxLibrary.HasUlt(heroKey)) yield break;
+            if (BolzenaFx.Calm || !FxLibrary.HasUlt(heroKey)) return Nothing();
+            FxLibrary.PreloadUlt(heroKey);
+            return RunPlan(Plan(heroKey, o.Pick), o);
+        }
+
+        static IEnumerator Nothing() { yield break; }
+
+        // 계획 하나를 시각표대로 — 고학년 · 카드가 같이 쓴다
+        public static IEnumerator RunPlan(List<UltPart> plan, UltOptions o)
+        {
+            if (BolzenaFx.Calm || plan == null || plan.Count == 0) yield break;
             var from = o.From;
             var to = o.To ?? o.From;
-            FxLibrary.PreloadUlt(heroKey);
-            var plan = Plan(heroKey, o.Pick);
             bool flip = to.x < from.x;
             bool sync = o.Impact.HasValue;
             int lag = plan.Any(p => p.At == "move") ? PROJ_LAG : 0;
             float impact = o.Impact ?? 0, endMs = o.End ?? 0;
             float end = sync ? Mathf.Max(1.6f, (Mathf.Max(impact, endMs) + lag) / 1000f + 0.9f)
-                             : Mathf.Max(1.6f, ImpactMs(heroKey) / 1000f + 1.2f);
+                             : Mathf.Max(1.6f, ImpactMs(plan) / 1000f + 1.2f);
             var sched = new List<KeyValuePair<float, UltPart>>();
             void Fire(IEnumerable<UltPart> list, float at, float gap) { int i = 0; foreach (var p in list) sched.Add(new KeyValuePair<float, UltPart>(at + i++ * gap, p)); }
             var pre = plan.Where(p => p.Pre).ToList();
@@ -142,7 +163,7 @@ namespace Bolzena.Fx
                 }
                 else Fire(pre, 0, 60);
                 Fire(proj, impact, 80);
-                Fire(main.Where(p => p.At == "caster"), impact, 60);
+                Fire(main.Where(p => p.At == "caster" || p.At == "screen"), impact, 60);
                 Fire(main.Where(p => p.At == "target"), impact + lag, 90);
                 var again = main.Where(p => p.Again).ToList();
                 if (again.Count > 0 && endMs > impact && o.Marks != null)
@@ -162,11 +183,11 @@ namespace Bolzena.Fx
                 float at = 0;
                 if (pre.Count > 0) { Fire(pre, 0, 60); at += 1000 * Mathf.Min(0.6f, pre.Max(p => p.Dur) * 0.5f); }
                 if (proj.Count > 0) { Fire(proj, at, 80); at += PROJ_LAG; }
-                Fire(main.Where(p => p.At == "caster"), at, 60);
+                Fire(main.Where(p => p.At == "caster" || p.At == "screen"), at, 60);
                 Fire(main.Where(p => p.At == "target"), at, 90);
             }
             sched.Sort((a, b) => a.Key.CompareTo(b.Key));
-            var runs = new List<FxRun>();
+            var runs = new List<KeyValuePair<FxRun, int>>();   // 무대 · 그때의 세대(풀에서 되쓰이면 세대가 바뀐다)
             float now = 0;       // ms
             int next2 = 0;
             while (true)
@@ -174,10 +195,11 @@ namespace Bolzena.Fx
                 while (next2 < sched.Count && sched[next2].Key <= now)
                 {
                     var r = FirePart(sched[next2].Value, o, from, to, flip, Mathf.Max(FxRun.FADE, end - now / 1000f));
-                    if (r != null) runs.Add(r);
+                    if (r != null) o.OnPart?.Invoke(r);
+                    if (r != null) runs.Add(new KeyValuePair<FxRun, int>(r, r.Gen));
                     next2++;
                 }
-                if (next2 >= sched.Count && runs.All(r => r == null || r.IsDone)) yield break;
+                if (next2 >= sched.Count && runs.All(r => r.Key == null || r.Key.Gen != r.Value || r.Key.IsDone)) yield break;
                 yield return null;
                 now += 1000f * Mathf.Min(1f / 20f, Mathf.Max(0, BolzenaFx.DeltaTime())) * BolzenaFx.Rate;
             }
@@ -186,11 +208,23 @@ namespace Bolzena.Fx
         static FxRun FirePart(UltPart p, UltOptions o, Vector3 from, Vector3 to, bool flip, float until)
         {
             var b = new FxPlayOptions { Scale = o.Scale, Top = o.Top, Flip = flip, Until = until, Order = o.Order, SortingLayer = o.SortingLayer, Parent = o.Parent };
-            if (p.At == "move") { b.At = from; b.MoveTo = to; b.MoveDur = 0.35f; return BolzenaFx.Play(p.Name, b); }
+            if (p.At == "move") { b.At = o.ShotFrom ?? from; b.MoveTo = o.ToBody ?? to; b.MoveDur = 0.35f; return BolzenaFx.Play(p.Name, b); }
+            if (p.Ally && o.Allies != null && o.Allies.Count > 0)
+            {
+                b.At = from; b.Flip = false;
+                var first = BolzenaFx.Play(p.Name, b);
+                foreach (var a in o.Allies)
+                {
+                    var r = BolzenaFx.Play(p.Name, new FxPlayOptions { At = a(), Scale = o.Scale, Top = o.Top, Until = until, Order = o.Order, SortingLayer = o.SortingLayer, Parent = o.Parent });
+                    if (r != null) o.OnPart?.Invoke(r);
+                }
+                return first;
+            }
+            if (p.At == "screen") { b.At = BolzenaFx.ScreenCenter(); b.Flip = false; b.Top = null; return BolzenaFx.Play(p.Name, b); }
             Vector3? m = p.Muzzle && o.Muzzle != null ? o.Muzzle() : null;
             if (m.HasValue) { b.At = m.Value; b.Track = o.Muzzle; b.Bare = true; return BolzenaFx.Play(p.Name, b); }
-            b.At = p.At == "caster" ? from : to;
-            b.Center = p.At == "target" && !o.Dash;
+            b.At = p.At == "caster" ? from : p.Body && o.ToBody.HasValue ? o.ToBody.Value : to;
+            b.Center = p.At == "target" && !o.Dash && !p.Body;
             if (p.At == "target" && o.ToWidth > 0) b.SpreadWidth = o.ToWidth;
             return BolzenaFx.Play(p.Name, b);
         }

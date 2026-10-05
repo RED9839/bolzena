@@ -9,7 +9,7 @@ L.hero({
   id: ID, name: '다야(퓨어샤인)', nature: '광기', row: 'mid', role: '서포터', star: 3, hp: 600, atk: 75, def: 60, crit: 5,
   blurb: '마법 소녀로 변신한 다야. 변신이 부끄러워 누구보다 빨리 끝내고 싶다 — 파티가 한 턴에 카드를 넉 장 내면 마무리 빔이 손에 들어온다.',
   keyword: {
-    name: KW, desc: '변신이 부끄러워 서두르는 마음. 턴 첫 카드가 퓨어샤인의 카드면 켜지고, 그 턴 「샤이닝 피니시」 를 한 장 더 받는다. 턴이 끝나면 사라진다', carrier: 'self', cap: 1, endClear: true,
+    name: KW, desc: '서두르는 마음 — 턴 첫 카드가 자신의 것이면 켜져 「샤이닝 피니시」를 한 장 더', carrier: 'self', cap: 1, endClear: true,
   },
   passives: [
     { name: '퓨어☆피니시', when: { on: 'play', who: 'any', nth: 4 }, limit: { per: 'turn', n: 1 },
