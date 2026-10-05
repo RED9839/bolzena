@@ -107,7 +107,8 @@ def now(d, By):
 def play(d, By, base, a, notes, r):
     d.get(base + "/"); time.sleep(1.5)
     shot(d, a, f"{r}-1-로비")
-    d.execute_script("document.querySelector('.home-primary').click()"); time.sleep(1.6)
+    d.execute_script("document.querySelector('.home-primary').click()"); time.sleep(1.2)
+    d.execute_script("document.querySelector('.vg-go').click()"); time.sleep(1.6)   # 마을 공개 → 편성(ui.js villageScreen)
 
     # 편성
     for name in a.party.split(","):

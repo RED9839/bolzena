@@ -1,4 +1,4 @@
-// 한 판을 처음부터 끝까지(지도 · 이벤트 · 캠프 · 상점 · 장비 · 3층 + 마지막 싸움) 봇에게 맡겨 완주율을 잰다.
+// 한 판을 처음부터 끝까지(지도 · 이벤트 · 캠프 · 상점 · 장비 · 마을 하나의 두 층 — 2층 보스가 끝) 봇에게 맡겨 완주율을 잰다.
 // 손은 tools/lib/bot.js(전투) · tools/lib/run-bot.js(전투 밖). 옛 손(simple)과 사람만큼 하는 손(smart)을 같은 씨앗으로 견준다.
 //   node tools/run-sim.js                          편성 열 가지 × 파티 6 × 판 3 — 두 손 견주기
 //   node tools/run-sim.js --bot smart --parties 10 --runs 4
@@ -7,6 +7,7 @@
 //   node tools/run-sim.js --log 에르핀 [--turns 3]  그 사도가 든 파티의 첫 싸움(--boss 면 1층 보스) 기록을 풀어 보인다
 //   --depth 2  한 수 더 내다본다(느리다)  · --jobs N 작업 스레드(기본 2) · --json
 //   --seed K   파티 · 판 씨앗을 다른 벌로(기본 0) — 고른 값이 우연이 아닌지 두 번째 벌로 다시 잰다
+//   --village worldtree  그 마을만(enemies.js VILLAGES 의 id). 안 주면 판마다 씨앗이 마을을 정하고, 마을별 완주율을 따로 보인다
 // 결과는 스레드 수와 상관없이 같다(씨앗이 정해져 있다).
 import os from "node:os";
 import { fileURLToPath } from "node:url";
@@ -17,7 +18,7 @@ import * as R from "../js/run.js";
 import * as RULES from "../js/rules.js";
 import * as M from "../js/map.js";
 import * as EV from "../js/events.js";
-import { ENEMIES, FLOORS } from "../js/data/enemies.js";
+import { ENEMIES, VILLAGES } from "../js/data/enemies.js";
 import { makeBots } from "./lib/bot.js";
 import { makeRunner } from "./lib/run-bot.js";
 // 오래 돈다 — 낮은 우선순위로 돌아 컴퓨터를 막지 않게
@@ -31,9 +32,11 @@ const HPX = +opt("hp", 1);       // 「1.2」 = 지금 값(rules.js foeScale)의
 const DMGX = +opt("dmg", 1);     // 적의 치는 수 — 같은 자리(e.dmgx)에 더 곱한다. 즉시 행동 장수는 그대로
 const SEED = +opt("seed", 0);
 const HEROES = opt("heroes") ? opt("heroes").split(",") : null;
+const VILLAGE = opt("village") || null;
+if (VILLAGE && !VILLAGES[VILLAGE]) { console.error(`모르는 마을 ${VILLAGE} — ${Object.keys(VILLAGES).join(", ")}`); process.exit(1); }
 
 const bots = makeBots({ C, B, R: RULES, ENEMIES });
-const runner = makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots });
+const runner = makeRunner({ C, B, R, RULES, M, EV, ENEMIES, bots });
 const CFG = {
   simple: { smartFight: false, smartOut: false },
   smart: { smartFight: true, smartOut: true, depth: DEPTH },
@@ -65,17 +68,18 @@ function parties() {
 
 function job(j) {
   const t0 = Date.now();
-  const r = runner.runFull(j.party, j.seed, { ...CFG[j.bot], hpx: HPX, dmgx: DMGX });
+  const r = runner.runFull(j.party, j.seed, { ...CFG[j.bot], hpx: HPX, dmgx: DMGX, village: VILLAGE });
   return { ...r, ms: Date.now() - t0 };
 }
 
 // ── 기록 풀어 보기 ──────────────────────────────────────────────────────
 if (isMainThread && opt("log")) {
-  const who = opt("log"), TURNS = +opt("turns", 3);
-  const k = heroes.find((x) => x === who) || heroes.find((x) => B.HERO_DATA[x].ko === who);
+  const TURNS = +opt("turns", 3);
+  // 「--log 마리,마카샤」 처럼 쉼표로 여럿을 주면 그 사도들로 파티를 채운다(모자란 자리만 무작위)
+  const ks = opt("log").split(",").map((who) => heroes.find((x) => x === who) || heroes.find((x) => B.HERO_DATA[x].ko === who));
   const r0 = rng(99);
-  const party = [k]; while (party.length < 3) { const x = heroes[Math.floor(r0() * heroes.length)]; if (!party.includes(x)) party.push(x); }
-  const run = R.newRun(party, Object.fromEntries(party.map((x) => [x, B.HERO_DATA[x].row])), 12345);
+  const party = ks.slice(0, 3); while (party.length < 3) { const x = heroes[Math.floor(r0() * heroes.length)]; if (!party.includes(x)) party.push(x); }
+  const run = R.newRun(party, Object.fromEntries(party.map((x) => [x, B.HERO_DATA[x].row])), 12345, VILLAGE);
   if (argv.includes("--boss")) { run.node = 3; }
   else { M.mapOf(run); M.enterNode(run, M.reachable(run)[0]); }
   const { st } = R.openFight(run, { hpx: HPX, dmgx: DMGX });
@@ -90,7 +94,7 @@ if (isMainThread && opt("log")) {
       console.log(`\n── ${st.turn}턴 · AP ${st.ap} · 게이지 ${st.gauge}% · 손 ${st.hand.map((id) => C.cardOf(st, id).name).join(", ")}`);
       console.log(`   아군: ${st.party.map(hp).join(" · ")}`);
       console.log(`   적:   ${st.enemies.filter((e) => !e.dead).map(intent).join(" · ")}`);
-      console.log(`   예상 피해(지금 그대로 넘기면): ${[...inc.pool].map(([u, p]) => `${u.ko} -${p.lost}`).join(" · ")}`);
+      console.log(`   예상 피해(지금 그대로 넘기면): 파티 -${inc.pool.lost}`);
     }
   };
   let t = 0;
@@ -134,8 +138,10 @@ if (!isMainThread) {
   for (const bot of BOTS) {
     const rs = jobs.filter((j) => j.bot === bot).map((j) => ({ ...res[j.i], tag: j.tag, comp: compOf(j.party) }));
     const n = rs.length, cl = rs.filter((r) => r.clear).length;
-    const deaths = [0, 0, 0, 0];
+    const deaths = [0, 0];
     for (const r of rs) if (!r.clear) deaths[r.floor]++;
+    const byVillage = {};
+    for (const r of rs) (byVillage[r.village] = byVillage[r.village] || []).push(r.clear);
     const where = {};
     for (const r of rs) if (!r.clear) where[r.where] = (where[r.where] || 0) + 1;
     const fights = rs.reduce((a, r) => a + r.fights, 0), turns = rs.reduce((a, r) => a + r.turns, 0);
@@ -156,17 +162,19 @@ if (!isMainThread) {
       msPerRun: Math.round(rs.reduce((a, r) => a + r.ms, 0) / n),
       byTag: Object.fromEntries(Object.entries(byTag).map(([k, a]) => [k, pct(a)])),
       byComp: Object.fromEntries(Object.entries(byComp).map(([k, a]) => [k, pct(a)])),
-      // 칸 갈래마다(「2:boss」 = 2층 보스 · F = 마지막) 싸운 수 · 싸움당 턴 · 이긴 비율
+      byVillage: Object.fromEntries(Object.entries(byVillage).map(([k, a]) => [k, { n: a.length, clear: pct(a) }])),
+      // 칸 갈래마다(「2:boss」 = 2층 보스 — 판의 끝) 싸운 수 · 싸움당 턴 · 이긴 비율
       kinds: Object.fromEntries(Object.entries(kinds).sort().map(([k, a]) => [k, { n: a.n, turns: +(a.turns / a.n).toFixed(2), win: +(a.win / a.n * 100).toFixed(1) }])),
     };
   }
   out.wall = +wall.toFixed(1);
   if (argv.includes("--json")) console.log(JSON.stringify(out));
   else {
-    console.log(`판 ${ps.length}파티 × ${N}판${SEED ? ` · 씨앗 ${SEED}` : ""} · 적 체력 ×${out.hpx} · 피해 ×${DMGX} · ${wall.toFixed(0)}초`);
+    console.log(`판 ${ps.length}파티 × ${N}판${SEED ? ` · 씨앗 ${SEED}` : ""}${VILLAGE ? ` · 마을 ${VILLAGES[VILLAGE].ko}` : ""} · 적 체력 ×${out.hpx} · 피해 ×${DMGX} · ${wall.toFixed(0)}초`);
     for (const [bot, b] of Object.entries(out.bots)) {
       console.log(`\n[${bot}] 완주 ${b.clear}% (${b.n}판) · 판당 ${b.fightsPerRun}전 · 전투당 ${b.turnsPerFight}턴 · 판당 ${b.msPerRun}ms`);
-      console.log(`  쓰러진 층  1층 ${b.deathFloor[0]}% · 2층 ${b.deathFloor[1]}% · 3층 ${b.deathFloor[2]}% · 마지막 ${b.deathFloor[3]}%   (칸: ${Object.entries(b.deathAt).map(([k, v]) => `${k} ${v}`).join(" · ")})`);
+      console.log(`  쓰러진 층  1층 ${b.deathFloor[0]}% · 2층 ${b.deathFloor[1]}%   (칸: ${Object.entries(b.deathAt).map(([k, v]) => `${k} ${v}`).join(" · ")})`);
+      console.log(`  마을  ${Object.entries(b.byVillage).map(([k, v]) => `${(VILLAGES[k] || {}).ko || k} ${v.clear}%(${v.n})`).join(" · ")}`);
       console.log(`  칸  ${Object.entries(b.kinds).map(([k, a]) => `${k} ${a.turns}턴·${a.win}%(${a.n})`).join(" · ")}`);
       console.log(`  ${HEROES ? "사도" : "편성"}  ${Object.entries(b.byTag).map(([k, v]) => `${HEROES ? (B.HERO_DATA[k] || {}).ko || k : k} ${v}%`).join(" · ")}`);
       if (HEROES) console.log(`  역할  ${Object.entries(b.byComp).sort().map(([k, v]) => `${k} ${v}%`).join(" · ")}`);

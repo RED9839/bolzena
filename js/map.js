@@ -9,16 +9,17 @@
 //   1-10        보스
 // 한 줄에 자리(레인)가 넷 — 칸은 그 자리에만 서고, 선은 같은 자리 · 바로 옆 자리로만 이어진다(엇갈리지 않는다).
 // 모든 칸은 처음 줄에서 닿고, 모든 칸에서 보스에 닿는다.
-// 싸움의 세기는 줄이 정한다 — 층의 싸움(FLOORS[].pools — 세기마다 네다섯 벌) 가운데 1-1~1-3 약 · 1-4~1-5 중 · 1-6~ 강.
+// 한 판은 마을 하나의 두 층(1-0 ~ 1-10 · 2-0 ~ 2-10) — 2-10 보스가 판의 끝이다(docs/20-마을.md).
+// 싸움의 세기는 줄이 정한다 — 그 마을 그 층의 싸움(enemies.js VILLAGES[].floors[].pools — 세기마다 네다섯 벌) 가운데 1-1~1-3 약 · 1-4~1-5 중 · 1-6~ 강.
 // 엘리트는 한 단계 센 싸움을 체력 ×ELITE_HP 로(rules.js) — 이기면 장비 하나와 신탁, 골드 더.
 //
-// 지도는 판의 씨앗과 층으로 정해진다 — 다시 그려도 같은 길이다. 설계는 docs/10-지도.md.
+// 지도는 판의 씨앗 · 마을 · 층으로 정해진다 — 다시 그려도 같은 길이다. 설계는 docs/10-지도.md.
 import { makeRng } from "./combat.js";
-import { FLOORS, ENEMIES } from "./data/enemies.js";
+import { ENEMIES, floorsOf } from "./data/enemies.js";
 
-// 싸움 칸마다 그 층 · 그 세기의 싸움 가운데 하나(엘리트는 전용 넷). 바로 앞 칸과 같은 짝은 되도록 피한다
-function pickFoes(rng, floor, node, prev) {
-  const F = FLOORS[floor] || FLOORS[0];
+// 싸움 칸마다 그 마을 그 층 · 그 세기의 싸움 가운데 하나(엘리트는 전용 넷). 바로 앞 칸과 같은 짝은 되도록 피한다
+function pickFoes(rng, village, floor, node, prev) {
+  const fl = floorsOf(village), F = fl[floor] || fl[0];
   const pool = node.type === "elite" ? F.elites || [F.fights[2]] : (F.pools || F.fights.map((x) => [x]))[node.fight] || [F.fights[0]];
   const fresh = pool.filter((p) => !prev.some((q) => q === p));
   const from = fresh.length ? fresh : pool;
@@ -41,7 +42,7 @@ function kindWeights(r) {
 }
 const tierOf = (r) => (r < 3 ? 0 : r < 5 ? 1 : 2);
 
-export function genMap(seed, floor) {
+export function genMap(seed, floor, village) {
   const rng = makeRng(((seed >>> 0) ^ Math.imul(floor + 1, 2654435761)) >>> 0);
   const weighted = (ws) => {
     const tot = ws.reduce((a, [, w]) => a + w, 0);
@@ -114,7 +115,7 @@ export function genMap(seed, floor) {
   for (let r = 0; r < rows.length; r++) for (const n of rows[r]) {
     if (n.type !== "fight" && n.type !== "elite") continue;
     const prev = r ? rows[r - 1].filter((p) => p.next.includes(n.id) && p.foes).map((p) => p.foes) : [];
-    n.foes = pickFoes(rng, floor, n, prev);
+    n.foes = pickFoes(rng, village, floor, n, prev);
   }
   // ④ 출발 칸(1-0) — 맨 앞에 하나. 파티가 여기 서서 시작하고, 1-1 의 칸 모두로 이어진다
   const rename = {};
@@ -122,7 +123,7 @@ export function genMap(seed, floor) {
   for (const row of rows) for (const n of row) n.next = n.next.map((x) => rename[x]);
   const start = { id: "r0c0", row: 0, col: 0, lane: null, x: 0.5, type: "start", next: rows[0].map((n) => n.id) };
   rows.unshift([start]);
-  return { floor, rows, at: start.id, seen: [start.id] };
+  return { floor, village, rows, at: start.id, seen: [start.id] };
 }
 
 // 지금 칸에서 앞으로 닿을 수 있는 칸 전부 — 화면이 이 밖의 칸 · 길을 흐리게 한다
@@ -133,12 +134,12 @@ export function aheadOf(run) {
   return out;
 }
 
-// 이 판의 지금 층 지도 — 없거나 층이 바뀌었으면 새로 그린다
+// 이 판의 지금 층 지도 — 없거나 층 · 마을이 바뀌었으면 새로 그린다(마을을 안 적은 옛 지도는 run.js migrateVillage 가 맞춰 둔 층 그대로)
 export function mapOf(run) {
-  if (!run.map || run.map.floor !== run.floor) run.map = genMap(run.seed, run.floor);
+  if (!run.map || run.map.floor !== run.floor || (run.map.village && run.map.village !== run.village)) run.map = genMap(run.seed, run.floor, run.village);
   // 이어하던 판의 지도에 지금은 없는 적이 적혀 있으면(적 개편 전 저장) 그 칸만 같은 세기의 짝으로 다시 고른다
   for (const n of run.map.rows.flat()) {
-    if (n.foes && n.foes.some((k) => !ENEMIES[k])) n.foes = pickFoes(makeRng((run.seed ^ (n.row * 97 + n.col)) >>> 0), run.floor, n, []);
+    if (n.foes && n.foes.some((k) => !ENEMIES[k])) n.foes = pickFoes(makeRng((run.seed ^ (n.row * 97 + n.col)) >>> 0), run.village, run.floor, n, []);
   }
   return run.map;
 }
@@ -171,7 +172,7 @@ export function enterNode(run, id) {
 
 // 이 칸에서 만나는 적 — 지도에 미리 보여 준다
 export function enemiesAt(run, node) {
-  const f = FLOORS[run.floor];
+  const f = floorsOf(run.village)[run.floor];
   if (node.type === "boss") return f.boss;
   if (node.type === "fight" || node.type === "elite") return node.foes || f.fights[node.fight] || [];
   return [];

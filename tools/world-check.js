@@ -9,7 +9,7 @@
 // 걸린 줄이 곧 오류는 아니다 — 예외가 많은 규칙이라 사람이 한 번 봐야 한다.
 import { CARDS } from "../js/data/cards.js";
 import { HEROES } from "../js/data/heroes.js";
-import { ENEMIES, FLOORS } from "../js/data/enemies.js";
+import { ENEMIES, VILLAGES } from "../js/data/enemies.js";
 import { TRAITS } from "../js/data/traits.js";
 import TALK from "../js/data/talk.js";
 import { HERO_DATA } from "../js/cardbook.js";
@@ -106,7 +106,10 @@ for (const e of Object.values(ENEMIES)) {
   if (e.phase2) LINES.push([`적 ${e.ko}`, null, e.phase2.say]);
   for (const p of e.passives || []) LINES.push([`적 ${e.ko}`, null, p.name]);
 }
-for (const f of FLOORS) LINES.push([`${f.n}층`, null, `${f.name} ${f.sub}`]);
+for (const v of Object.values(VILLAGES)) {
+  LINES.push([`마을 ${v.ko}`, null, `${v.ko} ${v.line}`]);
+  for (const f of v.floors) LINES.push([`${v.ko} ${f.n}층`, null, `${f.name} ${f.sub}`]);
+}
 // 이벤트 — 장면 · 선택지 · 연출 한 줄(docs/08-이벤트.md). 원작 사도가 나오니 세계 규칙에 가장 잘 걸리는 자리다
 for (const ev of EVENTS) {
   LINES.push([`이벤트 ${ev.id}`, null, `${ev.name} ${ev.scene}`]);

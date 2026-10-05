@@ -69,12 +69,11 @@ export function fightScreen(run, onDone, onQuit, opts = {}) {
 
   // ① 머리 — 어디서 싸우는가
   const head = el("div", "bhead");
-  // 판의 마지막 싸움(마지막 층 너머 — run.js finalOf)은 층 이름 대신 그곳 이름
-  const fin = !run.eventFight && R.finalOf(run);
-  head.appendChild(el("span", "bwhere", fin ? fin.name : `${floor.n}층 · ${floor.name}`));
+  // 마을 + 층 — 「세계수 · 1층 에르피엔」. 2층 보스는 판의 끝
+  head.appendChild(el("span", "bwhere", `${R.villageOfRun(run).ko} · ${floor.n}층 ${floor.name}`));
   const mapNode = M.currentNode(run);
   const stageTag = mapNode ? `${M.stageName(run, mapNode)} ${M.KIND_KO[mapNode.type]}` : `${run.node + 1}번째 싸움`;
-  head.appendChild(el("span", "bsub", fin ? fin.sub : `${floor.sub} · ${run.eventFight ? `이벤트 — ${run.eventFight.name}` : R.isBoss(run) ? `${mapNode ? M.stageName(run, mapNode) + " " : ""}층의 끝` : stageTag}`));
+  head.appendChild(el("span", "bsub", `${floor.sub} · ${run.eventFight ? `이벤트 — ${run.eventFight.name}` : R.isBoss(run) ? `${mapNode ? M.stageName(run, mapNode) + " " : ""}${R.isLastFloor(run) ? "판의 끝" : "층의 끝"}` : stageTag}`));
   const flashBox = el("span", "bflash");
   for (const id of run.traits) { const t = TRAITS[id]; const c = el("span", "flash", t.ko); c.title = t.text; flashBox.appendChild(c); }
   head.appendChild(flashBox);
@@ -1899,6 +1898,8 @@ export function fightScreen(run, onDone, onQuit, opts = {}) {
     불굴: (n) => `받는 피해 -${P100(RULES.stackEff("불굴", n))}%${n * SV.불굴 > SV.불굴Cap ? ` (최대 -${P100(SV.불굴Cap)}%)` : ""}`,
     결의: (n) => `얻는 방어 · 실드 +${Math.round(RULES.stackEff("결의", n))}`,
     결정화: (n) => `턴 끝에 방어력 ${P100(RULES.stackEff("결정화", n))}% 고정 실드`,
+    // 리듬(박자형 공용 부품, docs/19 §7) — 저절로 하는 일은 없다. 카드 · 패시브가 센다
+    리듬: (n) => `이번 턴 박자 ${n} — 「잇기:」 · 「앞이 …:」 가 서면 +1, 「리듬 1개당 …」 카드가 쓴다(최대 ${SV.리듬Max}) — 턴이 끝나면 사라진다`,
   };
   const stHelp = (id, n = 1, u = null) => (ST_HELP[id] ? ST_HELP[id](n, u) + (INT_SET.has(id) ? " (전투 내내)" : "") : "");
   const turnTxt = (n) => (n != null && n >= RULES.BOON_TURNS ? "전투 내내" : n == null || n >= 999 ? "이번 전투" : `${n}턴`);   // 전투 내내 — 강화 카드(그 전투 끝까지)
@@ -1935,7 +1936,8 @@ export function fightScreen(run, onDone, onQuit, opts = {}) {
       if (isHero && !HERO_ST.has(k)) continue;          // 파티 층은 파티 막대 밑에
       if (isPool && HERO_ST.has(k)) continue;
       const kw = (st.kw || {})[k];
-      if (kw) { keys.push({ id: k, n: v, owner: kw.owner }); continue; }
+      // 파티의 리듬(공용 부품)은 상태다 — 이름이 같은 사도 전용 키워드(자기 주머니)가 있어도 그것은 상태에 살지 않는다
+      if (kw && !(k === RULES.RHYTHM && kw.carrier === "self")) { keys.push({ id: k, n: v, owner: kw.owner }); continue; }
       (BAD_ST.includes(k) ? debuffs : buffs).push({ id: k, v, left: STACK_SET.has(k) ? null : v, stack: STACK_SET.has(k) ? v : 0 });
     }
     // 도발 — 파티가 덜 받는다(파티 층). 누가 막아 섰는지는 출처로
@@ -3282,7 +3284,20 @@ export function fightScreen(run, onDone, onQuit, opts = {}) {
             : [`${(((st.stacks || {})[u.key] || {})[r.when.id]) || 0}개`];
           tags.push(`「${r.when.id}」 ${held.length ? held.join(" · ") : "없음"}`);
         }
+        // 공용 부품(docs/19 §7) — 리듬 지금 수 · 이번 턴 전환했나 · 예약이 몇 남았나
+        if (r.when.on === "rhythm") tags.push(`리듬 ${RULES.rhythmOf(st)}/${r.when.n}${(st.counts || {})[`${id}|rhythm|${st.turn}`] ? " · 이번 턴 했음" : ""}`);
+        if (r.when.on === "switch") tags.push(st.switchTurn === st.turn ? "이번 턴 전환했음" : "이번 턴 전환 없음");
+        if (r.when.on === "reserveGone") {
+          const held = [];
+          for (const kw of Object.values(st.kw || {})) {
+            if (!kw.reserve) continue;
+            if (kw.carrier === "self") { const n = ((st.stacks || {})[kw.owner] || {})[kw.id] || 0; if (n) held.push(`「${kw.id}」 ${n}`); }
+            else for (const x of [...st.party.slice(0, 1), ...st.enemies]) if (!x.dead && (x.status || {})[kw.id]) held.push(`「${kw.id}」 ${x.side === "party" ? "파티" : x.ko} ${x.status[kw.id]}`);
+          }
+          tags.push(held.length ? `예약 ${held.join(" · ")}` : "예약 없음");
+        }
         for (const c of r.conds || []) {
+          if (c.c === "status" && c.id === RULES.RHYTHM) tags.push(`리듬 ${RULES.rhythmOf(st)}`);
           if (c.c === "playedMax" || c.c === "playedMin") tags.push(`파티 ${st.playedThisTurn || 0}장`);
           if (c.c === "stack" && c.not) tags.push(`「${c.id}」 ${(((st.stacks || {})[u.key] || {})[c.id]) || ((u.status || {})[c.id]) || 0}개`);
           if (c.c === "ownNone") tags.push(`${u.ko} 이번 턴 ${(st.playedBy || {})[u.key] || 0}장`);

@@ -14,8 +14,9 @@
 //     파티는 한 몸이다(docs/16 §8) — HP · 방어 · 실드 · 상태는 파티의 것이라 「피해를 받으면」 · 「HP가 …」 · 「방어나 실드를 얻으면」 ·
 //     「자신 사기가 …」 은 모두 파티를 본다. 「아군이 쓰러지면」 은 없앴다(쓰러지는 사도가 없다)
 //           적에게 디버프를 걸면 · 회복량이 최대 HP를 초과하면 · 「X」가 N개가 되면 · 항상 ·
-//           이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면(리코타의 … — 그 사도 것만) · 「X」가 사라지면 · 「X」가 다 닳으면
-//     조건  「X」가 있으면 · 「X」가 없으면 · 「X」가 N개 이상이면 · HP가 N% 이하이면 · HP가 N% 이상이면 · 적이 N명 이상이면 ·
+//           이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면(리코타의 … — 그 사도 것만) · 「X」가 사라지면 · 「X」가 다 닳으면 ·
+//           공용 부품(docs/19 §7): 리듬이 N이 되면 · 아군이 전환하면 · 전환하면 · 아군의 예약이 다 닳으면
+//     조건  「X」가 있으면 · 「X」가 없으면 · 「X」가 N개 이상이면 · 리듬이 N 이상이면 · HP가 N% 이하이면 · HP가 N% 이상이면 · 적이 N명 이상이면 ·
 //           적이 N명뿐이면 · 파티가 이번 턴 카드를 N장 이상(이하로) 냈으면 · 이번 턴 에르핀의 카드를 내지 않았으면 ·
 //           AP가 남았으면 · 고학년 게이지가 N% 이상이면 · 실드가 있으면 · 적이 즉시 행동했으면
 //     효과  카드와 같은 말(공격력 N% 피해 · 방어력 N% 방어 · AP +1 · 드로우 1 · 「X」 +1 …) +
@@ -24,7 +25,8 @@
 //
 //   **키워드 「X」** 설명. 최대 N. 적의 차례가 끝나면 N 감소. 적에게 거는 표식이다. 다른 사도의 카드를 내면 전부 사라진다.
 //                     1개당 자신 주는 피해 +N%. 1개당 턴 종료 시 공격력 N% 피해. 「X」가 N개가 되면: … ·
-//                     「X」가 사라지면: …(0 이 되는 순간 — 무엇으로든) · 「X」가 다 닳으면: …(「적의 차례가 끝나면 … 감소」 로 0 이 됐을 때만)
+//                     「X」가 사라지면: …(0 이 되는 순간 — 무엇으로든) · 「X」가 다 닳으면: …(「적의 차례가 끝나면 … 감소」 · 재촉으로 0 이 됐을 때만) ·
+//                     전환하는 모드다.(최대 1 — 0 ↔ 1 이 전환) · 예약이다.(재촉이 줄이는 시계)
 
 import { parseEffect } from "./effects.js";
 import { STAT_ST, stackEff, STATUS_V } from "./rules.js";
@@ -32,6 +34,14 @@ import { STAT_ST, stackEff, STATUS_V } from "./rules.js";
 // ── 읽기 ───────────────────────────────────────────────────────────────
 
 const TRIGGERS = [
+  // 공용 부품(docs/19 §7) — 같은 운영 방식 사도끼리 남이 일으킨 계기에도 반응한다.
+  //   「아군의 예약이 다 닳으면」 — 어느 사도의 예약 키워드(「예약이다.」)든 다 닳는 순간(적의 차례 · 재촉). 적 표식이었으면 그 적이 「적 1명」(combat kwGone)
+  //   「아군이 전환하면」 — 파티 누구의 모드 키워드든(자신 포함) 0 ↔ 1 로 바뀌는 순간 · 「전환하면」 — 자신의 모드만(combat kwSwitch)
+  //   「리듬이 N이 되면」 — 파티의 리듬이 그 수에 처음 닿는 순간, 턴마다 한 번(combat rhythmAdd)
+  [/아군의\s*예약이\s*다\s*닳으면/, () => ({ on: "reserveGone" })],
+  [/아군이\s*전환하면/, () => ({ on: "switch", who: "any" })],
+  [/(?<![가-힣「])전환하면/, () => ({ on: "switch" })],
+  [/(?<![가-힣「])리듬이\s*(\d+)\s*(?:개\s*)?(?:이|가)?\s*되면/, (m) => ({ on: "rhythm", n: Number(m[1]) })],
   // 「「X」가 사라지면」 — 겹이 0 보다 크다가 0 이 되는 순간(소모 · 감소 · 「다른 사도의 카드를 내면 전부 사라진다」 · 무엇이든).
   // 「「X」가 다 닳으면」 — 그 가운데 「적의 차례가 끝나면 N 감소」(decayKeywords)로 0 이 됐을 때만(예약형의 시계 — docs/19). combat kwGone 이 알린다.
   // 맨 앞에 둔다 — 뒤의 효과 글(「… 턴 종료 시 …」)이 다른 언제로 먼저 읽히지 않게
@@ -93,7 +103,8 @@ const CONDS = [
   [/HP가\s*(\d+)\s*%\s*이하이면/, (m) => ({ c: "hp", pct: Number(m[1]) / 100 })],
   // 「자신 사기가 3 이상이면」 — 이 사도에게 지금 걸린 상태의 겹(장비 · 패시브가 상태를 쌓은 만큼 보상)
   // v6 — 파티 층 버프(잔광 · 피해 감소 · 면역 · 실드 유지 · 저장 · 협공 · 고동)도 겹으로 본다. 받침 따라 이 · 가
-  [/(?:자신\s*|파티\s*)?(사기|불굴|결의|결정화|반격|잔광|피해 감소|면역|실드 유지|저장|협공|고동)(?:이|가)\s*(\d+)\s*(?:겹\s*)?이상이면/, (m) => ({ c: "status", id: m[1], n: Number(m[2]) })],
+  // 「리듬이 N 이상이면」 — 파티의 리듬(박자형 공용 부품, docs/19 §7)도 같은 꼴
+  [/(?:자신\s*|파티\s*)?(사기|불굴|결의|결정화|반격|잔광|피해 감소|면역|실드 유지|저장|협공|고동|리듬)(?:이|가)\s*(\d+)\s*(?:개\s*|겹\s*)?이상이면/, (m) => ({ c: "status", id: m[1], n: Number(m[2]) })],
   [/적이\s*(\d+)\s*명\s*이상이면/, (m) => ({ c: "foes", n: Number(m[1]) })],
   [/혼자\s*남으면/, () => ({ c: "alone" })],
   // 덱 무게(docs/11 §3-3) — 이번 턴 **파티가** 낸 카드 장수. 장수로 세니 신탁으로 코스트가 내려간 카드도 같다.
@@ -203,6 +214,7 @@ const PER_STATS = [
 ];
 
 const WIPE = /다른\s*사도의?\s*카드를\s*내면\s*(?:전부|모두)\s*사라/;
+const MODE = /전환하는\s*모드다/, RESERVE = /(?<![가-힣])예약이다/;
 export function parseKeyword(id, text, keywords = []) {
   const kw = { id, cap: null, decay: 0, carrier: "self", per: [], rules: [], left: [] };
   if (!text) return kw;
@@ -219,12 +231,16 @@ export function parseKeyword(id, text, keywords = []) {
   else { const d = text.match(new RegExp(WHEN + "(\\d+)\\s*(?:씩\\s*)?(?:감소|줄어)")); if (d) kw.decay = Number(d[1]); }
   // 「다른 사도의 카드를 내면 전부 사라진다」(박자형 — 끊기면 처음부터) — 이 키워드 주인이 아닌 카드(교주 카드 포함)를 내면 겹이 0(combat kwWipe)
   if (WIPE.test(text)) kw.wipe = true;
+  // 공용 부품(docs/19 §7) — 「전환하는 모드다.」 켜졌다(1) · 꺼졌다(0) 둘뿐인 모드(최대 1). 0 ↔ 1 이 되는 순간이 「전환」(combat kwSwitch) ·
+  // 「예약이다.」 턴마다 줄어드는 시계(「적의 차례가 끝나면 N 감소」 와 같이 쓴다 — tools/check-hero.js). 「재촉 N」 이 줄이고, 다 닳으면 「아군의 예약이 다 닳으면」
+  if (MODE.test(text)) { kw.mode = true; kw.cap = 1; }
+  if (RESERVE.test(text)) kw.reserve = true;
 
   // 첫 문장은 설명(사람이 읽는 말)이다. 그 뒤 문장은 모두 규칙이어야 한다 — 못 읽으면 left 에 남긴다.
   const sentences = text.split(/(?<=[.。])\s+/).map((x) => x.replace(/[.。]\s*$/, "").trim()).filter(Boolean);
   sentences.forEach((s, i) => {
     if (i === 0) return;
-    const meta = /다른\s*사도의?\s*카드를\s*내면\s*(?:전부|모두)\s*사라|최대\s*\d+|(?:턴\s*종료\s*시|적의\s*차례가\s*끝나면)\s*(?:\d+\s*(?:씩\s*)?(?:감소|줄어)|(?:전부|모두)\s*사라)|턴\s*끝에\s*(?:전부\s*|모두\s*)?사라|발동하면\s*(?:\d+\s*(?:씩\s*)?(?:감소|줄어)|(?:전부\s*|모두\s*)?사라)|(?:적|아군)에게\s*(?:거는|붙는|쌓는|새기는|주는|나눠\s*주는|씌우는)/;
+    const meta = /다른\s*사도의?\s*카드를\s*내면\s*(?:전부|모두)\s*사라|전환하는\s*모드다|(?<![가-힣])예약이다|최대\s*\d+|(?:턴\s*종료\s*시|적의\s*차례가\s*끝나면)\s*(?:\d+\s*(?:씩\s*)?(?:감소|줄어)|(?:전부|모두)\s*사라)|턴\s*끝에\s*(?:전부\s*|모두\s*)?사라|발동하면\s*(?:\d+\s*(?:씩\s*)?(?:감소|줄어)|(?:전부\s*|모두\s*)?사라)|(?:적|아군)에게\s*(?:거는|붙는|쌓는|새기는|주는|나눠\s*주는|씌우는)/;
     // 「1개당 …」 으로 시작하는 문장만 — 「턴 종료 시 「드론」 1개당 …」 은 규칙 문장이다(뒤의 피해를 쌓인 수만큼)
     const per = s.match(/^1\s*개\s*당\s*(.+)/);
     if (per) {
@@ -395,6 +411,11 @@ function matches(s, owner, w, ev, info, kwOf) {
     case "stackReach": return w.id === info.id && info.before < w.n && info.after >= w.n && (!info.owner || info.owner === owner.key);
     // 「「X」가 사라지면」 — 무엇으로든 0 이 되면 · 「다 닳으면」(w.decay) — 「적의 차례가 끝나면 N 감소」 로 0 이 됐을 때만(info.decay). 주인은 키워드 주인
     case "stackGone": return w.id === info.id && (!w.decay || !!info.decay) && (!info.owner || info.owner === owner.key);
+    // 공용 부품(docs/19 §7) — 「아군이 전환하면」 은 누구의 모드든(자신 포함) · 「전환하면」 은 자신의 모드만 · 「리듬이 N이 되면」 은 그 수를 넘어서는 순간 ·
+    // 「아군의 예약이 다 닳으면」 은 누구의 예약이든
+    case "switch": return w.who === "any" || info.owner === owner.key;
+    case "rhythm": return info.before < w.n && info.after >= w.n;
+    case "reserveGone": return true;
     default: return true;
   }
 }
@@ -433,6 +454,8 @@ export function emit(s, ev, info, run) {
           s.counts[sk] = (s.playLog || []).length;
         }
         if (!condOk(s, owner, r, info)) return;
+        // 「리듬이 N이 되면」 — 턴마다 한 번(쓰고 다시 쌓아 또 닿아도 그 턴에는 안 돈다)
+        if (ev === "rhythm") { const rk = `${id}|rhythm|${s.turn}`; if (s.counts[rk]) return; s.counts[rk] = 1; }
         if (r.limit) {
           const key = `${id}|${r.limit.per === "turn" ? s.turn : "f"}`;
           if ((s.fired[key] || 0) >= r.limit.n) return;
@@ -441,7 +464,9 @@ export function emit(s, ev, info, run) {
         if (!r.fx.length) return;
         let fx = r.fx;
         const target = info.target && info.target.side === "enemy" ? info.target : null;
-        const holder = (ev === "stackReach" || ev === "stackGone") && info.target && info.target !== owner ? info.target : null;
+        // 「아군의 예약이 다 닳으면」 · 「전환하면」 은 남의 것일 수 있다 — 든 사람으로 넘기는 것은 적 표식일 때만(그 적이 「적 1명」)
+        const holder = ((ev === "stackReach" || ev === "stackGone") && info.target && info.target !== owner) || ((ev === "reserveGone" || ev === "switch") && info.target && info.target.side === "enemy")
+          ? info.target : null;
         const ally = info.who && info.who.side === "party" && !info.who.dead ? info.who : owner;
         // 규칙이 스스로를 다시 부르지 않는다 — 「디버프를 걸면 … 적 1명 주는 피해 -10%」 · 「방어를 얻으면 … 방어」 가 제 효과로 또 돌던 고리
         if (!FIRING.has(s)) FIRING.set(s, new Set());

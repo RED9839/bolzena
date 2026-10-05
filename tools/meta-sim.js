@@ -14,7 +14,7 @@ import * as R from "../js/run.js";
 import * as RULES from "../js/rules.js";
 import * as M from "../js/map.js";
 import * as EV from "../js/events.js";
-import { ENEMIES, FLOORS } from "../js/data/enemies.js";
+import { ENEMIES, VILLAGES } from "../js/data/enemies.js";
 import { makeBots } from "./lib/bot.js";
 import { makeRunner } from "./lib/run-bot.js";
 // 오래 돈다 — 낮은 우선순위로 돌아 컴퓨터를 막지 않게
@@ -26,7 +26,7 @@ const ROUNDS = +opt("rounds", 30), SEED = +opt("seed", 0);
 const HPX = +opt("hp", 1), DMGX = +opt("dmg", 1);
 
 const bots = makeBots({ C, B, R: RULES, ENEMIES });
-const runner = makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots });
+const runner = makeRunner({ C, B, R, RULES, M, EV, ENEMIES, bots });
 const HEROES = Object.keys(B.HERO_DATA);
 const LETTER = { 탱커: "T", 서포터: "S", 딜러: "D" };
 const roleOf = (k) => B.HERO_DATA[k].role;
@@ -34,7 +34,7 @@ const compOf = (p) => p.map((k) => LETTER[roleOf(k)]).sort((a, b) => "TSD".index
 
 function job(j) {
   const r = runner.runFull(j.party, j.seed, { smartFight: true, smartOut: true, depth: 1, hpx: HPX, dmgx: DMGX });
-  return { i: j.i, clear: !!r.clear, floor: r.floor, where: r.where };
+  return { i: j.i, clear: !!r.clear, village: r.village, floor: r.floor, where: r.where };
 }
 
 if (!isMainThread) {
@@ -67,11 +67,13 @@ if (!isMainThread) {
   // ── 모으기 ──
   const pct = (w, n) => (n ? (w / n) * 100 : 0);
   const add = (map, key, win) => { const x = (map[key] = map[key] || [0, 0]); x[0]++; if (win) x[1]++; };
-  const hero = {}, comp = {}, pair = {};
+  // 마을마다 · 쓰러진 층(한 판은 마을 하나의 두 층 — docs/20-마을.md)
+  const hero = {}, comp = {}, pair = {}, village = {}, fell = [0, 0];
   let wins = 0;
   for (const j of jobs) {
     const win = res[j.i].clear;
-    if (win) wins++;
+    if (win) wins++; else fell[res[j.i].floor] = (fell[res[j.i].floor] || 0) + 1;
+    add(village, res[j.i].village, win);
     for (const k of j.party) add(hero, k, win);
     add(comp, compOf(j.party), win);
     const p = j.party.slice().sort();
@@ -86,6 +88,8 @@ if (!isMainThread) {
     runs: jobs.length, rounds: ROUNDS, hpx: HPX, dmgx: DMGX, clear: +all.toFixed(1), sec: Math.round((Date.now() - t0) / 1000),
     heroes: rows.sort((a, b) => b.win - a.win).map((r) => ({ ...r, win: +r.win.toFixed(1) })),
     comps: Object.fromEntries(Object.entries(comp).sort().map(([k, [n, w]]) => [k, { n, win: +pct(w, n).toFixed(1) }])),
+    villages: Object.fromEntries(Object.entries(village).map(([k, [n, w]]) => [k, { n, win: +pct(w, n).toFixed(1) }])),
+    fell: fell.map((n) => +pct(n, jobs.length).toFixed(1)),
   };
 
   if (argv.includes("--json")) {
@@ -96,7 +100,8 @@ if (!isMainThread) {
 
   const bar = (p) => "█".repeat(Math.round(p / 10)).padEnd(10, "·");
   console.log(`메타 통계 — smart 봇 ${jobs.length}판(사도마다 ${ROUNDS}판) · 전체 완주 ${all.toFixed(1)}% · ${out.sec}초${HPX !== 1 || DMGX !== 1 ? ` · 적 체력 ×${HPX} 피해 ×${DMGX}` : ""}`);
-  console.log(`  사도 한 명의 값은 ±${half(all, ROUNDS).toFixed(0)}%p 쯤 흔들린다(${ROUNDS}판) — 순위의 가운데는 믿지 말고 양 끝만 본다\n`);
+  console.log(`  사도 한 명의 값은 ±${half(all, ROUNDS).toFixed(0)}%p 쯤 흔들린다(${ROUNDS}판) — 순위의 가운데는 믿지 말고 양 끝만 본다`);
+  console.log(`  마을  ${Object.entries(out.villages).map(([k, v]) => `${(VILLAGES[k] || {}).ko || k} ${v.win.toFixed(1)}%(${v.n}판)`).join(" · ")} · 쓰러진 층 1층 ${out.fell[0]}% · 2층 ${out.fell[1]}%\n`);
 
   // 퍼짐 — 몇 명이 어디에 몰려 있나
   const bands = [[70, 101, "70% 이상"], [50, 70, "50~70%"], [30, 50, "30~50%"], [15, 30, "15~30%"], [0, 15, "15% 미만"]];

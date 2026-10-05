@@ -10,6 +10,8 @@
 //   combat  싸움 중일 때만(where 가 fight). 적의 수(intent)는 적 데이터 안의 길로, 신탁 장부(book)는 읽을 때 다시 만든다
 // 파티 HP(2026-10, docs/16 §8) — 판은 run.partyHp · run.partyMaxHp, 싸움은 combat.pool 하나. 옛 저장(사도마다 hp · maxHp)은
 //   읽을 때 더해서 하나로 바꾼다(run.js migrateRun · combat.js linkParty). 판 번호(v)는 그대로 — 옛 판도 이어 한다
+// 마을(2026-10-04, docs/20) — 판은 run.village 의 두 층. 마을이 없는 옛 판(세 층 + 우로스)은 마을로 옮겨 잇고(run.js migrateVillage),
+//   우로스 앞 · 우로스 싸움에 멈춘 옛 판만 버린다(check)
 // 브라우저가 저장을 막아도 게임은 돈다 — 이어하기만 안 될 뿐이다.
 import { DEV } from "./dev.js";
 import { makeRng, linkParty } from "./combat.js";
@@ -98,6 +100,8 @@ function check(d) {
   if (!known(r.bag || [], EQUIP)) throw new Error("모르는 장비");
   for (const g of Object.values(r.gear || {})) if (!known(Object.values(g), EQUIP)) throw new Error("모르는 장비");
   if (!r.where || !WHERE.includes(r.where.k)) throw new Error("어느 화면인지 모른다");
+  // 옛 판(마을 없음 — 세 층 + 우로스)의 우로스 앞 · 우로스 싸움은 이어할 곳이 없다(마지막 싸움을 없앴다). 그 밖의 옛 판은 run.js migrateVillage 가 마을로 옮긴다
+  if (!r.village && (r.node >= 4 || r.where.kind === "final")) throw new Error("옛 판의 마지막 싸움");
   if (r.where.k === "fight") {
     const c = d.combat;
     if (!c) throw new Error("싸움이 없다");

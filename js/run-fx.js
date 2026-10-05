@@ -79,7 +79,10 @@ function addStack(s, key, id, v) {
 
 // 「「X」 1개당 …」 의 X 가 몇 개인가 — 자기 주머니는 그 사도의 것, 적 표식은 고른 적(규칙이면 일을 일으킨 적)이 든 수,
 // 아군 표식은 파티의 것(파티에 하나 — linkParty)
+// 「리듬 1개당」 의 자리표 — 사도 전용 키워드 이름(「리듬」 일 수도 있다)과 겹치지 않게
+const RHYTHM_PER = "\u0000리듬";
 function perCount(s, ctx, id) {
+  if (id === RHYTHM_PER) return R.rhythmOf(s);
   const kw = (s.kw || {})[id];
   if (kw && kw.carrier === "enemy") {
     const t = ctx.holder && ctx.holder.side === "enemy" ? ctx.holder : resolve(s, ctx, "oneEnemy")[0];
@@ -115,9 +118,17 @@ export function runFx(s, fxList, ctx, api) {
       // 「연속: …」 — 이번 턴 바로 앞에 낸 카드가 이 카드와 같은 속성(사도 성격)이면 뒤가 돈다(combat playCard 가 ctx.chain 을 정한다)
       case "ifChain": gate = !!ctx.chain; break;
       // 「잇기: …」 — 이번 턴 바로 앞에 낸 카드가 같은 사도의 카드였으면(combat playCard 가 ctx.link 를 정한다)
-      case "ifLink": gate = !!ctx.link; break;
       // 「앞이 공격: …」 — 이번 턴 바로 앞에 낸 카드(누구 것이든)의 종류가 그것이었으면(ctx.prev — 첫 장이면 없다)
-      case "ifPrev": gate = !!ctx.prev && ctx.prev === f.type; break;
+      // 서서 뒤가 돌면 저절로 「리듬」 +1(박자형 공용 부품, docs/19 §7) — 낸 카드 한 장에 한 번(ctx.rhythmed). 뒤의 효과보다 먼저 쌓는다
+      case "ifLink": case "ifPrev":
+        gate = f.k === "ifLink" ? !!ctx.link : !!ctx.prev && ctx.prev === f.type;
+        if (gate && ctx.card && !ctx.rhythmed && api.rhythm) { ctx.rhythmed = true; api.rhythm(1); }
+        break;
+      // 「리듬이 N 이상이면: …」 — 파티의 리듬 · 「전환: …」 — 이번 턴 아군 누구든 모드가 바뀐 적이 있으면(combat kwSwitch 가 s.switchTurn 을 적는다)
+      case "ifRhythm": gate = R.rhythmOf(s) >= f.n; break;
+      case "ifSwitched": gate = s.switchTurn != null && s.switchTurn === s.turn; break;
+      // 「리듬 1개당 …」 — 바로 뒤 한 줄을 리듬 수만큼(perCount)
+      case "perRhythm": ctx.perStack = RHYTHM_PER; break;
       // 「「X」가 있으면」 · 「「X」가 없으면」(not)
       case "ifStack": {
         const kw = (s.kw || {})[f.id];
@@ -309,6 +320,29 @@ export function runFx(s, fxList, ctx, api) {
         }
         break;
       }
+      // ── 공용 부품(docs/19 §7) ──────────────────────────────────────
+      // 「리듬 N 소모」 · 「리듬 전부 소모」 — 파티의 리듬(combat rhythmAdd)
+      case "spendRhythm": if (api.rhythm) api.rhythm(f.v === "all" ? "all" : -f.v); break;
+      // 「전환」 — 카드 주인의 모드 키워드(「전환하는 모드다.」)를 뒤집는다: 있으면 0, 없으면 1. 없는 사도면 아무 일 없다.
+      // 바뀐 것은 stackChanged 로 알린다 — 0 → 1 이든 1 → 0 이든 combat 이 「전환」 을 낸다(kwSwitch)
+      case "flip": {
+        if (!owner) break;
+        const kw = Object.values(s.kw || {}).find((k) => k.mode && k.owner === owner.key);
+        if (!kw) break;
+        const hs = kw.carrier === "self" ? [owner]
+          : kw.carrier === "enemy" ? (ctx.holder && ctx.holder.side === "enemy" ? [ctx.holder] : resolve(s, ctx, "oneEnemy"))
+          : once(resolve(s, ctx, "self"));
+        for (const t of hs) {
+          const before = kw.carrier === "self" ? stackOf(s, owner.key, kw.id) : ((t.status || {})[kw.id] || 0);
+          const after = before > 0 ? 0 : 1;
+          if (kw.carrier === "self") addStack(s, owner.key, kw.id, after - before);
+          else { t.status = t.status || {}; if (after) t.status[kw.id] = after; else delete t.status[kw.id]; }
+          if (api.stackChanged) api.stackChanged(owner.key, kw.id, before, after, t);
+        }
+        break;
+      }
+      // 「재촉 N」 — 파티가 가진 예약 키워드를 모두 N 줄인다(combat hasten — 0 이 되면 「다 닳으면」)
+      case "hasten": if (api.hasten) api.hasten(f.v); break;
       case "capStack": if (owner) { s.stackCap = s.stackCap || {}; s.stackCap[owner.key] = s.stackCap[owner.key] || {}; s.stackCap[owner.key][f.id] = f.v; } break;
       case "trigger": if (owner) api.trigger(owner, f.id, f.v); break;
 

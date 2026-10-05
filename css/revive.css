@@ -965,3 +965,59 @@ body:has(#screen.battle) .bottom { top: 84px; }
 #screen.battle .foe .intent.i-stun .igem:before { background: linear-gradient(135deg, #ffe7a8, #e0a52a) !important; border-color: #fff3c4 !important; }
 #screen.battle .foe .intent.i-stun .igem b { color: #fff8e0; -webkit-text-stroke: 3px #5a3c06; }
 #screen.battle .foe .intent.i-stun .iwhat b { color: #ffe7a8; }
+
+/* ══ 마을 공개(js/ui.js villageScreen) — 모험을 시작하면 무작위로 정해진 마을을 파티 고르기 전에 보인다(docs/20-마을.md §0) ══
+   배경은 그 마을 1층 싸움터(--stagebg)를 흐리게, 가운데 종이 판 하나: 마을 이름 · 종족 · 한 줄 소개 · 두 층 · 단추 둘 */
+#screen.villagescreen {
+  position: fixed; inset: 0; z-index: 1; max-width: none; margin: 0; padding: 24px; border-radius: 0; min-height: 0;
+  height: var(--app-h, 100vh); overflow: hidden; isolation: isolate; display: grid; place-items: center;
+  background: var(--ui-bg); color: var(--rv-text); font-family: var(--rv-body);
+}
+#screen.villagescreen::before {
+  content: ""; position: absolute; inset: -30px; z-index: -2; pointer-events: none;
+  background: var(--stagebg, none) 50% 70% / cover no-repeat; filter: blur(3px) saturate(.95) brightness(.6);
+}
+#screen.villagescreen::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 60% 70% at 50% 50%, transparent 30%, #0b0a12cc 100%);
+}
+#screen.villagescreen > .fsmini { position: absolute; top: 18px; right: 22px; }
+.vg-card {
+  width: min(560px, 100%); display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  padding: 26px 30px 24px; background: var(--rv-paper); border: 3px solid var(--rv-line); border-radius: var(--rv-r);
+  box-shadow: var(--rv-drop), 0 18px 40px #000a; animation: vg-pop .35s ease-out both;
+}
+@keyframes vg-pop { from { transform: translateY(14px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+.vg-kicker { font-family: var(--rv-font); font-size: var(--fs-md); color: var(--rv-sun); }
+.vg-name {
+  margin: 0; font-family: var(--rv-font); font-weight: var(--rv-w); font-size: 52px; line-height: 1.1; color: #fff;
+  -webkit-text-stroke: 7px var(--rv-ink); paint-order: stroke fill; text-shadow: 0 6px 0 var(--rv-ink);
+}
+.vg-race { font-family: var(--rv-font); font-size: var(--fs-sm); color: var(--rv-text); background: var(--rv-cream2); border: 2px solid var(--rv-line); border-radius: 99px; padding: 1px 12px; }
+.vg-line { margin: 6px 0 4px; font-size: var(--fs-md); line-height: 1.55; color: var(--ui-dim); }
+.vg-floors { list-style: none; margin: 4px 0 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.vg-floors li {
+  display: grid; grid-template-columns: 44px auto 1fr; align-items: baseline; gap: 10px; text-align: left;
+  padding: 9px 14px; background: var(--rv-cream); border: 2px solid var(--rv-line); border-radius: var(--ui-r);
+}
+.vg-floors em { font-style: normal; font-family: var(--rv-font); color: var(--rv-sun); }
+.vg-floors b { font-family: var(--rv-font); font-weight: var(--rv-w); font-size: var(--fs-lg); }
+.vg-floors span { font-size: var(--fs-xs); color: var(--ui-dim); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vg-note { margin: 6px 0 2px; font-size: var(--fs-xs); color: var(--ui-dim); }
+.vg-btns { display: flex; gap: 10px; width: 100%; margin-top: 6px; }
+.vg-btns button { flex: 1; font-family: var(--rv-font); font-weight: var(--rv-w); font-size: var(--fs-lg); padding: 12px 10px; border-radius: var(--ui-r); border: 3px solid var(--rv-ink); box-shadow: 0 4px 0 var(--rv-shadow); }
+.vg-go { flex: 2 !important; background: var(--ui-btn); color: var(--ui-btn-ink); }
+.vg-back { background: var(--rv-cream2); color: var(--rv-text); }
+.vg-btns button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--rv-shadow); }
+.phone #screen.villagescreen { padding: 12px; }
+.phone .vg-card { padding: 16px 18px; gap: 6px; }
+.phone .vg-name { font-size: 38px; }
+.phone .vg-line { font-size: var(--fs-sm); margin: 2px 0; }
+@media (prefers-reduced-motion: reduce) { .vg-card { animation: none; } }
+/* 편성 화면 첫 층의 보스가 짝일 때(js/party-screen.js .tf-boss.many) — 이름이 세로로 쪼개지지 않게 작게 세로로 쌓는다 */
+.tf-boss.many { flex-direction: column; gap: 4px; }
+.tf-boss.many .tf-bossone { padding: 3px 10px 3px 3px; gap: 8px; }
+.tf-boss.many .tf-bossone .art { width: 36px !important; height: 36px !important; }
+.tf-boss.many .tf-bossone b { font-size: 14px; white-space: nowrap; }
+.phone .tf-boss.many .tf-bossone .art { width: 28px !important; height: 28px !important; }
+.phone .tf-boss.many .tf-bossone b { font-size: 12.5px; }

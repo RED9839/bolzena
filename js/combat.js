@@ -26,7 +26,8 @@ export const ROW_KO = (r) => (r === "front" ? "앞" : r === "mid" ? "가운데" 
 // 기획서는 **상성**이다 — 광기 → 순수 → 냉정 → 광기, 활발 ↔ 우울.
 // (한때 "같은 성격을 모을수록 강해진다"는 시너지로 만들었는데, 기획서가 시너지를 없애고
 //  상성으로 정했다. 기획서가 원본이다.)
-export const natureOf = (k) => (designOf(k) || {}).nature || REL.nature[k] || null;
+// 성격 — 사도는 기획서 · 관계 데이터, 적은 적 데이터(ENEMIES[key].nature). 전에는 적을 못 찾아 null 이라 적의 성격 상성이 안 걸렸다(2026-10-04 종합 평가)
+export const natureOf = (k) => (designOf(k) || {}).nature || REL.nature[k] || (ENEMIES[k] || {}).nature || null;
 export const natureEdge = R.natureEdge;
 // 적의 약점 성격 — enemies.js 의 weak 가 있으면 그것, 없으면 상성에서(그 성격을 이기는 성격). 성격 없는 적은 weak 를 적어야 약점이 있다
 export const weakOf = (key) => { const d = ENEMIES[key] || {}; return d.weak || (d.nature ? R.weakTo(d.nature) : []); };
@@ -543,6 +544,8 @@ export function endTurn(s) {
   s.discard.push(...s.hand.splice(0).filter((id) => !cardOf(s, id).temp && !keep.includes(id) && !gone.includes(id)));
   s.hand.push(...keep);
   checkOver(s); if (s.over) return s;
+  // 리듬(박자형, docs/19 §7) — 턴이 끝나면 다 사라진다(「턴 종료 시 리듬이 N 이상이면」 은 위 turnEnd 에서 이미 봤다)
+  if (st(s.pool, R.RHYTHM) > 0) { say(s, `리듬 ${st(s.pool, R.RHYTHM)} — 턴이 끝나 사라진다`); delete s.pool.status[R.RHYTHM]; }
 
   // 적의 차례에 사도에게 새로 걸린 상태 — 이번에는 줄이지 않는다(2026-10 사용자: 「약화 1턴」 이 걸리자마자 풀려 아무 일도 안 했다).
   // 걸린 뒤 내 턴을 한 번 거치고 나서 줄어든다. 적에게 건 것은 그대로(내 턴에 걸고 → 적의 차례를 거쳐 → 줄어든다)
@@ -1717,9 +1720,57 @@ function kwWipe(s, c) {
 }
 // 키워드 겹이 0 보다 크다가 0 이 됐다 — 「「X」가 사라지면」 · decay(적의 차례가 끝나 다 닳았으면) 「「X」가 다 닳으면」 도(passive.js matches stackGone).
 // 적 표식이면 그 효과의 「적 1명」 은 표식이 있던 그 적이다 — 그 적이 쓰러졌으면 돌지 않는다. 아군 표식 · 자기 주머니면 키워드 주인이 시전자
+// 공용 부품(docs/19 §7) — 모드 키워드(「전환하는 모드다.」)면 1 → 0 도 전환이다 · 예약 키워드(「예약이다.」)가 다 닳았으면(decay — 적의 차례 · 재촉)
+// 「아군의 예약이 다 닳으면」(누구의 예약이든). 적 표식이면 그 적이 효과의 「적 1명」
 function kwGone(s, id, ownerKey, holder, decay = false) {
   if (s.over || (holder && holder.side === "enemy" && holder.dead)) return;
   emit(s, "stackGone", { id, owner: ownerKey, target: holder, decay });
+  const kw = (s.kw || {})[id];
+  if (kw && kw.mode) kwSwitch(s, kw, holder);
+  if (decay && kw && kw.reserve && !s.over) emit(s, "reserveGone", { id, owner: ownerKey, target: holder });
+}
+// 전환(두 얼굴형, docs/19 §7) — 모드 키워드의 겹이 0 → 1 · 1 → 0 이 된 순간(카드 · 패시브 · 소모 · 사라짐 무엇으로든).
+// 「전환: …」 카드 조건이 보는 이번 턴 표시(s.switchTurn)를 남기고 「아군이 전환하면」 · 「전환하면」 을 부른다
+function kwSwitch(s, kw, holder) {
+  if (s.over) return;
+  s.switchTurn = s.turn;
+  const on = kw.carrier === "self" ? (((s.stacks || {})[kw.owner] || {})[kw.id] || 0) > 0 : (((holder && holder.status) || {})[kw.id] || 0) > 0;
+  const who = s.party.find((u) => u.key === kw.owner) || null;
+  say(s, `${who ? who.ko + " " : ""}「${kw.id}」 — 전환(${on ? "켜짐" : "꺼짐"})`);
+  cue(s, "status", who || holder, { id: `전환 「${kw.id}」`, up: true });
+  emit(s, "switch", { id: kw.id, owner: kw.owner, target: holder, on });
+}
+// 리듬(박자형, docs/19 §7) — 파티 상태 하나. n 만큼 더하거나 빼고("all" 이면 0), 오르면 「리듬이 N이 되면」(passive.js matches rhythm)
+function rhythmAdd(s, n) {
+  const before = st(s.pool, R.RHYTHM);
+  if (n === "all") { if (before) delete s.pool.status[R.RHYTHM]; }
+  else addSt(s.pool, R.RHYTHM, n);
+  const after = st(s.pool, R.RHYTHM);
+  if (after === before) return;
+  say(s, `리듬 ${after > before ? "+" : ""}${after - before} (${after})`);
+  if (after > before) {
+    cue(s, "status", partyRep(s), { id: `리듬 +${after - before}`, up: true });
+    emit(s, "rhythm", { before, after });
+  }
+}
+// 재촉 N(예약형, docs/19 §7) — 파티가 가진 모든 예약 키워드(제 주머니 · 아군 표식 · 살아 있는 적의 표식)를 N 씩 줄인다.
+// 0 이 되면 적의 차례가 끝나 닳은 것과 같은 길(kwGone decay) — 「「X」가 다 닳으면」 · 「아군의 예약이 다 닳으면」. 적 표식은 적마다 따로
+function hasten(s, n) {
+  const gone = [];
+  for (const kw of Object.values(s.kw || {})) {
+    if (!kw.reserve) continue;
+    if (kw.carrier === "self") {
+      const bag = (s.stacks || {})[kw.owner];
+      if (bag && bag[kw.id]) { bag[kw.id] = Math.max(0, bag[kw.id] - n); if (!bag[kw.id]) gone.push({ kw, holder: s.party.find((u) => u.key === kw.owner) || null }); }
+    } else {
+      for (const u of [partyRep(s), ...alive(s.enemies)]) if (u && u.status && u.status[kw.id]) {   // 파티 상태는 하나 — 한 번만
+        const left = Math.max(0, u.status[kw.id] - n);
+        if (left) u.status[kw.id] = left; else { delete u.status[kw.id]; gone.push({ kw, holder: u }); }
+      }
+    }
+  }
+  say(s, `재촉 ${n} — 예약이 ${n} 씩 줄어든다${gone.length ? ` · 다 닳음 ${gone.map((g) => `「${g.kw.id}」`).join(" ")}` : ""}`);
+  for (const g of gone) { kwGone(s, g.kw.id, g.kw.owner, g.holder, true); if (s.over) return; }
 }
 // 좋은 상태 — 적에게 걸려도 「디버프를 걸면」 이 아니다
 const BUFF_ST = new Set(["사기", "불굴", "결의", "반격", "결정화", "잔광", "피해 감소", "면역", "실드 유지", "저장", "협공", "고동"]);
@@ -1796,6 +1847,8 @@ function fxApi(s) {
     // by — 건 사도(지속 피해 · 고정 피해 상태의 바탕 — 그 사도의 지금 공격력. 교주 카드면 파티에서 가장 높은 공격력)
     addStatus: (t, id, v, turns, by) => {
       const n = Math.max(1, turns || v || 1);
+      // 「리듬 N」 — 파티 상태(박자형, docs/19 §7). 누구를 가리켜도 파티에 — 오르면 「리듬이 N이 되면」 이 돈다
+      if (id === R.RHYTHM) { if (t.side === "party") rhythmAdd(s, n); return; }
       if (v > 0 && R.isBadSt(id) && st(t, "면역") > 0 && id !== "도발") {
         // 면역 — 해로운 효과 하나를 막고 1 쓴다(addSt 와 같은 규칙 — 기절 · 침묵도 막는다)
         addSt(t, "면역", -1); t.immuneHit = (t.immuneHit || 0) + 1;
@@ -1830,10 +1883,18 @@ function fxApi(s) {
     stackChanged: (owner, id, before, after, holder) => {
       // 쌓이면 든 사람 위에 꼬리표 「초청객 +1」 — 칩 숫자만 바뀌면 언제 늘었는지 안 보였다
       if (after > before) cue(s, "status", holder, { id: `${id} +${after - before}`, up: true });
-      if (after > before) emit(s, "stackReach", { id, before, after, owner, target: holder });
+      if (after > before) {
+        emit(s, "stackReach", { id, before, after, owner, target: holder });
+        // 모드 키워드가 0 → 1 — 전환(docs/19 §7). 1 → 0 은 아래 kwGone 이 낸다
+        const kw = (s.kw || {})[id];
+        if (kw && kw.mode && before <= 0 && !s.over) kwSwitch(s, kw, holder);
+      }
       // 0 이 됐다 — 「「X」가 사라지면」(쓰기 · 「X」 -N · 「N개가 되면: 「X」 전부 소모」 …). 주인은 키워드 주인(없으면 낸 사도)
       else if (before > 0 && after <= 0) kwGone(s, id, ((s.kw || {})[id] || {}).owner || owner, holder);
     },
+    // 리듬 · 재촉(공용 부품, docs/19 §7)
+    rhythm: (n) => rhythmAdd(s, n),
+    hasten: (n) => hasten(s, n),
     cleanse: (t, n) => { for (let i = 0; i < (n || 1); i++) { const bad = BAD.find((b) => st(t, b) > 0); if (bad) delete t.status[bad]; } },
     trigger: () => {},          // 사도 전용 발동(재채기 등) — 아직 몸이 없다
     // 버리기 — 낸 사람이 고른 카드(s.discardPick)부터. 「무작위」면 무작위로, 고른 것이 없으면(모의전 · 미리보기) 손 끝에서부터

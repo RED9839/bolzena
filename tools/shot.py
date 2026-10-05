@@ -74,7 +74,9 @@ def main():
         d.get(base + "/"); time.sleep(1.5)
         shot(d, a.out, "1-로비")
 
-        d.execute_script("document.querySelector('.home-primary').click()"); time.sleep(2.0)
+        d.execute_script("document.querySelector('.home-primary').click()"); time.sleep(1.2)
+        shot(d, a.out, "2a-마을")              # 모험 시작 → 마을이 정해져 보인다(ui.js villageScreen) → 파티를 짠다
+        d.execute_script("document.querySelector('.vg-go').click()"); time.sleep(2.0)
         shot(d, a.out, "2-팀편성")
         d.find_element(By.CSS_SELECTOR, ".tm-fdex").click(); time.sleep(1.2)
         shot(d, a.out, "3-도감")
@@ -160,7 +162,8 @@ def main():
             d.get(base + "/"); time.sleep(0.5)
             d.execute_script("try { localStorage.removeItem('bolzena.run') } catch (e) {}")
             d.get(base + "/"); time.sleep(1.5)
-            d.execute_script("document.querySelector('.home-primary').click()"); time.sleep(2.0)
+            d.execute_script("document.querySelector('.home-primary').click()"); time.sleep(1.2)
+            d.execute_script("document.querySelector('.vg-go').click()"); time.sleep(2.0)   # 마을 공개 → 편성
             d.find_element(By.CSS_SELECTOR, ".tm-fdex").click(); time.sleep(1.4)
             # 찾던 이름이 남아 있으면 두 장만 깔린다. 지우고 봐야 전체가 보인다.
             d.execute_script("""

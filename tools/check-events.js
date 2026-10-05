@@ -10,7 +10,7 @@ import { EVENTS, CURSES } from "../js/data/events.js";
 import * as EV from "../js/events.js";
 import { newRun } from "../js/run.js";
 import { HERO_DATA, CARDS } from "../js/cardbook.js";
-import { ENEMIES, FLOORS } from "../js/data/enemies.js";
+import { ENEMIES, ALL_FLOORS, floorsOf } from "../js/data/enemies.js";
 import { newCombat, playCard, endTurn, hasTag } from "../js/combat.js";
 
 let fails = 0;
@@ -31,13 +31,23 @@ console.log("결과 낱말");
 }
 
 console.log("");
+// 땅 — 마을 층의 land(enemies.js VILLAGES). 이벤트 풀이 땅으로 묶인다. 땅마다 그 땅 층들의 적(일반 · 엘리트 · 보스)
+const LANDS = [...new Set(ALL_FLOORS.map((F) => F.land))];
+const landFoes = {};
+for (const F of ALL_FLOORS) for (const e of [...F.pools.flat(2), ...F.elites.flat(), ...F.boss]) (landFoes[F.land] = landFoes[F.land] || new Set()).add(e);
+// 판을 그 땅의 층에 세운다(마을 · 층)
+const onLand = (run, land) => { const F = ALL_FLOORS.find((x) => x.land === land); run.village = F.village; run.floor = F.n - 1; };
+
 console.log("나오는 것");
 {
   // C3 「주말농장에서 온 편지」 는 뺐다 — 파티 HP 하나라 쓰러지는 사도가 없다(docs/16 §8)
   check(EVENTS.length === 56, `이벤트 ${EVENTS.length}종 (문서: 56)`);
-  const pools = { 공용: 0, 0: 0, 1: 0, 2: 0 };
-  for (const ev of EVENTS) pools[ev.pool]++;
-  check(pools.공용 === 11 && pools[0] === 15 && pools[1] === 15 && pools[2] === 15, `풀 — 공용 ${pools.공용} · 에르피엔 ${pools[0]} · 모나티엄 ${pools[1]} · 벨리티엔 ${pools[2]}`);
+  // 풀은 땅 이름(마을 층의 land — enemies.js VILLAGES). 땅 이벤트의 땅은 판에 나오는 땅이어야 한다
+  const pools = { 공용: 0, 에르피엔: 0, 모나티엄: 0, 벨리티엔: 0 };
+  for (const ev of EVENTS) pools[ev.pool] = (pools[ev.pool] || 0) + 1;
+  check(pools.공용 === 11 && pools.에르피엔 === 15 && pools.모나티엄 === 15 && pools.벨리티엔 === 15, `풀 — 공용 ${pools.공용} · 에르피엔 ${pools.에르피엔} · 모나티엄 ${pools.모나티엄} · 벨리티엔 ${pools.벨리티엔}`);
+  const noLand = Object.keys(pools).filter((p) => p !== "공용" && !LANDS.includes(p));
+  check(!noLand.length, noLand.length ? `판에 없는 땅의 이벤트: ${noLand.join(", ")}` : `땅 이벤트가 모두 마을 층의 땅이다 (${LANDS.join(" · ")})`);
   const names = new Set();
   // 사도가 아닌 인물(겨우살이 — js/ui.js NPC_ART)은 기획서 이름이 아니다
   const NOT_HERO = new Set(["겨우살이"]);
@@ -49,26 +59,25 @@ console.log("나오는 것");
   const missing = [...names].filter((n) => !byKo(n));
   check(!missing.length, missing.length ? `기획서에 없는 사도: ${missing.join(", ")}` : `나오는 사도 ${names.size}명이 모두 기획서에 있다`);
   const foes = new Set();
-  // 이벤트 전투의 적 — 층 이벤트는 배열, 공용은 { 층: [...] } 일 수 있다(C9). 층마다 나오는 적 묶음으로 편다
-  const fightsOf = (ev, o) => Array.isArray(o.fight.enemies) ? [[ev.pool, o.fight.enemies]] : Object.entries(o.fight.enemies).map(([f, l]) => [Number(f), l]);
+  // 이벤트 전투의 적 — 땅 이벤트는 배열, 공용은 { 땅: [...] } 일 수 있다(C9). 땅마다 나오는 적 묶음으로 편다
+  const fightsOf = (ev, o) => Array.isArray(o.fight.enemies) ? [[ev.pool, o.fight.enemies]] : Object.entries(o.fight.enemies);
   for (const ev of EVENTS) for (const o of ev.options) if (o.fight) for (const [, l] of fightsOf(ev, o)) l.forEach((e) => foes.add(e));
   const noFoe = [...foes].filter((e) => !ENEMIES[e]);
   check(!noFoe.length, noFoe.length ? `없는 적: ${noFoe.join(", ")}` : `이벤트 전투의 적 ${foes.size}종이 모두 있다`);
-  // 그 땅의 적만 — 층 이벤트의 전투는 그 층 지도(일반 · 엘리트 · 보스)에 나오는 적으로, 공용 이벤트는 층마다 적을 따로 적는다
-  const floorFoes = FLOORS.map((F) => new Set([...F.pools.flat(2), ...F.elites.flat(), ...F.boss]));
+  // 그 땅의 적만 — 땅 이벤트의 전투는 그 땅의 층 지도(일반 · 엘리트 · 보스)에 나오는 적으로, 공용 이벤트는 땅마다 적을 따로 적는다
   const offFloor = [];
   for (const ev of EVENTS) for (const o of ev.options) if (o.fight) {
-    if (ev.pool === "공용" && Array.isArray(o.fight.enemies)) { offFloor.push(`${ev.id} 공용인데 층마다 적을 안 나눴다`); continue; }
-    for (const [f, l] of fightsOf(ev, o)) for (const e of l) if (!floorFoes[f] || !floorFoes[f].has(e)) offFloor.push(`${ev.id} ${e}(${f + 1}층 아님)`);
+    if (ev.pool === "공용" && Array.isArray(o.fight.enemies)) { offFloor.push(`${ev.id} 공용인데 땅마다 적을 안 나눴다`); continue; }
+    for (const [land, l] of fightsOf(ev, o)) for (const e of l) if (!landFoes[land] || !landFoes[land].has(e)) offFloor.push(`${ev.id} ${e}(${land} 아님)`);
   }
-  if (EVENTS.some((ev) => ev.pool === "공용" && ev.options.some((o) => o.fight && !Array.isArray(o.fight.enemies) && FLOORS.some((_, f) => !o.fight.enemies[f]))))
-    offFloor.push("공용 이벤트 전투에 적이 빠진 층이 있다");
-  check(!offFloor.length, offFloor.length ? `다른 땅의 적: ${offFloor.join(", ")}` : "이벤트 전투의 적이 모두 그 층(공용은 층마다) 땅의 것이다");
+  if (EVENTS.some((ev) => ev.pool === "공용" && ev.options.some((o) => o.fight && !Array.isArray(o.fight.enemies) && LANDS.some((land) => !o.fight.enemies[land]))))
+    offFloor.push("공용 이벤트 전투에 적이 빠진 땅이 있다");
+  check(!offFloor.length, offFloor.length ? `다른 땅의 적: ${offFloor.join(", ")}` : "이벤트 전투의 적이 모두 그 땅(공용은 땅마다)의 것이다");
   // 무대 — 56종 모두 세울 그림이 있다(사도 · 겨우살이 · 그 땅의 적). 적은 그 층(공용은 어느 층에나 있는 것) 땅의 것
   const bare = EVENTS.filter((ev) => !ev.npc && !ev.foe).map((ev) => ev.id);
   check(!bare.length, bare.length ? `무대에 세울 인물이 없는 이벤트: ${bare.join(", ")}` : "56종 모두 무대에 세울 인물(사도 · 겨우살이 · 그 땅의 적)이 있다");
-  const badFoe = EVENTS.filter((ev) => ev.foe && (!ENEMIES[ev.foe] || (ev.pool === "공용" ? !floorFoes.every((F) => F.has(ev.foe)) : !floorFoes[ev.pool].has(ev.foe)))).map((ev) => `${ev.id} ${ev.foe}`);
-  check(!badFoe.length, badFoe.length ? `무대의 적이 없거나 다른 땅의 것: ${badFoe.join(", ")}` : "무대에 세운 적이 모두 그 층 땅의 것이다");
+  const badFoe = EVENTS.filter((ev) => ev.foe && (!ENEMIES[ev.foe] || (ev.pool === "공용" ? !LANDS.every((land) => landFoes[land].has(ev.foe)) : !(landFoes[ev.pool] || new Set()).has(ev.foe)))).map((ev) => `${ev.id} ${ev.foe}`);
+  check(!badFoe.length, badFoe.length ? `무대의 적이 없거나 다른 땅의 것: ${badFoe.join(", ")}` : "무대에 세운 적이 모두 그 땅의 것이다");
   check(EVENTS.every((ev) => ev.npc !== "쓰러진 사도" && ev.cond !== "fallen"), "쓰러진 사도를 세우는 이벤트가 없다 — 파티 HP 하나(docs/16 §8)");
   const races = new Set(Object.values(HERO_DATA).map((h) => h.race));
   const badRace = EVENTS.flatMap((ev) => ev.options.filter((o) => o.race && !races.has(o.race)).map((o) => o.race));
@@ -97,7 +106,7 @@ console.log("선택지 전부 골라 보기");
         try {
           const run = newRun(partyFor(probe), {}, seed * 97 + oi);
           run.gold = 500;
-          run.floor = ev.pool === "공용" ? seed - 1 : ev.pool;     // 공용은 세 층에서 한 번씩 — 층마다 적이 다른 전투(C9)
+          onLand(run, ev.pool === "공용" ? LANDS[(seed - 1) % LANDS.length] : ev.pool);     // 공용은 땅 셋에서 한 번씩 — 땅마다 적이 다른 전투(C9)
           // 조건 맞추기 — 파티 HP 30% 이하 · 고유 카드(신탁 대상)
           if (probe.when === "hp30") run.partyHp = Math.floor(run.partyMaxHp * 0.25);
           const uni = Object.keys(CARDS).find((id) => CARDS[id].hero === run.party[0] && CARDS[id].unique);
@@ -181,7 +190,7 @@ console.log("이벤트 칸");
   for (let seed = 1; seed <= 200; seed++) {
     const run = newRun(["네르", "티그", "에르핀"], {}, 1759000000000 + seed * 7919);
     const seenIds = [];
-    for (let f = 0; f < 3; f++) {
+    for (let f = 0; f < floorsOf(run.village).length; f++) {
       run.floor = f;
       const plan = EV.planEvents(run);
       per[plan.length] = (per[plan.length] || 0) + 1;

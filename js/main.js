@@ -57,11 +57,17 @@ async function hasSd() {
 }
 
 // 로비 — 이어할 판이 있으면 「이어하기」 가 맨 위에 선다(js/save.js). 새로 떠나면 그 판은 버린다
+// 모험 시작 → 마을이 무작위로 정해져 보인다(ui.js villageScreen) → 그 마을을 보고 파티를 짠다(docs/20-마을.md §0)
 function start() {
   ui.hint("");
-  const go = (party, rows) => { S.clearSave(); run = R.newRun(party, rows); mapStep(); };
   const saved = S.readSave();
-  lobbyScreen(() => ui.partyScreen(go, start), {
+  const newAdventure = () => {
+    const village = R.rollVillage();
+    const go = (party, rows) => { S.clearSave(); run = R.newRun(party, rows, Date.now(), village); mapStep(); };
+    ui.villageScreen(village, () => ui.partyScreen(go, start, { village }), start);
+  };
+  const go = (party, rows) => { S.clearSave(); run = R.newRun(party, rows); mapStep(); };
+  lobbyScreen(newAdventure, {
     // 로비에서 연 도감은 나가면 로비로 · 이어할 판이 있으면 편성으로 못 간다. 그 판에서 받은 축복(shin)은 도감에 밝혀 둔다
     onDex: () => ui.partyScreen(go, start, { view: "도감", dexOnly: !!saved, shin: saved ? saved.run.shin || null : null }),
     onHelp: () => ui.openHelp("상성"),
@@ -93,7 +99,7 @@ function resume(saved) {
 // 판이 끝났다 — 이긴 판 · 진 판은 이어할 수 없게 저장을 지운다
 function end(kind) {
   S.clearSave();
-  if (run && run.recordOn) ui.saveRecord(run, kind === "clear" ? "우로스 승리" : "우로스 패배");
+  if (run && run.recordOn) ui.saveRecord(run, kind === "clear" ? "2층 보스 승리" : "2층 보스 패배");
   ui.endScreen(kind, run, start);
 }
 
@@ -115,15 +121,14 @@ function reward() {
   if (!R.isBoss(run)) return mapStep();
   // 층 보스의 몫 — 보스를 잡은 화면 위에서 가진 고유 카드 셋 중 하나를 골라 복제한다(run.js bossCopyOffer).
   // 다음 층으로 넘어간 뒤 알리던 것을 바꿨다(2026-10 사용자). 고르고 나서야 층을 넘는다
-  const offer = R.bossCopyOffer(run);
+  // 2층 보스(판의 끝)는 복제할 것이 없다 — 곧장 판을 이긴다
+  const offer = R.isLastFloor(run) ? [] : R.bossCopyOffer(run);
   if (offer.length) { S.writeSave(run); return ui.bossCopyPick(run, offer, (id) => { R.bossCopy(run, id); nextFloor(); }); }
   nextFloor();
 }
 function nextFloor() {
-  const next = R.advance(run);             // 층이 바뀐다 — 사도 교체는 없다
+  R.advance(run);                          // 층이 바뀐다 — 사도 교체는 없다. 2층 보스를 넘었으면 판을 이겼다
   if (run.done === "clear") return end("clear");
-  // 마지막 층의 보스를 넘으면 뿌리 깊은 곳 — 상점 없이 캠프 한 번, 떠나면 곧장 마지막 싸움(우로스). 그것을 이겨야 판을 깬다
-  if (next.final) return camp("final");
   mapStep();
 }
 
@@ -167,20 +172,24 @@ function eventFightDone(result) {
   eventStop();
 }
 
-// 캠프 — 수련 선택지는 들어올 때 한 번 굴린다(run.js enterCamp). kind "final" 은 마지막 싸움 앞의 캠프 — 떠나면 지도가 아니라 싸움으로
+// 캠프 — 수련 선택지는 들어올 때 한 번 굴린다(run.js enterCamp)
 function camp(kind) {
   ui.hint("");
   R.enterCamp(run, kind);
   run.where = { k: "camp", kind };
   S.writeSave(run);
-  ui.campScreen(run, kind === "campshop", kind === "final" ? finalGo : mapStep, () => shop(kind));
+  ui.campScreen(run, kind === "campshop", lastBossNext() ? recordGo : mapStep, () => shop(kind));
 }
-// 우로스 앞 — 여기까지의 판 기록을 보내겠냐고 묻는다(2026-10 사용자: 다른 사람의 기록을 모아 밸런스를 잰다 — functions/api/record.js).
-// 보내기를 고르면 우로스를 이기든 지든 끝난 뒤 결과를 한 번 더 보낸다(end)
-function finalGo() {
+// 바로 다음이 2층 보스(판의 끝)인가 — 2-9 휴식+상점
+const lastBossNext = () => R.isLastFloor(run) && M.reachable(run).some((id) => (M.nodeById(M.mapOf(run), id) || {}).type === "boss");
+// 2층 보스 앞(2-9 를 떠날 때) — 여기까지의 판 기록을 보내겠냐고 한 번 묻는다(2026-10 사용자: 다른 사람의 기록을 모아 밸런스를 잰다 — functions/api/record.js).
+// 보내기를 고르면 보스를 이기든 지든 끝난 뒤 결과를 한 번 더 보낸다(end)
+function recordGo() {
+  if (run.recordAsked) return mapStep();
   ui.recordAsk(run, (yes) => {
-    if (yes) { run.recordOn = true; S.writeSave(run); ui.saveRecord(run, "우로스 전"); }
-    fight();
+    run.recordAsked = true;
+    if (yes) { run.recordOn = true; ui.saveRecord(run, "2층 보스 전"); }
+    mapStep();
   });
 }
 

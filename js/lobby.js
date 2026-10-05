@@ -10,7 +10,7 @@
 // 이름이 다른 화면과 겹쳐 데인 적이 있어(.fcard · .top) 모두 #screen.lobby2 아래 · lb- 로 시작한다.
 import * as art from "./art.js";
 import { HERO_DATA } from "./cardbook.js";
-import { FLOORS } from "./data/enemies.js";
+import { VILLAGES, villageOf } from "./data/enemies.js";
 import TALK from "./data/talk.js";
 import { spineView, loadSpineManifest } from "./spine-view.js";
 import { getSettings, setSetting } from "./settings.js";
@@ -135,12 +135,12 @@ export function lobbyScreen(onStart, { onDex, onHelp, resume } = {}) {
   const start = node("button", "lb-start home-primary");
   start.type = "button";
   if (resume) {
-    const r = resume.run, f = FLOORS[r.floor] || FLOORS[0];
+    const r = resume.run, v = villageOf(r.village), f = v.floors[r.floor] || v.floors[0];
     const names = r.party.map((k) => (HERO_DATA[k] || {}).ko || k).join(" · ");
-    start.append(node("b", null, "이어하기"), node("span", null, `${r.floor + 1}층 ${f.name} · ${names}`));
+    start.append(node("b", null, "이어하기"), node("span", null, `${v.ko} ${f.n}층 ${f.name} · ${names}`));
     start.onclick = () => { sfx.play("ui.start"); leave(resume.go)(); };
   } else {
-    start.append(node("b", null, "모험 시작"), node("span", null, "사도 셋을 골라 세계수 아래로"));
+    start.append(node("b", null, "모험 시작"), node("span", null, "마을 하나가 정해지면 사도 셋을 고릅니다"));
     start.onclick = () => { sfx.play("ui.start"); leave(onStart)(); };
   }
   menu.appendChild(start);
@@ -159,13 +159,13 @@ export function lobbyScreen(onStart, { onDex, onHelp, resume } = {}) {
   if (onDex) item("❖", "사도 도감", "135명의 능력 · 카드 · 신탁", leave(onDex), "lb-dex");
   if (onHelp) item("?", "도움말", "상성 · 줄 · 은총과 신탁 · 드랍", () => onHelp(), "lb-help");
   item("⚙", "설정", "해상도 · 그래픽 · 소리 · 글자", () => openSettings(), "lb-set");
-  // 여정 — 세 층
+  // 마을 — 모험마다 하나가 무작위로(docs/20-마을.md). 한 판은 그 마을의 두 층
   const route = node("div", "lb-route");
-  route.appendChild(node("small", null, "여정"));
+  route.appendChild(node("small", null, "마을 — 모험마다 하나"));
   const hops = node("ol");
-  FLOORS.forEach((f, i) => {
+  Object.values(VILLAGES).forEach((v) => {
     const li = node("li");
-    li.append(node("em", null, String(i + 1)), node("b", null, f.name), node("span", null, f.sub));
+    li.append(node("em", null, "✦"), node("b", null, v.ko), node("span", null, v.floors.map((f) => f.name).join(" → ")));
     hops.appendChild(li);
   });
   route.appendChild(hops);

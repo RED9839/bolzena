@@ -6,6 +6,7 @@
 //   방어·실드 200% = 0.8 · 치유 240% = 0.8 (방어력 기준 — v6, 옛 회복력 80% 몫. 파티에 한 번 — 대상 말과 상관없이)
 //   드로우 1 = 0.4 · AP 1 = 0.9 · 게이지 10% = 0.1 · 기절 0.8 · 취약·약화 1턴 0.2 · 증감 10%·1턴 0.2
 //   키워드 +1 = 0.3 · 강인도 1칸 0.3 · 카제나 태그(연계 0.6 · 천상 0.45 …)와 조건(파괴 ×0.4 · 연속 ×0.5 · 감응 ×0.85 · 잇기 ×0.5 · 앞이 공격 ×0.45 · 없으면 ×0.5)은 아래 TAG_VAL · COND_VAL
+//   공용 부품(docs/19 §7): 리듬 1겹 0.1(파티 ×1.6) · 리듬 1개당 = 리듬 둘로 · 리듬이 N 이상이면 ×0.4 · 전환 0.3 · 전환: ×0.35 · 재촉 N = 0.3 × N
 // 코스트 c 의 기준 값어치 = 0.5 + c  (1코 1.5 · 2코 2.5 · 3코 3.5)
 // 정밀한 값이 아니다 — 크게 어긋난 카드(공짜나 다름없는 것, 코스트만 비싼 것)를 찾는 체다.
 
@@ -20,7 +21,8 @@
 //     실드 유지 0.25 · 저장 0.3 · 협공 0.6(덤 공격 100%) · 균열 0.2 · 고동 0.5(전투 내내 모든 적) · 그을림 0.25 · 충격 0.35 · 충격파 0.6
 //   아군 전원 · 적 전체는 area(×1.6)
 export const STATUS_VAL = { 사기: 0.6, 불굴: 0.5, 취약: 0.25, 약화: 0.25, 고통: 0.13, 손상: 0.15, 표식: 0.8, 결의: 0.5, 결정화: 0.32, 반격: 0.4, 감전: 0.2, 중독: 0.2, 침묵: 0.2,
-  잔불: 0.12, 잔광: 0.4, "피해 감소": 0.15, 면역: 0.3, "실드 유지": 0.25, 저장: 0.3, 협공: 0.6, 균열: 0.2, 고동: 0.5, 그을림: 0.25, 충격: 0.35, 충격파: 0.6 };
+  잔불: 0.12, 잔광: 0.4, "피해 감소": 0.15, 면역: 0.3, "실드 유지": 0.25, 저장: 0.3, 협공: 0.6, 균열: 0.2, 고동: 0.5, 그을림: 0.25, 충격: 0.35, 충격파: 0.6,
+  리듬: 0.1 };   // 리듬(docs/19 §7) — 저절로 하는 일 없이 이번 턴만. 쓰는 카드가 있어야 값이 난다
 const area = (t) => (t === "allEnemies" || t === "allAllies" || t === "party" ? 1.6 : t === "randomEnemy" ? 0.9 : 1);
 // 파티는 한 몸(docs/16 §8, 2026-10). 상태는 두 층 —
 //   사도 층(사기 — rules.js HERO_ST): 가리킨 사도마다. 자신 · 한 명 ×1, 아군 전원 · 파티 ×1.6(옛 값 그대로)
@@ -49,17 +51,25 @@ export const TOUGH_VAL = 0.3;
 //   박자형(docs/19) — 잇기(바로 앞이 같은 사도의 카드 — 사도 셋이라 손이 차례를 고르면 반쯤) · 앞이 공격 · 스킬 · 강화(바로 앞 카드의 종류 — 잇기보다 조금 덜) ·
 //     「X」가 없으면(ifStack not — 키워드가 비어 있을 때. 쌓는 사도일수록 드물다). 「X」가 있으면(ifStack)은 옛 값 그대로(조건 없이 센다)
 //   live — 지금 판에서 순서 조건(잇기 · 앞이 …)이 서 있으면 확률 없이 다 센다(봇이 손의 카드를 지금 판에서 셀 때 — tools/lib/bot.js)
-export const COND_VAL = { ifBroken: 0.4, ifChain: 0.5, ifTune: 0.4, draw: 0.85, discard: 0.4, ifLink: 0.5, ifPrev: 0.45, ifNoStack: 0.5 };
+//   공용 부품(docs/19 §7) — 리듬이 N 이상이면(ifRhythm — 박자를 깐 뒤에야 선다) · 전환:(ifSwitched — 이번 턴 누군가 모드를 바꿨으면)
+export const COND_VAL = { ifBroken: 0.4, ifChain: 0.5, ifTune: 0.4, draw: 0.85, discard: 0.4, ifLink: 0.5, ifPrev: 0.45, ifNoStack: 0.5, ifRhythm: 0.4, ifSwitched: 0.35 };
+// 「리듬 1개당 …」 — 보통 깔려 있는 리듬(봇이 지금 판에서 셀 때는 실제 수 — valueOf 의 rhythm)
+export const RHYTHM_PER = 2;
+// 「전환」(제 모드를 뒤집는다) · 「재촉 N」(예약을 N 앞당긴다 — 키워드 +1 몫과 같게)
+export const FLIP_VAL = 0.3, HASTEN_VAL = 0.3;
 const ORDER_COND = new Set(["ifLink", "ifPrev"]);
 // 순서 조건(잇기 · 앞이 공격 …)이 붙은 카드인가 — 봇이 내는 차례를 따져 볼 카드
 export const orderCond = (fx) => (fx || []).find((f) => ORDER_COND.has(f.k)) || null;
+// 리듬을 쓰는 카드인가(리듬 1개당 · 리듬이 N 이상이면) — 봇이 리듬을 쌓은 뒤로 미뤄 볼 카드(tools/lib/bot.js)
+export const rhythmUse = (fx) => (fx || []).some((f) => f.k === "perRhythm" || f.k === "ifRhythm");
 
 // 「전투 내내 공격력 +N%」 를 사기 눈금으로 세는가 — 옛 「자신 · 아군 1명 사기 N」 을 옮긴 개인 버프(2026-10 사용자 「개인 공격력 증가로」).
 //   강화 카드(power · 「강화 카드.」 신탁)의 전투 내내는 옛 눈금 그대로 — 쓰면 이 전투에서 사라지는 한 장의 강화 몫이다(글로는 둘을 가를 수 없다)
 const moraleMod = (f, fx, power) => f.k === "atkMod" && f.run && f.v > 0
   && !(power || (fx || []).some((g) => g.k === "tag" && g.id === "강화"));
 // power — 강화 카드(rules.js isPower)의 글이다. 강화 카드의 「전투 내내」 증감은 옛 눈금 그대로 센다(쓰면 이 전투에서 사라지는 한 장의 몫)
-export function valueOf(fx, { power = false, live = false } = {}) {
+// rhythm — 지금 판의 리듬 수(봇 — 있으면 「리듬 1개당」 · 「리듬이 N 이상이면」 을 그 수로 센다)
+export function valueOf(fx, { power = false, live = false, rhythm = null } = {}) {
   let v = 0, per = 1, cond = 1, dmgV = 0, dmgArea = 1;
   const tags = [], marks = [];
   for (const f of fx || []) {
@@ -70,6 +80,12 @@ export function valueOf(fx, { power = false, live = false } = {}) {
       case "ifBroken": case "ifChain": case "ifTune": cond = COND_VAL[f.k]; break;
       case "ifLink": case "ifPrev": cond = live ? 1 : COND_VAL[f.k]; break;
       case "ifStack": if (f.not) cond = COND_VAL.ifNoStack; break;
+      // 공용 부품(docs/19 §7)
+      case "ifRhythm": cond = rhythm != null ? (rhythm >= f.n ? 1 : 0.2) : COND_VAL.ifRhythm; break;
+      case "ifSwitched": cond = COND_VAL.ifSwitched; break;
+      case "perRhythm": per = rhythm != null ? rhythm : RHYTHM_PER; break;
+      case "flip": v += FLIP_VAL; break;
+      case "hasten": v += HASTEN_VAL * (f.v || 1); break;
       case "when": if (COND_VAL[f.on]) cond = COND_VAL[f.on]; break;
       case "tough": v += TOUGH_VAL * (f.v || 1) * area(f.target); break;
       // 「「X」 1개당 …」 은 바로 뒤 피해 한 줄을 쌓인 수만큼 친다 — 보통 쌓여 있는 셋으로 센다

@@ -2,11 +2,11 @@
 // 전투 밖에서 고르는 것도 두 갈래:
 //   simple  아무 생각 없는 손 — 지도는 첫 갈래, 캠프는 늘 쉬기, 상점은 그냥 지나감, 이벤트는 첫 선택지, 장비는 빈 칸에만
 //   smart   사람처럼 — 지도는 HP 와 골드를 보고 길 전체를 따져서, 캠프는 HP 가 낮으면 쉬고 아니면 수련,
-//           상점은 약한 시작 카드 빼기 · 쓸 만한 장비 · 교주 카드, 이벤트는 결과의 값어치로, 장비는 나아질 때 바꿔 낀다
+//           상점은 시작 카드부터 빼기(의도한 플레이 — 고유 카드 덱) · 쓸 만한 장비 · 교주 카드, 이벤트는 결과의 값어치로(제거 · 고유 카드 복제를 높게), 장비는 나아질 때 바꿔 낀다
 // 난수는 판(run.rng)과 전투(제 씨앗)의 것만 쓴다 — 같은 씨앗이면 같은 판이다.
 import { valueOf } from "./card-value.js";
 
-export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
+export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, bots }) {
   const { CARDS, EQUIP, HERO_DATA } = B;
   // 파티 HP 하나(docs/16 §8) — 사도는 늘 나선다
   const alive = (run) => ((run.partyHp || 0) > 0 ? run.party.slice() : []);
@@ -53,9 +53,9 @@ export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
 
   // ── 전투 ──────────────────────────────────────────────────────────────
   // 싸움 칸의 갈래 — 갈래마다 턴을 따로 센다(run-sim 의 표)
-  const kindOf = (run) => (run.eventFight ? (run.eventFight.elite ? "eventElite" : "event") : R.isFinal(run) ? "final" : R.isBoss(run) ? "boss" : run.elite ? "elite" : "fight");
+  const kindOf = (run) => (run.eventFight ? (run.eventFight.elite ? "eventElite" : "event") : R.isBoss(run) ? "boss" : run.elite ? "elite" : "fight");
   function fight(run, P, out) {
-    const kind = `${R.isFinal(run) ? "F" : run.floor + 1}:${kindOf(run)}`;
+    const kind = `${run.floor + 1}:${kindOf(run)}`;
     // hpx · dmgx — 적 체력 · 피해를 rules.js 의 층마다 값 위에 더 곱해 잴 때(run-sim --hp · --dmg)
     const { st, loot } = R.openFight(run, { hpx: P.hpx || 1, dmgx: P.dmgx || 1 });
     const r = rngOf(run.seed * 31 + (run.step || 0));
@@ -122,7 +122,7 @@ export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
     if (P.smartOut) {
       if (kind === "campshop") shop(run);
       const h = hpRatio(run), lo = minRatio(run);
-      const bossNext = kind === "final" || M.reachable(run).some((id) => (M.nodeById(M.mapOf(run), id) || {}).type === "boss");
+      const bossNext = M.reachable(run).some((id) => (M.nodeById(M.mapOf(run), id) || {}).type === "boss");
       const tp = trainPick(run);
       if (!tp || h < (bossNext ? 0.75 : 0.55) || lo < 0.35) R.campRest(run); else R.campTrain(run, tp);
       manageGear(run, true);
@@ -131,11 +131,17 @@ export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
       manageGear(run, false);
     }
   }
+  // 의도한 플레이(2026-10-04 사용자): 기본(시작) 카드를 거의 다 빼고 고유 카드로 덱을 짜서 보스전.
+  // 그래서 뺄 카드는 골칫거리 → 기본 카드(약한 것부터) → 그다음에야 고유 · 교주 카드 중 약한 것
+  const isBasic = (id) => !!(CARDS[id] && CARDS[id].hero && !CARDS[id].unique && !B.isCopy(id));
+  const basicsLeft = (run) => run.deck.filter(isBasic).length;
   function worstCard(run) {
     let w = null, wv = 1e9;
-    for (const id of run.deck) { const v = deckEff(run, id) + (CARDS[id] && CARDS[id].unique ? 0.5 : 0); if (v < wv) { wv = v; w = id; } }
+    for (const id of run.deck) { const v = deckEff(run, id) + (CARDS[id] && CARDS[id].curse ? -10 : isBasic(id) ? 0 : 5); if (v < wv) { wv = v; w = id; } }
     return w;
   }
+  // 복제할 카드 — 고유 카드(신탁이 붙었으면 더) 중 가장 센 것. 기본 카드는 늘리지 않는다
+  const bestDupe = (run, ids) => ids.filter((id) => !isBasic(id)).sort((a, b) => deckEff(run, b) - deckEff(run, a))[0];
   function shop(run) {
     const at = run.map && run.map.at;
     if (!run.shop || run.shop.floor !== run.floor || run.shop.at !== at) { R.rollShop(run); run.shop.at = at; }
@@ -148,7 +154,8 @@ export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
       if (x.it.kind === "equip" && x.v > 0.5 && run.gold >= x.it.price) { R.buy(run, x.i); manageGear(run, true); }
     }
     const w = worstCard(run);
-    if (w && run.deck.length > 8 && deckEff(run, w) < 1.0 && run.gold >= R.removePrice(run)) R.removeCard(run, w);
+    // 기본 카드가 남아 있으면 값과 상관없이 뺀다(의도한 플레이). 다 뺐으면 예전처럼 정말 약한 것만
+    if (w && run.gold >= R.removePrice(run) && (isBasic(w) || (CARDS[w] && CARDS[w].curse) ? run.deck.length > 6 : run.deck.length > 8 && deckEff(run, w) < 1.0)) R.removeCard(run, w);
     for (const x of order) {
       if (x.it.kind === "neutral" && !x.it.sold && cardEff(x.it.id) >= 1.1 && run.gold - x.it.price >= 0) R.buy(run, x.i);
     }
@@ -172,8 +179,8 @@ export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
           break;
         }
         case "maxHp": v += (o.v * 1.2) / K; break;
-        case "remove": v += run.deck.some((id) => CARDS[id] && CARDS[id].curse) ? 30 : 14; break;
-        case "dupe": v += 10; break;
+        case "remove": v += run.deck.some((id) => CARDS[id] && CARDS[id].curse) ? 30 : basicsLeft(run) ? 22 : 8; break;
+        case "dupe": v += run.deck.some((id) => !isBasic(id) && CARDS[id] && !CARDS[id].curse) ? 16 : 4; break;
         case "unique": v += 20; break;
         case "neutral": v += o.grade === "전설" ? 20 : o.grade === "희귀" ? 15 : 10; break;
         case "equip": v += GRADE_V[o.grade] || 10; break;
@@ -224,7 +231,7 @@ export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
         case "remove": val = smart ? worstCard(run) : run.deck[0]; break;
         case "dupe": {
           const ok = [...new Set(run.deck)].filter((id) => EV.dupeOk(id, run) && run.gold >= EV.dupeExtra(run, id));
-          val = smart ? ok.sort((a, b) => deckEff(run, b) - deckEff(run, a))[0] : ok[0];
+          val = smart ? (bestDupe(run, ok) || ok.sort((a, b) => deckEff(run, b) - deckEff(run, a))[0]) : ok[0];
           break;
         }
         case "card": val = smart ? p.cards.slice().sort((a, b) => cardEff(b) - cardEff(a))[0] : p.cards[0]; break;
@@ -269,13 +276,14 @@ export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
   }
 
   // ── 한 판 ─────────────────────────────────────────────────────────────
-  // P: { smartFight, smartOut, depth, width, hpx, dmgx, trace }
-  // 돌려주는 것: { clear, floor(쓰러진 층 0~2, 3 은 마지막 싸움), node(쓰러진 칸 종류), fights, turns, kinds({ "1:boss": { n, turns, win } }) }
+  // P: { smartFight, smartOut, depth, width, hpx, dmgx, trace, village }
+  // 한 판은 마을 하나의 두 층(docs/20-마을.md) — 마을은 P.village, 없으면 씨앗이 정한다(run.js newRun). 2층 보스를 이기면 완주
+  // 돌려주는 것: { clear, village, floor(쓰러진 층 0 · 1), where(쓰러진 칸 종류), fights, turns, kinds({ "1:boss": { n, turns, win } }) }
   function runFull(party, seed, P) {
     const rows = {};
     for (const k of party) rows[k] = (HERO_DATA[k] || {}).row || "mid";
-    const run = R.newRun(party, rows, seed);
-    const out = { clear: false, floor: 0, where: null, fights: 0, turns: 0 };
+    const run = R.newRun(party, rows, seed, P.village || null);
+    const out = { clear: false, village: run.village, floor: 0, where: null, fights: 0, turns: 0 };
     let guard = 0;
     while (!run.done && guard++ < 200) {
       M.mapOf(run);
@@ -288,15 +296,8 @@ export function makeRunner({ C, B, R, RULES, M, EV, ENEMIES, FLOORS, bots }) {
         run.elite = false;
         if (!R.isBoss(run)) continue;
         { const off = R.bossCopyOffer(run); if (off.length) R.bossCopy(run, off[0]); }   // 층 보스의 몫 — 셋 중 첫째
-        const next = R.advance(run);
+        R.advance(run);
         if (run.done === "clear") break;
-        if (next.final) {
-          camp(run, "final", P);
-          out.floor = 3; out.where = "final";
-          if (!fight(run, P, out)) return out;
-          R.advance(run);
-          break;
-        }
       } else if (node.type === "event") { if (!event(run, P, out)) return out; }
       else if (node.type === "camp" || node.type === "campshop") camp(run, node.type, P);
     }

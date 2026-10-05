@@ -6,16 +6,21 @@ import { HERO_DATA } from "./cardbook.js";
 const base = (k) => HERO_DATA[k] || HEROES[k] || { hp: 50, row: "mid" };
 import { CARDS as OLD_CARDS, EXTRA } from "./data/cards.js";
 import { CARDS, NEUTRAL_IDS, EQUIP, flashed, COPY, baseId, isCopy } from "./cardbook.js";
-import { FLOORS } from "./data/enemies.js";
+import { VILLAGES, VILLAGE_IDS, villageOf, floorsOf } from "./data/enemies.js";
 import * as R from "./rules.js";
 import { buildDeck, makeRng, newCombat } from "./combat.js";
 
 // 파티 HP 하나(docs/16 §8) — 세 사도의 최대 HP 합. 장비 HP 는 끼는 순간 파티 최대 HP 에 더한다(shiftHp)
 export const partyBaseHp = (keys) => keys.reduce((a, k) => a + (base(k).hp || 0), 0);
-export function newRun(partyKeys, rows, seed = Date.now()) {
+// 마을 — 모험을 시작하면 하나를 무작위로(파티를 고르기 전에 보인다 — main.js start). docs/20-마을.md
+export const rollVillage = (rnd = Math.random) => VILLAGE_IDS[Math.floor(rnd() * VILLAGE_IDS.length)];
+// 마을을 안 준 판(시험 도구 · 봇)은 씨앗으로 정한다 — 같은 씨앗이면 같은 마을. 판의 난수(run.rng)는 건드리지 않는다
+const villageBySeed = (seed) => VILLAGE_IDS[(Math.imul((seed >>> 0) ^ 0x9e3779b9, 2654435761) >>> 0) % VILLAGE_IDS.length];
+export function newRun(partyKeys, rows, seed = Date.now(), village = null) {
   const max = partyBaseHp(partyKeys);
   return {
     seed, rng: makeRng(seed),
+    village: VILLAGES[village] ? village : villageBySeed(seed),   // 이 판의 마을(enemies.js VILLAGES) — 1-1 ~ 2-10 이 모두 그 마을의 적
     party: partyKeys.slice(), rows: { ...rows }, partyHp: max, partyMaxHp: max,
     traits: [],                   // 옛 신탁 체계 — 지금은 안 쓴다(tools/sim.js 가 아직 잰다)
     flash: {},                    // 카드 id → 신탁 번호(1~5). 카드마다 하나만.
@@ -31,7 +36,7 @@ export function newRun(partyKeys, rows, seed = Date.now()) {
     stops: {},                    // 들른 캠프 — { "0:camp": { used: "rest" } }
     camp: null,                   // 지금 캠프에서 굴린 수련 선택지
     deck: buildDeck(partyKeys),
-    floor: 0, node: 0,            // node 0..2 전투, 3 보스, 4 마지막 층 너머의 마지막 보스(isFinal)
+    floor: 0, node: 0,            // floor 0 · 1 — 마을의 1층(바깥) · 2층(안쪽). node 0..2 전투, 3 보스 — 2층 보스를 이기면 판을 이긴다
     bench: Object.keys(HERO_DATA).filter((k) => !partyKeys.includes(k)),
 
     where: null,                  // 지금 어느 화면에 있나 — 이어하기가 그 자리로 돌아간다(js/main.js · js/save.js)
@@ -39,15 +44,17 @@ export function newRun(partyKeys, rows, seed = Date.now()) {
   };
 }
 
-export const currentFloor = (run) => FLOORS[run.floor];
+export const villageOfRun = (run) => villageOf(run.village);
+export const floorsOfRun = (run) => floorsOf(run.village);
+export const currentFloor = (run) => floorsOfRun(run)[run.floor];
+// 마을의 마지막 층(2층)인가 — 그 층의 보스가 판의 끝이다
+export const isLastFloor = (run) => run.floor >= floorsOfRun(run).length - 1;
 export const isBoss = (run) => run.node >= 3;
-// 판의 마지막 싸움 — 마지막 층의 보스를 넘은 뒤 뿌리 깊은 곳의 우로스(enemies.js final). 이것도 보스다
-export const isFinal = (run) => run.node >= 4;
-export const finalOf = (run) => (isFinal(run) && FLOORS[run.floor] && FLOORS[run.floor].final) || null;
+// 보스 데이터가 아직 없는 층(enemies.js bossElite)의 보스 칸 — 엘리트 몸으로 선다(체력 ×ELITE_HP · 강인도 +1)
+const bossAsElite = (run) => !run.eventFight && isBoss(run) && !!(currentFloor(run) || {}).bossElite;
 export function currentEnemies(run) {
   if (run.eventFight) return run.eventFight.enemies;      // 이벤트가 연 전투(js/events.js)
   const f = currentFloor(run);
-  if (isFinal(run)) return f.final.boss;
   if (isBoss(run)) return f.boss;
   // 지도의 칸이 정해 둔 짝(js/map.js) — 없으면(옛 저장 · 도구) 세기의 대표 싸움
   const at = run.map && run.map.at && run.map.rows.flat().find((n) => n.id === run.map.at);
@@ -58,7 +65,8 @@ export function currentEnemies(run) {
 // 굴리는 차례가 판의 난수를 정하니 바꾸지 않는다: 신탁(빛날 카드) → 전리품. 전투는 제 씨앗으로 따로 굴린다.
 // 적 세기는 rules.js foeScale 한 곳에서 — 층 · 보스 · 엘리트. 이벤트가 연 싸움은 run.eventFight.elite 를 본다(전에는 엘리트 체력이 빠졌다). hpx · dmgx 는 재는 도구가 그 위에 더 곱는 것
 export function foeScaleOf(run) {
-  return R.foeScale(run.floor, { boss: isBoss(run) && !run.eventFight, final: isFinal(run) && !run.eventFight, elite: run.eventFight ? !!run.eventFight.elite : !!run.elite });
+  if (bossAsElite(run)) return R.foeScale(run.floor, { elite: true });
+  return R.foeScale(run.floor, { boss: isBoss(run) && !run.eventFight, elite: run.eventFight ? !!run.eventFight.elite : !!run.elite });
 }
 export function openFight(run, { hpx = 1, dmgx = 1 } = {}) {
   const next = run.nextFight || null;          // 이벤트가 걸어 둔 「다음 전투」 효과 — 여기서 한 번 가져간다(events.js takeNextFight 와 같다)
@@ -68,7 +76,7 @@ export function openFight(run, { hpx = 1, dmgx = 1 } = {}) {
     enemyIds: currentEnemies(run), partyHp: run.partyHp, partyMaxHp: run.partyMaxHp, traits: run.traits, gear: gearStats(run), gearFx: gearPassives(run), flash: run.flash,
     enemyHp: foeScaleOf(run).hp * hpx, enemyDmg: foeScaleOf(run).dmg * dmgx,   // 층마다 · 엘리트 칸(이벤트 엘리트도) 체력 ×1.5
     next, shin: run.shin, gauge: run.gauge || 0,   // 기적이 붙은 카드 · 고학년 게이지는 전투 사이에 이어진다
-    elite: run.eventFight ? !!run.eventFight.elite : !!run.elite,   // 엘리트 칸 — 강인도 칸이 하나 더(rules.js TOUGH)
+    elite: run.eventFight ? !!run.eventFight.elite : !!run.elite || bossAsElite(run),   // 엘리트 칸 — 강인도 칸이 하나 더(rules.js TOUGH)
     glow: run.forceGlow || rollEpiphany(run),   // 신탁 — 이 전투에서 빛날 카드(카제나). forceGlow 는 시험 도구가 정해 넣는 것
     seed: (run.seed + run.floor * 101 + run.node * 7 + (run.step || 0) * 13 + (run.eventFight ? 555 : 0)) >>> 0,
   });
@@ -85,9 +93,9 @@ export function afterFight(run, combat) {
   // 강화 카드는 판에 남기는 것이 없다 — 덱에 그대로 있고, 버프는 그 전투에서 끝났다(옛 gained.spent · boons 는 보지 않는다)
   run.lastGained = { cards: g.cards.slice(), flash: g.flash.slice() };
   // 싸움 기록 — 판 기록 파일(recordOf)에 들어간다. 어디서 · 누구와 · 몇 턴 · 파티 HP 얼마에서 얼마로
-  const kind = run.eventFight ? "event" : isFinal(run) ? "final" : isBoss(run) ? "boss" : run.elite ? "elite" : "fight";
+  const kind = run.eventFight ? "event" : isBoss(run) ? "boss" : run.elite ? "elite" : "fight";
   (run.hist = run.hist || []).push({
-    floor: run.floor + 1, node: run.node, kind, foes: FLOORS[run.floor] ? (currentEnemies(run) || []).slice() : [],   // 시험 도구의 가짜 판(층 없음)에서도 멈추지 않게 result: combat.over || null,
+    floor: run.floor + 1, node: run.node, kind, foes: currentFloor(run) || run.eventFight ? (currentEnemies(run) || []).slice() : [],   // 시험 도구의 가짜 판(층 없음)에서도 멈추지 않게 result: combat.over || null,
     turns: combat.turn || 0, hp: [run.partyHp, combat.pool ? Math.max(0, combat.pool.hp) : run.partyHp, run.partyMaxHp],
     got: { cards: g.cards.slice(), flash: g.flash.map((f) => [f.cardId, f.n]) },
   });
@@ -169,10 +177,10 @@ export function uniqueIdsOf(heroKey) {
 // 볼 때마다 카드가 바뀐다(전에 그랬다).
 export function rollReward(run) {
   const [lo, hi] = R.GOLD_FIGHT;
-  const base = isBoss(run) ? R.GOLD_BOSS : lo + Math.floor(run.rng() * (hi - lo + 1)) + run.floor * 5;
+  const base = isBoss(run) ? R.GOLD_BOSS : lo + Math.floor(run.rng() * (hi - lo + 1)) + run.floor * R.GOLD_FLOOR;
   const gold = run.elite ? Math.round(base * R.ELITE_GOLD) : base;
-  const lastBoss = isBoss(run) && run.floor >= FLOORS.length - 1 && (isFinal(run) || !FLOORS[run.floor].final);
-  // 드랍 — 장비가 확률로 하나(R.DROP). 마지막 보스는 판이 끝나니 안 떨군다. 교주 카드는 상점 · 이벤트에서만
+  const lastBoss = isBoss(run) && isLastFloor(run);
+  // 드랍 — 장비가 확률로 하나(R.DROP). 마지막 보스(2층 보스)는 판이 끝나니 안 떨군다. 교주 카드는 상점 · 이벤트에서만
   const T = R.DROP[isBoss(run) ? "boss" : run.elite ? "elite" : "fight"];
   const at = (tbl) => tbl[Math.min(run.floor, tbl.length - 1)];
   const eq = !lastBoss && (run.devDrop || run.rng() < T.equip) ? offerEquip(run, at(T.equipGrade), 1, { dupes: true }) : [];   // devDrop — 시험 화면(&drop=1)
@@ -530,10 +538,9 @@ export function advance(run) {
   if (!wasBoss) { run.node++; return { swap: false }; }
   // 층 보스의 몫(고유 카드 복제)은 층을 넘기 전에 보스를 잡은 화면에서 셋 중 하나를 고른다(main.js reward · bossCopyOffer). 여기서는 안 한다
   const copied = null;
-  // 마지막 층의 보스 뒤에 마지막 싸움이 있으면 층을 넘지 않고 그리로(node 4) — 캠프 한 번을 거친다(main.js finalCamp)
-  if (!isFinal(run) && run.floor === FLOORS.length - 1 && FLOORS[run.floor].final) { run.node = 4; return { swap: false, final: true, copied }; }
+  // 마을의 마지막 층(2층)의 보스를 넘으면 판을 이긴 것이다
+  if (isLastFloor(run)) { run.done = "clear"; return { swap: false, copied }; }
   run.floor++; run.node = 0;
-  if (run.floor >= FLOORS.length) { run.done = "clear"; return { swap: false, copied }; }
   // 층 사이에 조금 쉰다 — 몸도 마음도(사도 한 명에 10 씩이던 몫을 파티에). 사도 교체는 없다(처음 고른 셋으로 끝까지 간다)
   run.partyHp = Math.min(run.partyMaxHp, run.partyHp + FLOOR_REST * run.party.length);
   return { swap: false, copied };
@@ -548,7 +555,6 @@ const copyable = (run) => [...new Set(run.deck)].filter((id) => {
   return !R.isOnly(flashed(c, (run.flash || {})[id]));
 });
 export function bossCopyOffer(run) {
-  if (isFinal(run)) return [];
   const at = `${run.floor}`;
   if (run.copyOffer && run.copyOffer.at === at) return run.copyOffer.ids.slice();
   const pool = copyable(run), ids = [];
@@ -578,14 +584,15 @@ export function addCopy(run, id) {
   return cid;
 }
 
-// 판 기록 — 우로스 앞에서 저장하겠냐고 묻는다(main.js). 내려받은 파일을 모아 밸런스를 잰다(tools/records.js).
+// 판 기록 — 2층 보스 앞(2-9 휴식+상점을 떠날 때)에서 보내겠냐고 묻는다(main.js). 모아서 밸런스를 잰다(tools/records.js).
+// v 2 — 마을 판(두 층 · 2층 보스가 끝). v 1 은 옛 판(세 층 + 우로스)
 // 판을 되살리는 저장(save.js)과 달리 읽기 좋은 모양 — 이름을 같이 적는다
 export function recordOf(run, stage) {
   const nm = (id) => (CARDS[id] ? CARDS[id].name : id);
   const count = {};
   for (const id of run.deck) count[id] = (count[id] || 0) + 1;
   return {
-    kind: "bolzena-record", v: 1, stage, at: new Date().toISOString(), seed: run.seed,
+    kind: "bolzena-record", v: 2, stage, at: new Date().toISOString(), seed: run.seed, village: run.village,
     party: run.party.map((k) => ({ key: k, ko: (HERO_DATA[k] || {}).ko || k, row: run.rows[k], gear: Object.fromEntries(Object.entries(gearOf(run, k)).map(([s, id]) => [s, (EQUIP[id] || {}).ko || id])) })),
     partyHp: run.partyHp, partyMaxHp: run.partyMaxHp, gold: run.gold, gauge: run.gauge || 0, removals: run.removals || 0,
     deck: Object.entries(count).map(([id, n]) => ({ id, name: nm(id), n, hero: (CARDS[id] || {}).hero || null, flash: (run.flash || {})[id] || null, shin: (run.shin || {})[id] || null })),
@@ -621,6 +628,29 @@ export function swapHero(run, outKey, inKey) {
 // 판이 끝났나 — 파티 HP 가 0(쓰러지는 사도는 없다)
 export function partyWiped(run) { return (run.partyHp || 0) <= 0; }
 
+// 옛 판(마을 없음 — 세 층 에르피엔 · 모나티엄 · 벨리티엔 + 우로스, 2026-10-04 까지)을 마을 판으로 옮긴다. 깨지지 않게만:
+//   1층(에르피엔) → 세계수 1층 · 2층(모나티엄) → 모나티엄 2층(도심 — 그 층의 지도 · 적 · 보스가 그대로 맞는다) · 3층(벨리티엔) → 세계수 2층.
+//   층 번호가 바뀌는 3층 판은 층으로 묶인 기록(들른 캠프 · 이벤트 · 상점 · 지도)의 번호도 2 → 1 로 옮긴다.
+//   우로스 앞 · 우로스 싸움(node 4)은 save.js 가 읽기 전에 버린다(이어할 층이 없다)
+function migrateVillage(run) {
+  if (VILLAGES[run.village]) return;
+  const old = run.floor || 0;
+  run.village = old === 1 ? "monatium" : "worldtree";
+  if (old < 2) return;
+  const to = floorsOf(run.village).length - 1;
+  const moveKeys = (o) => o && Object.fromEntries(Object.entries(o).map(([k, v]) => [k.replace(/^\d+(?=:|$)/, (n) => (+n === old ? String(to) : n)), v]));
+  run.floor = to;
+  if (run.node > 3) run.node = 3;
+  run.stops = moveKeys(run.stops) || {};
+  run.eventDone = moveKeys(run.eventDone);
+  run.shopSeen = moveKeys(run.shopSeen) || {};
+  run.eventPlan = moveKeys(run.eventPlan);
+  for (const o of [run.event, run.camp]) if (o && typeof o.key === "string") o.key = o.key.replace(/^\d+/, (n) => (+n === old ? String(to) : n));
+  if (run.copyOffer && run.copyOffer.at === String(old)) run.copyOffer.at = String(to);
+  if (run.shop && run.shop.floor === old) run.shop.floor = to;
+  if (run.map && run.map.floor === old) run.map.floor = to;
+}
+
 // 옛 저장 — 사도마다 hp · maxHp 였던 판을 파티 HP 하나로(더한다). 주말농장에 갔던 사도(0)는 0 을 더한다
 export function migrateRun(run) {
   if (!run) return run;
@@ -632,6 +662,7 @@ export function migrateRun(run) {
   // 옛 판의 가방 — 버리지 않는다. 그대로 「정할 차례」 줄이 되어 지도 · 캠프 · 상점에 들어오면 하나씩 끼기 or 팔기로 묻는다(ui.js settleGear)
   if (!Array.isArray(run.bag)) run.bag = [];
   if (!Array.isArray(run.bagBought)) run.bagBought = [];
+  migrateVillage(run);
   if (run.partyMaxHp != null) return run;
   const hp = run.hp || {}, max = run.maxHp || {};
   run.partyMaxHp = Math.max(1, run.party.reduce((a, k) => a + (max[k] || base(k).hp || 0), 0));

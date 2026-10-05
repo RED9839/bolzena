@@ -10,7 +10,11 @@ import { parseEffect } from "./effects.js";
 import { 은는, 을를, josa } from "./ko.js";
 import { CARDS, NEUTRAL_IDS, EQUIP, HERO_DATA, flashed, isCopy } from "./cardbook.js";
 import * as R from "./rules.js";
-import { rewardCards, offerFlash, offerEquip, offerEquipSlot, gainEquip, forgetCard, divineKindsFor, powerWhy, powerCard, flashOk, addCopy } from "./run.js";
+import { rewardCards, offerFlash, offerEquip, offerEquipSlot, gainEquip, forgetCard, divineKindsFor, powerWhy, powerCard, flashOk, addCopy, currentFloor } from "./run.js";
+
+// 이 층의 땅 — 이벤트 풀(data/events.js pool)이 땅 이름으로 묶인다(enemies.js 층의 land — 세계수 1층 에르피엔 · 2층 벨리티엔 · 모나티엄 두 층 모나티엄).
+// 땅 이벤트가 없는 마을(다음 단계의 새 마을)은 공용만 돈다
+export const landOf = (run) => (currentFloor(run) || {}).land || null;
 
 export { EVENTS };
 const koOf = (k) => (HERO_DATA[k] || {}).ko || k;
@@ -107,7 +111,7 @@ export function eventLeft(run) { return EVENTS.some((e) => eligible(run, e)); }
 
 function eligible(run, ev) {
   if ((run.eventsSeen || []).includes(ev.id)) return false;           // 한 판에 한 번
-  if (ev.pool !== "공용" && ev.pool !== run.floor) return false;
+  if (ev.pool !== "공용" && ev.pool !== landOf(run)) return false;
   return true;
 }
 
@@ -121,7 +125,7 @@ export function rollEvents(run, n = 1) {
   for (let i = 0; i < n; i++) {
     // 드문 이벤트(rare: 0~1) — 굴릴 때마다 그 확률로만 후보에 든다(겨우살이 따위)
     const left = EVENTS.filter((e) => eligible(run, e) && !out.includes(e) && (!e.rare || run.rng() < e.rare));
-    const floorPool = left.filter((e) => e.pool === run.floor);
+    const floorPool = left.filter((e) => e.pool === landOf(run));
     const common = left.filter((e) => e.pool === "공용");
     const from = !floorPool.length ? common : !common.length ? floorPool : run.rng() < R.EVENT_FLOOR_SHARE ? floorPool : common;
     if (!from.length) break;
@@ -148,8 +152,8 @@ export function enterEvent(run) {
 }
 export const eventById = (id) => EVENTS.find((e) => e.id === id) || null;
 
-// 이벤트 전투의 적 — 배열이면 그대로, { 층 번호: [...] } 면 지금 층의 것(공용 이벤트가 그 땅의 적을 부른다 — C9)
-export const foesOf = (run, fight) => Array.isArray(fight.enemies) ? fight.enemies : fight.enemies[run.floor] || fight.enemies[0];
+// 이벤트 전투의 적 — 배열이면 그대로, { 땅: [...] } 면 지금 층 땅의 것(공용 이벤트가 그 땅의 적을 부른다 — C9). 그 땅 몫이 없으면 처음 것
+export const foesOf = (run, fight) => Array.isArray(fight.enemies) ? fight.enemies : fight.enemies[landOf(run)] || Object.values(fight.enemies)[0];
 
 export function pickEvent(run, id) {
   if (!run.event || !run.event.choices.includes(id)) return "고를 수 없습니다";

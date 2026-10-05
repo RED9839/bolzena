@@ -5,7 +5,7 @@
 // 엔진은 부르는 쪽이 넘긴다(role-sim 의 --root 처럼 옛 사본으로도 돌게). 엔진은 읽기만 한다.
 // 봇은 난수를 쓰지 않는다 — 복사한 판에는 고정 씨앗을 준다. 같은 씨앗이면 같은 판이 나온다.
 // 파티는 한 몸이다(docs/16 §8) — HP · 방어 · 실드 · 상태는 s.pool 하나. 적의 수는 모두 파티를 친다(전체 공격은 한 대 × FOE_ALL_X).
-import { valueOf, orderCond } from "./card-value.js";
+import { valueOf, orderCond, rhythmUse } from "./card-value.js";
 
 export function makeBots({ C, B, R, ENEMIES }) {
   const ATTACKS = ["attack", "back", "multi", "attackAll"];
@@ -66,15 +66,19 @@ export function makeBots({ C, B, R, ENEMIES }) {
   }
   // 순서 조건(잇기 · 앞이 공격 …, docs/19 박자형)이 지금 판에서 서 있으면 조건 몫까지 다 센 값 — 서 있지 않으면 위의 확률 값.
   // 그래서 받쳐 줄 카드(같은 사도 · 그 종류)를 먼저 내면 손에 남은 이 카드의 몫(potential)이 오른다 — 한 수 앞만 봐도 차례를 맞춘다
+  // 리듬을 쓰는 카드(「리듬 1개당」 · 「리듬이 N 이상이면」, docs/19 §7)는 지금 깔린 리듬 수로 센다 — 리듬을 쌓는 카드를 먼저 내면
+  // 손에 남은 이 카드의 몫이 오른다(같은 눈금으로 쌓은 뒤에 쏟는 차례를 고른다)
+  const rhythmNow = (s) => (((s.pool && s.pool.status) || {}).리듬) || 0;
   function liveValue(s, id, c) {
-    const oc = orderCond(c.fx);
-    if (!oc) return cardValue(s, id);
+    const oc = orderCond(c.fx), rh = rhythmUse(c.fx);
+    if (!oc && !rh) return cardValue(s, id);
     const last = (s.playLog || [])[(s.playLog || []).length - 1];
-    const on = !!last && (oc.k === "ifLink" ? !!c.hero && last.hero === c.hero : last.type === oc.type);
-    if (!on) return cardValue(s, id);
-    const key = id + ":" + ((s.flash || {})[id] || 0) + ":live";
+    const on = !!oc && !!last && (oc.k === "ifLink" ? !!c.hero && last.hero === c.hero : last.type === oc.type);
+    if (!on && !rh) return cardValue(s, id);
+    const n = rh ? rhythmNow(s) : null;
+    const key = id + ":" + ((s.flash || {})[id] || 0) + ":live" + (on ? 1 : 0) + (rh ? ":r" + n : "");
     let v = cvCache.get(key);
-    if (v == null) { v = valueOf(c.fx, { live: true }); cvCache.set(key, v); }
+    if (v == null) { v = valueOf(c.fx, { live: on, rhythm: n }); cvCache.set(key, v); }
     return v;
   }
   // 「… 카드를 차례로 내면」 패시브(passive.js seqStep) — 반쯤 이은 차례는 그만큼 값이 있다(다음 종류의 카드를 낼 수 있을 때만).
@@ -97,7 +101,8 @@ export function makeBots({ C, B, R, ENEMIES }) {
     return v;
   }
   // 차례가 값어치를 바꾸는 손인가 — 순서 조건 카드가 손에 있거나 「차례로 내면」 패시브가 있으면 두 수 앞까지 둬 본다(smartPlay)
-  const orderly = (s) => s.hand.some((id) => orderCond((C.cardOf(s, id) || {}).fx))
+  // 리듬을 쓰는 카드(리듬 1개당 · 리듬이 N 이상이면)도 — 리듬을 깐 뒤에 내야 크다
+  const orderly = (s) => s.hand.some((id) => { const fx = (C.cardOf(s, id) || {}).fx; return orderCond(fx) || rhythmUse(fx); })
     || s.party.some((u) => !u.dead && ((s.passives || {})[u.key] || []).some((r) => r.when && r.when.seq));
 
   // 적 하나가 한 턴에 얼마나 아픈가 — 수의 평균(전체 공격은 셋을 친다). 처치 값어치에 쓴다

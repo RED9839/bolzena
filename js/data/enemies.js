@@ -5,7 +5,7 @@
 // 적도 성격을 가진다 — 게임 파일이 몬스터마다 naive/mad/cool/gloomy/jolly 다섯 벌을 들고 있다.
 // nature 는 사도와 같은 성격 이름(순수·광기·냉정·우울·활발)을 쓴다 — 성격 상성 · 스킨용.
 //
-// 눈금(v6) — 데이터의 값에 층 배율이 곱해진다(rules.js foeScale — 체력 1층 2.6 · 2층 3.7 · 3층 4.2, 피해 2.1 · 4.7 · 7.4).
+// 눈금(v6) — 데이터의 값에 층 배율이 곱해진다(rules.js foeScale — 한 판은 마을 하나의 두 층, 2층은 옛 마지막 층(3층)의 눈금).
 //   보통 체력 200~780(중앙 440) · 치는 수 한 번 50~160(중앙 100) · 강인도 3 / 엘리트 칸 체력 ×1.5 · 강인도 4 / 보스 2300~3300 · 110~300 · 강인도 5(우로스 6)
 //
 // 수(intents) — 매 턴 하나를 고르고, 적 머리 위에 미리 보여 준다.
@@ -1034,120 +1034,193 @@ export function foeLook(id) {
   return { art: e.art || id, skin: e.skin || NATURE_SKIN[e.nature] || null };
 }
 
-// 층 — 지어낸 곳이 아니라 엘리아스의 실제 지도에서 온다(docs/03-세계관.md).
-// 요정 왕국에서 시작해 엘프 도시를 지나 세계수 뿌리까지 내려간다.
+// 마을 — 한 판은 마을 하나의 두 층이다(docs/20-마을.md §0, 2026-10-04 사용자). 모험을 시작하면 마을 하나를 무작위로 고르고
+// (run.js rollVillage — 파티를 고르기 전에 보인다), 1-1 ~ 2-10 은 모두 그 마을의 적만 나온다. **2층 보스가 판의 끝**이다(옛 마지막 싸움 「우로스」 는 없앴다).
+// 1층 = 마을의 **바깥**, 2층 = **안쪽** — 같은 종족, 안으로 갈수록 세다. 세기는 마을이 아니라 층이 정한다(rules.js foeScale).
+// 곳은 지어낸 것이 아니라 엘리아스의 실제 지도에서 온다(docs/03-세계관.md).
 // 적은 **원작에서 그 땅에 사는 것만**(docs/11-적.md 의 근거 표 — 도감의 교주의 기록 · 메인 스토리 시즌 1 의 종족 차례):
 //   에르피엔  요정 주민(저혈당 · 고혈당 요정) · 요정의 농기구(불효자손) · 요정 왕국 근처의 산사모 · 에슈르 빵집의 실패작(목매킴 · 부스러기) ·
 //             멜로 셋 · 요정에게 사탕을 받은 루파루 · 누루링-요정 넷 · 요정 금고를 노린 새마음금고
 //   모나티엄  엘프 돌격병 · 엘프 명사수(의장대 · 노동반 · 호위) · 드론 S형 · G형 · 누루링-엘프 넷 · 엘프 폐수를 먹은 한입초
 //   벨리티엔  누루링-마녀 넷 · 마녀가 만든 인형 누루링 · 마녀 모자의 햇팽이
-// 보스는 1층 커버러스, 2층 M.E.O.W(엘프 도시의 고양이 로봇) + 드론 둘, 3층 R41 리뉴아(흑뉴아 — 프론티어 보스) + 후방 드론 둘,
-// 그리고 3층 너머 뿌리 깊은 곳의 우로스(엘리아스 프론티어 보스 — 판의 마지막, final).
-//   pools[세기]  약(1-1~1-3) · 중(1-4~1-6) · 강(1-7~1-10) 싸움이 다섯 벌씩 — 지도의 칸마다 하나를 고른다
+// 지금 마을은 둘(세계수 · 모나티엄). 수인 마을 · 정령산 · 유령 늪 · 용족 터와 사도 클론 보스는 다음 단계(docs/20 §3) — 꼴은 여섯을 받는다.
+// R41 리뉴아 · 후방 드론 · 우로스는 판에서 뺐다(다른 차원 — docs/20 §0 · §4-3). 데이터는 위에 남겨 둔다.
+//
+// 마을 { ko, race, line, floors: [1층, 2층] } — line 은 파티를 고르기 전에 보이는 한 줄 소개
+// 층 { n, name, sub, land, bg, pools, elites, boss, bossElite? }
+//   land         그 층의 땅 — 이벤트 풀(js/data/events.js pool)이 이것으로 묶인다. 세계수는 1층 에르피엔 · 2층 벨리티엔, 모나티엄은 두 층 다 모나티엄
+//   bg           싸움터 배경(assets/bg) — fight · boss · event
+//   pools[세기]  약(1-1~1-3) · 중(1-4~1-5) · 강(1-6~1-8) 싸움이 네다섯 벌씩 — 지도의 칸마다 하나를 고른다(map.js pickFoes)
 //   elites       엘리트 칸 전용 넷 — 그 층에서 가장 사나운 짝(머리는 도감의 광기 · 냉정 기록에서 온 엘리트 몸)
-//   fights       옛 도구(tools/sim.js · 로비 미리보기)가 보는 대표 셋 — pools 의 첫 벌
-const FLOOR_DEFS = [
-  {
-    n: 1, name: "에르피엔", sub: "요정 왕국 · 세계수 주변",
-    pools: [
-      [
-        ["fairymobcloserange", "fairymoblongrange"],
-        ["buseuleogi", "buseuleogi", "nururingarcher_fairy"],
-        ["mogmaekim", "fairymoblongrange"],
-        ["nururingwarrior_fairy", "nururingsupporter_fairy"],
-        ["magicfork", "marshmallowdealer"],
-      ],
-      [
-        ["fairymoblongrange", "ginseng", "fairymobcloserange"],
-        ["marshmallowtanker", "marshmallowdealer", "marshmallowsupporter"],
-        ["nururingtanker_fairy", "lupalu"],
-        ["mogmaekim", "mogmaekim", "buseuleogi"],
-        ["magicfork", "nururingarcher_fairy", "ginseng"],
-      ],
-      [
-        ["nururingtanker_fairy", "nururingwarrior_fairy", "nururingsupporter_fairy"],
-        ["marshmallowtanker", "magicfork", "ginseng"],
-        ["fairymobcloserange", "mogmaekim", "lupalu"],
-        ["buseuleogi", "buseuleogi", "nururingarcher_fairy", "marshmallowsupporter"],
-        ["fairymobcloserange", "fairymobcloserange", "fairymoblongrange"],
-      ],
+//   boss         층 보스 칸의 짝 — 2층 보스를 이기면 판을 이긴다
+//   bossElite    보스 데이터가 아직 없는 층 — 보스 칸에 엘리트 몸(체력 ×ELITE_HP · 강인도 +1)으로 선다(run.js foeScaleOf). 클론 보스가 오면 지운다
+//   fights       옛 도구(tools/sim.js · 미리보기)가 보는 대표 셋 — pools 의 첫 벌(아래에서 붙인다)
+const VILLAGE_DEFS = {
+  worldtree: {
+    ko: "세계수", race: "요정 · 마녀",
+    line: "세계수 둘레의 요정 왕국에서 뿌리 아래 마녀 왕국으로 — 쌍둥이 여왕의 땅",
+    floors: [
+      {
+        // 1층은 카제나 체계를 하나씩 가르친다 — 상태 카드 · 격파로 끊기는 모으기 · 격파되면 무른 몸 · 강인도 되찾기 · 달아오름 · 폭탄 · 손상
+        n: 1, name: "에르피엔", sub: "요정 왕국 · 세계수 숲", land: "에르피엔",
+        bg: { fight: "stage3_2", boss: "stage3_3", event: "stage2_1" },
+        pools: [
+          [
+            ["fairymobcloserange", "fairymoblongrange"],
+            ["buseuleogi", "buseuleogi", "nururingarcher_fairy"],
+            ["mogmaekim", "fairymoblongrange"],
+            ["nururingwarrior_fairy", "nururingsupporter_fairy"],
+            ["magicfork", "marshmallowdealer"],
+          ],
+          [
+            ["fairymoblongrange", "ginseng", "fairymobcloserange"],
+            ["marshmallowtanker", "marshmallowdealer", "marshmallowsupporter"],
+            ["nururingtanker_fairy", "lupalu"],
+            ["mogmaekim", "mogmaekim", "buseuleogi"],
+            ["magicfork", "nururingarcher_fairy", "ginseng"],
+          ],
+          [
+            ["nururingtanker_fairy", "nururingwarrior_fairy", "nururingsupporter_fairy"],
+            ["marshmallowtanker", "magicfork", "ginseng"],
+            ["fairymobcloserange", "mogmaekim", "lupalu"],
+            ["buseuleogi", "buseuleogi", "nururingarcher_fairy", "marshmallowsupporter"],
+            ["fairymobcloserange", "fairymobcloserange", "fairymoblongrange"],
+          ],
+        ],
+        elites: [
+          ["goldring", "buseuleogi", "fairymoblongrange"],
+          ["magicfork_mad", "nururingsupporter_fairy", "marshmallowdealer"],
+          ["marshmallowtanker", "ginseng_mad", "mogmaekim", "mogmaekim"],
+          ["nururingtanker_fairy", "nururingwarrior_fairy", "nururingarcher_fairy", "nururingsupporter_fairy"],
+        ],
+        boss: ["curburus"],
+      },
+      {
+        // 2층은 저주다 — 균열 · 고통이 방어를 우회하고, 실 · 바늘 · 가루 · 점액 · 쪽지가 손을 괴롭히고, 면역 깃발이 디버프를 막고, 깬 뒤 일어서면 성난다
+        n: 2, name: "벨리티엔", sub: "마녀 왕국 · 세계수 뿌리", land: "벨리티엔",
+        bg: { fight: "stage23_1", boss: "stage25_1", event: "stage16_1" },
+        pools: [
+          [
+            ["hatsnail", "hatsnail_jolly"],
+            ["nururingwarrior_witch", "nururingarcher_witch"],
+            ["hatsnail_mad", "hatsnail_jolly"],
+            ["nururingwarrior_witch", "curseddoll_mad"],
+          ],
+          [
+            ["nururingtanker_witch", "curseddoll_jolly"],
+            ["hatsnail", "curseddoll_mad", "hatsnail_jolly"],
+            ["curseddoll_naive", "curseddoll_mad"],
+            ["nururingtanker_witch", "nururingsupporter_witch"],
+            ["hatsnail_mad", "nururingarcher_witch", "hatsnail_jolly"],
+          ],
+          [
+            ["curseddoll_naive", "curseddoll_jolly", "curseddoll_mad"],
+            ["nururingtanker_witch", "nururingwarrior_witch", "nururingsupporter_witch"],
+            ["hatsnail", "hatsnail_mad", "nururingarcher_witch"],
+            ["nururingwarrior_witch", "hatsnail_jolly", "curseddoll_mad", "nururingarcher_witch"],
+            ["curseddoll_naive", "hatsnail_mad", "nururingsupporter_witch"],
+          ],
+        ],
+        elites: [
+          ["nururingtanker_witch", "nururingarcher_witch", "curseddoll_mad"],
+          ["curseddoll_naive", "curseddoll_jolly", "hatsnail_mad"],
+          ["hatsnail", "hatsnail_mad", "nururingsupporter_witch", "hatsnail_jolly"],
+          ["nururingwarrior_witch", "nururingsupporter_witch", "curseddoll_mad"],
+        ],
+        // 판의 끝 — 모자에 깃든 마녀가 떠돌이 인형을 부린다(R41 리뉴아 · 후방 드론에서 되돌렸다, docs/20 §4-3). 클론 프리클이 오면 바꾼다
+        boss: ["hatsnailwitch", "curseddoll_jolly"],
+      },
     ],
-    elites: [
-      ["goldring", "buseuleogi", "fairymoblongrange"],
-      ["magicfork_mad", "nururingsupporter_fairy", "marshmallowdealer"],
-      ["marshmallowtanker", "ginseng_mad", "mogmaekim", "mogmaekim"],
-      ["nururingtanker_fairy", "nururingwarrior_fairy", "nururingarcher_fairy", "nururingsupporter_fairy"],
-    ],
-    boss: ["curburus"],
   },
-  {
-    n: 2, name: "모나티엄", sub: "엘프 도시 · 동부",
-    pools: [
-      [
-        ["elfsoldiercloserange", "elfsoldierlongrange"],
-        ["droneg", "elfsoldierlongrange"],
-        ["nururingwarrior", "nururingsupporter"],
-        ["elfsoldiercloserange_worker", "drones_scrap"],
-        ["nependers", "drones_scrap"],
-      ],
-      [
-        ["elfsoldiercloserange_worker", "elfsoldierlongrange_escort"],
-        ["nururingtanker", "nururingarcher"],
-        ["droneg_repair", "drones"],
-        ["elfsoldiercloserange_honor", "nururingarcher"],
-        ["elfsoldiercloserange", "nependers", "drones_scrap"],
-      ],
-      [
-        ["elfsoldiercloserange_worker", "drones", "elfsoldierlongrange_honor"],
-        ["nururingtanker", "nururingwarrior", "nururingsupporter"],
-        ["droneg", "droneg_repair", "elfsoldierlongrange_escort"],
-        ["elfsoldiercloserange", "elfsoldiercloserange_honor", "elfsoldierlongrange", "drones_scrap"],
-        ["nururingtanker", "nependers", "drones"],
-      ],
+  monatium: {
+    ko: "모나티엄", race: "엘프",
+    line: "엘프 도시 — 노동반과 폐수가 흐르는 바깥에서 의장대와 경비 드론이 지키는 도심으로",
+    floors: [
+      {
+        // 바깥 — 도감의 「외부 유지 보수」 · 「뒷골목」 기록: 노동반 · 호위 · 폐수의 한입초 · 수리 안 된 드론 · 도시 근처의 누루링-엘프
+        n: 1, name: "모나티엄 외곽", sub: "엘프 도시 바깥 · 노동반과 폐수 길", land: "모나티엄",
+        bg: { fight: "stage8_1", boss: "stage9_1", event: "stage4_1" },
+        pools: [
+          [
+            ["elfsoldiercloserange", "elfsoldierlongrange"],
+            ["nururingwarrior", "nururingsupporter"],
+            ["elfsoldiercloserange_worker", "drones_scrap"],
+            ["nependers", "drones_scrap"],
+            ["elfsoldiercloserange", "nururingarcher"],
+          ],
+          [
+            ["elfsoldiercloserange_worker", "elfsoldierlongrange_escort"],
+            ["nururingtanker", "nururingarcher"],
+            ["droneg_repair", "drones_scrap"],
+            ["elfsoldiercloserange", "nependers", "drones_scrap"],
+            ["elfsoldiercloserange_worker", "elfsoldierlongrange", "nururingsupporter"],
+          ],
+          [
+            ["nururingtanker", "nururingwarrior", "nururingsupporter"],
+            ["droneg_repair", "elfsoldierlongrange_escort", "nependers"],
+            ["elfsoldiercloserange_worker", "elfsoldierlongrange_escort", "drones_scrap"],
+            ["nururingtanker", "nependers", "elfsoldierlongrange"],
+            ["elfsoldiercloserange", "elfsoldiercloserange_worker", "elfsoldierlongrange", "drones_scrap"],
+          ],
+        ],
+        elites: [
+          ["nururingtanker", "nururingwarrior", "nururingarcher", "nururingsupporter"],
+          ["droneg_repair", "nependers", "drones_scrap", "drones_scrap"],
+          ["elfsoldiercloserange_worker", "elfsoldierlongrange_escort", "droneg_repair"],
+          ["nependers", "nururingtanker", "nururingsupporter"],
+        ],
+        // 바깥의 끝 — 도심으로 드는 문의 시설 경비 드론 G형 + 드론 S형. 보스 데이터가 아직 없어 엘리트 몸으로 선다(bossElite).
+        // 클론 칸나(docs/20 §3-2)가 오면 바꾼다
+        boss: ["droneg_sentry", "drones"], bossElite: true,
+      },
+      {
+        // 안쪽 — 「도심 순찰대」 · 「관리가 중요한 시설」 기록: 의장대 · 순찰 드론 · 시설 경비 · 징병제 돌격병 · 명사수
+        n: 2, name: "모나티엄 도심", sub: "엘프 도시 안쪽 · 의장대와 시설 경비", land: "모나티엄",
+        bg: { fight: "stage8_1", boss: "stage9_1", event: "stage4_1" },
+        pools: [
+          [
+            ["elfsoldiercloserange_honor", "elfsoldierlongrange"],
+            ["droneg", "elfsoldierlongrange"],
+            ["drones", "elfsoldiercloserange"],
+            ["droneg", "drones"],
+            ["elfsoldiercloserange", "elfsoldierlongrange_honor"],
+          ],
+          [
+            ["elfsoldiercloserange_honor", "elfsoldierlongrange_honor"],
+            ["droneg", "drones", "elfsoldierlongrange"],
+            ["elfsoldiercloserange", "elfsoldiercloserange_honor", "drones"],
+            ["droneg", "elfsoldiercloserange", "elfsoldierlongrange_honor"],
+            ["elfsoldiercloserange", "elfsoldierlongrange", "drones"],
+          ],
+          [
+            ["elfsoldiercloserange", "elfsoldiercloserange_honor", "elfsoldierlongrange", "drones"],
+            ["droneg", "elfsoldierlongrange_honor", "drones"],
+            ["elfsoldiercloserange_honor", "elfsoldierlongrange_honor", "droneg"],
+            ["droneg", "drones", "drones", "elfsoldierlongrange"],
+            ["elfsoldiercloserange", "elfsoldierlongrange", "elfsoldierlongrange_honor", "droneg"],
+          ],
+        ],
+        elites: [
+          ["droneg_sentry", "drones", "elfsoldierlongrange"],
+          ["elfsoldiercloserange_honor", "elfsoldiercloserange", "elfsoldierlongrange_honor"],
+          ["droneg_sentry", "droneg", "elfsoldierlongrange_honor"],
+          ["droneg", "drones", "drones", "elfsoldiercloserange_honor"],
+        ],
+        // 판의 끝 — 엘레나가 만든 고양이 로봇 M.E.O.W 와 드론 둘
+        boss: ["meow", "drones", "droneg"],
+      },
     ],
-    elites: [
-      ["droneg_sentry", "drones", "elfsoldierlongrange_escort"],
-      ["nururingtanker", "nururingwarrior", "nururingarcher", "nururingsupporter"],
-      ["elfsoldiercloserange_honor", "elfsoldiercloserange", "elfsoldierlongrange_honor"],
-      ["droneg_repair", "nependers", "drones_scrap", "drones_scrap"],
-    ],
-    boss: ["meow", "drones", "droneg"],
   },
-  {
-    n: 3, name: "벨리티엔", sub: "마녀 왕국 · 세계수 뿌리",
-    pools: [
-      [
-        ["hatsnail", "hatsnail_jolly"],
-        ["nururingwarrior_witch", "nururingarcher_witch"],
-        ["hatsnail_mad", "hatsnail_jolly"],
-        ["nururingwarrior_witch", "curseddoll_mad"],
-      ],
-      [
-        ["nururingtanker_witch", "curseddoll_jolly"],
-        ["hatsnail", "curseddoll_mad", "hatsnail_jolly"],
-        ["curseddoll_naive", "curseddoll_mad"],
-        ["nururingtanker_witch", "nururingsupporter_witch"],
-        ["hatsnail_mad", "nururingarcher_witch", "hatsnail_jolly"],
-      ],
-      [
-        ["curseddoll_naive", "curseddoll_jolly", "curseddoll_mad"],
-        ["nururingtanker_witch", "nururingwarrior_witch", "nururingsupporter_witch"],
-        ["hatsnail", "hatsnail_mad", "nururingarcher_witch"],
-        ["nururingwarrior_witch", "hatsnail_jolly", "curseddoll_mad", "nururingarcher_witch"],
-        ["curseddoll_naive", "hatsnail_mad", "nururingsupporter_witch"],
-      ],
-    ],
-    elites: [
-      ["nururingtanker_witch", "nururingarcher_witch", "curseddoll_mad"],
-      ["curseddoll_naive", "curseddoll_jolly", "hatsnail_mad"],
-      ["hatsnail", "hatsnail_mad", "nururingsupporter_witch", "hatsnail_jolly"],
-      ["nururingwarrior_witch", "nururingsupporter_witch", "curseddoll_mad"],
-    ],
-    // 3층 끝은 R41 리뉴아(흑뉴아) + 후방 드론 둘(2026-10 사용자). 햇팽이 마녀는 데이터로 남겨 둔다(지금은 안 나온다)
-    boss: ["r41_renewa", "r41_backdrone", "r41_backdrone"],
-    // 판의 마지막 — 3층 보스를 넘으면 상점 없이 캠프 한 번을 거쳐 뿌리 깊은 곳의 우로스와 싸운다(run.js isFinal · main.js finalCamp).
-    // 우로스를 이겨야 판을 깬다
-    final: { name: "세계수 뿌리 깊은 곳", sub: "벨리티엔 아래 · 판의 마지막", boss: ["e0_uros"] },
-  },
-];
-export const FLOORS = FLOOR_DEFS.map((f) => ({ ...f, fights: f.pools.map((p) => p[0]) }));
+};
+export const VILLAGES = Object.fromEntries(Object.entries(VILLAGE_DEFS).map(([id, v]) => [id, {
+  ...v, id, floors: v.floors.map((f) => ({ ...f, village: id, fights: f.pools.map((p) => p[0]) })),
+}]));
+export const VILLAGE_IDS = Object.keys(VILLAGES);
+// 마을을 모르는 판(옛 저장 · 시험 도구)이 서는 곳
+export const DEFAULT_VILLAGE = "worldtree";
+export const villageOf = (id) => VILLAGES[id] || VILLAGES[DEFAULT_VILLAGE];
+export const floorsOf = (id) => villageOf(id).floors;
+// 모든 마을의 모든 층 — 검사 도구가 「판에 나오는 적」 을 셀 때
+export const ALL_FLOORS = VILLAGE_IDS.flatMap((id) => VILLAGES[id].floors);
+// 옛 도구(tools/sim.js · hero-power 따위 — 1층 싸움 몇 벌만 본다)가 보는 대표 — 기본 마을(세계수)의 두 층. 게임은 이것을 안 본다
+export const FLOORS = floorsOf(DEFAULT_VILLAGE);

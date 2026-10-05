@@ -99,6 +99,10 @@ for (const file of files) {
       notes.push(`키워드 ${kwName}: ${kw.carrier === "self" ? "자기 것" : kw.carrier === "enemy" ? "적에게 거는 표식" : "아군에게 씌우는 것"}`
         + `${kw.cap != null ? ` · 최대 ${kw.cap}` : ""}${kw.decay ? ` · 턴마다 ${kw.decay === "all" ? "전부" : "-" + kw.decay}` : ""}`
         + `${kw.per.length ? " · 1개당 " + kw.per.map(perLabel).join(", ") : ""}${kw.rules.length ? ` · 규칙 ${kw.rules.length}` : ""}`);
+      // 예약(docs/19 §7 예약형) — 줄어드는 때가 있어야 시계다. 「적의 차례가 끝나면 N 감소」 가 없으면 다 닳지 않는다
+      if (kw.reserve && !(typeof kw.decay === "number" && kw.decay > 0)) errs.push(`키워드 「${kwName}」 — 「예약이다.」 는 「적의 차례가 끝나면 N 감소.」 와 같이 쓴다(줄어야 다 닳는다)`);
+      if (kw.mode) notes.push(`키워드 ${kwName}: 모드(최대 1 — 0 ↔ 1 이 전환)`);
+      if (kw.reserve) notes.push(`키워드 ${kwName}: 예약(재촉이 줄인다)`);
       for (const p of kw.per) if (p.v && kw.cap && Math.abs(p.v * kw.cap) > 0.4) errs.push(`키워드 1개당 ${perLabel(p)} × 최대 ${kw.cap} = ${Math.round(p.v * kw.cap * 100)}% — 너무 크다(40% 까지)`);
       if (!kw.per.length && !kw.rules.length) {
         // 카드가 스택을 소모·조건으로 쓰면 그걸로 충분하다 — 아래에서 센다
@@ -123,11 +127,12 @@ for (const file of files) {
       for (const f of fx) {
         sane(f, c.where, errs, false);
         if (f.k === "stack" && f.id === kwName && f.v > 0) makes++;
+        if (f.k === "flip" && kw && kw.mode) makes++;   // 「전환」 — 모드 키워드를 켠다(끈다)
         if ((f.k === "spend" || f.k === "ifStack" || f.k === "perStack" || (f.xStack === kwName)) && f.id === kwName) uses++;
         if (f.xStack === kwName) uses++;
       }
     }
-    for (const r of rules) for (const f of r.fx) { if (f.k === "stack" && f.id === kwName && f.v > 0) makes++; if (f.k === "spend" && f.id === kwName) uses++; }
+    for (const r of rules) for (const f of r.fx) { if ((f.k === "stack" && f.id === kwName && f.v > 0) || (f.k === "flip" && kw && kw.mode)) makes++; if (f.k === "spend" && f.id === kwName) uses++; }
     if (kw) {
       for (const r of kw.rules) for (const f of r.fx) if (f.k === "stack" && f.id === kwName && f.v > 0) makes++;
       if (!makes) errs.push(`키워드 「${kwName}」 를 쌓는 곳이 없다 (카드·패시브에 「${kwName}」 +N)`);
@@ -358,7 +363,9 @@ function layers(r) {
 //   이름의 1코 이상 카드를 N장(N ≥ 2 — 쓴 AP 보다 돌려받는 AP 가 늘 적다) · HP N% 이하 · 고학년 스킬. 드로우는 처치도(적 수만큼)
 function STRUCT(w) {
   // 「「X」가 사라지면 · 다 닳으면」(쌓아야 비는 것) · 「… 카드를 차례로 내면」(장수를 치른다 — docs/19 박자형)도 언제 자체가 막는다
-  return ["turnStart", "turnEnd", "fightStart", "stackReach", "stackGone", "lowHp", "ult"].includes(w.on)
+  // 공용 부품(docs/19 §7) — 「리듬이 N이 되면」(턴마다 한 번) · 「아군이 전환하면 · 전환하면」(모드가 바뀌어야 — 바꾸는 데 카드 · 겹이 든다) ·
+  // 「아군의 예약이 다 닳으면」(쌓고 기다려야 닳는다)도 언제 자체가 막는다
+  return ["turnStart", "turnEnd", "fightStart", "stackReach", "stackGone", "lowHp", "ult", "rhythm", "switch", "reserveGone"].includes(w.on)
     || (w.on === "play" && !!(w.nth || (w.seq && w.seq.length >= 2) || (w.every >= 2 && w.minCost >= 1)));
 }
 function capRule(r, where, errs) {
@@ -393,11 +400,11 @@ function fxLabel(f) {
   }
 }
 function whenLabel(w) {
-  return { fightStart: "전투 시작", turnStart: "턴 시작", turnEnd: "턴 끝", play: w.seq ? `${w.who === "any" ? "파티 " : ""}${w.seq.join(" → ")} 차례로` : `${w.sig ? "시그니처 " : ""}카드${w.type ? "(" + w.type + ")" : ""}${w.who === "any" ? "(파티)" : w.every ? "(자기)" : ""}${w.minCost ? ` ${w.minCost}코 이상` : ""}${w.every ? ` ${w.every}장마다` : ""}${w.nth ? ` ${w.nth}장째` : ""}`, kill: w.mine ? "처치" : "적 쓰러짐", hurt: w.who === "any" ? "아군 피격" : "피격", lowHp: `HP ${Math.round(w.pct * 100)}% 이하`, allyDown: "아군 쓰러짐", ult: "고학년 스킬", combo: "연계", rush: "적 즉시 행동", guard: `${w.who === "any" ? "아군 " : ""}${w.kind === "block" ? "방어" : w.kind === "shield" ? "실드" : "방어·실드"} 얻음`, debuff: "디버프 걺", overheal: "회복량 초과", stackReach: `${w.id} ${w.n}개`, stackGone: `${w.id} ${w.decay ? "다 닳음" : "사라짐"}`, always: "항상" }[w.on] || w.on;
+  return { fightStart: "전투 시작", turnStart: "턴 시작", turnEnd: "턴 끝", play: w.seq ? `${w.who === "any" ? "파티 " : ""}${w.seq.join(" → ")} 차례로` : `${w.sig ? "시그니처 " : ""}카드${w.type ? "(" + w.type + ")" : ""}${w.who === "any" ? "(파티)" : w.every ? "(자기)" : ""}${w.minCost ? ` ${w.minCost}코 이상` : ""}${w.every ? ` ${w.every}장마다` : ""}${w.nth ? ` ${w.nth}장째` : ""}`, kill: w.mine ? "처치" : "적 쓰러짐", hurt: w.who === "any" ? "아군 피격" : "피격", lowHp: `HP ${Math.round(w.pct * 100)}% 이하`, allyDown: "아군 쓰러짐", ult: "고학년 스킬", combo: "연계", rush: "적 즉시 행동", guard: `${w.who === "any" ? "아군 " : ""}${w.kind === "block" ? "방어" : w.kind === "shield" ? "실드" : "방어·실드"} 얻음`, debuff: "디버프 걺", overheal: "회복량 초과", stackReach: `${w.id} ${w.n}개`, stackGone: `${w.id} ${w.decay ? "다 닳음" : "사라짐"}`, rhythm: `리듬 ${w.n}`, switch: w.who === "any" ? "아군 전환" : "전환", reserveGone: "아군 예약 다 닳음", always: "항상" }[w.on] || w.on;
 }
 function condLabel(c) {
   return c.c === "stack" ? (c.not ? `${c.id} 없음` : `${c.id} ${c.n}+`) : c.c === "hp" ? `HP ${Math.round(c.pct * 100)}% 이하` : c.c === "hpMin" ? `HP ${Math.round(c.pct * 100)}% 이상` : c.c === "foes" ? `적 ${c.n}명+`
     : c.c === "foesMax" ? `적 ${c.n}명 이하` : c.c === "playedMax" ? `파티 ${c.n}장 이하` : c.c === "playedMin" ? `파티 ${c.n}장 이상` : c.c === "ownNone" ? "자기 카드 안 냄"
-    : c.c === "apLeft" ? `AP ${c.n} 남음` : c.c === "gauge" ? `게이지 ${c.n}%+` : c.c === "guarded" ? "방어·실드 있음" : c.c === "rushed" ? "적 즉시 행동했음" : c.c;
+    : c.c === "apLeft" ? `AP ${c.n} 남음` : c.c === "gauge" ? `게이지 ${c.n}%+` : c.c === "guarded" ? "방어·실드 있음" : c.c === "rushed" ? "적 즉시 행동했음" : c.c === "status" ? `${c.id} ${c.n}+` : c.c;
 }
 function perLabel(p) { return p.stat === "dot" ? `턴 끝 피해 ${Math.round(p.ratio * 100)}%` : p.stat === "hot" ? `턴 끝 회복 ${Math.round(p.ratio * 100)}%` : `${{ dealt: "주는 피해", taken: "받는 피해", atk: "공격력", def: "방어력", crit: "치명" }[p.stat]} ${p.v > 0 ? "+" : ""}${Math.round(p.v * 100)}%${p.who === "allies" ? "(아군 전원)" : ""}`; }

@@ -100,6 +100,32 @@ console.log("글 읽기 — 상태 문법");
     const k = parsePassiveKw("박자", "끊기면 처음부터. 최대 3. 다른 사도의 카드를 내면 전부 사라진다. 「박자」가 사라지면: 드로우 1.", ["박자"]);
     check(k.wipe && !k.left.length && k.rules.length === 1, "키워드 줄 「다른 사도의 카드를 내면 전부 사라진다」(meta) · 「사라지면:」(규칙)");
   }
+  // 공용 부품(docs/19 §7) — 리듬 · 전환 · 재촉 · 예약. 카드 글 · 패시브 · 키워드 줄
+  {
+    const fxk = (t, o) => { const { fx, left } = parseEffect(t, o); return { left, got: fx.map((f) => f.k === "status" ? `status:${f.id}:${f.turns}:${f.target}` : f.k).join(" · ") }; };
+    for (const [t, w] of [["리듬 2", "status:리듬:2:party"], ["적 1명에게 공격력 80% 피해. 잇기: 리듬 1", "dmg · ifLink · status:리듬:1:party"],
+      ["리듬 1개당 적 1명에게 공격력 30% 피해, 리듬 전부 소모", "perRhythm · dmg · spendRhythm"], ["리듬 2 소모, 드로우 1", "spendRhythm · draw"],
+      ["드로우 1. 리듬이 3 이상이면: AP +1", "draw · ifRhythm · ap"], ["방어력 200% 방어, 전환", "block · flip"], ["드로우 1. 전환: AP +1", "draw · ifSwitched · ap"],
+      ["재촉 1, 드로우 1", "hasten · draw"]]) {
+      const r = fxk(t);
+      check(!r.left && r.got === w, `「${t}」 → ${r.got}${r.left ? ` (못 읽음 ${r.left})` : ""}`);
+    }
+    const sp = parseEffect("리듬 2 소모").fx[0], ir = parseEffect("리듬이 3 이상이면: AP +1").fx[0], hs = parseEffect("재촉 2").fx[0];
+    check(sp.v === 2 && parseEffect("리듬 전부 소모").fx[0].v === "all" && ir.n === 3 && hs.v === 2, "리듬 N 소모 · 전부 · 리듬이 N 이상이면 · 재촉 N 의 수");
+    // 사도 전용 키워드 이름이 「리듬」 이면 그 키워드 문법이 먼저(파티의 리듬이 아니다)
+    const own = fxk("「리듬」 1개당 적 1명에게 공격력 30% 피해, 「리듬」 +1", { keywords: ["리듬"] });
+    check(!own.left && own.got === "perStack · dmg · stack", `낫표 「리듬」(사도 키워드) → ${own.got}`);
+    check(!parseEffect("적을 재촉하지 않고").fx.some((f) => f.k === "hasten") && !parseEffect("전환점").fx.some((f) => f.k === "flip"), "「재촉하지」 · 「전환점」 은 효과가 아니다");
+    const [rh, rc, sw, swAny, rv] = parsePassive("박자: 리듬이 5가 되면 드로우 1 · 흥: 턴 종료 시 리듬이 3 이상이면 결의 1 · 깸: 전환하면 드로우 1 · 꿈길: 아군이 전환하면 드로우 1 · "
+      + "결말: 아군의 예약이 다 닳으면 적 1명에게 공격력 100% 피해");
+    check(rh.when.on === "rhythm" && rh.when.n === 5 && !rh.left, "패시브 「리듬이 N이 되면」");
+    check(rc.when.on === "turnEnd" && rc.conds.some((c) => c.c === "status" && c.id === "리듬" && c.n === 3) && !rc.left, "패시브 조건 「리듬이 N 이상이면」");
+    check(sw.when.on === "switch" && sw.when.who !== "any" && swAny.when.on === "switch" && swAny.when.who === "any" && !sw.left && !swAny.left, "「전환하면」(자신) · 「아군이 전환하면」(누구든)");
+    check(rv.when.on === "reserveGone" && !rv.left, "「아군의 예약이 다 닳으면」");
+    const mk1 = parsePassiveKw("꿈", "꿈과 깸 사이. 전환하는 모드다. 「꿈」이 사라지면: 드로우 1.", ["꿈"]);
+    const rs1 = parsePassiveKw("씨앗", "심어 둔 것. 예약이다. 최대 3. 적의 차례가 끝나면 1 감소. 「씨앗」이 다 닳으면: 드로우 1.", ["씨앗"]);
+    check(mk1.mode && mk1.cap === 1 && !mk1.left.length && rs1.reserve && rs1.decay === 1 && !rs1.left.length, "키워드 줄 「전환하는 모드다.」(최대 1) · 「예약이다.」");
+  }
   check(!parseEffect("사기진작").fx.length && !parseEffect("적 전체에 「늑대 표식」 +2").fx.some((f) => f.k === "status"), "낱말 속 · 사도 표식은 상태가 아니다(사기진작 · 「늑대 표식」)");
   check(!parseEffect("잔광. 적 1명에게 공격력 50% 피해").fx.some((f) => f.k === "tag") && !parseEffect("드로우 1. 감응: AP +1").fx.some((f) => f.k === "when"),
     "옛 카드 태그 「잔광.」 · 옛 「감응:」 은 이제 안 읽힌다(잔광은 상태 · 감응은 영감)");

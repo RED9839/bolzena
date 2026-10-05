@@ -23,7 +23,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import BUILT from "../js/data/built.js";
 import KW from "../js/data/keywords.js";
-import { ENEMIES, FLOORS } from "../js/data/enemies.js";
+import { ENEMIES, VILLAGES } from "../js/data/enemies.js";
 import { EVENTS, CURSES, GIFTS } from "../js/data/events.js";
 import { STATUS_CARDS } from "../js/data/status-cards.js";
 
@@ -76,7 +76,11 @@ for (const [k, e] of Object.entries(ENEMIES)) {
   for (const ph of [e.phase, e.phase2]) if (ph) add(`적 ${k} 판 바뀜`, ph.say, "story");
   for (const p of [...(e.passives || []), ...((e.phase && e.phase.passives) || [])]) add(`적 ${k} 패시브 이름`, p.name, "name");
 }
-for (const F of FLOORS) { add(`층 ${F.n} 이름`, F.name, "name"); add(`층 ${F.n}`, F.sub, "story"); }
+// 마을 — 이름 · 한 줄 소개 · 두 층(docs/20-마을.md)
+for (const v of Object.values(VILLAGES)) {
+  add(`마을 ${v.id} 이름`, v.ko, "name"); add(`마을 ${v.id}`, v.line, "story");
+  for (const F of v.floors) { add(`마을 ${v.id} ${F.n}층 이름`, F.name, "name"); add(`마을 ${v.id} ${F.n}층`, F.sub, "story"); }
+}
 // 이벤트 — 결과 낱말(out …)은 규칙 글, 이름 · 단추 · 장면 · 한 줄은 이야기
 const OUT_KEYS = ["out", "win", "pass", "fail", "leaveOut"];
 const walkEvent = (where, o) => {

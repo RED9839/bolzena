@@ -1,6 +1,6 @@
 // 편성 · 도감 화면. 같이 쓰는 조각은 ui-common.js.
 import { CARDS } from "./cardbook.js";
-import { ENEMIES, FLOORS } from "./data/enemies.js";
+import { ENEMIES, villageOf } from "./data/enemies.js";
 import { HERO_DATA, kitOf, EQUIP, NEUTRAL_IDS } from "./cardbook.js";
 import CARDART from "./data/cardart.js";
 import { shortText, blessLine } from "./card-text.js";
@@ -10,7 +10,7 @@ import * as art from "./art.js";
 import { speak } from "./voice.js";
 import { sfx } from "./sfx.js";
 import { spineView } from "./spine-view.js";
-import { el, hint, screen, NTINT, uiIcon, goldLabel, mistletoeIcon, openHelp, fsButton, img, withKeywords, kwText, showCard, showPiles, bigCard, BATTLE_BG, GRADE_COLOR, emptySlotIcon, equipCard } from "./ui-common.js";
+import { el, hint, screen, NTINT, uiIcon, goldLabel, mistletoeIcon, openHelp, fsButton, img, withKeywords, kwText, showCard, showPiles, bigCard, floorBg, GRADE_COLOR, emptySlotIcon, equipCard } from "./ui-common.js";
 import { nameMatch } from "./ko.js";
 
 // ── 편성 ───────────────────────────────────────────────────────────────
@@ -335,9 +335,9 @@ export function partyScreen(onStart, onBack, opts = {}) {
     return cell;
   }
 
-  // 도감 · 사도 정보도 편성과 같은 1층 싸움터를 깐다 — 흐리고 어둡게는 css 가(czn.css 끝)
+  // 도감 · 사도 정보도 편성과 같은 1층 싸움터(이번 판 마을의 1층 — 마을이 없으면 세계수)를 깐다 — 흐리고 어둡게는 css 가(czn.css 끝)
   function stageBg() {
-    const bg = `assets/bg/${BATTLE_BG[1].fight}.jpg`;
+    const bg = `assets/bg/${floorBg(villageOf(opts.village).floors[0]).fight}.jpg`;
     s.style.setProperty("--stagebg", `url("${typeof location === "object" ? new URL(bg, location.href).href : bg}")`);
   }
 
@@ -377,18 +377,19 @@ export function partyScreen(onStart, onBack, opts = {}) {
     const slots = el("div", "tf-slots");
     main.appendChild(slots);
 
-    // ③ 오른쪽 — 첫 층 · 파티 성격 · 시작 덱 · 떠납니다
+    // ③ 오른쪽 — 첫 층 · 파티 성격 · 시작 덱 · 떠납니다. 첫 층은 이번 판의 마을(main.js start 가 파티 고르기 전에 정한다)의 1층
     const side = el("aside", "tf-side");
-    const floor = FLOORS[0];
+    const village = villageOf(opts.village);
+    const floor = village.floors[0];
     const where = el("section", "tf-floor");
     const wt = el("div", "tf-ftop");
-    wt.appendChild(el("small", null, "첫 층"));
+    wt.appendChild(el("small", null, `${village.ko} · 첫 층`));
     wt.appendChild(el("b", null, `${floor.n}층 · ${floor.name}`));
     const sub = el("span", null, floor.sub);
     sub.title = "지도에서 길을 골라 10칸 끝의 보스까지";
     wt.appendChild(sub);
     where.appendChild(wt);
-    const bossRow = el("div", "tf-boss");
+    const bossRow = el("div", "tf-boss" + (floor.boss.length > 1 ? " many" : ""));   // 보스가 짝이면(모나티엄 1층 드론 짝) 작게 세로로
     for (const id of floor.boss) {
       const e = ENEMIES[id]; if (!e) continue;
       const b = el("div", "tf-bossone");

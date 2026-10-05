@@ -14,7 +14,7 @@ import * as EV from "../js/events.js";
 import * as M from "../js/map.js";
 import * as S from "../js/save.js";
 import { HERO_DATA, CARDS, EQUIP } from "../js/cardbook.js";
-import { ENEMIES, FLOORS } from "../js/data/enemies.js";
+import { ENEMIES, VILLAGES, floorsOf, DEFAULT_VILLAGE } from "../js/data/enemies.js";
 import * as RULES from "../js/rules.js";
 
 let fails = 0;
@@ -142,10 +142,8 @@ function step(g) {
     if (run.eventFight) { EV.afterEventFight(run, true); EV.enterEvent(run); run.where = { k: "event" }; return "이벤트 싸움 이김"; }
     run.elite = false;
     if (R.isBoss(run)) {
-      const next = R.advance(run);
-      if (run.done === "clear") { g.end = "clear"; return "완주"; }
-      // 마지막 층의 보스 뒤 — 캠프 한 번 뒤 마지막 싸움(main.js camp("final"))
-      if (next.final) { R.enterCamp(run, "final"); run.where = { k: "camp", kind: "final" }; return "마지막 캠프"; }
+      R.advance(run);
+      if (run.done === "clear") { g.end = "clear"; return "완주"; }      // 2층 보스 — 판의 끝
     }
     run.where = { k: "map" };
     return "싸움 이김";
@@ -173,7 +171,6 @@ function step(g) {
       return "캠프 고름";
     }
     if (w.kind === "campshop" && !shopHere(run)) { R.rollShop(run); run.shop.at = run.map.at; run.where = { k: "shop", kind: w.kind }; return "캠프→상점"; }
-    if (w.kind === "final") { openFight(g); return "마지막 싸움"; }
     run.where = { k: "map" };
     return "캠프 떠남";
   }
@@ -281,7 +278,7 @@ console.log(`  (그 밖: ${Object.entries(seen).filter(([k]) => !/막 연|두 �
 console.log("");
 console.log("사도 135명 · 장비의 패시브가 적히는가");
 {
-  const foes = FLOORS[0].fights[0];
+  const foes = floorsOf(DEFAULT_VILLAGE)[0].fights[0];
   const badHero = [];
   for (const k of keys) {
     const st = C.newCombat({ partyKeys: [k], deck: C.buildDeck([k]), enemyIds: foes, seed: 3 });
@@ -360,6 +357,43 @@ console.log("파티 HP · 층마다 적 세기 — 되살려도 그대로");
   const fe = RULES.foeScale(0, { elite: true });
   check(h4.combat.enemies.every((e) => e.maxHp === Math.round(ENEMIES[e.key].hp * fe.hp)) && h4.run.eventFight.elite,
     `이벤트 엘리트 싸움 — 체력 ×${RULES.ELITE_HP} 그대로 되살아난다 (${h4.combat.enemies.map((e) => e.maxHp).join(" · ")})`);
+}
+
+// ── 마을 — 판의 마을이 저장에 실리고, 마을이 없는 옛 판(세 층 + 우로스)은 마을로 옮겨 읽는다 ─────────────
+console.log("");
+console.log("마을 — 저장에 실리고, 옛 판은 마을로 옮긴다");
+{
+  const party = PARTIES[0];
+  const rows = Object.fromEntries(party.map((k) => [k, HERO_DATA[k].row]));
+  for (const v of Object.keys(VILLAGES)) {
+    const run = R.newRun(party, rows, 5150, v);
+    run.where = { k: "map" };
+    M.mapOf(run);
+    const h = S.unpack(JSON.parse(JSON.stringify(S.pack(run))));
+    check(!!h && h.run.village === v && canon(M.mapOf(h.run)) === canon(M.mapOf(run)), `${VILLAGES[v].ko} — 되살려도 같은 마을 · 같은 지도`);
+  }
+  // 옛 판 — run.village 가 없고 층이 셋이던 때(floor 0 에르피엔 · 1 모나티엄 · 2 벨리티엔)
+  const oldRun = (floor, extra = {}) => {
+    const run = R.newRun(party, rows, 6100 + floor, "worldtree");
+    delete run.village;
+    run.floor = floor;
+    Object.assign(run, extra);
+    run.where = run.where || { k: "map" };
+    return JSON.parse(JSON.stringify(S.pack(run)));
+  };
+  const o0 = S.unpack(oldRun(0));
+  check(!!o0 && o0.run.village === "worldtree" && o0.run.floor === 0 && R.currentFloor(o0.run).name === "에르피엔", "옛 1층(에르피엔) → 세계수 1층");
+  const o1 = S.unpack(oldRun(1));
+  check(!!o1 && o1.run.village === "monatium" && o1.run.floor === 1 && R.currentFloor(o1.run).boss.includes("meow"), "옛 2층(모나티엄) → 모나티엄 2층(보스 M.E.O.W 그대로)");
+  const o2 = S.unpack(oldRun(2, { stops: { "2:camp:r4c1": { used: "rest" }, "0:camp": { used: null } }, shopSeen: { 2: true }, map: null }));
+  check(!!o2 && o2.run.village === "worldtree" && o2.run.floor === 1 && R.currentFloor(o2.run).name === "벨리티엔"
+    && o2.run.stops["1:camp:r4c1"] && o2.run.stops["0:camp"] && !o2.run.stops["2:camp:r4c1"] && o2.run.shopSeen[1] && !o2.run.shopSeen[2],
+    "옛 3층(벨리티엔) → 세계수 2층 — 층으로 묶인 기록(캠프 · 상점)도 2 → 1");
+  check(!!o2 && M.mapOf(o2.run).floor === 1 && M.mapOf(o2.run).rows.flat().filter((n) => n.foes).every((n) => n.foes.every((k) => ENEMIES[k])), "옮긴 옛 판의 지도가 선다");
+  R.advance(Object.assign(o2.run, { node: 3 }));
+  check(o2.run.done === "clear", "옮긴 옛 3층 판도 그 층 보스를 넘으면 판을 이긴다");
+  check(S.unpack(oldRun(2, { node: 4 })) === null, "옛 판의 우로스 싸움(node 4)은 버린다");
+  check(S.unpack(oldRun(2, { node: 4, where: { k: "camp", kind: "final" } })) === null, "옛 판의 우로스 앞 캠프는 버린다");
 }
 
 // ── 못 쓰는 저장 ───────────────────────────────────────────────────────

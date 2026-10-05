@@ -11,6 +11,7 @@ import * as art from "./art.js";
 import * as M from "./map.js";
 import { toggleFullscreen } from "./stage.js";
 import { 이가 } from "./ko.js";
+import { floorsOf, DEFAULT_VILLAGE } from "./data/enemies.js";
 
 // 사도 정보는 기획서가 원본이다. 빛깔만 옛 heroes.js 가 들고 있다.
 export const HERO = (k) => HERO_DATA[k] || HEROES[k] || { ko: k, row: "mid", nature: null };
@@ -205,6 +206,9 @@ const HELP = [
     "「조율: …」 — 이 카드의 코스트가 남은 AP 와 꼭 같을 때 뒤가 돕니다. 「안식: …」 — 카드 효과로 버려질 때 뒤가 돕니다.",
     "「잇기: …」 — 이번 턴 바로 앞에 낸 카드가 같은 사도의 카드면 뒤가 돕니다. 사이에 교주 카드나 다른 사도의 카드가 끼면 끊깁니다. 「앞이 공격: …」 · 「앞이 스킬: …」 · 「앞이 강화: …」 — 이번 턴 바로 앞에 낸 카드(누구 것이든, 교주 카드도)가 그 종류면 뒤가 돕니다. 턴이 바뀌면 앞 카드는 없습니다.",
     "「「X」가 없으면 …」 — 그 키워드가 하나도 없을 때만 뒤가 돕니다(「「X」가 있으면 …」 의 반대).",
+    `리듬 — 파티에 하나인 박자입니다(최대 ${RULES.STATUS_V.리듬Max}). 누구의 카드든 「잇기: …」 · 「앞이 …: …」 가 서면 저절로 1 오릅니다(카드 한 장에 한 번). 「리듬 2」 로 주고, 「리듬 1개당 …」 은 바로 뒤 한 줄을 리듬 수만큼, 「리듬 전부 소모」 · 「리듬 2 소모」 로 씁니다. 「리듬이 3 이상이면: …」 은 그만큼 있을 때만 뒤가 돕니다. 턴이 끝나면 사라집니다.`,
+    "전환 — 「전환하는 모드다」 인 키워드(켜짐 · 꺼짐 둘뿐)가 켜지거나 꺼지는 순간입니다(카드 · 패시브 · 쓰기 · 사라지기 무엇으로든). 효과 「전환」 은 카드 주인의 모드를 뒤집습니다. 「전환: …」 — 이번 턴 아군 누구든 한 번이라도 전환했으면 뒤가 돕니다.",
+    "재촉 N — 파티가 건 예약(「예약이다」 인 키워드 — 내 것 · 아군 표식 · 살아 있는 적의 표식 모두)을 N 씩 줄입니다. 0 이 되면 적의 차례가 끝나 다 닳은 것과 같이 「다 닳으면」 이 돕니다.",
     "소멸 N — 이 전투에서 N 번 내면 사라집니다. 회수(N) — 내고 나면 버린 더미 대신 손으로 돌아옵니다(한 전투에 N 번). 연결 — 직접 내면 손의 다른 연결 카드를 모두 버립니다.",
     "개막 — 전투가 시작되면 AP 를 써서 저절로 나갑니다(모자라면 안 나갑니다). 연쇄 — 다음 턴 시작에 같은 효과가 한 번 더 돕니다. 봉인 — 처음 내면 효과 없이 봉인만 풀립니다. 금기 — 신탁 · 복제 · 상점 제거가 안 됩니다.",
     "상태 카드 — 적이 이 전투에만 끼워 넣는 방해 카드입니다. 덱에는 남지 않습니다. 저주(골칫거리)는 이벤트의 대가로 판의 덱에 남습니다.",
@@ -215,7 +219,8 @@ const HELP = [
     "「공격 카드를 낼 때마다」 처럼 이름이 없으면 그 사도 자신의 카드입니다. 장비는 「자신의 …」 — 낀 사도의 카드를 셉니다.",
     "「파티가 이번 턴 카드를 3장째 낼 때」 · 「파티가 이번 턴 카드를 3장 이상 냈으면」 — 누가 냈든 파티 셋이 이번 턴 낸 카드를 함께 셉니다. 「아군이 … 낼 때마다」 도 누구든입니다.",
     "「이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면」 — 파티가 이번 턴 그 종류를 바로 잇달아 낸 순간(마지막 장)에 돕니다. 다시 차례를 맞추면 또 돕니다. 「리코타의 …」 처럼 이름이 붙으면 그 사도의 카드만 세고, 사이에 다른 카드가 끼면 처음부터입니다.",
-    "「「X」가 사라지면」 — 키워드가 0 이 되는 순간(쓰기 · 줄기 · 다른 사도의 카드에 사라지기 · 무엇으로든). 「「X」가 다 닳으면」 — 그 가운데 적의 차례가 끝나 줄어서 0 이 됐을 때만입니다(시계가 다 돈 것 — 쓰거나 지워서 0 이 된 것은 아닙니다). 적에게 건 것이면 그 적에게, 적마다 따로 돕니다(쓰러진 적의 것은 안 돕니다).",
+    "「「X」가 사라지면」 — 키워드가 0 이 되는 순간(쓰기 · 줄기 · 다른 사도의 카드에 사라지기 · 무엇으로든). 「「X」가 다 닳으면」 — 그 가운데 적의 차례가 끝나 줄어서 0 이 됐을 때만입니다(시계가 다 돈 것 — 쓰거나 지워서 0 이 된 것은 아닙니다). 적에게 건 것이면 그 적에게, 적마다 따로 돕니다(쓰러진 적의 것은 안 돕니다). 재촉으로 0 이 된 것도 다 닳은 것입니다.",
+    "같은 운영 방식끼리 — 「리듬이 5가 되면」(파티의 리듬이 그 수에 처음 닿을 때, 턴마다 한 번) · 「아군이 전환하면」(누구의 모드든, 자신 포함) · 「전환하면」(자신의 모드만) · 「아군의 예약이 다 닳으면」(누구의 예약이든 — 적의 표식이었으면 그 적에게). 남이 일으킨 계기에도 돕니다.",
     "사도 정보 창의 패시브 줄에 지금 센 수가 붙습니다 — 「에르핀 공격 1/3」 은 에르핀 것만, 「파티 2장」 은 파티 전체, 「차례 공격✓ → 스킬 → 강화」 는 어디까지 이었는지입니다.",
   ])],
   ["신탁", "은총 · 신탁 · 겨우살이의 축복", () => helpList([
@@ -230,7 +235,7 @@ const HELP = [
     "보상 화면은 없습니다. 쓰러진 적이 골드를 떨구고, 가장 센 적이 장비를 떨굽니다. 이기면 그대로 챙깁니다.",
     `장비 — 일반 싸움 ${Math.round(RULES.DROP.fight.equip * 100)}% · 엘리트 · 보스는 늘(마지막 보스 빼고). 층이 오를수록 등급이 오릅니다. 같은 장비도 다시 떨어집니다 — 상점 · 이벤트도 마찬가지라 두 사도가 같은 것을 낄 수 있습니다.`,
     "교주 카드는 싸움에서 떨어지지 않습니다 — 골디의 상점과 이벤트에서만 얻습니다.",
-    `골디의 상점(휴식+상점 칸) — 교주 카드 셋 · 장비 ${RULES.SHOP_EQUIP_N}점 · 새로고침 · 카드 제거. 고유 카드는 팔지 않습니다(은총으로만). 골디는 깎아 주지 않습니다.`,
+    `골디의 상점(휴식+상점 칸) — 교주 카드 셋 · 장비 ${RULES.SHOP_EQUIP_N}점 · 새로고침 · 카드 제거. 고유 카드는 팔지 않습니다(은총으로만).`,
   ])],
   ["장비", "장비", () => helpList([
     `사도마다 무기 · 방어구 · 장신구 한 칸씩입니다. 가방은 없습니다 — 장비를 얻으면(드랍 · 상점 · 이벤트) 그 자리에서 사도 하나에게 끼거나 사는 값의 ${Math.round(RULES.EQUIP_SELL * 100)}% 에 팝니다. 찬 칸에 끼면 낀 것은 같은 값에 팔리고, 한 번 낀 장비는 뺄 수 없습니다.`,
@@ -240,6 +245,7 @@ const HELP = [
     "등급 — 일반 · 고급 · 희귀 · 전설. 일반 몇 종은 스탯뿐입니다.",
   ])],
   ["지도", "지도", () => helpList([
+    `한 판은 마을 하나의 두 층입니다 — 모험을 시작하면 마을이 무작위로 정해지고, 1층(바깥) · 2층(안쪽) 모두 그 마을의 적만 나옵니다. 2층 보스를 이기면 판을 이깁니다.`,
     `한 층은 ${M.ROWS}칸 길입니다. 출발에서 오른쪽으로 가며 이어진 칸을 골라 들어갑니다. 끝은 보스, 그 앞은 늘 휴식+상점입니다.`,
     `칸 — ${["fight", "elite", "camp", "campshop", "event", "boss"].map((k) => M.KIND_KO[k]).join(", ")}.`,
     `엘리트는 한 단계 센 적(체력 ×${RULES.ELITE_HP})이고, 이기면 장비가 늘 떨어지고 신탁이 늘 뜹니다.`,
@@ -592,19 +598,14 @@ export function bigCard(c, pic, calc) {
 // 화면 뒤에 그 싸움의 배경을 깐다 — 전투와, 이긴 뒤의 보상 화면이 같은 그림을 쓴다.
 // 변수에 담긴 url() 은 그 변수를 쓰는 css 파일 기준으로 풀린다 — 그래서 문서 기준 절대 주소로 넘긴다
 export function setStageBg(s, run) {
-  const floor = R.currentFloor(run);
-  const bg = BATTLE_BG[floor.n] || BATTLE_BG[1];
+  const bg = floorBg(R.currentFloor(run));
   const bgFile = `assets/bg/${run.eventFight ? bg.event : R.isBoss(run) ? bg.boss : bg.fight}.jpg`;
   s.style.setProperty("--stagebg", `url("${typeof location === "object" ? new URL(bgFile, location.href).href : bgFile}")`);
 }
 
-// 싸움터 배경 — assets/bg (tools/extract-bg.py 가 게임에서 뽑은 16:9 그림)
-// 에르피엔은 숲속 버섯 마을, 모나티엄은 엘프 도시, 벨리티엔은 마녀 왕국의 보랏빛 숲
-export const BATTLE_BG = {
-  1: { fight: "stage3_2", boss: "stage3_3", event: "stage2_1" },
-  2: { fight: "stage8_1", boss: "stage9_1", event: "stage4_1" },
-  3: { fight: "stage23_1", boss: "stage25_1", event: "stage16_1" },
-};
+// 싸움터 배경 — assets/bg (tools/extract-bg.py 가 게임에서 뽑은 16:9 그림). 마을 층마다 fight · boss · event(enemies.js VILLAGES 층의 bg)
+// 에르피엔은 숲속 버섯 마을, 모나티엄은 엘프 도시, 벨리티엔은 마녀 왕국의 보랏빛 숲. 층을 모르면(시험 화면) 세계수 1층의 것
+export const floorBg = (floor) => (floor && floor.bg) || floorsOf(DEFAULT_VILLAGE)[0].bg;
 
 // ── 장비 ────────────────────────────────────────────────────────────────
 // 칸은 사도당 무기·방어구·장신구. 기획서: 얻는 곳은 보상·상점·이벤트, **바꿔 끼기는 휴식 노드(캠프)에서.**
@@ -721,7 +722,7 @@ function popBox(cls) {
   return box;
 }
 const STAT_FULL = { atk: "공격력", def: "방어력", hp: "HP", crit: "치명" };
-export function showEquip(id, { heroKey = null, note = "", acts = [] } = {}) {
+export function showEquip(id, { heroKey = null, note = "", acts = [], sell = true } = {}) {
   const e = EQUIP[id];
   if (!e) return;
   const box = popBox("eqdetail g-" + e.grade);
@@ -750,7 +751,7 @@ export function showEquip(id, { heroKey = null, note = "", acts = [] } = {}) {
     if (e.affinityPassive) body.appendChild(effLine(e, `애착 · ${e.affinityKo}`, e.affinityPassive, e.affinityRead));
   }
   if (e.blurb) body.appendChild(el("p", "eblurb", e.blurb));
-  body.appendChild(goldLabel("p", "eqsell", `팔면 +${R.sellPrice(id)} 골드`));
+  if (sell) body.appendChild(goldLabel("p", "eqsell", `팔면 +${R.sellPrice(id)} 골드`));   // sell: false — 장비 전체 탭의 아직 없는 장비(팔 것이 없다)
   if (note) body.appendChild(el("p", "eqnote", note));
   const row = el("div", "bmbtns");
   for (const a of acts) {

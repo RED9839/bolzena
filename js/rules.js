@@ -29,7 +29,7 @@ export const ENEMY_HP = 0.85;
 export const SCALE = 10;
 
 // ── 층마다 적 세기(2026-10) — 난이도 손잡이 ─────────────────────────────
-// 기준: 사람만큼 하는 손(tools/run-sim.js --bot smart)이 한 판(3층 + 마지막 싸움)을 **20~30%** 완주하게.
+// 기준: 사람만큼 하는 손(tools/run-sim.js --bot smart)이 한 판(옛 3층 + 마지막 싸움 — 지금은 마을 하나의 두 층)을 **20~30%** 완주하게.
 // 1층은 조심하는 사람이면 대개 넘고, 쓰러지는 곳은 2 · 3층과 보스에 몰리게. 옛 목표(role-sim 의 손으로 잰 완주율)는 버렸다.
 // 체력은 ENEMY_HP 위에 곱하고(보스 칸은 BOSS_HP 를, 엘리트는 ELITE_HP 를 더 곱한다),
 // 피해는 적의 치는 수(공격 · 관통 · 연타 · 전체 · 가시)에 곱한다 — 적마다 e.dmgx 로 들고 다녀
@@ -46,8 +46,10 @@ export const SCALE = 10;
 // 뒤층일수록 쌓인 사기 · 불굴이 커서 2층 · 3층 · 마지막을 크게 올리고 1층은 조금만: 1.85/2.0/2.1/1.55 · 1.55/2.25/3.05/3.5 →
 // 2.0/2.85/3.25/2.4 · 1.67/3.35/4.95/5.7. 200판: 스마트 24.5% — 쓰러진 층 4 · 49.5 · 18.5 · 3.5, 일반 싸움 5.0~6.4턴 · 보스 8.4~10.2턴,
 // 편성 TTT 45 · TTS 45 · TTD 50 · TSS 35 · SSS 35 · SDD 15 · SSD 10 · TSD 5 · TDD 5 · DDD 0(한 칸 20판이라 ±10).
-export const FLOOR_HP = { 1: 2.0, 2: 2.85, 3: 3.25, final: 2.4 };
-export const BOSS_HP = { 1: 0.7, 2: 0.65, 3: 0.6, final: 0.8 };
+// 마을(2026-10-04 사용자, docs/20-마을.md) — 한 판이 마을 하나의 두 층이 되고 마지막 싸움(우로스)을 없앴다.
+// 1층은 옛 1층 값, 2층은 옛 마지막 층(3층) 값을 그대로 옮겼다(옛 2층 · final 은 버렸다). 마을마다 다시 잴 것은 run-sim --village
+export const FLOOR_HP = { 1: 2.0, 2: 3.25 };
+export const BOSS_HP = { 1: 0.7, 2: 0.6 };
 // 파티 HP 하나(docs/16 §8, 2026-10)로 바꾼 뒤 같은 값에서 스마트 53.5%(쓰러진 층 3.5 · 31 · 11 · 1, TTT 95 · DDD 5) — 사도가 쓰러져 카드가 빠지는 일이 없고
 // 방어 · 실드가 늘 파티를 지켜서 쉬워졌다. 피해 ×1.35(run-sim --dmg) 에서 31.5%(13.5 · 46.5 · 8.5 · 0 — 1층이 무겁고 3층 · 마지막이 가볍다)라
 // 층마다 달리 올렸다: 1층 ×1.25 · 2층 ×1.4 · 3층 · 마지막 ×1.5 → 2.09/4.69/7.43/8.55(체력은 그대로).
@@ -57,11 +59,11 @@ export const BOSS_HP = { 1: 0.7, 2: 0.65, 3: 0.6, final: 0.8 };
 // v6 사도는 스탯 식이 바뀌어(딜러 HP 620 · 방어 29) 2층부터 버티지 못했다. 1층은 거의 그대로 두고 2층 · 3층 · 마지막을 절반 가까이 내렸다.
 // --parties 4 --runs 3(씨앗 0) 26.7% + --parties 6 --runs 3(씨앗 1) 21.7% = 300판 23.7% — 쓰러진 층 9 · 36.5 · 26 · 4.7,
 // 일반 싸움 4.0~4.9턴 · 보스 7.1~8.6턴. 편성(한 칸 30판이라 ±10) TTS 50 · TSD 40 · TTT 37 · TTD 30 · SSS 27 · SSD 27 · TSS 23 · SDD 3 · TDD 0 · DDD 0.
-export const FLOOR_DMG = { 1: 2.4, 2: 2.4, 3: 3.8, final: 5.3 };
-// floor — run.floor(0부터). final 이면 마지막 싸움(우로스)
-export function foeScale(floor, { boss = false, final = false, elite = false } = {}) {
-  const k = final ? "final" : floor + 1;
-  const hp = ENEMY_HP * (FLOOR_HP[k] ?? 1) * (boss || final ? BOSS_HP[k] ?? 1 : 1) * (elite ? ELITE_HP : 1);
+export const FLOOR_DMG = { 1: 2.4, 2: 3.8 };
+// floor — run.floor(0부터). 보스 칸은 BOSS_HP 를, 엘리트 칸(보스 데이터가 없어 엘리트 몸으로 서는 보스 칸 — enemies.js bossElite 도)은 ELITE_HP 를 더 곱한다
+export function foeScale(floor, { boss = false, elite = false } = {}) {
+  const k = floor + 1;
+  const hp = ENEMY_HP * (FLOOR_HP[k] ?? 1) * (boss ? BOSS_HP[k] ?? 1 : 1) * (elite ? ELITE_HP : 1);
   return { hp, dmg: FLOOR_DMG[k] ?? 1 };
 }
 
@@ -127,14 +129,15 @@ export const SHIN_CHANCE = 0.05;
 // 버는 쪽과 서비스 값은 **우리가 정했다.** 한 층(싸움 셋)이면 상점에서 교주 카드 한두 장을 산다.
 export const GOLD_START = 99;
 // 2026-10-04 사용자 「골드 수급 조금 올려」 — 한 층이 열 칸으로 줄어 싸움이 줄었다. 보통 15~25 → 20~30, 보스 75 → 95
-export const GOLD_FIGHT = [20, 30];      // 보통 싸움 — 층이 오를수록 +5씩
+export const GOLD_FIGHT = [20, 30];      // 보통 싸움 — 2층은 +GOLD_FLOOR(옛 3층 몫 — 판이 두 층이 되며 +5 → +10)
+export const GOLD_FLOOR = 10;
 export const GOLD_BOSS = 95;
 // 엘리트 칸(docs/10-지도.md) — 한 단계 센 싸움을 체력 ×1.5 로. 이기면 장비 하나 · 신탁 · 골드 ×1.5
 export const ELITE_HP = 1.5;
 export const ELITE_GOLD = 1.5;
 // 등급 무게는 장비 하나마다 — 실제 비율은 무게 × 그 등급 장비 수(일반 16 · 고급 20 · 희귀 22 · 전설 29)
-// 2026-10-04 사용자 표: 엘리트 1층 고급 · 2층 고급~희귀 · 3층 희귀~전설
-export const ELITE_EQUIP = [{ 고급: 1 }, { 고급: 1, 희귀: 1 }, { 희귀: 3, 전설: 1 }];   // 고급 100 · 48/52 · 희귀 69/전설 31   // 층마다 엘리트가 주는 등급
+// 2026-10-04 사용자 표: 엘리트 1층 고급 · 2층 고급~희귀 · 3층 희귀~전설 — 판이 두 층이 되며(마을) 2층은 옛 3층 몫
+export const ELITE_EQUIP = [{ 고급: 1 }, { 희귀: 3, 전설: 1 }];   // 고급 100 · 희귀 69/전설 31   // 층마다 엘리트가 주는 등급
 export const SHOP_NEUTRAL = 3;           // 진열하는 교주 카드
 // 고유 카드는 팔지 않는다 — 은총(전투 중)으로만 얻는다. 진열은 교주 카드 셋 + 장비 셋
 export const SHOP_EQUIP_N = 3;           // 진열하는 장비
@@ -160,20 +163,20 @@ export const SLOTS = ["무기", "방어구", "장신구"];
 export const EQUIP_PRICE = { 일반: 90, 고급: 130, 희귀: 180, 전설: 250 };
 // 장비 팔기 — 얻은 장비를 끼지 않고 팔 때 · 찬 칸에 바꿔 낄 때 낀 것이 사는 값의 40% 에(일반 36 · 고급 52 · 희귀 72 · 전설 100)
 export const EQUIP_SELL = 0.4;
-export const BOSS_EQUIP = [{ 전설: 1 }, { 전설: 1 }, { 전설: 1 }];   // 층 보스는 모두 전설(2026-10-04 사용자)   // 층마다 보스가 주는 등급
+export const BOSS_EQUIP = [{ 전설: 1 }, { 전설: 1 }];   // 층 보스는 모두 전설(2026-10-04 사용자)   // 층마다 보스가 주는 등급
 export const SHOP_EQUIP = { 일반: 3, 고급: 3, 희귀: 2, 전설: 1 };
 
 // ── 드랍 테이블 — 적이 쓰러질 때 떨어지는 것(docs/09-상점.md 「드랍」) ─────────────
 // 골드는 늘. 장비는 확률로, 한 싸움에 **하나까지**. 보상 화면은 없다 — 떨어진 것은 이기면 그대로 챙긴다.
 // 교주 카드는 **떨어지지 않는다** — 골디의 상점과 이벤트에서만 얻는다(덱이 저절로 불지 않게).
 // 한 층에 지나는 칸(지도 500판 평균): 일반 5.6 · 엘리트 1.1 · 보스 1 — 그래서 층마다 대략
-//   장비  일반 1.23 + 엘리트 1.1 + 보스 1 ≈ 3.3  (사도 셋 × 세 칸 = 아홉 칸을 세 층에 걸쳐 채운다)
+//   장비  일반 1.23 + 엘리트 1.1 + 보스 1 ≈ 3.3  (사도 셋 × 세 칸 = 아홉 칸을 두 층에 걸쳐 채운다 — 2층 등급이 높다)
 // 등급은 층마다 한 칸씩 오른다. 이미 가진 장비도 떨어진다(상점 · 이벤트도 마찬가지).
 export const DROP = {
   // 일반 전투 22% → 50%(2026-10-04 사용자 「장비 칸이 너무 비었다」) — 한 판 장비 8.5 → 12.5개(칸 아홉), 1층 끝에 2.8 → 4.2개
   fight: {
-    // 1층 일반~고급 · 2층 고급~희귀 · 3층 고급~희귀(희귀가 더) — 일반 62/고급 38 · 고급 65/희귀 35 · 고급 38/희귀 62
-    equip: 0.5, equipGrade: [{ 일반: 2, 고급: 1 }, { 고급: 2, 희귀: 1 }, { 고급: 2, 희귀: 3 }],
+    // 1층 일반~고급 · 2층 고급~희귀(희귀가 더 — 옛 3층 몫) — 일반 62/고급 38 · 고급 38/희귀 62
+    equip: 0.5, equipGrade: [{ 일반: 2, 고급: 1 }, { 고급: 2, 희귀: 3 }],
   },
   elite: {
     equip: 1, equipGrade: ELITE_EQUIP,
@@ -246,7 +249,12 @@ export const STATUS_V = {
   잔불: 0.3, 잔불Max: 5, 잔광: 0.5,
   "실드 유지": 0.5, 협공: 1.0, 충격: 0.8, 충격Shield: 0.5, 충격파: 3.0, 그을림: 0.8, 그을림Max: 10,
   분쇄: 0.2,
+  // 리듬(박자형 공용 부품, docs/19 §7) — 파티 상태. 저절로 하는 일은 없고 카드 · 패시브가 센다(「리듬 1개당 …」 · 「리듬이 N 이상이면」). 턴이 끝나면 사라진다
+  리듬Max: 10,
 };
+// 리듬 — 박자형(docs/19 §7)의 공용 계기. 파티에 하나(s.pool.status.리듬). 「잇기:」 · 「앞이 공격:」 조건이 서면 저절로 +1(combat.js rhythmAdd)
+export const RHYTHM = "리듬";
+export const rhythmOf = (s) => (((s && s.pool && s.pool.status) || {})[RHYTHM]) || 0;
 // 방어 기반 피해 — 카제나 「방어력 210% + 공격력 30%」. 「방어 기반 피해 N%」 · 반격이 이것을 바탕으로 N% 를 친다
 export const DEF_DMG = { def: 2.1, atk: 0.3 };
 export const defDmgStat = (atk, def) => Math.max(1, Math.round((def || 0) * DEF_DMG.def + (atk || 0) * DEF_DMG.atk));
@@ -263,8 +271,10 @@ export const CHARGE_ST = ["취약", "약화", "손상", "피해 감소", "반격
 export const INTENSITY_ST = ["사기", "불굴", "결의", "결정화", "고동"];
 // 턴 끝에 겹만큼 피해를 주고 절반이 되는 상태
 export const DOT_ST = ["고통", "균열"];
+// 턴이 끝나면 다 사라지는 파티 상태 — 리듬(박자형, docs/19 §7). 쓰는 카드가 셀 뿐 저절로 하는 일은 없다
+export const TURN_ST = [RHYTHM];
 // 겹으로 도는 상태 전부 — 화면 칩이 숫자를 겹으로 보인다(턴이 아니다). 감전 · 침묵 · 기절은 턴이다
-export const STACK_ST = [...CHARGE_ST, ...INTENSITY_ST, ...DOT_ST, "잔불"];
+export const STACK_ST = [...CHARGE_ST, ...INTENSITY_ST, ...DOT_ST, "잔불", ...TURN_ST];
 // 피해의 바탕을 건 사람에게서 가져오는 상태 — 건 사람의 공격력을 대상에 적어 둔다(combat.js dotUnit)
 export const UNIT_ST = ["고통", "균열", "고동", "그을림", "충격", "충격파"];
 // 세기 상태 n 겹이 하는 일 — 사기 3 → 0.6. 최대 겹 · 불굴Cap 을 지킨다

@@ -516,21 +516,9 @@ console.log("\n이후 화면");
     check(C.costOf(s3, cost1) === CB.CARDS[cost1].cost - 1, "기적 「비용 -1」이 든다");
   }
 
-  // 보상 — 이제 골드 · 장비와 「이 전투에서 받은 것」
-  let picked = { card: "없음", flash: null };
+  // 보상 — 골드 · 장비뿐(보상 화면은 없다)
   R.rollReward(r4);
   check(!r4.reward.cards.length && !r4.reward.flash, "보상에 고유 카드 · 신탁 고르기가 없다(전투 중에 얻는다)");
-  const rw = ui.rewardScreen(r4, (id, f) => (picked = { card: id, flash: f }));
-  check(/이 전투에서 받은 은총 · 신탁/.test(rw.textContent) && count(rw, "gcard") >= 2, "보상 화면이 이 전투에서 얻은 카드 · 신탁을 그림으로 보여 준다");
-  const cont = clickAll(rw).find((n) => n.textContent === "계속합니다");
-  check(!!cont, "「계속합니다」로 넘어간다");
-  if (cont) cont.onclick();
-  check(picked.card === null, "보상에서 따로 고를 카드는 없다");
-  {
-    const a1 = JSON.stringify(r4.reward);
-    ui.rewardScreen(r4, () => {});
-    check(a1 === JSON.stringify(r4.reward), "보상은 다시 그려도 안 바뀐다");
-  }
 }
 run.floor = 0; run.node = 3;
 run.partyHp = 40;                         // 보스 싸움에서 많이 다쳤다
@@ -579,8 +567,6 @@ console.log("\n골디의 상점");
   buyBtn.onclick();
   check(r.gold === before - r.shop.items[0].price && r.deck.length === deckN + 1, "사면 골드가 줄고 덱에 들어온다");
   check(/팔렸습니다/.test(sp.textContent), "산 칸은 팔렸다고 적는다");
-  clickAll(sp, (n) => n.classList.contains("sh-haggle"))[0].onclick();
-  check(/할인은 안 돼요/.test(sp.textContent), "골디는 할인하지 않는다");
   // 골디를 누르면 쓰다듬기 — 한 줄 한다
   clickAll(sp, (n) => n.classList.contains("sh-stand"))[0].onclick();
   check(/서비스 품목이 아니에요/.test(sp.textContent), "골디를 쓰다듬으면 한마디 한다");
@@ -728,12 +714,9 @@ console.log("\n장비");
   check(r.reward.equip && r.reward.equip.length === 1, "보스는 장비 하나를 떨군다");
   const pick = r.reward.equip[0];
   check(R.takeEquip(r, pick) === null && r.bag.includes(pick) && R.takeEquip(r, r.reward.equip[1]) !== null, "하나만 받는다(받으면 끼기 or 팔기를 기다린다)");
-  r.floor = 2; r.node = 4; R.rollReward(r);
-  check(!r.reward.equip, "마지막 싸움(뿌리 깊은 곳의 우로스)은 장비를 안 준다(판이 끝난다)");
-  // 보상 화면 · 캠프 화면 · 상점
+  r.floor = 1; r.node = 3; R.rollReward(r);
+  check(!r.reward.equip, "2층 보스(판의 끝)는 장비를 안 준다(판이 끝난다)");
   r.floor = 0; r.node = 3; R.rollReward(r);
-  const rw = ui.rewardScreen(r, () => {});
-  check(count(rw, "ecard") === 1, "보상 화면에 떨어진 장비 하나");
   // 드랍 테이블 — 싸움 종류 · 층마다 떨어지는 비율과 등급
   {
     const RU = await import("../js/rules.js"), CBm = await import("../js/cardbook.js");
@@ -748,8 +731,8 @@ console.log("\n장비");
     };
     const f1 = rate((q) => { q.floor = 0; q.node = 0; });
     check(Math.abs(f1.eq - RU.DROP.fight.equip) < 0.03 && Object.keys(f1.g).every((g) => g === "일반" || g === "고급"), `일반 싸움 1층 — 장비 ${(f1.eq * 100).toFixed(1)}%(일반 · 고급만 ${JSON.stringify(f1.g)})`);
-    const f3 = rate((q) => { q.floor = 2; q.node = 0; });
-    check(!f3.g["일반"] && !f3.g["전설"], `일반 싸움 3층 — 고급 · 희귀만 (${JSON.stringify(f3.g)})`);
+    const f3 = rate((q) => { q.floor = 1; q.node = 0; });
+    check(!f3.g["일반"] && !f3.g["전설"], `일반 싸움 2층 — 고급 · 희귀만 (${JSON.stringify(f3.g)})`);
     const el = rate((q) => { q.floor = 0; q.node = 0; q.elite = true; }, 400);
     const bo = rate((q) => { q.floor = 0; q.node = 3; }, 400);
     check(el.eq === 1 && bo.eq === 1, "엘리트 · 보스는 장비가 늘 떨어진다");
@@ -939,7 +922,7 @@ console.log("로비와 프로필");
   let changed = false;
   for (let i = 0; i < 6 && !changed; i++) { stand.onclick(); changed = line.textContent !== before; }
   check(changed, "메인 사도를 누르면 다른 말을 한다");
-  check(/에르피엔[\s\S]*모나티엄[\s\S]*벨리티엔/.test(s3.textContent), "여정이 FLOORS 차례와 같다");
+  check(/세계수[\s\S]*에르피엔 → 벨리티엔[\s\S]*모나티엄/.test(s3.textContent), "로비에 마을이 두 층과 함께 적힌다");
   clickAll(s3, (n) => n.classList.contains("lb-help"))[0].onclick();
   check(help === 1, "도움말 단추");
   clickAll(s3, (n) => n.classList.contains("lb-dex"))[0].onclick();
@@ -1237,12 +1220,12 @@ console.log("");
 console.log("지도 (js/map.js · docs/10-지도.md)");
 {
   const M = await import("../js/map.js");
-  // 씨앗 200개 × 세 층 — 모양 규칙이 늘 지켜지는가
+  // 씨앗 200개 × 두 층 — 모양 규칙이 늘 지켜지는가
   // 1-1 은 일반 전투 2~4 갈래 · 1-2~1-8 은 줄마다 2~4칸(싸움 칸 하나는) · 1-9 휴식(상점) 하나 · 1-10 보스(M.ROWS 줄)
   const N = M.ROWS;
   let bad = [], seen = new Set();
   const KINDS = new Set(["fight", "elite", "camp", "campshop", "event", "boss"]);
-  for (let seed = 1; seed <= 200; seed++) for (let f = 0; f < 3; f++) {
+  for (let seed = 1; seed <= 200; seed++) for (let f = 0; f < 2; f++) {
     const m = M.genMap(seed * 7919, f);
     if (m.rows[0].length !== 1 || m.rows[0][0].type !== "start" || m.at !== m.rows[0][0].id) bad.push(`${seed}/${f} 출발 칸(1-0)`);
     const rows = m.rows.slice(1), ids = new Set(rows.flat().map((n) => n.id));     // 1-1 … 1-10
@@ -1273,8 +1256,8 @@ console.log("지도 (js/map.js · docs/10-지도.md)");
     }
     seen.add(types.map((t) => t.join("")).join("|"));
   }
-  check(!bad.length, bad.length ? `지도 모양이 규칙을 어긴다 ${bad.length}: ${bad.slice(0, 3).join(" · ")}` : "지도 600장이 모두 규칙대로다(1-1 일반 2~4갈래 · 줄마다 2~4칸 · 1-9 휴식(상점) · 1-10 보스 · 다 이어짐 · 선은 옆 자리까지만 · 엇갈림 없음)");
-  check(seen.size > 500, `씨앗마다 길이 다르다 (${seen.size}가지)`);
+  check(!bad.length, bad.length ? `지도 모양이 규칙을 어긴다 ${bad.length}: ${bad.slice(0, 3).join(" · ")}` : "지도 400장이 모두 규칙대로다(1-1 일반 2~4갈래 · 줄마다 2~4칸 · 1-9 휴식(상점) · 1-10 보스 · 다 이어짐 · 선은 옆 자리까지만 · 엇갈림 없음)");
+  check(seen.size > 340, `씨앗마다 길이 다르다 (${seen.size}가지)`);
   check(JSON.stringify(M.genMap(42, 1)) === JSON.stringify(M.genMap(42, 1)), "같은 씨앗 · 같은 층이면 같은 지도");
   {
     const all = [];
@@ -1307,6 +1290,13 @@ console.log("지도 (js/map.js · docs/10-지도.md)");
   const adv2 = R.advance(mr);
   check(mr.floor === 1 && adv2.swap === false, "보스를 넘으면 다음 층(사도 교체 없이)");
   check(M.mapOf(mr).floor === 1 && M.currentNode(mr).type === "start" && M.stageName(mr, M.currentNode(mr)) === "2-0" && M.reachable(mr).length >= 2, "다음 층은 새 지도, 2-0 출발 칸부터");
+  // 2층 끝까지 — 2-9 휴식(상점) 뒤 2-10 보스, 그것을 넘으면 판을 이긴다(다음 층 · 마지막 싸움이 없다)
+  while (M.reachable(mr).length) M.enterNode(mr, M.reachable(mr)[0]);
+  check(M.currentNode(mr).type === "boss" && M.stageName(mr, M.currentNode(mr)) === `2-${M.ROWS}` && R.isLastFloor(mr), `2층 끝 칸은 2-${M.ROWS} 보스 — 마을의 마지막 층`);
+  R.rollReward(mr);
+  check(!mr.reward.equip, "2층 보스는 장비를 안 떨군다(판이 끝난다)");
+  R.advance(mr);
+  check(mr.done === "clear" && mr.floor === 1, "2층 보스를 넘으면 판을 이긴다 — 판이 2층에서 끝난다");
 
   // 화면 — 칸을 누르면 들어간다
   let entered = null;
@@ -1317,6 +1307,86 @@ console.log("지도 (js/map.js · docs/10-지도.md)");
   check(count(ms, "t-start") === 1, "맨 앞에 출발 칸(1-0)");
   ms.enterNode(M.reachable(mr2)[0]);
   check(entered && entered.type === "fight", "칸을 누르면 그 칸으로 들어간다");
+}
+
+console.log("");
+console.log("마을 (docs/20-마을.md) — 판은 마을 하나의 두 층, 그 마을의 적만, 2층 보스가 끝");
+{
+  const { VILLAGES, ENEMIES, ALL_FLOORS } = await import("../js/data/enemies.js");
+  const M = await import("../js/map.js");
+  const EV = await import("../js/events.js");
+  const ids = Object.keys(VILLAGES);
+  check(ids.length >= 2 && ids.every((id) => VILLAGES[id].floors.length === 2 && VILLAGES[id].ko && VILLAGES[id].line), `마을 ${ids.length}곳 — 모두 두 층 · 이름 · 한 줄 소개 (${ids.map((id) => VILLAGES[id].ko).join(" · ")})`);
+  // 마을이 정해진다 — 모험을 시작하면 무작위로 하나(rollVillage), 판에 실린다
+  const rolled = new Set();
+  for (let i = 0; i < 40; i++) rolled.add(R.rollVillage(() => (i + 0.5) / 40));
+  check(ids.every((id) => rolled.has(id)), `무작위 마을 — 모두 나온다 (${[...rolled].join(" · ")})`);
+  const rv = R.newRun(started.party, started.rows, 123, "monatium");
+  check(rv.village === "monatium" && R.villageOfRun(rv).ko === "모나티엄" && R.currentFloor(rv).name === "모나티엄 외곽", "고른 마을이 판에 실린다 — 1층은 그 마을의 바깥");
+  const bySeed = new Set();
+  for (let sd = 1; sd <= 40; sd++) bySeed.add(R.newRun(started.party, started.rows, sd).village);
+  check(ids.every((id) => bySeed.has(id)), "마을을 안 주면(봇 · 시험) 씨앗이 정한다 — 씨앗마다 고루");
+  // 그 마을 적만 — 지도의 모든 칸 · 보스가 그 마을 그 층의 적이고, 다른 마을에만 사는 적은 안 나온다
+  const foesOf = (F) => new Set([...F.pools.flat(2), ...F.elites.flat(), ...F.boss]);
+  const own = Object.fromEntries(ids.map((id) => [id, new Set(VILLAGES[id].floors.flatMap((F) => [...foesOf(F)]))]));
+  let off = [], cross = 0;
+  for (const id of ids) for (let sd = 1; sd <= 30; sd++) for (let f = 0; f < 2; f++) {
+    const q = R.newRun(started.party, started.rows, sd * 131, id);
+    q.floor = f;
+    const allowed = foesOf(VILLAGES[id].floors[f]);
+    for (const n of M.mapOf(q).rows.flat()) {
+      const fs = M.enemiesAt(q, n);
+      for (const k of fs) {
+        if (!allowed.has(k)) off.push(`${id} ${f + 1}층 ${k}`);
+        if (ids.some((o) => o !== id && own[o].has(k) && !own[id].has(k))) cross++;
+      }
+    }
+  }
+  check(!off.length && !cross, off.length || cross ? `다른 곳의 적이 나온다 ${off.length + cross}: ${off.slice(0, 3).join(" · ")}` : "마을마다 지도 60장 — 모든 칸 · 보스가 그 마을 그 층의 적이다");
+  check(ALL_FLOORS.every((F) => !F.final) && ALL_FLOORS.every((F) => ![...foesOf(F)].some((k) => /^(e0_uros|r41_)/.test(k))), "마지막 싸움(우로스) · R41 리뉴아 · 후방 드론은 판에 없다");
+  check(typeof R.isFinal === "undefined" && typeof R.finalOf === "undefined", "마지막 싸움 갈래(isFinal · finalOf)가 엔진에 없다");
+  check(ALL_FLOORS.every((F) => [...foesOf(F)].every((k) => ENEMIES[k])), "마을의 모든 적이 적 데이터에 있다");
+  // 보스 데이터가 아직 없는 층(bossElite) — 보스 칸에 엘리트 몸으로 선다
+  {
+    const q = R.newRun(started.party, started.rows, 77, "monatium");
+    q.node = 3;
+    const RU = await import("../js/rules.js");
+    const st = R.openFight(q).st;
+    const fe = RU.foeScale(0, { elite: true });
+    check(st.enemies.every((e) => e.maxHp === Math.round(ENEMIES[e.key].hp * fe.hp) && e.toughMax === C2.toughOf(e.key, true)), `모나티엄 1층 보스(드론 짝)는 엘리트 몸 — 체력 ×${RU.ELITE_HP} · 강인도 +1 (${st.enemies.map((e) => `${e.ko} ${e.maxHp}`).join(" · ")})`);
+    const q2 = R.newRun(started.party, started.rows, 77, "worldtree"); q2.node = 3;
+    const fb = RU.foeScale(0, { boss: true });
+    const st2 = R.openFight(q2).st;
+    check(st2.enemies.every((e) => e.maxHp === Math.round(ENEMIES[e.key].hp * fb.hp) && e.toughMax === C2.toughOf(e.key, false)), "세계수 1층 보스(커버러스)는 보스 몸 그대로");
+  }
+  // 이벤트 — 그 마을 그 층 땅의 이벤트 + 공용만
+  {
+    let bad = [], lands = new Set();
+    for (const id of ids) for (let f = 0; f < 2; f++) for (let sd = 1; sd <= 60; sd++) {
+      const q = R.newRun(started.party, started.rows, 1759000000000 + sd * 7919, id);
+      q.floor = f;
+      const land = R.currentFloor(q).land;
+      for (const ev of EV.rollEvents(q, 2)) { if (ev.pool !== "공용" && ev.pool !== land) bad.push(`${id} ${f + 1}층 ${ev.id}(${ev.pool})`); if (ev.pool !== "공용") lands.add(`${id}:${ev.pool}`); }
+    }
+    check(!bad.length, bad.length ? `다른 땅의 이벤트: ${bad.slice(0, 4).join(" · ")}` : `이벤트는 그 층 땅의 것 + 공용만 (${[...lands].join(" · ")})`);
+  }
+  // 마을 공개 — 파티를 고르기 전에 보인다(ui.js villageScreen), 파티 화면은 그 마을의 1층을 미리 보인다
+  {
+    let went = 0, back = 0;
+    const vs = ui.villageScreen("monatium", () => went++, () => back++);
+    check(vs.className.includes("villagescreen") && /모나티엄/.test(vs.textContent) && /모나티엄 외곽/.test(vs.textContent) && /모나티엄 도심/.test(vs.textContent), "마을 공개 — 이름 · 두 층이 보인다");
+    clickAll(vs, (n) => n.classList.contains("vg-go"))[0].onclick();
+    clickAll(vs, (n) => n.classList.contains("vg-back"))[0].onclick();
+    check(went === 1 && back === 1, "파티를 짭니다 · 로비로 단추");
+    const ps = ui.partyScreen(() => {}, () => {}, { village: "monatium" });
+    check(/모나티엄 · 첫 층/.test(ps.textContent) && /모나티엄 외곽/.test(ps.textContent) && /드론 G형 · 시설 경비/.test(ps.textContent) && !/커버러스/.test(ps.textContent), "파티 화면 — 고른 마을의 1층 · 보스를 미리 보인다");
+  }
+  // 지도 머리 — 마을 + 층
+  {
+    const q = R.newRun(started.party, started.rows, 9, "worldtree");
+    const ms = ui.mapScreen(q, () => {}, () => {});
+    check(/세계수 · 1층 에르피엔/.test(ms.textContent), "지도 머리에 마을 + 층 이름");
+  }
 }
 
 console.log("");
@@ -1619,6 +1689,191 @@ console.log("박자형 · 예약형 문법 — 잇기 · 앞이 공격 · 차례
     put(t, A, "드로우 1", "강화"); put(t, Bk, "방어력 50% 방어", "스킬"); put(t, Ck, "적 1명에게 공격력 30% 피해", "공격");
     bots.smartPlay(t, { depth: 1 });
     check(t.log.some((l) => l.includes("풀코스")), `봇 — 공격 · 스킬 · 강화 를 차례로 내 패시브를 살린다 (${t.playLog.map((p) => p.type).join(" → ")})`);
+  }
+}
+
+// ── 공용 부품(docs/19 §7) — 박자형 「리듬」 · 두 얼굴형 「전환」 · 예약형 「재촉」 「아군의 예약이 다 닳으면」 ─────
+// 시험 카드 · 키워드를 판의 장부에 세워 실제 playCard · endTurn 을 돌린다
+console.log("");
+console.log("공용 부품 — 리듬 · 전환 · 재촉 · 아군의 예약이 다 닳으면");
+{
+  const C = C2;
+  const B4 = (await import("../js/data/built.js")).default;
+  const { parseEffect } = await import("../js/effects.js");
+  const PV = await import("../js/passive.js");
+  const RR = await import("../js/rules.js");
+  const { ENEMIES } = await import("../js/data/enemies.js");
+  const [A, Bk, Ck] = Object.keys(B4.heroes).filter((k) => B4.starter[k]);
+  const FOE = Object.keys(ENEMIES).find((k) => !ENEMIES[k].boss && !(ENEMIES[k].passives || []).length && ENEMIES[k].nature);
+  const KWS = ["꿈", "꿈B", "Z", "W"];
+  const calm = { t: "block", v: 0, say: "가만히", rush: 0 };
+  const mk = (foes = 1) => {
+    const s = C.newCombat({ partyKeys: [A, Bk, Ck], deck: [], enemyIds: Array(foes).fill(FOE), seed: 9 });
+    for (const u of s.party) { u.crit = 0; u.hp = u.maxHp = 99999; u.status = {}; u.mods = []; }
+    for (const e of s.enemies) { e.hp = e.maxHp = 99999; e.tough = e.toughMax = 99; e.intent = { ...calm }; }
+    s.passives = {}; s.kw = {}; s.always = {}; s.stacks = {}; s.stackCap = {}; s.counts = {}; s.fired = {}; s.noNature = true;
+    s.hand = []; s.draw = []; s.discard = []; s.ap = 50;
+    return s;
+  };
+  let n = 0;
+  const put = (s, hero, text, type) => {
+    const { fx, left } = parseEffect(text, { keywords: KWS });
+    if (left) throw new Error(`못 읽음: ${text} → ${left}`);
+    const id = `공용시험${++n}`;
+    s.book[id] = { id, name: `공용 ${n}`, ko: `공용 ${n}`, cost: 1, type, hero, built: true, target: "적", text, fx, tags: [] };
+    s.hand.push(id);
+    return id;
+  };
+  const play = (s, hero, text, type = "스킬", target = 0) => {
+    const id = put(s, hero, text, type);
+    const r = C.playCard(s, s.hand.indexOf(id), target);
+    if (!r.ok) throw new Error(r.why);
+  };
+  const apGain = (s, f) => { const a = s.ap; f(); return s.ap - a + 1; };   // 낸 카드 비용 1 을 돌려 센다
+  const nextTurn = (s) => { C.endTurn(s); for (const e of s.enemies) if (!e.dead) e.intent = { ...calm }; s.ap = 50; };
+  const rh = (s) => RR.rhythmOf(s);
+  const addKw = (s, id, text, owner) => {
+    const kw = PV.parseKeyword(id, text, [id]);
+    if (kw.left.length) throw new Error(`키워드 못 읽음: ${kw.left.join(" / ")}`);
+    s.kw[id] = { ...kw, owner };
+    if (kw.carrier === "self" && kw.cap != null) (s.stackCap[owner] = s.stackCap[owner] || {})[id] = kw.cap;
+    s.passives[owner] = [...(s.passives[owner] || []), ...kw.rules.map((r) => ({ ...r, kwOf: kw.carrier }))];
+    return kw;
+  };
+  const addPas = (s, owner, text) => { s.passives[owner] = [...(s.passives[owner] || []), ...PV.parsePassive(text, KWS)]; };
+  const runs = (s, name) => s.log.filter((l) => l.includes(` · ${name}`)).length;
+  const stk = (s, id, k) => ((s.stacks[k] || {})[id]) || 0;
+
+  // 1. 리듬 — 「잇기:」 · 「앞이 …:」 가 서면 저절로 +1(카드 한 장에 한 번) · 턴이 끝나면 0 · 최대 10
+  {
+    const s = mk();
+    play(s, A, "잇기: 드로우 1");
+    check(rh(s) === 0, "리듬 — 잇기가 안 서면(첫 장) 오르지 않는다");
+    play(s, A, "잇기: 드로우 1");
+    check(rh(s) === 1, `리듬 — 잇기가 서면 저절로 +1 (${rh(s)})`);
+    play(s, Bk, "적 1명에게 공격력 10% 피해", "공격");
+    play(s, Ck, "앞이 공격: 드로우 1");
+    check(rh(s) === 2, `리듬 — 다른 사도의 「앞이 공격:」 도 +1 (${rh(s)})`);
+    play(s, Ck, "앞이 스킬: 드로우 1. 잇기: 드로우 1");
+    check(rh(s) === 3, `리듬 — 한 장에 조건이 둘 서도 +1 한 번 (${rh(s)})`);
+    play(s, null, "리듬 9");
+    check(rh(s) === 10, `리듬 — 「리듬 N」 으로 주고 최대 10 (${rh(s)})`);
+    check((s.party[0].status || {}).리듬 === 10 && (s.party[2].status || {}).리듬 === 10, "리듬은 파티 상태 — 누구의 창으로 봐도 같은 수");
+    nextTurn(s);
+    check(rh(s) === 0, `리듬 — 턴이 끝나면 사라진다 (${rh(s)})`);
+  }
+  // 2. 리듬 1개당 피해 횟수 · 리듬 전부 소모 · 리듬이 N 이상이면: · 「리듬이 N이 되면」(턴마다 한 번)
+  {
+    const s = mk();
+    const e = s.enemies[0];
+    const hit = (text) => { const h0 = e.hp; play(s, A, text, "공격"); return h0 - e.hp; };
+    const one = hit("적 1명에게 공격력 50% 피해");
+    check(hit("리듬 1개당 적 1명에게 공격력 50% 피해") === 0, "리듬 1개당 — 리듬 0 이면 치지 않는다");
+    play(s, null, "리듬 3");
+    const three = hit("리듬 1개당 적 1명에게 공격력 50% 피해");
+    check(three === one * 3, `리듬 1개당 — 리듬 3 이면 세 번 (${three} = ${one} × 3)`);
+    check(apGain(s, () => play(s, A, "리듬이 3 이상이면: AP +2")) === 2 && apGain(s, () => play(s, A, "리듬이 4 이상이면: AP +2")) === 0, "리듬이 N 이상이면: — 그만큼 있을 때만");
+    play(s, A, "리듬 2 소모");
+    check(rh(s) === 1, `리듬 N 소모 (${rh(s)})`);
+    play(s, A, "리듬 전부 소모");
+    check(rh(s) === 0, "리듬 전부 소모");
+    const t = mk();
+    addPas(t, Bk, "박자: 리듬이 3이 되면 AP +4");
+    const g1 = apGain(t, () => play(t, null, "리듬 2"));
+    const g2 = apGain(t, () => play(t, null, "리듬 2"));
+    check(g1 === 0 && g2 === 4 && runs(t, "박자") === 1, `「리듬이 3이 되면」 — 3 을 넘어서는 순간 (${g1} · ${g2})`);
+    play(t, null, "리듬 전부 소모"); play(t, null, "리듬 5");
+    check(runs(t, "박자") === 1, "「리듬이 N이 되면」 — 같은 턴에 다시 닿아도 한 번");
+    nextTurn(t);
+    play(t, null, "리듬 3");
+    check(runs(t, "박자") === 2, "「리듬이 N이 되면」 — 다음 턴에는 또");
+    addPas(t, Ck, "흥: 턴 종료 시 리듬이 3 이상이면 AP +1");
+    nextTurn(t);
+    check(runs(t, "흥") === 1, "패시브 조건 「리듬이 N 이상이면」 — 턴 끝에 사라지기 전에 본다");
+  }
+  // 3. 전환 — 모드 키워드 0 ↔ 1(카드 · 피격 · 소모) · 「아군이 전환하면」 · 「전환하면」(자신만) · 「전환:」
+  {
+    const s = mk();
+    const kw = addKw(s, "꿈", "꿈과 깸 사이. 전환하는 모드다.", A);
+    check(kw.mode && kw.cap === 1, "키워드 줄 「전환하는 모드다.」 — 모드 · 최대 1");
+    addPas(s, Bk, "꿈길: 아군이 전환하면 AP +2");
+    addPas(s, A, "깸: 전환하면 AP +1");
+    addPas(s, Ck, "남의 일: 전환하면 AP +5");
+    check(apGain(s, () => play(s, A, "전환: AP +3")) === 0, "「전환:」 — 이번 턴 전환이 없으면 안 돈다");
+    // 카드 — 「전환」 으로 0 → 1
+    const g = apGain(s, () => play(s, A, "드로우 1, 전환"));
+    check(stk(s, "꿈", A) === 1 && runs(s, "꿈길") === 1 && runs(s, "깸") === 1 && runs(s, "남의 일") === 0 && g === 3,
+      `카드 「전환」 0 → 1 — 아군이 전환하면(누구든) · 전환하면(자신) 돌고, 남의 「전환하면」 은 안 돈다 (AP +${g})`);
+    check(apGain(s, () => play(s, A, "전환: AP +3")) === 3, "「전환:」 — 이번 턴 아군이 전환했으면 돈다");
+    // 소모 — 「꿈」 전부 소모로 1 → 0
+    play(s, A, "「꿈」 전부 소모");
+    check(stk(s, "꿈", A) === 0 && runs(s, "꿈길") === 2, "소모로 1 → 0 도 전환");
+    // 다시 쌓기 · 이미 1 이면 더 쌓아도 전환이 아니다(최대 1)
+    play(s, A, "「꿈」 +1"); play(s, A, "「꿈」 +1");
+    check(stk(s, "꿈", A) === 1 && runs(s, "꿈길") === 3, "「꿈」 +1 로 0 → 1 도 전환 · 이미 켜졌으면 아니다");
+    // 다른 사도가 「전환」 을 내면 — 그 사도에게 모드가 없으니 아무 일 없다
+    play(s, Bk, "전환");
+    check(stk(s, "꿈", A) === 1 && runs(s, "꿈길") === 3, "모드 없는 사도의 「전환」 은 아무 일 없다");
+    // 피격 — 「피해를 받으면 전환」(패시브)
+    addPas(s, A, "뒤척임: 피해를 받으면 전환");
+    s.enemies[0].intent = { t: "attack", v: 10, say: "친다", rush: 0 };
+    const before = runs(s, "꿈길");
+    nextTurn(s);
+    check(stk(s, "꿈", A) === 0 && runs(s, "꿈길") === before + 1, `피격으로 1 → 0 도 전환 (꿈길 ${runs(s, "꿈길") - before}번)`);
+    check(apGain(s, () => play(s, A, "전환: AP +3")) === 0, "「전환:」 — 새 턴에는 다시 안 선다");
+    // 「전환」 이 패시브에서 돌아 모드를 켜면 그것도 전환
+    const t = mk();
+    addKw(t, "꿈B", "깨어 있는 낯. 전환하는 모드다. 아군에게 거는 표식이다.", Ck);
+    addPas(t, A, "꿈길: 아군이 전환하면 AP +2");
+    play(t, Ck, "전환");
+    check(((t.pool.status || {}).꿈B || 0) === 1 && runs(t, "꿈길") === 1, "아군 표식 모드도 「전환」 으로 켜진다(파티에 하나)");
+    play(t, Ck, "전환");
+    check(!((t.pool.status || {}).꿈B) && runs(t, "꿈길") === 2, "다시 「전환」 하면 꺼진다");
+  }
+  // 4. 재촉 — 적 표식 · 제 주머니 예약을 줄이고, 다 닳으면 「「X」가 다 닳으면」 과 「아군의 예약이 다 닳으면」 둘 다(다른 사도 예약에도)
+  {
+    const s = mk(3);
+    const zk = addKw(s, "Z", "걸어 둔 시계. 예약이다. 적에게 거는 표식이다. 최대 3. 적의 차례가 끝나면 1 감소. 「Z」가 다 닳으면: 적 1명에게 공격력 100% 피해.", A);
+    const wk = addKw(s, "W", "심어 둔 씨. 예약이다. 최대 3. 적의 차례가 끝나면 1 감소. 「W」가 다 닳으면: 드로우 1.", Bk);
+    check(zk.reserve && wk.reserve && zk.decay === 1, "키워드 줄 「예약이다.」");
+    addPas(s, Ck, "결말: 아군의 예약이 다 닳으면 적 1명에게 공격력 50% 피해");
+    const [e0, e1, e2] = s.enemies;
+    play(s, A, "적 1명 「Z」 +1", "스킬", e0.idx); play(s, A, "적 1명 「Z」 +2", "스킬", e1.idx); play(s, A, "적 1명 「Z」 +1", "스킬", e2.idx);
+    play(s, Bk, "「W」 +1");
+    e2.hp = 0; e2.dead = true;
+    const h0 = e0.hp, h1 = e1.hp, atk = s.party.find((u) => u.key === A).atk, atkC = s.party.find((u) => u.key === Ck).atk;
+    play(s, Ck, "재촉 1");
+    check(!(e0.status || {}).Z && (e1.status || {}).Z === 1 && (e2.status || {}).Z === 1 && stk(s, "W", Bk) === 0,
+      "재촉 1 — 살아 있는 적의 표식 · 제 주머니 모두 1 줄고(쓰러진 적은 그대로)");
+    check(runs(s, "Z") === 1 && runs(s, "W") === 1, "재촉으로 0 → 「「X」가 다 닳으면」(적 표식 · 제 주머니)");
+    check(runs(s, "결말") === 2, `「아군의 예약이 다 닳으면」 — 다른 사도(A · Bk)의 예약에도 (${runs(s, "결말")}번)`);
+    check(h0 - e0.hp >= Math.round((atk + atkC * 0.5) * 0.9) && h1 === e1.hp, `적 표식이 닳은 적이 「적 1명」 (${h0 - e0.hp} · 옆 적 ${h1 - e1.hp})`);
+    const g1 = e1.hp;
+    nextTurn(s);
+    check(!(e1.status || {}).Z && runs(s, "Z") === 2 && runs(s, "결말") === 3, "적의 차례가 끝나 다 닳은 것도 「아군의 예약이 다 닳으면」");
+    check(g1 - e1.hp >= Math.round((atk + atkC * 0.5) * 0.9), `그때도 표식이 닳은 그 적에게 — 「「X」가 다 닳으면」 · 「아군의 예약이 …」 둘 다 (${g1 - e1.hp})`);
+    // 소모로 0 이 된 것은 다 닳은 것이 아니다 · 예약이 없는 재촉은 아무 일 없다
+    play(s, A, "적 1명 「Z」 +1", "스킬", e0.idx);
+    play(s, A, "적 1명 「Z」 1 소모", "스킬", e0.idx);
+    check(runs(s, "결말") === 3, "소모로 0 이 된 예약은 「다 닳으면」 이 아니다");
+    play(s, Ck, "재촉 2");
+    check(runs(s, "결말") === 3, "줄일 예약이 없으면 재촉은 아무 일 없다");
+    // 예약이 아닌 키워드는 재촉이 건드리지 않는다
+    const t = mk();
+    addKw(t, "W", "그냥 쌓는 것. 최대 3. 적의 차례가 끝나면 1 감소.", Bk);
+    play(t, Bk, "「W」 +2"); play(t, Ck, "재촉 1");
+    check(stk(t, "W", Bk) === 2, "「예약이다.」 가 없는 키워드는 재촉이 안 줄인다");
+  }
+  // 5. smart 봇 — 리듬을 쌓은 뒤 「리듬 1개당」 카드를 낸다(tools/lib/bot.js orderly · liveValue)
+  {
+    const { makeBots } = await import("./lib/bot.js");
+    const bots = makeBots({ C, B: await import("../js/cardbook.js"), R: RR, ENEMIES });
+    const s = mk();
+    s.ap = 2;
+    const pay = put(s, A, "리듬 1개당 적 1명에게 공격력 100% 피해", "공격");
+    const build = put(s, Bk, "리듬 4", "스킬");
+    bots.smartPlay(s, { depth: 1 });
+    check(s.discard.indexOf(build) === 0 && s.discard.indexOf(pay) === 1, `봇 — 리듬을 깐 뒤 「리듬 1개당」 을 낸다 (${s.discard.map((id) => (id === pay ? "리듬 1개당" : id === build ? "리듬 4" : id)).join(" → ")})`);
   }
 }
 
