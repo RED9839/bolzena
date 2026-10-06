@@ -49,6 +49,7 @@ namespace Bolzena.RunUI
                 h = face ? R * 1.35f * (frac / 0.34f) : frac * RefBody * f.Scale;
                 // 위 = 머리 둘레 상자 위 끝(머리카락 · 귀 · 뿔)까지, 다만 몸 꼭대기 위로 창 높이의 8%(얼굴 칸 4%)까지만 — 뿔이 길면 뿔 끝이 잘린다(얼굴이 먼저)
                 top = Mathf.Min(f.HeadBox.yMax, f.TopY + h * (face ? 0.04f : 0.08f)) + h * 0.03f;
+                if (face && f.FaceY != 0) top = f.FaceY + h * 0.55f;   // 얼굴이 몸 위 끝이 아닌 사도(꿀벌 쥬비) — 얼굴을 칸 가운데 조금 위에
                 float w0 = h * ratio;
                 float cx = StandingFit.CropCenterX(f, StandMode.Upper, face);
                 float m = w0 * 0.04f;
@@ -97,6 +98,7 @@ namespace Bolzena.RunUI
                     s.name = "snap " + art;
                 }
             }
+            if (cache.Count >= 160) cache.Clear();   // 상한 — 띄운 것은 화면이 쥐어 살고, 나머지 구운 그림은 다음 장면 정리 때 풀린다
             cache[key] = s;
             return s;
         }

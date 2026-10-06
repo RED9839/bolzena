@@ -12,14 +12,57 @@
       "atk": 92,
       "def": 65,
       "crit": 5,
-      "blurb": "마카샤가 비틀어 쓴 우로스 이야기책에서 태어난 유리도마뱀 소녀.",
+      "blurb": "먼저 휘두르지 않는 검사. 검 끝으로 「검의 영역」 을 그어 그 안의 동료가 덜 다치고 더 세게 치게 하고, 칼을 맞댄 적과는 결투로 친구가 됩니다.",
       "keyword": {
-        "name": "결투",
-        "desc": "통성명 뒤엔 결투 — 맞붙은 한 적의 공격을 다 막으면 강인도를 깎고, 쓰러뜨리면 반격",
-        "carrier": "enemy",
-        "cap": 1,
-        "hunt": true
+        "name": "검의 영역",
+        "desc": "검 끝으로 그어 세운 둘레",
+        "carrier": "ally",
+        "cap": 3,
+        "decay": 1,
+        "per": [
+          {
+            "stat": "taken",
+            "v": -0.05
+          },
+          {
+            "stat": "dealt",
+            "v": 0.05
+          }
+        ],
+        "rules": [
+          {
+            "name": "강한 상대에게 강함",
+            "when": {
+              "on": "turnEnd"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "검의 영역",
+                "n": 1
+              }
+            ],
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 0.2,
+                "target": "randomEnemy",
+                "base": "def",
+                "hits": 4
+              }
+            ]
+          }
+        ]
       },
+      "keywords": [
+        {
+          "name": "결투",
+          "desc": "한 적과 맞붙는 결투",
+          "carrier": "enemy",
+          "cap": 1,
+          "hunt": true
+        }
+      ],
       "passives": [
         {
           "name": "통성명 뒤엔 결투",
@@ -81,6 +124,11 @@
             "id": "둔화",
             "v": 1,
             "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "검의 영역",
+            "v": 2
           }
         ]
       },
@@ -129,119 +177,115 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "shield",
-          "ratio": 2.4
+          "k": "stack",
+          "id": "검의 영역",
+          "v": 2
         },
         {
           "k": "status",
-          "id": "반격",
+          "id": "피해 감소",
           "v": 1
         },
         {
           "k": "status",
-          "id": "결의",
+          "id": "협공",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "힘준 검 조율",
+          "name": "숫돌질",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 3.1
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
             },
             {
               "k": "status",
-              "id": "반격",
-              "v": 2
+              "id": "피해 감소",
+              "v": 1
             },
             {
               "k": "status",
-              "id": "결의",
+              "id": "협공",
               "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 검 조율",
+          "name": "칼끝 맞추기",
           "cost": 1,
           "fx": [
             {
-              "k": "shield",
-              "ratio": 2.15
-            },
-            {
-              "k": "status",
-              "id": "반격",
+              "k": "stack",
+              "id": "검의 영역",
               "v": 1
             },
             {
               "k": "status",
-              "id": "결의",
+              "id": "협공",
               "v": 1
             }
           ]
         },
         {
-          "name": "검사의 검 조율",
+          "name": "결투 신청",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 3.1
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "결의",
+              "id": "협공",
               "v": 1
             }
           ]
         },
         {
-          "name": "든든한 검 조율",
-          "tags": [
-            "보존"
-          ],
+          "name": "버티는 자세",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 3
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
             },
             {
               "k": "status",
-              "id": "반격",
+              "id": "피해 감소",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "shield",
+              "ratio": 2.0
             }
           ]
         },
         {
-          "name": "복 받은 검 조율",
-          "tags": [
-            "축복"
-          ],
+          "name": "세 자루 조율",
+          "cost": 3,
           "fx": [
             {
-              "k": "shield",
-              "ratio": 3
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
             },
             {
               "k": "status",
-              "id": "반격",
+              "id": "협공",
               "v": 2
             },
             {
               "k": "status",
-              "id": "결의",
+              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -249,21 +293,16 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
+          "name": "가지런한 칼집",
           "kind": "guard"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "익숙한 손놀림",
+          "kind": "cost"
         },
         {
-          "name": "맞댄 칼날",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
+          "name": "유리비늘 갑옷",
+          "kind": "defUp"
         }
       ]
     },
@@ -292,90 +331,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 통성명",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "결투",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 1.3
-            }
-          ]
-        },
-        {
-          "name": "가벼운 통성명",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "결투",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.9
-            }
-          ]
-        },
-        {
-          "name": "검사의 통성명",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "결투",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 1.3
-            }
-          ]
-        },
-        {
-          "name": "재빠른 통성명",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "결투",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.25
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 통성명",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "정중한 인사",
           "fx": [
             {
               "k": "dmg",
@@ -392,25 +348,102 @@
               "ratio": 1.2
             }
           ]
+        },
+        {
+          "name": "이름만 대기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "검을 겨누고",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "수인의 예법",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.4
+            }
+          ]
+        },
+        {
+          "name": "격식 갖춘 결투",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결투",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 2.6
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "또렷한 목소리",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "예의 바른 방패",
+          "kind": "guard"
         },
         {
-          "name": "맞댄 칼날",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
+          "name": "상대 살피기",
+          "kind": "draw"
         }
       ]
     },
@@ -439,72 +472,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 장검 · 단도 · 한손검",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
-              "id": "결투"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가벼운 장검 · 단도 · 한손검",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
-              "id": "결투"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "검사의 장검 · 단도 · 한손검",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
-              "id": "결투"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 장검 · 단도 · 한손검",
-          "tags": [
-            "신속"
-          ],
+          "name": "세 자루 연격",
           "fx": [
             {
               "k": "dmg",
@@ -523,15 +491,56 @@
           ]
         },
         {
-          "name": "꿰뚫는 장검 · 단도 · 한손검",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "단도만",
+          "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.6,
               "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "결투의 검",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "세 방향 베기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies",
               "hits": 3
             },
             {
@@ -543,25 +552,40 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "한 자루 더",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "ifStack",
+              "id": "결투"
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "손에 익은 검",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "틈을 노리는 단도",
           "kind": "weakSpot"
         },
         {
-          "name": "맞댄 칼날",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
+          "name": "검 바꿔 쥐기",
+          "kind": "cost"
         }
       ]
     },
@@ -579,79 +603,160 @@
           "v": 1
         },
         {
-          "k": "status",
-          "id": "반격",
-          "v": 2
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "blocked"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "반격",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 독 없는 투구꽃",
+          "name": "검사의 예",
           "fx": [
             {
               "k": "status",
               "id": "결의",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 독 없는 투구꽃",
+          "name": "가지 하나",
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "검사의 독 없는 투구꽃",
+          "name": "통성명",
           "fx": [
             {
               "k": "status",
               "id": "결의",
-              "v": 2
+              "v": 1
             },
             {
+              "k": "stack",
+              "id": "결투",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "맞댄 칼날",
+          "fx": [
+            {
               "k": "status",
-              "id": "반격",
-              "v": 2
+              "id": "결의",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "든든한 독 없는 투구꽃",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 2
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 독 없는 투구꽃",
+          "name": "꽃 피는 결투장",
           "tags": [
             "축복"
           ],
@@ -659,30 +764,52 @@
             {
               "k": "status",
               "id": "결의",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
               "id": "반격",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
-          "kind": "ap"
+          "name": "단단한 꽃대",
+          "kind": "defUp"
         },
         {
-          "name": "한 장 더",
+          "name": "투구꽃 향기",
           "kind": "draw"
         },
         {
-          "name": "맞댄 칼날",
+          "name": "되받는 꽃잎",
           "fx": [
             {
-              "k": "draw",
+              "k": "status",
+              "id": "반격",
               "v": 1
             }
           ]

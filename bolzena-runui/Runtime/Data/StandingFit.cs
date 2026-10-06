@@ -33,6 +33,7 @@ namespace Bolzena.RunUI
             // 머리 상자(standing_head.json — Editor/StandHead.cs): 머리 뼈 · 머리 둘레 상자(머리 · 머리카락 · 얼굴, 장신구 뺌) · 얼굴 상자 · 얼굴 가운데 x
             public bool HasHead;
             public float HeadX, FaceCx;
+            public float FaceY;   // 얼굴(눈 · 입) 가운데 높이 — 손보정에만(0 = 없음). 얼굴 칸 자르기가 이 높이를 가운데 조금 아래에 둔다
             public Rect HeadBox, FaceBox;
             public bool Bent;     // 숙이거나 기운 포즈(머리가 몸 가운데선에서 옆으로 · 옛 자르기에서 얼굴이 잘리던 사도)
             public string Link;   // 키를 맞춘 원판(standing_height_link.json)
@@ -119,6 +120,32 @@ namespace Bolzena.RunUI
                         table[kv.Key] = f;
                         heads++;
                     }
+                // 중심 손보정(standing_center_fix.json — 벨라 · 클로에 · 쥬비): 바닥 · 몸 꼭대기 · 몸 가운데 · 얼굴 가운데 가운데 적은 것만 덮는다
+                bool noCenter = noHead || Array.IndexOf(Environment.GetCommandLineArgs(), "-nocenter") >= 0;
+                var cta = noCenter ? null : Resources.Load<TextAsset>("RunUI/standing_center_fix");
+                int centers = 0;
+                if (cta != null && FitJson.Parse(cta.text) is Dictionary<string, object> cj)
+                    foreach (var kv in cj)
+                    {
+                        if (kv.Key.StartsWith("_") || !(kv.Value is Dictionary<string, object> o) || !table.TryGetValue(kv.Key, out var f)) continue;
+                        if (Num(o, "footY") is float fy) { f.FootY = fy; f.Bounds = Rect.MinMaxRect(f.Bounds.xMin, fy, f.Bounds.xMax, f.Bounds.yMax); }
+                        if (Num(o, "topY") is float ty)
+                        {
+                            f.TopY = ty;
+                            f.HairTop = Mathf.Min(f.HairTop, ty + 20);
+                            if (f.HasHead) { f.HeadBox = Rect.MinMaxRect(f.HeadBox.xMin, f.HeadBox.yMin, f.HeadBox.xMax, Mathf.Min(f.HeadBox.yMax, ty + 20)); f.FaceBox = Rect.MinMaxRect(f.FaceBox.xMin, f.FaceBox.yMin, f.FaceBox.xMax, Mathf.Min(f.FaceBox.yMax, ty)); }
+                        }
+                        if (Num(o, "centerX") is float cx) f.CenterX = cx;
+                        if (Num(o, "faceY") is float fyy) f.FaceY = fyy;
+                        if (Num(o, "faceCx") is float fc && f.HasHead)
+                        {
+                            float d = fc - f.FaceCx;
+                            f.FaceCx = fc; f.HeadX = fc;
+                            f.FaceBox = new Rect(f.FaceBox.x + d, f.FaceBox.y, f.FaceBox.width, f.FaceBox.height);
+                        }
+                        table[kv.Key] = f;
+                        centers++;
+                    }
                 // 키 손보정(standing_height_fix.json) — 앉거나 숙여 키가 줄었거나 탈것 · 의자를 키에 넣은 사도는 「편 키」(서 있을 때 몸 키)로. 짝보다 먼저
                 var fta = noHead ? null : Resources.Load<TextAsset>("RunUI/standing_height_fix");
                 int fixes = 0;
@@ -146,7 +173,7 @@ namespace Bolzena.RunUI
                 foreach (var f in table.Values) bodies.Add(f.Body);
                 bodies.Sort();
                 if (bodies.Count > 0) p95 = bodies[Mathf.Clamp(Mathf.RoundToInt(bodies.Count * 0.95f) - 1, 0, bodies.Count - 1)];
-                Debug.Log($"[RunUI] 스탠딩 맞춤 표 {table.Count}명 · med_st {medSt} · 기준 키(95%) {p95:0} · 안 B {(hroot != null ? "standing_fit_height.json" : "없음 — 배율 1")} · 머리 상자 {heads}명 · 키 손보정 {fixes} · 키 짝 {links}");
+                Debug.Log($"[RunUI] 스탠딩 맞춤 표 {table.Count}명 · med_st {medSt} · 기준 키(95%) {p95:0} · 안 B {(hroot != null ? "standing_fit_height.json" : "없음 — 배율 1")} · 머리 상자 {heads}명 · 중심 손보정 {centers} · 키 손보정 {fixes} · 키 짝 {links}");
             }
             catch (Exception e) { Debug.LogWarning("[RunUI] standing_fit.json 을 읽지 못했습니다 — 그 자리에서 잽니다: " + e.Message); table.Clear(); }
         }
@@ -188,6 +215,18 @@ namespace Bolzena.RunUI
             float room = mode == StandMode.Full ? avail : slot.yMax - top - floor;
             if (reach * k > room) k = room / Mathf.Max(1, reach);
             origin = new Vector2(slot.center.x - CropCenterX(f, mode) * k, floor - f.FootY * k);
+            // 얼굴 높이 손보정이 있는 사도(꿀벌 쥬비 — 얼굴이 몸 왼쪽 아래): 무릎께 · 상반신은 얼굴을 칸 가운데 위 1/3 에, 몸 전체가 칸 안에 들게
+            if (f.FaceY != 0 && mode != StandMode.Full)
+            {
+                origin = new Vector2(slot.center.x - f.FaceCx * k, slot.yMax - slot.height / 3f - f.FaceY * k);
+                float l = origin.x + f.Bounds.xMin * k, r = origin.x + f.Bounds.xMax * k;
+                if (r - l <= slot.width) { if (l < slot.xMin) origin.x += slot.xMin - l; else if (r > slot.xMax) origin.x -= r - slot.xMax; }
+                else origin.x = slot.center.x - f.Bounds.center.x * k;
+                float b = origin.y + f.FootY * k, t = origin.y + f.Bounds.yMax * k;
+                if (b < slot.yMin) origin.y += slot.yMin - b;
+                else if (t > slot.yMax && b - (t - slot.yMax) >= slot.yMin) origin.y -= t - slot.yMax;
+                return true;
+            }
             // 얼굴이 칸 옆으로 나가면(숙인 · 기운 포즈) 안쪽으로 민다
             if (f.HasHead && mode != StandMode.Full)
             {

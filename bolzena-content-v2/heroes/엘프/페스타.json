@@ -12,19 +12,19 @@
       "atk": 83,
       "def": 62,
       "crit": 5,
-      "blurb": "규칙과 통제를 혐오하는 무정부주의 락커. 파티가 공격과 스킬을 번갈아 낼 때마다 반항심이 끓어오르고, 셋이 차면 모두가 같이 친다.",
+      "blurb": "규칙과 통제를 혐오하는 무정부주의 락커. 적이 쌓아 둔 기세를 기타 소리로 걷어 내고, 파티가 공격과 스킬을 번갈아 낼 때마다 반항심이 끓어올라 가득 차면 모두가 같이 치며 적의 기세가 꺾입니다.",
       "keyword": {
         "name": "반항",
-        "desc": "정해진 박자를 깨는 쾌감 — 공격과 스킬을 번갈아 내면 쌓이고, 셋이면 협공",
+        "desc": "공격 · 스킬을 번갈아 내는 박자",
         "carrier": "self",
-        "cap": 3,
+        "cap": 4,
         "rules": [
           {
-            "name": "나락도 락이다",
+            "name": "나락도 락",
             "when": {
               "on": "stackReach",
               "id": "반항",
-              "n": 3
+              "n": 4
             },
             "fx": [
               {
@@ -36,6 +36,12 @@
                 "k": "status",
                 "id": "협공",
                 "v": 1
+              },
+              {
+                "k": "status",
+                "id": "약화",
+                "v": 1,
+                "target": "allEnemies"
               }
             ]
           }
@@ -43,7 +49,7 @@
       },
       "passives": [
         {
-          "name": "나락도 락이다",
+          "name": "나락도 락",
           "when": {
             "on": "play",
             "who": "any",
@@ -61,7 +67,7 @@
           ]
         },
         {
-          "name": "나락도 락이다",
+          "name": "나락도 락",
           "when": {
             "on": "play",
             "who": "any",
@@ -151,21 +157,21 @@
       ],
       "fx": [
         {
+          "k": "dispel",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
           "k": "dmg",
-          "ratio": 1.5,
+          "ratio": 1.4,
           "base": "def",
           "target": "allEnemies"
         },
         {
           "k": "status",
           "id": "약화",
-          "v": 2,
+          "v": 1,
           "target": "allEnemies"
-        },
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
         }
       ],
       "oracles": [
@@ -176,21 +182,21 @@
           ],
           "fx": [
             {
+              "k": "dispel",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
               "k": "dmg",
-              "ratio": 1.95,
+              "ratio": 1.82,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
             }
           ]
         },
@@ -202,21 +208,21 @@
           ],
           "fx": [
             {
+              "k": "dispel",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 1.4,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
             }
           ]
         },
@@ -228,46 +234,46 @@
           ],
           "fx": [
             {
+              "k": "dispel",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
               "k": "dmg",
-              "ratio": 1.98,
+              "ratio": 1.85,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
             }
           ]
         },
         {
-          "name": "앙코르는 없다",
+          "name": "앙코르 없음",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
+              "k": "dispel",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
               "k": "dmg",
-              "ratio": 2.17,
+              "ratio": 2.03,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
             }
           ]
         },
@@ -279,21 +285,21 @@
           ],
           "fx": [
             {
+              "k": "dispel",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
               "k": "dmg",
-              "ratio": 1.98,
+              "ratio": 1.85,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
             }
           ]
         }
@@ -448,7 +454,7 @@
       ],
       "blesses": [
         {
-          "name": "앙코르는 없다",
+          "name": "앙코르 없음",
           "kind": "guard"
         },
         {
@@ -626,17 +632,29 @@
         {
           "k": "defMod",
           "v": 0.15,
-          "target": "self",
-          "run": true
-        },
-        {
-          "k": "stack",
-          "id": "반항",
-          "v": 3
+          "run": true,
+          "target": "self"
         },
         {
           "k": "draw",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "반항",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -645,18 +663,30 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.2,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "반항",
-              "v": 4
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -665,19 +695,31 @@
           "cost": 1,
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.15,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "반항",
-              "v": 3
-            },
-            {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "defMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -689,18 +731,31 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.18,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "stack",
               "id": "반항",
-              "v": 4
+              "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -709,18 +764,30 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.22,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "반항",
-              "v": 4
+              "v": 0.25,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -732,18 +799,30 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.18,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "반항",
-              "v": 4
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -758,7 +837,7 @@
           "kind": "draw"
         },
         {
-          "name": "앙코르는 없다",
+          "name": "앙코르 없음",
           "fx": [
             {
               "k": "stack",

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Linq;
 using TMPro;
@@ -21,6 +21,7 @@ namespace Bolzena.RunUI
                 bool hasNat = !string.IsNullOrEmpty(FoeNature);
                 // 적 속성이 있으면 오른쪽에 「이번 판 적 속성 + 층 보스 초상」 칸을 붙인다(이걸 보고 약점에 맞춰 파티를 짠다)
                 panel.At(0.5f, 0.5f, 0, 0, hasNat ? 680 + SideW : 680, hasNat ? 600 : 560);
+                FitScale.Fit(panel, Stage.Size, hasNat ? 680 + SideW : 680, hasNat ? 600 : 560, 0.67f);   // 화면 비례(PC 높이 900 에서 보이는 몫) — 보스 클론 초상도 함께 줄어든다
                 Ui.Shadow(panel, 30, -14, 0.7f);
                 Tw.Pop(panel, 0.05f, 0.85f, 0.5f);
                 var main = Ui.Rect("main", panel).Fill(0, 0, hasNat ? SideW : 0, 0);
@@ -50,13 +51,13 @@ namespace Bolzena.RunUI
                     Tw.Pop(row.rectTransform, 1.1f + i * 0.18f, 0.8f, 0.4f);
                 }
                 if (hasNat) FoeSide(panel, v, FoeNature, 1.4f);
-                var note = Ui.Text(main, $"1-1 부터 {v.Floors.Count}-10 까지 이 마을의 적만 나옵니다. {v.Floors.Count}층 보스를 이기면 판을 이깁니다.", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center);
+                var note = Ui.Text(main, $"1-1 부터 {v.Floors.Count}-10 까지 이 마을의 적만 나옵니다. {v.Floors.Count}층 보스를 이기면 모험 완주입니다.", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center);
                 note.rectTransform.Band(0, 30, 30, 30, 112);
                 var row2 = Ui.Rect("buttons", main).Band(0, 66, 40, 40, 34);
                 Ui.Row(row2, 16, TextAnchor.MiddleCenter, null, false, true);
                 var back = Btn.Make(row2, "로비로", BtnStyle.Dark, Lobby, Theme.FsMd);
                 back.Pref(200, 62);
-                var go = Btn.Make(row2, "파티를 짭니다", BtnStyle.Gold, onGo, Theme.FsLg);
+                var go = Btn.Make(row2, "파티 편성", BtnStyle.Gold, onGo, Theme.FsLg);
                 go.Pref(380, 62);
                 Stage.Hot["go"] = go;
 
@@ -91,7 +92,7 @@ namespace Bolzena.RunUI
         {
             var col = Ui.Rect("foeside", panel).Column(1, SideW, 0, 0, 0);
             var sep = Ui.Img(col, null, Color.white.A(0.1f), "sep"); sep.rectTransform.Column(0, 2, 28, 28, 0);
-            var kick = Ui.Title(col, "이번 판 적 속성", Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center);
+            var kick = Ui.Title(col, "이번 모험 적 속성", Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center);
             kick.rectTransform.Band(1, 30, 0, 0, -30);
             var head = Ui.Rect("head", col).At(0.5f, 1, 0, -68, 260, 76);
             var glow = Ui.Img(head, Theme.S("soft"), Theme.NatureCardOf(nat).A(0), "glow"); glow.rectTransform.At(0, 0.5f, 38, 0, 170, 170);
@@ -99,7 +100,7 @@ namespace Bolzena.RunUI
             var nm = Ui.Title(head, nat, 60, Theme.NatureCardOf(nat), TextAlignmentOptions.MidlineLeft); nm.rectTransform.Fill(106, 0, 0, 0);
             nm.Outline(0.12f); nm.textWrappingMode = TextWrappingModes.NoWrap;
             var wk = Ui.Title(col, WeakLine(nat), Theme.FsLg, Theme.Ink, TextAlignmentOptions.Center); wk.rectTransform.Band(1, 34, 20, 20, -150);
-            var hint = Ui.Text(col, "모든 적 · 두 보스가 이 성격 — 약점 사도(공명은 늘)로 치면\n강인도가 크게 깎인다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Top);
+            var hint = Ui.Text(col, "모든 적 · 두 보스가 이 성격 — 약점 사도(공명은 늘)로 치면\n강인도가 크게 깎입니다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Top);
             hint.rectTransform.Band(1, 46, 16, 16, -186);
             int n = Mathf.Min(2, v.Floors.Count);
             float cw = 158, ch = 236, gap = 18;
@@ -190,7 +191,7 @@ namespace Bolzena.RunUI
             var nc = Theme.NatureCardOf(nat);
             var b = Ui.Img(body, Theme.Round, Color.Lerp(Theme.NavyWell, nc, 0.22f).A(0.9f), "foenature"); b.Pref(-1, 44);
             var ic = Ui.Img(b.transform, Icon("성격_" + nat), Color.white, "ic"); ic.rectTransform.At(0, 0.5f, 10, 0, 30, 30); ic.preserveAspect = true;
-            var l = Ui.Title(b.transform, "이번 판 적 속성", Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); l.rectTransform.Fill(48, 0, 0, 0);
+            var l = Ui.Title(b.transform, "이번 모험 적 속성", Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); l.rectTransform.Fill(48, 0, 0, 0);
             var r = Ui.Title(b.transform, $"<color={Hex(nc)}>{nat}</color>  <size=78%>{WeakLine(nat)}</size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight);
             r.rectTransform.Fill(0, 0, 14, 0); r.textWrappingMode = TextWrappingModes.NoWrap;
         }
@@ -199,7 +200,7 @@ namespace Bolzena.RunUI
         void BossCardsRow(RectTransform body, Bolzena.Core.VillageDef v, string nat, float w)
         {
             int n = Mathf.Min(2, v.Floors.Count);
-            float h = Theme.C(196, 150), cw = Mathf.Min(150, (w - 48 - 12 * (n - 1)) / n);
+            float h = Theme.C(196, 124), cw = Mathf.Min(150, (w - 48 - 12 * (n - 1)) / n);
             var row = Ui.Rect("bosses", body); row.Pref(-1, h);
             Ui.Row(row, 12, TextAnchor.MiddleCenter, null, false, false);
             for (int i = 0; i < n; i++)

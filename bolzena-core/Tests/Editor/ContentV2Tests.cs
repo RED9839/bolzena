@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
@@ -270,6 +271,23 @@ namespace Bolzena.Core.Tests
             var all = string.Join("\n", Validator.Check(d).Errors);
             StringAssert.Contains("앞에 roll", all); StringAssert.Contains("음수로 걸 수 없다", all);
             Assert.AreEqual("2턴간 자신의 공격 카드 비용 -1, 적의 다음 공격 한 대 피해 -30%", new CardText(d).Card(d.Card("ok")));
+        }
+
+        [Test] public void 콘텐츠_하이디_고학년이_특종감을_처치하면_잠복_2와_cue()
+        {
+            string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
+            if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
+            var d = GameData.FromFolder(dir);
+            var cues = new List<Cue>();
+            var en = d.Enemies.Keys.First();
+            var b = Battle.Start(d, new BattleSetup { Party = new List<string> { "하이디" }, Enemies = new List<string> { en, en }, Deck = d.Hero("하이디").Starter.ToList(), Gauge = 300, Seed = 3, EnemyHp = 50 }, cues);
+            b.Enemies[0].Hp = b.Enemies[0].MaxHp;
+            b.Enemies[1].Hp = 1;
+            Assert.AreEqual(0, b.StackOf("하이디", "잠복"));
+            Assert.IsTrue(b.UseUlt("하이디").Ok);
+            Assert.IsTrue(b.Enemies[1].Dead, "고학년이 HP 가 가장 낮은 특종감을 처치");
+            Assert.AreEqual(2, b.StackOf("하이디", "잠복"), "초 집중 취재 — 특종감이 쓰러지면 잠복 +2");
+            Assert.IsTrue(cues.Any(c => c.K == "fx" && c.Id == "heidi_next_scoop"));
         }
     }
 }

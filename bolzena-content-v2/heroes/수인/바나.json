@@ -15,7 +15,7 @@
       "blurb": "영웅의 검을 만들겠다는 꿈을 품은 곱슬쥐 대장장이.",
       "keyword": {
         "name": "단조",
-        "desc": "풀무질 — 스킬 카드마다 손의 카드를 벼리며 쌓고, 둘이면 사기",
+        "desc": "스킬로 두드리는 풀무질",
         "carrier": "self",
         "cap": 3,
         "rules": [
@@ -147,7 +147,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 호두까기 장인",
+          "name": "장인의 손놀림",
           "fx": [
             {
               "k": "cardStatus",
@@ -163,12 +163,12 @@
             {
               "k": "stack",
               "id": "단조",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 호두까기 장인",
+          "name": "호두 한 알",
           "cost": 0,
           "fx": [
             {
@@ -176,11 +176,11 @@
               "id": "탐구심",
               "v": 1,
               "to": "hand",
-              "n": 0
+              "n": 1
             },
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 1.1
             },
             {
               "k": "stack",
@@ -190,7 +190,7 @@
           ]
         },
         {
-          "name": "벼린 호두까기 장인",
+          "name": "망치질 두 번",
           "fx": [
             {
               "k": "cardStatus",
@@ -201,7 +201,7 @@
             },
             {
               "k": "shield",
-              "ratio": 2.4
+              "ratio": 2.0
             },
             {
               "k": "stack",
@@ -211,34 +211,27 @@
           ]
         },
         {
-          "name": "든든한 호두까기 장인",
-          "tags": [
-            "보존"
-          ],
+          "name": "단단한 호두 껍질",
           "fx": [
-            {
-              "k": "cardStatus",
-              "id": "탐구심",
-              "v": 1,
-              "to": "hand",
-              "n": 0
-            },
             {
               "k": "shield",
               "ratio": 2.5
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
             },
             {
               "k": "stack",
               "id": "단조",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "복 받은 호두까기 장인",
-          "tags": [
-            "축복"
-          ],
+          "name": "명장의 작업대",
+          "cost": 2,
           "fx": [
             {
               "k": "cardStatus",
@@ -249,7 +242,7 @@
             },
             {
               "k": "shield",
-              "ratio": 2.5
+              "ratio": 4.35
             },
             {
               "k": "stack",
@@ -261,15 +254,15 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
+          "name": "두꺼운 앞치마",
           "kind": "guard"
         },
         {
-          "name": "한 장 더",
+          "name": "호두 바구니",
           "kind": "draw"
         },
         {
-          "name": "불꽃 튀는 모루",
+          "name": "풀무질",
           "fx": [
             {
               "k": "stack",
@@ -309,20 +302,20 @@
       ],
       "oracles": [
         {
-          "name": "힘준 모루 위의 망치",
+          "name": "힘찬 망치질",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.85,
+              "ratio": 2.7,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
@@ -332,7 +325,7 @@
           ]
         },
         {
-          "name": "가벼운 모루 위의 망치",
+          "name": "톡톡 망치질",
           "cost": 1,
           "tags": [
             "분쇄"
@@ -340,7 +333,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
@@ -356,14 +349,14 @@
           ]
         },
         {
-          "name": "벼린 모루 위의 망치",
+          "name": "담금질",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.65,
+              "ratio": 2.35,
               "target": "oneEnemy"
             },
             {
@@ -379,21 +372,21 @@
           ]
         },
         {
-          "name": "재빠른 모루 위의 망치",
+          "name": "불꽃 튀기기",
           "tags": [
-            "분쇄",
-            "신속"
+            "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.75,
-              "target": "oneEnemy"
+              "ratio": 1.6,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 1
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -403,48 +396,42 @@
           ]
         },
         {
-          "name": "꿰뚫는 모루 위의 망치",
+          "name": "전설의 검 두드리기",
+          "cost": 3,
           "tags": [
-            "분쇄",
-            "약점 공격"
+            "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.65,
+              "ratio": 3.6,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 1
+              "v": 2
             },
             {
               "k": "stack",
               "id": "단조",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "시뻘건 쇳물",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "금 간 곳",
           "kind": "weakSpot"
         },
         {
-          "name": "불꽃 튀는 모루",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "단조",
-              "v": 1
-            }
-          ]
+          "name": "손에 익은 망치",
+          "kind": "cost"
         }
       ]
     },
@@ -474,39 +461,18 @@
       ],
       "oracles": [
         {
-          "name": "힘준 정령 일꾼들아!",
+          "name": "일꾼 총동원",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.95
+              "ratio": 2.05
             },
             {
               "k": "cardStatus",
               "id": "탐구심",
               "v": 1,
               "to": "hand",
-              "n": 2
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "가벼운 정령 일꾼들아!",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.35
-            },
-            {
-              "k": "cardStatus",
-              "id": "탐구심",
-              "v": 1,
-              "to": "hand",
-              "n": 2
+              "n": 3
             },
             {
               "k": "draw",
@@ -515,11 +481,32 @@
           ]
         },
         {
-          "name": "벼린 정령 일꾼들아!",
+          "name": "한 명만 와 줘",
+          "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.95
+              "ratio": 0.7
+            },
+            {
+              "k": "cardStatus",
+              "id": "탐구심",
+              "v": 1,
+              "to": "hand",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "불씨 정령",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.3
             },
             {
               "k": "cardStatus",
@@ -529,43 +516,35 @@
               "n": 2
             },
             {
-              "k": "draw",
-              "v": 2
+              "k": "stack",
+              "id": "단조",
+              "v": 1
             }
           ]
         },
         {
-          "name": "든든한 정령 일꾼들아!",
+          "name": "정령 응원단",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작업장 정리",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.9
-            },
-            {
-              "k": "cardStatus",
-              "id": "탐구심",
-              "v": 1,
-              "to": "hand",
-              "n": 2
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "복 받은 정령 일꾼들아!",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.9
+              "ratio": 1.6
             },
             {
               "k": "cardStatus",
@@ -583,22 +562,16 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
+          "name": "정령 방패",
           "kind": "guard"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "일당 지급",
+          "kind": "ap"
         },
         {
-          "name": "불꽃 튀는 모루",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "단조",
-              "v": 1
-            }
-          ]
+          "name": "일거리 하나 더",
+          "kind": "draw"
         }
       ]
     },
@@ -611,110 +584,167 @@
       "type": "강화",
       "fx": [
         {
-          "k": "cardStatus",
-          "id": "탐구심",
-          "v": 2,
-          "to": "draw",
-          "n": 3
-        },
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
-        },
-        {
           "k": "draw",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "cardStatus",
+                  "id": "탐구심",
+                  "v": 1,
+                  "to": "hand",
+                  "n": 1
+                },
+                {
+                  "k": "stack",
+                  "id": "단조",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 이야기책에 남을 검",
+          "name": "전설의 대장장이",
           "fx": [
-            {
-              "k": "cardStatus",
-              "id": "탐구심",
-              "v": 2,
-              "to": "draw",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "탐구심",
+                      "v": 2,
+                      "to": "hand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "단조",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 이야기책에 남을 검",
+          "name": "풀무 한 번",
           "cost": 0,
           "fx": [
             {
-              "k": "cardStatus",
-              "id": "탐구심",
-              "v": 2,
-              "to": "draw",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "탐구심",
+                      "v": 1,
+                      "to": "hand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "단조",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "벼린 이야기책에 남을 검",
+          "name": "달군 쇠",
           "fx": [
             {
-              "k": "cardStatus",
-              "id": "탐구심",
-              "v": 2,
-              "to": "draw",
-              "n": 3
-            },
-            {
               "k": "status",
               "id": "사기",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "탐구심",
+                      "v": 1,
+                      "to": "hand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "단조",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "든든한 이야기책에 남을 검",
+          "name": "모루 소리",
           "fx": [
             {
-              "k": "cardStatus",
-              "id": "탐구심",
-              "v": 2,
-              "to": "draw",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "사기",
+              "k": "draw",
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "탐구심",
+                      "v": 1,
+                      "to": "hand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "단조",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 이야기책에 남을 검",
+          "name": "영웅담의 첫 장",
           "tags": [
             "축복"
           ],
@@ -727,28 +757,47 @@
               "n": 3
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            },
-            {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "탐구심",
+                      "v": 1,
+                      "to": "hand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "단조",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
+          "name": "아침 화로",
           "kind": "ap"
         },
         {
-          "name": "한 장 더",
+          "name": "설계도",
           "kind": "draw"
         },
         {
-          "name": "불꽃 튀는 모루",
+          "name": "첫 담금질",
           "fx": [
             {
               "k": "stack",

@@ -12,10 +12,10 @@
       "atk": 79,
       "def": 58,
       "crit": 5,
-      "blurb": "레이저 포인터로 싫은 기억을 지우는 망각의 유령. 레테 카드를 낼 때마다 적의 버프 한 겹을 번쩍 지워 그만큼 실드로 바꾸고, 지운 것이 쌓이면 파티를 해로운 것에서 지킨다.",
+      "blurb": "레이저 포인터로 싫은 기억을 지우는 망각의 유령. 카드를 낼 때마다 적의 버프를 번쩍 지워 그만큼 실드로 바꾸고, 지운 기억이 쌓이면 파티의 아픔까지 털어 냅니다. 포인터를 몇 번 휘두르면 레이저가 연달아 꽂힙니다.",
       "keyword": {
         "name": "지운 기억",
-        "desc": "레이저로 지운 기억 조각 — 레테가 실드로 바꿔 쥔다",
+        "desc": "잊어서 털어 내는 아픈 기억",
         "carrier": "self",
         "cap": 5,
         "per": [
@@ -39,13 +39,8 @@
                 "all": true
               },
               {
-                "k": "status",
-                "id": "면역",
-                "v": 1
-              },
-              {
-                "k": "shield",
-                "ratio": 1
+                "k": "heal",
+                "ratio": 1.2
               }
             ]
           }
@@ -74,6 +69,22 @@
               "k": "stack",
               "id": "지운 기억",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "레이저 테러범",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "every": 2
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 0.15,
+              "hits": 4,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -145,11 +156,11 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.4
+          "ratio": 1.6
         },
         {
-          "k": "cleanse",
-          "v": 2
+          "k": "heal",
+          "ratio": 0.8
         },
         {
           "k": "stack",
@@ -159,34 +170,34 @@
       ],
       "oracles": [
         {
-          "name": "깊은 링크",
+          "name": "완전 동기화",
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.5
+              "ratio": 2.2
             },
             {
-              "k": "cleanse",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.1
             },
             {
               "k": "stack",
               "id": "지운 기억",
-              "v": 2
+              "v": 3
             }
           ]
         },
         {
-          "name": "짧은 링크",
+          "name": "간이 접속",
           "cost": 1,
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.05
+              "ratio": 1.0
             },
             {
-              "k": "cleanse",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.5
             },
             {
               "k": "stack",
@@ -196,22 +207,25 @@
           ]
         },
         {
-          "name": "대기 중인 링크",
-          "tags": [
-            "보존"
-          ],
+          "name": "기억 정리",
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.25
-            },
-            {
-              "k": "cleanse",
-              "v": 2
+              "ratio": 2.4
             },
             {
               "k": "stack",
               "id": "지운 기억",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "지운 기억",
+              "n": 4
+            },
+            {
+              "k": "status",
+              "id": "면역",
               "v": 2
             }
           ]
@@ -221,7 +235,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 3
+              "ratio": 3.0
             },
             {
               "k": "cleanse",
@@ -235,30 +249,31 @@
           ]
         },
         {
-          "name": "축복의 링크",
+          "name": "풀 리부트",
+          "cost": 3,
           "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.1
+              "ratio": 2.8
             },
             {
-              "k": "cleanse",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.5
             },
             {
               "k": "stack",
               "id": "지운 기억",
-              "v": 2
+              "v": 3
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "두꺼운 막",
+          "name": "방화벽",
           "kind": "guard"
         },
         {
@@ -266,11 +281,11 @@
           "kind": "cost"
         },
         {
-          "name": "차분한 기억",
+          "name": "저장된 기억",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
+              "k": "stack",
+              "id": "지운 기억",
               "v": 1
             }
           ]
@@ -287,7 +302,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.35,
           "hits": 4,
           "target": "oneEnemy"
         },
@@ -302,9 +317,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
-              "hits": 4,
-              "target": "oneEnemy"
+              "ratio": 0.48,
+              "target": "oneEnemy",
+              "hits": 4
             },
             {
               "k": "dispel",
@@ -313,14 +328,14 @@
           ]
         },
         {
-          "name": "포인터 두 번",
+          "name": "톡톡 짚기",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.25,
-              "hits": 4,
-              "target": "oneEnemy"
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "dispel",
@@ -329,16 +344,33 @@
           ]
         },
         {
-          "name": "쥐고 있던 포인터",
-          "tags": [
-            "보존"
-          ],
+          "name": "지워 버리기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "hits": 4,
-              "target": "oneEnemy"
+              "ratio": 0.35,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "dispel",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "빙 둘러 짚기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "allEnemies",
+              "hits": 4
             },
             {
               "k": "dispel",
@@ -348,38 +380,20 @@
         },
         {
           "name": "포인터 5연타",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
-              "hits": 5,
-              "target": "oneEnemy"
+              "ratio": 0.54,
+              "target": "oneEnemy",
+              "hits": 5
             },
             {
               "k": "dispel",
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "축복의 포인터",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "hits": 4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dispel",
+              "k": "tough",
               "v": 1
             }
           ]
@@ -433,7 +447,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 2.1,
               "target": "oneEnemy"
             },
             {
@@ -442,7 +456,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.45
+              "ratio": 0.35
             },
             {
               "k": "status",
@@ -452,12 +466,12 @@
           ]
         },
         {
-          "name": "약한 레이저",
+          "name": "레이저 한 줄기",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
@@ -467,32 +481,6 @@
             {
               "k": "shield",
               "ratio": 0.25
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "충전된 레이저",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.4
             },
             {
               "k": "status",
@@ -515,24 +503,46 @@
             },
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 0.3
             },
             {
-              "k": "status",
-              "id": "약화",
+              "k": "stack",
+              "id": "지운 기억",
               "v": 2
             }
           ]
         },
         {
-          "name": "축복의 레이저",
-          "tags": [
-            "축복"
-          ],
+          "name": "눈부신 섬광",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.1,
+              "ratio": 1.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "최대 출력",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.8,
               "target": "oneEnemy"
             },
             {
@@ -546,14 +556,14 @@
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "출력 최대",
+          "name": "렌즈 닦기",
           "kind": "power"
         },
         {
@@ -582,12 +592,28 @@
         {
           "k": "status",
           "id": "결정화",
-          "v": 2
+          "v": 1
         },
         {
-          "k": "stack",
-          "id": "지운 기억",
-          "v": 2
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "지운 기억",
+                  "v": 1
+                },
+                {
+                  "k": "shield",
+                  "ratio": 0.3
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -602,12 +628,28 @@
             {
               "k": "status",
               "id": "결정화",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지운 기억",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -616,19 +658,34 @@
           "cost": 1,
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
+              "k": "draw",
               "v": 1
             },
             {
               "k": "status",
               "id": "결정화",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지운 기억",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -641,7 +698,7 @@
             {
               "k": "status",
               "id": "불굴",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
@@ -649,9 +706,25 @@
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지운 기억",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -665,18 +738,34 @@
             },
             {
               "k": "status",
-              "id": "결정화",
-              "v": 3
-            },
-            {
-              "k": "status",
               "id": "면역",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지운 기억",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "축복의 간호",
+          "name": "새벽 회진",
           "tags": [
             "축복"
           ],
@@ -684,28 +773,44 @@
             {
               "k": "status",
               "id": "불굴",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
               "id": "결정화",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지운 기억",
+                      "v": 2
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "따뜻한 손",
+          "name": "밤새 켜 둔 등",
           "kind": "defUp"
         },
         {
-          "name": "서둘러 오기",
+          "name": "급한 호출",
           "kind": "cost"
         },
         {

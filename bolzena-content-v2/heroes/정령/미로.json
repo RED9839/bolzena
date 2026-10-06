@@ -11,16 +11,34 @@
    "atk": 75,
    "def": 76,
    "crit": 5,
-   "blurb": "거울 속에서 지켜보며 응원하는 정령. 파티를 친 적에게 시선을 꽂아 그 적의 공격을 무디게 하고, 시선이 쌓인 적일수록 거울 조각이 깊이 박힌다.",
+   "blurb": "거울 속에서 지켜보며 응원하는 정령. 파티를 친 적에게 시선을 꽂아 그 적의 공격을 무디게 합니다. 거울 속으로 숨으면 그동안 날아든 공격을 거울에 비춰 두었다가, 다음 턴 그 수만큼 광선으로 되돌려 보냅니다.",
    "keyword": {
     "name": "시선",
-    "desc": "거울 속에서 지켜보는 눈 — 맞을 때마다 그 적에게 하나",
+    "desc": "파티를 친 적에게 꽂히는 눈",
     "carrier": "enemy",
     "cap": 3,
     "per": [
      {
       "stat": "dealt",
       "v": -0.1
+     }
+    ],
+    "rules": [
+     {
+      "name": "눈을 피하지 마요",
+      "when": {
+       "on": "stackOver",
+       "id": "시선"
+      },
+      "fx": [
+       {
+        "k": "perEvent"
+       },
+       {
+        "k": "shield",
+        "ratio": 0.3
+       }
+      ]
      }
     ]
    },
@@ -39,6 +57,31 @@
        "target": "oneEnemy"
       }
      ]
+    },
+    {
+     "name": "거울에 맺힌 공격",
+     "when": {
+      "on": "hurt",
+      "guarded": true
+     },
+     "conds": [
+      {
+       "c": "stack",
+       "id": "거울 속",
+       "n": 1
+      }
+     ],
+     "fx": [
+      {
+       "k": "cue",
+       "id": "miro_flash"
+      },
+      {
+       "k": "stack",
+       "id": "반사된 시선",
+       "v": 1
+      }
+     ]
     }
    ],
    "ult": {
@@ -46,10 +89,13 @@
     "cost": 200,
     "fx": [
      {
+      "k": "cue",
+      "id": "miro_hide"
+     },
+     {
       "k": "stack",
-      "id": "시선",
-      "v": 3,
-      "target": "allEnemies"
+      "id": "거울 속",
+      "v": 1
      },
      {
       "k": "shield",
@@ -57,8 +103,14 @@
      },
      {
       "k": "status",
-      "id": "반격",
+      "id": "피해 감소",
       "v": 2
+     },
+     {
+      "k": "stack",
+      "id": "시선",
+      "v": 3,
+      "target": "allEnemies"
      }
     ]
    },
@@ -68,6 +120,86 @@
     "미로_s1",
     "미로_s2",
     "미로_s2"
+   ],
+   "keywords": [
+    {
+     "name": "거울 속",
+     "desc": "거울 안에 숨은 미로",
+     "carrier": "self",
+     "cap": 1,
+     "rules": [
+      {
+       "name": "거울 밖으로",
+       "when": {
+        "on": "turnStart"
+       },
+       "conds": [
+        {
+         "c": "stack",
+         "id": "거울 속",
+         "n": 1
+        }
+       ],
+       "fx": [
+        {
+         "k": "cue",
+         "id": "miro_beam",
+         "xStack": "반사된 시선",
+         "n": 5,
+         "max": 10
+        },
+        {
+         "k": "perStack",
+         "id": "반사된 시선",
+         "n": 5,
+         "max": 10
+        },
+        {
+         "k": "dmg",
+         "ratio": 0.4,
+         "target": "randomEnemy"
+        },
+        {
+         "k": "stack",
+         "id": "시선",
+         "v": 1,
+         "target": "allEnemies"
+        }
+       ]
+      },
+      {
+       "name": "거울 밖으로",
+       "when": {
+        "on": "turnStart"
+       },
+       "conds": [
+        {
+         "c": "stack",
+         "id": "거울 속",
+         "n": 1
+        }
+       ],
+       "fx": [
+        {
+         "k": "spend",
+         "id": "반사된 시선",
+         "all": true
+        },
+        {
+         "k": "spend",
+         "id": "거울 속",
+         "all": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "반사된 시선",
+     "desc": "거울에 맺힌 적의 공격",
+     "carrier": "self",
+     "cap": 10
+    }
    ]
   }
  ],

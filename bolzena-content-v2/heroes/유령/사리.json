@@ -12,10 +12,10 @@
       "atk": 104,
       "def": 25,
       "crit": 10,
-      "blurb": "누가 무엇을 하든 맞장구치며 포즈까지 따라 하는 리액션 장인. 아군이 공격할 때마다 「맞장구」 가 쌓이고, 사리의 공격은 맞장구를 몽땅 털어 한 마디 촌철살인을 박는다.",
+      "blurb": "누가 무엇을 하든 맞장구치며 포즈까지 따라 하는 리액션 장인. 아군이 공격할 때마다 「맞장구」 가 쌓이고, 사리의 공격은 맞장구를 몽땅 털어 한 마디 촌철살인을 박습니다.",
       "keyword": {
         "name": "맞장구",
-        "desc": "아군이 칠 때마다 「그렇지!」 — 모아서 제 공격에 실어 보낸다",
+        "desc": "아군 공격에 맞추는 장단",
         "carrier": "self",
         "cap": 4,
         "per": [
@@ -150,7 +150,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.9,
+              "ratio": 2.4,
               "target": "oneEnemy"
             },
             {
@@ -159,7 +159,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.55,
               "target": "oneEnemy"
             },
             {
@@ -175,7 +175,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.7,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
@@ -184,7 +184,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.35,
               "target": "oneEnemy"
             },
             {
@@ -195,14 +195,11 @@
           ]
         },
         {
-          "name": "참은 웃음",
-          "tags": [
-            "보존"
-          ],
+          "name": "멈추지 않는 웃음",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.7,
+              "ratio": 2.1,
               "target": "oneEnemy"
             },
             {
@@ -211,13 +208,12 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.5,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "맞장구",
-              "all": true
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -235,7 +231,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.45,
               "target": "allEnemies"
             },
             {
@@ -246,14 +242,14 @@
           ]
         },
         {
-          "name": "축복 웃음",
+          "name": "웃음 전염",
           "tags": [
-            "축복"
+            "연계"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.6,
+              "ratio": 2.0,
               "target": "oneEnemy"
             },
             {
@@ -262,7 +258,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.5,
               "target": "oneEnemy"
             },
             {
@@ -325,13 +321,23 @@
             {
               "k": "stack",
               "id": "맞장구",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "슬쩍 포즈",
+          "name": "브이",
           "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "거울 놀이",
           "fx": [
             {
               "k": "status",
@@ -341,25 +347,7 @@
             {
               "k": "stack",
               "id": "맞장구",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "굳힌 포즈",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 2
+              "v": 4
             }
           ]
         },
@@ -383,20 +371,20 @@
           ]
         },
         {
-          "name": "축복 포즈",
+          "name": "등장 포즈",
           "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
               "k": "status",
               "id": "협공",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
               "id": "맞장구",
-              "v": 2
+              "v": 3
             }
           ]
         }
@@ -407,7 +395,7 @@
           "kind": "draw"
         },
         {
-          "name": "재빠른 포즈",
+          "name": "찰칵",
           "kind": "cost"
         },
         {
@@ -450,7 +438,7 @@
       ],
       "oracles": [
         {
-          "name": "뼈 때리기",
+          "name": "촌철살인",
           "tags": [
             "연계"
           ],
@@ -458,12 +446,12 @@
             {
               "k": "stack",
               "id": "맞장구",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 1
+              "v": 3
             },
             {
               "k": "draw",
@@ -472,7 +460,7 @@
           ]
         },
         {
-          "name": "가벼운 맞장구",
+          "name": "그치그치",
           "cost": 0,
           "tags": [
             "연계"
@@ -482,6 +470,19 @@
               "k": "stack",
               "id": "맞장구",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "장단 맞추기",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 3
             },
             {
               "k": "status",
@@ -495,55 +496,33 @@
           ]
         },
         {
-          "name": "아껴 둔 한마디",
+          "name": "다 들리게",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "곱씹는 한마디",
           "tags": [
             "연계",
             "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "촌철살인",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ],
-          "tags": [
-            "연계"
-          ]
-        },
-        {
-          "name": "축복의 맞장구",
-          "tags": [
-            "연계",
-            "축복"
           ],
           "fx": [
             {
@@ -565,12 +544,12 @@
       ],
       "blesses": [
         {
-          "name": "콕 찌르기",
-          "kind": "frost"
-        },
-        {
           "name": "맞받아치기",
           "kind": "draw"
+        },
+        {
+          "name": "추임새",
+          "kind": "cost"
         },
         {
           "name": "따라 웃기",
@@ -620,9 +599,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "hits": 3,
-              "target": "oneEnemy"
+              "ratio": 1.0,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "ifStack",
@@ -642,14 +621,14 @@
           ]
         },
         {
-          "name": "가벼운 수의",
+          "name": "찢긴 조각",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "hits": 3,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "ifStack",
@@ -669,16 +648,13 @@
           ]
         },
         {
-          "name": "접어 둔 수의",
-          "tags": [
-            "보존"
-          ],
+          "name": "장단 맞춘 수의",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "hits": 3,
-              "target": "oneEnemy"
+              "ratio": 0.95,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "ifStack",
@@ -689,11 +665,6 @@
               "k": "status",
               "id": "사기",
               "v": 1
-            },
-            {
-              "k": "spend",
-              "id": "맞장구",
-              "v": 2
             }
           ]
         },
@@ -703,8 +674,8 @@
             {
               "k": "dmg",
               "ratio": 0.6,
-              "hits": 3,
-              "target": "allEnemies"
+              "target": "allEnemies",
+              "hits": 3
             },
             {
               "k": "ifStack",
@@ -724,16 +695,16 @@
           ]
         },
         {
-          "name": "축복의 수의",
+          "name": "찢긴 틈새",
           "tags": [
-            "축복"
+            "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "hits": 3,
-              "target": "oneEnemy"
+              "ratio": 0.87,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "ifStack",

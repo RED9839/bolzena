@@ -149,7 +149,8 @@ namespace Bolzena.Core
                     else if (p.Do.T == "feign") { u.Feign = true; Say($"{u.Name}: 쓰러진 척한다 — 회복받으면 일어선다"); StatusCue(u, "가사"); }
                     else ActEnemy(u, p.Do, true, p.Do.Say ?? p.Name);
                 }
-            foreach (var x in Enemies.Where(x => !x.Dead && x.Summoner == u.Idx && (Data.Enemy(x.Key)?.Tied ?? false)).ToList())
+            // 보스가 세운 강인도 없는 소환물(수 summon 의 noTough)은 보스가 쓰러지면 같이 쓰러진다 — 보스 전투는 보스 하나를 쓰러뜨리면 끝(사용자 2026-10-06)
+            foreach (var x in Enemies.Where(x => !x.Dead && x.Summoner == u.Idx && ((Data.Enemy(x.Key)?.Tied ?? false) || (u.Boss && x.ToughMax <= 0))).ToList())
             {
                 Say($"{x.Name}: 세운 이가 쓰러져 함께 쓰러진다");
                 Kill(x);

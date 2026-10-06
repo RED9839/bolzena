@@ -62,11 +62,20 @@ namespace Bolzena.UI
             rightDown = r && !prevRight;
             held = h;
             if (down) { downPos = pos; downAt = Time.unscaledTime; Moved = false; longFired = false; }
-            if (held && (pos - downPos).magnitude > 0.18f) Moved = true;
+            if (held && (pos - downPos).magnitude > MoveSlop(cam)) Moved = true;
             longPress = false;
             if (held && !Moved && !longFired && Time.unscaledTime - downAt > 0.45f) { longPress = true; longFired = true; }
             prevHeld = h;
             prevRight = r;
+        }
+
+        // 끌기로 치는 거리(월드) — 마우스 0.18. 터치는 손가락 떨림이 있어 화면 2.5mm(dpi 를 모르면 짧은 변의 2.2%) 와 0.18 중 큰 것.
+        //   폰은 화면 1 단위가 10여 px 이라 0.18 이면 가만히 누른 손가락도 「끌기」가 되어 길게 누르기 확대가 열리지 않았다
+        static float MoveSlop(Camera cam)
+        {
+            if (!Touch || cam == null || Screen.height <= 0) return 0.18f;
+            float px = Screen.dpi > 0 ? Screen.dpi * 0.1f : Mathf.Min(Screen.width, Screen.height) * 0.022f;
+            return Mathf.Max(0.18f, px * cam.orthographicSize * 2f / Screen.height);
         }
 
         public static Vector2 Pos { get { Tick(); return pos; } }

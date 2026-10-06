@@ -113,7 +113,9 @@
       "cutHit",
       "clearDebt",
       "form",
-      "formEnd"
+      "formEnd",
+      "power",
+      "cue"
      ],
      "description": "효과 조각 종류 — Docs/데이터.md §2"
     },
@@ -268,8 +270,18 @@
     "ofEvent": {
      "type": "number"
     },
+    "ofStack": {
+     "type": "string"
+    },
     "else": {
      "$ref": "#/$defs/fxList"
+    },
+    "rules": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/rule"
+     },
+     "description": "power — 강화 카드 지속 규칙(패시브 규칙과 같은 꼴). 카드를 내면 이 전투 끝까지 켜진다"
     }
    },
    "required": [
@@ -591,6 +603,7 @@
       "overheal",
       "stackReach",
       "stackGone",
+      "stackOver",
       "reserveGone",
       "switch",
       "rhythm",
@@ -1824,6 +1837,13 @@
     },
     "pool": {
      "type": "string"
+    },
+    "floor": {
+     "enum": [
+      0,
+      1,
+      2
+     ]
     },
     "npc": {
      "type": "string"

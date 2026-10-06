@@ -225,7 +225,7 @@ namespace Bolzena.Core
             Say($"{e.Name}: 격파! (AP +{R.TOUGH.Ap} · 다음 차례 행동 불가)");
             HitCue(e, "break", new Cue { V = R.TOUGH.Ap });
             Emit("break", new EmitInfo { Target = e, By = Acting });
-            if (e.Intent != null && e.Intent.Brk && !e.Dead) { Say($"{e.Name}: 격파 — 「{e.Intent.Say}」 를 놓쳤다"); StatusCue(e, "끊김!"); e.Intent = null; }
+            if (e.Intent != null && e.Intent.Brk && !e.Dead) { UltCut(e, "격파"); Say($"{e.Name}: 격파 — 「{e.Intent.Say}」 를 놓쳤다"); StatusCue(e, "끊김!"); e.Intent = null; }
             if (!e.Dead) FoePassives("broken", e);
             HandAuto("break", new AutoInfo { Target = e });
         }
@@ -244,13 +244,6 @@ namespace Bolzena.Core
             more.K = k; more.Side = e.Side; more.Idx = e.Idx;
             Cues.Insert(j, more);
             OnCue?.Invoke(more);
-        }
-
-        void RefillTough(Unit e)
-        {
-            if (e.ToughMax <= 0 || (e.Tough == e.ToughMax && !e.Broken)) return;
-            e.Broken = false; e.Tough = e.ToughMax;
-            Cue("tough", e, new Cue { From = 0, To = e.Tough, Up = true });
         }
     }
 }

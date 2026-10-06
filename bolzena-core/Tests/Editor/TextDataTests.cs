@@ -24,7 +24,7 @@ namespace Bolzena.Core.Tests
         [TestCase("{'k':'draw','v':2}", "드로우 2")]
         [TestCase("{'k':'ap','v':1}", "AP +1")]
         [TestCase("{'k':'gauge','v':30}", "고학년 게이지 +30%")]
-        [TestCase("{'k':'nextCheaper','v':1}", "다음 카드 코스트 -1")]
+        [TestCase("{'k':'nextCheaper','v':1}", "다음 카드 비용 -1")]
         [TestCase("{'k':'status','id':'기절','v':1,'target':'oneEnemy'}", "적 1명 기절")]
         [TestCase("{'k':'rushDown','v':1,'target':'allEnemies'}", "적 전체 즉시 행동 1장 늦춤")]
         [TestCase("{'k':'cleanse','v':1}", "파티 디버프 1개 해제")]
@@ -61,27 +61,56 @@ namespace Bolzena.Core.Tests
         [Test] public void 패시브와_키워드()
         {
             var r = new PassiveRule { Name = "맞불", When = new When { On = "hurt" }, Limit = new Limit { Per = "turn", N = 1 }, Fx = L("{'k':'status','id':'반격','v':1}") };
-            Assert.AreEqual("맞불: 피해를 받으면 반격 1 (턴당 1회)", T.Passives(new List<PassiveRule> { r }));
+            Assert.AreEqual("맞불: 파티가 피해를 받으면 → 반격 1 (턴당 1회)", T.Passives(new List<PassiveRule> { r }));
             var r2 = new PassiveRule { Name = "풀코스", When = new When { On = "play", Who = "any", Seq = new List<string> { "공격", "스킬", "강화" } }, Fx = L("{'k':'shield','ratio':1.5,'target':'party'}") };
-            Assert.AreEqual("풀코스: 이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면 방어력 150% 실드", T.Passives(new List<PassiveRule> { r2 }));
+            Assert.AreEqual("풀코스: 이번 턴 공격 · 스킬 · 강화 카드를 차례로 내면 → 방어력 150% 실드", T.Passives(new List<PassiveRule> { r2 }));
             var r3 = new PassiveRule { Name = "버팀", When = new When { On = "turnStart" }, Conds = new List<Cond> { new Cond { C = "status", Id = "불굴", N = 2 } }, Fx = L("{'k':'block','ratio':1.0}") };
-            Assert.AreEqual("버팀: 턴 시작 시 파티 불굴이 2 이상이면 방어력 100% 방어", T.Passives(new List<PassiveRule> { r3 }));
-            Assert.AreEqual("박자: 리듬이 5가 되면 드로우 1", T.Passives(new List<PassiveRule> { new PassiveRule { Name = "박자", When = new When { On = "rhythm", N = 5 }, Fx = L("{'k':'draw','v':1}") } }));
+            Assert.AreEqual("버팀: 턴 시작 시 파티 불굴이 2 이상이면 → 방어력 100% 방어", T.Passives(new List<PassiveRule> { r3 }));
+            Assert.AreEqual("박자: 리듬이 5가 되면 → 드로우 1", T.Passives(new List<PassiveRule> { new PassiveRule { Name = "박자", When = new When { On = "rhythm", N = 5 }, Fx = L("{'k':'draw','v':1}") } }));
             var kw = new KeywordDef { Name = "이온화", Desc = "적에게 쌓는 전하", Carrier = "enemy", Cap = 5, Decay = 1, Per = new List<PerStat> { new PerStat { Stat = "taken", V = 0.05 } } };
-            Assert.AreEqual("적에게 쌓는 전하. 적에게 건다. 최대 5. 1개당 받는 피해 +5%. 적의 차례마다 1 감소.", T.Keyword(kw));
-            // 짧은 글 = 손 글(desc) · 패시브는 계기 + 핵심 효과(소모 · 횟수는 Detail 로)
-            Assert.AreEqual("적에게 쌓는 전하", T.Short(kw));
+            Assert.AreEqual("적에게 쌓는 전하\n· 적에게 쌓임 · 적마다 최대 5\n· 「이온화」 1당 그 적의 받는 피해 +5%\n· 적의 차례가 끝나면 → −1", T.Keyword(kw));
+            // 「자세히」 없앰(Docs/설명글.md) — Short 와 Detail 은 같은 글(수치 · 제한까지 다)
+            Assert.AreEqual(T.Keyword(kw), T.Short(kw));
             Assert.AreEqual(T.Keyword(kw), T.Detail(kw));
             var r4 = new PassiveRule { Name = "덫", When = new When { On = "hurt" }, Limit = new Limit { Per = "turn", N = 2 }, Fx = L("{'k':'spend','id':'덫','v':1}", "{'k':'dmg','ratio':1.1,'target':'oneEnemy'}") };
-            Assert.AreEqual("피해를 받으면 적 1명에게 공격력 110% 피해", T.Short(r4));
-            Assert.AreEqual("피해를 받으면 「덫」 1 소모, 적 1명에게 공격력 110% 피해 (턴당 2회)", T.Detail(r4));
+            Assert.AreEqual("파티가 피해를 받으면 → 「덫」 1 소모, 때린 적에게 공격력 110% 피해 (턴당 2회)", T.Detail(r4));
+            Assert.AreEqual(T.Detail(r4), T.Short(r4));
+        }
+
+        /// <summary>사도 상세 칸(Docs/설명글.md §4) — 고학년 · 고유 효과 · 패시브 세 칸 따로, 계기의 적 · 대상 낱말이 붙는다.</summary>
+        [Test] public void 고유_효과_한_칸()
+        {
+            var d = K.Data(heroes: "[{id:'g', name:'깃발이', role:'서포터', row:'front', hp:500, atk:80, def:60, keyword:{name:'깃발', desc:'공격으로 꽂는 깃발', carrier:'enemy', cap:3, weakens:true}, " +
+                "passives:[{name:'찜', when:{on:'play', type:'공격'}, limit:{per:'turn', n:1}, fx:[{k:'stack', id:'깃발', v:1}]}, " +
+                "{name:'찜', when:{on:'kill'}, conds:[{c:'stack', id:'깃발'}], limit:{per:'turn', n:1}, fx:[{k:'draw', v:1}, {k:'ap', v:1}]}, " +
+                "{name:'따로', when:{on:'turnStart'}, fx:[{k:'status', id:'사기', v:1}]}], ult:{name:'한 방', cost:200, fx:[{k:'dmg', ratio:2.0, target:'allEnemies'}]}}]");
+            var t = new CardText(d);
+            var tr = t.Traits(d.Hero("g"));
+            // 세 칸 따로(2026-10-06 사용자 「패시브 칸 따로」) — 고유 효과 = 자원 · 표식 자체의 규칙, 패시브 = passives 전부(같은 이름은 한 칸)
+            Assert.AreEqual(new[] { "고학년", "고유 효과", "패시브", "패시브" }, tr.Select(x => x.Kind).ToArray());
+            Assert.AreEqual("게이지 200%", tr[0].Sub);
+            Assert.AreEqual("공격으로 꽂는 깃발", tr[1].Sub);
+            Assert.AreEqual("· 적에게 쌓임 · 적마다 최대 3\n· 「깃발」이 있는 적은 아군 카드에 약점으로 맞음 — 카드 1장이 칠 때마다 −1", tr[1].Body);
+            Assert.AreEqual("찜", tr[2].Name);
+            Assert.AreEqual("· 자신의 공격 카드를 낼 때마다 → 그 적에게 「깃발」 +1 (턴당 1회)\n· 「깃발」이 있는 적이 쓰러지면 → 드로우 1, AP +1 (턴당 1회)", tr[2].Body);
+            Assert.AreEqual("따로", tr[3].Name);
+            Assert.AreEqual("턴 시작 시 → 사기 1", tr[3].Body);
+            // 패시브가 없는 사도 — 패시브 칸에 「없음」
+            var d2 = K.Data(heroes: "[{id:'n', name:'무패', role:'딜러', row:'back', hp:500, atk:80, def:60, keyword:{name:'자원', cap:2}}]");
+            var tr2 = new CardText(d2).Traits(d2.Hero("n"));
+            Assert.AreEqual(CardText.NoPassive, tr2.Last().Name);
+            Assert.AreEqual("패시브", tr2.Last().Kind);
+            // 낱말 판(Tips) 의 고유 효과도 같은 본문
+            StringAssert.Contains(tr[1].Body, t.Tips()["깃발"]);
+            // 엔진 키워드 글의 수치는 Rules.cs 값
+            StringAssert.Contains($"+{Num.Round(R.SV("사기") * 100)}%p", CardText.Tip("사기"));
         }
 
         [Test] public void 적의_수와_이벤트_결과()
         {
             Assert.AreEqual("공격 110", T.Intent(new Intent { T = "attack", V = 110 }));
             Assert.AreEqual("40 × 3회 · 한 대마다 고통 1", T.Intent(new Intent { T = "multi", V = 40, N = 3, Id = "고통" }));
-            Assert.AreEqual("힘을 모은다 — 다음 턴 공격 300 · 격파하면 끊긴다", T.Intent(new Intent { T = "charge", Brk = true, Next = new Intent { T = "attack", V = 300 } }));
+            Assert.AreEqual("힘 모으기 — 다음 턴 공격 300 · 격파하면 끊김", T.Intent(new Intent { T = "charge", Brk = true, Next = new Intent { T = "attack", V = 300 } }));
             var outs = GameData.FromJson<List<Outcome>>("[{'k':'hp','v':-0.1},{'k':'flash'},{'k':'shin','v':0.2},{'k':'next','next':{'ap':1}}]".Replace('\'', '"'));
             Assert.AreEqual("HP -10% · 신탁 1 · 축복 20% · 다음 전투: 첫 턴 AP +1", T.Outcomes(outs));
         }
@@ -131,9 +160,9 @@ namespace Bolzena.Core.Tests
             var d = K.Sample(); var t = new CardText(d);
             Assert.AreEqual("「코스」 1개당 적 1명에게 방어 기반 피해 60%, 「코스」 전부 소모, 적 1명 강인도 피해 1", t.Card(d.Cards["rico_u1"]));
             Assert.AreEqual("연계. 적 1명에게 방어 기반 피해 60%. 앞이 스킬: 「코스」 +1", t.Card(d.Cards["rico_u4"]));
-            Assert.AreEqual("코스트 1. 「코스」 1개당 적 1명에게 방어 기반 피해 50%, 「코스」 전부 소모, 적 1명 강인도 피해 1", t.Oracle(d.Cards["rico_u1"], d.Cards["rico_u1"].Oracles[0]));
+            Assert.AreEqual("비용 1. 「코스」 1개당 적 1명에게 방어 기반 피해 50%, 「코스」 전부 소모, 적 1명 강인도 피해 1", t.Oracle(d.Cards["rico_u1"], d.Cards["rico_u1"].Oracles[0]));
             Assert.AreEqual("피해 ×1.3.", t.Bless(d.Cards["rico_u1"].Blesses[0]));
-            StringAssert.Contains("5개가 되면 모두 써서: 「진혼의 탄환」 1장 생성", t.Keyword(d.Heroes["sion"].Keyword));
+            StringAssert.Contains("5개가 되면 모두 써서 → 「진혼의 탄환」 1장 생성", t.Keyword(d.Heroes["sion"].Keyword));
             Assert.AreEqual("적", d.View("sion_u4").Target);
             var sheet = t.Hero(d.Heroes["rico"]);
             StringAssert.StartsWith("리코타 — 탱커 · 냉정 · 전열 · 박자형", sheet);

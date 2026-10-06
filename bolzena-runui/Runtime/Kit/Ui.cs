@@ -104,6 +104,7 @@ namespace Bolzena.RunUI
             var rt = Rect(name, parent);
             var t = rt.gameObject.AddComponent<TextMeshProUGUI>();
             t.font = title ? Theme.Title : Theme.Body;
+            CardTerms.Prepare(t);   // 글 속 카드 아이콘(<sprite>)이 글자로 새지 않게 — 판 화면 글 모두
             t.text = text;
             t.fontSize = size * Settings.TextScale;
             t.color = c ?? Theme.Ink;
@@ -121,10 +122,25 @@ namespace Bolzena.RunUI
             => Text(parent, text, size, c, align, true, name);
 
         /// <summary>글 둘레에 테두리(배경 위에 바로 얹는 제목).</summary>
+        //   글마다 재질을 복제하지 않고(outlineWidth 세터는 글마다 「(Instance)」 재질을 만든다) 글꼴 재질 · 굵기 · 색마다 하나를 나눠 쓴다 —
+        //   복제본은 화면을 세울 때마다 쌓여 전투로 넘어갈 때의 정리(UnloadUnusedAssets)를 길게 했다(2026-10-06 연속 싸움 시험)
+        static readonly System.Collections.Generic.Dictionary<string, Material> outlineMats = new System.Collections.Generic.Dictionary<string, Material>();
         public static TextMeshProUGUI Outline(this TextMeshProUGUI t, float w = 0.18f, Color? c = null)
         {
-            t.outlineWidth = w;
-            t.outlineColor = c ?? new Color(0.05f, 0.03f, 0.08f, 0.9f);
+            var col = c ?? new Color(0.05f, 0.03f, 0.08f, 0.9f);
+            var src = t.fontSharedMaterial;
+            if (src == null) { t.outlineWidth = w; t.outlineColor = col; return t; }
+            string key = src.GetEntityId() + "|" + w.ToString("F3") + "|" + (Color32)col;
+            if (!outlineMats.TryGetValue(key, out var m) || m == null)
+            {
+                m = new Material(src) { name = src.name + " outline" };
+
+                m.SetFloat(ShaderUtilities.ID_OutlineWidth, w);
+                m.SetColor(ShaderUtilities.ID_OutlineColor, col);
+                m.hideFlags = HideFlags.DontUnloadUnusedAsset;   // 나눠 쓰는 것 — 화면이 바뀌어도 둔다(가짓수는 몇 안 된다)
+                outlineMats[key] = m;
+            }
+            t.fontSharedMaterial = m;
             return t;
         }
 

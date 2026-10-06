@@ -11,10 +11,10 @@
    "atk": 145,
    "def": 25,
    "crit": 10,
-   "blurb": "완벽을 강요하는 감독. 고유 카드는 내고 나면 손으로 돌아와 테이크를 쌓고, 세 번째 테이크에 「오케이 컷」 이 나온다.",
+   "blurb": "완벽을 강요하는 감독. 고유 카드는 내고 나면 손으로 돌아와 테이크를 쌓고, 세 번째 테이크에 「오케이 컷」 이 나옵니다.",
    "keyword": {
     "name": "테이크",
-    "desc": "다시 찍은 횟수 — 쌓일수록 세지고, 셋이면 「오케이 컷」",
+    "desc": "공격마다 다시 찍는 테이크",
     "carrier": "self",
     "cap": 3,
     "per": [
@@ -560,15 +560,27 @@
    "type": "강화",
    "fx": [
     {
-     "k": "stack",
-     "id": "테이크",
-     "v": 2
-    },
-    {
      "k": "atkMod",
-     "v": 0.2,
+     "v": 0.15,
      "run": true,
      "target": "self"
+    },
+    {
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "테이크",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -576,15 +588,27 @@
      "name": "32테이크",
      "fx": [
       {
-       "k": "stack",
-       "id": "테이크",
-       "v": 2
-      },
-      {
        "k": "atkMod",
-       "v": 0.3,
+       "v": 0.15,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "테이크",
+           "v": 2
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -593,15 +617,25 @@
      "cost": 0,
      "fx": [
       {
-       "k": "stack",
-       "id": "테이크",
-       "v": 2
+       "k": "draw",
+       "v": 1
       },
       {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "테이크",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -609,13 +643,8 @@
      "name": "완벽주의",
      "fx": [
       {
-       "k": "stack",
-       "id": "테이크",
-       "v": 2
-      },
-      {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
@@ -624,6 +653,23 @@
        "v": 0.1,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "테이크",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -631,19 +677,31 @@
      "name": "필름 태우기",
      "fx": [
       {
-       "k": "stack",
-       "id": "테이크",
-       "v": 2
-      },
-      {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
       {
        "k": "draw",
        "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "테이크",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -654,15 +712,32 @@
      ],
      "fx": [
       {
-       "k": "stack",
-       "id": "테이크",
-       "v": 2
-      },
-      {
        "k": "atkMod",
-       "v": 0.25,
+       "v": 0.15,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "테이크",
+       "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "테이크",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     }

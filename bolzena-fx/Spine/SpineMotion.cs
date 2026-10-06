@@ -221,7 +221,7 @@ namespace Bolzena.Fx
                     if (e.Name == "SFX" && Num(e.S) > 0) p.Snd.Add(new SoundEvent { N = (int)Num(e.S), T = Mathf.RoundToInt(1000 * (off + e.Time)) });
                 off += Duration(d, n);
             }
-            p.S = new StrikeInfo { At = w.At, End = Math.Max(w.At, w.End), Marks = w.Marks.Count > 0 ? new List<int>(w.Marks) : new List<int> { w.At }, Total = Math.Max(w.MotionMs, Mathf.RoundToInt(off * 1000)) };
+            p.S = new StrikeInfo { At = w.Moves ? Math.Max(w.HitMs, w.At) : w.At, End = Math.Max(w.At, w.End), Marks = w.Moves ? w.Strikes() : w.Marks.Count > 0 ? new List<int>(w.Marks) : new List<int> { w.At }, Total = Math.Max(w.MotionMs, Mathf.RoundToInt(off * 1000)) };
             return p;
         }
 

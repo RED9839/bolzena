@@ -14,20 +14,22 @@ namespace Bolzena.Core
     /// </summary>
     public sealed partial class Run
     {
-        bool Eligible(EventDef ev) => !S.EventsSeen.Contains(ev.Id) && (ev.Pool == "공용" || ev.Pool == Land);
+        /// <summary>이 판 이 층의 이벤트인가 — 공용 · 이 판 마을(id) · 이 층의 땅(옛 꼴). floor 가 있으면 그 층에서만.</summary>
+        bool Local(EventDef ev) => ev.Pool == S.Village || ev.Pool == Land;
+        bool Eligible(EventDef ev) => !S.EventsSeen.Contains(ev.Id) && (ev.Floor <= 0 || ev.Floor == S.Floor + 1) && (ev.Pool == "공용" || Local(ev));
 
         public bool EventLeft() => Data.Events.Any(Eligible);
 
         static bool HasRemove(EventDef e) => e.Options.Any(o => o.Out.Any(x => x.K == "remove") || (o.Gamble?.Any(g => g.Out.Any(x => x.K == "remove")) ?? false));
 
-        /// <summary>땅 풀 70% · 공용 30%(한쪽이 비면 다른 쪽). 카드 제거가 있는 이벤트는 무게 ×5.</summary>
+        /// <summary>마을 풀 70% · 공용 30%(한쪽이 비면 다른 쪽). 카드 제거가 있는 이벤트는 무게 ×5. 한 번 나온 이벤트는 그 판에서 다시 안 나온다.</summary>
         public List<EventDef> RollEvents(int n = 1)
         {
             var outs = new List<EventDef>();
             for (int i = 0; i < n; i++)
             {
                 var left = Data.Events.Where(e => Eligible(e) && !outs.Contains(e) && (e.Rare <= 0 || Rnd() < e.Rare)).ToList();
-                var floorPool = left.Where(e => e.Pool == Land).ToList();
+                var floorPool = left.Where(Local).ToList();
                 var common = left.Where(e => e.Pool == "공용").ToList();
                 var from = floorPool.Count == 0 ? common : common.Count == 0 ? floorPool : Rnd() < R.EVENT_FLOOR_SHARE ? floorPool : common;
                 if (from.Count == 0) break;
@@ -48,6 +50,8 @@ namespace Bolzena.Core
                 var evs = RollEvents(S.Scout ? 2 : 1);
                 S.Event = new EventState { Key = key, Choices = evs.Select(e => e.Id).ToList(), Id = evs.Count == 1 ? evs[0].Id : null };
                 if (S.Scout && evs.Count > 1) S.Scout = false;
+                // 뜬 이벤트는 바로 「나왔다」 — 고르기 전에 판을 저장 · 다시 열어도 같은 판에 또 나오지 않게
+                if (S.Event.Id != null && !S.EventsSeen.Contains(S.Event.Id)) S.EventsSeen.Add(S.Event.Id);
             }
             return S.Event;
         }
@@ -56,6 +60,7 @@ namespace Bolzena.Core
         {
             if (S.Event == null || !S.Event.Choices.Contains(id)) return "고를 수 없습니다";
             S.Event.Id = id;
+            if (!S.EventsSeen.Contains(id)) S.EventsSeen.Add(id);
             return null;
         }
 
@@ -72,7 +77,7 @@ namespace Bolzena.Core
                 if (o.When == "hp30") return HpRatio <= 0.3;
                 return true;
             }).ToList();
-            opts.Add(new EventOption { Label = ev.Leave ?? "떠납니다", Out = ev.LeaveOut ?? new List<Outcome>(), Leave = true });
+            opts.Add(new EventOption { Label = ev.Leave ?? "떠나기", Out = ev.LeaveOut ?? new List<Outcome>(), Leave = true });
             return opts;
         }
 
@@ -184,9 +189,10 @@ namespace Bolzena.Core
                     case "dupe": for (int i = 0; i < Math.Max(1, o.N); i++) E.Pending.Add(new Pending { K = "dupe" }); break;
                     case "unique":
                         {
-                            var cards = RewardCards();
-                            if (cards.Count > 0) E.Pending.Add(new Pending { K = "card", Cards = cards, Label = "고유 카드" });
-                            else E.Log.Add("파티 사도의 고유 카드는 이미 다 가졌습니다");
+                            // 이벤트 은총(2026-10-06 사용자) — 파티 셋 가운데 사도를 고르고(grace), 그 사도의 아직 없는 고유 카드에서 무작위 n 장
+                            // 남은 고유 카드가 있는 사도가 아무도 없으면 대신 골드(GRACE_GOLD)
+                            if (S.Party.Any(k => UniquesLeft(k).Count > 0)) E.Pending.Add(new Pending { K = "grace", N = Math.Max(1, o.N), Label = "은총" });
+                            else { S.Gold += GRACE_GOLD; E.Log.Add($"파티 사도의 고유 카드는 이미 다 가졌습니다 — 대신 골드 +{GRACE_GOLD}"); }
                             break;
                         }
                     case "neutral":
@@ -207,7 +213,7 @@ namespace Bolzena.Core
                             var offer = OfferFlash();
                             if (o.Swap)
                             {
-                                var had = S.Flash.Keys.Where(id => Data.Card(id)?.Oracles.Count == 5).OrderBy(x => x, StringComparer.Ordinal).ToList();
+                                var had = S.Flash.Keys.Where(id => Data.Card(id)?.Oracles.Count == 5 && !GameData.IsCopy(id)).OrderBy(x => x, StringComparer.Ordinal).ToList();
                                 if (had.Count > 0) { var id = had[RndInt(had.Count)]; offer = OfferOf(id, S.Flash[id], swap: true); }
                             }
                             // all(다섯 중 고르기)은 없앴다(2026-10-05 신탁 통일) — 늘 무작위 셋
@@ -230,14 +236,14 @@ namespace Bolzena.Core
                             else { E.ShinChance = 1; E.Log.Add("축복을 얹을 신탁이 아직 없습니다 — 이번에 고르는 신탁에 얹힙니다"); }
                             break;
                         }
-                    case "curse": S.Deck.Add(o.Id); E.Log.Add($"{tx.Outcome(o)} — 덱에"); break;
+                    case "curse": GainCard(o.Id); E.Log.Add($"{tx.Outcome(o)} — 덱에"); break;
                     case "gift":
                         if (OnlyCard(o.Id) && HasCard(o.Id)) { E.Log.Add($"「{Data.Card(o.Id).Name}」 — 유일, 이미 덱에 있습니다"); break; }
                         GainCard(o.Id); E.Log.Add($"「{Data.Card(o.Id).Name}」 — 덱에"); break;
-                    case "mindBreak": S.MindBreak = Math.Max(S.MindBreak, Math.Max(1, o.N)); E.Log.Add($"정신 붕괴 — 다음 {Math.Max(1, o.N)} 싸움이 끝날 때까지 카드 얻기 · 신탁 · 제거를 못 한다"); break;
+                    case "mindBreak": S.MindBreak = Math.Max(S.MindBreak, Math.Max(1, o.N)); E.Log.Add($"정신 붕괴 — 다음 전투 {Math.Max(1, o.N)}번이 끝날 때까지 카드 얻기 · 신탁 · 제거를 할 수 없습니다"); break;
                     case "scout": S.Scout = true; E.Log.Add("지도 공개 — 다음 이벤트 칸에서 둘 중 하나를 고릅니다"); break;
                     case "shopGift": S.ShopGift = o.Grade; E.Log.Add($"다음 상점에서 {o.Grade} 장비 하나를 공짜로 받습니다"); break;
-                    case "rewardFlash": S.RewardFlash = true; E.Log.Add("다음 싸움에서 신탁이 꼭 뜹니다"); break;
+                    case "rewardFlash": S.RewardFlash = true; E.Log.Add("다음 전투에서 신탁이 꼭 뜹니다"); break;
                     case "next":
                         S.NextFight = (S.NextFight ?? new NextFight()).Merge(o.Next);
                         E.Log.Add(tx.Outcome(o));
@@ -246,6 +252,12 @@ namespace Bolzena.Core
                 }
             }
         }
+
+        /// <summary>이벤트 은총을 받을 고유 카드가 하나도 남지 않았을 때 대신 주는 골드.</summary>
+        public const int GRACE_GOLD = 75;
+
+        /// <summary>이벤트 은총 — 고를 수 있는 사도(남은 고유 카드가 있는 파티 사도).</summary>
+        public List<string> GraceHeroes() => S.Party.Where(k => UniquesLeft(k).Count > 0).ToList();
 
         List<string> NeutralOffer(string grade, int n)
         {
@@ -289,10 +301,25 @@ namespace Bolzena.Core
                         E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」");
                         break;
                     }
+                case "grace":
+                    {
+                        // value = 사도 키 — 그 사도의 남은 고유 카드에서 무작위 N 장(남은 만큼). null 이면 받지 않는다
+                        if (id == null) { E.Log.Add($"{p.Label ?? "은총"} — 받지 않았습니다"); break; }
+                        if (!S.Party.Contains(id)) return "파티에 없는 사도입니다";
+                        var left = UniquesLeft(id).Where(x => PowerWhy(x) == null).OrderBy(x => x, StringComparer.Ordinal).ToList();
+                        if (left.Count == 0) return "남은 고유 카드가 없는 사도입니다";
+                        for (int i = 0; i < Math.Max(1, p.N) && left.Count > 0; i++)
+                        {
+                            int k = RndInt(left.Count); var cid = left[k]; left.RemoveAt(k);
+                            GainCard(cid);
+                            E.Log.Add($"은총 — {Data.Hero(id)?.Name ?? id} 「{Data.Card(cid).Name}」 — 덱에");
+                        }
+                        break;
+                    }
                 case "dupe":
                     {
                         if (!S.Deck.Contains(id)) return "덱에 없는 카드입니다";
-                        if (!DupeOk(id)) return "복제는 사도 고유 카드만(유일 · 금기는 안 된다)";
+                        if (!DupeOk(id)) return "복제는 사도 고유 카드만 됩니다(유일 · 금기 제외)";
                         AddCopy(id);
                         E.Log.Add($"「{Data.Card(id).Name}」 — 복제본 한 장 더");
                         break;
@@ -311,6 +338,7 @@ namespace Bolzena.Core
                         if (value == null) { E.Log.Add("신탁 — 받지 않았습니다"); break; }
                         int n = Convert.ToInt32(value);
                         if (!p.Offer.Picks.Contains(n)) return "고를 수 없는 신탁입니다";
+                        if (GameData.IsCopy(p.Offer.CardId)) return "복제본은 신탁 · 축복을 받을 수 없습니다";
                         if (!TakeOffer(p.Offer, n)) S.Flash[p.Offer.CardId] = n;
                         var c = Data.Card(p.Offer.CardId);
                         E.Log.Add($"「{c.Name}」 — 신탁 「{c.Oracles[n - 1].Name}」");

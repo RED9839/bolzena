@@ -57,6 +57,7 @@ namespace Bolzena.View
             var t = Node(name, parent, pos);
             var tmp = t.gameObject.AddComponent<TextMeshPro>();
             tmp.font = Res.Font;
+            Bolzena.RunUI.CardTerms.Prepare(tmp);   // 글 속 카드 아이콘(<sprite>) — 모든 싸움터 글에 걸어 둔다(갈래 창 · 확대 · 더미 · 툴팁). 애셋이 없으면 CardTerms 가 「▣」로 쓴다
             tmp.text = text;
             tmp.fontSize = size * 10f;
             tmp.alignment = align;
@@ -127,12 +128,24 @@ namespace Bolzena.View
             m.uv = new[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1) };
             m.triangles = new[] { 0, 2, 1, 1, 2, 3 };
             m.RecalculateBounds();
+            m.name = "quad " + name;
             mf.sharedMesh = m;
+            Own(t.gameObject, m);                   // 조각과 함께 지운다(전투마다 새로 만든 메시가 남지 않게)
             mr.sharedMaterial = mat;
             mr.sortingOrder = order;
             mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             mr.receiveShadows = false;
             return mr;
+        }
+
+        /// <summary>코드로 만든 자산(재질 · 메시 …)을 이 오브젝트가 지워질 때 같이 지운다.</summary>
+        public static T Own<T>(GameObject go, T asset) where T : Object
+        {
+            if (go == null || asset == null) return asset;
+            var o = go.GetComponent<Owned>();
+            if (o == null) o = go.AddComponent<Owned>();
+            o.List.Add(asset);
+            return asset;
         }
 
         public static void Alpha(SpriteRenderer sr, float a)
@@ -143,5 +156,12 @@ namespace Bolzena.View
         }
 
         public static void Alpha(TextMeshPro t, float a) => t.alpha = a;
+    }
+
+    // 코드로 만든 자산의 주인 — 오브젝트가 지워질 때 같이 지운다(Make.Own)
+    public class Owned : MonoBehaviour
+    {
+        public readonly System.Collections.Generic.List<Object> List = new System.Collections.Generic.List<Object>();
+        void OnDestroy() { foreach (var o in List) if (o != null) Destroy(o); List.Clear(); }
     }
 }

@@ -29,6 +29,7 @@ namespace Bolzena.Fx
         static Material baseMat;
         static readonly Dictionary<Texture, Material> mats = new Dictionary<Texture, Material>();
 
+        public static int MatKeep = 384;
         public static Material MaterialFor(Texture tex)
         {
             if (tex != null && mats.TryGetValue(tex, out var m) && m != null) return m;
@@ -38,6 +39,7 @@ namespace Bolzena.Fx
             m = baseMat != null ? new Material(baseMat) : new Material(shader);
             m.name = "fx:" + (tex ? tex.name : "none");
             m.mainTexture = tex;
+            if (mats.Count >= MatKeep) mats.Clear();   // 상한 — 사도가 바뀌며 텍스처마다 재질이 끝없이 쌓이지 않게(쓰는 것은 그대로 산다)
             if (tex != null) mats[tex] = m;
             return m;
         }

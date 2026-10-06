@@ -11,11 +11,11 @@
    "atk": 75,
    "def": 60,
    "crit": 5,
-   "blurb": "인사 대신 물총부터 쏘는 외로운 수문장. 물총을 맞은 아군이 이번 턴 카드를 내면 물줄기나 물보라가 따라붙는다.",
+   "blurb": "인사 대신 물총부터 쏘는 외로운 수문장. 물총을 맞은 아군이 이번 턴 공격하면 물줄기가, 스킬을 쓰면 회복이 따라붙고, 지친 친구는 박박 씻겨 디버프까지 털어 냅니다.",
    "keywords": [
     {
      "name": "물총",
-     "desc": "나이아가 쏜 물에 젖은 아군 — 이번 턴 그 아군이 카드를 내면 물이 따라간다",
+     "desc": "이번 턴 물에 젖은 아군 표시",
      "carrier": "hero",
      "cap": 1,
      "endClear": true
@@ -54,7 +54,7 @@
      },
      "fx": [
       {
-       "k": "shield",
+       "k": "heal",
        "ratio": 0.6
       }
      ]
@@ -65,12 +65,17 @@
     "cost": 150,
     "fx": [
      {
-      "k": "heal",
-      "ratio": 1.5
+      "k": "dmg",
+      "ratio": 1.0,
+      "target": "allEnemies"
      },
      {
-      "k": "shield",
-      "ratio": 1.5
+      "k": "heal",
+      "ratio": 2.5
+     },
+     {
+      "k": "cleanse",
+      "v": 1
      },
      {
       "k": "stack",
@@ -257,78 +262,77 @@
   },
   {
    "id": "나이아_u2",
-   "name": "수문 개방",
+   "name": "그게 씻은거야?",
    "hero": "나이아",
    "unique": true,
-   "cost": 2,
+   "cost": 1,
    "type": "스킬",
    "fx": [
     {
-     "k": "shield",
-     "ratio": 2
+     "k": "heal",
+     "ratio": 2.0
     },
     {
-     "k": "heal",
-     "ratio": 1.2
+     "k": "cleanse",
+     "v": 1
     },
     {
      "k": "stack",
      "id": "물총",
      "v": 1,
-     "target": "allAllies"
+     "target": "oneAlly"
     }
    ],
    "oracles": [
     {
-     "name": "대홍수",
+     "name": "스무 번 박박",
      "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.7
-      },
       {
        "k": "heal",
-       "ratio": 1.62
+       "ratio": 2.6
       },
       {
-       "k": "stack",
-       "id": "물총",
-       "v": 1,
-       "target": "allAllies"
-      }
-     ]
-    },
-    {
-     "name": "작은 수문",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1.7
-      },
-      {
-       "k": "heal",
-       "ratio": 1.02
-      },
-      {
-       "k": "stack",
-       "id": "물총",
-       "v": 1,
-       "target": "allAllies"
-      }
-     ]
-    },
-    {
-     "name": "수문장의 방벽",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.64
-      },
-      {
-       "k": "status",
-       "id": "실드 유지",
+       "k": "cleanse",
        "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "대충 헹구기",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 0.9
+      },
+      {
+       "k": "cleanse",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "물총",
+       "v": 1,
+       "target": "oneAlly"
+      }
+     ]
+    },
+    {
+     "name": "거품 목욕",
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 2.6
+      },
+      {
+       "k": "cleanse",
+       "v": 2
       },
       {
        "k": "stack",
@@ -345,18 +349,18 @@
      ],
      "fx": [
       {
-       "k": "shield",
-       "ratio": 2
+       "k": "heal",
+       "ratio": 2.4
       },
       {
-       "k": "heal",
-       "ratio": 1.6
+       "k": "cleanse",
+       "v": 1
       },
       {
        "k": "stack",
        "id": "물총",
        "v": 1,
-       "target": "allAllies"
+       "target": "oneAlly"
       }
      ]
     },
@@ -367,18 +371,18 @@
      ],
      "fx": [
       {
-       "k": "shield",
+       "k": "heal",
        "ratio": 2.2
       },
       {
-       "k": "heal",
-       "ratio": 1.4
+       "k": "cleanse",
+       "v": 1
       },
       {
        "k": "stack",
        "id": "물총",
        "v": 1,
-       "target": "allAllies"
+       "target": "oneAlly"
       }
      ]
     }
@@ -389,8 +393,14 @@
      "kind": "heal"
     },
     {
-     "name": "굳센 둑",
-     "kind": "guard"
+     "name": "뽀득뽀득",
+     "fx": [
+      {
+       "k": "status",
+       "id": "면역",
+       "v": 1
+      }
+     ]
     },
     {
      "name": "물살 타기",
@@ -534,18 +544,25 @@
     {
      "k": "status",
      "id": "탄성",
-     "v": 3
+     "v": 2
     },
     {
-     "k": "status",
-     "id": "결의",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "물총",
-     "v": 1,
-     "target": "allAllies"
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "물총",
+         "v": 1,
+         "target": "allAllies"
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -555,7 +572,7 @@
       {
        "k": "status",
        "id": "탄성",
-       "v": 5
+       "v": 2
       },
       {
        "k": "status",
@@ -563,10 +580,22 @@
        "v": 1
       },
       {
-       "k": "stack",
-       "id": "물총",
-       "v": 1,
-       "target": "allAllies"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "물총",
+           "v": 1,
+           "target": "allAllies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -575,20 +604,22 @@
      "cost": 0,
      "fx": [
       {
-       "k": "status",
-       "id": "탄성",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "물총",
-       "v": 1,
-       "target": "allAllies"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "물총",
+           "v": 1,
+           "target": "allAllies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -598,18 +629,29 @@
       {
        "k": "status",
        "id": "탄성",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "결의",
        "v": 2
       },
       {
-       "k": "stack",
-       "id": "물총",
-       "v": 1,
-       "target": "allAllies"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "물총",
+           "v": 1,
+           "target": "allAllies"
+          },
+          {
+           "k": "shield",
+           "ratio": 0.4
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -619,17 +661,30 @@
       {
        "k": "status",
        "id": "탄성",
-       "v": 4
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
+       "v": 3
       },
       {
        "k": "status",
        "id": "면역",
        "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "물총",
+           "v": 1,
+           "target": "allAllies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -642,18 +697,31 @@
       {
        "k": "status",
        "id": "탄성",
-       "v": 4
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
+       "v": 2
       },
       {
        "k": "stack",
        "id": "물총",
        "v": 1,
        "target": "allAllies"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "물총",
+           "v": 1,
+           "target": "allAllies"
+          }
+         ]
+        }
+       ]
       }
      ]
     }

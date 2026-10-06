@@ -11,20 +11,66 @@
    "atk": 95,
    "def": 61,
    "crit": 5,
-   "blurb": "지웠던 불행한 기억을 안고 돌아온 본체. 카드가 소멸할 때마다 되찾은 기억이 쌓여 손끝이 단단해지고, 제 카드가 사라질 땐 파티의 아픔 하나를 씻어 낸다.",
+   "blurb": "지웠던 불행한 기억을 안고 돌아온 본체. 카드가 소멸할 때마다 되찾은 기억이 쌓여 파티의 손끝이 날카로워지고, 고학년에 그 기억을 모두 쏟아 연못을 엽니다.",
    "keyword": {
     "name": "되찾은 기억",
-    "desc": "사라진 카드에서 건져 올린 기억",
+    "desc": "사라진 카드에서 건진 기억",
     "carrier": "self",
-    "cap": 6,
+    "cap": 5,
     "per": [
      {
       "stat": "dealt",
-      "v": 0.1
+      "v": 0.04,
+      "who": "allies"
+     }
+    ],
+    "rules": [
+     {
+      "name": "이젠 마주할게",
+      "when": {
+       "on": "ult"
+      },
+      "conds": [
+       {
+        "c": "stack",
+        "id": "되찾은 기억",
+        "n": 3
+       }
+      ],
+      "fx": [
+       {
+        "k": "status",
+        "id": "취약",
+        "v": 1,
+        "target": "allEnemies"
+       }
+      ]
      },
      {
-      "stat": "guard",
-      "v": 0.1
+      "name": "이젠 마주할게",
+      "when": {
+       "on": "ult"
+      },
+      "fx": [
+       {
+        "k": "spend",
+        "id": "되찾은 기억",
+        "all": true
+       }
+      ]
+     },
+     {
+      "name": "깊어지는 연못",
+      "when": {
+       "on": "ult"
+      },
+      "fx": [
+       {
+        "k": "stack",
+        "id": "연못 깊이",
+        "v": 1
+       }
+      ]
      }
     ]
    },
@@ -69,18 +115,31 @@
     "cost": 200,
     "fx": [
      {
-      "k": "pull",
-      "from": "gone",
-      "at": "random",
-      "n": 1
+      "k": "cue",
+      "id": "ui_pond"
      },
      {
-      "k": "heal",
-      "ratio": 1.5
+      "k": "dmg",
+      "ratio": 0.6,
+      "target": "allEnemies"
+     },
+     {
+      "k": "perStack",
+      "id": "되찾은 기억"
+     },
+     {
+      "k": "dmg",
+      "ratio": 0.25,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "사기",
+      "v": 1
      },
      {
       "k": "stack",
-      "id": "되찾은 기억",
+      "id": "기억의 연못",
       "v": 2
      }
     ]
@@ -91,6 +150,61 @@
     "우이_기억_s1",
     "우이_기억_s2",
     "우이_기억_s2"
+   ],
+   "keywords": [
+    {
+     "name": "기억의 연못",
+     "desc": "적 발밑에 고인 기억의 연못",
+     "carrier": "self",
+     "cap": 2,
+     "decay": 1,
+     "rules": [
+      {
+       "name": "일렁이는 파동",
+       "when": {
+        "on": "exhaust",
+        "who": "any"
+       },
+       "conds": [
+        {
+         "c": "stack",
+         "id": "기억의 연못",
+         "n": 1
+        }
+       ],
+       "limit": {
+        "per": "turn",
+        "n": 3
+       },
+       "fx": [
+        {
+         "k": "cue",
+         "id": "ui_pond_wave"
+        },
+        {
+         "k": "dmg",
+         "ratio": 0.2,
+         "target": "allEnemies"
+        },
+        {
+         "k": "perStack",
+         "id": "연못 깊이"
+        },
+        {
+         "k": "dmg",
+         "ratio": 0.1,
+         "target": "allEnemies"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "연못 깊이",
+     "desc": "쓸수록 깊어지는 연못",
+     "carrier": "self",
+     "cap": 3
+    }
    ]
   }
  ],
@@ -111,14 +225,21 @@
   },
   {
    "id": "우이_기억_s2",
-   "name": "맑은 연못물",
+   "name": "물살 응원",
    "hero": "우이_기억",
    "cost": 1,
-   "type": "스킬",
+   "type": "공격",
    "fx": [
     {
-     "k": "heal",
-     "ratio": 1.2
+     "k": "dmg",
+     "ratio": 0.6,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "status",
+     "id": "취약",
+     "v": 1,
+     "target": "oneEnemy"
     }
    ]
   },
@@ -177,8 +298,8 @@
        "v": 1
       },
       {
-       "k": "shield",
-       "ratio": 0.8
+       "k": "nextCheaper",
+       "v": 1
       }
      ]
     },
@@ -198,8 +319,8 @@
        "v": 1
       },
       {
-       "k": "heal",
-       "ratio": 0.6
+       "k": "gauge",
+       "v": 20
       }
      ]
     },
@@ -408,18 +529,20 @@
    "hero": "우이_기억",
    "unique": true,
    "cost": 1,
-   "type": "스킬",
+   "type": "공격",
    "fx": [
     {
      "k": "burn",
      "v": 1
     },
     {
-     "k": "shield",
-     "ratio": 1.6
+     "k": "dmg",
+     "ratio": 0.8,
+     "target": "oneEnemy"
     },
     {
-     "k": "draw",
+     "k": "status",
+     "id": "사기",
      "v": 1
     }
    ],
@@ -432,11 +555,13 @@
        "v": 1
       },
       {
-       "k": "shield",
-       "ratio": 2.16
+       "k": "dmg",
+       "ratio": 1.1,
+       "target": "oneEnemy"
       },
       {
-       "k": "draw",
+       "k": "status",
+       "id": "사기",
        "v": 1
       }
      ]
@@ -450,11 +575,13 @@
        "v": 1
       },
       {
-       "k": "shield",
-       "ratio": 1.4
+       "k": "dmg",
+       "ratio": 0.7,
+       "target": "oneEnemy"
       },
       {
-       "k": "draw",
+       "k": "status",
+       "id": "사기",
        "v": 1
       }
      ]
@@ -467,11 +594,13 @@
        "v": 2
       },
       {
-       "k": "shield",
-       "ratio": 1.8
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy"
       },
       {
-       "k": "draw",
+       "k": "status",
+       "id": "사기",
        "v": 2
       }
      ]
@@ -480,16 +609,18 @@
      "name": "작별 인사",
      "fx": [
       {
-       "k": "burn",
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "사기",
        "v": 1
       },
       {
-       "k": "shield",
-       "ratio": 1.94
-      },
-      {
-       "k": "heal",
-       "ratio": 1.21
+       "k": "draw",
+       "v": 1
       }
      ]
     },
@@ -501,21 +632,22 @@
        "v": 1
       },
       {
-       "k": "shield",
-       "ratio": 1.6
+       "k": "status",
+       "id": "사기",
+       "v": 1
       },
       {
        "k": "stack",
        "id": "되찾은 기억",
-       "v": 2
+       "v": 3
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "단단한 마음",
-     "kind": "guard"
+     "name": "거센 작별",
+     "kind": "power"
     },
     {
      "name": "빈손",
@@ -545,8 +677,13 @@
      "n": 1
     },
     {
-     "k": "heal",
-     "ratio": 0.8
+     "k": "stack",
+     "id": "되찾은 기억",
+     "v": 1
+    },
+    {
+     "k": "draw",
+     "v": 1
     }
    ],
    "oracles": [
@@ -563,12 +700,13 @@
        "n": 1
       },
       {
-       "k": "heal",
-       "ratio": 1.2
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 1
       },
       {
        "k": "draw",
-       "v": 1
+       "v": 2
       }
      ]
     },
@@ -586,8 +724,9 @@
        "n": 1
       },
       {
-       "k": "heal",
-       "ratio": 0.6
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 1
       }
      ]
     },
@@ -604,8 +743,13 @@
        "n": 2
       },
       {
-       "k": "heal",
-       "ratio": 0.8
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
       }
      ]
     },
@@ -622,13 +766,13 @@
        "n": 1
       },
       {
-       "k": "heal",
-       "ratio": 0.8
-      },
-      {
        "k": "stack",
        "id": "되찾은 기억",
-       "v": 2
+       "v": 3
+      },
+      {
+       "k": "draw",
+       "v": 1
       }
      ]
     },
@@ -645,28 +789,29 @@
        "n": 1
       },
       {
-       "k": "shield",
-       "ratio": 1.4
+       "k": "stack",
+       "id": "되찾은 기억",
+       "v": 2
       },
       {
-       "k": "heal",
-       "ratio": 0.8
+       "k": "gauge",
+       "v": 40
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "맑은 연못",
-     "kind": "heal"
+     "name": "기억 한 줌",
+     "kind": "draw"
     },
     {
      "name": "젖은 발",
      "kind": "cost"
     },
     {
-     "name": "기억 한 줌",
-     "kind": "draw"
+     "name": "물결",
+     "kind": "ap"
     }
    ]
   }

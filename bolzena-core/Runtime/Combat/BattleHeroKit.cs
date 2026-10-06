@@ -53,7 +53,12 @@ namespace Bolzena.Core
                             "broken" => t.Broken,
                             "tough" => t.ToughMax > 0 && t.Tough / t.ToughMax <= (f.Pct > 0 ? f.Pct : 0.5),
                             "guarded" => t.Block + t.Shield > 0,
-                            "attack" => t.Intent != null && IsHit(t.Intent.T),
+                            "attack" => t.Intent != null && HitLike(t.Intent),
+                            // 2026-10-06 — 마무리(즉사의 턴제판): HP 비율 이하 · 보스가 아닌 적만
+                            "hp" => t.MaxHp > 0 && (double)t.Hp / t.MaxHp <= (f.Pct > 0 ? f.Pct : 0.3),
+                            "hpMob" => !t.Boss && t.MaxHp > 0 && (double)t.Hp / t.MaxHp <= (f.Pct > 0 ? f.Pct : 0.3),
+                            // 그 상태가 걸린 적(감전 → 충격 …)
+                            var st when R.ALL_ST.Contains(st) => St(t, st) > 0,
                             _ => false,
                         });
                         if (f.Not) gate = !gate;

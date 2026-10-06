@@ -204,8 +204,51 @@ namespace Bolzena.Core
         }
     }
 
+    /// <summary>
+    /// 덱 한 장에 얹힌 것 — 받은 신탁(이름만, 번호는 쓰지 않는다) · 축복(이름 · 글) · 복제본인가. 화면 카드 표식이 쓴다.
+    /// 판은 Run.MarkOf, 전투는 Battle.MarkOf.
+    /// </summary>
+    public sealed class CardMark
+    {
+        public string Oracle, Bless, BlessText;
+        public bool Copy;
+        public bool Blessed => Bless != null;
+        public bool Any => Oracle != null || Bless != null || Copy;
+        /// <summary>복제 표식 글 — 복제본은 복제할 때 모습에 묶인다.</summary>
+        public const string COPY_LINE = "복제 — 신탁 · 축복 불가";
+
+        public static CardMark Of(GameData d, string id, int flash, string shin)
+        {
+            var c = d.Card(id);
+            var m = new CardMark { Copy = GameData.IsCopy(id) };
+            if (c == null) return m;
+            if (!GameData.IsPlain(id) && flash >= 1 && flash <= c.Oracles.Count) m.Oracle = c.Oracles[flash - 1].Name;
+            if (shin != null && !GameData.IsPlain(id))
+            {
+                var b = Battle.BlessOf(c, shin);
+                string ko = R.DIVINE_KO.TryGetValue(shin, out var k) ? k : null;
+                m.Bless = b?.Name ?? (ko != null ? ko.Split('—')[0].Trim() : R.DIVINE_NAME);
+                m.BlessText = b != null ? new CardText(d).Bless(b) : ko != null && ko.Contains("—") ? ko.Substring(ko.IndexOf('—') + 1).Trim() : ko ?? shin;
+            }
+            return m;
+        }
+
+        /// <summary>카드 확대 · 툴팁의 덧글 — 신탁 · 축복(효과 글) · 복제 줄. 없으면 빈 글.</summary>
+        public string Lines()
+        {
+            var a = new List<string>();
+            if (Oracle != null) a.Add($"신탁 「{Oracle}」");
+            if (Bless != null) a.Add($"축복 「{Bless}」 — {BlessText}");
+            if (Copy) a.Add(COPY_LINE);
+            return string.Join("\n", a);
+        }
+    }
+
     public sealed partial class Battle
     {
+        /// <summary>손 · 더미의 한 장에 얹힌 것(신탁 · 축복 · 복제) — 화면 표식.</summary>
+        public CardMark MarkOf(string id) => CardMark.Of(Data, id, Flash.TryGetValue(id, out var n) ? n : 0, ShinOf(id));
+
         /// <summary>빛나는 카드의 신탁 후보 셋(축복 포함) — 카드 신탁일 때. 은총(hero)이거나 빛이 없으면 빈 목록. 고른 차례 번호를 ApplyEpiphany 에.</summary>
         public System.Collections.Generic.List<OracleOption> EpiphanyOptions(string cardId)
         {

@@ -12,13 +12,45 @@
       "atk": 84,
       "def": 79,
       "crit": 5,
-      "blurb": "은의 용족 공녀. 무례한 손님에게 티파티 초대장을 건네고, 그 손님이 손을 올리기 직전 부채로 손등을 탁 친다.",
+      "blurb": "은의 용족 공녀. 무례한 손님에게 티파티 초대장을 건네 모두가 노릴 과녁으로 세우고, 그 손님이 손을 올리기 직전 부채로 손등을 탁 칩니다. 동료가 손님을 칠 때마다 다과회의 흐름이 빨라집니다.",
       "keyword": {
         "name": "티파티 초대장",
-        "desc": "한 번에 한 손님 — 초대받은 적이 공격하려 하면 실비아가 먼저 꾸짖는다",
+        "desc": "한 번에 한 적에게 보내는 초대장",
         "carrier": "enemy",
         "cap": 1,
-        "hunt": true
+        "hunt": true,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.2
+          }
+        ],
+        "rules": [
+          {
+            "name": "어머니의 특별 강의",
+            "when": {
+              "on": "hit",
+              "who": "other"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "티파티 초대장",
+                "n": 1
+              }
+            ],
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "gauge",
+                "v": 10
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
@@ -88,6 +120,10 @@
           {
             "k": "status",
             "id": "기절",
+            "v": 1
+          },
+          {
+            "k": "ap",
             "v": 1
           }
         ]
@@ -308,7 +344,7 @@
           ]
         },
         {
-          "name": "맨 앞을 막아선다",
+          "name": "맨 앞 막아서기",
           "fx": [
             {
               "k": "shield",
@@ -540,13 +576,29 @@
       "fx": [
         {
           "k": "status",
-          "id": "반격",
-          "v": 2
-        },
-        {
-          "k": "status",
           "id": "결의",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "foeActBefore",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 2
+              },
+              "fx": [
+                {
+                  "k": "shield",
+                  "ratio": 0.3
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -555,13 +607,29 @@
           "fx": [
             {
               "k": "status",
-              "id": "반격",
+              "id": "결의",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "foeActBefore",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -570,24 +638,40 @@
           "fx": [
             {
               "k": "status",
-              "id": "반격",
-              "v": 3
+              "id": "결의",
+              "v": 1
             },
             {
               "k": "status",
-              "id": "결의",
-              "v": 1
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "foeActBefore",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "그 어머니에 그 딸",
           "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
             {
               "k": "status",
               "id": "결의",
@@ -597,6 +681,27 @@
               "k": "status",
               "id": "불굴",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "foeActBefore",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -608,11 +713,6 @@
           "fx": [
             {
               "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "status",
               "id": "결의",
               "v": 1
             },
@@ -621,6 +721,27 @@
               "id": "티파티 초대장",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "foeActBefore",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -629,14 +750,25 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "foeActBefore",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.5
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

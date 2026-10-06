@@ -12,10 +12,10 @@
       "atk": 86,
       "def": 60,
       "crit": 5,
-      "blurb": "엘리아스에 언더돌 문화를 연 유령 아이돌. 아군이 카드를 낼 때마다 무대 「열기」 가 오르고, 넷이 차면 앵콜 — 버린 카드 한 장이 무대로 돌아오고 파티의 기세가 오른다.",
+      "blurb": "엘리아스에 언더돌 문화를 연 유령 아이돌. 아군이 카드를 낼 때마다 무대 열기가 오르고, 앵콜이 터지면 버린 카드 한 장이 무대로 돌아옵니다. 단독 공연을 여는 동안에는 동료들이 만든 환호를 모아 두었다가, 다음 무대가 밝으면 한꺼번에 터뜨립니다.",
       "keyword": {
         "name": "열기",
-        "desc": "팬들이 만든 무대의 열기 — 다른 아군이 카드를 낼 때마다 오른다",
+        "desc": "아군 카드로 오르는 무대 열기",
         "carrier": "self",
         "cap": 4,
         "rules": [
@@ -71,15 +71,18 @@
         "cost": 200,
         "fx": [
           {
+            "k": "cue",
+            "id": "kisha_stage"
+          },
+          {
             "k": "dmg",
-            "ratio": 1.5,
+            "ratio": 1.0,
             "target": "allEnemies"
           },
           {
-            "k": "status",
-            "id": "약화",
-            "v": 1,
-            "target": "allEnemies"
+            "k": "stack",
+            "id": "공연 중",
+            "v": 1
           },
           {
             "k": "stack",
@@ -93,6 +96,102 @@
         "키샤_s1",
         "키샤_s2",
         "키샤_s2"
+      ],
+      "keywords": [
+        {
+          "name": "공연 중",
+          "desc": "무대 위에서 노래하는 키샤",
+          "carrier": "self",
+          "cap": 1,
+          "rules": [
+            {
+              "name": "환호 모으기",
+              "when": {
+                "on": "hit",
+                "who": "any"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "공연 중",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "저장된 환호",
+                  "v": 1,
+                  "ofEvent": 0.1
+                }
+              ]
+            },
+            {
+              "name": "무대 폭발",
+              "when": {
+                "on": "turnStart"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "공연 중",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "kisha_finale",
+                  "xStack": "저장된 환호"
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 1,
+                  "ofStack": "저장된 환호",
+                  "ofEvent": 2,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "status",
+                  "id": "약화",
+                  "v": 1,
+                  "target": "allEnemies"
+                }
+              ]
+            },
+            {
+              "name": "무대 폭발",
+              "when": {
+                "on": "turnStart"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "공연 중",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "spend",
+                  "id": "저장된 환호",
+                  "all": true
+                },
+                {
+                  "k": "spend",
+                  "id": "공연 중",
+                  "all": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "저장된 환호",
+          "desc": "공연 동안 쌓인 박수",
+          "carrier": "self",
+          "cap": 40
+        }
       ]
     }
   ],
@@ -172,25 +271,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.9
-            },
-            {
-              "k": "stack",
-              "id": "열기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "아껴 둔 후렴",
-          "tags": [
-            "회수",
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.6
+              "ratio": 0.7
             },
             {
               "k": "stack",
@@ -217,19 +298,44 @@
           ]
         },
         {
-          "name": "축복의 멜로디",
+          "name": "포근한 발라드",
           "tags": [
-            "회수",
-            "축복"
+            "회수"
           ],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.55
+              "ratio": 0.9
+            },
+            {
+              "k": "shield",
+              "ratio": 0.9
             },
             {
               "k": "stack",
               "id": "열기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "앙코르 메들리",
+          "tags": [
+            "회수"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
@@ -299,29 +405,6 @@
               "k": "status",
               "id": "협공",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "열기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "켜 둔 조명봉",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "열기",
-              "v": 1
             }
           ]
         },
@@ -346,20 +429,35 @@
           ]
         },
         {
-          "name": "축복의 조명",
+          "name": "열기 고조",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "오프닝 조명",
           "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
               "k": "status",
               "id": "협공",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
               "id": "열기",
-              "v": 1
+              "v": 2
             }
           ]
         }
@@ -423,31 +521,12 @@
           ]
         },
         {
-          "name": "작은 하트",
+          "name": "윙크 한 번",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "모아 둔 하트",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.5,
               "target": "allEnemies"
             },
             {
@@ -464,8 +543,8 @@
             {
               "k": "dmg",
               "ratio": 0.5,
-              "hits": 2,
-              "target": "allEnemies"
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "status",
@@ -476,14 +555,27 @@
           ]
         },
         {
-          "name": "축복의 하트",
-          "tags": [
-            "축복"
-          ],
+          "name": "하트 저격",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "두근두근 열기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
               "target": "allEnemies"
             },
             {
@@ -491,6 +583,11 @@
               "id": "약화",
               "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "열기",
+              "v": 2
             }
           ]
         }
@@ -562,7 +659,7 @@
           ]
         },
         {
-          "name": "작은 떼창",
+          "name": "소곤소곤 떼창",
           "cost": 1,
           "fx": [
             {
@@ -571,30 +668,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "터지기 직전",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "열기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.3,
               "target": "allEnemies"
             },
             {
@@ -631,10 +705,7 @@
           ]
         },
         {
-          "name": "축복의 떼창",
-          "tags": [
-            "축복"
-          ],
+          "name": "너만을 위한 노래",
           "fx": [
             {
               "k": "perStack",
@@ -642,13 +713,34 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 1.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "무대 붕괴",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "열기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             }
           ]

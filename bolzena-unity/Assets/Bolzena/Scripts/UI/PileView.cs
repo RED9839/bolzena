@@ -31,7 +31,7 @@ namespace Bolzena.UI
         public static string CardTip(CardInfo c)
         {
             var sb = new StringBuilder();
-            sb.Append(Tip.Head(c.Name)).Append("  ").Append(Tip.Dim($"{c.HeroName} · {c.TypeName} · 코스트 {c.Cost}"));
+            sb.Append(Tip.Head(c.Name)).Append("  ").Append(Tip.Dim($"{c.HeroName} · {c.TypeName} · 비용 {c.Cost}"));
             sb.Append('\n').Append(c.Text);
             if (c.Terms.Count > 0) sb.Append("\n\n").Append(Tip.Terms(c.Terms));
             return sb.ToString();
@@ -203,9 +203,11 @@ namespace Bolzena.UI
             float areaL = lineX + 0.6f * k, areaR = hw - 0.5f * k;
             // 한 줄 다섯 장 — 폭은 화면 폭의 11% 를 넘지 않게, 사이는 넉넉히. 줄은 가운데로
             float gap = 0.34f * k;
-            float cw = Mathf.Min(Mathf.Clamp(Tone.HalfW * 2 * 0.11f, 1.7f, 2.4f) * Mathf.Max(1f, k * 0.92f), (areaR - areaL - gap * 4) / 5f);
+            // 넓은 화면은 한 줄 5~8장(카드 폭은 그대로 — 판 화면 덱 보기와 같은 규칙, 2026-10-06 사용자). 폰은 전처럼 다섯
+            float cw0 = Mathf.Clamp(Tone.HalfW * 2 * 0.11f, 1.7f, 2.4f) * Mathf.Max(1f, k * 0.92f);
+            int cols = Tone.Compact ? 5 : Mathf.Clamp(Mathf.FloorToInt((areaR - areaL + gap) / (cw0 + gap)), 5, 8);
+            float cw = Mathf.Min(cw0, (areaR - areaL - gap * (cols - 1)) / cols);
             float ch = cw * CardView.H / CardView.W;
-            int cols = 5;
             float rowW = cols * cw + (cols - 1) * gap;
             areaL = (areaL + areaR) / 2 - rowW / 2;
             float y = top - 0.3f * k;

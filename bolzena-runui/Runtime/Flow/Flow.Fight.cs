@@ -16,7 +16,7 @@ namespace Bolzena.RunUI
         {
             bool ev = P.S.EventFight != null;
             var node = P.Here;
-            string kind = ev ? "이벤트 싸움" : P.IsBoss ? "보스" : P.S.Elite ? "엘리트" : "일반 전투";
+            string kind = ev ? "이벤트 전투" : P.IsBoss ? "보스" : P.S.Elite ? "엘리트" : "일반 전투";
             var f = P.Floor;
             string bgKey = P.IsBoss && !ev ? "boss" : "fight";
             Stage.SetBg(f.Bg != null && f.Bg.TryGetValue(bgKey, out var bg) ? bg : "stage3_2", 0.5f);
@@ -70,7 +70,7 @@ namespace Bolzena.RunUI
                 Tw.Rise(partyBox, 0.15f, 30, 0.45f, Vector2.left);
 
                 // 결과 받기
-                var note = Ui.Text(root, "전투 화면(트랙 C)이 들어올 자리입니다 — 지금은 결과만 받습니다. 「봇이 싸웁니다」 는 코어 규칙으로 실제 한 판을 돌립니다.", 17, Theme.Sub, TextAlignmentOptions.Center);
+                var note = Ui.Text(root, "전투 화면(트랙 C)이 들어올 자리입니다 — 지금은 결과만 받습니다. 「봇 전투」는 코어 규칙으로 실제 전투를 한 번 돌립니다.", 17, Theme.Sub, TextAlignmentOptions.Center);
                 note.rectTransform.Band(0, 30, 200, 200, 140);
                 note.Outline(0.2f);
                 var bar = Ui.Rect("actions", root).Band(0, 80, 300, 300, 40);
@@ -81,8 +81,8 @@ namespace Bolzena.RunUI
                     Banner(o.Won ? "승리!" : "패배", o.Won ? Theme.Gold : Theme.Bad, () => FightDone(o));
                 }
                 var win = Btn.Make(bar, "전투 결과 받기 — 이김", BtnStyle.PillGold, () => Go("win"), 26); win.Pref(380, 80);
-                var bot = Btn.Make(bar, "봇이 싸웁니다", BtnStyle.PillDark, () => Go("bot"), 24); bot.Pref(260, 80);
-                var lose = Btn.Make(bar, "짐", BtnStyle.PillDark, () => Confirm("진 것으로 받을까요?", "판이 끝납니다.", "진 것으로", () => Go("lose"), true), 24); lose.Pref(140, 80);
+                var bot = Btn.Make(bar, "봇 전투", BtnStyle.PillDark, () => Go("bot"), 24); bot.Pref(260, 80);
+                var lose = Btn.Make(bar, "짐", BtnStyle.PillDark, () => Confirm("진 것으로 받을까요?", "모험이 끝납니다.", "진 것으로", () => Go("lose"), true), 24); lose.Pref(140, 80);
                 Stage.Hot["fight.win"] = win; Stage.Hot["fight.bot"] = bot; Stage.Hot["fight.lose"] = lose;
                 Tw.Rise(bar, 0.4f, 30, 0.4f);
             });
@@ -150,6 +150,11 @@ namespace Bolzena.RunUI
         {
             Ui.Clear(root);
             W.StatusBar(root, this, true, true, true, null, null);
+            // 골드는 저절로(2026-10-06 사용자) — 화면이 서면 곧장 받고 「+N 골드」 가 머리 띠 골드로 날아가며 숫자가 오른다.
+            //   엔진 TakeGold 는 GoldTaken 으로 한 번만 — 다시 그려도 · 떠날 때 또 불러도 두 번 받지 않는다. 엘리트 · 보스 보상도 이 화면(이벤트 싸움은 보상 화면이 없다).
+            int goldBefore = P.S.Gold;
+            bool goldNow = loot != null && !loot.GoldTaken;
+            if (goldNow) { P.TakeGold(); var gt = root.GetComponentsInChildren<TextMeshProUGUI>(true).FirstOrDefault(x => x.name == "gold"); if (gt) gt.text = Ui.Gold(goldBefore); }
 
             // 싸움터 — 판 화면만 있을 때는 사도 셋을 세워 둔다(본 게임에서는 전투 장면의 사도가 그대로 서 있다)
             if (!bare)
@@ -159,11 +164,10 @@ namespace Bolzena.RunUI
                 foreach (var k in P.S.Party)
                 {
                     var h = Roster.OfCore(k);
-                    var spot = Ui.Rect("mini" + pi, scene).At(0.5f, 0, -520 + pi * 150, Theme.C(220, 170) + (pi % 2) * 22, 10, 10);
-                    var g = SpineUi.Make(spot, "minimi", h.MiniSkin, Theme.C(170, 140), "Idle", "idle");
-                    if (g == null) { var fc = W.Face(spot, h, 96); fc.At(0.5f, 0, 0, 0, 96, 96); }
-                    else g.AnimationState.Update(pi * 0.4f);
-                    var sh = Ui.Img(spot, Theme.S("soft"), Color.black.A(0.45f), "shadow"); sh.rectTransform.At(0.5f, 0.5f, 0, 0, 130, 26); sh.transform.SetAsFirstSibling();
+                    // 전투와 같은 SD 전투 스파인 · 같은 고정 배율(휴식 · 이벤트와 같은 몸 키) — 미니미는 없앴다(2026-10-06)
+                    float body = Stage.Size.y * 0.24f;
+                    var spot = Ui.Rect("hero" + pi, scene).At(0.5f, 0, -560 + (P.S.Party.Count - 1 - pi) * body * 0.9f, Theme.C(200, 150) + (pi % 2) * 14, 10, 10);
+                    SceneHero.Make(spot, h, body, true, pi * 0.4f);
                     Tw.Pop(spot, 0.1f + pi * 0.08f, 0.7f, 0.4f);
                     pi++;
                 }
@@ -207,15 +211,8 @@ namespace Bolzena.RunUI
             }
             if (loot != null)
             {
-                Line("gold", $"골드 <color={Theme.GoldTag}>{loot.Gold}</color>", null, Theme.Icon("gold"), Color.white, loot.GoldTaken, () =>
-                {
-                    int before = P.S.Gold;
-                    P.TakeGold(); Sfx.Play("coin");
-                    var gb = Stage.Hot.TryGetValue("reward.gold", out var gbtn) ? gbtn : null;
-                    if (gb) CoinBurst(gb.GetComponent<RectTransform>());
-                    CountGold(root, before, P.S.Gold);
-                    Tw.After(0.5f, () => { if (root) BuildReward(root, o, loot, glows, bare); });
-                }, "reward.gold");
+                Line("gold", $"골드 <color={Theme.GoldTag}>+{loot.Gold}</color>", "받음", Theme.Icon("gold"), Color.white, true, null, "reward.gold");
+                if (goldNow) GoldFly(root, list, loot.Gold, goldBefore, P.S.Gold);
             }
             if (loot?.Equip != null)
                 foreach (var id in loot.Equip)
@@ -266,7 +263,7 @@ namespace Bolzena.RunUI
                 if (loot?.Equip != null && loot.Equip.Count > 0 && loot.EquipTaken == null) missed.Add("장비");
                 if (glows.Count > 0) missed.Add("빛났던 카드");
                 if (missed.Count == 0) { Leave(); return; }
-                Confirm("받지 않고 떠날까요?", $"{string.Join(" · ", missed)} — 떠나면 사라집니다." + (loot != null && !loot.GoldTaken ? " 골드는 챙깁니다." : ""), "떠납니다", Leave, true);
+                Confirm("받지 않고 떠날까요?", $"{string.Join(" · ", missed)} — 떠나면 사라집니다." + (loot != null && !loot.GoldTaken ? " 골드는 챙깁니다." : ""), "떠나기", Leave, true);
             }, 0, "next");
             var nrt = next.GetComponent<RectTransform>(); nrt.At(1, 0, -Theme.Gutter, Theme.Gutter, 300, 70);
             var play = Ui.Img(nrt, Theme.S("circle"), Theme.Brown.A(0.18f), "disc"); play.rectTransform.At(0, 0.5f, 12, 0, 46, 46);
@@ -277,6 +274,53 @@ namespace Bolzena.RunUI
             Stage.Hot["reward.next"] = next;
         }
 
+        /// <summary>「+N 골드」 가 보상 줄 골드 칸에서 떠올라 머리 띠 골드로 날아가고, 닿으면 숫자가 before → after 로 오른다(동전 몇 닢이 따라간다).</summary>
+        void GoldFly(RectTransform root, RectTransform list, int amount, int before, int after)
+        {
+            var target = root.GetComponentsInChildren<TextMeshProUGUI>(true).FirstOrDefault(x => x.name == "gold");
+            var layer = Stage.ToastLayer;
+            var c = new Vector3[4];
+            list.GetWorldCorners(c);
+            Vector3 from = new Vector3(Mathf.Lerp(c[0].x, c[2].x, 0.55f), c[1].y - Theme.C(39, 35) * list.lossyScale.y, 0);
+            Vector3 to = target != null ? target.transform.position : new Vector3(Screen.width - 120, Screen.height - 40, 0);
+            var tag = Ui.Title(layer, $"+{amount} 골드", Theme.FsXl, Theme.Gold, TextAlignmentOptions.Center, "goldfly");
+            tag.Outline(0.25f, new Color(0.3f, 0.15f, 0));
+            tag.rectTransform.sizeDelta = new Vector2(320, 60);
+            tag.transform.position = from;
+            tag.alpha = 0;
+            var trt = tag.rectTransform;
+            float rise = 60 * layer.lossyScale.y;
+            Tw.Run(trt, 0.35f, k => { if (!trt) return; tag.alpha = k; trt.position = from + new Vector3(0, rise * Tw.OutCubic(k), 0); trt.localScale = Vector3.one * Mathf.Lerp(0.6f, 1.15f, Tw.OutBack(k)); }, Tw.Linear, 0.25f);
+            Tw.Run(trt, 0.5f, k =>
+            {
+                if (!trt) return;
+                var a = from + new Vector3(0, rise, 0);
+                var mid = (a + to) / 2 + new Vector3(0, 80 * layer.lossyScale.y, 0);
+                trt.position = Vector3.Lerp(Vector3.Lerp(a, mid, k), Vector3.Lerp(mid, to, k), k);
+                trt.localScale = Vector3.one * Mathf.Lerp(1.15f, 0.5f, k);
+                tag.alpha = 1 - k * k * 0.6f;
+            }, Tw.InOut, 0.85f, () =>
+            {
+                if (trt) Destroy(trt.gameObject);
+                Sfx.Play("coin");
+                CountGold(root, before, after);
+                if (target) { var tr = target.transform; Tw.Run(tr, 0.3f, k => { if (tr) tr.localScale = Vector3.one * (1 + 0.25f * Mathf.Sin(k * Mathf.PI)); }); }
+            });
+            for (int i = 0; i < 6; i++)
+            {
+                var coin = Ui.Img(layer, Theme.Icon("gold"), Color.white, "coin");
+                var rt = coin.rectTransform; rt.sizeDelta = new Vector2(26, 26); rt.position = from;
+                var jitter = new Vector3(UnityEngine.Random.Range(-40f, 40f), UnityEngine.Random.Range(-10f, 30f), 0) * layer.lossyScale.y;
+                Tw.Run(rt, 0.55f, k =>
+                {
+                    if (!rt) return;
+                    var a = from + jitter;
+                    rt.position = Vector3.Lerp(a, to, Tw.InOut(k)) + new Vector3(0, Mathf.Sin(k * Mathf.PI) * 90 * layer.lossyScale.y, 0);
+                    coin.color = new Color(1, 1, 1, k < 0.85f ? 1 : (1 - k) / 0.15f);
+                }, Tw.Linear, 0.55f + i * 0.05f, () => { if (rt) Destroy(rt.gameObject); });
+            }
+        }
+
         /// <summary>머리 띠 골드 숫자를 before → after 로 올린다.</summary>
         void CountGold(RectTransform root, int before, int after)
         {
@@ -285,65 +329,39 @@ namespace Bolzena.RunUI
             Tw.Run(t, 0.5f, k => { if (t) t.text = Ui.Gold(Mathf.RoundToInt(Mathf.Lerp(before, after, k))); });
         }
 
-        /// <summary>빛났던 카드 고르기 — 선택지 카드(은총) 또는 신탁 줄 가운데 하나. 고르면 받고 picked, 닫으면 그대로(보상 줄에 남는다).</summary>
+        /// <summary>빛났던 카드 고르기 — 신탁 · 은총 고르기 연출(OracleReveal, 2026-10-06). 고르면 받고 picked, 닫으면 그대로(보상 줄에 남는다).
+        /// 신탁은 그 카드의 후보 셋(+ 축복)을 신탁을 얹은 모습으로, 은총은 받을 고유 카드를. 번호는 붙이지 않는다.</summary>
         void GlowPick(string cardId, Glow g, Action picked)
         {
+            if (OracleReveal.IsOpen) return;
+            List<string> gcs = null;
             var baseCard = P.Data.Card(cardId);
-            string head = g.Kind == "hero" ? $"은총 — {Roster.OfCore(g.Hero).ko}" : $"신탁 — 「{baseCard?.Name}」";
-            var (body, close, _) = Stage.ModalBox("glow", Mathf.Clamp(g.Count * (Theme.C(250, 214) + 26) + 140, 760, 1200), Theme.C(620, 600), head, "빛났지만 내지 않은 카드 · 하나만 고릅니다 — 고르지 않고 떠나면 사라집니다");
-            float cw = Theme.C(250, 214);
-            var row = Ui.Rect("opts", body).Fill();
-            if (g.Kind == "card")
-            {
-                // 신탁 — 코어가 고른 후보 셋(+ 축복)을 신탁을 얹은 카드 모습으로
-                var opts = Core.OracleOption.Of(P.Data, cardId, g.Picks);
-                OracleRow(row, cardId, opts, Theme.C(230, 190), idx =>
-                {
-                    var why = P.ClaimGlow(cardId, g, idx);
-                    if (why != null) { Toast.Show(why); return; }
-                    close();
-                    var o = opts[idx];
-                    Toast.Show($"「{o.Name}」 — 받았습니다" + (o.Blessed ? $" · 축복 「{o.BlessName}」" : ""));
-                    picked();
-                }, "glow.opt");
-                Stage.Hot["glow.close"] = Stage.Hot["modal.x"];
-                return;
+            bool card = g.Kind == "card";
+            var opts = card ? Core.OracleOption.Of(P.Data, cardId, g.Picks) : null;
+            List<RevealPick> picks;
+            List<int> order;
+            if (card) { picks = RevealPick.Of(P.Data, cardId, opts); order = Enumerable.Range(0, picks.Count).ToList(); }
+            else
+            {   // 은총 선택지도 기본 → 고유 순(CardOrder) — 받을 때는 원래 자리(idx)로
+                var sorted = CardOrder.Sort(g.Options.Take(g.Count), P.Data, P.S.Party);
+                order = Enumerable.Range(0, g.Count).OrderBy(i => sorted.IndexOf(g.Options[i])).ToList();
+                picks = order.Select(i => new RevealPick { CardId = g.Options[i], Label = P.Data.Card(g.Options[i])?.Name }).ToList();
             }
-            Ui.Row(row, 26, TextAnchor.MiddleCenter, null, false, false);
-            // 은총 선택지도 기본 → 고유 순(CardOrder) — 받을 때는 원래 자리(idx)로
-            var order = Enumerable.Range(0, g.Count).ToList();
-            if (g.Kind == "hero") { var sorted = CardOrder.Sort(g.Options.Take(g.Count), P.Data, P.S.Party); order = order.OrderBy(i => sorted.IndexOf(g.Options[i])).ToList(); }
-            foreach (var i in order)
+            string who = card ? $"<color=#ffd76a>{baseCard?.Name}</color>에 신탁" : $"<color=#ffd76a>{Roster.OfCore(g.Hero).ko}</color>의 은총";
+            OracleReveal.Show(this, new RevealOpts
             {
-                int idx = i;
-                var holder = Ui.Rect("opt" + i, row); holder.Pref(cw, cw * 1.45f);
-                RectTransform face; Btn btn; string label;
-                if (g.Kind == "hero")
+                Title = card ? "신탁!" : "은총!", Awake = card ? "신탁" : "은총",
+                Sub = $"{who} — 빛났지만 내지 않은 카드 · 하나를 고르세요(닫고 떠나면 사라집니다)",
+                BaseCardId = cardId, Picks = picks, Cancel = true, Hot = "glow.opt",
+                Try = k => { gcs = CardSnap(); return P.ClaimGlow(cardId, g, order[k]); },
+                Done = k =>
                 {
-                    label = P.Data.Card(g.Options[i])?.Name ?? g.Options[i];
-                    face = W.Card(holder, this, g.Options[i], cw);
-                    btn = face.gameObject.AddComponent<Btn>();
-                }
-                else
-                {
-                    var orc = baseCard.Oracles[g.Picks[i].N - 1];
-                    label = orc.Name;
-                    var ob = W.Option(holder, orc.Name, P.Text.Oracle(baseCard, orc), null, cw * 1.4f, Theme.S("ic_spark"), "oracle");
-                    face = ob.GetComponent<RectTransform>(); btn = ob;
-                }
-                face.At(0.5f, 0.5f, 0, 0, cw, cw * 1.4f);
-                btn.OnClick = () =>
-                {
-                    var why = P.ClaimGlow(cardId, g, idx);
-                    if (why != null) { Toast.Show(why); return; }
-                    close();
-                    Toast.Show($"「{label}」 — 받았습니다");
-                    picked();
-                };
-                Stage.Hot["glow.opt" + i] = btn;
-                Tw.Pop(holder, 0.1f + i * 0.08f, 0.6f, 0.4f);
-            }
-            Stage.Hot["glow.close"] = Stage.Hot["modal.x"];
+                    var o = card ? opts[order[k]] : null;
+                    Toast.Show($"「{picks[k].Label}」 — 받았습니다" + (o != null && o.Blessed ? $" · 축복 「{o.BlessName}」" : ""));
+                    GainCards(gcs != null ? NewCards(gcs) : null, picked);   // 은총 고유 카드 — 다시 태어난 뒤 가운데에서 덱으로(신탁은 새 카드가 없어 그대로)
+                },
+            });
+            Stage.Hot["glow.close"] = Stage.Hot.TryGetValue("glow.opt.close", out var x) ? x : null;
         }
 
         void CoinBurst(RectTransform at)
@@ -375,7 +393,7 @@ namespace Bolzena.RunUI
             ids = CardOrder.Sort(ids, P.Data, P.S.Party);
             Stage.Show("bosscopy", root =>
             {
-                W.StatusBar(root, this, true, true, false, "층 보스의 몫", "가진 고유 카드 셋 가운데 하나 — 복제본이 한 장 더 덱에 들어갑니다(신탁 · 축복도 같이)");
+                W.StatusBar(root, this, true, true, false, "층 보스의 몫", "고유 카드 하나를 복제합니다 — 지금 신탁 · 축복 그대로, 그 뒤로는 받을 수 없습니다");
                 float cw = Theme.C(280, 236);
                 var row = Ui.Rect("cards", root).At(0.5f, 0.5f, 0, Theme.C(-10, -6), 1000, cw * 1.4f + 30);
                 Ui.Row(row, 30, TextAnchor.MiddleCenter, null, false, false);
@@ -411,7 +429,7 @@ namespace Bolzena.RunUI
                 go.Interactable = false;
                 go.Why = "카드를 하나 고르세요";
                 Stage.Hot["copy.go"] = go;
-                var skip = Btn.Make(root, "받지 않습니다", BtnStyle.PillDark, () => pick(null), Theme.FsMd);
+                var skip = Btn.Make(root, "받지 않기", BtnStyle.PillDark, () => pick(null), Theme.FsMd);
                 skip.GetComponent<RectTransform>().At(0, 0, Theme.Gutter, Theme.Gutter, 240, 66);
             });
         }

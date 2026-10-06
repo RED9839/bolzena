@@ -12,10 +12,10 @@
       "atk": 146,
       "def": 29,
       "crit": 10,
-      "blurb": "누구도 모시지 않는 달을 홀로 섬겨 온 사제. 턴마다 달이 그믐 → 초승 → 반달 → 보름으로 차오르고, 스킬로 기도하면 한 칸 앞당긴다.",
+      "blurb": "달을 섬기는 무녀. 달이 차오를수록 달바라기 꽃밭이 파티를 감싸 덜 다치게 하고, 보름이 뜨면 달빛이 적 전체에 스며들어 밤새 상처를 벌립니다.",
       "keyword": {
         "name": "달의 위상",
-        "desc": "턴마다 한 칸 도는 달 — 1 그믐(고유 카드 AP +1) · 2~3 초승 · 반달(드로우 1) · 4 보름(피해 +60%)",
+        "desc": "차오를수록 파티를 감싸는 달",
         "carrier": "self",
         "cap": 4,
         "wrap": true,
@@ -29,10 +29,19 @@
             },
             "fx": [
               {
-                "k": "heal",
-                "ratio": 0.6
+                "k": "status",
+                "id": "균열",
+                "v": 2,
+                "target": "allEnemies"
               }
             ]
+          }
+        ],
+        "per": [
+          {
+            "stat": "taken",
+            "v": -0.03,
+            "who": "allies"
           }
         ]
       },
@@ -76,8 +85,12 @@
         "cost": 200,
         "fx": [
           {
+            "k": "cue",
+            "id": "yomi_moon_summon"
+          },
+          {
             "k": "dmg",
-            "ratio": 1,
+            "ratio": 0.6,
             "target": "allEnemies"
           },
           {
@@ -87,8 +100,9 @@
             "target": "allEnemies"
           },
           {
-            "k": "ap",
-            "v": 1
+            "k": "stack",
+            "id": "구름 걷는 달빛",
+            "v": 2
           }
         ]
       },
@@ -97,6 +111,45 @@
         "요미_s1",
         "요미_s2",
         "요미_s3"
+      ],
+      "keywords": [
+        {
+          "name": "구름 걷는 달빛",
+          "desc": "전장을 비추는 달빛",
+          "carrier": "self",
+          "cap": 2,
+          "decay": 1,
+          "rules": [
+            {
+              "name": "달빛 내리쬠",
+              "when": {
+                "on": "turnEnd"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "구름 걷는 달빛",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "yomi_moonlight"
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.4,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "gauge",
+                  "v": 10
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   ],
@@ -177,7 +230,7 @@
           "v": 1
         }
       ],
-      "blurb": "달이 어떤 얼굴이든 사제의 손은 흔들리지 않는다",
+      "blurb": "달이 어떤 얼굴이든 사제의 손은 흔들리지 않습니다",
       "oracles": [
         {
           "name": "은빛 사격",
@@ -363,9 +416,9 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
-          "target": "oneEnemy",
-          "hits": 3
+          "ratio": 0.55,
+          "target": "allEnemies",
+          "hits": 2
         },
         {
           "k": "ifStack",
@@ -378,16 +431,16 @@
           "v": 1
         }
       ],
-      "blurb": "달이 숨은 밤의 화살은 보이지 않는다",
+      "blurb": "달이 숨은 밤의 화살은 보이지 않습니다",
       "oracles": [
         {
           "name": "칠흑의 화살",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.75,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "ifStack",
@@ -407,9 +460,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.3,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "ifStack",
@@ -428,7 +481,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.5,
               "target": "allEnemies",
               "hits": 3
             },
@@ -449,9 +502,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.55,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "균열",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
               "k": "ifStack",
@@ -473,9 +532,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.7,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "ifStack",
@@ -638,32 +697,70 @@
       "type": "강화",
       "fx": [
         {
-          "k": "stack",
-          "id": "달의 위상",
-          "v": 1
-        },
-        {
           "k": "atkMod",
-          "v": 0.15,
+          "v": 0.1,
           "run": true,
           "target": "self"
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "stackReach",
+                "id": "달의 위상",
+                "n": 4
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "사기",
+                  "v": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.6,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ]
         }
       ],
-      "blurb": "모시는 이 없어도 달은 차오른다",
+      "blurb": "모시는 이 없어도 달은 차오릅니다",
       "oracles": [
         {
           "name": "만월의 서약",
           "fx": [
             {
-              "k": "stack",
-              "id": "달의 위상",
-              "v": 1
-            },
-            {
               "k": "atkMod",
-              "v": 0.2,
+              "v": 0.15,
               "run": true,
               "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "달의 위상",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "사기",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -672,10 +769,28 @@
           "cost": 0,
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "달의 위상",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "사기",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -683,19 +798,38 @@
           "name": "사제의 인내",
           "fx": [
             {
-              "k": "stack",
-              "id": "달의 위상",
-              "v": 1
-            },
-            {
               "k": "atkMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "달의 위상",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "사기",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -703,13 +837,8 @@
           "name": "달의 가호",
           "fx": [
             {
-              "k": "stack",
-              "id": "달의 위상",
-              "v": 1
-            },
-            {
               "k": "atkMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
@@ -717,6 +846,30 @@
               "k": "status",
               "id": "피해 감소",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "달의 위상",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "사기",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -727,15 +880,39 @@
           ],
           "fx": [
             {
-              "k": "stack",
-              "id": "달의 위상",
-              "v": 2
-            },
-            {
               "k": "atkMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true,
               "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "달의 위상",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "달의 위상",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "사기",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

@@ -15,13 +15,40 @@
       "blurb": "사료스탕스의 티그를 동경해 최강의 전사를 꿈꾸며 매일 장작을 패는 꼬마 개 수인.",
       "keyword": {
         "name": "수련",
-        "desc": "하루도 거르지 않는 수련 — 격파할 때마다 쌓이고, 판이 끝날 때까지 공격력도 자란다",
+        "desc": "격파로 쌓는 수련",
         "carrier": "self",
         "cap": 5,
         "per": [
           {
             "stat": "dealt",
             "v": 0.1
+          }
+        ],
+        "rules": [
+          {
+            "name": "수련 완성",
+            "when": {
+              "on": "stackReach",
+              "id": "수련",
+              "n": 5
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "수련",
+                "all": true
+              },
+              {
+                "k": "growRun",
+                "id": "atk",
+                "v": 2
+              },
+              {
+                "k": "dmg",
+                "ratio": 1.5,
+                "target": "oneEnemy"
+              }
+            ]
           }
         ]
       },
@@ -140,11 +167,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 퍄오오~",
+          "name": "퍄아아아~!",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.7,
+              "ratio": 1.6,
               "target": "oneEnemy"
             },
             {
@@ -154,12 +181,12 @@
           ]
         },
         {
-          "name": "가벼운 퍄오오~",
+          "name": "작은 기합",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
@@ -169,11 +196,11 @@
           ]
         },
         {
-          "name": "수련한 퍄오오~",
+          "name": "수련의 기합",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
+              "ratio": 1.3,
               "target": "oneEnemy"
             },
             {
@@ -188,58 +215,48 @@
           ]
         },
         {
-          "name": "재빠른 퍄오오~",
-          "tags": [
-            "신속"
-          ],
+          "name": "도끼 돌리기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.65,
-              "target": "oneEnemy"
+              "ratio": 0.85,
+              "target": "allEnemies"
             },
             {
               "k": "tough",
-              "v": 1
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "꿰뚫는 퍄오오~",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "온몸 기합",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
+              "ratio": 2.5,
               "target": "oneEnemy"
             },
             {
               "k": "tough",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "힘찬 도끼",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "쩍 갈라진 틈",
+          "kind": "frost"
         },
         {
-          "name": "장작 백 개",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "수련",
-              "v": 1
-            }
-          ]
+          "name": "기합 충전",
+          "kind": "atkUp"
         }
       ]
     },
@@ -270,14 +287,14 @@
       ],
       "oracles": [
         {
-          "name": "힘준 결대로 쪼개기",
+          "name": "통나무 두 동강",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.3,
+              "ratio": 3.05,
               "target": "oneEnemy"
             },
             {
@@ -286,12 +303,12 @@
             {
               "k": "stack",
               "id": "수련",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 결대로 쪼개기",
+          "name": "잔가지 쪼개기",
           "cost": 1,
           "tags": [
             "약점 공격"
@@ -299,7 +316,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 1.75,
               "target": "oneEnemy"
             },
             {
@@ -313,15 +330,72 @@
           ]
         },
         {
-          "name": "수련한 결대로 쪼개기",
+          "name": "결 따라 수련",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.05,
+              "ratio": 2.55,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "수련",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "stack",
+              "id": "수련",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "나무꾼 휘두르기",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "stack",
+              "id": "수련",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "단숨에 장작더미",
+          "cost": 3,
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 4.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "ifBreak"
@@ -332,69 +406,20 @@
               "v": 2
             }
           ]
-        },
-        {
-          "name": "재빠른 결대로 쪼개기",
-          "tags": [
-            "약점 공격",
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifBreak"
-            },
-            {
-              "k": "stack",
-              "id": "수련",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 결대로 쪼개기",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.05,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifBreak"
-            },
-            {
-              "k": "stack",
-              "id": "수련",
-              "v": 1
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "도끼날 갈기",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "나뭇결 읽기",
           "kind": "weakSpot"
         },
         {
-          "name": "장작 백 개",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "수련",
-              "v": 1
-            }
-          ]
+          "name": "쪼갠 장작 줍기",
+          "kind": "draw"
         }
       ]
     },
@@ -408,49 +433,98 @@
       "fx": [
         {
           "k": "status",
-          "id": "잔광",
-          "v": 2
-        },
-        {
-          "k": "stack",
-          "id": "수련",
-          "v": 2
-        },
-        {
-          "k": "status",
           "id": "불굴",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "수련",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 티그 님처럼",
+          "name": "백 번 휘두르기",
           "fx": [
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "수련",
-              "v": 2
-            },
             {
               "k": "status",
               "id": "불굴",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수련",
+                      "v": 2
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "break",
+                    "mine": true
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수련",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 티그 님처럼",
+          "name": "목검 수련",
           "cost": 0,
           "fx": [
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수련",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "장작 백 개",
+          "fx": [
+            {
               "k": "status",
-              "id": "잔광",
-              "v": 3
+              "id": "불굴",
+              "v": 1
             },
             {
               "k": "stack",
@@ -458,87 +532,103 @@
               "v": 2
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수련",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "수련한 티그 님처럼",
+          "name": "사부님 흉내",
           "fx": [
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "수련",
-              "v": 3
-            },
             {
               "k": "status",
               "id": "불굴",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "든든한 티그 님처럼",
-          "fx": [
+            },
             {
               "k": "status",
               "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "수련",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수련",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 티그 님처럼",
+          "name": "수련 일지",
           "tags": [
             "축복"
           ],
           "fx": [
             {
               "k": "status",
-              "id": "잔광",
-              "v": 3
+              "id": "불굴",
+              "v": 1
             },
             {
               "k": "stack",
               "id": "수련",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수련",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
-          "kind": "ap"
+          "name": "티그 님 흉내",
+          "kind": "atkUp"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "따라 하기",
+          "kind": "cost"
         },
         {
-          "name": "장작 백 개",
+          "name": "아침 수련",
           "fx": [
             {
               "k": "stack",
@@ -574,16 +664,16 @@
       ],
       "oracles": [
         {
-          "name": "힘준 심부름길 호신술",
+          "name": "단단한 호신술",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.95
+              "ratio": 2.2
             },
             {
               "k": "status",
               "id": "반격",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
@@ -593,31 +683,26 @@
           ]
         },
         {
-          "name": "가벼운 심부름길 호신술",
+          "name": "몸 피하기",
           "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.35
+              "ratio": 0.8
             },
             {
               "k": "status",
               "id": "반격",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "수련",
-              "v": 1
             }
           ]
         },
         {
-          "name": "수련한 심부름길 호신술",
+          "name": "수련 겸 심부름",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 1.5
             },
             {
               "k": "status",
@@ -632,45 +717,42 @@
           ]
         },
         {
-          "name": "든든한 심부름길 호신술",
+          "name": "되받아 찍기",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.0
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "수련",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "장바구니 막기",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.9
+              "ratio": 1.5
             },
             {
               "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "수련",
+              "id": "회피",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 심부름길 호신술",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.9
             },
             {
               "k": "status",
               "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "수련",
               "v": 1
             }
           ]
@@ -678,15 +760,15 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
+          "name": "단단한 자세",
           "kind": "guard"
         },
         {
-          "name": "한 장 더",
+          "name": "심부름 쪽지",
           "kind": "draw"
         },
         {
-          "name": "장작 백 개",
+          "name": "한 걸음 수련",
           "fx": [
             {
               "k": "stack",

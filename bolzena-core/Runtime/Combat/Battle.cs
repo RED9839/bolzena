@@ -17,6 +17,8 @@ namespace Bolzena.Core
         public bool NoNature;
         /// <summary>판의 적 속성 — 주면 이 싸움의 모든 적(소환 포함)의 성격 · 약점을 이것으로 맞춘다(RunState.EnemyNature). 없으면 적 데이터 그대로.</summary>
         public string EnemyNature;
+        /// <summary>판의 층(1 · 2 — 0 은 모름). 보스 클론 고학년의 층 기준(BossUlt) — 판이 실제로 그 보스를 세운 층.</summary>
+        public int Floor;
         /// <summary>사도마다 장비 능력치 줄(HP 는 파티 최대 HP 에 이미 들어 있다 — 여기선 공격 · 방어 · 치명만).</summary>
         public Dictionary<string, Stats> Gear;
         /// <summary>사도마다 장비 효과(패시브로 돈다).</summary>
@@ -92,6 +94,8 @@ namespace Bolzena.Core
         public bool NoNature, Preview;
         /// <summary>판의 적 속성(BattleSetup.EnemyNature) — null 이면 적마다 데이터 성격.</summary>
         public string EnemyNature;
+        /// <summary>판의 층(BattleSetup.Floor — 1 · 2, 0 은 모름).</summary>
+        public int Floor;
         public int? PreviewPick;
 
         public Dictionary<string, int> Flash = new();
@@ -216,6 +220,7 @@ namespace Bolzena.Core
             double hpx = st.EnemyHp ?? R.ENEMY_HP, dmgx = st.EnemyDmg ?? 1;
             EnemyHpx = hpx; EnemyDmgx = dmgx; EliteFight = st.Elite;
             EnemyNature = string.IsNullOrEmpty(st.EnemyNature) ? null : st.EnemyNature;
+            Floor = st.Floor;
             for (int i = 0; i < st.Enemies.Count; i++)
             {
                 var e = Data.Enemy(st.Enemies[i]) ?? throw new ArgumentException($"없는 적: {st.Enemies[i]}");
@@ -236,6 +241,7 @@ namespace Bolzena.Core
 
             gearRules = st.GearRules;
             SetupPassives(st.GearRules);
+            MeterInit();
 
             // 개전 — 첫 손패에 든다(뽑을 더미는 끝에서부터 뽑으니 끝으로)
             var opening = Draw.Where(id => HasTagB(id, Tag.Opening)).ToList();
@@ -272,7 +278,7 @@ namespace Bolzena.Core
         {
             double t = e.Tough > 0 ? e.Tough : e.Boss ? R.TOUGH.Boss : elite ? R.TOUGH.Elite : R.TOUGH.Fight;
             if (elite && !e.Boss && t < R.TOUGH.Elite) t += R.TOUGH.EliteMinion;
-            return Math.Max(R.TOUGH.Min, t);
+            return Math.Max(e.Boss ? R.TOUGH.MinBoss : R.TOUGH.Min, t);
         }
 
         // ── 복사(봇 · 미리보기) ──────────────────────────────────────
@@ -280,7 +286,7 @@ namespace Bolzena.Core
         public Battle Clone(Rng rng = null)
         {
             var s = (Battle)MemberwiseClone();
-            s.OnCue = null; s.OnLog = null; s.Cues = null;
+            s.OnCue = null; s.OnLog = null; s.Cues = null; s.Meter = null;
             s.Log = new List<string>();
             s.Rng = rng ?? Rng.Clone();
             s.Pool = Pool.Clone();
@@ -308,7 +314,8 @@ namespace Bolzena.Core
             s.CostMods = CostMods.Select(x => x.Copy()).ToList(); s.PlayedPrev = new(PlayedPrev); s.BattleVals = new(BattleVals);
             s.Later = Later.Select(x => x.Copy()).ToList();
             s.GrowthGain = GrowthGain.ToDictionary(kv => kv.Key, kv => kv.Value + new Stats());
-            s.Forms = Forms.ToDictionary(kv => kv.Key, kv => kv.Value.Copy());   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다
+            s.Forms = Forms.ToDictionary(kv => kv.Key, kv => kv.Value.Copy());
+            s.Powers = Powers.Select(p => p.Copy()).ToList();   // 규칙 캐시(powerRules)는 나눠 쓴다 — 같은 강화면 규칙이 같다   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다
             return s;
         }
 
@@ -384,6 +391,8 @@ namespace Bolzena.Core
         public bool Own;
         /// <summary>변신이 덧붙인 규칙이면 그 변신 id.</summary>
         public string Form;
+        /// <summary>강화 카드 지속 규칙이면 그 강화 이름.</summary>
+        public string Power;
     }
 
     public sealed class AlwaysMod

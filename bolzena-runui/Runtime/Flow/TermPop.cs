@@ -8,9 +8,10 @@ using UnityEngine.UI;
 namespace Bolzena.RunUI
 {
     // 글 속 밑줄 낱말 — PC 는 올리기만 해도, 폰은 누르면 그 낱말 옆에 작은 설명 판(CardTerms).
-    //   키워드 · 상태 · 사도 고유 효과 = 이름 · 한두 줄(고유 효과는 짧은 글 + 「자세히」 펼침) · 해로운 것은 붉은 테.
+    //   키워드 · 상태 · 사도 고유 효과 = 이름 · 수치가 다 든 글 하나(「자세히」 없음 — core Docs/설명글.md) · 해로운 것은 붉은 테.
+    //   판이 화면보다 길면 판 묶음이 화면 안에서 스크롤된다.
     //   생성 카드 = 그 카드를 작은 카드 모양으로(W.Card — 코스트 · 이름 · 종류 · 효과 글).
-    //   PC 는 판 위에 올라가 있는 동안 닫지 않는다(「자세히」를 누를 수 있게). 폰은 바깥을 누르면 닫힌다.
+    //   PC 는 판 위에 올라가 있는 동안 닫지 않는다(스크롤 · 글 속 낱말을 누를 수 있게). 폰은 바깥을 누르면 닫힌다.
     //   낱말이 아닌 곳을 누르면 부모(카드 단추 Btn)로 그대로 넘긴다(누름 · 뗌 · 클릭 모두).
     //
     // 전투 화면도 같은 판을 쓴다(Flow 없이):
@@ -149,16 +150,6 @@ namespace Bolzena.RunUI
         }
         static bool demoHold;   // 데모가 연 판은 마우스가 없어도 닫지 않는다
 
-        /// <summary>자동 데모 — 열린 판의 「자세히」를 펼친다(있으면 true).</summary>
-        public static bool DemoMore()
-        {
-            if (openBox == null) return false;
-            var b = openBox.GetComponentInChildren<Btn>();
-            if (b == null) return false;
-            b.OnClick?.Invoke();
-            return true;
-        }
-
         public static bool IsOpen => open != null;
 
         public static void Close()
@@ -201,7 +192,7 @@ namespace Bolzena.RunUI
             var boxes = new List<RectTransform>();
             foreach (var t in list)
             {
-                var bx = t.IsCard && cardMaker != null ? CardBox(stack, t, cardMaker) : Box(stack, t, Theme.C(400, 440), () => Reflow(stack));
+                var bx = t.IsCard && cardMaker != null ? CardBox(stack, t, cardMaker) : Box(stack, t, Theme.C(400, 440));
                 boxes.Add(bx);
             }
             // 세로로 쌓기(위에서 아래로)
@@ -216,30 +207,32 @@ namespace Bolzena.RunUI
                 y -= bx.sizeDelta.y + 8;
             }
             stack.sizeDelta = new Vector2(wMax, total);
-            openBox = stack;
-            Place(stack, lp, layer.rect.size, stack.sizeDelta);
-            Tw.Pop(stack, 0, 0.92f, 0.16f);
+            // 화면보다 길면(긴 고유 효과 · 칸 여럿) 묶음을 화면 높이 안의 스크롤 창에 담는다 — 글을 자르거나 접지 않는다
+            RectTransform shown = stack;
+            float maxH = layer.rect.size.y - 24;
+            if (total > maxH)
+            {
+                var view = Ui.Rect("termscroll", root);
+                view.anchorMin = view.anchorMax = new Vector2(0.5f, 0.5f); view.pivot = Vector2.zero;
+                view.sizeDelta = new Vector2(wMax, maxH);
+                view.gameObject.AddComponent<RectMask2D>();
+                var hit = view.gameObject.AddComponent<Image>(); hit.color = new Color(0, 0, 0, 0);
+                stack.SetParent(view, false);
+                stack.anchorMin = stack.anchorMax = new Vector2(0, 1); stack.pivot = new Vector2(0, 1);
+                stack.anchoredPosition = Vector2.zero;
+                var sr = view.gameObject.AddComponent<ScrollRect>();
+                sr.viewport = view; sr.content = stack; sr.horizontal = false; sr.vertical = true;
+                sr.movementType = ScrollRect.MovementType.Clamped; sr.scrollSensitivity = 40; sr.inertia = true;
+                shown = view;
+            }
+            openBox = shown;
+            Place(shown, lp, layer.rect.size, shown.sizeDelta);
+            Tw.Pop(shown, 0, 0.92f, 0.16f);
             return stack;
         }
 
-        // 「자세히」를 펼쳐 판 높이가 바뀌면 다시 쌓고 화면 안으로
-        static void Reflow(RectTransform stack)
-        {
-            if (stack == null) return;
-            float total = 0, wMax = 0;
-            var kids = new List<RectTransform>();
-            foreach (RectTransform c in stack) { kids.Add(c); total += c.sizeDelta.y; wMax = Mathf.Max(wMax, c.sizeDelta.x); }
-            total += Mathf.Max(0, kids.Count - 1) * 8;
-            float top = stack.anchoredPosition.y + stack.sizeDelta.y;   // 위 끝을 그대로 두고 아래로 늘린다
-            float y = total;
-            foreach (var c in kids) { c.anchoredPosition = new Vector2(0, y); y -= c.sizeDelta.y + 8; }
-            stack.sizeDelta = new Vector2(wMax, total);
-            var layer = stack.parent != null ? stack.parent.parent as RectTransform : null;
-            var size = layer != null ? layer.rect.size : new Vector2(1600, 900);
-            float ny = top - total;
-            if (ny < -size.y / 2 + 12) ny = -size.y / 2 + 12;
-            stack.anchoredPosition = new Vector2(stack.anchoredPosition.x, ny);
-        }
+        /// <summary>자동 데모 · 점검 — 열린 판 묶음이 스크롤 창에 담겼나(화면보다 길었나).</summary>
+        public static bool OpenScrolls => openBox != null && openBox.GetComponent<ScrollRect>() != null;
 
         static RectTransform CardBox(RectTransform parent, CardTerms.Term t, CardMaker maker)
         {
@@ -267,8 +260,8 @@ namespace Bolzena.RunUI
         }
 
         /// <summary>
-        /// 낱말 판 하나 — 이름(금 · 해로운 것은 붉게) · 한두 줄 · (고유 효과면) 「자세히」 펼침. 크기는 글에 맞춘다(width 고정).
-        /// relayout 은 「자세히」로 높이가 바뀐 뒤 부른다(쌓기 다시). 생성 카드 낱말을 카드 그림 없이 그릴 때도 이것.
+        /// 낱말 판 하나 — 이름(금 · 해로운 것은 붉게) · 수치가 다 든 글(「자세히」 없음). 크기는 글에 맞춘다(width 고정, 화면보다 길면 ShowAt 이 스크롤 창에 담는다).
+        /// relayout 은 옛 매개변수(쓰지 않는다 — 전투 쪽 옛 호출을 깨지 않게 남김). 생성 카드 낱말을 카드 그림 없이 그릴 때도 이것.
         /// </summary>
         public static RectTransform Box(Transform parent, CardTerms.Term t, float width, Action relayout = null)
         {
@@ -280,7 +273,6 @@ namespace Bolzena.RunUI
             Color edge = t.Bad ? Theme.Bad : t.Hero ? Theme.Gold : t.IsCard ? Theme.Sky : Theme.Edge;
             var rim = Ui.Img(box, Theme.Frame, edge, "rim"); rim.rectTransform.Fill();
             var top = Ui.Img(box, Theme.White, edge.A(t.Bad || t.Hero ? 1 : 0.6f), "bar"); top.rectTransform.Band(1, 3, 8, 8, -3);
-            bool more = false;
             float inner = width - 36;
             var col = Ui.Rect("col", box).Fill(18, 14, 18, 14);
 
@@ -288,7 +280,7 @@ namespace Bolzena.RunUI
             {
                 Ui.Clear(col);
                 float h = 28;
-                string kind = t.Kind ?? (t.Hero ? $"고유 효과{(t.Owner != null ? " · " + t.Owner : "")}" : t.IsCard ? "카드" : t.Bad ? "해로운 효과" : null);
+                string kind = t.Kind ?? (t.Hero ? $"고유 효과{(t.Owner != null ? " · " + t.Owner : "")}" : t.IsCard ? "카드" : t.Bad ? "디버프" : null);
                 var nm = Ui.Title(col, t.Name + (kind != null ? $"  <size=66%><color={Theme.SubTag}>{kind}</color></size>" : ""), Theme.FsMd, t.Bad ? Theme.Bad : t.IsCard ? Theme.Sky : Theme.Gold, TextAlignmentOptions.TopLeft, "name");
                 nm.textWrappingMode = TextWrappingModes.Normal;
                 float y = 0;
@@ -305,44 +297,11 @@ namespace Bolzena.RunUI
                 var body = Ui.Text(col, bodyText, Theme.FsSm, Theme.Ink, TextAlignmentOptions.TopLeft, false, "body");
                 body.textWrappingMode = TextWrappingModes.Normal; body.overflowMode = TextOverflowModes.Overflow; body.lineSpacing = 2;
                 Put(body);
-                bool hasMore = !string.IsNullOrEmpty(t.Detail) && t.Detail != t.Body;
-                if (hasMore && more)
-                {
-                    var rule = Ui.Img(col, Theme.White, Theme.Line, "rule");
-                    rule.rectTransform.anchorMin = new Vector2(0, 1); rule.rectTransform.anchorMax = new Vector2(1, 1); rule.rectTransform.pivot = new Vector2(0.5f, 1);
-                    rule.rectTransform.sizeDelta = new Vector2(0, 1); rule.rectTransform.anchoredPosition = new Vector2(0, -y - 1); y += 8;
-                    var dt = Ui.Text(col, t.Detail, Theme.FsCap, Theme.Sub, TextAlignmentOptions.TopLeft, false, "detail");
-                    dt.textWrappingMode = TextWrappingModes.Normal; dt.overflowMode = TextOverflowModes.Overflow; dt.lineSpacing = 2;
-                    Put(dt);
-                }
-                if (hasMore)
-                {
-                    var mb = MoreChip(col, more);
-                    var mrt = mb.GetComponent<RectTransform>();
-                    mrt.anchorMin = mrt.anchorMax = mrt.pivot = new Vector2(0, 1);
-                    mrt.anchoredPosition = new Vector2(0, -y);
-                    y += mrt.sizeDelta.y + 4;
-                    mb.OnClick = () => { more = !more; Build(); relayout?.Invoke(); };
-                }
                 h += y;
                 box.sizeDelta = new Vector2(width, h);
             }
             Build();
             return box;
-        }
-
-        /// <summary>「자세히 ▼ / 접기 ▲」 작은 알약 단추.</summary>
-        public static Btn MoreChip(Transform parent, bool open, string name = "more")
-        {
-            var b = Btn.Make(parent, null, BtnStyle.PillDark, null, 0, name);
-            var rt = b.GetComponent<RectTransform>();
-            var t = Ui.Title(rt, open ? "접기 ▲" : "자세히 ▼", Theme.FsCap + 1, Theme.Gold, TextAlignmentOptions.Center);
-            t.rectTransform.Fill(12, 0, 12, 0); t.textWrappingMode = TextWrappingModes.NoWrap;
-            b.Label = t;
-            float w = t.GetPreferredValues(t.text).x + 30;
-            rt.sizeDelta = new Vector2(w, 30);
-            b.Pref(w, 30);
-            return b;
         }
 
         /// <summary>누름을 받아 삼킨다(부모로 올라가지 않게).</summary>

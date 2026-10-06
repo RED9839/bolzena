@@ -12,10 +12,10 @@
       "atk": 125,
       "def": 28,
       "crit": 10,
-      "blurb": "엘리아스를 동맹국으로 착각하는 PTSD 장교. 턴마다 적 하나를 외계인으로 착각하고, 그 적을 치면 뒤이어 한 발 더 갈긴다.",
+      "blurb": "엘리아스를 동맹국으로 착각하는 PTSD 장교. 턴마다 적 1명을 외계인으로 착각하고, 그 적을 치면 뒤이어 한 발 더 갈깁니다.",
       "keyword": {
         "name": "외계인",
-        "desc": "헤일리가 외계인이라 믿는 적 — 헤일리가 치면 추가 공격",
+        "desc": "외계인이라 믿는 적 표시",
         "carrier": "enemy",
         "cap": 1,
         "hunt": true
@@ -618,19 +618,35 @@
         {
           "k": "atkMod",
           "v": 0.15,
-          "target": "self",
-          "run": true
-        },
-        {
-          "k": "status",
-          "id": "고통",
-          "v": 2,
-          "target": "allEnemies"
+          "run": true,
+          "target": "self"
         },
         {
           "k": "status",
           "id": "사기",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "hit"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 2
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "고통",
+                  "v": 1,
+                  "target": "oneEnemy"
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -639,20 +655,36 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
-              "target": "allEnemies"
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "사기",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 3,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -661,21 +693,36 @@
           "cost": 1,
           "fx": [
             {
+              "k": "draw",
+              "v": 1
+            },
+            {
               "k": "atkMod",
               "v": 0.15,
-              "target": "self",
-              "run": true
+              "run": true,
+              "target": "self"
             },
             {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -687,20 +734,36 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.19,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
-              "target": "allEnemies"
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "사기",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -709,20 +772,36 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.22,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
-              "target": "allEnemies"
+              "v": 0.2,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "사기",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -732,8 +811,8 @@
             {
               "k": "atkMod",
               "v": 0.2,
-              "target": "self",
-              "run": true
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
@@ -742,9 +821,26 @@
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 3,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

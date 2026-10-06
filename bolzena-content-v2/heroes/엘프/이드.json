@@ -12,10 +12,10 @@
       "atk": 90,
       "def": 75,
       "crit": 5,
-      "blurb": "세상 전부를 자기가 꾸는 꿈이라 여기는 영원살이. 손에 들어온 카드마다 꿈결이 번져 방패가 되고, 버려진 꿈은 다음 턴의 손패로 돌아온다.",
+      "blurb": "세상 전부를 자기가 꾸는 꿈이라 여기는 영원살이. 손에 들어온 카드마다 꿈결이 번져 방패가 되고, 버려진 꿈은 다음 턴의 손패로 돌아옵니다.",
       "keyword": {
         "name": "꿈결",
-        "desc": "이드의 카드가 뽑힐 때마다 번지는 꿈 — 모아서 한꺼번에 방패로",
+        "desc": "카드가 뽑힐 때 번지는 꿈",
         "carrier": "self",
         "cap": 5
       },
@@ -391,7 +391,7 @@
           ]
         },
         {
-          "name": "나타는 거부한다",
+          "name": "나타의 거부",
           "tags": [
             "신속"
           ],
@@ -610,18 +610,34 @@
       "fx": [
         {
           "k": "defMod",
-          "v": 0.2,
-          "target": "self",
-          "run": true
+          "v": 0.15,
+          "run": true,
+          "target": "self"
         },
         {
           "k": "draw",
           "v": 2
         },
         {
-          "k": "status",
-          "id": "면역",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "꿈결",
+                  "v": 1
+                },
+                {
+                  "k": "shield",
+                  "ratio": 0.4
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -630,18 +646,34 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.26,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "면역",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꿈결",
+                      "v": 2
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.6
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -650,19 +682,35 @@
           "cost": 1,
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.2,
-              "target": "self",
-              "run": true
-            },
-            {
               "k": "draw",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "면역",
-              "v": 1
+              "k": "defMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꿈결",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -674,18 +722,35 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.24,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "draw",
-              "v": 2
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "면역",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꿈결",
+                      "v": 2
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -694,18 +759,34 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.29,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "면역",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꿈결",
+                      "v": 2
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -714,18 +795,34 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.26,
-              "target": "self",
-              "run": true
+              "v": 0.25,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "면역",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꿈결",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

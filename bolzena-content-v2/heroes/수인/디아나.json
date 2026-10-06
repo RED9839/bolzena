@@ -15,7 +15,7 @@
       "blurb": "눈을 감은 채 웃는 수인 마을의 촌장이자 현자.",
       "keyword": {
         "name": "기공",
-        "desc": "진짜 치료법 — 스킬 카드로 모은 기를 기공 주문이 한꺼번에 쏟는다",
+        "desc": "스킬로 모으는 기",
         "carrier": "self",
         "cap": 4
       },
@@ -136,26 +136,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 자연 치유",
+          "name": "깊은 호흡",
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.6
-            },
-            {
-              "k": "status",
-              "id": "초재생",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "가벼운 자연 치유",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.8
+              "ratio": 2.85
             },
             {
               "k": "status",
@@ -165,11 +150,26 @@
           ]
         },
         {
-          "name": "기공 자연 치유",
+          "name": "약초 한 줌",
+          "cost": 1,
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.4
+              "ratio": 1.3
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기 돌리기",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.0
             },
             {
               "k": "status",
@@ -184,31 +184,31 @@
           ]
         },
         {
-          "name": "든든한 자연 치유",
-          "tags": [
-            "보존"
-          ],
+          "name": "몸 다지기",
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.5
+              "ratio": 1.8
             },
             {
               "k": "status",
               "id": "초재생",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
             }
           ]
         },
         {
-          "name": "복 받은 자연 치유",
-          "tags": [
-            "축복"
-          ],
+          "name": "백년 약탕",
+          "cost": 3,
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.5
+              "ratio": 3.5
             },
             {
               "k": "status",
@@ -220,15 +220,15 @@
       ],
       "blesses": [
         {
-          "name": "따뜻한 손",
+          "name": "따스한 손",
           "kind": "heal"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "단전 호흡",
+          "kind": "defUp"
         },
         {
-          "name": "기혈 순환",
+          "name": "기 모으기",
           "fx": [
             {
               "k": "stack",
@@ -269,11 +269,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 기공 주문",
+          "name": "기공탄",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 1.2,
               "target": "oneEnemy"
             },
             {
@@ -293,12 +293,12 @@
           ]
         },
         {
-          "name": "가벼운 기공 주문",
+          "name": "지팡이 끝 기",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.55,
               "target": "oneEnemy"
             },
             {
@@ -318,11 +318,11 @@
           ]
         },
         {
-          "name": "기공 기공 주문",
+          "name": "기 남겨 두기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 1.25,
               "target": "oneEnemy"
             },
             {
@@ -331,8 +331,27 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.3,
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "기공 파동",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "기공"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies"
             },
             {
               "k": "spend",
@@ -342,14 +361,12 @@
           ]
         },
         {
-          "name": "재빠른 기공 주문",
-          "tags": [
-            "신속"
-          ],
+          "name": "백보신권",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 1.75,
               "target": "oneEnemy"
             },
             {
@@ -358,34 +375,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "기공",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 기공 주문",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "기공"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
@@ -398,22 +388,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "노련한 손목",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "경혈 찌르기",
+          "kind": "frost"
         },
         {
-          "name": "기혈 순환",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "기공",
-              "v": 1
-            }
-          ]
+          "name": "지팡이 내려놓기",
+          "kind": "cost"
         }
       ]
     },
@@ -442,16 +426,16 @@
       ],
       "oracles": [
         {
-          "name": "힘준 수인 마을 잔칫상",
+          "name": "푸짐한 상차림",
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.35
+              "ratio": 3.05
             },
             {
               "k": "status",
               "id": "사기",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
@@ -461,13 +445,27 @@
           ]
         },
         {
-          "name": "가벼운 수인 마을 잔칫상",
+          "name": "주먹밥 한 접시",
           "cost": 1,
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.6
+              "ratio": 1.2
             },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "잔치 뒤 수련",
+          "fx": [
             {
               "k": "status",
               "id": "사기",
@@ -477,64 +475,45 @@
               "k": "status",
               "id": "결의",
               "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "기공"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.05
             }
           ]
         },
         {
-          "name": "기공 수인 마을 잔칫상",
+          "name": "온 마을 잔치",
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.35
+              "ratio": 2.55
             },
             {
               "k": "status",
               "id": "사기",
               "v": 2
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
             }
           ]
         },
         {
-          "name": "든든한 수인 마을 잔칫상",
+          "name": "잔칫날 아침",
           "tags": [
-            "보존"
+            "개전"
           ],
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.25
+              "ratio": 2.6
             },
             {
               "k": "status",
               "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "결의",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 수인 마을 잔칫상",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 2.25
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
             },
             {
               "k": "status",
@@ -546,22 +525,16 @@
       ],
       "blesses": [
         {
-          "name": "따뜻한 손",
+          "name": "할머니 손맛",
           "kind": "heal"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "배부른 기운",
+          "kind": "ap"
         },
         {
-          "name": "기혈 순환",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "기공",
-              "v": 1
-            }
-          ]
+          "name": "한 그릇 더",
+          "kind": "draw"
         }
       ]
     },
@@ -574,48 +547,94 @@
       "type": "강화",
       "fx": [
         {
-          "k": "heal",
-          "ratio": 1.2
-        },
-        {
           "k": "status",
           "id": "결정화",
           "v": 1
         },
         {
-          "k": "stack",
-          "id": "기공",
-          "v": 2
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "기공",
+                  "v": 1
+                },
+                {
+                  "k": "heal",
+                  "ratio": 0.4
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 은퇴한 무인의 수련",
+          "name": "사부의 비기",
           "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.55
-            },
             {
               "k": "status",
               "id": "결정화",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "기공",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "기공",
+                      "v": 2
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.7
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 은퇴한 무인의 수련",
+          "name": "아침 체조",
           "cost": 0,
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.1
-            },
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "기공",
+                      "v": 1
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "기혈 타통",
+          "fx": [
             {
               "k": "status",
               "id": "결정화",
@@ -625,86 +644,119 @@
               "k": "stack",
               "id": "기공",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "기공",
+                      "v": 1
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "기공 은퇴한 무인의 수련",
+          "name": "약손",
           "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.45
-            },
             {
               "k": "status",
               "id": "결정화",
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "기공",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "든든한 은퇴한 무인의 수련",
-          "fx": [
-            {
               "k": "heal",
-              "ratio": 1.5
+              "ratio": 1.0
             },
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "기공",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "기공",
+                      "v": 1
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 은퇴한 무인의 수련",
+          "name": "무인의 휴일",
           "tags": [
             "축복"
           ],
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.5
-            },
-            {
               "k": "status",
               "id": "결정화",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "기공",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.6
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "기공",
+                      "v": 1
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
+          "name": "새벽 수련",
           "kind": "ap"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "굳은살",
+          "kind": "defUp"
         },
         {
-          "name": "기혈 순환",
+          "name": "약수 한 모금",
           "fx": [
             {
-              "k": "stack",
-              "id": "기공",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.5
             }
           ]
         }

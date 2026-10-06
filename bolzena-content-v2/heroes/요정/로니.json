@@ -15,7 +15,7 @@
    "blurb": "막대사탕을 물고 황무지를 떠돌던 전직 요정 경비대 부관. 평소엔 깍듯한 존댓말이지만 정의 앞에선 말보다 몸이 먼저 나가는, 정의롭게 멍청한 보안관.",
    "keyword": {
     "name": "무법자",
-    "desc": "보안관이 점찍은 현상범 — 움직이기 직전 로니가 먼저 쏜다",
+    "desc": "보안관이 찍은 현상범",
     "carrier": "enemy",
     "hunt": true,
     "cap": 1,
@@ -101,6 +101,20 @@
       "id": "무법자",
       "v": 1,
       "target": "oneEnemy"
+     },
+     {
+      "k": "ifFoe",
+      "id": "hpMob",
+      "pct": 0.3
+     },
+     {
+      "k": "cue",
+      "id": "roni_finish"
+     },
+     {
+      "k": "dmg",
+      "ratio": 4.0,
+      "target": "oneEnemy"
      }
     ]
    },
@@ -181,12 +195,11 @@
    ],
    "oracles": [
     {
-     "name": "날랜 소닉붐",
-     "tags": [],
+     "name": "최대 출력",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.85,
+       "ratio": 2.7,
        "target": "oneEnemy"
       },
       {
@@ -203,13 +216,12 @@
      ]
     },
     {
-     "name": "가벼운 소닉붐",
+     "name": "경고 사격",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.75,
+       "ratio": 1.4,
        "target": "oneEnemy"
       },
       {
@@ -226,36 +238,51 @@
      ]
     },
     {
-     "name": "현상수배 소닉붐",
-     "tags": [],
+     "name": "현상범 진압",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.75,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "무법자",
-       "v": 1,
+       "ratio": 2.3,
        "target": "oneEnemy"
       },
       {
        "k": "status",
        "id": "둔화",
        "v": 1
+      },
+      {
+       "k": "ifStack",
+       "id": "무법자",
+       "n": 1
+      },
+      {
+       "k": "tough",
+       "v": 2
       }
      ]
     },
     {
-     "name": "물고 있던 소닉붐",
-     "tags": [
-      "보존"
-     ],
+     "name": "확성기 소닉붐",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.65,
+       "ratio": 1.8,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "고막 진압",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.9,
        "target": "oneEnemy"
       },
       {
@@ -266,31 +293,7 @@
       },
       {
        "k": "status",
-       "id": "둔화",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "보안관의 소닉붐",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.65,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "무법자",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "둔화",
+       "id": "기절",
        "v": 1
       }
      ]
@@ -298,19 +301,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "찢어지는 소리",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "조준경",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "진동파",
+     "kind": "frost"
     }
    ]
   },
@@ -340,19 +340,18 @@
    ],
    "oracles": [
     {
-     "name": "날랜 석양",
-     "tags": [],
+     "name": "황혼의 결투",
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.25,
        "run": true,
        "target": "self"
       },
       {
        "k": "status",
        "id": "잔광",
-       "v": 2
+       "v": 1
       },
       {
        "k": "draw",
@@ -361,9 +360,72 @@
      ]
     },
     {
-     "name": "가벼운 석양",
+     "name": "해 질 녘 한숨",
      "cost": 0,
-     "tags": [],
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.1,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "정해진 표적",
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "ifStack",
+       "id": "무법자",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "표식",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "석양의 동료들",
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "allAllies"
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "황야의 보안관",
+     "tags": [
+      "보존",
+      "주도"
+     ],
      "fx": [
       {
        "k": "atkMod",
@@ -381,90 +443,20 @@
        "v": 1
       }
      ]
-    },
-    {
-     "name": "현상수배 석양",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "물고 있던 석양",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "보안관의 석양",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "휘파람",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "모자 고쳐 쓰기",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "석양빛 눈매",
+     "kind": "atkUp"
     }
    ]
   },
@@ -495,12 +487,11 @@
    ],
    "oracles": [
     {
-     "name": "날랜 리코더",
-     "tags": [],
+     "name": "풀스윙",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.45,
+       "ratio": 1.4,
        "target": "oneEnemy",
        "hits": 2
       },
@@ -517,13 +508,12 @@
      ]
     },
     {
-     "name": "가벼운 리코더",
+     "name": "삑 찌르기",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.9,
+       "ratio": 0.7,
        "target": "oneEnemy",
        "hits": 2
       },
@@ -540,9 +530,14 @@
      ]
     },
     {
-     "name": "현상수배 리코더",
-     "tags": [],
+     "name": "현행범 체포",
      "fx": [
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      },
       {
        "k": "dmg",
        "ratio": 1.2,
@@ -558,26 +553,17 @@
        "k": "status",
        "id": "표식",
        "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "무법자",
-       "v": 1,
-       "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "물고 있던 리코더",
-     "tags": [
-      "보존"
-     ],
+     "name": "리코더 난타",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.3,
-       "target": "oneEnemy",
-       "hits": 2
+       "ratio": 0.8,
+       "target": "randomEnemy",
+       "hits": 4
       },
       {
        "k": "ifStack",
@@ -592,16 +578,18 @@
      ]
     },
     {
-     "name": "보안관의 리코더",
-     "tags": [
-      "축복"
-     ],
+     "name": "불협화음",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.3,
+       "ratio": 1.25,
        "target": "oneEnemy",
        "hits": 2
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
       },
       {
        "k": "ifStack",
@@ -618,19 +606,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "쇳소리",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "약한 데 찌르기",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "따가운 음정",
+     "kind": "frost"
     }
    ]
   },
@@ -660,8 +645,7 @@
    ],
    "oracles": [
     {
-     "name": "날랜 막대사탕",
-     "tags": [],
+     "name": "왕 막대사탕",
      "fx": [
       {
        "k": "shield",
@@ -681,34 +665,52 @@
      ]
     },
     {
-     "name": "가벼운 막대사탕",
+     "name": "사탕 한 입",
      "cost": 0,
-     "tags": [],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 1.3
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "무법자",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "찜해 둔 놈",
      "fx": [
       {
        "k": "shield",
        "ratio": 1.5
       },
       {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      },
-      {
        "k": "stack",
        "id": "무법자",
        "v": 1,
        "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "표식",
+       "v": 1
       }
      ]
     },
     {
-     "name": "현상수배 막대사탕",
-     "tags": [],
+     "name": "하나 줄까?",
      "fx": [
       {
        "k": "shield",
-       "ratio": 2.75
+       "ratio": 2.0
       },
       {
        "k": "status",
@@ -716,50 +718,25 @@
        "v": 1
       },
       {
-       "k": "stack",
-       "id": "무법자",
-       "v": 1,
-       "target": "oneEnemy"
+       "k": "heal",
+       "ratio": 1.8
       }
      ]
     },
     {
-     "name": "물고 있던 막대사탕",
+     "name": "오래 물고 있기",
      "tags": [
       "보존"
      ],
      "fx": [
       {
        "k": "shield",
-       "ratio": 2.4
+       "ratio": 2.0
       },
       {
        "k": "status",
        "id": "피해 감소",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "무법자",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "보안관의 막대사탕",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.4
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
+       "v": 2
       },
       {
        "k": "stack",
@@ -772,19 +749,16 @@
    ],
    "blesses": [
     {
-     "name": "단단한 숨결",
-     "kind": "guard",
-     "fx": []
+     "name": "딱딱한 사탕",
+     "kind": "guard"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "사탕 껍질",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "느긋한 보안관",
+     "kind": "defUp"
     }
    ]
   }

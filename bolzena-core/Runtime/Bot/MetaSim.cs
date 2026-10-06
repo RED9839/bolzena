@@ -27,6 +27,12 @@ namespace Bolzena.Core
             /// <summary>격파 — 판당 · 싸움 종류(fight · elite · boss)마다 싸움당. 강인도를 깎은 카드 가운데 약점 공격 비율(%).</summary>
             public double BreaksPerRun, WeakPct;
             public Dictionary<string, double> BreaksPerFight = new();
+            /// <summary>봇 · 편성 이름(보고 머리).</summary>
+            public string Label = "초보 봇 · 무작위 편성";
+            /// <summary>판이 끝날 때 덱 — 평균 장수 · 고유 카드 · 기본 카드(복제본 포함 · 교주 카드는 장수에만).</summary>
+            public double AvgDeck, AvgUniques, AvgBasics;
+            /// <summary>판당 상점 빼기 횟수.</summary>
+            public double AvgRemovals;
         }
 
         static readonly Dictionary<string, string> LETTER = new() { ["탱커"] = "T", ["서포터"] = "S", ["딜러"] = "D" };
@@ -64,18 +70,22 @@ namespace Bolzena.Core
         }
 
         /// <summary>메타 시뮬. with 를 주면 그 사도를 늘 넣은 rounds 판(JobsWith).</summary>
-        public static Result Run(GameData d, int rounds = 30, int seed = 0, double hpx = 1, double dmgx = 1, int threads = 0, List<string> heroes = null, Action<int, int> progress = null, string with = null)
+        /// <param name="bot">봇 손잡이(Skilled · UniqueOnly) — null 이면 초보 봇.</param>
+        /// <param name="party">편성(PartyPick.MODES — random · role · synergy). null 이면 random.</param>
+        public static Result Run(GameData d, int rounds = 30, int seed = 0, double hpx = 1, double dmgx = 1, int threads = 0, List<string> heroes = null, Action<int, int> progress = null, string with = null,
+            SimOpts bot = null, string party = null, PartyPick.SynScore syn = null)
         {
             var t0 = DateTime.Now;
-            var jobs = with != null ? JobsWith(d, with, rounds, seed) : Jobs(d, rounds, seed, heroes);
+            var jobs = with != null ? JobsWith(d, with, rounds, seed) : PartyPick.Jobs(d, rounds, seed, party, syn, heroes);
+            bool skilled = bot?.Skilled == true, uonly = bot?.UniqueOnly == true;
             var res = new SimResult[jobs.Count];
             int done = 0;
             var po = new ParallelOptions { MaxDegreeOfParallelism = threads > 0 ? threads : Math.Max(1, Environment.ProcessorCount - 1) };
             // 봇은 카드 값어치를 담아 두니 작업마다 따로 만든다(스레드끼리 나누지 않는다)
             Parallel.ForEach(jobs, po, j =>
             {
-                var bot = new RunBot(d);
-                res[j.i] = bot.RunFull(j.party, j.seed, new SimOpts { Hpx = hpx, Dmgx = dmgx });
+                var rb = new RunBot(d);
+                res[j.i] = rb.RunFull(j.party, j.seed, new SimOpts { Hpx = hpx, Dmgx = dmgx, Skilled = skilled, UniqueOnly = uonly });
                 progress?.Invoke(System.Threading.Interlocked.Increment(ref done), jobs.Count);
             });
             double Pct(int w, int n) => n > 0 ? 100.0 * w / n : 0;
@@ -110,8 +120,12 @@ namespace Bolzena.Core
                 AvgTurnsFight = fN > 0 ? (double)fT / fN : 0, AvgTurnsBoss = bN > 0 ? (double)bT / bN : 0,
                 BreaksPerRun = jobs.Count > 0 ? (double)brk / jobs.Count : 0, WeakPct = Pct(tw, th),
                 BreaksPerFight = bk.ToDictionary(kv => kv.Key, kv => kv.Value[0] > 0 ? (double)kv.Value[1] / kv.Value[0] : 0),
+                Label = $"{(skilled ? "숙련" : "초보")} 봇 · {PartyName(party)} 편성{(uonly ? " · 고유 카드만" : "")}",
+                AvgDeck = res.Length > 0 ? res.Average(x => x.Deck) : 0, AvgUniques = res.Length > 0 ? res.Average(x => x.Uniques) : 0, AvgBasics = res.Length > 0 ? res.Average(x => x.Basics) : 0, AvgRemovals = res.Length > 0 ? res.Average(x => x.Removals) : 0,
             };
         }
+
+        public static string PartyName(string mode) => mode == PartyPick.Role ? "역할" : mode == PartyPick.Synergy ? "시너지" : "무작위";
 
         /// <summary>판 묶음을 병렬로 — 완주했나만(짝 재기 따위).</summary>
         public static bool[] RunJobs(GameData d, List<(int i, List<string> party, long seed)> jobs, int threads = 0, double hpx = 1, double dmgx = 1)
@@ -374,7 +388,7 @@ namespace Bolzena.Core
             var sb = new StringBuilder();
             double Half(double p, int n) => n > 0 ? 1.96 * Math.Sqrt(p / 100 * (1 - p / 100) / n) * 100 : 0;
             sb.AppendLine($"# {title}").AppendLine();
-            sb.AppendLine($"smart 봇 · 판 전체 · {r.Runs}판 · 전체 완주 **{r.Clear:0.0}%** · 쓰러진 층 1층 {r.Fell[0]:0.0}% · 2층 {r.Fell[1]:0.0}% · 평균 턴 일반 {r.AvgTurnsFight:0.0} · 보스 {r.AvgTurnsBoss:0.0} · {r.Sec:0}초").AppendLine();
+            sb.AppendLine($"{r.Label} · 판 전체 · {r.Runs}판 · 전체 완주 **{r.Clear:0.0}%** · 쓰러진 층 1층 {r.Fell[0]:0.0}% · 2층 {r.Fell[1]:0.0}% · 평균 턴 일반 {r.AvgTurnsFight:0.0} · 보스 {r.AvgTurnsBoss:0.0} · {r.Sec:0}초").AppendLine();
             sb.AppendLine("## 마을").AppendLine().AppendLine("| 마을 | 판 | 완주 |").AppendLine("|---|---|---|");
             foreach (var kv in r.Villages.OrderByDescending(x => x.Value.win)) sb.AppendLine($"| {d.Villages[kv.Key].Name} | {kv.Value.n} | {kv.Value.win:0.0}% |");
             var ct = comps ?? r.Comps;
@@ -429,7 +443,8 @@ namespace Bolzena.Core
         public static string Report(GameData d, Result r)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"메타 통계 — smart 봇 {r.Runs}판(바퀴 {r.Rounds}) · 전체 완주 {r.Clear:0.0}% · {r.Sec:0}초{(r.Hpx != 1 || r.Dmgx != 1 ? $" · 적 체력 ×{r.Hpx} 피해 ×{r.Dmgx}" : "")}");
+            sb.AppendLine($"메타 통계 — {r.Label} {r.Runs}판(바퀴 {r.Rounds}) · 전체 완주 {r.Clear:0.0}% · {r.Sec:0}초{(r.Hpx != 1 || r.Dmgx != 1 ? $" · 적 체력 ×{r.Hpx} 피해 ×{r.Dmgx}" : "")}");
+            sb.AppendLine($"  끝난 덱 — 평균 {r.AvgDeck:0.0}장 · 고유 {r.AvgUniques:0.0} · 기본 {r.AvgBasics:0.0} · 상점 빼기 판당 {r.AvgRemovals:0.00}");
             sb.AppendLine($"  마을  {string.Join(" · ", r.Villages.Select(kv => $"{d.Villages[kv.Key].Name} {kv.Value.win:0.0}%({kv.Value.n}판)"))} · 쓰러진 층 1층 {r.Fell[0]:0.0}% · 2층 {r.Fell[1]:0.0}%");
             sb.AppendLine($"  평균 턴 — 일반 싸움 {r.AvgTurnsFight:0.0} · 보스 {r.AvgTurnsBoss:0.0}");
             sb.AppendLine($"  격파 — 판당 {r.BreaksPerRun:0.0} · 싸움당 {string.Join(" · ", r.BreaksPerFight.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))} · 강인도 깎은 카드 가운데 약점 공격 {r.WeakPct:0}%");

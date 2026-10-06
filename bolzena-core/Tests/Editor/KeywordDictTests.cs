@@ -225,6 +225,35 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(3, b.Ap); Assert.AreEqual(1, b.Hand.Count);
         }
 
+        [Test] public void 근면_2는_다른_카드로_두_번_같은_카드는_한_번()
+        {
+            // 근면은 카드 하나에 한 번 — 둘째는 다른 카드로 잡아야 돈다, 한 턴에 근면 수까지
+            (int ap, int hand, int n) Run(int dil, int plays)
+            {
+                var b = K.Fight(K.Data(), new[] { "a" }, new[] { "dummy", "dummy", "dummy", "dummy" }, st => st.Deck = Enumerable.Repeat("zero", 20).ToList());
+                K.Hand(b, Enumerable.Repeat("hit", plays).ToArray());
+                b.Pool.Status["근면"] = dil;
+                foreach (var e in b.Enemies) e.Hp = 50;   // 때리기 한 번에 하나씩 쓰러진다
+                int got = 0;
+                for (int k = 0; k < plays; k++) K.Play(b, "hit", b.Enemies.FindIndex(e => !e.Dead));
+                b.Counts.TryGetValue($"근면|{b.Turn}", out got);
+                return (b.Ap, b.Hand.Count, got);
+            }
+            Assert.AreEqual(1, Run(1, 2).n, "근면 1 — 두 장으로 잡아도 턴에 한 번");
+            Assert.AreEqual(1, Run(2, 1).n, "근면 2 — 한 장이면 한 번");
+            Assert.AreEqual(2, Run(2, 2).n, "근면 2 — 다른 카드로 잡으면 두 번");
+            Assert.AreEqual(2, Run(2, 3).n, "근면 2 — 턴에 두 번까지");
+
+            // 휩쓸기 한 장으로 적 둘을 잡아도 한 번
+            var d = K.Data(cards: "[{id:'sweep', name:'휩쓸기', hero:'a', cost:1, type:'공격', fx:[{k:'dmg', ratio:1.0, target:'allEnemies'}]}]");
+            var w = K.Fight(d, new[] { "a" }, new[] { "dummy", "dummy", "dummy" }, st => st.Deck = Enumerable.Repeat("zero", 20).ToList());
+            K.Hand(w, "sweep"); w.Pool.Status["근면"] = 2;
+            w.Enemies[0].Hp = 50; w.Enemies[1].Hp = 50;
+            K.Play(w, "sweep", 0);
+            w.Counts.TryGetValue($"근면|{w.Turn}", out var wn);
+            Assert.AreEqual(1, wn, "한 장으로 둘을 잡아도 근면은 한 번");
+        }
+
         [Test] public void 집중_다음_턴_드로우_초재생()
         {
             var b = K.Fight(K.Data(), new[] { "a" }, new[] { "dummy" }, st => st.Deck = Enumerable.Repeat("zero", 30).ToList());

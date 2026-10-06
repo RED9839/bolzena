@@ -65,7 +65,7 @@ namespace Bolzena.Core
         public double StatMod(Unit u, string stat)
         {
             if (u == null) return 0;
-            double v = FormMod(u, stat);
+            double v = FormMod(u, stat) + PowerMod(u, stat);
             foreach (var m in u.Mods) if (m.Stat == stat) v += m.V;
             if (u.Side == Side.Party && u.BodyRef != null && Always.TryGetValue(u.Key, out var al))
                 foreach (var m in al)
@@ -230,6 +230,7 @@ namespace Bolzena.Core
                 case "foeShieldBreak": return !w.Mine || info.By == owner.Key;
                 case "stackReach": return w.Id == info.Id && info.Before < w.N && info.After >= w.N && (info.Owner == null || info.Owner == owner.Key);
                 case "stackGone": return w.Id == info.Id && (!w.Decay || info.Decay) && (info.Owner == null || info.Owner == owner.Key);
+                case "stackOver": return w.Id == info.Id && (info.Owner == null || info.Owner == owner.Key);
                 case "switch": return w.Who == "any" || info.Owner == owner.Key;
                 case "rhythm": return info.Before < w.N && info.After >= w.N;
                 default: return true;
@@ -255,57 +256,80 @@ namespace Bolzena.Core
                     for (int i = 0; i < total; i++)
                     {
                         bool fr = i >= rules.Count;
-                        var rt = fr ? frules[i - rules.Count] : rules[i]; var r = rt.R;
+                        var rt = fr ? frules[i - rules.Count] : rules[i];
                         if (!fr && rt.Own && fd != null && fd.Replace) continue;
-                        if (!Matches(owner, r.When, ev, info, rt.KwOf)) continue;
                         string id = fr ? $"{owner.Key}|form:{fd.Id}|{i - rules.Count}" : $"{owner.Key}|{i}";
-                        if (firing.Contains(id)) continue;
-                        // 「적에게 디버프를 걸면」 — 한 번의 일에 한 번
-                        if (ONCE_PER_ACT.Contains(ev) && info.Seq != 0) { string dk = id + "|" + ev; if (Counts.TryGetValue(dk, out var dv) && dv == info.Seq) continue; Counts[dk] = info.Seq; }
-                        // 「N장 낼 때마다」 — 장수는 조건과 상관없이 세고, N장째에 조건을 본다
-                        if (r.When.Every > 0)
-                        {
-                            string ck = r.When.PerTurn ? $"{id}|{Turn}" : id;
-                            Counts[ck] = (Counts.TryGetValue(ck, out var cv) ? cv : 0) + 1;
-                            if (Counts[ck] % r.When.Every != 0) continue;
-                        }
-                        // 「… 카드를 차례로 내면」
-                        if (r.When.Seq != null && r.When.Seq.Count > 0)
-                        {
-                            string sk = $"{id}|seq|{Turn}";
-                            if (SeqStep(r.When, owner.Key, Counts.TryGetValue(sk, out var sv) ? sv : 0) < r.When.Seq.Count) continue;
-                            Counts[sk] = PlayLog.Count;
-                        }
-                        if (!CondOk(owner, r.Conds, rt.KwOf, info)) continue;
-                        if (ev == "rhythm") { string rk = $"{id}|rhythm|{Turn}"; if (Counts.ContainsKey(rk)) continue; Counts[rk] = 1; }
-                        if (r.Limit != null)
-                        {
-                            string key = $"{id}|{(r.Limit.Per == "fight" ? "f" : Turn.ToString())}";
-                            if ((Fired.TryGetValue(key, out var fv) ? fv : 0) >= r.Limit.N) continue;
-                            Fired[key] = (Fired.TryGetValue(key, out var fv2) ? fv2 : 0) + 1;
-                        }
-                        else if (ev == "lowHp")
-                        {
-                            string key = $"{id}|f";
-                            if (Fired.ContainsKey(key)) continue;
-                            Fired[key] = 1;
-                        }
-                        if (r.Fx.Count == 0) continue;
-                        // 일을 당한 적 — 대상 적 · 없으면 때린 적(공격받음 · 막음 · 실드 깨짐)
-                        var target = info.Target != null && info.Target.Side == Side.Enemy ? info.Target : info.From != null && info.From.Side == Side.Enemy && !info.From.Dead ? info.From : null;
-                        Unit holder = ((ev == "stackReach" || ev == "stackGone") && info.Target != null && info.Target != owner)
-                            || ((ev == "reserveGone" || ev == "switch") && info.Target != null && info.Target.Side == Side.Enemy) ? info.Target : null;
-                        var ally = info.Who != null && info.Who.Side == Side.Party && !info.Who.Dead ? info.Who : owner;
-                        firing.Add(id);
-                        var gs0 = gearSrc; gearSrc = rt.Gear ? "gear:" + owner.Key : null;
-                        if (ev == "huntDown" || ev == "kill" || ev == "break") holder = info.Target;
-                        try { RunPassive(owner, r.Fx, new FxCtx { Owner = owner, TargetIdx = target != null && !target.Dead ? target.Idx : (AliveEnemies().FirstOrDefault()?.Idx ?? 0), Passive = r.Name, Holder = holder, Ally = ally, EventV = info.V, Attacker = info.From }, $"{owner.Name} · {r.Name}"); }
-                        finally { firing.Remove(id); gearSrc = gs0; }
+                        FireRule(owner, rt, id, ev, info, 1);
                     }
+                    // 강화 카드 지속 규칙 — 켜진 강화(그 사도가 낸 것)마다, 겹 수만큼 효과가 돈다
+                    if (Powers.Count > 0)
+                        foreach (var pw in Powers.ToList())
+                        {
+                            if (pw.Hero != owner.Key || Over != null) continue;
+                            var prs = PowerRules(pw);
+                            for (int i = 0; i < prs.Count; i++) FireRule(owner, prs[i], $"{owner.Key}|pw:{pw.Id}|{i}", ev, info, Math.Max(1, pw.N));
+                        }
                 }
                 if (Forms.Count > 0 && Over == null) FormUntil(ev, info);
             }
             finally { depth--; }
+        }
+
+        /// <summary>규칙 하나를 그 일에 맞춰 돌린다(맞지 않으면 그냥 돌아간다). reps — 효과를 되풀이할 수(강화 겹). 횟수 제한은 발동 수로 센다.</summary>
+        void FireRule(Unit owner, RuleRt rt, string id, string ev, EmitInfo info, int reps)
+        {
+            var r = rt.R;
+            if (!Matches(owner, r.When, ev, info, rt.KwOf)) return;
+            if (firing.Contains(id)) return;
+            // 「적에게 디버프를 걸면」 — 한 번의 일에 한 번
+            if (ONCE_PER_ACT.Contains(ev) && info.Seq != 0) { string dk = id + "|" + ev; if (Counts.TryGetValue(dk, out var dv) && dv == info.Seq) return; Counts[dk] = info.Seq; }
+            // 「N장 낼 때마다」 — 장수는 조건과 상관없이 세고, N장째에 조건을 본다
+            if (r.When.Every > 0)
+            {
+                string ck = r.When.PerTurn ? $"{id}|{Turn}" : id;
+                Counts[ck] = (Counts.TryGetValue(ck, out var cv) ? cv : 0) + 1;
+                if (Counts[ck] % r.When.Every != 0) return;
+            }
+            // 「… 카드를 차례로 내면」
+            if (r.When.Seq != null && r.When.Seq.Count > 0)
+            {
+                string sk = $"{id}|seq|{Turn}";
+                if (SeqStep(r.When, owner.Key, Counts.TryGetValue(sk, out var sv) ? sv : 0) < r.When.Seq.Count) return;
+                Counts[sk] = PlayLog.Count;
+            }
+            if (!CondOk(owner, r.Conds, rt.KwOf, info)) return;
+            if (ev == "rhythm") { string rk = $"{id}|rhythm|{Turn}"; if (Counts.ContainsKey(rk)) return; Counts[rk] = 1; }
+            if (r.Limit != null)
+            {
+                string key = $"{id}|{(r.Limit.Per == "fight" ? "f" : Turn.ToString())}";
+                if ((Fired.TryGetValue(key, out var fv) ? fv : 0) >= r.Limit.N) return;
+                Fired[key] = (Fired.TryGetValue(key, out var fv2) ? fv2 : 0) + 1;
+            }
+            else if (ev == "lowHp")
+            {
+                string key = $"{id}|f";
+                if (Fired.ContainsKey(key)) return;
+                Fired[key] = 1;
+            }
+            if (r.Fx.Count == 0) return;
+            // 일을 당한 적 — 대상 적 · 없으면 때린 적(공격받음 · 막음 · 실드 깨짐)
+            var target = info.Target != null && info.Target.Side == Side.Enemy ? info.Target : info.From != null && info.From.Side == Side.Enemy && !info.From.Dead ? info.From : null;
+            Unit holder = ((ev == "stackReach" || ev == "stackGone" || ev == "stackOver") && info.Target != null && info.Target != owner)
+                || ((ev == "reserveGone" || ev == "switch") && info.Target != null && info.Target.Side == Side.Enemy) ? info.Target : null;
+            var ally = info.Who != null && info.Who.Side == Side.Party && !info.Who.Dead ? info.Who : owner;
+            firing.Add(id);
+            var gs0 = gearSrc; gearSrc = rt.Gear ? "gear:" + owner.Key : null;
+            if (ev == "huntDown" || ev == "kill" || ev == "break") holder = info.Target;
+            string label = rt.Power != null ? $"{owner.Name} · 강화 「{rt.Power}」" : $"{owner.Name} · {r.Name}";
+            try
+            {
+                for (int k = 0; k < reps && Over == null; k++)
+                {
+                    var t = target != null && !target.Dead ? target : null;
+                    RunPassive(owner, r.Fx, new FxCtx { Owner = owner, TargetIdx = t != null ? t.Idx : (AliveEnemies().FirstOrDefault()?.Idx ?? 0), Passive = r.Name ?? rt.Power, Holder = holder, Ally = ally, EventV = info.V, Attacker = info.From }, label);
+                }
+            }
+            finally { firing.Remove(id); gearSrc = gs0; }
         }
 
         void RunPassive(Unit owner, List<Fx> fx, FxCtx ctx, string label)

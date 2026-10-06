@@ -12,10 +12,10 @@
    "atk": 93,
    "def": 23,
    "crit": 10,
-   "blurb": "생식 요정의 모범이던 엘튜버였지만, 드레싱 뿌린 샐러드를 먹다 찍혀 몰락했다. 생당근은 질색, 당근 케이크는 최고. 구독자를 되찾기 위해 오늘도 방송 켠다.",
+   "blurb": "생식 요정의 모범이던 엘튜버였지만, 드레싱 뿌린 샐러드를 먹다 찍혀 몰락했습니다. 생당근은 질색, 당근 케이크는 최고. 오늘도 방송을 켜고, 마법쇼의 후원과 당근으로 파티의 상처를 아물게 합니다.",
    "keyword": {
     "name": "구독자",
-    "desc": "다시 모으는 시청자 — 볼수록 힘이 나고 다섯마다 떡상, 쓰러질 듯하면 빠진다",
+    "desc": "모으고 잃는 시청자",
     "carrier": "self",
     "cap": 10,
     "per": [
@@ -84,6 +84,19 @@
       ]
      },
      {
+      "name": "기적의 회복 방송",
+      "when": {
+       "on": "unwound"
+      },
+      "fx": [
+       {
+        "k": "stack",
+        "id": "구독자",
+        "v": 3
+       }
+      ]
+     },
+     {
       "name": "생방송 구독자",
       "when": {
        "on": "lowHp",
@@ -146,6 +159,14 @@
      {
       "k": "heal",
       "ratio": 6
+     },
+     {
+      "k": "perStack",
+      "id": "구독자"
+     },
+     {
+      "k": "heal",
+      "ratio": 0.5
      },
      {
       "k": "status",
@@ -235,51 +256,7 @@
    ],
    "oracles": [
     {
-     "name": "화제의 추적 방송",
-     "tags": [],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.65,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "가벼운 추적 방송",
-     "cost": 1,
-     "tags": [],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.25,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "떡상한 추적 방송",
-     "tags": [],
+     "name": "실시간 급상승",
      "fx": [
       {
        "k": "dmg",
@@ -299,14 +276,12 @@
      ]
     },
     {
-     "name": "예약된 추적 방송",
-     "tags": [
-      "보존"
-     ],
+     "name": "쇼츠 추적",
+     "cost": 1,
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.35,
+       "ratio": 1.9,
        "target": "oneEnemy"
       },
       {
@@ -322,14 +297,11 @@
      ]
     },
     {
-     "name": "축복의 추적 방송",
-     "tags": [
-      "축복"
-     ],
+     "name": "댓글 박제",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.35,
+       "ratio": 2.8,
        "target": "oneEnemy"
       },
       {
@@ -340,6 +312,49 @@
       {
        "k": "stack",
        "id": "구독자",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "공개 저격 방송",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.0,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "참교육 생방송",
+     "tags": [
+      "약점 공격"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 3.1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2
+      },
+      {
+       "k": "tough",
        "v": 1
       }
      ]
@@ -347,19 +362,22 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "조회수 폭발",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "어그로 집중",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "구독 알림",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
     }
    ]
   },
@@ -373,9 +391,13 @@
    "fx": [
     {
      "k": "dmg",
-     "ratio": 0.7,
+     "ratio": 0.6,
      "target": "randomEnemy",
      "hits": 4
+    },
+    {
+     "k": "drain",
+     "ratio": 0.3
     },
     {
      "k": "stack",
@@ -385,14 +407,17 @@
    ],
    "oracles": [
     {
-     "name": "화제의 마법쇼",
-     "tags": [],
+     "name": "100만 기념 쇼",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.9,
+       "ratio": 0.8,
        "target": "randomEnemy",
        "hits": 4
+      },
+      {
+       "k": "drain",
+       "ratio": 0.3
       },
       {
        "k": "stack",
@@ -402,15 +427,38 @@
      ]
     },
     {
-     "name": "가벼운 마법쇼",
+     "name": "짧은 라이브",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
        "ratio": 0.55,
        "target": "randomEnemy",
-       "hits": 4
+       "hits": 3
+      },
+      {
+       "k": "drain",
+       "ratio": 0.3
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "합동 방송",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.6,
+       "target": "allEnemies",
+       "hits": 3
+      },
+      {
+       "k": "drain",
+       "ratio": 0.3
       },
       {
        "k": "stack",
@@ -420,14 +468,38 @@
      ]
     },
     {
-     "name": "떡상한 마법쇼",
-     "tags": [],
+     "name": "도네이션 폭주",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.75,
+       "ratio": 0.6,
        "target": "randomEnemy",
        "hits": 4
+      },
+      {
+       "k": "drain",
+       "ratio": 0.4
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 4
+      }
+     ]
+    },
+    {
+     "name": "24시간 마라톤",
+     "cost": 3,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.65,
+       "target": "randomEnemy",
+       "hits": 7
+      },
+      {
+       "k": "drain",
+       "ratio": 0.3
       },
       {
        "k": "stack",
@@ -435,61 +507,20 @@
        "v": 3
       }
      ]
-    },
-    {
-     "name": "예약된 마법쇼",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.85,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "축복의 마법쇼",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.85,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      }
-     ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "특수 효과",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "깜짝 연출",
+     "kind": "frost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "후원금",
+     "kind": "ap"
     }
    ]
   },
@@ -503,111 +534,140 @@
    "fx": [
     {
      "k": "heal",
-     "ratio": 4.2
+     "ratio": 4.0
     },
     {
      "k": "stack",
      "id": "구독자",
      "v": 2
+    },
+    {
+     "k": "perStack",
+     "id": "구독자"
+    },
+    {
+     "k": "heal",
+     "ratio": 0.4
     }
    ],
    "oracles": [
     {
-     "name": "화제의 당근 케이크",
-     "tags": [],
+     "name": "유기농 당근",
      "fx": [
       {
        "k": "heal",
-       "ratio": 5.45
+       "ratio": 5.0
       },
       {
        "k": "stack",
        "id": "구독자",
        "v": 2
+      },
+      {
+       "k": "perStack",
+       "id": "구독자"
+      },
+      {
+       "k": "heal",
+       "ratio": 0.5
       }
      ]
     },
     {
-     "name": "가벼운 당근 케이크",
+     "name": "당근 한 입",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "heal",
-       "ratio": 3.35
+       "ratio": 2.6
       },
       {
        "k": "stack",
        "id": "구독자",
        "v": 2
-      }
-     ]
-    },
-    {
-     "name": "떡상한 당근 케이크",
-     "tags": [],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 4.6
       },
       {
-       "k": "stack",
-       "id": "구독자",
-       "v": 3
+       "k": "perStack",
+       "id": "구독자"
+      },
+      {
+       "k": "heal",
+       "ratio": 0.2
       }
      ]
     },
     {
-     "name": "예약된 당근 케이크",
-     "tags": [
-      "보존"
-     ],
+     "name": "당근 먹방",
      "fx": [
       {
        "k": "heal",
-       "ratio": 5.05
+       "ratio": 4.0
       },
       {
        "k": "stack",
        "id": "구독자",
        "v": 2
+      },
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
       }
      ]
     },
     {
-     "name": "축복의 당근 케이크",
-     "tags": [
-      "축복"
-     ],
+     "name": "당근 나눔 이벤트",
      "fx": [
       {
        "k": "heal",
-       "ratio": 5.05
+       "ratio": 3.4
+      },
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 4
+      },
+      {
+       "k": "perStack",
+       "id": "구독자"
+      },
+      {
+       "k": "heal",
+       "ratio": 0.4
+      }
+     ]
+    },
+    {
+     "name": "단단한 당근",
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 4.0
       },
       {
        "k": "stack",
        "id": "구독자",
        "v": 2
+      },
+      {
+       "k": "shield",
+       "ratio": 2.0
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "포근한 숨결",
-     "kind": "heal",
-     "fx": []
+     "name": "당근 즙",
+     "kind": "heal"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "다음 콘텐츠",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "건강 루틴",
+     "kind": "defUp"
     }
    ]
   },
@@ -631,8 +691,7 @@
    ],
    "oracles": [
     {
-     "name": "화제의 챌린지",
-     "tags": [],
+     "name": "챌린지 시즌 2",
      "fx": [
       {
        "k": "stack",
@@ -646,9 +705,22 @@
      ]
     },
     {
-     "name": "가벼운 챌린지",
+     "name": "쇼츠 챌린지",
      "cost": 0,
-     "tags": [],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "구독자",
+       "v": 2
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "생식 먹방",
      "fx": [
       {
        "k": "stack",
@@ -658,74 +730,57 @@
       {
        "k": "draw",
        "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 1.5
       }
      ]
     },
     {
-     "name": "떡상한 챌린지",
-     "tags": [],
+     "name": "챌린지 성공!",
      "fx": [
       {
        "k": "stack",
        "id": "구독자",
-       "v": 5
+       "v": 3
       },
       {
-       "k": "draw",
+       "k": "ap",
        "v": 1
       }
      ]
     },
     {
-     "name": "예약된 챌린지",
+     "name": "매일 챌린지",
      "tags": [
-      "보존"
+      "개전"
      ],
      "fx": [
       {
        "k": "stack",
        "id": "구독자",
-       "v": 4
+       "v": 3
       },
       {
        "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "축복의 챌린지",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 4
-      },
-      {
-       "k": "draw",
-       "v": 1
+       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "풀때기 에너지",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "추천 알고리즘",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "근본 텐션",
+     "kind": "atkUp"
     }
    ]
   }

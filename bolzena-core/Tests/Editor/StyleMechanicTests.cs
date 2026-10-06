@@ -167,11 +167,11 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("이번 턴 쓴 AP가 꼭 3이면: AP +1", t.Fx(new List<Fx> { new Fx { K = "ifSpent", N = 3 }, new Fx { K = "ap", V = 1 } }));
             Assert.AreEqual("적 1명의 디버프 1가지당 적 1명에게 공격력 20% 피해", t.Fx(new List<Fx> { new Fx { K = "perDebuff" }, new Fx { K = "dmg", Ratio = 0.2, Target = "oneEnemy" } }));
             Assert.AreEqual("다음 턴 AP -1, 손패 1장 소멸", t.Fx(new List<Fx> { new Fx { K = "nextAp", V = -1 }, new Fx { K = "burn", V = 1 } }));
-            Assert.AreEqual("가시: 공격을 방어 · 실드로 다 막으면 그 피해의 50%를 때린 적에게 고정 피해로",
+            Assert.AreEqual("가시: 공격을 방어 · 실드로 다 막으면 → 그 피해의 50%를 때린 적에게 고정 피해로",
                 t.Passives(new List<PassiveRule> { new PassiveRule { Name = "가시", When = new When { On = "blocked" }, Fx = new List<Fx> { new Fx { K = "reflect", Ratio = 0.5 } } } }));
             Assert.AreEqual("아군이 적에게 새 디버프를 걸면", t.WhenText(new When { On = "debuff", Who = "any", Fresh = true }));
             var kw = new KeywordDef { Name = "현상수배", Desc = "찍어 둔 사냥감", Carrier = "enemy", Hunt = true, Cap = 5 };
-            StringAssert.Contains("한 번에 한 적에게만 — 옮기면 처음부터", t.Keyword(kw));
+            StringAssert.Contains("한 번에 적 1명에게만(다른 적에게 쌓으면 옮겨 가고 처음부터)", t.Keyword(kw));
             var v = Validator.Check(K.Data(heroes: "[{id:'x', name:'x', role:'딜러', hp:1, atk:1, def:1, keyword:{name:'k', hunt:true}}]",
                 cards: "[{id:'bad', name:'잘못', hero:'x', cost:0, type:'스킬', fx:[{k:'ifSpent'}, {k:'reflect'}, {k:'perDebuff'}, {k:'draw', v:1}]}]"));
             string all = string.Join("\n", v.Errors);

@@ -76,6 +76,7 @@ namespace Bolzena.Core
         void BeginTurn()
         {
             Turn++;
+            MeterTurn();
             Cue("turn", PartyRep(), new Cue { V = Turn });
             int gain = Math.Max(0, R.AP_PER_TURN - ApJam) + (Turn == 1 ? StartAp : 0) + ApCarry;
             ApCarry = 0;
@@ -266,9 +267,9 @@ namespace Bolzena.Core
             if (!Enemies.Any(e => !e.Dead))
             {
                 if (Over != "win") { var w = AliveParty().FirstOrDefault(); if (w != null) Talk(w, "win"); Cue("over", PartyRep(), new Cue { Id = "win" }); }
-                Over = "win";
+                Over = "win"; MeterFlush();
             }
-            else if (Pool.Dead) { if (Over != "lose") Cue("over", Party.FirstOrDefault(), new Cue { Id = "lose" }); Over = "lose"; }
+            else if (Pool.Dead) { if (Over != "lose") Cue("over", Party.FirstOrDefault(), new Cue { Id = "lose" }); Over = "lose"; MeterFlush(); }
         }
 
         void Kill(Unit u)
@@ -280,9 +281,11 @@ namespace Bolzena.Core
             KillSeq = ActSeq;
             Cue("die", u);
             FoeDeath(u);
-            // 근면 — 적을 처치하면 AP 1 · 드로우 1(턴당 1회)
-            if (Acting != null && St(Pool, "근면") > 0 && !Counts.ContainsKey($"근면|{Turn}") && AliveEnemies().Count > 0)
-            { Counts[$"근면|{Turn}"] = 1; GainAp(1); Say("근면 — AP +1 · 드로우 1"); StatusCue(PartyRep(HeroUnit(Acting)), "근면!", true); DrawCards(1); }
+            // 근면 N — 적을 처치하면 AP 1 · 드로우 1. 카드(행동) 하나에 한 번, 한 턴에 N 번까지 — 근면 2 의 둘째는 다른 카드로 처치해야 돈다(2026-10 사용자)
+            int dil = St(Pool, "근면");
+            Counts.TryGetValue($"근면|{Turn}", out var dilN);
+            if (Acting != null && dil > 0 && dilN < dil && !Counts.ContainsKey($"근면@{ActSeq}") && AliveEnemies().Count > 0)
+            { Counts[$"근면|{Turn}"] = dilN + 1; Counts[$"근면@{ActSeq}"] = 1; GainAp(1); Say($"근면 — AP +1 · 드로우 1 ({dilN + 1}/{dil})"); StatusCue(PartyRep(HeroUnit(Acting)), "근면!", true); DrawCards(1); }
             foreach (var kw in Kw.Values.Where(k => k.Def.Hunt).ToList())
                 if (St(u, kw.Id) > 0) Emit("huntDown", new EmitInfo { Id = kw.Id, Owner = kw.Owner, Target = u, N = St(u, kw.Id), By = Acting });
             Say($"{u.Name} 쓰러짐");

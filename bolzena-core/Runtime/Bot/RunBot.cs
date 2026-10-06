@@ -8,6 +8,10 @@ namespace Bolzena.Core
     public sealed class SimOpts
     {
         public bool SmartFight = true, SmartOut = true;
+        /// <summary>숙련 봇(RunBotSkilled.cs) — 의도한 플레이: 기본 카드를 빼고 고유 카드 · 파티 축으로 덱을 짠다. 끄면 옛 봇(초보).</summary>
+        public bool Skilled;
+        /// <summary>기본 카드 없이 파티 사도의 고유 카드만으로 판을 시작한다(극단 측정).</summary>
+        public bool UniqueOnly;
         public int Depth = 1, Width = 3;
         public double Hpx = 1, Dmgx = 1;
         public string Village;
@@ -24,6 +28,10 @@ namespace Bolzena.Core
         public int Floor;
         public string Where;
         public int Fights, Turns, Gold, Deck;
+        /// <summary>판이 끝날 때 덱의 고유 카드(복제본 포함) · 기본 카드 장수.</summary>
+        public int Uniques, Basics;
+        /// <summary>상점에서 뺀 횟수.</summary>
+        public int Removals;
         public Dictionary<string, (int n, int turns, int win)> Kinds = new();
         /// <summary>강인도 통계 — 카드가 강인도를 깎은 횟수 · 그 가운데 약점 · 격파 수. 싸움 종류(fight · elite · boss …)마다 격파 수.</summary>
         public int ToughHits, ToughWeakHits, Breaks;
@@ -37,12 +45,14 @@ namespace Bolzena.Core
     ///            이벤트는 결과의 값어치로, 장비는 나아질 때 바꿔 낀다
     /// 난수는 판과 전투의 것만 쓴다 — 같은 씨앗이면 같은 판.
     /// </summary>
-    public sealed class RunBot
+    public sealed partial class RunBot
     {
         readonly GameData data;
         readonly Bots bots;
         const int K = R.SCALE;
         public RunBot(GameData data) { this.data = data; bots = new Bots(data); }
+        /// <summary>숙련 봇의 판 짜기 눈(판마다 새로) — 초보 봇이면 null.</summary>
+        DeckPlan plan;
 
         double HpRatio(Run run) => (double)run.S.PartyHp / Math.Max(1, run.S.PartyMaxHp);
         double DeckEff(Run run, string id) => CardValue.Efficiency(run.ViewOf(id));
@@ -84,6 +94,7 @@ namespace Bolzena.Core
             double v = (s.Hp * 0.3 + s.Atk * atkW + s.Def * (role == "탱커" ? 2.2 : role == "서포터" ? 2 : 1)) / K + s.Crit * 0.25;
             if (e.Effect.Count > 0) v += 4;
             if (e.Affinity == k && e.AffinityEffect.Count > 0) v += 5;
+            if (plan != null) v += 1.5 * plan.GearHits(e);   // 숙련 — 파티 축에 맞는 효과
             return v;
         }
 
@@ -130,6 +141,7 @@ namespace Bolzena.Core
             run.AfterFight(st);
             SettleNeutrals(run);
             if (st.Over != "win") return false;
+            if (plan != null) ClaimLeftover(run, st);   // 숙련 — 빛났지만 안 낸 카드도 보상에서 받는다(화면의 보상 줄과 같다)
             if (loot != null)
             {
                 if (loot.Equip != null && loot.Equip.Count > 0 && loot.EquipTaken == null) run.TakeEquip(loot.Equip[0]);
@@ -157,13 +169,14 @@ namespace Bolzena.Core
             var ids = run.Reachable();
             if (!smart || ids.Count == 1) return ids[0];
             var map = run.MapOf(); double h = HpRatio(run); int g = run.S.Gold;
+            double pull = plan != null ? ShopPull(run) : 0;   // 숙련 — 기본 카드를 뺄 상점
             double Val(MapNode n) => n.Type switch
             {
                 "fight" => h < 0.35 ? -2 : 3,
                 "elite" => h >= 0.8 ? 8 : h >= 0.6 ? 2 : -10,
                 "event" => 4,
                 "camp" => h < 0.6 ? 9 : 4,
-                "campshop" => (h < 0.6 ? 9 : 4) + (g >= 100 ? 5 : 1),
+                "campshop" => (h < 0.6 ? 9 : 4) + (g >= 100 ? 5 : 1) + pull,
                 _ => 0,
             };
             var memo = new Dictionary<string, double>();
@@ -184,6 +197,7 @@ namespace Bolzena.Core
         void Camp(Run run, string kind, SimOpts P)
         {
             run.EnterCamp(kind);
+            if (plan != null) { SkilledCamp(run, kind); return; }
             if (P.SmartOut)
             {
                 if (kind == "campshop") Shop(run);
@@ -213,6 +227,7 @@ namespace Bolzena.Core
 
         void Shop(Run run)
         {
+            if (plan != null) { SkilledShop(run); return; }
             if (run.S.Shop == null || run.S.Shop.Floor != run.S.Floor || run.S.Shop.At != run.S.Map?.At) run.RollShop();
             var items = run.S.Shop.Items;
             double EqGain(string id) => run.S.Party.Max(k => { run.GearOf(k).TryGetValue(data.Equip(id).Slot, out var old); return GearScore(run, id, k) - GearScore(run, old, k); });
@@ -242,17 +257,17 @@ namespace Bolzena.Core
                             break;
                         }
                     case "maxHp": v += o.V * 1.2 / K; break;
-                    case "remove": v += run.S.Deck.Any(id => data.Card(id)?.IsCurse == true) ? 30 : run.S.Deck.Any(IsBasic) ? 22 : 8; break;
-                    case "dupe": v += run.S.Deck.Any(id => !IsBasic(id) && data.Card(id)?.IsCurse == false) ? 16 : 4; break;
-                    case "unique": v += 20; break;
-                    case "neutral": v += o.Grade == "전설" ? 20 : o.Grade == "희귀" ? 15 : 10; break;
+                    case "remove": v += plan != null ? RemoveWorth(run, o.Basic) * Math.Max(1, o.N) : run.S.Deck.Any(id => data.Card(id)?.IsCurse == true) ? 30 : run.S.Deck.Any(IsBasic) ? 22 : 8; break;
+                    case "dupe": v += plan != null ? DupeWorth(run) : run.S.Deck.Any(id => !IsBasic(id) && data.Card(id)?.IsCurse == false) ? 16 : 4; break;
+                    case "unique": v += plan != null ? (run.GraceHeroes().Count > 0 ? 26 * Math.Max(1, o.N) : 15) : 20; break;
+                    case "neutral": v += (o.Grade == "전설" ? 20 : o.Grade == "희귀" ? 15 : 10) * (plan != null && run.S.Deck.Count > DeckPlan.THICK ? 0.5 : 1); break;
                     case "equip": v += GRADE_V.TryGetValue(o.Grade ?? "", out var gv) ? gv : 10; break;
                     case "flash": v += 14; break;
                     case "shin": v += 15 * o.V; break;
                     case "shinPick": v += 12 * Math.Max(1, o.N); break;
                     case "shinNow": v += 12; break;
                     case "noShin": v -= 2; break;
-                    case "curse": v -= 25; break;
+                    case "curse": v -= plan != null ? 30 : 25; break;
                     case "gift": v += 8; break;
                     case "scout": v += 2; break;
                     case "shopGift": v += (GRADE_V.TryGetValue(o.Grade ?? "", out var sg) ? sg : 10) * 0.8; break;
@@ -295,7 +310,8 @@ namespace Bolzena.Core
             {
                 var p = run.S.Event.Pending[0];
                 object val = null;
-                switch (p.K)
+                if (plan != null) val = SkilledPending(run, p);
+                else switch (p.K)
                 {
                     case "remove": val = smart ? WorstCard(run) : run.S.Deck[0]; break;
                     case "dupe":
@@ -305,6 +321,12 @@ namespace Bolzena.Core
                             break;
                         }
                     case "card": val = smart ? p.Cards.OrderByDescending(id => CardEff(id)).First() : p.Cards[0]; break;
+                    case "grace":
+                        {
+                            var hs = run.GraceHeroes();
+                            val = smart ? hs.OrderByDescending(k => run.UniquesLeft(k).Max(id => (double?)CardEff(id)) ?? 0).FirstOrDefault() : hs.FirstOrDefault();
+                            break;
+                        }
                     case "flash": val = smart ? p.Offer.Picks.OrderByDescending(n => CardEff(p.Offer.CardId, n)).First() : p.Offer.Picks[0]; break;
                     case "gambleChoice":
                         {
@@ -355,6 +377,9 @@ namespace Bolzena.Core
         public SimResult RunFull(List<string> party, long seed, SimOpts P)
         {
             var run = Run.New(data, party, seed, P.Village);
+            plan = P.Skilled ? new DeckPlan(data, party) : null;
+            bots.EpiPick = plan != null ? SkilledEpi : null;
+            if (P.UniqueOnly) { run.S.Deck.Clear(); run.S.Deck.AddRange(party.SelectMany(k => data.UniquesOf(k))); }   // 고유만 — 기본 카드 없이 시작
             var outr = new SimResult { Village = run.S.Village };
             int guard = 0;
             while (run.S.Done == null && guard++ < 200)
@@ -370,7 +395,7 @@ namespace Bolzena.Core
                     run.S.Elite = false;
                     if (!run.IsBoss) continue;
                     var off = run.BossCopyOffer();
-                    if (off.Count > 0) run.BossCopy(P.SmartOut ? off.OrderByDescending(x => DeckEff(run, x)).First() : off[0]);
+                    if (off.Count > 0) run.BossCopy(plan != null ? off.OrderByDescending(x => plan.Score(run.ViewOf(x))).First() : P.SmartOut ? off.OrderByDescending(x => DeckEff(run, x)).First() : off[0]);
                     run.Advance();
                     if (run.S.Done == "clear") break;
                 }
@@ -381,6 +406,13 @@ namespace Bolzena.Core
             return Finish(run, outr);
         }
 
-        static SimResult Finish(Run run, SimResult o) { o.Gold = run.S.Gold; o.Deck = run.S.Deck.Count; return o; }
+        static SimResult Finish(Run run, SimResult o)
+        {
+            o.Gold = run.S.Gold; o.Deck = run.S.Deck.Count;
+            o.Uniques = run.S.Deck.Count(id => run.Data.Card(id)?.Unique == true);
+            o.Basics = run.S.Deck.Count(run.IsBasic);
+            o.Removals = run.S.Removals;
+            return o;
+        }
     }
 }

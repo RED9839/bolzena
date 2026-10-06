@@ -159,6 +159,8 @@ namespace Bolzena.UI
 
         bool dirty;
         void OnChanged() => dirty = true;
+        // 창을 닫지 않은 채 전투가 끝나 장면째 지워져도 정적 이벤트에 남지 않게
+        void OnDestroy() => Bolzena.RunUI.DisplayOptions.Changed -= OnChanged;
 
         void Update()
         {
@@ -253,7 +255,7 @@ namespace Bolzena.UI
                 var hl = Make.Sliced("vrowhl", T, Res.UI("cell_on_9s"), rc, new Vector2(rowW, rh), OC, new Color(1, 1, 1, 0));
                 var lt = Tone.Text("vl", T, "수직동기", new Vector3(Pad + 0.2f, rc.y, 0), Tone.Body, OC + 1, Tone.Ink, TextAlignmentOptions.Left, false);
                 lt.ForceMeshUpdate();
-                Tone.Text("vs", T, "주사율에 맞춰 찢김 없이 · 켜면 프레임 제한은 쉰다", new Vector3(Pad + 0.32f + lt.preferredWidth, rc.y - 0.01f, 0), Tone.Cap, OC + 1, Tone.Sub, TextAlignmentOptions.Left, true);
+                Tone.Text("vs", T, "주사율에 맞춰 찢김 없이 그립니다 · 켜면 프레임 제한은 쉽니다", new Vector3(Pad + 0.32f + lt.preferredWidth, rc.y - 0.01f, 0), Tone.Cap, OC + 1, Tone.Sub, TextAlignmentOptions.Left, true);
                 var track = new Vector3(Wd - Pad - 0.5f, rc.y, 0);
                 Make.Sliced("vtrack", T, Res.UI("bar_fill_9s"), track, new Vector2(0.64f, 0.3f), OC + 1, vs ? Tone.Gold : new Color(0.1f, 0.13f, 0.24f));
                 Make.Box("vknob", T, Res.UI("circle"), track + new Vector3(vs ? 0.17f : -0.17f, 0, 0), new Vector2(0.26f, 0.26f), OC + 2, Color.white);

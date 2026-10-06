@@ -54,12 +54,12 @@ namespace Bolzena.Core
         }
 
         /// <summary>
-        /// 카드를 덱에 — 교주 카드는 주인 사도와 함께(「id@사도」). heroKey 가 없거나 파티에 없으면 주인 고르기 줄(NeutralWait)에 선다.
+        /// 카드를 덱에 — 주인 없는 카드(교주 · 선물, CardDef.Ownable — 상태 · 저주는 주인 없이 바로 덱에)는 주인 사도와 함께(「id@사도」). heroKey 가 없거나 파티에 없으면 주인 고르기 줄(NeutralWait)에 선다.
         /// 돌려줌: 덱에 든 id(줄에 섰으면 null).
         /// </summary>
         public string GainCard(string id, string heroKey = null)
         {
-            if (Data.Card(id)?.Neutral != true || GameData.OwnerOf(id) != null) { S.Deck.Add(id); return id; }
+            if (Data.Card(id)?.Ownable != true || GameData.OwnerOf(id) != null) { S.Deck.Add(id); return id; }
             if (heroKey != null && S.Party.Contains(heroKey)) { var nid = GameData.WithOwner(id, heroKey); S.Deck.Add(nid); return nid; }
             S.NeutralWait.Add(GameData.NoOwner(id));
             return null;
@@ -121,15 +121,36 @@ namespace Bolzena.Core
         /// <summary>층의 보스 성급(사용자 2026-10-05) — 첫 층(1층) 보스는 1~2성 사도 클론, 그 뒤 층(2층)은 3성.</summary>
         public static bool StarFits(int floor, int star) => floor == 0 ? star <= 2 : star >= 3;
 
-        /// <summary>그 마을 종족에서 원래 성격이 nature 인 사도(바탕 이름마다 하나 — id 차례). floor 를 주면 그 층 보스 성급(StarFits)만.</summary>
+        /// <summary>
+        /// 클론이 없는 사도 — 원작에서 엘다인만 클론 형태가 없다(사용자 2026-10-06 · 나무위키 엘다인 문서). 사도 id 그대로(바탕 이름으로 묶지 않는다 — 네르_빡침을 빼도 네르는 남는다).
+        /// 영원살이 아야 · 시온 더 다크불릿 · 에피카 · 비비 · 클로에 · 이드 · 우이 · 우이(기억) / 영원의 메아리 리뉴아 · 실비아 / 영원의 새싹 비비(신성) / 약속의 메아리 에르핀(왕도)
+        /// 몽환살이 란 · 디아나(왕년) · 벨라 · 죠안 · 우로스 / 염원살이 티그(영웅) · 네르(빡침) / 별바라기 요미. 이드(재활)은 일반 3성이라 후보에 남는다. 슈로는 우로스와 다른 사도라 남는다.
+        /// </summary>
+        public static readonly HashSet<string> NO_CLONE = new() {
+            "아야", "시온더다크불릿", "에피카", "비비", "클로에", "이드", "우이", "우이_기억",
+            "리뉴아", "실비아", "비비_신성", "에르핀_왕도",
+            "란", "디아나_왕년", "벨라", "죠안", "우로스",
+            "티그_영웅", "네르_빡침", "요미" };
+
+        /// <summary>그 마을 종족에서 원래 성격이 nature 인 사도(엘다인 제외 · 바탕 이름마다 하나 — id 차례). floor 를 주면 그 층 보스 성급(StarFits)만.</summary>
         public static List<string> CloneCandidates(GameData d, string village, string nature, int floor = -1)
         {
             if (village == null || !d.Villages.TryGetValue(village, out var v)) return new List<string>();
-            return d.Heroes.Values.Where(h => h.Race == v.Race && h.Nature == nature && (floor < 0 || StarFits(floor, h.Star)))
+            return d.Heroes.Values.Where(h => h.Race == v.Race && h.Nature == nature && !NO_CLONE.Contains(h.Id) && (floor < 0 || StarFits(floor, h.Star)))
                 .Select(h => h.Id).OrderBy(x => x, StringComparer.Ordinal).GroupBy(HeroBase).Select(g => g.First()).ToList();
         }
 
-        /// <summary>그 마을에서 뽑을 수 있는 적 속성 — 클론 보스 자리를 그 성격 사도(바탕 이름이 다른 · 성급 무관 — 모자란 층은 다른 성급)로 다 채울 수 있는 것만. 클론 자리가 없는 마을은 다섯 다.</summary>
+        /// <summary>
+        /// 그 층 보스 후보(사용자 2026-10-06 최종) — 마을 종족 · 원래 성격 = 그 판 적 속성 사도만(다른 종족에서 빌리지 않는다).
+        /// 1층 1~2성 · 2층 3성. 그 종족에 그 속성 1~2성이 없으면 1층도 3성(두 층은 다른 사도 — FillBosses). 못 채우면 그 속성은 그 마을에서 안 뽑는다(NaturesFor).
+        /// </summary>
+        public static List<string> FloorCandidates(GameData d, string village, string nature, int floor)
+        {
+            var c = CloneCandidates(d, village, nature, floor);
+            return c.Count == 0 && floor == 0 ? CloneCandidates(d, village, nature, 1) : c;
+        }
+
+        /// <summary>그 마을에서 뽑을 수 있는 적 속성 — 클론 보스 자리를 마을 종족 · 그 성격 사도(1층 1~2성 · 2층 3성, 1~2성이 없으면 두 층 다른 3성)로 다 채울 수 있는 것만. 클론 자리가 없는 마을은 다섯 다.</summary>
         public static List<string> NaturesFor(GameData d, string village) =>
             R.FOE_NATURES.Where(n => { FillBosses(d, village, n, 0, out bool full); return full; }).ToList();
 
@@ -149,18 +170,26 @@ namespace Bolzena.Core
         }
 
         /// <summary>
-        /// 층마다 보스 줄 — 클론 자리를 그 마을 종족 · 원래 성격이 nature · 그 층 성급(1층 1~2성 · 2층 3성) 사도의 클론으로(판 하나 = 적 속성 하나, 클론은 제 성격 그대로).
-        /// 그 층 후보(원래 클론 사도 포함) 가운데 판 씨앗으로 무작위 — 그 층 보스였던 클론 데이터가 있으면 그것, 없으면 그 자리 원래 클론의 몸을 빌린 클론(GameData.CloneId).
-        /// 그 층 성급 사도가 모자라면 그 층만 다른 성급(남은 같은 성격 사도). 같은 사도(바탕 이름)는 한 판에 한 번. 그래도 모자라면 그 자리는 원래 클론(NaturesFor 가 그런 속성은 안 뽑는다).
+        /// 층마다 보스 줄 — 보스 하나(사용자 2026-10-06: 보스 전투에 졸개 없음). 클론 자리를 그 마을 종족 · 원래 성격이 nature · 그 층 성급(1층 1~2성 · 2층 3성) 사도의 클론으로(판 하나 = 적 속성 하나, 클론은 제 성격 그대로).
+        /// 그 층 후보(원래 클론 사도 포함) 가운데 판 씨앗으로 무작위 — 그 층 보스였던 클론 데이터가 있으면 그것, 없으면 그 자리 원래 클론의 몸을 빌린 클론(GameData.CloneId). 고정 보스는 없다 — 매 판 새로 뽑는다.
+        /// 마을 종족 사도만. 그 종족에 그 속성 1~2성이 없으면 1층도 3성(두 층 다른 사도). 같은 사도(바탕 이름)는 한 판에 한 번. 그래도 모자라면 그 자리는 원래 클론(NaturesFor 가 그런 속성은 안 뽑는다).
         /// </summary>
         public static List<List<string>> PickBosses(GameData d, string village, string nature, long seed) => FillBosses(d, village, nature, seed, out _);
+
+        /// <summary>보스 줄을 보스 하나로 — 보스(boss)인 첫 적(없으면 첫 적). 옛 저장 · 옛 데이터의 졸개를 덜어 낸다.</summary>
+        public static List<string> OneBoss(GameData d, List<string> line)
+        {
+            if (line == null || line.Count <= 1) return line?.ToList() ?? new List<string>();
+            var b = line.FirstOrDefault(id => d.Enemy(id)?.Boss == true) ?? line[0];
+            return new List<string> { b };
+        }
 
         static List<List<string>> FillBosses(GameData d, string village, string nature, long seed, out bool full)
         {
             full = true;
             if (village == null || !d.Villages.TryGetValue(village, out var v)) return null;
-            var lines = v.Floors.Select(f => f.Boss.ToList()).ToList();
-            var slots = CloneSlots(d, village);
+            var lines = v.Floors.Select(f => OneBoss(d, f.Boss)).ToList();
+            var slots = CloneSlots(d, village).Where(s => lines[s.floor].Contains(s.id)).ToList();
             if (nature == null || slots.Count == 0) return lines;
             var used = new HashSet<string>();
             var need = slots.ToList();   // 원래 클론도 후보 가운데 하나 — 판마다 씨앗으로 다른 클론(사용자 2026-10-05)
@@ -172,36 +201,26 @@ namespace Bolzena.Core
                 for (int i = l.Count - 1; i > 0; i--) { int j = rng.Int(i + 1); (l[i], l[j]) = (l[j], l[i]); }
                 return l;
             }
-            // ① 규칙대로 — 그 층 성급 사도로, 후보가 적은 층부터(1~2성이 드물다)
-            var left = new List<(int floor, int idx, string id)>();
-            foreach (var g in need.GroupBy(s => s.floor).OrderBy(g => CloneCandidates(d, village, nature, g.Key).Count).ThenBy(g => g.Key))
+            // 그 층 후보(마을 종족만 · 1층 1~2성 · 2층 3성, 1~2성이 없으면 1층도 3성)로 — 2층 먼저(3성 자리를 1층 대타가 먼저 가져가지 않게).
+            // 모자라면 그 자리는 원래 클론 그대로 · full = false(그 속성은 그 마을에서 안 뽑는다 — 사용자 2026-10-06 최종: 다른 종족에서 빌리지 않는다).
+            foreach (var g in need.GroupBy(s => s.floor).OrderByDescending(g => g.Key))
             {
-                var rest = Shuffled(CloneCandidates(d, village, nature, g.Key).Where(h => !used.Contains(HeroBase(h))).ToList());
+                var rest = Shuffled(FloorCandidates(d, village, nature, g.Key).Where(h => !used.Contains(HeroBase(h))).ToList());
                 foreach (var sl in g)
-                {
-                    var h = rest.FirstOrDefault(x => !used.Contains(HeroBase(x)));
-                    if (h == null) { left.Add(sl); continue; }
-                    used.Add(HeroBase(h));
-                    lines[sl.floor][sl.idx] = DefOf(h, sl.floor) ?? GameData.CloneId(h, sl.id);
-                }
-            }
-            // ② 그 층 성급 사도가 모자라면 그 층만 다른 성급(사용자 2026-10-05) — 남은 같은 성격 사도 가운데, 다른 층 보스와 겹치지 않게
-            if (left.Count > 0)
-            {
-                var rest = Shuffled(CloneCandidates(d, village, nature).Where(h => !used.Contains(HeroBase(h))).ToList());
-                foreach (var sl in left)
                 {
                     var h = rest.FirstOrDefault(x => !used.Contains(HeroBase(x)));
                     if (h == null) { full = false; continue; }
                     used.Add(HeroBase(h));
-                    lines[sl.floor][sl.idx] = DefOf(h, sl.floor) ?? GameData.CloneId(h, sl.id);
+                    int at = lines[sl.floor].IndexOf(sl.id);
+                    lines[sl.floor][at] = DefOf(h, sl.floor) ?? GameData.CloneId(h, sl.id);
                 }
             }
             return lines;
         }
 
-        /// <summary>층마다 보스 줄(판 시작 화면 · 지도) — 새 판은 적 속성에 맞춘 줄, 옛 저장은 마을 데이터.</summary>
-        public List<List<string>> Bosses => S.Bosses ?? VillageDef.Floors.Select(f => f.Boss.ToList()).ToList();
+        /// <summary>층마다 보스 줄(판 시작 화면 · 지도) — 층마다 보스 하나. 옛 저장(S.Bosses 없음)도 고정 보스를 쓰지 않고 그 판 씨앗 · 적 속성으로 새로 고른다.</summary>
+        public List<List<string>> Bosses => S.Bosses != null ? S.Bosses.Select(l => OneBoss(Data, l)).ToList()
+            : PickBosses(Data, S.Village, S.EnemyNature != null && NaturesFor(Data, S.Village).Contains(S.EnemyNature) ? S.EnemyNature : NatureBySeed(Data, S.Village, S.Seed), S.Seed);
         /// <summary>층마다 보스 사도 클론의 사도 키(클론이 없는 층은 null) — 판 시작 화면이 미리 보인다.</summary>
         public List<string> BossHeroes => Bosses.Select(l => l.Select(id => Data.Enemy(id)?.Clone).FirstOrDefault(x => x != null)).ToList();
 
@@ -226,7 +245,18 @@ namespace Bolzena.Core
         }
 
         public string Save() => GameData.ToJson(S);
-        public static Run Load(GameData data, string json) => new Run(data, GameData.FromJson<RunState>(json));
+        public static Run Load(GameData data, string json) => new Run(data, Reroll(data, GameData.FromJson<RunState>(json)));
+
+        /// <summary>저장된 판의 적 속성이 그 마을에서 닫힌 속성이면(사용자 2026-10-06 — 유령 순수 · 정령 광기 · 용족 활발) 씨앗으로 다시 뽑고 보스 줄도 새로 고른다.</summary>
+        static RunState Reroll(GameData d, RunState s)
+        {
+            if (s?.EnemyNature == null || s.Village == null || !d.Villages.ContainsKey(s.Village)) return s;
+            var ok = NaturesFor(d, s.Village);
+            if (ok.Count == 0 || ok.Contains(s.EnemyNature)) return s;
+            s.EnemyNature = NatureBySeed(d, s.Village, s.Seed);
+            s.Bosses = PickBosses(d, s.Village, s.EnemyNature, s.Seed);
+            return s;
+        }
         public static Run Of(GameData data, RunState s) => new Run(data, s);
 
         // ── 어디인가 ───────────────────────────────────────────────────
@@ -243,7 +273,7 @@ namespace Bolzena.Core
         {
             if (S.EventFight != null) return S.EventFight.Enemies;
             var f = CurrentFloor;
-            if (IsBoss) return S.Bosses != null && S.Floor < S.Bosses.Count ? S.Bosses[S.Floor] : f.Boss;
+            if (IsBoss) { var bl = Bosses; return S.Floor < bl.Count ? bl[S.Floor] : OneBoss(Data, f.Boss); }   // 보스 하나(졸개 없음)
             var at = S.Map?.At != null ? NodeById(S.Map, S.Map.At) : null;
             return at?.Foes ?? f.Pools[Math.Min(S.Node, f.Pools.Count - 1)][0];
         }
@@ -271,7 +301,7 @@ namespace Bolzena.Core
                 Party = S.Party.ToList(), Rows = S.Rows, Deck = S.Deck.ToList(), Enemies = CurrentEnemies().ToList(),
                 PartyHp = S.PartyHp, PartyMaxHp = S.PartyMaxHp, Gear = GearStats(), GearRules = GearRules(), Flash = S.Flash,
                 EnemyHp = sc.hp * hpx, EnemyDmg = sc.dmg * dmgx, Next = next, Shin = S.Shin, Gauge = S.Gauge,
-                Elite = S.EventFight != null ? S.EventFight.Elite : S.Elite || BossAsElite, EnemyNature = S.EnemyNature,
+                Elite = S.EventFight != null ? S.EventFight.Elite : S.Elite || BossAsElite, EnemyNature = S.EnemyNature, Floor = S.Floor + 1,
                 Glow = glow, Growth = S.Growth, CardVals = S.CardVals,
                 Seed = (uint)(S.Seed + S.Floor * 101 + S.Node * 7 + S.Step * 13 + (S.EventFight != null ? 555 : 0)),
             };
@@ -287,7 +317,7 @@ namespace Bolzena.Core
             if (!mind)
             {
                 foreach (var id in b.GainedCards) if (!S.Deck.Contains(id) && PowerWhy(id) == null) GainCard(id);
-                foreach (var (cardId, n, shin) in b.GainedFlash) { S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
+                foreach (var (cardId, n, shin) in b.GainedFlash) { if (GameData.IsCopy(cardId)) continue; S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
             }
             // 제거 태그 — 덱에서 완전히 뺀다
             foreach (var id in b.Removed) { int i = S.Deck.IndexOf(id); if (i >= 0) { S.Deck.RemoveAt(i); if (!S.Deck.Contains(id)) ForgetCard(id); } }
@@ -323,6 +353,9 @@ namespace Bolzena.Core
         /// <summary>
         /// 싸움을 열 때 어느 카드가 빛날지 — 은총(사도마다: 아직 얻을 고유 카드가 남은 사도의 기본 카드) · 카드 신탁(사도마다 + 교주 카드 몫).
         /// 일반 · 엘리트 · 보스 칸은 은총 하나는 반드시, 엘리트는 카드 신탁 하나도 반드시.
+        /// 한 전투에 사도마다 신탁 · 은총 가운데 하나만(2026-10-06 사용자) — 은총이 선 사도의 카드(교주 카드는 주인 사도 몫)는 신탁 후보에서 빠진다.
+        /// 빛나는 카드는 내든 안 내든(끝난 뒤 보상에서 받는다) 그 전투의 몫이라, 빛을 정할 때 사도마다 하나로 막는다.
+        /// 꼭 떠야 하는 카드 신탁(엘리트 · 이벤트 「다음 전투에서 신탁」)에 빈 사도가 없으면 은총 하나를 카드 신탁으로 바꾼다 — 엘리트는 은총이 둘 이상일 때만(은총 하나는 반드시가 먼저).
         /// </summary>
         public Dictionary<string, Glow> RollEpiphany()
         {
@@ -340,16 +373,31 @@ namespace Bolzena.Core
             foreach (var k in heroes) if (Rnd() < (R.EPI_HERO.TryGetValue(kind, out var p) ? p : 0)) Grace(k);
             if (heroes.Count > 0 && R.EPI_SURE_HERO.Contains(kind) && glow.Count == 0) Grace(Pick(heroes));
             var able = FlashTargets().Where(id => !glow.ContainsKey(id)).ToList();
+            string OwnerOf(string id) => ViewOf(id).Hero ?? "neutral";   // 교주 카드는 주인 사도 몫
             var owners = new List<(string owner, List<string> ids)>();
             foreach (var id in able)
             {
-                var o = ViewOf(id).Hero ?? "neutral";   // 교주 카드는 주인 사도 몫
+                var o = OwnerOf(id);
                 var g = owners.FirstOrDefault(x => x.owner == o);
                 if (g.ids == null) owners.Add((o, new List<string> { id })); else g.ids.Add(id);
             }
+            // 사도마다 신탁 · 은총 가운데 하나만 — 은총이 선 사도는 카드 신탁을 굴리지 않는다
+            var graced = new HashSet<string>(glow.Values.Select(x => x.Hero));
+            var free = owners.Where(x => !graced.Contains(x.owner)).ToList();
             var lit = new List<string>();
-            foreach (var (_, ids) in owners) if (Rnd() < (R.EPI_CARD.TryGetValue(kind, out var q) ? q : 0)) lit.Add(Pick(ids));
-            if (able.Count > 0 && lit.Count == 0 && (S.RewardFlash || R.EPI_SURE_CARD.Contains(kind))) lit.Add(Pick(able));
+            foreach (var (_, ids) in free) if (Rnd() < (R.EPI_CARD.TryGetValue(kind, out var q) ? q : 0)) lit.Add(Pick(ids));
+            if (able.Count > 0 && lit.Count == 0 && (S.RewardFlash || R.EPI_SURE_CARD.Contains(kind)))
+            {
+                var freeIds = free.SelectMany(x => x.ids).ToList();
+                if (freeIds.Count > 0) lit.Add(Pick(freeIds));
+                else if (S.RewardFlash || glow.Count > 1)
+                {   // 빈 사도가 없다 — 그 사도의 은총을 카드 신탁으로 바꾼다
+                    var at = Pick(able);
+                    var gk = glow.First(kv => kv.Value.Hero == OwnerOf(at)).Key;
+                    glow.Remove(gk);
+                    lit.Add(at);
+                }
+            }
             if (lit.Count > 0) S.RewardFlash = false;
             foreach (var cardId in lit)
             {
@@ -434,7 +482,7 @@ namespace Bolzena.Core
         public bool FlashOk(string cardId, int n)
         {
             var c = Data.Card(cardId);
-            if (c == null || n < 1 || n > c.Oracles.Count) return false;
+            if (c == null || n < 1 || n > c.Oracles.Count || GameData.IsCopy(cardId)) return false;   // 복제본은 복제할 때 모습에 묶인다
             if (!Data.View(cardId, n).IsPower || Data.View(cardId).IsPower) return true;
             return S.Deck.Count(x => x == cardId) <= 1;
         }
@@ -753,10 +801,14 @@ namespace Bolzena.Core
         List<string> Copyable() => S.Deck.Distinct().Where(id =>
         {
             var c = Data.Card(id);
-            return c != null && c.Unique && c.Hero != null && !GameData.IsCopy(id) && !ViewOf(id).IsOnly && !ViewOf(id).IsTaboo;
+            return c != null && c.Unique && c.Hero != null && S.Party.Contains(c.Hero) && !c.IsCurse && !c.IsStatusCard
+                && !GameData.IsCopy(id) && !GameData.IsPlain(id) && !ViewOf(id).IsOnly && !ViewOf(id).IsTaboo;
         }).ToList();
 
-        /// <summary>층 보스 보상 — 덱에 가진 고유 카드 가운데 셋. 하나를 고르면 복제본이 한 장 더(BossCopy).</summary>
+        /// <summary>
+        /// 층 보스 보상(1층 보스 뒤 「복제」 단계 — 이벤트의 복제 Pending「dupe」 와 따로) — 덱에 든 파티 사도 고유 카드 가운데 무작위 셋(같은 카드는 한 번, 기본 · 교주 · 상태 · 저주 · 복제본 · 유일 · 금기 빼고).
+        /// 셋보다 적으면 있는 만큼, 없으면 빈 목록(화면은 이 단계를 건너뛴다). 하나를 고르면 복제본이 한 장 더(BossCopy) — 그때 모습 그대로.
+        /// </summary>
         public List<string> BossCopyOffer()
         {
             string at = S.Floor.ToString();
@@ -776,17 +828,36 @@ namespace Bolzena.Core
             return AddCopy(id);
         }
 
-        /// <summary>복제본을 덱에 — 원본의 신탁 · 축복을 옮겨 받은 따로 된 카드(id + ^).</summary>
+        /// <summary>
+        /// 복제본을 덱에 — 복제한 순간 원본의 신탁 · 축복을 베낀 따로 된 카드(id + ^). 그 뒤로 복제본은 그 모습에 묶인다(2026-10-06 사용자):
+        /// 원본이 나중에 신탁 · 축복을 받아도 복제본은 그대로, 복제본은 신탁 · 축복을 받지 못한다(FlashTargets · ShinAble · FlashOk 가 뺀다).
+        /// 이미 덱에 같은 모습의 복제본이 있으면 같은 id 로 한 장 더, 모습이 다르면 꼬리를 늘린 새 id(x^^ …)로.
+        /// </summary>
         public string AddCopy(string id)
         {
-            string cid = GameData.IsCopy(id) ? id : GameData.WithOwner(GameData.BaseId(id), GameData.OwnerOf(id)) + GameData.COPY;   // 교주 카드는 주인 그대로
-            if (!S.Deck.Contains(cid))
+            if (GameData.IsCopy(id)) { S.Deck.Add(id); return id; }   // 복제본의 복제 — 같은 모습 그대로 한 장 더
+            string head = GameData.WithOwner(GameData.BaseId(id), GameData.OwnerOf(id));   // 교주 카드는 주인 그대로
+            S.Flash.TryGetValue(id, out var f);
+            S.Shin.TryGetValue(id, out var sh);
+            for (int k = 1; ; k++)
             {
-                if (S.Flash.TryGetValue(id, out var f)) S.Flash[cid] = f; else S.Flash.Remove(cid);
-                if (S.Shin.TryGetValue(id, out var sh)) S.Shin[cid] = sh; else S.Shin.Remove(cid);
+                string cid = head + new string(GameData.COPY[0], k);
+                if (S.Deck.Contains(cid))
+                {
+                    bool same = (S.Flash.TryGetValue(cid, out var cf) ? cf : 0) == f && (S.Shin.TryGetValue(cid, out var cs) ? cs : null) == sh;
+                    if (!same) continue;
+                }
+                else
+                {
+                    if (f > 0) S.Flash[cid] = f; else S.Flash.Remove(cid);
+                    if (sh != null) S.Shin[cid] = sh; else S.Shin.Remove(cid);
+                }
+                S.Deck.Add(cid);
+                return cid;
             }
-            S.Deck.Add(cid);
-            return cid;
         }
+
+        /// <summary>덱의 한 장에 얹힌 것 — 화면 표식(신탁 띠 · 축복 · 복제)이 쓴다.</summary>
+        public CardMark MarkOf(string id) => CardMark.Of(Data, id, S.Flash.TryGetValue(id, out var n) ? n : 0, S.Shin.TryGetValue(id, out var sh) ? sh : null);
     }
 }

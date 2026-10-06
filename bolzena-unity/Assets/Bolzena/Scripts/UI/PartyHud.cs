@@ -21,6 +21,8 @@ namespace Bolzena.UI
         TextMeshPro hpText, shieldText, apText, handText, deckText, discText, goneText, turnText, waveText, speedText, pvText, gaugeText;
         Ring endRing;
         ChipRow chips;
+        /// <summary>파티 버프 줄(강화 칩 포함).</summary>
+        public ChipRow Chips => chips;
         Group TL, TR, ML, MR, BL, BR, BC;
         public System.Action<int> OnPile;           // 0 뽑을 · 1 버린 · 2 사라진
         public System.Action OnSpeed, OnPause, OnParty, OnAuto;
@@ -31,7 +33,6 @@ namespace Bolzena.UI
         TextMeshPro gaugeMaxText;
         readonly List<(int need, SpriteRenderer line, TextMeshPro num)> ticks = new List<(int, SpriteRenderer, TextMeshPro)>();
         readonly List<Portrait> portraits = new List<Portrait>();
-        readonly List<(Transform t, TextMeshPro n)> heads = new List<(Transform, TextMeshPro)>();
         public readonly List<UltButton> Ults = new List<UltButton>();
         int hp, maxHp, gauge, gaugeMax = 300, block, due, ap;
         float fillF = 1, lagF = 1, lagHold, gaugeShown;
@@ -216,18 +217,8 @@ namespace Bolzena.UI
             inner.Set(1);
             Make.Box("check", br, Res.UI("ic_check"), EndAt, new Vector2(0.56f, 0.56f), O + 4, new Color(0.88f, 0.95f, 1f));
             Txt("endt", br, "턴 종료", EndAt + new Vector3(0, -EndD / 2 - 0.14f, 0), 0.13f, O + 4, Tone.Sub, TextAlignmentOptions.Center, 0.3f);
-            TipZone.Add(endBtn, Vector2.one, () => "턴을 넘긴다 — 손패를 버리고 적의 차례 · 단축키 E", 2);
+            TipZone.Add(endBtn, Vector2.one, () => "턴을 넘깁니다 — 손패를 버리고 적의 차례 · 단축키 E", 2);
 
-            // ── 싸움터 — 사도 머리 위 고유 효과(키워드) 표시 ──
-            for (int i = 0; i < s.Heroes.Count; i++)
-            {
-                var n = Make.Node("head" + i, t);
-                Make.Box("g", n, Res.UI("soft"), Vector3.zero, new Vector2(0.6f, 0.6f), 300, new Color(1f, 0.8f, 0.4f, 0.45f), Res.SpriteMat(true, 1.4f));
-                Make.Box("d", n, Res.UI("diamond"), Vector3.zero, new Vector2(0.3f, 0.3f), 301, Tone.Gold);
-                var nt = Txt("n", n, "", new Vector3(0, -0.005f, 0), 0.16f, 302, Tone.Brown, TextAlignmentOptions.Center, 0f);
-                n.gameObject.SetActive(false);
-                heads.Add((n, nt));
-            }
             Anchor();
         }
 
@@ -400,7 +391,6 @@ namespace Bolzena.UI
         public void EndPose(bool won)
         {
             foreach (var g in new[] { TR, ML, MR, BL, BR, BC }) g.Node.gameObject.SetActive(false);
-            foreach (var h in heads) h.t.gameObject.SetActive(false);
             endPose = true;
             var chip = Make.Node("battleEnd", ML.Node.parent, Vector3.zero);
             endChip = chip;
@@ -470,17 +460,6 @@ namespace Bolzena.UI
                 }
             }
             for (int i = 0; i < Ults.Count; i++) Ults[i].Gauge = gaugeShown;
-            // 사도 머리 위 키워드 표시
-            var d = BattleDirector.I;
-            for (int i = 0; i < heads.Count; i++)
-            {
-                var hs = Snap != null && i < Snap.Heroes.Count ? Snap.Heroes[i] : null;
-                bool on = !endPose && d != null && hs != null && !hs.Dead && !string.IsNullOrEmpty(hs.KeywordName) && hs.KeywordStacks > 0 && i < d.Heroes.Count && Modal.Open == null;
-                if (heads[i].t.gameObject.activeSelf != on) heads[i].t.gameObject.SetActive(on);
-                if (!on) continue;
-                heads[i].t.position = d.FieldRoot.TransformPoint(d.Heroes[i].Top) + new Vector3(0, 0.42f + 0.04f * Mathf.Sin(Clock.Now * 2.4f + i), 0);
-                heads[i].n.text = hs.KeywordStacks.ToString();
-            }
         }
 
         float endBase => EndD / Res.UI("circle").bounds.size.x;
@@ -559,8 +538,7 @@ namespace Bolzena.UI
             var h = state;
             if (h == null) return null;
             var s = Tip.Head(h.Name) + "  " + Tip.Dim($"{h.Role} · {h.Nature}");
-            if (!string.IsNullOrEmpty(h.KeywordName)) s += "\n" + $"<color={Tone.GoldTag}>{h.KeywordName}</color> {h.KeywordStacks}" + (string.IsNullOrEmpty(h.KeywordShort) ? "" : "\n" + h.KeywordShort)
-                + (string.IsNullOrEmpty(h.KeywordText) || h.KeywordText == h.KeywordShort ? "" : "\n" + Tip.Dim("자세히 — " + h.KeywordText));   // 짧은 글 + 자세히
+            if (!string.IsNullOrEmpty(h.KeywordName)) s += "\n" + $"<color={Tone.GoldTag}>{h.KeywordName}</color> {h.KeywordStacks}" + (string.IsNullOrEmpty(h.KeywordText) ? "" : "\n" + h.KeywordText);   // 수치가 다 든 한 가지 글(CardText.Trait)
             s += "\n" + Tip.Dim("누르면 사도 정보");
             return s;
         }
@@ -670,10 +648,9 @@ namespace Bolzena.UI
         {
             var h = State;
             if (h == null) return null;
-            // 짧은 글(CardText.Short) 먼저, 자세히(효과 전부)는 흐리게 아래
-            string body = string.IsNullOrEmpty(h.UltShort) ? h.UltText : h.UltShort + (h.UltText != h.UltShort ? "\n" + Tip.Dim("자세히 — " + h.UltText) : "");
+            string body = h.UltText;   // 효과 전부(CardText.Fx) — 「자세히」 없음
             var s = Tip.Head($"{h.Name} · 「{h.UltName}」") + "\n" + body + "\n" + Tip.Dim($"게이지 {Mathf.RoundToInt(Gauge)}% / 필요 {h.UltMax}%" + " (파티 공용 — 카드에 쓴 AP 1 마다 +10%)");
-            s += "\n\n" + Tip.Dim(Ready ? "눌러서 고르고, 적(또는 다시 이 띠)을 눌러 쓴다 · 단축키 Z X C" : "게이지가 모자랍니다") + "\n" + Tip.Dim("오른쪽 클릭 · 길게 누르기 — 사도 정보");
+            s += "\n\n" + Tip.Dim(Ready ? "눌러서 고르고, 적(또는 다시 이 띠)을 눌러 씁니다 · 단축키 Z X C" : "게이지가 모자랍니다") + "\n" + Tip.Dim("오른쪽 클릭 · 길게 누르기 — 사도 정보");
             return s;
         }
 

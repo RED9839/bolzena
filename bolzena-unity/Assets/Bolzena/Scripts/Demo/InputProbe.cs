@@ -88,10 +88,15 @@ namespace Bolzena.Demo
             InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;   // 창이 뒤에 있어도
             mouse = InputSystem.AddDevice<Mouse>("ProbeMouse");
             mouse.MakeCurrent();
+            // 진짜 마우스 · 터치는 끈다 — 사람이 그 사이 마우스를 움직이면 Mouse.current 가 진짜 장치로 넘어가 가상 입력이 먹히지 않았다
+            foreach (var dev in InputSystem.devices.ToArray())
+                if (dev is Pointer && dev != mouse) InputSystem.DisableDevice(dev);
             dir = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "Captures", "probe"));
             Directory.CreateDirectory(dir);
             Debug.Log("[Probe] 가상 마우스로 사람 입력을 흉내 냅니다 → " + dir);
-            StartCoroutine(Run());
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-sound") < 0) AudioListener.volume = 0f;   // 점검은 음소거
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-holdprobe") >= 0) StartCoroutine(HoldRun());
+            else StartCoroutine(Run());
             StartCoroutine(Limit());
         }
 
@@ -142,6 +147,256 @@ namespace Bolzena.Demo
             Destroy(tex);
         }
 
+        // 연속 촬영(-probeburst) — 보스가 45% 아래이고 곁에 다른 적(소환물)이 있는 동안부터 싸움이 끝나고 3초 뒤까지 4프레임마다 한 장(jpg).
+        //   보스와 함께 쓰러지는 소환물의 화면(배치 · 체력바 · 사라짐)을 보려고 — 보스가 지속 피해 · 반격 등 어느 때 쓰러져도 담긴다
+        IEnumerator Watch(BattleDirector d)
+        {
+            while (!d.Over)
+            {
+                var es = d.Battle.Snapshot.Enemies;
+                if (es.Exists(e => e.Boss && !e.Dead && e.Hp <= e.MaxHp * 0.45f) && es.Exists(e => !e.Boss && !e.Dead)) break;
+                if (!es.Exists(e => e.Boss) && es.Exists(e => e.Dead) && es.Exists(e => !e.Dead)) break;   // 보스 없는 싸움 — 하나가 쓰러진 뒤(되살아남 확인)
+                yield return null;
+            }
+            var sub = Path.Combine(dir, "burst");
+            Directory.CreateDirectory(sub);
+            float after = 0; int n = 0, f = 0;
+            while (after < 3f)
+            {
+                yield return new WaitForEndOfFrame();
+                if (d.Over) after += Time.unscaledDeltaTime;
+                if (f++ % 4 != 0) continue;
+                var tex = ScreenCapture.CaptureScreenshotAsTexture();
+                File.WriteAllBytes(Path.Combine(sub, $"{++n:D4}.jpg"), tex.EncodeToJPG(75));
+                Destroy(tex);
+            }
+        }
+
+        // ── -holdprobe: 손패 길게 누르기(카제나식) — 가상 마우스 · 가상 터치로 같은 장면을 연속 촬영(3프레임마다 jpg) ──
+        //   ① 꾹 누르기 → 확대 → 떼기(닫힘 · 안 냄)  ② 꾹 누르기 → 확대 → 끌어서 적 타격  ③ 짧게 누르기 = 고르기(다시 눌러 내려놓기)
+        //   결과: [Hold] 로그 · Captures/probe/hold_<입력>_<장면>/NNNN.jpg
+        Touchscreen touch;
+        bool touchMode;
+        int holdFail;
+
+        void Ptr(Vector2 screen, bool held, bool began = false)
+        {
+            if (!touchMode) { Set(screen, held); return; }
+            var ph = began ? UnityEngine.InputSystem.TouchPhase.Began : held ? UnityEngine.InputSystem.TouchPhase.Moved : UnityEngine.InputSystem.TouchPhase.Ended;
+            touch.MakeCurrent();
+            InputSystem.QueueStateEvent(touch, new TouchState { touchId = 1, phase = ph, position = screen, pressure = held ? 1 : 0 });
+            // Windows 는 터치로 마우스 자리도 옮긴다 — 가상 마우스도 같은 자리에(단추는 안 누름)
+            InputSystem.QueueStateEvent(mouse, new MouseState { position = screen, buttons = 0 });
+        }
+
+        IEnumerator Burst(string tag, Func<bool> until)
+        {
+            var sub = Path.Combine(dir, tag);
+            if (Directory.Exists(sub)) foreach (var f in Directory.GetFiles(sub)) File.Delete(f);
+            Directory.CreateDirectory(sub);
+            int n = 0, fr = 0;
+            while (!until())
+            {
+                yield return new WaitForEndOfFrame();
+                if (fr++ % 3 != 0) continue;
+                var tex = ScreenCapture.CaptureScreenshotAsTexture();
+                File.WriteAllBytes(Path.Combine(sub, $"{++n:D4}.jpg"), tex.EncodeToJPG(80));
+                Destroy(tex);
+            }
+        }
+
+        void Check(bool ok, string what)
+        {
+            if (!ok) holdFail++;
+            Debug.Log($"[Hold] {(ok ? "맞음" : "틀림(!)")} — {what}");
+        }
+
+        string ZoomInfo(BattleDirector d)
+        {
+            var cam = Camera.main;
+            var c = CardZoom.At;
+            float hw = cam.orthographicSize * cam.aspect;
+            return $"확대 {(CardZoom.Shown ? "켜짐" : "꺼짐")} · 가운데 x {c.x - cam.transform.position.x:F2}(화면 반폭 {hw:F2}) · y {c.y:F2}(위 끝 {c.y + CardView.H * CardZoom.Scale / 2:F2} · 아래 끝 {c.y - CardView.H * CardZoom.Scale / 2:F2} · 화면 위 {cam.orthographicSize:F2} · 손패 위 {HandView.Bottom + CardView.H * d.Hand.HandScale:F2}) · 배율 {CardZoom.Scale:F2}(손패 {d.Hand.HandScale:F2} → {CardZoom.Scale / Mathf.Max(0.01f, d.Hand.HandScale):F2}배) · 판 {CardZoom.PanelCount}개 {(CardZoom.PanelsRight ? "오른쪽" : "왼쪽")}";
+        }
+
+        IEnumerator HoldRun()
+        {
+            float t = 0;
+            while ((BattleDirector.I == null || !BattleDirector.I.WaitingInput) && t < 150f) { t += Time.unscaledDeltaTime; yield return null; }
+            var d = BattleDirector.I;
+            if (d == null) { Debug.LogError("[Probe] 전투가 열리지 않았습니다"); Application.Quit(6); yield break; }
+            touch = InputSystem.AddDevice<Touchscreen>("ProbeTouch");
+            Debug.Log($"[Hold] 화면 {Screen.width}×{Screen.height} · 폰 {Tone.Compact}");
+            yield return new WaitForSecondsRealtime(0.5f);
+            foreach (var mode in new[] { "mouse", "touch" })
+            {
+                touchMode = mode == "touch";
+                // ① 꾹 누르기 → 떼기
+                yield return WaitReady(d);
+                int i = PickCard(d);
+                if (i < 0) { Debug.LogError("[Hold] 낼 카드 없음"); break; }
+                var cv = d.Hand.Cards[i];
+                int hand0 = d.Battle.Snapshot.Hand.Count, ap0 = d.Battle.Snapshot.Ap;
+                Vector2 at = Scr(cv.transform.position + new Vector3(0, -0.3f, 0));
+                bool done = false;
+                StartCoroutine(Burst($"hold_{mode}_release", () => done));
+                Ptr(at, false); yield return Frames(4);
+                Ptr(at, true, true); yield return Frames(2);
+                float held = 0; while (held < 0.15f) { Ptr(at, true); held += Time.unscaledDeltaTime; yield return null; }
+                Check(!d.Hand.HoldZooming && !CardZoom.Shown, $"{mode} 0.15초 — 아직 확대 안 함");
+                while (held < 0.7f) { Ptr(at, true); held += Time.unscaledDeltaTime; yield return null; }
+                Debug.Log($"[Hold] {mode} 꾹 누름 「{cv.Info.Name}」 — {ZoomInfo(d)}");
+                var cam = Camera.main;
+                Check(d.Hand.HoldZooming && CardZoom.Shown && Mathf.Abs(CardZoom.At.x - cam.transform.position.x) < 0.05f && CardZoom.At.y > 0 && CardZoom.PanelsRight, $"{mode} 꾹 누름 — 가운데 위 확대 · 판 오른쪽");
+                Shot($"hold_{mode}_zoom");
+                yield return Frames(3);
+                Ptr(at, false); yield return Frames(4);
+                yield return new WaitForSecondsRealtime(0.4f);
+                Check(!CardZoom.Shown && !d.Hand.HasSelection && d.Battle.Snapshot.Hand.Count == hand0 && d.Battle.Snapshot.Ap == ap0 && d.WaitingInput, $"{mode} 그 자리에서 뗌 — 닫힘 · 안 냄 · 고르지 않음");
+                done = true; yield return Frames(2);
+
+                // ② 꾹 누르기 → 끌어서 적 타격
+                yield return WaitReady(d);
+                i = PickCard(d);
+                if (i < 0) { Debug.LogError("[Hold] 낼 카드 없음"); break; }
+                cv = d.Hand.Cards[i];
+                string id = cv.Info.Id;
+                hand0 = d.Battle.Snapshot.Hand.Count; ap0 = d.Battle.Snapshot.Ap;
+                int target = d.FirstAliveEnemy();
+                bool aims = cv.Info.Target == TargetKind.Enemy;
+                Vector3 to = aims ? ArtBounds(d.Enemies[target]).center : cv.Info.Target == TargetKind.Ally ? d.Hand.AllyDrop(cv.Info) : new Vector3(0.3f, 0.6f, 0);
+                at = Scr(cv.transform.position + new Vector3(0, -0.3f, 0));
+                Vector2 b = Scr(to);
+                done = false;
+                StartCoroutine(Burst($"hold_{mode}_drag", () => done));
+                Ptr(at, false); yield return Frames(4);
+                Ptr(at, true, true); yield return Frames(2);
+                held = 0; while (held < 0.6f) { Ptr(at, true); held += Time.unscaledDeltaTime; yield return null; }
+                Check(d.Hand.HoldZooming && CardZoom.Shown, $"{mode} 끌기 전 확대 — {ZoomInfo(d)}");
+                for (int k = 1; k <= 30; k++)
+                {
+                    Ptr(Vector2.Lerp(at, b, Ease.InOutCubic(k / 30f)), true); yield return null;
+                    if (k == 8) Check(!CardZoom.Shown && d.Hand.Held == i, $"{mode} 움직이기 시작 — 확대 닫고 그 카드를 끔(끄는 카드 {d.Hand.Held})");
+                }
+                for (int k = 0; k < 12; k++) { Ptr(b, true); yield return null; }
+                Check(d.Hand.Aim >= 0 || !aims, $"{mode} 적 위 — 겨눔 {d.Hand.Aim}");
+                Check(!aims || d.Hand.RingCount == 1, $"{mode} 끄는 동안 — 발밑 고리 {d.Hand.RingCount}개");
+                if (aims) Shot($"drag_{mode}_aim");
+                Ptr(b, false); yield return Frames(3);
+                float w = 0;
+                while (d.WaitingInput && w < 1.5f) { w += Time.unscaledDeltaTime; yield return null; }
+                w = 0;
+                while (!d.WaitingInput && !d.Over && w < 30f) { w += Time.unscaledDeltaTime; yield return null; }
+                var s = d.Battle.Snapshot;
+                Check(s.Over || s.Ap != ap0 || s.Hand.Count != hand0 || !s.Hand.Exists(c => c.Id == id), $"{mode} 꾹 누른 뒤 끌어 놓기 — 카드 {id}{(aims ? "(적 대상)" : "")} 나감 · AP {ap0}→{s.Ap}");
+                done = true; yield return Frames(2);
+                if (d.Over) break;
+                if (!touchMode) { yield return KindsRun(d); if (d.Over) break; }
+
+                // ③ 짧게 누르기 = 고르기, 다시 누르면 내려놓기(적 카드) — 지금 동작 그대로
+                yield return WaitReady(d);
+                i = PickCard(d);
+                if (i < 0) continue;
+                cv = d.Hand.Cards[i];
+                at = Scr(cv.transform.position + new Vector3(0, -0.3f, 0));
+                Ptr(at, false); yield return Frames(4);
+                Ptr(at, true, true); yield return Frames(4);
+                Ptr(at, false); yield return Frames(12);
+                Check(d.Hand.HasSelection && !CardZoom.Shown, $"{mode} 짧게 누름 — 고름 · 확대 없음");
+                Shot($"tap_{mode}_select");
+                bool enemyCard = d.Hand.Cards[i].Info.Target == TargetKind.Enemy;
+                at = Scr(d.Hand.Cards[i].transform.position);
+                if (enemyCard)
+                {
+                    Ptr(at, false); yield return Frames(4);
+                    Ptr(at, true, true); yield return Frames(4);
+                    Ptr(at, false); yield return Frames(12);
+                    Check(!d.Hand.HasSelection, $"{mode} 다시 누름 — 내려놓기({d.Hand.LastTap} → 고른 {d.Hand.Held})");
+                }
+                if (d.Hand.HasSelection) d.Hand.Cancel();
+                // 손에서 비켜 둔다(올려 두기 확대가 다음 장면에 남지 않게)
+                Ptr(Scr(new Vector3(0, 2.5f, 0)), false); yield return Frames(30);
+            }
+            Debug.Log($"[Hold] 끝 — 틀림 {holdFail}");
+            yield return new WaitForSecondsRealtime(0.5f);
+            Application.Quit(holdFail > 0 ? 7 : 0);
+        }
+
+        // 끌다가 빈 곳에 놓기(취소 — 손패로 돌아감) · 적 전체 카드(모든 적 발밑 고리) · 아군 카드(사도 위 초록 고리)
+        IEnumerator KindsRun(BattleDirector d)
+        {
+            // 취소
+            yield return WaitReady(d);
+            int i = PickCard(d);
+            if (i >= 0)
+            {
+                var cv = d.Hand.Cards[i];
+                int hand0 = d.Battle.Snapshot.Hand.Count, ap0 = d.Battle.Snapshot.Ap;
+                Vector2 at = Scr(cv.transform.position + new Vector3(0, -0.3f, 0)), b = Scr(new Vector3(-0.5f, 3.6f, 0));
+                bool done = false;
+                StartCoroutine(Burst("drag_cancel", () => done));
+                Ptr(at, false); yield return Frames(4);
+                Ptr(at, true, true); yield return Frames(2);
+                for (int k = 1; k <= 24; k++) { Ptr(Vector2.Lerp(at, b, k / 24f), true); yield return null; }
+                yield return Frames(10);
+                Check(d.Hand.Aim < 0 && d.Hand.RingCount == 0, $"빈 곳 위 — 겨눔 없음 · 고리 {d.Hand.RingCount}");
+                Ptr(b, false); yield return Frames(30);
+                Check(d.Battle.Snapshot.Hand.Count == hand0 && d.Battle.Snapshot.Ap == ap0 && d.Hand.Held < 0, "빈 곳에 놓음 — 취소 · 손패로 돌아감");
+                done = true; yield return Frames(2);
+            }
+            foreach (var kind in new[] { TargetKind.AllEnemies, TargetKind.Ally })
+            {
+                yield return WaitReady(d);
+                if (d.Over) yield break;
+                int j = -1;
+                for (int k = 0; k < d.Hand.Cards.Count; k++) if (d.Battle.CanPlay(k, out _) && d.Hand.Cards[k].Info.Target == kind) { j = k; break; }
+                if (j < 0) { Debug.Log($"[Hold] {kind} 카드가 손에 없음 — 건너뜀"); continue; }
+                var cv = d.Hand.Cards[j];
+                string id = cv.Info.Id;
+                int hand0 = d.Battle.Snapshot.Hand.Count, ap0 = d.Battle.Snapshot.Ap;
+                Vector3 to = kind == TargetKind.Ally ? d.Hand.AllyDrop(cv.Info) : new Vector3(0.3f, 1.2f, 0);
+                Vector2 at = Scr(cv.transform.position + new Vector3(0, -0.3f, 0)), b = Scr(to);
+                bool done = false;
+                string tag = kind == TargetKind.Ally ? "drag_ally" : "drag_all";
+                StartCoroutine(Burst(tag, () => done));
+                Ptr(at, false); yield return Frames(4);
+                Ptr(at, true, true); yield return Frames(2);
+                for (int k = 1; k <= 26; k++) { Ptr(Vector2.Lerp(at, b, Ease.InOutCubic(k / 26f)), true); yield return null; }
+                yield return Frames(12);
+                int alive = 0; foreach (var e in d.Battle.Snapshot.Enemies) if (!e.Dead) alive++;
+                Check(kind == TargetKind.Ally ? d.Hand.AllyAim >= 0 && d.Hand.RingCount == 1 : d.Hand.RingCount == alive, $"{kind} 위로 — 고리 {d.Hand.RingCount}개(산 적 {alive}) · 아군 겨눔 {d.Hand.AllyAim}");
+                Shot(tag);
+                Ptr(b, false); yield return Frames(3);
+                float w = 0;
+                while (d.WaitingInput && w < 1.5f) { w += Time.unscaledDeltaTime; yield return null; }
+                w = 0;
+                while (!d.WaitingInput && !d.Over && w < 30f) { w += Time.unscaledDeltaTime; yield return null; }
+                var s = d.Battle.Snapshot;
+                Check(s.Over || s.Ap != ap0 || s.Hand.Count != hand0 || !s.Hand.Exists(c => c.Id == id), $"{kind} 카드 {id} 놓기 — 나감 · AP {ap0}→{s.Ap}");
+                done = true; yield return Frames(2);
+            }
+        }
+
+        IEnumerator WaitReady(BattleDirector d)
+        {
+            float w = 0;
+            while (!d.WaitingInput && !d.Over && w < 30f) { w += Time.unscaledDeltaTime; yield return null; }
+            yield return new WaitForSecondsRealtime(0.4f);
+        }
+
+        // 낼 수 있는 카드 — 적을 고르는 카드 먼저
+        int PickCard(BattleDirector d)
+        {
+            int any = -1;
+            for (int i = 0; i < d.Hand.Cards.Count; i++)
+            {
+                if (!d.Battle.CanPlay(i, out _)) continue;
+                if (d.Hand.Cards[i].Info.Target == TargetKind.Enemy) return i;
+                if (any < 0) any = i;
+            }
+            return any;
+        }
+
         IEnumerator Run()
         {
             // 전투 장면 · 입력 대기까지
@@ -152,6 +407,7 @@ namespace Bolzena.Demo
             Debug.Log($"[Probe] 전투 입력 대기 — 가짜 손가락 {(PointerInput.Simulated ? "켜짐(!)" : "꺼짐")} · 판에서 넘어옴 {BattleBridge.Fight != null} · timeScale {Time.timeScale}");
             yield return new WaitForSecondsRealtime(0.5f);
             Shot("start");
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-probeburst") >= 0) StartCoroutine(Watch(d));
             int turn = 1;
             for (int step = 0; step < 60 && !d.Over; step++)
             {
@@ -168,8 +424,8 @@ namespace Bolzena.Demo
                     int before = d.Battle.Snapshot.Hand.Count, ap = d.Battle.Snapshot.Ap;
                     int target = d.FirstAliveEnemy();
                     // 놓는 자리 — 적 그림(스파인 메시 경계) 안의 여러 곳을 돌아가며: 가운데 · 머리 쪽 · 오른쪽 가장자리 · 왼쪽 가장자리
-                    string spot = "스킬";
-                    Vector3 to = new Vector3(0.3f, 0.6f, 0);
+                    string spot = cv.Info.Target == TargetKind.Ally ? "아군" : "스킬";
+                    Vector3 to = cv.Info.Target == TargetKind.Ally ? d.Hand.AllyDrop(cv.Info) : new Vector3(0.3f, 0.6f, 0);
                     bool aims = cv.Info.Target == TargetKind.Enemy;
                     if (aims)
                     {
@@ -226,7 +482,7 @@ namespace Bolzena.Demo
                 w = 0;
                 while (d.WaitingInput && w < 1.5f) { w += Time.unscaledDeltaTime; yield return null; }
             }
-            yield return new WaitForSecondsRealtime(1f);
+            yield return new WaitForSecondsRealtime(Array.IndexOf(Environment.GetCommandLineArgs(), "-probeburst") >= 0 ? 3.2f : 1f);   // 연속 촬영이 끝 3초를 담게
             Shot("end");
             Debug.Log($"[Probe] 끝 — 상자 {(BattleDirector.OldEnemyBox ? "옛것(-oldbox)" : "새것")} · 대상 카드 나감 {aimOk} / 안 나감 {aimMiss} · 대상 없는 카드 나감 {skillOk} / 안 나감 {skillMiss} · 신탁 창 골라짐 {epiOk} / 멈춤 {epiStuck} · 턴 종료 {ends} · 싸움 {(d.Over ? (d.Battle.Snapshot.Won ? "승리" : "패배") : "안 끝남")}");
             yield return new WaitForSecondsRealtime(0.8f);

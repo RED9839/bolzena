@@ -233,6 +233,8 @@ namespace Bolzena.RunUI
         // ── 카드 ──
         public CardView View(string id) => Run != null ? Run.ViewOf(id) : Data.View(id);
         public string CardLine(string id) { var v = View(id); return v != null ? Text.Card(v) : id; }
+        /// <summary>덱 한 장에 얹힌 것(신탁 · 축복 · 복제) — 카드 표식(W.Card) · 카드 크게(CardZoom).</summary>
+        public CardMark Mark(string id) => Run != null ? Run.MarkOf(id) : CardMark.Of(Data, id, 0, null);
 
         // ── 교주 카드 주인 사도(덱에 넣을 때 고른 사도 — 틀 색 · 핀 · 위력) ──
         //   core: 덱의 교주 카드 id 는 「카드id@사도키」(복제 꼬리는 뒤 「n_x@rico^」). 카드를 얻은 뒤 PendingNeutral 이 있으면 고르기 창 → AssignNeutral.

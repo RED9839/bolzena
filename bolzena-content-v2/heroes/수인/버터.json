@@ -12,10 +12,10 @@
       "atk": 135,
       "def": 25,
       "crit": 10,
-      "blurb": "친구 사귀기가 제일 좋은 골든 리트리버 수인.",
+      "blurb": "부탁은 거절 못 하는 골든 리트리버 수인. 친구를 친 녀석에게 옐로카드를 주고, 튕기는 짱돌은 경고받은 녀석에게 더 자주 날아가며, 카드가 넘치도록 쌓이면 웃음기가 싹 가십니다.",
       "keyword": {
         "name": "옐로카드",
-        "desc": "파티를 친 적에게 꺼내는 경고 — 받은 적은 버터의 공격에 더 아프고, 셋이면 기절",
+        "desc": "파티를 친 적에게 주는 경고",
         "carrier": "enemy",
         "cap": 3,
         "rules": [
@@ -40,6 +40,23 @@
                 "k": "spend",
                 "id": "옐로카드",
                 "all": true
+              }
+            ]
+          },
+          {
+            "name": "퇴장 경고",
+            "when": {
+              "on": "stackOver",
+              "id": "옐로카드"
+            },
+            "fx": [
+              {
+                "k": "perEvent"
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.6,
+                "target": "oneEnemy"
               }
             ]
           }
@@ -146,146 +163,150 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.8,
-          "target": "oneEnemy"
+          "ratio": 0.5,
+          "target": "randomEnemy",
+          "hits": 4
         },
         {
-          "k": "ifStack",
-          "id": "옐로카드"
+          "k": "perStack",
+          "id": "옐로카드",
+          "each": true
         },
         {
           "k": "dmg",
-          "ratio": 1.2,
-          "target": "oneEnemy"
+          "ratio": 0.3,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "힘준 버터 플라이!",
+          "name": "버터 플라이 킥!",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.35,
-              "target": "oneEnemy"
+              "ratio": 0.62,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
-              "k": "ifStack",
-              "id": "옐로카드"
+              "k": "perStack",
+              "id": "옐로카드",
+              "each": true
             },
             {
               "k": "dmg",
-              "ratio": 1.55,
-              "target": "oneEnemy"
+              "ratio": 0.35,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "가벼운 버터 플라이!",
+          "name": "살짝 플라이",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "randomEnemy",
+              "hits": 3
             },
             {
-              "k": "ifStack",
-              "id": "옐로카드"
+              "k": "perStack",
+              "id": "옐로카드",
+              "each": true
             },
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
+              "ratio": 0.25,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "경고하는 버터 플라이!",
+          "name": "경고 누적",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "옐로카드"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
+              "ratio": 0.55,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
               "k": "stack",
               "id": "옐로카드",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "옐로카드",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "재빠른 버터 플라이!",
+          "name": "버터 회오리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "randomEnemy",
+              "hits": 6
+            },
+            {
+              "k": "perStack",
+              "id": "옐로카드",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "다이빙 헤딩",
           "tags": [
             "신속"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.25,
-              "target": "oneEnemy"
+              "ratio": 0.55,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
-              "k": "ifStack",
-              "id": "옐로카드"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 버터 플라이!",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "옐로카드"
+              "k": "perStack",
+              "id": "옐로카드",
+              "each": true
             },
             {
               "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
+              "ratio": 0.35,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "한껏 날아오르기",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "옐로 받은 녀석",
           "kind": "weakSpot"
         },
         {
-          "name": "휘슬",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 1
-            }
-          ]
+          "name": "신나는 꼬리",
+          "kind": "atkUp"
         }
       ]
     },
@@ -313,16 +334,16 @@
       ],
       "oracles": [
         {
-          "name": "힘준 부탁은 거절 안 해",
+          "name": "뭐든 맡겨 줘",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.7
+              "ratio": 1.8
             },
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
@@ -331,17 +352,12 @@
           ]
         },
         {
-          "name": "가벼운 부탁은 거절 안 해",
+          "name": "잠깐만 도와줄게",
           "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.15
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "ratio": 0.9
             },
             {
               "k": "draw",
@@ -350,53 +366,51 @@
           ]
         },
         {
-          "name": "경고하는 부탁은 거절 안 해",
+          "name": "심부름 갔다 올게",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.7
+              "ratio": 1.3
             },
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "대신 맞아 줄게",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.3
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
               "v": 1
             }
           ]
         },
         {
-          "name": "든든한 부탁은 거절 안 해",
+          "name": "착한 강아지",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.65
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 부탁은 거절 안 해",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.65
+              "ratio": 1.4
             },
             {
               "k": "status",
@@ -412,22 +426,16 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
+          "name": "두 발로 버티기",
           "kind": "guard"
         },
         {
-          "name": "한 장 더",
+          "name": "부탁 쪽지",
           "kind": "draw"
         },
         {
-          "name": "휘슬",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 1
-            }
-          ]
+          "name": "든든한 등",
+          "kind": "defUp"
         }
       ]
     },
@@ -441,117 +449,123 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
-          "target": "oneEnemy"
+          "ratio": 0.45,
+          "target": "randomEnemy",
+          "hits": 2
         },
         {
           "k": "stack",
           "id": "옐로카드",
-          "v": 1
+          "v": 1,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "힘준 구덩이 파기",
+          "name": "깊은 구덩이",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
+              "ratio": 0.6,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
               "k": "stack",
               "id": "옐로카드",
-              "v": 2
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "가벼운 구덩이 파기",
+          "name": "얕은 구덩이",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
+              "ratio": 0.3,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
               "k": "stack",
               "id": "옐로카드",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "경고하는 구덩이 파기",
+          "name": "경고 두 장",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
               "k": "stack",
               "id": "옐로카드",
-              "v": 2
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "재빠른 구덩이 파기",
-          "tags": [
-            "신속"
-          ],
+          "name": "구덩이 밭",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
+              "ratio": 0.4,
+              "target": "randomEnemy",
+              "hits": 3
             },
             {
               "k": "stack",
               "id": "옐로카드",
-              "v": 1
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "꿰뚫는 구덩이 파기",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "발목 걸기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
               "k": "stack",
               "id": "옐로카드",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "삽질 한 번 더",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "흙투성이",
+          "kind": "frost"
         },
         {
-          "name": "휘슬",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 1
-            }
-          ]
+          "name": "신나게 파기",
+          "kind": "cost"
         }
       ]
     },
@@ -585,110 +599,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 에이프런 매그넘",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "옐로카드"
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "가벼운 에이프런 매그넘",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "옐로카드"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "경고하는 에이프런 매그넘",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "옐로카드"
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "재빠른 에이프런 매그넘",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.75,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "옐로카드"
-            },
-            {
-              "k": "dmg",
-              "ratio": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 에이프런 매그넘",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "풀파워 매그넘",
           "fx": [
             {
               "k": "dmg",
@@ -710,26 +621,121 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "에이프런 슛",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "레드카드 매그넘",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "매그넘 난사",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "앞치마 펄럭",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 6.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "앞치마 꽉 매기",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "골문 구석",
           "kind": "weakSpot"
         },
         {
-          "name": "휘슬",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 1
-            }
-          ]
+          "name": "짧은 도움닫기",
+          "kind": "cost"
         }
       ]
     }

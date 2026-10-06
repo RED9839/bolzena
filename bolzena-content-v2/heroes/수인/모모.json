@@ -15,7 +15,7 @@
       "blurb": "닌자 만화에 푹 빠진 다람쥐 수인.",
       "keyword": {
         "name": "분신",
-        "desc": "분신술 — 공격하면 하나가 따라 치고, 맞으면 하나가 통나무가 되어 한 대를 흘린다",
+        "desc": "따라 치고 대신 맞는 분신",
         "carrier": "self",
         "cap": 3
       },
@@ -173,11 +173,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 두배로 안아준닷",
+          "name": "세배로 안아준닷",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.25,
               "target": "oneEnemy",
               "hits": 2
             },
@@ -188,18 +188,18 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.2,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "가벼운 두배로 안아준닷",
+          "name": "살짝 안아준닷",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.8,
               "target": "oneEnemy",
               "hits": 2
             },
@@ -210,48 +210,24 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.6,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "그림자 두배로 안아준닷",
+          "name": "분신도 안아준닷",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.1,
               "target": "oneEnemy",
               "hits": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "분신",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "분신",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 두배로 안아준닷",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy",
-              "hits": 2
             },
             {
               "k": "ifStack",
@@ -260,21 +236,18 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.25,
+              "ratio": 1.0,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "꿰뚫는 두배로 안아준닷",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "모두 안아준닷",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy",
+              "ratio": 0.8,
+              "target": "allEnemies",
               "hits": 2
             },
             {
@@ -284,7 +257,33 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.6,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "찌릿 포옹",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "분신",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.0,
               "target": "oneEnemy"
             }
           ]
@@ -292,22 +291,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "힘껏 포옹",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "빈틈 포옹",
           "kind": "weakSpot"
         },
         {
-          "name": "닌자의 극의",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 1
-            }
-          ]
+          "name": "신난 람쥐",
+          "kind": "atkUp"
         }
       ]
     },
@@ -332,7 +325,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 전기 수리검",
+          "name": "고압 수리검",
           "fx": [
             {
               "k": "dmg",
@@ -347,12 +340,12 @@
           ]
         },
         {
-          "name": "가벼운 전기 수리검",
+          "name": "정전기 수리검",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
@@ -363,11 +356,11 @@
           ]
         },
         {
-          "name": "그림자 전기 수리검",
+          "name": "분신 수리검",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.9,
               "target": "oneEnemy"
             },
             {
@@ -383,32 +376,30 @@
           ]
         },
         {
-          "name": "재빠른 전기 수리검",
+          "name": "번개 흩뿌리기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "번개 같은 손",
           "tags": [
             "신속"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "충격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 전기 수리검",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 1.05,
               "target": "oneEnemy"
             },
             {
@@ -421,22 +412,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "찌릿찌릿",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "감전",
+          "kind": "frost"
         },
         {
-          "name": "닌자의 극의",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 1
-            }
-          ]
+          "name": "손목 스냅",
+          "kind": "cost"
         }
       ]
     },
@@ -461,7 +446,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 환영술",
+          "name": "다중 환영술",
           "fx": [
             {
               "k": "stack",
@@ -476,13 +461,13 @@
           ]
         },
         {
-          "name": "가벼운 환영술",
+          "name": "잔상",
           "cost": 0,
           "fx": [
             {
               "k": "stack",
               "id": "분신",
-              "v": 3
+              "v": 1
             },
             {
               "k": "status",
@@ -492,22 +477,47 @@
           ]
         },
         {
-          "name": "그림자 환영술",
+          "name": "그림자 분신",
           "fx": [
             {
               "k": "stack",
               "id": "분신",
-              "v": 4
+              "v": 2
             },
             {
               "k": "status",
               "id": "회피",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "든든한 환영술",
+          "name": "연막탄",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "통나무 진법",
           "tags": [
             "보존"
           ],
@@ -515,29 +525,16 @@
             {
               "k": "stack",
               "id": "분신",
-              "v": 3
+              "v": 2
             },
             {
               "k": "status",
               "id": "회피",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 환영술",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 3
             },
             {
               "k": "status",
-              "id": "회피",
+              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -545,19 +542,19 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
-          "kind": "guard"
+          "name": "손가락 인",
+          "kind": "cost"
         },
         {
-          "name": "한 장 더",
+          "name": "두루마리",
           "kind": "draw"
         },
         {
-          "name": "닌자의 극의",
+          "name": "통나무 하나 더",
           "fx": [
             {
-              "k": "stack",
-              "id": "분신",
+              "k": "status",
+              "id": "회피",
               "v": 1
             }
           ]
@@ -575,7 +572,7 @@
         {
           "k": "stack",
           "id": "분신",
-          "v": 3
+          "v": 1
         },
         {
           "k": "status",
@@ -583,90 +580,139 @@
           "v": 1
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "분신",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 카게닌자의 극의",
+          "name": "그림자 분신술",
           "fx": [
             {
               "k": "stack",
               "id": "분신",
-              "v": 4
-            },
-            {
-              "k": "status",
-              "id": "회피",
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "분신",
+                      "v": 3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 카게닌자의 극의",
+          "name": "연기 구슬",
           "cost": 0,
           "fx": [
             {
-              "k": "stack",
-              "id": "분신",
-              "v": 4
-            },
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "분신",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "그림자 카게닌자의 극의",
+          "name": "통나무 대기",
           "fx": [
             {
               "k": "stack",
               "id": "분신",
-              "v": 5
+              "v": 1
             },
             {
               "k": "status",
               "id": "회피",
-              "v": 1
+              "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "분신",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "든든한 카게닌자의 극의",
+          "name": "닌자 두루마리",
           "fx": [
             {
               "k": "stack",
               "id": "분신",
-              "v": 4
-            },
-            {
-              "k": "status",
-              "id": "회피",
               "v": 1
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "분신",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 카게닌자의 극의",
+          "name": "카게의 비전",
           "tags": [
             "축복"
           ],
@@ -674,7 +720,7 @@
             {
               "k": "stack",
               "id": "분신",
-              "v": 4
+              "v": 2
             },
             {
               "k": "status",
@@ -682,23 +728,36 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "분신",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
+          "name": "닌자 호흡",
           "kind": "ap"
         },
         {
-          "name": "한 장 더",
+          "name": "비전서 한 장",
           "kind": "draw"
         },
         {
-          "name": "닌자의 극의",
+          "name": "그림자 하나",
           "fx": [
             {
               "k": "stack",

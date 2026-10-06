@@ -78,6 +78,10 @@ namespace Bolzena.Core
         public bool Battle;
         /// <summary>dmg · shield — 일의 값(EventV) × 이것을 고정값으로(넘친 치유 100% → 고정 피해).</summary>
         public double OfEvent;
+        /// <summary>dmg · shield — 이 고유 효과의 지금 겹을 일의 값으로 삼는다(ofEvent 와 같이: 겹 × ofEvent 고정값). stack — 쓰지 않음.</summary>
+        public string OfStack;
+        /// <summary>power — 강화 카드의 지속 규칙(패시브 규칙과 같은 꼴). 카드를 내면 이 전투 끝까지 켜져 있다.</summary>
+        public List<PassiveRule> Rules;
 
         [Newtonsoft.Json.JsonIgnore] public int NOr1 => N <= 0 ? 1 : N;
 
@@ -127,6 +131,10 @@ namespace Bolzena.Core
             Recast = "recast", CostMod = "costMod", AddTag = "addTag", CutHit = "cutHit", ClearDebt = "clearDebt";
         // 변신(2026-10-05 여섯째) — 그 사도가 변신 상태가 된다(HeroDef.Forms 의 id) · 지금 변신을 푼다
         public const string Form = "form", FormEnd = "formEnd";
+        // 강화 카드 지속 규칙(2026-10-05 일곱째) — 카드를 내면 rules 가 이 전투 끝까지 켜진다(같은 id 를 또 내면 겹 +1)
+        public const string Power = "power";
+        // 연출 쪽지(2026-10-06) — 효과는 없고 화면 · 이펙트에 그 순간을 알린다(cue id · 수). 글에 안 나온다
+        public const string Cue = "cue";
 
         public static readonly HashSet<string> Conditions = new() { IfBroken, IfTune, IfChain, IfLink, IfPrev, IfRhythm, IfSwitched, IfStack, When,
             IfRepeat, IfHeld, IfPlayedMax, IfApLeft, IfSpent, IfBalanced, IfHunted, IfDebuffs, IfHp, IfKill, IfBreak, IfWounded,
@@ -151,7 +159,7 @@ namespace Bolzena.Core
             IfChoice, IfRandom, IfHand, IfPile, IfNth, IfStreak, IfAllHeroes, IfFoe, IfCardSt, PerPlayed, PerPile, PerCardSt, PerEvent,
             Later, AfterCards, Trap, Confuse, AutoPlay, CastOther, Pull, ExileFrom, Dispel, MoveRow, GrowRun,
             Roll, IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, Recast, CostMod, AddTag, CutHit, ClearDebt, HealMod,
-            Form, FormEnd,
+            Form, FormEnd, Power, Cue,
         };
         public static string ModStat(string k) => k switch
         {
@@ -229,6 +237,9 @@ namespace Bolzena.Core
         public List<string> Choices;
 
         [Newtonsoft.Json.JsonIgnore] public bool Neutral => Hero == null && (Type == "공격" || Type == "스킬" || Type == "강화") && !Gift && !Token;
+        /// <summary>얻을 때 주인 사도를 고르는 카드 — 교주 카드 · 선물 카드 · 골칫거리(저주) · 상태 카드처럼 사도가 없는 것(만든 카드 제외).
+        /// 교주 카드가 아닌 것의 주인(「id@사도」)은 덱 묶음 표시만 — 전투에서 누가 내는지 · 효과는 바뀌지 않는다(View 의 Hero 는 교주 카드만).</summary>
+        [Newtonsoft.Json.JsonIgnore] public bool Ownable => Hero == null && !Token && (Neutral || Gift);   // 주인을 고르는 것은 교주 · 선물 카드만 — 상태 · 저주는 주인 없이 덱의 「상태」 · 「저주」 묶음으로(2026-10-06 사용자)
         [Newtonsoft.Json.JsonIgnore] public bool IsStatusCard => Type == "상태";
         [Newtonsoft.Json.JsonIgnore] public bool IsCurse => Type == "저주";
     }
@@ -654,6 +665,8 @@ namespace Bolzena.Core
         public int Max;
         /// <summary>summon — 세운 소환물은 강인도가 없다(최대 0 — 격파되지 않고 화면은 강인도 막대를 숨긴다). 강인도 최소치 3 의 유일한 예외(사용자 2026-10-05).</summary>
         public bool NoTough;
+        /// <summary>ult(보스 클론의 고학년) — 차례로 하는 수들. 엔진이 사도 고학년에서 만든다(BossUlt) — 데이터에 쓰지 않는다.</summary>
+        public List<Intent> Then;
 
         [Newtonsoft.Json.JsonIgnore] public int WOr1 => W <= 0 ? 1 : W;
     }
@@ -709,8 +722,10 @@ namespace Bolzena.Core
     {
         public string Id;
         public string Name;
-        /// <summary>"공용" 또는 땅 이름.</summary>
+        /// <summary>"공용" · 마을 id(그 마을 판에서만 — 2026-10-06 마을 이벤트) · 땅 이름(옛 꼴 — 그 층의 land).</summary>
         public string Pool = "공용";
+        /// <summary>나오는 층(1 · 2). 0 = 두 층 모두. 마을 이벤트가 층마다 보상 · 위험을 달리할 때.</summary>
+        public int Floor;
         public string Npc;
         public string Scene;
         /// <summary>드문 이벤트 — 굴릴 때마다 이 확률로만 후보에 든다.</summary>

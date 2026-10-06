@@ -28,6 +28,15 @@ namespace Bolzena.RunUI
             });
         }
 
+        /// <summary>주인 고르기 창의 한 줄 — 교주 카드는 위력, 선물(· 상태) 카드는 덱 묶음만 정한다(전투 효과는 그대로). 저주는 이 창에 오지 않는다(덱의 「저주」 묶음).</summary>
+        string OwnerSub(string cardId, string name)
+        {
+            var c = P.Data.Card(cardId);
+            if (c == null || c.Neutral) return $"교주 카드 「{name}」 — 넣은 사도의 공격력 · 방어력으로 위력이 정해지고, 카드 틀이 그 사도 성격 색이 됩니다";
+            string kind = c.IsStatusCard ? "상태 카드" : "선물 카드";
+            return $"{kind} 「{name}」 — 고른 사도의 카드 묶음 맨 끝에 들어갑니다(효과는 누구에게 넣어도 같습니다)";
+        }
+
         /// <summary>교주 카드(id)를 넣을 사도를 고르는 창 — 화면만(덱에 넣기는 chosen 이). view 를 주면 그 모습(시범의 가짜 카드), 안 주면 사도마다 core 의 그 사도 카드 모습.</summary>
         public void OwnerWindow(string cardId, Action<string> chosen, Core.CardView view = null, IList<string> party = null)
         {
@@ -36,7 +45,7 @@ namespace Bolzena.RunUI
             var keys = (party ?? P.S?.Party ?? new List<string>()).Take(3).ToList();
             if (v == null || keys.Count == 0) { done?.Invoke(keys.FirstOrDefault()); return; }
             float H = Theme.C(680, 640);
-            var (body, close, _) = Stage.ModalBox("ownerpick", 1240, H, "누구 덱에 넣을까요?", $"교주 카드 「{v.Name}」 — 넣은 사도의 공격력 · 방어력으로 위력이 정해지고, 카드 틀이 그 사도 성격 색이 됩니다", false, null, 0, false);
+            var (body, close, _) = Stage.ModalBox("ownerpick", 1240, H, "누구 덱에 넣을까요?", OwnerSub(cardId, v.Name), false, null, 0, false);
 
             // 왼쪽 — 얻은 카드
             float cardW = Theme.C(220, 196);
@@ -44,6 +53,7 @@ namespace Bolzena.RunUI
             left.sizeDelta = new Vector2(cardW + 24, 0); left.anchoredPosition = Vector2.zero;
             var cardHost = Ui.Rect("cardhost", left).At(0.5f, 0.5f, 0, 18, cardW, cardW * 1.4f);
             var card = W.Card(cardHost, this, cardId, cardW, "card", v);
+            bool picked = false;
             card.At(0.5f, 0.5f, 0, 0, cardW, cardW * 1.4f);
             var cap = Ui.Text(left, "얻은 카드", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center);
             cap.rectTransform.At(0.5f, 0.5f, 0, 18 + cardW * 0.7f + 22, cardW, 24);
@@ -92,7 +102,7 @@ namespace Bolzena.RunUI
                 var sub = Ui.Text(well.rectTransform, $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(hero?.nature))}>{hero?.nature}</color> · {hero?.role}", Theme.FsSm, Theme.Sub, TextAlignmentOptions.BottomLeft);
                 sub.rectTransform.Band(0, 24, 16, 12, 8); sub.Outline(0.3f);
                 var bar = Ui.Img(well.rectTransform, Theme.White, nat, "band"); bar.rectTransform.Band(1, 4);
-                // 이 사도의 고유 효과 · 패시브 · 고학년(짧은 글 판 — 판마다 자세히). 창 위 오른쪽(칸 단추와 따로 눌린다)
+                // 이 사도의 고유 효과 · 패시브 · 고학년 판(수치가 다 든 글 · 길면 스크롤). 창 위 오른쪽(칸 단추와 따로 눌린다)
                 if (P.Data.Hero(key) != null)
                 {
                     var tc = TraitsChip(rt, key, "고유 효과", "traits");
@@ -135,9 +145,12 @@ namespace Bolzena.RunUI
                 var gl = Ui.Title(go.transform, "이 사도 덱에 넣기", Theme.FsMd, Theme.Brown, TextAlignmentOptions.Center); gl.rectTransform.Fill();
                 void Choose()
                 {
-                    // 고른 사도 성격 색으로 카드를 다시 그려 한 번 튀게 하고 닫는다
-                    UnityEngine.Object.Destroy(card.gameObject);
+                    // 고른 사도 성격 색으로 카드를 다시 그려 한 번 튀게 하고 닫는다 — 두 번 눌러도(칸 · 단추) 한 번만, 창이 먼저 닫혔으면 넣기만
+                    if (picked) return; picked = true;
+                    if (cardHost == null) { done?.Invoke(key); return; }   // 창이 이미 닫혔다(닫기를 또 부르면 없는 판을 만진다) — 넣기만
+                    if (card != null) UnityEngine.Object.Destroy(card.gameObject);
                     var nc = W.Card(cardHost, this, cardId, cardW, "card", v, key); nc.At(0.5f, 0.5f, 0, 0, cardW, cardW * 1.4f);
+                    card = nc;
                     Tw.Pop(nc, 0, 0.85f, 0.3f);
                     W.Select(b, true);
                     Tw.Run(rt, 0.55f, _ => { }, Tw.Linear, 0, () => { close(); done?.Invoke(key); });

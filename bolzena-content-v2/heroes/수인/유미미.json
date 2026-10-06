@@ -15,7 +15,7 @@
       "blurb": "숲속에서 스스로 먹고사는 나른한 사냥꾼.",
       "keyword": {
         "name": "나른함",
-        "desc": "늘어지기 — 턴 끝마다 쌓이고(쉰 턴엔 더), 공격 카드 한 장에 모두 쏟는다",
+        "desc": "쉬는 턴마다 모이는 힘",
         "carrier": "self",
         "cap": 3,
         "per": [
@@ -154,11 +154,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 발싸! 아뵤~",
+          "name": "힘껏 발싸!",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3,
+              "ratio": 2.75,
               "target": "topEnemy"
             },
             {
@@ -173,12 +173,12 @@
           ]
         },
         {
-          "name": "가벼운 발싸! 아뵤~",
+          "name": "대충 발싸",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.05,
+              "ratio": 1.5,
               "target": "topEnemy"
             },
             {
@@ -193,11 +193,11 @@
           ]
         },
         {
-          "name": "느긋한 발싸! 아뵤~",
+          "name": "늘어지게 조준",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.75,
+              "ratio": 2.3,
               "target": "topEnemy"
             },
             {
@@ -210,21 +210,38 @@
               "v": 1
             },
             {
-              "k": "stack",
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "topEnemy"
+            }
+          ]
+        },
+        {
+          "name": "화살비 아뵤~",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
               "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
               "v": 1
             }
           ]
         },
         {
-          "name": "재빠른 발싸! 아뵤~",
-          "tags": [
-            "신속"
-          ],
+          "name": "천벌 예행연습",
+          "cost": 3,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.9,
+              "ratio": 3.6,
               "target": "topEnemy"
             },
             {
@@ -234,51 +251,23 @@
             },
             {
               "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 발싸! 아뵤~",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.75,
-              "target": "topEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "팽팽한 시위",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "급소 관찰",
           "kind": "weakSpot"
         },
         {
-          "name": "한숨 늘어지기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 1
-            }
-          ]
+          "name": "화살 줍기",
+          "kind": "draw"
         }
       ]
     },
@@ -307,11 +296,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 유령도 꿰뚫는 화살",
+          "name": "유령 관통",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.35,
               "target": "oneEnemy"
             },
             {
@@ -326,12 +315,12 @@
           ]
         },
         {
-          "name": "가벼운 유령도 꿰뚫는 화살",
+          "name": "툭 쏘기",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
@@ -346,39 +335,37 @@
           ]
         },
         {
-          "name": "느긋한 유령도 꿰뚫는 화살",
+          "name": "졸린 눈 조준",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
               "k": "ifStack",
               "id": "나른함",
-              "n": 3
+              "n": 2
             },
             {
               "k": "tough",
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "나른함",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "재빠른 유령도 꿰뚫는 화살",
-          "tags": [
-            "신속"
-          ],
+          "name": "연달아 두 발",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy"
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "ifStack",
@@ -392,7 +379,7 @@
           ]
         },
         {
-          "name": "꿰뚫는 유령도 꿰뚫는 화살",
+          "name": "유령 사냥 화살",
           "tags": [
             "약점 공격"
           ],
@@ -416,22 +403,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "날 선 화살촉",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "으스스한 화살",
+          "kind": "frost"
         },
         {
-          "name": "한숨 늘어지기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 1
-            }
-          ]
+          "name": "하품 섞인 한 발",
+          "kind": "cost"
         }
       ]
     },
@@ -458,7 +439,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 수풀에 늘어지기",
+          "name": "푹 늘어지기",
           "tags": [
             "보존"
           ],
@@ -470,13 +451,52 @@
             },
             {
               "k": "shield",
-              "ratio": 1.55
+              "ratio": 1.2
             }
           ]
         },
         {
-          "name": "가벼운 수풀에 늘어지기",
+          "name": "잠깐 눕기",
           "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "수풀 위장",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "뒹굴며 줍기",
           "tags": [
             "보존"
           ],
@@ -488,12 +508,17 @@
             },
             {
               "k": "shield",
-              "ratio": 1.1
+              "ratio": 1.0
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "느긋한 수풀에 늘어지기",
+          "name": "본격 낮잠",
+          "cost": 2,
           "tags": [
             "보존"
           ],
@@ -505,64 +530,28 @@
             },
             {
               "k": "shield",
-              "ratio": 1.45
-            }
-          ]
-        },
-        {
-          "name": "든든한 수풀에 늘어지기",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 3
+              "ratio": 2.4
             },
             {
-              "k": "shield",
-              "ratio": 1.5
-            }
-          ]
-        },
-        {
-          "name": "복 받은 수풀에 늘어지기",
-          "tags": [
-            "보존",
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 3
-            },
-            {
-              "k": "shield",
-              "ratio": 1.5
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "든든함",
+          "name": "푹신한 풀밭",
           "kind": "guard"
         },
         {
-          "name": "한 장 더",
+          "name": "꿈결에 한 장",
           "kind": "draw"
         },
         {
-          "name": "한숨 늘어지기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 1
-            }
-          ]
+          "name": "느긋한 마음",
+          "kind": "defUp"
         }
       ]
     },
@@ -591,11 +580,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 약하면 설치지 마",
+          "name": "건방진 놈 혼내기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.45,
+              "ratio": 2.3,
               "target": "oneEnemy"
             },
             {
@@ -604,18 +593,18 @@
             },
             {
               "k": "dmg",
-              "ratio": 2.45,
+              "ratio": 2.0,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "가벼운 약하면 설치지 마",
+          "name": "손가락 튕기기",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.7,
+              "ratio": 1.3,
               "target": "oneEnemy"
             },
             {
@@ -624,17 +613,27 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.7,
+              "ratio": 1.4,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "느긋한 약하면 설치지 마",
+          "name": "나른한 일격",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 1.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
@@ -643,26 +642,40 @@
             },
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 1.9,
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "제일 약한 놈 골라",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.5,
+              "target": "lowEnemy"
             },
             {
-              "k": "stack",
-              "id": "나른함",
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
               "v": 1
             }
           ]
         },
         {
-          "name": "재빠른 약하면 설치지 마",
-          "tags": [
-            "신속"
-          ],
+          "name": "끝장내기",
+          "cost": 3,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 2.6,
               "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "ifWounded",
@@ -670,29 +683,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 2.4,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 약하면 설치지 마",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifWounded",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 3.6,
               "target": "oneEnemy"
             }
           ]
@@ -700,22 +691,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "깔보는 눈빛",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "약한 곳 찌르기",
           "kind": "weakSpot"
         },
         {
-          "name": "한숨 늘어지기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 1
-            }
-          ]
+          "name": "잘난 척",
+          "kind": "atkUp"
         }
       ]
     }

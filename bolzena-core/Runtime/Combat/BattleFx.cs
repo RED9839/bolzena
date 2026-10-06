@@ -51,6 +51,8 @@ namespace Bolzena.Core
         public string Pulled;
         public HashSet<string> ExtraTags;
         public bool Recasting, PerEach;
+        /// <summary>perStack 의 최소 · 최대(n · max — 0 이면 없음). 「1개당」 이 쓰이면 지운다.</summary>
+        public int PerMin, PerMax;
         public Fx CurFx;
         public FxCtx Copy() { var c = (FxCtx)MemberwiseClone(); c.Toughed = null; return c; }
     }
@@ -119,7 +121,17 @@ namespace Bolzena.Core
             bag[id] = Math.Max(0, next);
         }
 
+        /// <summary>「1개당」 의 수 — perStack 에 n(최소) · max(최대)가 있으면 그 안으로(미로 「거울 속」 광선 5~10발).</summary>
         int PerCount(FxCtx ctx, string id)
+        {
+            int c = PerCountRaw(ctx, id);
+            if (ctx.PerMax > 0) c = Math.Min(c, ctx.PerMax);
+            if (ctx.PerMin > 0) c = Math.Max(c, ctx.PerMin);
+            ctx.PerMin = ctx.PerMax = 0;
+            return c;
+        }
+
+        int PerCountRaw(FxCtx ctx, string id)
         {
             if (id == RHYTHM_PER) return St(Pool, R.RHYTHM);
             if (id == DISC_PER) return ctx.Discarded;
@@ -191,7 +203,7 @@ namespace Bolzena.Core
                             gate = f.Not ? !has : has;
                             break;
                         }
-                    case FxK.PerStack: ctx.PerStack = f.Id; ctx.PerEach = f.Each; break;
+                    case FxK.PerStack: ctx.PerStack = f.Id; ctx.PerEach = f.Each; ctx.PerMin = f.N; ctx.PerMax = f.Max; break;
                     // ── 운영 방식 계기(docs/19 §3) ──
                     case FxK.IfRepeat:   // 같은 카드 잇달아 — 박자형(서면 리듬 +1)
                         gate = ctx.Repeat;
@@ -283,6 +295,7 @@ namespace Bolzena.Core
                     case FxK.Dmg:
                         {
                             if (owner == null) break;
+                            if (f.OfStack != null) ctx.EventV = PerCountRaw(ctx, f.OfStack);   // 저장한 값(겹) — ofEvent 와 같이
                             if (f.OfEvent > 0)
                             {   // 일의 값 × ofEvent 를 고정 피해로(넘친 치유 · 막아 낸 양 …)
                                 int ev = Math.Max(1, Num.Round(ctx.EventV * f.OfEvent * ctx.Scale));
@@ -358,6 +371,7 @@ namespace Bolzena.Core
                     case FxK.Shield:
                         {
                             if (owner == null) break;
+                            if (f.OfStack != null) ctx.EventV = PerCountRaw(ctx, f.OfStack);
                             int k = 1;
                             if (ctx.PerStack != null) { k = PerCount(ctx, ctx.PerStack); ctx.PerStack = null; if (k == 0) break; }
                             double ratio = f.Ratio * k * ctx.Scale * (ctx.Made ? 1 + R.StackEff("형상 강화", St(owner, "형상 강화")) : 1);
@@ -462,6 +476,7 @@ namespace Bolzena.Core
 
                     // ── 키워드 · 공용 부품 ──
                     case FxK.Stack: StackFx(f, ctx); break;
+                    case FxK.Cue: CueFx(f, ctx); break;
                     case FxK.Spend: SpendFx(f, ctx); break;
                     case FxK.SpendRhythm: RhythmAdd(f.All ? (int?)null : -f.IV); break;
                     case FxK.Flip: FlipFx(ctx); break;
@@ -478,7 +493,7 @@ namespace Bolzena.Core
                         break;
 
                     default:
-                        if (!FxV2(f, ctx, ref gate) && !FxKit(f, ctx, ref gate) && !FxForm(f, ctx)) throw new InvalidOperationException($"모르는 효과 조각: {f.K}");
+                        if (!FxV2(f, ctx, ref gate) && !FxKit(f, ctx, ref gate) && !FxForm(f, ctx) && !FxPower(f, ctx)) throw new InvalidOperationException($"모르는 효과 조각: {f.K}");
                         if (Over != null) return;
                         break;
                 }
@@ -671,13 +686,24 @@ namespace Bolzena.Core
         {
             var owner = ctx.Owner;
             if (owner == null) return;
+            if (f.OfEvent > 0)
+            {   // 일의 값을 저장 — 받은 피해 · 준 피해 × ofEvent 만큼(이드(재활) 꿈 · 키샤 공연)
+                int n = (int)Math.Floor(ctx.EventV * f.OfEvent);
+                if (n <= 0) return;
+                f = f.Copy(); f.OfEvent = 0; f.V = n;
+            }
             Kw.TryGetValue(f.Id, out var kw);
             if (kw != null && kw.Carrier == "hero")
             {   // 사도에게 붙는 사도 표시(지정 아군 · 제자 …) — 가리킨 사도마다 따로
                 foreach (var t in Resolve(ctx, f.Target ?? "self").Where(u => u.Side == Side.Party))
                 {
+                    // 한 번에 한 아군(hunt) — 새 아군에게 붙이면 다른 아군의 표시는 사라진다(옮겨 간다)
+                    if (kw.Def.Hunt && f.IV > 0)
+                        foreach (var o in Party)
+                            if (o != t && StackOf(o.Key, f.Id) > 0) { int ob = StackOf(o.Key, f.Id); AddStack(o.Key, f.Id, -ob); Say($"「{f.Id}」 — {o.Name}에게서 {t.Name}에게로 옮긴다"); StackChanged(kw.Owner, f.Id, ob, 0, o); }
                     int before = StackOf(t.Key, f.Id);
                     AddStack(t.Key, f.Id, f.IV);
+                    if (Meter != null) MeterGain(f.Id, f.IV, StackOf(t.Key, f.Id) - before, StackOf(t.Key, f.Id));
                     StackChanged(kw.Owner, f.Id, before, StackOf(t.Key, f.Id), t);
                 }
                 return;
@@ -691,32 +717,62 @@ namespace Bolzena.Core
                 {
                     if (kw.Def.Hunt)
                         foreach (var o in Enemies) if (o != t && St(o, f.Id) > 0) { SetStRaw(o, f.Id, 0); Say($"「{f.Id}」 — {o.Name}에게서 {t.Name}에게로 옮긴다(처음부터)"); StatusCue(o, $"「{f.Id}」 옮김"); }
-                    int left = f.IV;
+                    int left = f.IV, got = 0, peak = 0;
                     for (int guard = 0; guard < 20; guard++)
                     {
                         int before = St(t, f.Id);
                         int next = Math.Max(0, before + left);
                         if (kw.Def.CapOrMode != null) next = Math.Min(kw.Def.CapOrMode.Value, next);
                         SetStRaw(t, f.Id, next);
+                        got += next - before; peak = Math.Max(peak, next);
                         StackChanged(owner.Key, f.Id, before, next, t);
                         left -= next - before;
                         if (left <= 0 || next == before || St(t, f.Id) >= next) break;
                     }
+                    if (Meter != null) MeterGain(f.Id, f.IV, got, peak);
+                    if (left > 0 && f.IV > 0 && !kw.Def.Mode && Over == null) StackOver(owner.Key, f.Id, left, t);
                 }
             }
             else
             {
-                int left = f.IV;
+                int left = f.IV, got = 0, peak = 0;
                 for (int guard = 0; guard < 20; guard++)
                 {
                     int before = StackOf(owner.Key, f.Id);
                     AddStack(owner.Key, f.Id, left);
                     int next = StackOf(owner.Key, f.Id);
+                    got += next - before; peak = Math.Max(peak, next);
                     StackChanged(owner.Key, f.Id, before, next, owner);
                     left -= next - before;
                     if (left <= 0 || next == before || StackOf(owner.Key, f.Id) >= next) break;
                 }
+                if (Meter != null) MeterGain(f.Id, f.IV, got, peak);
+                if (left > 0 && f.IV > 0 && !(kw?.Def.Mode ?? false) && !(kw?.Def.Wrap ?? false) && Over == null) StackOver(owner.Key, f.Id, left, owner);
             }
+        }
+
+        /// <summary>
+        /// 「X」가 최대에서 넘치면(stackOver) — 쌓으려던 몫이 최대에 막혀 남았다. 일의 값 = 넘친 수(perEvent 가 센다).
+        /// 넘친 몫을 다른 이득으로 바꾸는 규칙에 쓴다(2026-10-05 스택형 점검 — 디아나(왕년) 「바위 던지기」 …). 적 표식이면 그 적이 「적 1명」.
+        /// </summary>
+        void StackOver(string ownerKey, string id, int over, Unit holder)
+        {
+            Say($"「{id}」 — 최대라 {over} 넘친다");
+            Emit("stackOver", new EmitInfo { Id = id, Owner = Kw.TryGetValue(id, out var k) ? k.Owner : ownerKey, N = over, V = over, Target = holder });
+        }
+
+        /// <summary>
+        /// 연출 쪽지 — 쪽지 K="fx", Id = cue id, Hero = 주인, V = 수(xStack 키워드의 지금 겹을 n · max 안으로, 없으면 v).
+        /// 효과는 없다. 이펙트가 이 순간에 조각을 붙인다(미로 거울 숨기 · 광선 발사 …).
+        /// </summary>
+        void CueFx(Fx f, FxCtx ctx)
+        {
+            var owner = ctx.Owner;
+            if (owner == null || f.Id == null) return;
+            int v = f.XStack != null ? StackOf(owner.Key, f.XStack) : f.IV;
+            if (f.Max > 0) v = Math.Min(v, f.Max);
+            if (f.N > 0) v = Math.Max(v, f.N);
+            Cue("fx", owner, new Cue { Id = f.Id, Hero = owner.Key, V = v });
         }
 
         void SpendFx(Fx f, FxCtx ctx)
@@ -731,6 +787,7 @@ namespace Bolzena.Core
                 {
                     int b0 = StackOf(t.Key, f.Id); if (b0 <= 0) continue;
                     AddStack(t.Key, f.Id, f.All ? -b0 : -f.IV);
+                    MeterSpend(f.Id, b0 - StackOf(t.Key, f.Id));
                     StackChanged(kw.Owner, f.Id, b0, StackOf(t.Key, f.Id), t);
                     Emit("spend", new EmitInfo { Owner = kw.Owner, Id = f.Id, N = b0 - StackOf(t.Key, f.Id), By = Acting, Seq = ActSeq });
                 }
@@ -745,6 +802,7 @@ namespace Bolzena.Core
                     if (before <= 0) continue;
                     int after = f.All ? 0 : Math.Max(0, before - f.IV);
                     SetStRaw(t, f.Id, after);
+                    MeterSpend(f.Id, before - after);
                     StackChanged(owner.Key, f.Id, before, after, t);
                     if (before > after) Emit("spend", new EmitInfo { Owner = kw.Owner, Id = f.Id, N = before - after, By = Acting, Seq = ActSeq, Target = t.Side == Side.Enemy ? t : null });
                 }
@@ -754,6 +812,7 @@ namespace Bolzena.Core
                 int before = StackOf(owner.Key, f.Id);
                 AddStack(owner.Key, f.Id, f.All ? -before : -f.IV);
                 int after2 = StackOf(owner.Key, f.Id);
+                MeterSpend(f.Id, before - after2);
                 StackChanged(owner.Key, f.Id, before, after2, owner);
                 if (before > after2) Emit("spend", new EmitInfo { Owner = Kw.TryGetValue(f.Id, out var sk) ? sk.Owner : owner.Key, Id = f.Id, N = before - after2, By = Acting, Seq = ActSeq });
             }
@@ -810,6 +869,7 @@ namespace Bolzena.Core
                     {
                         Stacks[kw.Owner][kw.Id] = Cut(n);
                         int left = Stacks[kw.Owner][kw.Id];
+                        MeterSpend(kw.Id, n - left);
                         Say($"「{kw.Id}」 — 발동해 {(left > 0 ? $"{left} 남는다" : "사라진다")}");
                         if (left == 0) KwGone(kw.Id, kw.Owner, owner, false);
                     }
@@ -820,6 +880,7 @@ namespace Bolzena.Core
                         if (e.HitSeq == ActSeq && St(e, kw.Id) > 0)
                         {
                             int left = Cut(St(e, kw.Id));
+                            MeterSpend(kw.Id, St(e, kw.Id) - left);
                             SetStRaw(e, kw.Id, left);
                             if (left == 0) KwGone(kw.Id, kw.Owner, e, false);
                         }
@@ -827,6 +888,7 @@ namespace Bolzena.Core
                 else if (owner != null && c.Type == "공격" && St(Pool, kw.Id) > 0)
                 {
                     int left = Cut(St(Pool, kw.Id));
+                    MeterSpend(kw.Id, St(Pool, kw.Id) - left);
                     SetStRaw(Pool, kw.Id, left);
                     if (left == 0) KwGone(kw.Id, kw.Owner, PartyRep(), false);
                 }

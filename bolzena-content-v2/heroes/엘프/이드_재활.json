@@ -12,16 +12,16 @@
       "atk": 66,
       "def": 70,
       "crit": 5,
-      "blurb": "넘어져도 다시 일어서는 이드. 맞을 때마다 쌓이는 악몽을, 스킬을 낼 때 정면으로 마주해 방패와 파동으로 바꾼다.",
+      "blurb": "넘어져도 다시 일어서는 이드. 맞을 때마다 쌓이는 악몽을 스킬로 정면에서 마주해, 적의 걸음을 늦추고 방패로 바꿉니다. 깊이 잠든 동안 받아 둔 아픔은 깨어나는 순간 꿈과 함께 무너져 적을 덮치고 파티를 감쌉니다.",
       "keyword": {
         "name": "악몽",
-        "desc": "파티가 다칠 때마다 쌓이는 나쁜 꿈 — 이드(재활)가 스킬을 내면 실드와 피해로 몰아낸다",
+        "desc": "파티가 다칠 때 쌓이는 악몽",
         "carrier": "self",
         "cap": 5
       },
       "passives": [
         {
-          "name": "악몽을 마주하다",
+          "name": "악몽 마주하기",
           "when": {
             "on": "hurt"
           },
@@ -34,7 +34,34 @@
           ]
         },
         {
-          "name": "악몽을 마주하다",
+          "name": "악몽 마주하기",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "악몽",
+              "n": 3
+            }
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "nextEnemy"
+            }
+          ]
+        },
+        {
+          "name": "악몽 마주하기",
           "when": {
             "on": "play",
             "type": "스킬"
@@ -56,16 +83,6 @@
               "ratio": 0.3
             },
             {
-              "k": "perStack",
-              "id": "악몽"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
               "k": "spend",
               "id": "악몽",
               "all": true
@@ -78,6 +95,15 @@
         "cost": 250,
         "fx": [
           {
+            "k": "cue",
+            "id": "ide_sleep"
+          },
+          {
+            "k": "stack",
+            "id": "잠든 꿈",
+            "v": 1
+          },
+          {
             "k": "status",
             "id": "피해 감소",
             "v": 3
@@ -88,10 +114,9 @@
             "v": 4
           },
           {
-            "k": "dmg",
-            "ratio": 1.2,
-            "base": "def",
-            "target": "allEnemies"
+            "k": "status",
+            "id": "초재생",
+            "v": 1
           }
         ]
       },
@@ -100,6 +125,111 @@
         "이드_재활_s1",
         "이드_재활_s2",
         "이드_재활_s2"
+      ],
+      "keywords": [
+        {
+          "name": "잠든 꿈",
+          "desc": "다음 턴까지 이어지는 깊은 잠",
+          "carrier": "self",
+          "cap": 1,
+          "rules": [
+            {
+              "name": "아픔 저장",
+              "when": {
+                "on": "hurt",
+                "guarded": true
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "잠든 꿈",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "ide_store"
+                },
+                {
+                  "k": "stack",
+                  "id": "꿈에 쌓인 아픔",
+                  "v": 1,
+                  "ofEvent": 0.1
+                }
+              ]
+            },
+            {
+              "name": "꿈의 붕괴",
+              "when": {
+                "on": "turnStart"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "잠든 꿈",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "ide_wake",
+                  "xStack": "꿈에 쌓인 아픔"
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 1.2,
+                  "base": "def",
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "shield",
+                  "ratio": 1,
+                  "ofStack": "꿈에 쌓인 아픔",
+                  "ofEvent": 5
+                },
+                {
+                  "k": "status",
+                  "id": "둔화",
+                  "v": 1,
+                  "target": "allEnemies"
+                }
+              ]
+            },
+            {
+              "name": "꿈의 붕괴",
+              "when": {
+                "on": "turnStart"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "잠든 꿈",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "spend",
+                  "id": "꿈에 쌓인 아픔",
+                  "all": true
+                },
+                {
+                  "k": "spend",
+                  "id": "잠든 꿈",
+                  "all": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "꿈에 쌓인 아픔",
+          "desc": "잠결에 받아 둔 아픔",
+          "carrier": "self",
+          "cap": 60
+        }
       ]
     }
   ],
@@ -143,7 +273,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
+          "ratio": 0.8,
           "base": "def",
           "target": "allEnemies"
         },
@@ -154,8 +284,8 @@
           "target": "allEnemies"
         },
         {
-          "k": "stack",
-          "id": "악몽",
+          "k": "status",
+          "id": "사기",
           "v": 1
         }
       ],
@@ -165,7 +295,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.17,
+              "ratio": 1.1,
               "base": "def",
               "target": "allEnemies"
             },
@@ -176,8 +306,8 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "악몽",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
@@ -190,7 +320,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.08,
+              "ratio": 1.02,
               "base": "def",
               "target": "allEnemies"
             },
@@ -201,8 +331,8 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "악몽",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
@@ -212,7 +342,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.17,
+              "ratio": 1.1,
               "base": "def",
               "target": "allEnemies"
             },
@@ -223,8 +353,8 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "악몽",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
@@ -237,7 +367,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.08,
+              "ratio": 0.96,
               "base": "def",
               "target": "allEnemies"
             },
@@ -248,8 +378,8 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "악몽",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
@@ -260,7 +390,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.78,
+              "ratio": 1.95,
               "base": "def",
               "target": "allEnemies"
             },
@@ -271,8 +401,8 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "악몽",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
@@ -312,9 +442,15 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.5,
           "base": "def",
           "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "oneEnemy"
         },
         {
           "k": "stack",
@@ -324,16 +460,22 @@
       ],
       "oracles": [
         {
-          "name": "기어서라도 간다",
+          "name": "기어서라도 가기",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.72,
+              "ratio": 0.65,
               "base": "def",
               "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -350,17 +492,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.58,
               "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
               "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "악몽",
-              "v": 1
-            },
-            {
-              "k": "draw",
               "v": 1
             }
           ]
@@ -374,9 +518,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.5,
               "base": "def",
               "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -394,9 +544,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.66,
+              "ratio": 0.6,
               "base": "def",
               "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -413,19 +569,20 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.5,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "악몽",
-              "v": 1
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "악몽",
-              "v": 1
+              "v": 2
             }
           ]
         }
@@ -623,18 +780,30 @@
         {
           "k": "defMod",
           "v": 0.1,
-          "target": "self",
-          "run": true
-        },
-        {
-          "k": "stack",
-          "id": "악몽",
-          "v": 2
+          "run": true,
+          "target": "self"
         },
         {
           "k": "status",
           "id": "불굴",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "악몽",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -643,19 +812,31 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.13,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 3
+              "v": 0.1,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "불굴",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "악몽",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -664,20 +845,25 @@
           "cost": 0,
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.1,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "불굴",
+              "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "악몽",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -689,19 +875,31 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.13,
-              "target": "self",
-              "run": true
+              "v": 0.1,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "stack",
               "id": "악몽",
-              "v": 3
+              "v": 2
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "악몽",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -710,19 +908,31 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.14,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 3
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "불굴",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "악몽",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -731,19 +941,31 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.13,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 3
+              "v": 0.1,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "불굴",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "악몽",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

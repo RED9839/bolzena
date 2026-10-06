@@ -13,7 +13,7 @@ namespace Bolzena.RunUI
     // 카드 글 속 낱말 안내(2026-10 사용자: 「키워드를 누르면 무슨 효과인지 · 생성 카드 낱말을 누르면 무슨 카드인지」).
     //   판 화면(W.Card · TermPop)과 전투(CoreBattle → CardZoom)가 같이 쓴다. core 는 고치지 않고 core 의 표 · 데이터로 찾는다:
     //   · 키워드 = core CardText.Chips(카드) 의 이름들 — 풀이는 CardText.Tips()(엔진 키워드 · 상태)
-    //   · 사도 고유 효과(자원 · 표식) = 사도 데이터 keywords — 짧은 글 CardText.Short(k), 자세히 Detail(k)
+    //   · 사도 고유 효과(자원 · 표식) = 사도 데이터 keywords — 부제(desc) + CardText.Trait(사도, k)(그 키워드를 쓰는 패시브까지, 수치가 다 든 한 가지 글 — 「자세히」 없음)
     //   · 생성 카드 = 카드 효과 make · transform 의 id, 카드 정의 Evolve.Into(★→★★) · BondCard(결속 강해진 카드) · Becomes(봉인된 금기)
     //     글에 이름이 없는 것(진화 · 결속 · 금기)은 Extra 가 「진화 → 「이름」」 한 줄로 덧붙인다.
     //   · 자유 글(고유 효과 · 패시브 · 고학년 설명) = OfText — 「」 속 카드 이름 · 사도 고유 효과 이름 · 엔진 키워드 이름을 글에서 찾는다.
@@ -22,13 +22,22 @@ namespace Bolzena.RunUI
     {
         public sealed class Term
         {
-            public string Name, Body, Detail;
+            public string Name, Body;
+            /// <summary>옛 「자세히」 글 — 이제 쓰지 않는다(늘 null, Body 하나에 다 든다). 전투 쪽 옛 코드가 읽어도 되게 남겨 둔다.</summary>
+            public string Detail;
             public bool Bad, Hero;          // 해로운 상태 · 사도 고유 효과
             public string CardId;           // 생성 카드면 그 카드 id
             public string Rel;              // 글에 이름이 없는 카드의 관계(「진화」 · 「결속 3 이상」 · 「보스 처치 뒤」) — Extra 가 쓴다
             public string Owner;            // 사도 고유 효과의 주인 이름
             public string Kind;             // 판 머리의 작은 글(없으면 고유 효과 · 카드 · 해로운 효과 가운데 저절로)
             public bool IsCard => CardId != null;
+        }
+
+        /// <summary>부제(작은 흐린 글) + 본문 — 낱말 판 · 사도 상세 칸이 같은 꼴로.</summary>
+        public static string WithSub(string sub, string body)
+        {
+            sub = sub?.TrimEnd('.');
+            return string.IsNullOrEmpty(sub) ? body ?? "" : $"<size=90%><color={Theme.SubTag}>{sub}</color></size>\n{body}";
         }
 
         public const string KwHex = "#FFE3A0", BadHex = "#FF9AA2", CardHex = "#8FD3FF";
@@ -46,7 +55,7 @@ namespace Bolzena.RunUI
         {
             if (heroId != null && d.Heroes.TryGetValue(heroId, out var h))
                 foreach (var k in h.AllKeywords)
-                    if (k.Name == name) return new Term { Name = name, Body = t.Short(k), Detail = t.Detail(k), Hero = true, Owner = h.Name };
+                    if (k.Name == name) return new Term { Name = name, Body = WithSub(k.Desc, t.Trait(h, k)), Hero = true, Owner = h.Name };
             if (Tips(t).TryGetValue(name, out var tip)) return new Term { Name = name, Body = tip, Bad = R.IsBadSt(name) };
             return null;
         }

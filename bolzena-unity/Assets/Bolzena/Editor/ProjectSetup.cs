@@ -38,6 +38,7 @@ namespace Bolzena.EditorTools
 
         public static void Setup()
         {
+            WebBundleBuild.Restore();   // 웹 빌드가 중간에 멈춰 Resources 밖에 남은 스파인이 있으면 제자리로
             CoreData();
             AssetDatabase.Refresh();
             Recompress();
@@ -264,6 +265,7 @@ namespace Bolzena.EditorTools
 
         public static void SetupAndBuildWeb()
         {
+            WebBundleBuild.Restore();
             CoreData();
             CoreDataPack();
             AssetDatabase.Refresh();
@@ -275,7 +277,18 @@ namespace Bolzena.EditorTools
             Scene();
             AssetDatabase.SaveAssets();
             Debug.Log("[Setup] 웹 준비 끝");
-            BuildWeb();
+            WebTextureAudit.Run();   // 압축 안 된 채 남은 큰 그림 점검(WebImport)
+            // 스파인(353 폴더)은 첫 로딩(.data)에서 빼 번들로(WebBundleBuild · 런타임 WebBundles). BOLZENA_WEB_BUNDLES=1 일 때만(기본은 예전처럼 전부 .data — WebBundleBuild.Enabled)
+            bool ok;
+            bool bundles = WebBundleBuild.Enabled;
+            try
+            {
+                if (bundles) WebBundleBuild.MoveOut();
+                ok = BuildWebPlayer();
+                if (ok && bundles) ok = WebBundleBuild.Build(WebPath + "/Bundles");
+            }
+            finally { if (bundles) WebBundleBuild.Restore(); }
+            if (Application.isBatchMode) EditorApplication.Exit(ok ? 0 : 1);
         }
 
         static void CoreDataPack()
@@ -318,6 +331,12 @@ namespace Bolzena.EditorTools
 
         public static void BuildWeb()
         {
+            bool ok = BuildWebPlayer();
+            if (Application.isBatchMode) EditorApplication.Exit(ok ? 0 : 1);
+        }
+
+        static bool BuildWebPlayer()
+        {
             if (Directory.Exists(WebPath)) Directory.Delete(WebPath, true);
             var opts = new BuildPlayerOptions
             {
@@ -329,18 +348,20 @@ namespace Bolzena.EditorTools
             var report = BuildPipeline.BuildPlayer(opts);
             var s = report.summary;
             Debug.Log($"[Build] 웹 {s.result} — {s.totalSize / (1024 * 1024)}MB, {s.totalTime.TotalSeconds:F0}s, 오류 {s.totalErrors}");
-            if (Application.isBatchMode) EditorApplication.Exit(s.result == BuildResult.Succeeded ? 0 : 1);
+            return s.result == BuildResult.Succeeded;
         }
 
         public static void Build()
         {
+            // BOLZENA_DEV=1 — 개발 빌드(프로파일러 마커 · -ultprobe 로 멈칫 원인 재기)를 BuildDev/ 에 따로(배포판 Build/ 는 그대로)
+            bool dev = System.Environment.GetEnvironmentVariable("BOLZENA_DEV") == "1";
             var opts = new BuildPlayerOptions
             {
                 scenes = new[] { RunScenePath, ScenePath },
-                locationPathName = BuildPath,
+                locationPathName = dev ? "BuildDev/Bolzena.exe" : BuildPath,
                 target = BuildTarget.StandaloneWindows64,
                 // LZ4HC — 스탠딩 스파인 135명(.skel 180MB, 표정 동작이 많다)이 들어오며 빌드가 붓는다. 압축하면 skel 은 4할로 준다
-                options = BuildOptions.CompressWithLz4HC,
+                options = BuildOptions.CompressWithLz4HC | (dev ? BuildOptions.Development : BuildOptions.None),
             };
             var report = BuildPipeline.BuildPlayer(opts);
             var s = report.summary;

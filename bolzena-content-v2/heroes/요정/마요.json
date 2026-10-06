@@ -12,10 +12,10 @@
    "atk": 125,
    "def": 24,
    "crit": 10,
-   "blurb": "움직이지 않는 것만 모으는 수집광 요정. 전당포를 운영하며 음침하게 흐흐 웃고, 교주를 최고의 수집품으로 점찍어 둔 채 경쟁자들을 견제한다. 친구가 사라진 뒤로 '더는 움직이지 않는 것'만 모으게 됐고, 독침으로 움직임을 멈추게 하는 것도 수집의 일부. 말끝은 늘 음슴체임.",
+   "blurb": "움직이지 않는 것만 모으는 수집광 요정. 전당포를 운영하며 음침하게 흐흐 웃고, 교주를 최고의 수집품으로 점찍어 둔 채 경쟁자들을 견제합니다. 친구가 사라진 뒤로 「더는 움직이지 않는 것」만 모으게 됐고, 독침으로 움직임을 멈추게 하는 것도 수집의 일부. 말끝은 늘 음슴체임.",
    "keyword": {
     "name": "마취",
-    "desc": "독침에 굳어 가는 수집 후보 — 쌓일수록 무르고, 셋이면 굼떠진다",
+    "desc": "독침으로 쌓는 마취",
     "carrier": "enemy",
     "cap": 3,
     "per": [
@@ -153,12 +153,11 @@
    ],
    "oracles": [
     {
-     "name": "음침한 법칙",
-     "tags": [],
+     "name": "법칙 제1조",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.7,
+       "ratio": 1.6,
        "target": "oneEnemy",
        "hits": 3
       },
@@ -171,13 +170,12 @@
      ]
     },
     {
-     "name": "가벼운 법칙",
+     "name": "약식 법칙",
      "cost": 2,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.05,
+       "ratio": 1.1,
        "target": "oneEnemy",
        "hits": 3
       },
@@ -190,12 +188,55 @@
      ]
     },
     {
-     "name": "마취된 법칙",
-     "tags": [],
+     "name": "표본 고정",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "마취",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "dmg",
+       "ratio": 1.3,
+       "target": "oneEnemy",
+       "hits": 3
+      },
+      {
+       "k": "perStack",
+       "id": "마취"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.3,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "싹쓸이 수집",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.45,
+       "ratio": 1.15,
+       "target": "randomEnemy",
+       "hits": 5
+      },
+      {
+       "k": "stack",
+       "id": "마취",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "전부 내꺼임.",
+     "cost": 4,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.9,
        "target": "oneEnemy",
        "hits": 3
       },
@@ -204,65 +245,26 @@
        "id": "마취",
        "v": 3,
        "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "모셔 둔 법칙",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.55,
-       "target": "oneEnemy",
-       "hits": 3
       },
       {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "수집가의 법칙",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.55,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
+       "k": "tough",
+       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "희귀 표본",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "감정사의 눈",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "따끔한 침",
+     "kind": "frost"
     }
    ]
   },
@@ -290,14 +292,14 @@
    ],
    "oracles": [
     {
-     "name": "음침한 견제",
+     "name": "확실한 견제",
      "tags": [
       "분쇄"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.85,
+       "ratio": 2.7,
        "target": "oneEnemy"
       },
       {
@@ -308,7 +310,7 @@
      ]
     },
     {
-     "name": "가벼운 견제",
+     "name": "발 걸기",
      "cost": 1,
      "tags": [
       "분쇄"
@@ -316,7 +318,7 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.75,
+       "ratio": 1.4,
        "target": "oneEnemy"
       },
       {
@@ -327,7 +329,7 @@
      ]
     },
     {
-     "name": "마취된 견제",
+     "name": "마취 견제",
      "tags": [
       "분쇄"
      ],
@@ -351,59 +353,60 @@
      ]
     },
     {
-     "name": "모셔 둔 견제",
+     "name": "경쟁자 전원 견제",
      "tags": [
-      "분쇄",
-      "보존"
+      "분쇄"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.65,
-       "target": "oneEnemy"
+       "ratio": 1.5,
+       "target": "allEnemies"
       },
       {
        "k": "status",
        "id": "취약",
-       "v": 2
+       "v": 2,
+       "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "수집가의 견제",
+     "name": "밑장 빼기",
      "tags": [
-      "분쇄",
-      "축복"
+      "분쇄"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.65,
+       "ratio": 2.4,
        "target": "oneEnemy"
       },
       {
        "k": "status",
        "id": "취약",
        "v": 2
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "뾰족한 신경전",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "약점 수집",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "흘겨보기",
+     "kind": "draw"
     }
    ]
   },
@@ -430,12 +433,11 @@
    ],
    "oracles": [
     {
-     "name": "음침한 독침 세례",
-     "tags": [],
+     "name": "독침 소나기",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.8,
+       "ratio": 0.75,
        "target": "randomEnemy",
        "hits": 5
       },
@@ -448,13 +450,12 @@
      ]
     },
     {
-     "name": "가벼운 독침 세례",
+     "name": "몰래 한 발",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.5,
+       "ratio": 0.4,
        "target": "randomEnemy",
        "hits": 5
       },
@@ -467,8 +468,41 @@
      ]
     },
     {
-     "name": "마취된 독침 세례",
-     "tags": [],
+     "name": "마취 두 겹",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.65,
+       "target": "randomEnemy",
+       "hits": 5
+      },
+      {
+       "k": "stack",
+       "id": "마취",
+       "v": 2,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "한 놈 집중 사격",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.6,
+       "target": "oneEnemy",
+       "hits": 5
+      },
+      {
+       "k": "stack",
+       "id": "마취",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "잠드는 독",
      "fx": [
       {
        "k": "dmg",
@@ -483,48 +517,8 @@
        "target": "allEnemies"
       },
       {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "모셔 둔 독침 세례",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "수집가의 독침 세례",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "stack",
-       "id": "마취",
+       "k": "status",
+       "id": "약화",
        "v": 1,
        "target": "allEnemies"
       }
@@ -533,19 +527,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "진한 독",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "저릿한 침",
+     "kind": "frost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "통째로 쏟기",
+     "kind": "cost"
     }
    ]
   },
@@ -576,12 +567,54 @@
    ],
    "oracles": [
     {
-     "name": "음침한 흐흐",
-     "tags": [],
+     "name": "흐흐흐…",
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.25,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "마취",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "씨익",
+     "cost": 0,
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.1,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "마취",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "마취 진열",
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
@@ -598,9 +631,32 @@
      ]
     },
     {
-     "name": "가벼운 흐흐",
-     "cost": 0,
-     "tags": [],
+     "name": "다 내꺼 될 거임",
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "마취",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "숨긴 웃음",
+     "tags": [
+      "보존",
+      "주도"
+     ],
      "fx": [
       {
        "k": "atkMod",
@@ -619,93 +675,20 @@
        "v": 1
       }
      ]
-    },
-    {
-     "name": "마취된 흐흐",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "모셔 둔 흐흐",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "수집가의 흐흐",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "음흉한 계산",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "진열장 열쇠",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "수집욕",
+     "kind": "atkUp"
     }
    ]
   }

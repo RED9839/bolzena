@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Build;
@@ -44,6 +44,27 @@ namespace Bolzena.RunUI.EditorTools
             if (info == null) { Debug.LogError("[RunUiSetup] com.bolzena.core 없음"); return; }
             var src = Path.Combine(info.resolvedPath, "Data", "Sample");
             var dst = Path.Combine("Assets", "StreamingAssets", "CoreData");
+            // -coreData <폴더>: 다른 콘텐츠(예: bolzena-content-v2 — 135명)로 시험. 읽기만 하고, 「_」 로 시작하는 폴더 · 파일은 빼서 임시 폴더로 옮겨 읽는다
+            var args = System.Environment.GetCommandLineArgs();
+            int ai = System.Array.IndexOf(args, "-coreData");
+            if (ai >= 0 && ai + 1 < args.Length && Directory.Exists(args[ai + 1]))
+            {
+                var tmp = Path.Combine(Path.GetTempPath(), "runui_coredata");
+                if (Directory.Exists(tmp)) Directory.Delete(tmp, true);
+                foreach (var f in Directory.GetFiles(args[ai + 1], "*.json", SearchOption.AllDirectories))
+                {
+                    var rel = Path.GetRelativePath(args[ai + 1], f);
+                    // 「_」 폴더(작업 자료)는 빼고, 「_」 파일(_그림.json 같은 화면용 표)은 둔다 — 게임 데이터 읽기(GameData)는 「_」 를 건너뛴다
+                    var parts = rel.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                    bool skip = false;
+                    for (int pi = 0; pi < parts.Length - 1; pi++) if (parts[pi].StartsWith("_")) skip = true;
+                    if (skip) continue;
+                    var to = Path.Combine(tmp, rel);
+                    Directory.CreateDirectory(Path.GetDirectoryName(to));
+                    File.Copy(f, to, true);
+                }
+                src = tmp;
+            }
             try
             {
                 var d = Bolzena.Core.GameData.FromFolder(src);

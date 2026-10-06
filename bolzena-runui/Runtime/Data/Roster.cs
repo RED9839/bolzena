@@ -16,7 +16,6 @@ namespace Bolzena.RunUI
         [NonSerialized] public string CoreId;          // 코어 데이터의 사도 id(있으면 고를 수 있다)
         public bool Playable => CoreId != null;
         public Sprite Icon => Theme.HeroIcon(art);
-        public string MiniSkin => art == null ? null : "Mini_" + art;
         public string RowKo => row == "front" ? "전열" : row == "mid" ? "중열" : "후열";
     }
 

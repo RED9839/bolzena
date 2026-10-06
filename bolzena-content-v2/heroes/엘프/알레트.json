@@ -12,17 +12,18 @@
       "atk": 66,
       "def": 57,
       "crit": 5,
-      "blurb": "칸나 반장 말만 듣는 충견형 하사. 반장님이 공격하면 그 앞을 방패로 막고, 명령을 셋 받으면 반격으로 되갚는다.",
+      "blurb": "칸나 반장 말만 듣는 충견형 하사. 반장님이 공격하면 그 앞을 방패로 막고, 명령을 셋 받으면 반격으로 되갚습니다.",
       "keyword": {
         "name": "반장님",
-        "desc": "알레트가 따르는 아군 — 반장님이 공격하면 알레트가 방패를 든다",
+        "desc": "알레트가 따르는 아군 표시",
         "carrier": "hero",
-        "cap": 1
+        "cap": 1,
+        "hunt": true
       },
       "keywords": [
         {
           "name": "명령 수행",
-          "desc": "반장님의 공격 하나하나가 명령 — 셋이면 반격 태세",
+          "desc": "반장님 공격으로 쌓는 명령",
           "carrier": "self",
           "cap": 3,
           "rules": [
@@ -60,7 +61,7 @@
               "k": "stack",
               "id": "반장님",
               "v": 1,
-              "target": "otherAllies"
+              "target": "hero:칸나"
             }
           ]
         },
@@ -268,7 +269,7 @@
           ]
         },
         {
-          "name": "반장님 명령이다",
+          "name": "반장님 명령",
           "cost": 3,
           "fx": [
             {
@@ -569,7 +570,7 @@
           ]
         },
         {
-          "name": "반장님 앞은 못 지나간다",
+          "name": "반장님 앞은 못 지나감",
           "tags": [
             "보존"
           ],
@@ -667,13 +668,30 @@
         {
           "k": "defMod",
           "v": 0.1,
-          "target": "self",
-          "run": true
+          "run": true,
+          "target": "self"
         },
         {
           "k": "status",
           "id": "반격",
-          "v": 2
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "명령 수행",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -682,14 +700,35 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.13,
-              "target": "self",
-              "run": true
+              "v": 0.1,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "반격",
-              "v": 3
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "명령 수행",
+                      "v": 2
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -698,15 +737,25 @@
           "cost": 0,
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.1,
-              "target": "self",
-              "run": true
+              "k": "draw",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "명령 수행",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -716,17 +765,29 @@
             {
               "k": "defMod",
               "v": 0.1,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "명령 수행",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -735,14 +796,31 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.14,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "status",
               "id": "반격",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "명령 수행",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -751,19 +829,31 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.11,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "stack",
               "id": "명령 수행",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "명령 수행",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

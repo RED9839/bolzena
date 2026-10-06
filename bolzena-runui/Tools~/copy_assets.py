@@ -95,9 +95,9 @@ def spine(src_dir, name):
     print("스파인", name)
 
 
-spine(f"{SRC}/spine/minimi", "minimi")
+# 미니미(spine/minimi)는 더 쓰지 않는다(2026-10-06 — 장면은 SD 전투 스파인 SceneHero)
 # 스탠딩 — 로비 메인 사도(에르핀) · 상점 주인(골디) · 코어 샘플 이벤트의 NPC
-for key in ["erpin", "goldy", "sist", "alice", "jubee"]:
+for key in ["erpin", "goldy", "sist", "alice", "jubee", "noone"]:   # noone = 겨우살이(특별 이벤트 「겨우살이가 걸린 나무」 — event_style.json)
     p = f"{SRC}/spine/standing/{key}"
     if not os.path.isdir(p):
         p = f"{SRC}/standing/{key}"
@@ -105,6 +105,13 @@ for key in ["erpin", "goldy", "sist", "alice", "jubee"]:
         spine(p, "st_" + key)
 # 코어 샘플의 판에 데려가는 사도(편성 큰 카드 · 사도 상세 · 목록 · 주인 고르기가 스파인으로 움직인다) — 원본 폴더는 한글 이름, 그림 키는 roster.json 의 art
 for folder, art in [("리코타", "ricota"), ("캬롯", "kyarot"), ("시온더다크불릿", "xxionx")]:
+    p = f"{SRC}/spine/standing/{folder}"
+    if os.path.isdir(p):
+        spine(p, "st_" + art)
+# 이벤트 대상 · NPC(콘텐츠 events 의 npc · event_style 의 target) 스탠딩 — 원본 폴더 한글 이름 → 그림 키(roster.json art). SD 는 위 Spine/<한글 키> 로 이미 있다
+for folder, art in [("가비아", "gabia"), ("레이지", "lazy"), ("림", "rim"), ("마고", "mago"), ("멜루나", "meluna"), ("모모", "momo"), ("베니", "beni"),
+                    ("셰럼", "sherum"), ("스피키", "speaki"), ("실라", "sylla"), ("아네트", "arnet"), ("알레트", "allet"), ("에슈르", "ashur"), ("오르", "orr"),
+                    ("유미미", "yumimi"), ("이프리트", "ifrit"), ("타이다", "taida"), ("티그", "tig"), ("폴랑", "polan"), ("프리클", "fricle"), ("힐데", "hilde"), ("셰이디", "shady")]:
     p = f"{SRC}/spine/standing/{folder}"
     if os.path.isdir(p):
         spine(p, "st_" + art)

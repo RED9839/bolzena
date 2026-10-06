@@ -153,6 +153,8 @@ namespace Bolzena.RunUI
 
         /// <summary>올림 상태만 켠다 · 끈다(자동 데모가 버튼 상태를 찍을 때).</summary>
         public void Hover(bool v) { hover = v; if (!v) down = false; }
+        /// <summary>지금 올려져 있나(포인터 · 데모의 Hover).</summary>
+        public bool IsHovered => hover;
 
         /// <summary>가짜 손가락 — 길게 누른다(자동 데모).</summary>
         public System.Collections.IEnumerator LongPress()

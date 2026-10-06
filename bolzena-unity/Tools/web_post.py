@@ -112,7 +112,10 @@ html = r"""<!doctype html>
 // 25MB 넘는 파일은 조각으로 올렸다 — 로더가 원래 이름을 부르면 조각을 차례로 받아 한 줄기로 잇는다
 const SPLIT = %(split)s;
 const VERSION = "%(version)s";
+window.bzBundles = %(bundles)s;   // 스파인 번들(Bundles/manifest.json)이 있는 판인가 — WebBundles.cs
 const LAST_MODIFIED = new Date(%(mtime)d).toUTCString(), ETAG = '"' + VERSION + '"';
+// 전체 화면 전환 신호를 유니티에 넘기지 않는다 — 유니티 6000.6 WebGL 이 이때 렌더 타깃을 지우고 다시 만들지 않아 화면이 깨진다(캔버스 크기는 resize 의 fit() 이 맞춤)
+for (const t of ["fullscreenchange", "webkitfullscreenchange"]) window.addEventListener(t, (e) => e.stopImmediatePropagation(), true);
 const realFetch = window.fetch.bind(window);
 let bigDone = 0, bigTotal = 0;
 for (const k in SPLIT) bigTotal += SPLIT[k].size;
@@ -155,6 +158,17 @@ function headersOf(k) {
 }
 
 const fill = document.getElementById("fill"), status = document.getElementById("status"), err = document.getElementById("error");
+// 번들(스파인 — WebBundles.cs · BzWeb.jslib): 게임이 뜬 뒤에도 그림을 받는 동안 이 로딩 화면을 다시 띄운다. p < 0 = 실패(게임이 저절로 다시 받는다)
+const loadingEl = document.getElementById("loading");
+let bzBusy = false;
+window.bzStatus = (p, msg) => {
+  bzBusy = true;
+  loadingEl.style.display = "flex";
+  status.textContent = msg;
+  status.style.color = p < 0 ? "#ff8a7a" : "";
+  if (p >= 0) fill.style.width = (Math.min(1, p) * 100).toFixed(1) + "%%";
+};
+window.bzReady = () => { bzBusy = false; status.style.color = ""; if (window.unityInstance) loadingEl.style.display = "none"; };
 const canvas = document.getElementById("unity-canvas");
 function fit() {
   const r = window.devicePixelRatio || 1;
@@ -188,7 +202,7 @@ script.onload = () => {
     status.textContent = p >= 0.9 && bigDone >= bigTotal ? "준비하는 중…" : "불러오는 중… " + Math.round(shown * 100) + "%%";
   }).then((inst) => {
     window.unityInstance = inst;
-    document.getElementById("loading").style.display = "none";
+    if (!bzBusy) loadingEl.style.display = "none";
     document.getElementById("legal").style.display = "none";   // 게임 로비가 같은 표기를 띄운다
     canvas.focus();
   }).catch((e) => { err.textContent += String(e) + "\n"; status.textContent = "불러오지 못했습니다"; });
@@ -201,12 +215,22 @@ document.body.appendChild(script);
 """
 
 first = sum(os.path.getsize(os.path.join(build, f)) for f in os.listdir(build))
+# 번들(스파인) — boot 은 첫 화면 전에, later 는 첫 화면 뒤에 받는다(WebBundles.cs)
+boot_b = later_b = 0
+man = os.path.join(ROOT, "Bundles", "manifest.json")
+if os.path.exists(man):
+    for e in json.load(open(man, encoding="utf-8"))["bundles"]:
+        if e["group"] == "boot":
+            boot_b += e["size"]
+        else:
+            later_b += e["size"]
 mtime = int(time.time() * 1000)
 with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as o:
     o.write(html % {
         "legal": LEGAL, "split": json.dumps(split, ensure_ascii=False), "version": version, "stamp": stamp, "mtime": mtime,
         "data": files["data"], "framework": files["framework"], "wasm": files["wasm"], "name": name,
-        "total_mb": int(round(first / 1e6)),
+        "total_mb": int(round((first + boot_b) / 1e6)),
+        "bundles": "true" if os.path.exists(man) else "false",
     })
 
 # 쓰지 않는 템플릿 찌꺼기
@@ -233,6 +257,8 @@ for dp, dn, fn in os.walk(ROOT):
 
 print("[web] 조각낸 파일: " + ", ".join("%s → %d조각" % (k, len(v["parts"])) for k, v in split.items()))
 print("[web] 첫 로딩(Build/) %.1fMB · 전체 %.1fMB · 파일 %d개 · 가장 큰 파일 %s %.1fMB" % (first / 1e6, total / 1e6, count, largest[0], largest[1] / 1e6))
+if boot_b or later_b:
+    print("[web] 번들 — 첫 화면 전(boot) %.1fMB · 첫 화면 뒤(later) %.1fMB → 첫 화면까지 %.1fMB" % (boot_b / 1e6, later_b / 1e6, (first + boot_b) / 1e6))
 if over:
     sys.exit("[web] 25MB 넘는 파일: %r" % over)
 if count > 20000:

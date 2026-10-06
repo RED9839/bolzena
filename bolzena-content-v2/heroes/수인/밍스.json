@@ -15,7 +15,7 @@
       "blurb": "촌장을 수백 번 졸라 교사가 된 늑대 수인.",
       "keyword": {
         "name": "졸업 미룸",
-        "desc": "시범 수업 — 제자가 공격할 때마다 하나, 셋이면 사기 2 로 칭찬하고 처음부터",
+        "desc": "제자가 공격하면 쌓이는 수업",
         "carrier": "self",
         "cap": 3,
         "rules": [
@@ -58,7 +58,7 @@
       "keywords": [
         {
           "name": "제자",
-          "desc": "밍스 반 학생 — 공격 카드를 내면 밍스가 시범으로 따라 친다",
+          "desc": "밍스 반 학생 표시",
           "carrier": "hero",
           "cap": 1
         }
@@ -185,33 +185,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 캬오오~",
+          "name": "캬오오오오~!",
           "fx": [
             {
               "k": "dmg",
               "ratio": 1.3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가벼운 캬오오~",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
               "target": "allEnemies"
             },
             {
@@ -228,11 +206,33 @@
           ]
         },
         {
-          "name": "선생님의 캬오오~",
+          "name": "캬오",
+          "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "쉬는 시간 끝!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
               "target": "allEnemies"
             },
             {
@@ -249,21 +249,17 @@
           ]
         },
         {
-          "name": "재빠른 캬오오~",
-          "tags": [
-            "신속"
-          ],
+          "name": "꾸중 한 마디",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.25,
-              "target": "allEnemies"
+              "ratio": 1.9,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "v": 2
             },
             {
               "k": "stack",
@@ -273,21 +269,17 @@
           ]
         },
         {
-          "name": "꿰뚫는 캬오오~",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "교실 울림",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.0,
               "target": "allEnemies"
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "사기",
+              "v": 1
             },
             {
               "k": "stack",
@@ -299,22 +291,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "목청 높이기",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "쩌렁쩌렁",
+          "kind": "frost"
         },
         {
-          "name": "참 잘했어요",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
-            }
-          ]
+          "name": "선생님의 위엄",
+          "kind": "atkUp"
         }
       ]
     },
@@ -339,27 +325,27 @@
       ],
       "oracles": [
         {
-          "name": "힘준 요령은 없고 시범만",
+          "name": "확실한 시범",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.35,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "졸업 미룸",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 요령은 없고 시범만",
+          "name": "대충 시범",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.65,
               "target": "oneEnemy"
             },
             {
@@ -370,11 +356,11 @@
           ]
         },
         {
-          "name": "선생님의 요령은 없고 시범만",
+          "name": "한 번 더 시범",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
@@ -385,15 +371,12 @@
           ]
         },
         {
-          "name": "재빠른 요령은 없고 시범만",
-          "tags": [
-            "신속"
-          ],
+          "name": "전원 따라 해",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy"
+              "ratio": 0.8,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -403,14 +386,14 @@
           ]
         },
         {
-          "name": "꿰뚫는 요령은 없고 시범만",
+          "name": "모범 답안",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.15,
               "target": "oneEnemy"
             },
             {
@@ -423,22 +406,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "발톱 힘주기",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "약점 짚어 주기",
           "kind": "weakSpot"
         },
         {
-          "name": "참 잘했어요",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
-            }
-          ]
+          "name": "교과서 펼치기",
+          "kind": "draw"
         }
       ]
     },
@@ -463,28 +440,32 @@
       ],
       "oracles": [
         {
-          "name": "힘준 졸업장은 서랍 속에",
+          "name": "서랍 깊숙이",
           "fx": [
             {
               "k": "stack",
               "id": "졸업 미룸",
-              "v": 3
+              "v": 2
             },
             {
               "k": "status",
               "id": "협공",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
             }
           ]
         },
         {
-          "name": "가벼운 졸업장은 서랍 속에",
+          "name": "졸업장 한 장",
           "cost": 0,
           "fx": [
             {
               "k": "stack",
               "id": "졸업 미룸",
-              "v": 3
+              "v": 1
             },
             {
               "k": "status",
@@ -494,25 +475,7 @@
           ]
         },
         {
-          "name": "선생님의 졸업장은 서랍 속에",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 4
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "든든한 졸업장은 서랍 속에",
-          "tags": [
-            "보존"
-          ],
+          "name": "유급 통지",
           "fx": [
             {
               "k": "stack",
@@ -521,15 +484,36 @@
             },
             {
               "k": "status",
-              "id": "협공",
+              "id": "사기",
               "v": 1
             }
           ]
         },
         {
-          "name": "복 받은 졸업장은 서랍 속에",
+          "name": "무서운 담임",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "졸업 앨범",
           "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
@@ -547,22 +531,16 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
-          "kind": "guard"
+          "name": "열쇠 숨기기",
+          "kind": "cost"
         },
         {
-          "name": "한 장 더",
+          "name": "출석부",
           "kind": "draw"
         },
         {
-          "name": "참 잘했어요",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
-            }
-          ]
+          "name": "종소리",
+          "kind": "ap"
         }
       ]
     },
@@ -576,55 +554,153 @@
       "fx": [
         {
           "k": "status",
-          "id": "사기",
+          "id": "협공",
           "v": 1
         },
         {
-          "k": "status",
-          "id": "협공",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "졸업 미룸",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 오늘은 자습",
+          "name": "모범생 칭찬",
           "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            },
             {
               "k": "status",
               "id": "협공",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 오늘은 자습",
+          "name": "쉬는 시간",
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 2
+              "k": "draw",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "선생님의 오늘은 자습",
+          "name": "제자 지정",
           "fx": [
             {
               "k": "status",
-              "id": "사기",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "제자",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "시범 수업",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
               "v": 2
             },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "졸업 사진",
+          "tags": [
+            "축복"
+          ],
+          "fx": [
             {
               "k": "status",
               "id": "협공",
@@ -634,54 +710,38 @@
               "k": "stack",
               "id": "졸업 미룸",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "든든한 오늘은 자습",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
             },
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 오늘은 자습",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
+          "name": "조회 시간",
           "kind": "ap"
         },
         {
-          "name": "한 장 더",
+          "name": "자습 과제",
           "kind": "draw"
         },
         {
-          "name": "참 잘했어요",
+          "name": "숙제 검사",
           "fx": [
             {
               "k": "stack",

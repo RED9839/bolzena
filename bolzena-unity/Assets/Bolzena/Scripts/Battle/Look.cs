@@ -108,7 +108,8 @@ namespace Bolzena.Battle
             return artTable;
         }
 
-        static bool HasSpine(string folder) => !string.IsNullOrEmpty(folder) && Resources.LoadAll<Spine.Unity.SkeletonDataAsset>("Spine/" + folder).Length > 0;
+        // 있는지만 — 웹 빌드는 번들 목록으로 답한다(받기 전이어도. 대역을 잘못 세우지 않게)
+        static bool HasSpine(string folder) => Bolzena.RunUI.SpineSource.Exists(folder);
 
         // 원작 스킨 이름 — 표의 mad · cool 은 Skin_Mad · Skin_Cool, default 는 기본(스킨 없음)
         static string SkinName(string s)

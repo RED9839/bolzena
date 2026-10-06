@@ -19,16 +19,15 @@ namespace Bolzena.Core
             if (d.Phase != null && !e.Phased && e.Hp <= e.MaxHp * d.Phase.At)
             {
                 e.Phased = true; e.Step = 0;
-                Say($"{e.Name}: {d.Phase.Say}");
-                RefillTough(e);
+                Say($"{e.Name}: {d.Phase.Say}");   // 판이 바뀌어도 강인도는 차지 않는다(사용자 2026-10-06 — 격파 뒤 다음 턴 · 회복 스킬만)
             }
             if (d.Phase2 != null && e.Phased && !e.Phased2 && e.Hp <= e.MaxHp * d.Phase2.At)
             {
                 e.Phased2 = true; e.Step = 0;
                 Say($"{e.Name}: {d.Phase2.Say}");
-                RefillTough(e);
             }
             if (e.ForceNext != null) { e.Intent = e.ForceNext; e.ForceNext = null; e.Hist.Add(e.Intent.T); e.Step++; return; }
+            if (UltDue(e, d)) return;
             var list = e.Phased2 ? d.Phase2.Intents : e.Phased ? d.Phase.Intents : d.Intents;
             if (list == null || list.Count == 0) list = d.Intents;
             if (list == null || list.Count == 0) { e.Intent = null; return; }
@@ -56,6 +55,54 @@ namespace Bolzena.Core
             e.Intent = it;
             e.Hist.Add(it.T);
             e.Step++;
+        }
+
+        // ── 보스 클론의 고학년(BossUlt) ────────────────────────────────
+        /// <summary>
+        /// 보스 클론이 고학년을 예고할 턴이면 예고 수(charge → 다음 턴 ult)를 세우고 true. 평소 수의 차례(Step)는 그대로 둔다.
+        /// 처음은 BossUlt.FIRST 턴 — 같은 싸움의 두 번째 클론부터는 한 턴씩 늦게. 그 뒤 EVERY 턴마다.
+        /// </summary>
+        bool UltDue(Unit e, EnemyDef d)
+        {
+            if (Turn < 1 || !BossUlt.Has(Data, d)) return false;
+            if (e.UltAt == 0)
+            {
+                int order = Enemies.Count(x => x != e && x.Idx < e.Idx && x.Boss && Data.Enemy(x.Key)?.Clone != null);
+                e.UltAt = Math.Max(Turn, BossUlt.FIRST) + order;
+            }
+            if (Turn < e.UltAt) return false;
+            var p = BossUlt.PlanFor(Data, d, Floor);
+            if (p == null) return false;
+            e.UltAt = Turn + BossUlt.EVERY;
+            e.Intent = p.Warn; e.IntentFromCharge = false;
+            e.Hist.Add(p.Warn.T);
+            int shown = UltHitOf(e, p.Use);
+            Say($"{e.Name}: 고학년 예고 — 「{p.Name}」(다음 턴 피해 {shown} · 격파하면 끊김)");
+            Cue("foeUltWarn", e, new Cue { Hero = p.Hero, Name = p.Name, V = shown, T = p.Use.Then.FirstOrDefault(x => IsHit(x.T))?.T });
+            return true;
+        }
+
+        /// <summary>고학년 한 번의 피해 합(머리 위 숫자와 같은 셈 — 층 배율 · 약화 · 사기).</summary>
+        int UltHitOf(Unit e, Intent use)
+        {
+            int s = 0;
+            if (use?.Then != null) foreach (var x in use.Then) if (IsHit(x.T)) s += Dealt(e, AllX(x)) * (x.T == "multi" ? Math.Max(1, x.N) : 1);
+            return s;
+        }
+
+        /// <summary>그 적이 예고 · 사용 중인 고학년의 피해(예고 턴에도 — 다음 턴 피해). 고학년이 아니면 null.</summary>
+        public int? UltHit(Unit e) => e?.Intent == null ? null : e.Intent.T == "ult" ? UltHitOf(e, e.Intent) : BossUlt.IsUlt(e.Intent) ? UltHitOf(e, e.Intent.Next) : (int?)null;
+
+        /// <summary>치는 수인가(고학년이면 그 안에 치는 수가 있나).</summary>
+        static bool HitLike(Intent it) => it != null && (IsHit(it.T) || (it.T == "ult" && it.Then != null && it.Then.Any(x => IsHit(x.T))));
+
+        /// <summary>고학년이 끊겼다(격파 · 기절) — 쪽지 foeUltCut.</summary>
+        void UltCut(Unit e, string why)
+        {
+            if (!BossUlt.IsUlt(e?.Intent)) return;
+            var use = e.Intent.T == "ult" ? e.Intent : e.Intent.Next;
+            Say($"{e.Name}: {why} — 고학년 「{use.Say}」 이(가) 끊겼다");
+            Cue("foeUltCut", e, new Cue { Hero = use.Id, Name = use.Say, Label = why, T = e.Intent.T });
         }
 
         bool IntentOk(Unit e, Intent it)
@@ -91,7 +138,7 @@ namespace Bolzena.Core
         static int AllX(Intent it) => it.T == "attackAll" ? Num.Round(it.V * R.FOE_ALL_X) : it.V;
 
         /// <summary>머리 위에 보여 줄 수치 — 층 배율 · 약화 · 사기가 들어간 값. 치는 수가 아니면 null.</summary>
-        public int? IntentHit(Unit e) => e.Intent != null && IsHit(e.Intent.T) ? Dealt(e, AllX(e.Intent)) : (int?)null;
+        public int? IntentHit(Unit e) => e.Intent != null && IsHit(e.Intent.T) ? Dealt(e, AllX(e.Intent)) : e.Intent?.T == "ult" ? UltHitOf(e, e.Intent) : (int?)null;
 
         /// <summary>적의 치는 수의 값 — 층 배율만(상태는 빼고). 적 정보 창 · 가시가 쓴다.</summary>
         public static int FoeV(Unit e, Intent it)
@@ -181,6 +228,7 @@ namespace Bolzena.Core
                 if (e.Dead) continue;
                 if (e.Sealed)
                 {
+                    if (!e.Broken) UltCut(e, "기절");   // 격파는 격파하는 자리에서 끊는다(ToughHit)
                     e.Sealed = false;
                     Say($"{e.Name}: 움직이지 못한다{(e.Intent?.Next != null ? " — 모은 힘이 흩어졌다" : "")}");
                     if (e.Intent?.Next != null) e.Intent = null;
@@ -242,9 +290,9 @@ namespace Bolzena.Core
             if (it == null) return;
             if (!passive)
             {   // 적이 행동하기 직전 — 함정 · 「적이 행동하면(직전)」
-                SpringTraps(e, it);
+                SpringTraps(e, it.T == "ult" ? it.Then?.FirstOrDefault(x => IsHit(x.T)) ?? it : it);
                 if (Over != null || e.Dead) return;
-                Emit("foeActBefore", new EmitInfo { Target = e, Type = IsHit(it.T) ? "공격" : "기타" });
+                Emit("foeActBefore", new EmitInfo { Target = e, Type = HitLike(it) ? "공격" : "기타" });
                 if (Over != null || e.Dead || e.Sealed) return;
             }
             int seq0 = ActSeq; ActSeq = ++SeqN;
@@ -255,7 +303,7 @@ namespace Bolzena.Core
                 e.ActedTurn = true;
                 DelSt(e, "둔화"); DelSt(e, "급속");
                 FoePassives("act", e);
-                if (Over == null) Emit("foeAct", new EmitInfo { Target = e, Type = IsHit(it.T) ? "공격" : "기타" });
+                if (Over == null) Emit("foeAct", new EmitInfo { Target = e, Type = HitLike(it) ? "공격" : "기타" });
             }
         }
 
@@ -277,6 +325,7 @@ namespace Bolzena.Core
             return v;
         }
 
+        /// <summary>강인도 회복 스킬 — 수 brace(버티기) · 수에 붙은 tough. 격파 중이면 안 찬다(격파는 다음 내 턴 시작에 다 찬다).</summary>
         void RegainTough(Unit x, double n)
         {
             if (x.ToughMax <= 0 || x.Broken || x.Dead || x.Tough >= x.ToughMax) return;
@@ -286,9 +335,10 @@ namespace Bolzena.Core
             Say($"{x.Name}: 강인도 +{x.Tough - from:0.##}");
         }
 
-        void FoeAct(Unit e, Intent it, string say)
+        void FoeAct(Unit e, Intent it, string say, bool quiet = false)
         {
-            Cue("act", e, new Cue { Anim = IsHit(it.T) ? "attack" : "skill", Say = say, T = it.T, Rush = Rushing });
+            if (it.T == "ult") { FoeUlt(e, it); return; }
+            if (!quiet) Cue("act", e, new Cue { Anim = IsHit(it.T) ? "attack" : "skill", Say = say, T = it.T, Rush = Rushing });
             if (FoeActKit(e, it, say)) { if (it.Tough > 0) RegainTough(e, it.Tough); return; }
             // 혼란 — 치는 수가 다른 적(무작위)을 친다
             if (e.Confused && IsHit(it.T))
@@ -352,6 +402,7 @@ namespace Bolzena.Core
                         Say($"{e.Name}: {say} → 파티 ({d}){(it.Id != null ? $" · {it.Id} {Math.Max(1, it.N)}" : "")}");
                         break;
                     }
+                case "brace": Say($"{e.Name}: {say}"); RegainTough(e, it.V); break;   // 버티기 — 강인도 v 회복(격파 중이면 안 찬다)
                 case "block": { int bv = FoeBlock(e, it.V); Say($"{e.Name}: {say} (방어 +{bv} → {e.Block + e.Shield})"); break; }
                 case "buff":
                     foreach (var x in it.All ? AliveEnemies() : new List<Unit> { e }) { AddSt(x, it.Id, it.V, "enemy:" + e.Idx); StatusCue(x, it.Id, true); }
@@ -396,9 +447,31 @@ namespace Bolzena.Core
                         break;
                     }
             }
-            if (it.Tough > 0) foreach (var x in it.T == "guard" || it.All ? AliveEnemies() : new List<Unit> { e }) RegainTough(x, it.Tough);
+            // 강인도 회복은 그 적 자신만(all 이면 적 전체). 옛 「guard 면 적 전체」 는 없앴다(사용자 2026-10-06 — 회복 스킬이 있는 적만)
+            if (it.Tough > 0) foreach (var x in it.All ? AliveEnemies() : new List<Unit> { e }) RegainTough(x, it.Tough);
             // 치는 수는 적의 약화를 한 번 쓴다(Dealt 가 이미 넣었다)
             if (IsHit(it.T) && St(e, "약화") > 0) Charge(e, "약화");
+        }
+
+        /// <summary>
+        /// 보스 클론의 고학년 — 쪽지 foeUlt(시작) → act(T "ult" · Anim 은 치는 수가 있으면 attack) → 치는 수마다 foeUltHit → 그 수의 hurt · status … → foeUltEnd.
+        /// 안의 수들은 한 번의 일(ActSeq 하나)로 돈다 — 약화 · 반격은 한 번만.
+        /// </summary>
+        void FoeUlt(Unit e, Intent it)
+        {
+            var subs = it.Then ?? new List<Intent>();
+            int shown = UltHitOf(e, it);
+            Say($"{e.Name}: 고학년 — 「{it.Say}」");
+            Cue("foeUlt", e, new Cue { Hero = it.Id, Name = it.Say, V = shown });
+            Cue("act", e, new Cue { Anim = HitLike(it) ? "attack" : "skill", Say = it.Say, T = "ult", Rush = Rushing, Hero = it.Id, Name = it.Say });
+            int k = 0;
+            foreach (var x in subs)
+            {
+                if (Over != null || e.Dead) break;
+                if (IsHit(x.T)) Cue("foeUltHit", e, new Cue { Hero = it.Id, Name = it.Say, V = k++, T = x.T });
+                FoeAct(e, x, x.Say ?? it.Say, true);
+            }
+            if (!e.Dead) Cue("foeUltEnd", e, new Cue { Hero = it.Id, Name = it.Say });
         }
 
         /// <summary>맞는 자리(연출) — 피해는 늘 파티 몸으로 간다. 앞줄부터(관통은 뒷줄부터), 같은 열이면 파티 순서가 뒤인 사도.</summary>

@@ -15,13 +15,33 @@
       "blurb": "우로스를 쓰러뜨리기 직전, 한창때의 디아나가 벨벳이 찢은 책에서 튀어나온 모습.",
       "keyword": {
         "name": "백수공권",
-        "desc": "단순하게 — 손패를 다 비우고 공격하면 쌓여 자신의 피해가 오른다",
+        "desc": "빈손으로 치며 모으는 기세",
         "carrier": "self",
         "cap": 3,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.15
+            "v": 0.3
+          }
+        ],
+        "consume": 1,
+        "rules": [
+          {
+            "name": "바위 던지기",
+            "when": {
+              "on": "stackOver",
+              "id": "백수공권"
+            },
+            "fx": [
+              {
+                "k": "perEvent"
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.4,
+                "target": "allEnemies"
+              }
+            ]
           }
         ]
       },
@@ -46,7 +66,7 @@
         }
       ],
       "ult": {
-        "name": "부순다",
+        "name": "부수기",
         "cost": 250,
         "fx": [
           {
@@ -69,7 +89,7 @@
         {
           "id": "디아나_왕년_맨주먹",
           "name": "맨주먹 전성기",
-          "desc": "도끼가 박살 난 뒤의 맨주먹 — 우로스를 쓰러뜨리기 직전 한창때의 무공. 잃은 HP 를 조금씩 되찾는다",
+          "desc": "도끼가 박살 난 뒤의 맨주먹 — 우로스를 쓰러뜨리기 직전 한창때의 무공. 잃은 HP를 조금씩 되찾음",
           "turns": 0,
           "cards": {
             "디아나_왕년_s1": "디아나_왕년_f1"
@@ -178,7 +198,7 @@
     },
     {
       "id": "디아나_왕년_u1",
-      "name": "찢는다",
+      "name": "찢기",
       "hero": "디아나_왕년",
       "unique": true,
       "cost": 2,
@@ -210,126 +230,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 찢는다",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 0
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.8,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "가벼운 찢는다",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 0
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "단순한 찢는다",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 0
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.8,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "재빠른 찢는다",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.75,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 0
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.75,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 찢는다",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "갈가리 찢기",
           "fx": [
             {
               "k": "dmg",
@@ -342,7 +243,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
@@ -351,7 +252,101 @@
             },
             {
               "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "한 손으로 찢기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
               "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "빈손으로 찢기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "휩쓸어 찢기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "단숨에 찢기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.0,
               "target": "oneEnemy"
             }
           ]
@@ -359,22 +354,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "억센 손톱",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "약한 데부터",
           "kind": "weakSpot"
         },
         {
-          "name": "귀찮은 건 질색",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 1
-            }
-          ]
+          "name": "한창때 근육",
+          "kind": "atkUp"
         }
       ]
     },
@@ -402,7 +391,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 복잡한 건 질색",
+          "name": "정말 질색",
           "fx": [
             {
               "k": "discard",
@@ -410,7 +399,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 4.95,
+              "ratio": 4.6,
               "target": "oneEnemy"
             },
             {
@@ -420,7 +409,7 @@
           ]
         },
         {
-          "name": "가벼운 복잡한 건 질색",
+          "name": "대충 한 방",
           "cost": 2,
           "fx": [
             {
@@ -429,7 +418,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 3.4,
+              "ratio": 3.2,
               "target": "oneEnemy"
             },
             {
@@ -439,7 +428,7 @@
           ]
         },
         {
-          "name": "단순한 복잡한 건 질색",
+          "name": "생각은 접고",
           "fx": [
             {
               "k": "discard",
@@ -447,8 +436,27 @@
             },
             {
               "k": "dmg",
-              "ratio": 4.95,
+              "ratio": 4.1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "휘두르는 대로",
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "target": "allEnemies"
             },
             {
               "k": "tough",
@@ -457,9 +465,9 @@
           ]
         },
         {
-          "name": "재빠른 복잡한 건 질색",
+          "name": "도끼 없이 끝장",
           "tags": [
-            "신속"
+            "소멸"
           ],
           "fx": [
             {
@@ -468,176 +476,287 @@
             },
             {
               "k": "dmg",
-              "ratio": 4.75,
+              "ratio": 7.6,
               "target": "oneEnemy"
             },
             {
               "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 복잡한 건 질색",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "discard",
-              "all": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 4.55,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "통째로 부수기",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "귀찮은 건 빼고",
+          "kind": "cost"
         },
         {
-          "name": "귀찮은 건 질색",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 1
-            }
-          ]
+          "name": "얼얼한 주먹",
+          "kind": "frost"
         }
       ]
     },
     {
       "id": "디아나_왕년_u3",
-      "name": "수련은 거르지 않는다",
+      "name": "거르지 않는 수련",
       "hero": "디아나_왕년",
       "unique": true,
       "cost": 1,
       "type": "강화",
       "fx": [
         {
-          "k": "stack",
-          "id": "백수공권",
-          "v": 2
-        },
-        {
           "k": "status",
           "id": "잔광",
           "v": 2
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "play",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "ifHand",
+                  "n": 1
+                },
+                {
+                  "k": "stack",
+                  "id": "백수공권",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 수련은 거르지 않는다",
+          "name": "도끼 없이도",
           "fx": [
             {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 3
+              "k": "draw",
+              "v": 1
             },
             {
               "k": "status",
               "id": "잔광",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "ifHand",
+                      "n": 2
+                    },
+                    {
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 수련은 거르지 않는다",
+          "name": "맨손 체조",
           "cost": 0,
           "fx": [
             {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 3
+              "k": "draw",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "ifHand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "단순한 수련은 거르지 않는다",
+          "name": "단순 반복",
           "fx": [
             {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 4
-            },
-            {
               "k": "status",
               "id": "잔광",
               "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "ifHand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "든든한 수련은 거르지 않는다",
+          "name": "한창때 감각",
           "fx": [
             {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 3
-            },
-            {
               "k": "status",
               "id": "잔광",
               "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "ifHand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 수련은 거르지 않는다",
+          "name": "전성기의 하루",
           "tags": [
             "축복"
           ],
           "fx": [
             {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 3
-            },
-            {
               "k": "status",
               "id": "잔광",
               "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "ifHand",
+                      "n": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
+          "name": "새벽 단련",
           "kind": "ap"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "다시 붙은 근육",
+          "kind": "atkUp"
         },
         {
-          "name": "귀찮은 건 질색",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 1
-            }
-          ]
+          "name": "몸이 기억함",
+          "kind": "cost"
         }
       ]
     },
@@ -670,11 +789,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 맨주먹 한 방",
+          "name": "묵직한 한 방",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
+              "ratio": 1.5,
               "target": "oneEnemy"
             },
             {
@@ -683,7 +802,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.55,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
@@ -693,12 +812,12 @@
           ]
         },
         {
-          "name": "가벼운 맨주먹 한 방",
+          "name": "잽",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.75,
               "target": "oneEnemy"
             },
             {
@@ -707,8 +826,51 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.75,
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "빈손의 기세",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "맨주먹 바람",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifHand",
+              "n": 0
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
             },
             {
               "k": "tough",
@@ -717,76 +879,22 @@
           ]
         },
         {
-          "name": "단순한 맨주먹 한 방",
+          "name": "끝내기 주먹",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 0
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.55,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
               "k": "tough",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 맨주먹 한 방",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
             },
             {
-              "k": "ifHand",
-              "n": 0
+              "k": "ifKill"
             },
             {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 맨주먹 한 방",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 0
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
+              "k": "ap",
               "v": 1
             }
           ]
@@ -794,22 +902,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "주먹에 힘",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "멍 자국",
+          "kind": "frost"
         },
         {
-          "name": "귀찮은 건 질색",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 1
-            }
-          ]
+          "name": "숨 고르기",
+          "kind": "ap"
         }
       ]
     }

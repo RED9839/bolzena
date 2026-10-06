@@ -96,6 +96,8 @@ namespace Bolzena.Core
         public List<LaterRec> Traps = new();
         /// <summary>적 — 혼란(다음 치는 수가 다른 적을 친다).</summary>
         public bool Confused;
+        /// <summary>보스 클론 — 다음에 고학년을 예고할 턴(0 = 아직 안 정함). BossUlt.</summary>
+        public int UltAt;
         /// <summary>상태 겹마다 건 쪽 — 상태 id → 건 쪽(hero:키 · enemy:Idx · gear:키 · neutral · event) → 겹. 화면은 Battle.StatusViews 로 읽는다.</summary>
         public Dictionary<string, Dictionary<string, int>> Src = new();
 

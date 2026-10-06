@@ -43,6 +43,7 @@ namespace Bolzena.UI
             ScreenFit.Add(s.hurt.transform);
             s.LinesMat = Res.NewMat("Bolzena/FocusLines");
             s.lines = Make.Quad("lines", t, Vector3.zero, new Vector2(16.4f, 9.4f), s.LinesMat, 302);
+            Make.Own(s.lines.gameObject, s.LinesMat);
             ScreenFit.Add(s.lines.transform);
             s.LinesMat.SetFloat("_Alpha", 0);
             s.barTop = Make.Box("barTop", t, Res.UI("white"), new Vector3(0, 5.2f, 0), new Vector2(44, 1.2f), 303, Color.black);

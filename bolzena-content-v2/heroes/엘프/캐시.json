@@ -12,17 +12,17 @@
       "atk": 155,
       "def": 25,
       "crit": 10,
-      "blurb": "모든 것에 「히익」 떠는 겁쟁이. 적이 움직일 때마다 놀라 전기가 차오르고, 다음 한 방에 몽땅 지져 버린다.",
+      "blurb": "모든 것에 「히익」 떠는 겁쟁이. 적이 움직일 때마다 놀라 전기가 차오르고, 다음 한 방에 몽땅 지져 버립니다. 비명에 놀란 적들은 걸음까지 늦어집니다.",
       "keyword": {
         "name": "충전",
-        "desc": "적이 움직일 때마다 놀라서 차는 전기 — 카드 한 장에 모두 쓰고, 셋이면 적을 지진다",
+        "desc": "적이 움직일 때 차는 전기",
         "carrier": "self",
         "cap": 3,
         "consumeAll": true,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.3
+            "v": 0.2
           }
         ],
         "rules": [
@@ -34,6 +34,11 @@
               "n": 3
             },
             "fx": [
+              {
+                "k": "dmg",
+                "ratio": 0.7,
+                "target": "oneEnemy"
+              },
               {
                 "k": "status",
                 "id": "약화",
@@ -70,14 +75,19 @@
           },
           {
             "k": "dmg",
-            "ratio": 1.5,
-            "target": "oneEnemy"
+            "ratio": 1.0,
+            "target": "allEnemies"
           },
           {
             "k": "status",
-            "id": "약화",
+            "id": "둔화",
             "v": 1,
-            "target": "oneEnemy"
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "회피",
+            "v": 1
           }
         ]
       },
@@ -152,9 +162,10 @@
           "target": "randomEnemy"
         },
         {
-          "k": "stack",
-          "id": "충전",
-          "v": 1
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
@@ -173,9 +184,10 @@
               "target": "randomEnemy"
             },
             {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -197,14 +209,15 @@
               "target": "randomEnemy"
             },
             {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "캐시가방에들어가신다",
+          "name": "캐시가방에들어가심",
           "fx": [
             {
               "k": "dmg",
@@ -218,9 +231,10 @@
               "target": "randomEnemy"
             },
             {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -242,9 +256,10 @@
               "target": "randomEnemy"
             },
             {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -264,9 +279,10 @@
               "target": "randomEnemy"
             },
             {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -447,14 +463,14 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.28,
           "hits": 3,
           "target": "allEnemies"
         },
         {
           "k": "status",
           "id": "둔화",
-          "v": 1,
+          "v": 2,
           "target": "allEnemies"
         }
       ],
@@ -467,14 +483,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.39,
+              "ratio": 0.36,
               "hits": 3,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "둔화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -488,14 +504,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.34,
               "hits": 3,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "둔화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -508,14 +524,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.28,
               "hits": 3,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "둔화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             },
             {
@@ -534,14 +550,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.34,
               "hits": 3,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "둔화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -555,14 +571,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.54,
+              "ratio": 0.56,
               "hits": 3,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "둔화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -600,17 +616,29 @@
         {
           "k": "atkMod",
           "v": 0.15,
-          "target": "self",
-          "run": true
-        },
-        {
-          "k": "stack",
-          "id": "충전",
-          "v": 2
+          "run": true,
+          "target": "self"
         },
         {
           "k": "draw",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "충전",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -619,18 +647,30 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "충전",
-              "v": 3
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "충전",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -639,19 +679,31 @@
           "cost": 1,
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "충전",
-              "v": 2
-            },
-            {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -663,18 +715,31 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.18,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "stack",
               "id": "충전",
-              "v": 3
+              "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "충전",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -683,18 +748,46 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.22,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "충전",
-              "v": 3
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "충전",
+                      "v": 2
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "foeAct",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -706,18 +799,30 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.18,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "충전",
-              "v": 3
+              "v": 0.2,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

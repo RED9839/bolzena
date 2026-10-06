@@ -207,6 +207,8 @@ namespace Bolzena.Fx
         public static readonly Dictionary<string, KeyValuePair<string, bool>> MUZZLE = new Dictionary<string, KeyValuePair<string, bool>>
         {
             { "아멜리아", new KeyValuePair<string, bool>("Weapon_main7", true) },
+            { "캬롯", new KeyValuePair<string, bool>("Weapon1_9", true) },     // 사탕수수 끝(Point_Attack1 은 몸 앞 고정 점 — 2026-10-06 사용자 「몸통에서 총알」)
+            { "레테", new KeyValuePair<string, bool>("Laser_Head", true) },    // 손전등 머리(Point_UltLaser 는 머리 뒤 고정 점)
         };
         public static readonly Regex MUZZLE_RE = new Regex("(muzzle|barrel)", RegexOptions.IgnoreCase);
 

@@ -15,6 +15,8 @@ namespace Bolzena.Core
         readonly GameData data;
         const int K = R.SCALE;
         public Bots(GameData data) { this.data = data; }
+        /// <summary>신탁 고르기를 바꿔 끼운다(숙련 봇 — 파티 축 시너지를 더해 고른다). null 이면 EpiChoice.</summary>
+        public Func<Battle, string, int> EpiPick;
 
         static readonly string[] ATTACKS = { "attack", "back", "multi", "attackAll" };
 
@@ -112,7 +114,8 @@ namespace Bolzena.Core
             || s.AliveParty().Any(u => s.Passives.TryGetValue(u.Key, out var rs) && rs.Any(r => r.R.When.Seq != null && r.R.When.Seq.Count > 0));
 
         readonly Dictionary<string, double> threatCache = new();
-        static double HitOf(Intent it) => it == null ? 0 : it.T == "attack" || it.T == "back" ? it.V : it.T == "multi" ? it.V * Math.Max(1, it.N) : it.T == "attackAll" ? it.V * R.FOE_ALL_X : 0;
+        static double HitOf(Intent it) => it == null ? 0 : it.T == "attack" || it.T == "back" ? it.V : it.T == "multi" ? it.V * Math.Max(1, it.N) : it.T == "attackAll" ? it.V * R.FOE_ALL_X
+            : it.T == "ult" && it.Then != null ? it.Then.Sum(HitOf) : 0;
         double ThreatOf(string key)
         {
             if (threatCache.TryGetValue(key, out var t)) return t;
@@ -176,16 +179,19 @@ namespace Bolzena.Core
             foreach (var e in s.Enemies)
             {
                 if (e.Dead || e.Intent == null || e.Sealed || e.RushedTurn) continue;
-                var it = e.Intent;
-                if (it.T == "attack" || it.T == "back") Hit(e, PickT(live, it.T == "back"), s.Dealt(e, it.V), it.T == "back");
-                else if (it.T == "multi") { int d = s.Dealt(e, it.V); for (int k = 0; k < Math.Max(1, it.N); k++) Hit(e, PickT(live, false), d, false); }
-                else if (it.T == "attackAll") Hit(e, PickT(live, false), s.Dealt(e, Num.Round(it.V * R.FOE_ALL_X)), false);
-                else if (it.T == "charge") later += HitOf(it.Next) * e.Dmgx;
-                else if (it.T == "jam") misc += 5 * K * Math.Max(1, it.V);
-                else if (it.T == "buff") misc += 2 * K * Math.Max(1, it.V);
-                else if (it.T == "debuff") misc += 3 * K * Math.Max(1, it.V);
-                else if (it.T == "heal") misc += it.V * 0.8;
-                else if (it.T == "addCard") misc += 3 * K * Math.Max(1, it.N);
+                // 보스 클론의 고학년(ult)은 안의 수들을 차례로
+                foreach (var it in e.Intent.T == "ult" && e.Intent.Then != null ? e.Intent.Then : new List<Intent> { e.Intent })
+                {
+                    if (it.T == "attack" || it.T == "back") Hit(e, PickT(live, it.T == "back"), s.Dealt(e, it.V), it.T == "back");
+                    else if (it.T == "multi") { int d = s.Dealt(e, it.V); for (int k = 0; k < Math.Max(1, it.N); k++) Hit(e, PickT(live, false), d, false); }
+                    else if (it.T == "attackAll") Hit(e, PickT(live, false), s.Dealt(e, Num.Round(it.V * R.FOE_ALL_X)), false);
+                    else if (it.T == "charge") later += HitOf(it.Next) * e.Dmgx;
+                    else if (it.T == "jam") misc += 5 * K * Math.Max(1, it.V);
+                    else if (it.T == "buff") misc += 2 * K * Math.Max(1, it.V);
+                    else if (it.T == "debuff") misc += 3 * K * Math.Max(1, it.V);
+                    else if (it.T == "heal") misc += it.V * 0.8;
+                    else if (it.T == "addCard") misc += 3 * K * Math.Max(1, it.N);
+                }
                 Done();
             }
             return (hp, shield, later, misc);
@@ -274,6 +280,14 @@ namespace Bolzena.Core
                     v += (grows ? 3.5 : 1.5) * K * st.Value;
                 }
             v += 0.06 * K * s.Gauge;
+            // 켜진 강화 — 남은 전투에 돌 몫(카드 한 장 값과 같은 눈금 · 겹마다)
+            foreach (var pw in s.Powers)
+            {
+                var o = s.HeroUnit(pw.Hero);
+                if (o == null) continue;
+                double pv = 0; foreach (var r in pw.Rules) pv += CardValue.RuleWorth(r);
+                v += 0.8 * 1.2 * o.Atk * pv * Math.Max(1, pw.N);
+            }
             foreach (var id in s.Hand)
             {
                 var c = s.CardOf(id);
@@ -395,7 +409,7 @@ namespace Bolzena.Core
             if (m.Ult) return s.UseUlt(m.Hero, m.T).Ok;
             var id = s.Hand[m.I];
             var g = s.GlowOf(id);
-            if (g != null) s.ApplyEpiphany(id, g.Kind == "card" ? EpiChoice(s, id) : 0);
+            if (g != null) s.ApplyEpiphany(id, g.Kind == "card" ? (EpiPick ?? EpiChoice)(s, id) : 0);
             return s.PlayCard(m.I, m.T, new PlayOpts { Ally = m.Ally, Discard = m.Discard?.ToList(), Choice = m.Choice }).Ok;
         }
 

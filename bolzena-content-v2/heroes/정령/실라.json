@@ -11,10 +11,10 @@
    "atk": 145,
    "def": 25,
    "crit": 10,
-   "blurb": "정면 승부엔 강하고 기습엔 약한 바람의 맏언니. 한 적을 정면으로 마주 보고 쏠수록 그 적은 바람에 깎여 무너진다.",
+   "blurb": "정면 승부엔 강하고 기습엔 약한 바람의 맏언니. 한 적을 정면으로 마주 보고 쏠수록 그 적은 바람에 깎여 무너집니다.",
    "keyword": {
     "name": "정면 승부",
-    "desc": "실라와 정면으로 마주 선 적",
+    "desc": "한 적과 마주 선 승부",
     "carrier": "enemy",
     "cap": 3,
     "hunt": true,
@@ -614,14 +614,32 @@
    "fx": [
     {
      "k": "atkMod",
-     "v": 0.2,
+     "v": 0.15,
      "run": true,
      "target": "self"
     },
     {
      "k": "status",
      "id": "잔광",
-     "v": 2
+     "v": 1
+    },
+    {
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "정면 승부",
+         "v": 1,
+         "target": "oneEnemy"
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -630,14 +648,27 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.3,
+       "v": 0.25,
        "run": true,
        "target": "self"
       },
       {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "정면 승부",
+           "v": 2,
+           "target": "oneEnemy"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -646,15 +677,26 @@
      "cost": 0,
      "fx": [
       {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
+       "k": "draw",
+       "v": 1
       },
       {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "정면 승부",
+           "v": 1,
+           "target": "oneEnemy"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -663,19 +705,32 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
       {
        "k": "status",
-       "id": "잔광",
+       "id": "피해 감소",
        "v": 2
       },
       {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "정면 승부",
+           "v": 2,
+           "target": "oneEnemy"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -684,7 +739,7 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
@@ -692,6 +747,24 @@
        "k": "status",
        "id": "잔광",
        "v": 3
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "정면 승부",
+           "v": 1,
+           "target": "oneEnemy"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -703,14 +776,33 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.25,
+       "v": 0.2,
        "run": true,
        "target": "self"
       },
       {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
+       "k": "stack",
+       "id": "정면 승부",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "정면 승부",
+           "v": 2,
+           "target": "oneEnemy"
+          }
+         ]
+        }
+       ]
       }
      ]
     }
@@ -779,7 +871,7 @@
           ]
         }
       ],
-      "blurb": "바람을 타고 날아가는 화살. 연달아 쏘면 한 발이 덤으로 붙는다."
+      "blurb": "바람을 타고 날아가는 화살. 연달아 쏘면 한 발이 덤으로 붙습니다."
     }
   ]
 }

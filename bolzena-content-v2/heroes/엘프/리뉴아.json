@@ -12,10 +12,10 @@
       "atk": 146,
       "def": 29,
       "crit": 10,
-      "blurb": "규격에 딱 맞는 1초를 사랑하는 시간 여행자. 남은 AP 를 딱 맞춰 쓸 때 카드가 한 번 더 울리고, 초침이 세 번 돌면 다음 턴이 길어진다.",
+      "blurb": "규격에 딱 맞는 1초를 사랑하는 시간 여행자. 남은 AP 를 딱 맞춰 쓸 때 카드가 한 번 더 울리고, 초침이 세 번 돌면 다음 턴이 길어집니다.",
       "keyword": {
         "name": "초침",
-        "desc": "딱 맞게 흘려보낸 1초 — 조율로 쌓고, 셋이면 다음 턴 AP",
+        "desc": "조율로 쌓는 초침",
         "carrier": "self",
         "cap": 3,
         "rules": [
@@ -679,44 +679,62 @@
       "fx": [
         {
           "k": "atkMod",
-          "v": 0.2,
-          "target": "self",
-          "run": true
+          "v": 0.15,
+          "run": true,
+          "target": "self"
         },
         {
           "k": "gauge",
           "v": 20
         },
         {
-          "k": "ifTune"
-        },
-        {
-          "k": "stack",
-          "id": "초침",
-          "v": 2
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "초침",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "첫 줄을 읽다",
+          "name": "첫 줄 읽기",
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.26,
-              "target": "self",
-              "run": true
+              "v": 0.2,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "gauge",
-              "v": 26
+              "v": 20
             },
             {
-              "k": "ifTune"
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "초침",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -726,21 +744,26 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
-              "target": "self",
-              "run": true
+              "v": 0.1,
+              "run": true,
+              "target": "self"
             },
             {
-              "k": "gauge",
-              "v": 20
-            },
-            {
-              "k": "ifTune"
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "초침",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -752,21 +775,30 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.24,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "gauge",
-              "v": 24
+              "v": 30
             },
             {
-              "k": "ifTune"
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "초침",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -775,21 +807,30 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.29,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
-              "k": "gauge",
-              "v": 29
-            },
-            {
-              "k": "ifTune"
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "초침",
+                      "v": 2
+                    },
+                    {
+                      "k": "gauge",
+                      "v": 10
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -801,21 +842,30 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.24,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "gauge",
-              "v": 24
+              "v": 25
             },
             {
-              "k": "ifTune"
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "초침",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

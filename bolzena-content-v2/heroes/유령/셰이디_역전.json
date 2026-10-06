@@ -12,10 +12,10 @@
       "atk": 86,
       "def": 58,
       "crit": 5,
-      "blurb": "나약함을 인정하고 유령 늪의 파수꾼이 된 장난꾼. 파티를 지켜 줄 때마다 「참음」 이 쌓이고, 넷에서 참다 터지면 파티 전원이 덩달아 달려든다. 지키는 방식은 여전히 제멋대로.",
+      "blurb": "나약함을 인정하고 유령 늪의 파수꾼이 된 장난꾼. 파티를 지켜 줄 때마다 「참음」 이 쌓이고, 넷에서 참다 터지면 파티 전원이 덩달아 달려듭니다. 지키는 방식은 여전히 제멋대로.",
       "keyword": {
         "name": "참음",
-        "desc": "착한 척하느라 눌러 둔 짜증 — 넷이면 터진다",
+        "desc": "스킬로 눌러 둔 짜증",
         "carrier": "self",
         "cap": 4,
         "rules": [
@@ -155,8 +155,8 @@
             {
               "k": "dmg",
               "ratio": 1.15,
-              "hits": 2,
-              "target": "allEnemies"
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "status",
@@ -167,14 +167,14 @@
           ]
         },
         {
-          "name": "작은 틈",
+          "name": "실금 간 틈",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "hits": 2,
-              "target": "allEnemies"
+              "ratio": 0.55,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "status",
@@ -185,33 +185,13 @@
           ]
         },
         {
-          "name": "열어 둔 틈",
-          "tags": [
-            "보존"
-          ],
+          "name": "참다 터진 틈",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "hits": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "늪으로 끌어들이기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "hits": 2,
-              "target": "allEnemies"
+              "ratio": 0.85,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "status",
@@ -222,26 +202,41 @@
             {
               "k": "stack",
               "id": "참음",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "축복의 틈",
-          "tags": [
-            "축복"
-          ],
+          "name": "한 점으로 모은 틈",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
-              "hits": 2,
-              "target": "allEnemies"
+              "ratio": 1.0,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 1,
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "늪의 입",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -326,14 +321,11 @@
           ]
         },
         {
-          "name": "아껴 둔 분풀이",
-          "tags": [
-            "보존"
-          ],
+          "name": "쌓인 분풀이",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
@@ -342,18 +334,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.6,
               "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "참음",
+              "all": true
             }
           ]
         },
         {
-          "name": "참은 만큼",
+          "name": "인형 던지기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
+              "ratio": 0.85,
+              "target": "allEnemies"
             },
             {
               "k": "perStack",
@@ -361,20 +358,17 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
+              "ratio": 0.2,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "축복의 인형",
-          "tags": [
-            "축복"
-          ],
+          "name": "터진 솜뭉치",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.15,
               "target": "oneEnemy"
             },
             {
@@ -383,7 +377,13 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "oneEnemy"
             }
           ]
@@ -444,34 +444,17 @@
           ]
         },
         {
-          "name": "가벼운 낫질",
+          "name": "툭 휘두르기",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.65,
               "target": "oneEnemy"
             },
             {
               "k": "shield",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "경계 근무",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.1
+              "ratio": 0.55
             }
           ]
         },
@@ -495,19 +478,38 @@
           ]
         },
         {
-          "name": "축복의 낫",
-          "tags": [
-            "축복"
-          ],
+          "name": "되받아치기 자세",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 0.9,
               "target": "oneEnemy"
             },
             {
               "k": "shield",
-              "ratio": 1.05
+              "ratio": 0.8
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "밤샘 순찰",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.1
             }
           ]
         }
@@ -571,39 +573,17 @@
           ]
         },
         {
-          "name": "대충 수호",
+          "name": "대충 지키기",
           "cost": 1,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.7
+              "ratio": 1.6
             },
             {
               "k": "status",
               "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "참음",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "버티는 수호",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.4
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 3
+              "v": 1
             },
             {
               "k": "stack",
@@ -632,14 +612,30 @@
           ]
         },
         {
-          "name": "축복의 수호",
-          "tags": [
-            "축복"
-          ],
+          "name": "한계까지 참기",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.4
+              "ratio": 2.0
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "참음",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "꺼지지 않는 등불",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.5
             },
             {
               "k": "status",
@@ -647,9 +643,9 @@
               "v": 3
             },
             {
-              "k": "stack",
-              "id": "참음",
-              "v": 2
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
             }
           ]
         }

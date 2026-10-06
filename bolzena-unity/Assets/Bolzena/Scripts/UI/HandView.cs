@@ -13,6 +13,9 @@ namespace Bolzena.UI
     //   ② 눌러서 고르고 → 대상(적)을 누르거나, 대상 없는 카드는 싸움터를 누르거나 다시 그 카드를 누른다
     //   ③ 터치 — 첫 탭은 고르기(+ 미리보기), 적을 처음 누르면 그 적을 겨눠 미리보기, 같은 적을 한 번 더 누르면 낸다
     //   오른쪽 클릭 · Esc — 내려놓기. 단축키 1~9 고르기 · ←→ 대상 · Space/Enter 내기
+    //   길게 누르기(0.3초 · 마우스 · 터치 같게) — 그 카드를 화면 가운데 위에 손패의 약 2.5배로 + 오른쪽 키워드 판(넘치면 왼쪽).
+    //     손패의 그 자리는 흐리게. 그 자리에서 떼면 닫기(내지 않음), 누른 채 끌면 확대를 닫고 바로 끌어 내기로 이어진다
+    //   카드 확대(상세 보기)는 언제나 화면 가운데 위 — 고른 카드는 확대하지 않는다(손패에서 들어 올린 카드 글로 본다 · 적을 가리지 않게)
     public class HandView : MonoBehaviour
     {
         public readonly List<CardView> Cards = new List<CardView>();
@@ -28,9 +31,37 @@ namespace Bolzena.UI
         public Vector3 DeckPos = new Vector3(-7.35f, -0.3f, 0), DiscardPos = new Vector3(7.35f, -0.3f, 0);
         int hover = -1, drag = -1, sel = -1, aimTarget = -1, press = -1;
         float hoverT;
+        // 길게 누르기 확대(카제나식) — 손패 카드를 누른 채 HoldZoomT 초 움직이지 않으면 그 카드를 화면 가운데 위에 크게(키워드 판은 오른쪽).
+        //   떼면 접힌다(이 누름은 탭으로 치지 않는다). 누른 채 PointerInput 끌기 거리(0.18) 넘게 움직이면 접고 지금처럼 끌어 낸다.
+        public const float HoldZoomT = 0.3f;
+        float pressT;
+        bool holdZoom;
+        bool hoverMute;                                // 길게 눌러 본 뒤 뗐다 — 마우스가 그 카드 위에 그대로 있어도 올려 두기 확대를 다시 열지 않는다(떼면 닫힘)
+        /// <summary>점검 — 마지막 탭이 무엇을 했나.</summary>
+        public string LastTap { get; private set; }
+        /// <summary>지금 길게 누르기로 카드를 크게 띄우고 있나(자동 데모 · 점검).</summary>
+        public bool HoldZooming => holdZoom && press >= 0 && PointerInput.Held;
         Vector2 dragOffset;
         TargetArrow arrow;
         SpriteRenderer reticle;
+        // 끌기 꾸밈(카제나식) — 대상 발밑 타원 고리(적 붉게 · 아군 초록 파랑)
+        public Func<int, (Vector3 at, float w)?> EnemyFoot, AllyFoot;   // 번호 → 발 자리(월드) · 몸 폭. 없거나 쓰러졌으면 null
+        public Func<Vector2, int> AllyAt;                               // 월드 좌표 → 사도 번호(-1)
+        public Func<int> EnemyCount, AllyCount;
+        readonly List<SpriteRenderer> rings = new List<SpriteRenderer>();
+        int ringsUsed;
+        int allyTarget = -1;
+        /// <summary>점검 — 지금 끄는 카드가 겨눈 사도(-1) · 띄운 고리 수 · 뽑기 연출이 도는 중인가.</summary>
+        public int AllyAim => allyTarget;
+        public int RingCount => ringsUsed;
+        public bool Pulling => pullT >= 0;
+        // 뽑기 연출 — 고르거나 끌기 시작한 순간 0.22초: 튀어 오름(작은 넘침) · 살짝 기울었다 섬 · 테두리 빛(카드 성격 빛) · 뒤 빛 번짐.
+        //   그동안과 그 뒤로도 고른 · 끄는 카드 밖의 손패는 살짝 어둡게. 2× 배속 · 「움직임 줄이기」 는 약하게
+        CardView pulled;
+        float pullT = -1, pullAmp = 1;
+        SpriteRenderer pullGlow;
+        const float PullDur = 0.22f;
+        const string PullSfx = "card_pull";            // 효과음 자리 — Resources/Sfx/card_pull 이 생기면 그것, 없으면 card_hover 를 높게
         const float LiftY = -1.3f;                    // 이 위로 끌어 올리면 「낸다」(손 위 싸움터)
 
         // 미리보기 · 툴팁이 읽는 지금 손의 모습
@@ -44,7 +75,7 @@ namespace Bolzena.UI
             var root = Make.Node("Hand", parent);
             var h = root.gameObject.AddComponent<HandView>();
             h.arrow = TargetArrow.Create(root);
-            h.reticle = Make.Box("reticle", root, Res.UI("reticle"), Vector3.zero, new Vector2(1.3f, 1.3f), 690, new Color(1f, 0.35f, 0.3f, 0.9f), Res.SpriteMat(false, 1.6f));
+            h.reticle = Make.Box("reticle", root, ScopeSprite(), Vector3.zero, new Vector2(1.3f, 1.3f), 690, new Color(1f, 0.25f, 0.2f, 0.95f), Res.SpriteMat(false, 1.6f));
             h.reticle.enabled = false;
             return h;
         }
@@ -72,6 +103,7 @@ namespace Bolzena.UI
             {
                 if (sel == i) sel = -1; else if (sel > i) sel--;
                 if (drag == i) drag = -1; else if (drag > i) drag--;
+                if (press == i) { press = -1; holdZoom = false; } else if (press > i) press--;
             }
             if (hover >= Cards.Count) hover = -1;
             Layout();
@@ -133,16 +165,21 @@ namespace Bolzena.UI
             HandScale = s;
             float cw = CardView.W * s;
             // 카드는 살짝 겹친 부채꼴(카제나처럼 — 손패에서는 그림 · 이름만, 효과 글은 올리면)
-            float spacing = n > 1 ? Mathf.Min(cw * 0.88f, (span - cw) / (n - 1)) : 0;
-            int up = drag >= 0 ? (Lifted && NeedsEnemy(drag) ? drag : -1) : sel >= 0 ? sel : hover;
+            // 끄는 카드는 손패에서 뽑혀 나왔다 — 남은 카드끼리 빈자리를 메워 좁혀 앉는다(크기는 그대로). 취소하면 다시 벌어져 제자리로
+            int m = drag >= 0 && drag < n ? n - 1 : n;
+            float spacing = m > 1 ? Mathf.Min(cw * 0.88f, (span - cw) / (m - 1)) : 0;
+            int up = drag >= 0 ? -1 : sel >= 0 ? sel : hover;
+            int ghost = HoldZooming ? press : -1;     // 길게 눌러 크게 본 카드 — 손패 자리는 흐리게 두고 들어 올리지 않는다
+            if (ghost >= 0 && up == ghost) up = -1;
+            DimSlot(ghost);
             float upS = Mathf.Max(s * 1.34f, 1.18f);
             float upPush = up >= 0 ? Mathf.Max(0, (CardView.W * upS + cw) / 2 + Gap - spacing) : 0;   // 올린 카드와 이웃이 안 겹칠 만큼
             for (int i = 0; i < n; i++)
             {
                 var c = Cards[i];
-                float off = i - (n - 1) / 2f;
+                if (i == drag) continue;                  // 뽑혀 나온 카드 — 자리(SlotX)는 뽑기 전 것을 둔다
+                float off = (drag >= 0 && i > drag ? i - 1 : i) - (m - 1) / 2f;
                 c.SlotX = off * spacing;
-                if (i == drag) continue;
                 float push = 0;
                 if (up >= 0 && i != up) push = (i < up ? -1 : 1) * upPush;
                 float x = off * spacing + push;
@@ -166,12 +203,24 @@ namespace Bolzena.UI
                 c.TargetRot = rot;
                 c.TargetScale = sc;
                 c.Hovered = i == up;
+                c.Shade = (drag >= 0 || sel >= 0) && i != sel ? 0.68f : 1f;   // 고른 · 끄는 카드 밖의 손패는 살짝 어둡게
                 c.ShowDesc = i == up;
                 if (c.Order != order) c.SetOrder(order);
                 c.Playable = (CanPlay == null || CanPlay(c.Info)) && !c.Info.Unplayable;
             }
             if (drag >= 0 && drag < n) Cards[drag].ShowDesc = true;
             Pins(up);
+        }
+
+        // 길게 누르기 확대 동안 그 카드의 손패 자리를 흐리게(카제나 — 카드가 위로 「떠나간」 자리). 바뀔 때만 만진다(다른 연출의 SetAlpha 를 덮지 않게)
+        CardView dimmed;
+        void DimSlot(int i)
+        {
+            var c = i >= 0 && i < Cards.Count ? Cards[i] : null;
+            if (c == dimmed) return;
+            if (dimmed) dimmed.SetAlpha(1f);
+            dimmed = c;
+            if (c) c.SetAlpha(0.3f);
         }
 
         // 사도 핀 — 같은 사도 카드가 이어지면 그 묶음 첫 카드 위에 핀 하나(핀 빛 = 사도 빛)
@@ -240,6 +289,7 @@ namespace Bolzena.UI
             if (sel >= 0 || drag >= 0) Sfx.Play("card_hover", 0.25f, 0.8f);
             sel = -1;
             press = -1;
+            holdZoom = false;
             aimTarget = -1;
             CancelDrag();
         }
@@ -255,8 +305,8 @@ namespace Bolzena.UI
             if (!c.Playable) { Cant(i); return; }
             sel = i;
             aimTarget = NeedsEnemy(i) && NextEnemy != null ? NextEnemy(-1, 1) : -1;
-            Sfx.Play("card_hover", 0.45f, 1.15f);
             Layout();
+            PullFx(c);
         }
 
         void Cant(int i)
@@ -290,6 +340,7 @@ namespace Bolzena.UI
             arrow.Hide();
             reticle.enabled = false;
             Lifted = false;
+            allyTarget = -1;
             Tooltip.I?.Unpin();
             Request = (i, target);
         }
@@ -299,9 +350,10 @@ namespace Bolzena.UI
             Layout();
             if (!Interactive || Modal.Open != null)
             {
-                if (!Interactive) { if (drag >= 0) CancelDrag(); sel = -1; press = -1; }
+                if (!Interactive) { if (drag >= 0) CancelDrag(); sel = -1; press = -1; holdZoom = false; }
                 if (hover >= 0) { hover = -1; Layout(); }
                 arrow.Hide(); reticle.enabled = false; Lifted = false;
+                RingsBegin(); RingsEnd();
                 Tooltip.I?.Unpin();
                 if (!PileUi.Open) CardZoom.Hide();
                 return;
@@ -315,20 +367,29 @@ namespace Bolzena.UI
                 int h = CardAt(p);
                 // 올린 카드는 원래 자리 둘레도 올린 채로 둔다(떨리지 않게)
                 if (h < 0 && hover >= 0 && hover < Cards.Count && p.y < LiftY && Mathf.Abs(p.x - Cards[hover].TargetPos.x) < 0.8f) h = hover;
-                if (PointerInput.Touch && !PointerInput.Held) h = -1;   // 터치에는 올려 두기가 없다
+                // 터치에는 올려 두기가 없다(뗀 그 프레임까지는 둔다 — 카드 위 뗌이 싸움터 탭으로 새지 않게)
+                if (PointerInput.Touch && !PointerInput.Held && !PointerInput.Up) h = -1;
                 if (h != hover)
                 {
                     hover = h;
                     hoverT = 0;
+                    hoverMute = false;
                     if (h >= 0 && !PointerInput.Touch) Sfx.Play("card_hover", 0.35f);
                     Layout();
                 }
                 hoverT += Time.unscaledDeltaTime;
-                if (PointerInput.Down) press = CardAt(p);
-                // 누른 채 움직이면 끌기
+                if (PointerInput.Down) { press = CardAt(p); pressT = 0; holdZoom = false; }
+                // 누른 채 가만히 — 길게 누르기 확대
+                if (PointerInput.Held && press >= 0 && !PointerInput.Moved)
+                {
+                    pressT += Time.unscaledDeltaTime;
+                    if (!holdZoom && pressT >= HoldZoomT) { holdZoom = true; Sfx.Play("card_hover", 0.4f, 1.1f); }
+                }
+                // 누른 채 움직이면 끌기(확대는 접는다)
                 if (PointerInput.Held && press >= 0 && PointerInput.Moved && press < Cards.Count)
                 {
                     var c = Cards[press];
+                    holdZoom = false;
                     if (!c.Playable) { Cant(press); press = -1; }
                     else
                     {
@@ -336,35 +397,52 @@ namespace Bolzena.UI
                         sel = -1;
                         dragOffset = (Vector2)c.transform.localPosition - p;
                         c.SetOrder(650);
+                        PullFx(c);
                     }
                 }
-                if (drag < 0 && PointerInput.Tap) OnTap(p);
-                if (PointerInput.Up) press = -1;
+                // 길게 눌러 크게 본 뒤 뗌은 탭이 아니다(고르기 · 내기 없이 원래대로)
+                if (drag < 0 && PointerInput.Tap && !holdZoom) OnTap(p);
+                if (PointerInput.Up) { if (holdZoom) { hoverMute = true; hoverT = 0; } press = -1; holdZoom = false; }
             }
 
+            RingsBegin();
             if (drag >= 0) DragUpdate(p);
             else if (sel >= 0) SelUpdate(p);
             else { arrow.Hide(); reticle.enabled = false; Lifted = false; }
+            RingsEnd();
+            PullUpdate();
 
-            // 카드 확대 — 올린 카드는 잠깐 뒤 그 자리 위로 크게(키워드 판은 옆), 고른 카드는 왼쪽(사도 쪽)에 크게 — 오른쪽 적 · 미리보기를 가리지 않게
-            int tipCard = drag >= 0 ? -1 : sel >= 0 ? sel : hover >= 0 && hoverT > 0.4f ? hover : -1;
+            // 카드 확대(모두 CardZoom 한 판 · 언제나 화면 가운데 위 · 키워드 판은 카드 오른쪽, 넘치면 왼쪽) —
+            //   길게 누른 카드(마우스 · 터치 같게), 마우스를 잠깐 올려 둔 카드(PC). 고른 카드 · 끄는 카드는 확대하지 않는다(적 · 화살표를 가리지 않게)
+            int holdCard = HoldZooming && press < Cards.Count ? press : -1;
+            int tipCard = drag >= 0 ? -1 : holdCard >= 0 ? holdCard : sel < 0 && hover >= 0 && hoverT > 0.4f && !hoverMute && !PointerInput.Touch && (!PointerInput.Held || press == hover) ? hover : -1;
             if (tipCard >= 0 && tipCard < Cards.Count)
             {
                 var c = Cards[tipCard];
                 string why = !c.Playable ? WhyNot?.Invoke(tipCard) : null;
-                float s = Mathf.Min(2.0f, (Tone.HalfH * 2 * 0.58f) / CardView.H);
-                if (tipCard == sel)
-                    CardZoom.Show(transform.parent, c.Info, new Vector3(-Tone.HalfW + CardView.W * s / 2 + 0.3f, 0.6f, 0), s, false, why);
-                else
-                    CardZoom.Show(transform.parent, c.Info, new Vector3(c.TargetPos.x, Bottom + CardView.H * s / 2 + 0.05f, 0), s, false, why);
+                CardZoom.Show(transform.parent, c.Info, ZoomAt(out float s), s, false, why);
                 Tooltip.I?.Unpin();
             }
             else CardZoom.Hide();
         }
 
+        /// <summary>손패 확대 자리 — 화면 가운데(x = 0 · 카메라 가운데) 위쪽, 크기는 손패 카드의 약 2.5배(화면 높이에 맞춰 줄인다).</summary>
+        public Vector3 ZoomAt(out float s)
+        {
+            // 카제나처럼 손패 바로 위에 — 카드 아래 끝은 손패 카드 위쪽 절반께(손패 위에 살짝 겹친다), 위 끝은 위 HUD(파티 체력 줄) 아래.
+            //   둘 사이에 들도록 크기를 줄인다(그래서 손패의 약 2.2~2.5배)
+            float bottom = Bottom + CardView.H * HandScale * 0.45f;
+            float top = Tone.HalfH - 1.0f * Tone.K;
+            s = Mathf.Min(HandScale * 2.5f, (top - bottom) / CardView.H);
+            var cam = Camera.main;
+            float cx = cam != null && transform.parent != null ? transform.parent.InverseTransformPoint(cam.transform.position).x : 0;
+            return new Vector3(cx, bottom + CardView.H * s / 2, 0);
+        }
+
         void OnTap(Vector2 p)
         {
             int at = CardAt(p);
+            LastTap = $"탭 카드 {at} · 고른 {sel} · y {p.y:F2}";
             if (sel >= 0)
             {
                 if (at == sel)
@@ -407,6 +485,14 @@ namespace Bolzena.UI
             }
         }
 
+        /// <summary>자동 데모 · 점검 — 아군 카드를 놓을 자리(카드 주인 사도, 없으면 첫 사도의 몸 가운데께).</summary>
+        public Vector3 AllyDrop(CardInfo info)
+        {
+            int h = info.Hero >= 0 ? info.Hero : info.Owner >= 0 ? info.Owner : 0;
+            var f = AllyFoot?.Invoke(h) ?? AllyFoot?.Invoke(0);
+            return f.HasValue ? f.Value.at + new Vector3(0, 0.9f, 0) : new Vector3(-3f, 0.2f, 0);
+        }
+
         // 자동 데모 — 손가락 없이 고른 채로 겨누기
         public void DemoAim(int e) => aimTarget = e;
 
@@ -426,58 +512,202 @@ namespace Bolzena.UI
             Reticle(end, aimTarget >= 0);
         }
 
-        void Reticle(Vector3 end, bool on)
+        void Reticle(Vector3 end, bool on, float bodyW = 1.6f)
         {
             reticle.enabled = on;
             if (!on) return;
             reticle.transform.position = end;
-            reticle.transform.localRotation = Quaternion.Euler(0, 0, Clock.Now * 90f);
-            float rs = 1.3f * (1 + 0.06f * Mathf.Sin(Clock.Now * 10f));
+            reticle.transform.localRotation = Quaternion.identity;
+            float rs = Mathf.Clamp(bodyW * 0.7f, 1.1f, 2.2f) * (1 + 0.05f * Mathf.Sin(Clock.Now * 10f));
             Make.Fit(reticle, new Vector2(rs, rs));
         }
+
+        // 끌기(카제나식) — 카드는 손패에서 뽑혀 나온다.
+        //   적 1명 · 아군 1명 카드: 카드는 손패 가운데 위에 조금 크게 서 있고(손가락을 따라가지 않는다) 카드 위쪽에서 손가락까지 위로 볼록한 호.
+        //     적 위면 몸통에 조준경 + 발밑 붉은 타원 고리, 아군 위면 발밑 초록 파랑 고리. 대상 위에서 떼면 낸다, 아니면 손패로 돌아간다
+        //   그 밖(적 전체 · 대상 없음): 카드가 손가락을 따라간다. 위(싸움터)로 올리면 낸다 — 적 전체 카드는 그때 모든 적 발밑에 붉은 고리
+        //   어느 쪽이든 뽑는 순간 짧은 뽑기 연출(PullFx), 나머지 손패는 살짝 어둡게
+        static readonly Color FoeRed = new Color(1f, 0.22f, 0.18f), AllyTeal = new Color(0.3f, 0.95f, 0.75f);
+        public static float PullScale(float handScale) => Mathf.Max(handScale * 1.22f, 1.12f);
 
         void DragUpdate(Vector2 p)
         {
             var card = Cards[drag];
-            bool aims = card.Info.Target == TargetKind.Enemy;
+            var kind = card.Info.Target;
+            bool pointer = kind == TargetKind.Enemy || kind == TargetKind.Ally;
             bool lifted = p.y > LiftY;
-            Lifted = lifted;
             aimTarget = -1;
-            if (aims && lifted)
+            allyTarget = -1;
+            if (pointer)
             {
-                // 대상 카드 — 카드는 손 위에 띄워 두고 화살표로 짚는다
-                card.TargetScale = Mathf.Max(HandScale * 1.2f, 1.08f);
-                card.TargetPos = new Vector3(Mathf.Clamp(card.SlotX, -HalfSpan + 1.1f, HalfSpan - 1.1f), Bottom + 0.25f + CardView.H * card.TargetScale / 2, 0);
+                float ps = PullScale(HandScale);
+                card.TargetScale = ps;
                 card.TargetRot = 0;
-                aimTarget = AimAt(p);
-                Vector3 end = aimTarget >= 0 && EnemyAim != null ? EnemyAim(aimTarget) : (Vector3)p;
-                arrow.Show(card.transform.position + new Vector3(0, CardView.H * 0.5f, 0), end, aimTarget >= 0);
-                Reticle(end, aimTarget >= 0);
+                card.Hovered = true;                       // 테두리 빛(카드 성격 빛)
+                // 손패 줄 위로 확실히 — 카드 아래 끝이 손패 카드 높이의 4할께(더 올리면 폰에서 가까운 적을 가린다)
+                card.TargetPos = new Vector3(0, Bottom + CardView.H * HandScale * 0.4f + CardView.H * ps / 2, 0);
+                if (kind == TargetKind.Enemy) aimTarget = EnemyAt != null ? EnemyAt(p) : -1;
+                else allyTarget = AllyAt != null ? AllyAt(p) : -1;
+                bool on = aimTarget >= 0 || allyTarget >= 0;
+                Lifted = on || lifted;
+                Vector3 top = card.transform.position + new Vector3(0, CardView.H * 0.5f * card.transform.localScale.y, 0);
+                arrow.Show(top, p, on, kind == TargetKind.Enemy ? FoeRed : AllyTeal);
+                if (aimTarget >= 0 && EnemyAim != null)
+                {
+                    var f = EnemyFoot?.Invoke(aimTarget);
+                    Reticle(EnemyAim(aimTarget), true, f.HasValue ? f.Value.w : 1.6f);
+                    if (f.HasValue) Ring(f.Value.at, f.Value.w, FoeRed);
+                }
+                else Reticle(Vector3.zero, false);
+                if (allyTarget >= 0) { var f = AllyFoot?.Invoke(allyTarget); if (f.HasValue) Ring(f.Value.at, f.Value.w, AllyTeal); }
             }
             else
             {
+                Lifted = lifted;
                 arrow.Hide();
                 reticle.enabled = false;
                 card.TargetPos = new Vector3(p.x + dragOffset.x, p.y + dragOffset.y, 0);
                 card.TargetRot = 0;
-                card.TargetScale = lifted ? 1.0f : 1.1f;
+                card.Hovered = true;
+                card.TargetScale = PullScale(HandScale) * (lifted ? 0.95f : 1f);
+                if (lifted && kind == TargetKind.AllEnemies && EnemyFoot != null && EnemyCount != null)
+                    for (int e = 0; e < EnemyCount(); e++) { var f = EnemyFoot(e); if (f.HasValue) Ring(f.Value.at, f.Value.w, FoeRed); }
             }
 
             if (PointerInput.Up)
             {
                 int idx = drag;
-                bool ok = lifted && (!aims || aimTarget >= 0);
-                int target = aimTarget;
+                bool ok = pointer ? (aimTarget >= 0 || allyTarget >= 0) : lifted;
+                int target = kind == TargetKind.Enemy ? aimTarget : kind == TargetKind.Ally ? allyTarget : -1;
                 CancelDrag();
                 if (ok) Confirm(idx, target);
-                else if (lifted && aims) Miss(p);
+                else Sfx.Play("card_hover", 0.3f, 0.8f);   // 대상이 아닌 곳 · 손패 쪽 — 취소, 카드는 제자리로
             }
         }
+
+        // ── 발밑 타원 고리 — 프레임마다 쓴 만큼만 켠다(RingsBegin 으로 셈을 비우고, RingsEnd 로 남은 것을 끈다) ──
+        void RingsBegin() => ringsUsed = 0;
+        void RingsEnd()
+        {
+            for (int i = ringsUsed; i < rings.Count; i++) if (rings[i].enabled) rings[i].enabled = false;
+        }
+
+        void Ring(Vector3 at, float w, Color col)
+        {
+            if (ringsUsed >= rings.Count)
+                rings.Add(Make.Box("ring" + rings.Count, transform, RingSprite(), Vector3.zero, Vector2.one, 21, col, Res.SpriteMat(false, 1.5f)));
+            var r = rings[ringsUsed++];
+            r.enabled = true;
+            float rw = Mathf.Clamp(w * 0.95f, 1.3f, 4.2f) * (1 + 0.04f * Mathf.Sin(Clock.Now * 8f));
+            r.transform.position = new Vector3(at.x, at.y, 0);
+            Make.Fit(r, new Vector2(rw, rw * 0.3f));
+            col.a = 0.95f;
+            r.color = col;
+        }
+
+        // ── 뽑기 연출 ──
+        void PullFx(CardView c)
+        {
+            bool calm = Bolzena.RunUI.Settings.ReduceMotion || Clock.Speed > 1.5f;
+            pullAmp = calm ? 0.35f : 1f;
+            if (pulled != null && pulled != c) pulled.Follow = 14f;
+            pulled = c;
+            pullT = 0;
+            c.Follow = 30f;                                            // 이 동안은 빨리 따라간다(튀어 오름이 뭉개지지 않게)
+            if (Res.Clip("Sfx/" + PullSfx) != null) Sfx.Play(PullSfx, 0.5f); else Sfx.Play("card_hover", 0.5f, 1.35f);
+            Clock.Run(c.FlashCo(0.16f, 0.25f * pullAmp));
+            var tint = CardView.RimColor(c.Info);
+            if (pullGlow == null) pullGlow = Make.Box("pullglow", transform, Res.UI("soft"), Vector3.zero, Vector2.one, 640, tint, Res.SpriteMat(true, 2f));
+            pullGlow.color = tint;
+            pullGlow.transform.position = c.transform.position;        // 뽑힌 자리(손패)에 잠깐 남는 빛
+            pullGlow.enabled = true;
+        }
+
+        void PullUpdate()
+        {
+            if (pullT < 0) { if (pullGlow != null) pullGlow.enabled = false; return; }
+            pullT += Time.unscaledDeltaTime;
+            float k = Mathf.Clamp01(pullT / PullDur);
+            int i = pulled != null ? Cards.IndexOf(pulled) : -1;
+            if (i >= 0 && (i == drag || i == sel))
+            {
+                // 튀어 오름 — 0 → 넘침 → 제자리(sin 반 바퀴), 기울기 — 처음에 6° 기울었다 줄어든다
+                pulled.TargetScale *= 1 + 0.12f * pullAmp * Mathf.Sin(Mathf.PI * k);
+                pulled.TargetRot += 6f * pullAmp * (1 - k) * (1 - k) * (pulled.SlotX >= 0 ? -1 : 1);
+                pulled.TargetPos += new Vector3(0, 0.18f * pullAmp * Mathf.Sin(Mathf.PI * k), 0);
+            }
+            if (pullGlow != null)
+            {
+                var c = pullGlow.color; c.a = 0.55f * pullAmp * (1 - k) * (1 - k); pullGlow.color = c;
+                float g = CardView.W * HandScale * (1.3f + 0.5f * k);
+                Make.Fit(pullGlow, new Vector2(g, g * 1.35f));
+            }
+            if (k >= 1)
+            {
+                pullT = -1;
+                if (pulled != null) pulled.Follow = 14f;
+                pulled = null;
+                if (pullGlow != null) pullGlow.enabled = false;
+            }
+        }
+
+        // ── 그림 — 조준경(원 두 겹 + 가운데가 빈 십자선) · 타원 고리(가장자리가 부드러운 띠). 처음 한 번 만든다 ──
+        static Sprite scopeSpr, ringSpr;
+        static Sprite ScopeSprite()
+        {
+            if (scopeSpr != null) return scopeSpr;
+            const int N = 256;
+            var tex = new Texture2D(N, N, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
+            var px = new Color32[N * N];
+            float aa = 3f / N;
+            for (int y = 0; y < N; y++)
+                for (int x = 0; x < N; x++)
+                {
+                    float u = (x + 0.5f) / N * 2 - 1, v = (y + 0.5f) / N * 2 - 1, d = Mathf.Sqrt(u * u + v * v);
+                    float a = 0;
+                    a = Mathf.Max(a, Band(d, 0.84f, 0.93f, aa));                  // 바깥 원
+                    a = Mathf.Max(a, Band(d, 0.40f, 0.46f, aa));                  // 안 원
+                    float ax = Mathf.Abs(u), ay = Mathf.Abs(v);
+                    if (ay > 0.14f && ay < 0.99f) a = Mathf.Max(a, Band(ax, -1f, 0.022f, aa));   // 세로 십자선(가운데는 비운다)
+                    if (ax > 0.14f && ax < 0.99f) a = Mathf.Max(a, Band(ay, -1f, 0.022f, aa));   // 가로 십자선
+                    a = Mathf.Max(a, Band(d, -1f, 0.045f, aa));                   // 가운데 점
+                    px[y * N + x] = new Color32(255, 255, 255, (byte)(Mathf.Clamp01(a) * 255));
+                }
+            tex.SetPixels32(px); tex.Apply();
+            scopeSpr = Sprite.Create(tex, new Rect(0, 0, N, N), new Vector2(0.5f, 0.5f), N);
+            scopeSpr.name = "scope";
+            return scopeSpr;
+        }
+
+        static Sprite RingSprite()
+        {
+            if (ringSpr != null) return ringSpr;
+            const int N = 256;
+            var tex = new Texture2D(N, N, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
+            var px = new Color32[N * N];
+            for (int y = 0; y < N; y++)
+                for (int x = 0; x < N; x++)
+                {
+                    float u = (x + 0.5f) / N * 2 - 1, v = (y + 0.5f) / N * 2 - 1, d = Mathf.Sqrt(u * u + v * v);
+                    float core = Band(d, 0.82f, 0.94f, 0.03f);                    // 고리
+                    float glow = Mathf.Clamp01(1 - Mathf.Abs(d - 0.88f) / 0.12f) * 0.45f;   // 둘레 번짐
+                    float fill = d < 0.88f ? 0.12f * d : 0;                       // 안쪽은 아주 옅게
+                    px[y * N + x] = new Color32(255, 255, 255, (byte)(Mathf.Clamp01(Mathf.Max(core, Mathf.Max(glow, fill))) * 255));
+                }
+            tex.SetPixels32(px); tex.Apply();
+            ringSpr = Sprite.Create(tex, new Rect(0, 0, N, N), new Vector2(0.5f, 0.5f), N);
+            ringSpr.name = "foot ring";
+            return ringSpr;
+        }
+
+        // d 가 [lo, hi] 안이면 1, 밖으로 aa 만큼 부드럽게 0
+        static float Band(float d, float lo, float hi, float aa) => Mathf.Clamp01(Mathf.Min(d - lo, hi - d) / aa + 0.5f);
 
         void CancelDrag()
         {
             drag = -1;
             press = -1;
+            allyTarget = -1;
             arrow.Hide();
             reticle.enabled = false;
             Lifted = false;

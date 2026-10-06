@@ -12,10 +12,10 @@
       "atk": 135,
       "def": 35,
       "crit": 10,
-      "blurb": "역대 최고의 장난을 평생 소원으로 삼은 유령 우두머리. 공격할 때마다 적에게 「장난」 을 걸고, 셋이 다 걸린 적은 정신을 못 차리고 한 대 크게 얻어맞는다.",
+      "blurb": "역대 최고의 장난을 평생 소원으로 삼은 유령 우두머리. 공격할 때마다 적에게 「장난」 을 걸고, 셋이 다 걸린 적은 정신을 못 차리고 한 대 크게 얻어맞습니다.",
       "keyword": {
         "name": "장난",
-        "desc": "셰이디의 짓궂은 장난 — 셋이 겹치면 대형 사고",
+        "desc": "적에게 겹치는 장난",
         "carrier": "enemy",
         "cap": 3,
         "rules": [
@@ -187,26 +187,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "꺼 둔 불",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 0.8,
               "target": "allEnemies"
             },
             {
@@ -222,7 +203,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.0,
               "target": "allEnemies"
             },
             {
@@ -240,19 +221,45 @@
           ]
         },
         {
-          "name": "축복의 어둠",
-          "tags": [
-            "축복"
-          ],
+          "name": "어둠 속 술래",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.05,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "완전한 암흑",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
               "v": 1,
               "target": "allEnemies"
             }
@@ -269,8 +276,15 @@
           "kind": "frost"
         },
         {
-          "name": "슬쩍 빠지기",
-          "kind": "draw"
+          "name": "발소리 죽이기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
         }
       ]
     },
@@ -305,8 +319,8 @@
             {
               "k": "dmg",
               "ratio": 0.5,
-              "hits": 4,
-              "target": "oneEnemy"
+              "target": "oneEnemy",
+              "hits": 4
             },
             {
               "k": "ifRandom",
@@ -315,7 +329,8 @@
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -325,32 +340,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.25,
-              "hits": 4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifRandom",
-              "pct": 0.5
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "아끼는 사슬낫",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
               "ratio": 0.45,
-              "hits": 4,
-              "target": "oneEnemy"
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "ifRandom",
@@ -359,7 +351,8 @@
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -369,32 +362,31 @@
             {
               "k": "dmg",
               "ratio": 0.35,
-              "hits": 4,
-              "target": "oneEnemy"
+              "target": "oneEnemy",
+              "hits": 4
             },
             {
               "k": "stack",
               "id": "장난",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "축복의 사슬낫",
-          "tags": [
-            "축복"
-          ],
+          "name": "사방으로 휘두르기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
-              "hits": 4,
-              "target": "oneEnemy"
+              "ratio": 0.28,
+              "target": "allEnemies",
+              "hits": 4
             },
             {
               "k": "ifRandom",
@@ -403,7 +395,29 @@
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "몰래 한 자루 더",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "ifRandom",
+              "pct": 0.5
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -418,8 +432,15 @@
           "kind": "weakSpot"
         },
         {
-          "name": "빠른 회수",
-          "kind": "draw"
+          "name": "발목 걸기",
+          "fx": [
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -449,46 +470,49 @@
             {
               "k": "stack",
               "id": "장난",
-              "v": 3
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "살짝 매달기",
+          "name": "발끝만 매달기",
           "cost": 1,
           "fx": [
             {
               "k": "stack",
               "id": "장난",
-              "v": 2
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "매달아 두기",
-          "tags": [
-            "보존"
-          ],
+          "name": "줄줄이 매달기",
           "fx": [
             {
               "k": "stack",
               "id": "장난",
-              "v": 3
+              "v": 2,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 2,
+              "target": "allEnemies"
             }
           ]
         },
@@ -498,12 +522,14 @@
             {
               "k": "stack",
               "id": "장난",
-              "v": 2
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
@@ -514,29 +540,27 @@
           ]
         },
         {
-          "name": "축복의 밧줄",
+          "name": "밤새 대롱대롱",
           "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
               "k": "stack",
               "id": "장난",
-              "v": 3
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
-        {
-          "name": "튼튼한 밧줄",
-          "kind": "frost"
-        },
         {
           "name": "재빠른 매듭",
           "kind": "cost"
@@ -550,6 +574,10 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "놀란 틈에",
+          "kind": "draw"
         }
       ]
     },
@@ -582,7 +610,8 @@
             {
               "k": "stack",
               "id": "장난",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -592,29 +621,13 @@
           "fx": [
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
               "id": "장난",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꽉 찬 주머니",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -623,29 +636,55 @@
           "fx": [
             {
               "k": "draw",
-              "v": 3
+              "v": 2
             },
             {
               "k": "stack",
               "id": "장난",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "축복의 주머니",
-          "tags": [
-            "축복"
-          ],
+          "name": "주머니 속 낫",
           "fx": [
             {
               "k": "draw",
-              "v": 3
+              "v": 2
             },
             {
               "k": "stack",
               "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "extra",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "넣어 둔 주머니",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
               "v": 1
             }
           ]
@@ -666,7 +705,8 @@
             {
               "k": "status",
               "id": "취약",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -722,7 +762,7 @@
           ]
         }
       ],
-      "blurb": "차원을 가르는 사슬낫. 넷째 휘두름마다 어디선가 인형이 떨어진다."
+      "blurb": "차원을 가르는 사슬낫. 넷째 휘두름마다 어디선가 인형이 떨어집니다."
     }
   ]
 }

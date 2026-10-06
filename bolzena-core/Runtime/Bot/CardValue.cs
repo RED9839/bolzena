@@ -81,6 +81,8 @@ namespace Bolzena.Core
                     case FxK.Transform: v += 0.4; break;
                     case FxK.Form: v += FORM_VAL; break;   // 대충 — 검사는 FormValue 로 정확히
                     case FxK.FormEnd: break;
+                    case FxK.Cue: break;
+                    case FxK.Power: v += PowerValue(f); break;
                     case FxK.Later: case FxK.AfterCards: v += 0.8 * ValueOf(f.Then); break;
                     case FxK.Trap: v += 0.6 * ValueOf(f.Then); break;
                     case FxK.Confuse: v += 0.6; break;
@@ -104,7 +106,7 @@ namespace Bolzena.Core
                     case FxK.Hasten: v += HASTEN_VAL * Math.Max(1, f.V); break;
                     case FxK.When: if (COND_VAL.TryGetValue(f.On ?? "", out var cv)) cond = cv; break;
                     case FxK.Tough: v += TOUGH_VAL * Math.Max(1, f.V) * Area(f.Target); break;
-                    case FxK.PerStack: per = 3; break;
+                    case FxK.PerStack: per = Math.Max(3, f.N); break;
                     case FxK.Dmg:
                         {
                             double d = f.Ratio * n * 0.83 * Area(f.Target ?? "oneEnemy") * (f.XHits ? 3 : 1) * per * (f.Fixed ? 0.9 : 1);
@@ -192,6 +194,49 @@ namespace Bolzena.Core
             int rc = c.TagN(Tag.Recall);
             if (rc >= 0) v += 0.15 * Math.Min(3, Math.Max(1, rc));
             return v;
+        }
+
+        // ── 강화 카드 지속 규칙 ───────────────────────────────────────
+        /// <summary>강화를 켠 뒤 남은 전투의 턴(대충 — 일반 싸움 3.3턴 · 보스 5.6턴, 카드는 보통 1~2턴째에 낸다) · 규칙 몫의 할인.</summary>
+        public const double POWER_T = 3, POWER_W = 0.6;
+
+        /// <summary>power 한 조각의 값어치 — 규칙마다 (한 번 발동의 값 × 남은 전투에 발동할 수 × 할인). always 의 증감은 전투 내내 증감과 같은 셈.</summary>
+        public static double PowerValue(Fx f)
+        {
+            double v = 0;
+            foreach (var r in f?.Rules ?? new List<PassiveRule>()) v += RuleWorth(r);
+            return v;
+        }
+
+        /// <summary>강화 규칙 하나의 값어치.</summary>
+        public static double RuleWorth(PassiveRule r)
+        {
+            if (r == null) return 0;
+            if (r.When?.On == "always") return ValueOf(r.Fx.Select(x => { var c = x.Copy(); c.Run = true; return c; }).ToList()) * (r.Conds.Count > 0 ? 0.6 : 1);
+            return ValueOf(r.Fx) * RuleFires(r) * POWER_W;
+        }
+
+        /// <summary>남은 전투(POWER_T 턴)에 그 규칙이 발동할 대충의 수 — 계기마다 턴당 빈도 × 조건 · 횟수 제한.</summary>
+        public static double RuleFires(PassiveRule r)
+        {
+            var w = r.When ?? new When();
+            double perTurn = w.On switch
+            {
+                "turnStart" or "turnEnd" => 1,
+                "play" => (w.Who == "any" ? 3.0 : w.Who == "other" ? 2.0 : 1.4) * (w.Type != null ? 0.55 : 1) * (w.Tag != null || w.MaxCost != null || w.Marked != null ? 0.5 : 1) * (w.MinCost > 1 ? 0.5 : 1) / Math.Max(1, w.Every) * (w.Nth > 0 || w.Sig || (w.Seq != null && w.Seq.Count > 0) ? 0.35 : 1),
+                "hit" => w.Who == "any" ? 2.5 : 1.0,
+                "extra" => w.Who == "any" ? 1.2 : 0.6,
+                "hurt" => 1.2, "blocked" => 0.6, "guard" => 1.3, "debuff" => w.Who == "any" ? 1.5 : 0.8,
+                "drawn" => 1.2, "kill" => 0.35, "break" => 0.3, "crit" => 0.5, "spend" => 0.8, "make" => 0.6,
+                "stackReach" => 0.4, "stackGone" => 0.4, "stackOver" => 0.3, "shieldBreak" => 0.4, "foeAct" => 1.5, "foeActBefore" => 1.5,
+                "discard" => 0.6, "exhaust" => 0.4, "ult" => 0.25, "overheal" => 0.4,
+                _ => 0.5,
+            };
+            if (r.Conds.Count > 0) perTurn *= 0.6;
+            if (r.Limit != null && r.Limit.Per == "turn") perTurn = Math.Min(perTurn, r.Limit.N);
+            double total = perTurn * POWER_T;
+            if (r.Limit != null && r.Limit.Per == "fight") total = Math.Min(total, r.Limit.N);
+            return total;
         }
 
         /// <summary>효과 form 한 조각의 대충의 값(데이터 없이 셀 때).</summary>

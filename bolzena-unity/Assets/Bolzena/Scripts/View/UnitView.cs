@@ -18,6 +18,7 @@ namespace Bolzena.View
         public float Scale;
         public bool Facing;                  // true 면 오른쪽을 본다(사도)
         public Vector3 Home;
+        public Vector3 Slot;                 // 처음 받은 자리(표) — 배치(EnemyLayout)가 언제 다시 짜도 여기서 시작한다
         public int BaseOrder;
         SkeletonDataAsset data;
         string skin;
@@ -27,6 +28,7 @@ namespace Bolzena.View
         Color fillColor = Color.white;
         Color tint = Color.white, tintTarget = Color.white;
         Vector3 offset, knock;
+        public Vector3 Nudge;                // 화면 밖 막기가 미는 몫(고학년 루트 이동)
         SpriteRenderer shadow;
         float heightCache = -1;
         SpriteRenderer iconArt;              // 스킨이 없는 적 — 스파인 대신 정지 아이콘(또는 이름 판)
@@ -41,7 +43,7 @@ namespace Bolzena.View
             v.skin = skin;
             v.Scale = scale;
             v.Facing = faceRight;
-            v.Home = pos;
+            v.Home = v.Slot = pos;
             v.BaseOrder = order;
             v.shadow = Make.Sprite("shadow", root, Res.UI("shadow"), new Vector3(0, 0.02f, 0), order - 1, new Color(1, 1, 1, 0.75f));
             v.Art = Make.Node("art", root);
@@ -100,6 +102,7 @@ namespace Bolzena.View
             iconArt = Make.Sliced("plate", Art, Res.UI("bar_fill_9s"), new Vector3(0, 0.7f, 0), new Vector2(1.6f, 0.5f), BaseOrder, new Color(0.06f, 0.08f, 0.16f, 0.9f));
             var t = Make.Text("name", Art, label ?? name, new Vector3(0, 0.7f, 0), 0.2f, BaseOrder + 1, Color.white);
             Make.Outline(t, 0.3f, new Color(0, 0, 0, 0.9f));
+            plateText = t;
             iconW = 1.6f;
             heightCache = 1.4f;
         }
@@ -116,8 +119,12 @@ namespace Bolzena.View
             return null;
         }
 
+        // 변신 중 평타 · 강공 대신 트는 동작(림(혼돈) 「차원 너머의 낫」 — 원작 강화 공격 AS1_Ultimate1_2). 없으면 null
+        public string FormAttack;
+
         public string AnimFor(Motion m)
         {
+            if (FormAttack != null && (m == Motion.Attack1 || m == Motion.Attack2) && Has(FormAttack)) return FormAttack;
             switch (m)
             {
                 case Motion.Attack1: return Resolve("Attack1_1");
@@ -202,6 +209,84 @@ namespace Bolzena.View
             return total / Mathf.Max(0.01f, speed);
         }
 
+        // 고학년 줄이기 — 조각 안의 빈 구간(skips, 이어 튼 전체 시각 초)을 건너뛰고 endAt 초에서 쉬는 동작으로. PlayChain 바로 뒤에 부른다
+        public void CutChain(string first, IList<string> chain, List<(float from, float to)> skips, float endAt)
+        {
+            var names = new List<string> { first }; if (chain != null) names.AddRange(chain);
+            var offs = new List<float>(); float o = 0;
+            foreach (var n in names) { offs.Add(o); var a = data.GetSkeletonData(true).FindAnimation(F(n)); o += a != null ? a.Duration : 0; }
+            StartCoroutine(CutCo(names, offs, skips, endAt));
+        }
+
+        IEnumerator CutCo(List<string> names, List<float> offs, List<(float from, float to)> skips, float endAt)
+        {
+            var st = Sa.AnimationState;
+            var done = new HashSet<int>();
+            int piece = 0;
+            TrackEntry last = null;
+            while (true)
+            {
+                var cur = st.GetCurrent(0);
+                if (cur == null || cur.Loop) yield break;                 // 쉬는 동작까지 왔다
+                if (cur != last) { if (last != null) piece++; last = cur; }
+                if (piece >= names.Count) yield break;
+                float g = offs[piece] + cur.TrackTime;
+                if (g >= endAt)
+                {
+                    var idle = IdleName();
+                    if (idle != null) st.SetAnimation(0, idle, true).MixDuration = 0.25f;
+                    yield break;
+                }
+                for (int i = 0; i < skips.Count; i++)
+                    if (!done.Contains(i) && g >= skips[i].from && g < skips[i].to)
+                    {
+                        done.Add(i);
+                        cur.TrackTime += skips[i].to - g;                      // 같은 조각 안에서만 건너뛴다(만들 때 그렇게 고른다)
+                    }
+                yield return null;
+            }
+        }
+
+        // 조각들의 모든 스파인 이벤트 시각(이어 튼 전체 초)과 조각 경계
+        public (List<float> evs, List<float> offs, float total) ChainEvents(IList<string> names)
+        {
+            var evs = new List<float>(); var offs = new List<float>(); float o = 0;
+            foreach (var n in names)
+            {
+                offs.Add(o);
+                var a = data.GetSkeletonData(true).FindAnimation(F(n));
+                if (a == null) continue;
+                foreach (var tl in a.Timelines) if (tl is EventTimeline et) foreach (var ev in et.Events) evs.Add(o + ev.Time);
+                o += a.Duration;
+            }
+            evs.Sort();
+            return (evs, offs, o);
+        }
+
+        // 한 조각의 가운데부터 끝까지(원작 방식 고학년의 발동 조각 — 키샤 열기 폭발 · 이드(재활) 깨기). 길이(초, 속도 반영)를 돌려준다
+        public float PlayPart(string anim, float from, float speed = 1f)
+        {
+            var a = anim == null ? null : data.GetSkeletonData(true).FindAnimation(F(anim));
+            if (a == null) return 0;
+            from = Mathf.Clamp(from, 0, a.Duration);
+            var e = Sa.AnimationState.SetAnimation(0, a, false);
+            e.TimeScale = speed; e.MixDuration = 0.12f;
+            e.AnimationStart = from; e.AnimationLast = from;
+            var idle = IdleName();
+            if (idle != null) Sa.AnimationState.AddAnimation(0, idle, true, 0).MixDuration = 0.2f;
+            return (a.Duration - from) / Mathf.Max(0.01f, speed);
+        }
+
+        // 한 조각의 한 구간을 되풀이(이드(재활) 꿈속에서 잠 — 다음 차례까지)
+        public void LoopPart(string anim, float from, float to)
+        {
+            var a = anim == null ? null : data.GetSkeletonData(true).FindAnimation(F(anim));
+            if (a == null) return;
+            var e = Sa.AnimationState.SetAnimation(0, a, true);
+            e.AnimationStart = Mathf.Clamp(from, 0, a.Duration); e.AnimationEnd = Mathf.Clamp(to, e.AnimationStart + 0.05f, a.Duration);
+            e.AnimationLast = e.AnimationStart; e.MixDuration = 0.1f;
+        }
+
         public void Loop(string anim)
         {
             anim = F(anim);
@@ -235,6 +320,9 @@ namespace Bolzena.View
             }
             bool Sfx2(Spine.Event e) => e.Data.Name == "SFX" && int.TryParse(e.String, out var v) && v >= 2;
             Spine.Event hit = evs.Find(Sfx2) ?? evs.Find(Own);
+            // 맞는 소리(SFX2)와 이 유닛 이펙트 표시가 0.4초 안에 둘 다 있으면 늦은 쪽 — 이펙트를 내기 시작하는 표시가 주먹이 닿기 전에 오는 일이 있다(디아나 2026-10-06)
+            var s2 = evs.Find(Sfx2); var ow = evs.Find(Own);
+            if (s2 != null && ow != null && Mathf.Abs(s2.Time - ow.Time) <= 0.4f) hit = s2.Time >= ow.Time ? s2 : ow;
             float at = hit != null ? hit.Time : a.Duration * 0.45f;
             res.Add(at);
             foreach (var e in evs)
@@ -266,6 +354,113 @@ namespace Bolzena.View
 
         /// <summary>지금 그려진 그림의 경계(월드) — 판정 상자에 쓴다. Height() 는 처음 잰 값을 붙들어 두어(등장 · 웅크림 때 재면) 그림보다 작을 수 있다.</summary>
         public Bounds ArtBounds => iconArt != null ? iconArt.bounds : mr.bounds;
+
+        // ── 보이는 그림 상자 ── 쉬는 동작 그대로 한 번 그려(화면 밖 렌더 텍스처) 투명이 아닌 픽셀의 위아래 · 좌우 끝을 잰다.
+        //   스파인 메시 상자는 그림 둘레 빈칸까지 들어 실제보다 크다 — 적 머리 위 묶음(HP 막대 …)과 적 자리를 이것으로 정한다.
+        //   값은 발(이 오브젝트 자리) 기준 싸움터 단위. 같은 그림 · 스킨 · 크기 · 방향이면 한 번만 잰다(정적 표)
+        static readonly Dictionary<string, Rect> visCache = new Dictionary<string, Rect>();
+        Rect? vis;
+        float scaleMul = 1f, scale0 = -1, iconW0 = -1;
+        public float ScaleMul => scaleMul;
+
+        /// <summary>보이는 그림 상자(발 기준, 지금 배율). 처음 부를 때 잰다.</summary>
+        public Rect Visible
+        {
+            get
+            {
+                if (!vis.HasValue) vis = MeasureVisible();
+                var r = vis.Value;
+                return new Rect(r.x * scaleMul, r.y * scaleMul, r.width * scaleMul, r.height * scaleMul);
+            }
+        }
+
+        /// <summary>몸 크기를 처음 크기의 mul 배로(적이 많아 화면에 다 못 서면 배치가 조금 줄인다).</summary>
+        public void Rescale(float mul)
+        {
+            if (scale0 < 0) { scale0 = Scale; iconW0 = iconW; }
+            scaleMul = mul;
+            Art.localScale = new Vector3(mul, mul, 1);
+            Scale = scale0 * mul;
+            iconW = iconW0 * mul;
+            heightCache = -1;
+            travelCache.Clear();
+        }
+
+        Rect MeasureVisible()
+        {
+            var parent = transform.parent;
+            Rect ToLocal(Bounds b)
+            {
+                var a = parent != null ? parent.InverseTransformPoint(b.min) : b.min;
+                var c = parent != null ? parent.InverseTransformPoint(b.max) : b.max;
+                var o = transform.localPosition + Art.localPosition;
+                return Rect.MinMaxRect(a.x - o.x, a.y - o.y, c.x - o.x, c.y - o.y);
+            }
+            if (iconArt != null) return ToLocal(iconArt.bounds);
+            string key = data.name + "|" + skin + "|" + Scale.ToString("F3") + "|" + Facing;
+            if (visCache.TryGetValue(key, out var got)) return got;
+            // 쉬는 동작을 몇 장면 짚어(통통 튀는 젤리처럼 몸이 오르내리는 적) 그 모두를 합친 실루엣으로 잰다
+            var entry = Sa.AnimationState.GetCurrent(0);
+            float t0 = entry != null ? entry.TrackTime : 0, dur = entry != null && entry.Animation != null ? entry.Animation.Duration : 0;
+            int Samples = Mathf.Clamp(Mathf.CeilToInt(dur * 15f), 8, 40);   // 초당 15장면(짧게 튀어 오르는 순간도 잡게)
+            int ns = dur > 0.05f ? Samples : 1;
+            void Pose(int si) { if (entry != null && ns > 1) entry.TrackTime = t0 + dur * si / ns; Sa.Update(0); Sa.LateUpdate(); }
+            Bounds wb = default;
+            for (int si = 0; si < ns; si++) { Pose(si); if (si == 0) wb = mr.bounds; else wb.Encapsulate(mr.bounds); }
+            Rect res = ToLocal(wb);
+            if (wb.size.x > 0.01f && wb.size.y > 0.01f && SystemInfo.supportsRenderTextures)
+            {
+                const float Ppu = 96f;
+                int w = Mathf.Clamp(Mathf.CeilToInt(wb.size.x * Ppu), 8, 512), h = Mathf.Clamp(Mathf.CeilToInt(wb.size.y * Ppu), 8, 512);
+                var rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32);
+                Texture2D tex = null;
+                try
+                {
+                    for (int si = 0; si < ns; si++)
+                    {
+                        Pose(si);
+                        var cb = new UnityEngine.Rendering.CommandBuffer { name = "unit visible box" };
+                        cb.SetRenderTarget(rt);
+                        if (si == 0) cb.ClearRenderTarget(false, true, Color.clear);
+                        cb.SetViewProjectionMatrices(Matrix4x4.identity, Matrix4x4.Ortho(wb.min.x, wb.max.x, wb.min.y, wb.max.y, -1000f, 1000f));
+                        var mats = mr.sharedMaterials;
+                        for (int i = 0; i < mats.Length; i++) if (mats[i] != null) cb.DrawRenderer(mr, mats[i], i, 0);
+                        Graphics.ExecuteCommandBuffer(cb);
+                        cb.Release();
+                    }
+                    var prev = RenderTexture.active;
+                    RenderTexture.active = rt;
+                    tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+                    tex.ReadPixels(new Rect(0, 0, w, h), 0, 0, false);
+                    RenderTexture.active = prev;
+                    var px = tex.GetPixels32();
+                    int x0 = w, x1 = -1, y0 = h, y1 = -1;
+                    for (int y = 0; y < h; y++)
+                        for (int x = 0; x < w; x++)
+                            if (px[y * w + x].a > 40) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+                    if (x1 >= x0 && y1 >= y0)
+                    {
+                        var vb = new Bounds();
+                        vb.SetMinMax(new Vector3(wb.min.x + x0 * wb.size.x / w, wb.min.y + y0 * wb.size.y / h, 0),
+                                     new Vector3(wb.min.x + (x1 + 1) * wb.size.x / w, wb.min.y + (y1 + 1) * wb.size.y / h, 0));
+                        res = ToLocal(vb);
+                    }
+                }
+                catch (System.Exception e) { Debug.LogWarning("[Unit] 그림 상자 재기 실패 " + name + " — " + e.Message); }
+                finally
+                {
+                    RenderTexture.ReleaseTemporary(rt);
+                    if (tex != null) Destroy(tex);
+                    if (entry != null && ns > 1) { entry.TrackTime = t0; Sa.Update(0); Sa.LateUpdate(); }
+                }
+            }
+            Debug.Log($"[Unit] 그림 상자 {name}: 메시 {ToLocal(wb)} → 보임 {res} (쉬는 동작 {ns}장면)");
+            visCache[key] = res;
+            return res;
+        }
+
+        /// <summary>그려진 몸(스파인 메시)의 월드 경계 — 화면 밖 막기(고학년 몸짓의 루트 이동)</summary>
+        public Bounds MeshBounds => mr != null ? mr.bounds : new Bounds(transform.position, Vector3.zero);
 
         public float Width() => iconArt != null ? iconW : Mathf.Clamp(mr.bounds.size.x / transform.lossyScale.x, 0.8f, 6f);
 
@@ -339,10 +534,31 @@ namespace Bolzena.View
         }
 
         // 자리 본 「Point_<p>」(없으면 그것으로 시작하는 본 — Point_Attack1_Shot · 뒤가 _T 인 대상 표시는 빼고). 그림 한 장이면 null
+        public static System.Action<string, string> BoneMiss;
         Vector3? PointAt(string p)
         {
             if (!this || !SpineArt || Sa.Skeleton == null) return null;
-            if (!pointBones.TryGetValue(p, out var bn))
+            if (!pointBones.TryGetValue(p, out var bn) && (p == "WeaponTip" || p == "HandR"))
+            {
+                // 무기 끝 · 오른손 — 원작 고학년 쏘는 자리가 몸 앞 고정 점(Point_Attack1)뿐인 사도(에르핀(왕도) · 아일라 · 포셔 …)를 위해:
+                // 이름에 Weapon · Gun · Barrel · Staff · Wand 가 든 뼈 가운데 자식이 없는(끝) 것 중 처음 자세에서 몸 가운데에서 가장 먼 것
+                bn = null;
+                if (p == "WeaponTip")
+                {
+                    var mid = Sa.Skeleton.FindBone("Point_Middle");
+                    float best = -1;
+                    foreach (var b in Sa.Skeleton.Bones)
+                    {
+                        var nm = b.Data.Name;
+                        if (b.Children.Count > 0 || !System.Text.RegularExpressions.Regex.IsMatch(nm, "(?i)(weapon|gun|barrel|staff|wand|cane)") || nm.EndsWith("_T")) continue;
+                        float dd = mid != null ? (b.WorldX - mid.WorldX) * (b.WorldX - mid.WorldX) + (b.WorldY - mid.WorldY) * (b.WorldY - mid.WorldY) : b.WorldX * b.WorldX + b.WorldY * b.WorldY;
+                        if (dd > best) { best = dd; bn = nm; }
+                    }
+                }
+                else bn = Sa.Skeleton.FindBone("Hand_R") != null ? "Hand_R" : null;
+                pointBones[p] = bn;
+            }
+            if (!pointBones.TryGetValue(p, out bn))
             {
                 string want = "Point_" + p;
                 bn = Sa.Skeleton.FindBone(want) != null ? want : null;
@@ -350,14 +566,18 @@ namespace Bolzena.View
                     foreach (var b in Sa.Skeleton.Bones)
                         if (b.Data.Name.StartsWith(want, System.StringComparison.OrdinalIgnoreCase) && !b.Data.Name.EndsWith("_T")) { bn = b.Data.Name; break; }
                 pointBones[p] = bn;
+                if (bn == null) BoneMiss?.Invoke(FxKey ?? name, p);   // 점검 — 이펙트가 붙을 자리 본을 못 찾음(대신 짐작한 자리)
             }
             return bn != null ? Bone(bn, Vector3.zero) : (Vector3?)null;
         }
 
+        TMPro.TextMeshPro plateText;
         public void SetOrder(int order)
         {
             mr.sortingOrder = order;
             shadow.sortingOrder = order - 1;
+            if (iconArt != null) iconArt.sortingOrder = order;             // 스파인 대신 선 아이콘 · 이름 판도 같은 차례로
+            if (plateText != null) plateText.sortingOrder = order + 1;
         }
 
         // ── 색 · 번쩍임 ──
@@ -444,7 +664,7 @@ namespace Bolzena.View
         void LateUpdate()
         {
             float dt = Time.deltaTime;
-            Art.localPosition = offset + knock;
+            Art.localPosition = offset + knock + Nudge;
             if (fillPhase > 0) fillPhase = Mathf.Max(0, fillPhase - dt * fillDecay);
             mpb.SetColor("_FillColor", fillColor);
             mpb.SetFloat("_FillPhase", fillPhase);

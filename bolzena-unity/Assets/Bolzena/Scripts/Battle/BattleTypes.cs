@@ -33,7 +33,6 @@ namespace Bolzena.Battle
     {
         public string Word, Text, Kind;   // Kind: kw · tag · status · flash · no · card(생성 카드 — Card 를 작은 카드로)
         public CardInfo Card;
-        public string Detail;             // 사도 고유 효과의 자세히(CardText.Detail) — 판 아래 흐리게
         public Term(string word, string text, string kind = "kw") { Word = word; Text = text; Kind = kind; }
     }
 
@@ -44,8 +43,7 @@ namespace Bolzena.Battle
         public string Value;            // 「2」 · 「+20%」
         public int Turns = -1;          // 남은 턴(-1 이면 없음 · 전투 내내)
         public string Kind = "buff";
-        public string Text;             // 풀이(툴팁) — 짧은 글(고유 효과는 CardText.Short)
-        public string Detail;           // 자세히(고유 효과 CardText.Detail — 툴팁 아래 · 펼침). 없으면 null
+        public string Text;             // 풀이(툴팁 · 정보 창) — 수치 · 지속이 다 든 한 가지 글(엔진 키워드 = CardText.TIPS, 고유 효과 = CardText.Trait)
         /// <summary>이 상태를 건 사도(화면 키 — 초상). 엔진이 아직 안 내면 null — 정보 창은 초상 없이 그린다.</summary>
         public List<string> From;
     }
@@ -72,8 +70,11 @@ namespace Bolzena.Battle
         public bool Unplayable;
         public bool Unique;              // 고유 카드(더미 보기 차례: 사도별 기본 → 고유)
         public int Owner = -1;           // 교주 카드를 넣은 사도(파티 몇 번째) — 틀 빛깔 · 핀이 그 사도. 주인이 없으면 -1(금빛 중립)
+        public string Grade;             // 교주 카드 등급(일반 · 고급 · 희귀 · 전설) — 틀 빛깔(2026-10-06 사용자: 장비와 같은 등급 색)
         public string Nature;            // 주인 사도의 성격(카드 틀 빛깔) — 교주 카드는 넣은 사도의 성격, 주인 없는 교주 · 상태 카드는 null
         public string BlessName, BlessText;   // 신탁 선택지에 축복이 얹혔으면(15%) 그 이름 · 글
+        public string MarkBless, MarkBlessText;   // 이 카드에 이미 얹힌 축복(core CardMark) — 카드 표식 · 확대 판
+        public bool Copy;                // 복제본(core CardMark.Copy) — 오른쪽 위 복제 표 「복제 — 신탁 · 축복 불가」
         public List<string> Choices;     // 두 갈래 카드 — 갈래 이름 둘(낼 때 고른다). 없으면 null
     }
 
@@ -84,23 +85,28 @@ namespace Bolzena.Battle
         public string Id, Name, Grade, Text;
     }
 
+    // 사도 정보 칸 하나 — core CardText.TraitText 를 화면 서식(「」 금빛)으로
+    public class TraitLine
+    {
+        public string Kind, Name, Sub, Body;   // Kind: 고학년 · 고유 효과 · 패시브 / Sub: 부제(고학년은 「게이지 N%」) / Body: 「· 계기 → 결과」 줄 목록
+    }
+
     public class HeroState
     {
         public string Key;               // 스파인 · 소리 폴더 이름(ricota · kyarot …) — 화면용
         public string Id;                // 규칙 쪽 id(rico …)
         public string Name;
-        public string UltName, UltText;  // UltText = 자세히(효과 전부)
-        public string UltShort;          // 고학년 한 줄 요약(CardText.Short) — 기본으로 보이는 글
+        public string UltName, UltText;  // UltText = 효과 전부(CardText.Fx)
         public UnityEngine.Color Tint;
         public int Atk, Def, Crit;       // 바탕(장비 포함)
         public int AtkNow, DefNow, CritNow;
         public string Role, Nature, Row, Blurb;
         public int Ult, UltMax;          // 게이지(파티 공용) · 이 사도 고학년 값
         public bool Dead;
-        public List<string> Passives = new List<string>();   // 패시브 한 줄씩 — 자세히(CardText.Detail)
-        public List<string> PassivesShort = new List<string>();   // 패시브 한 줄 요약 「이름 — 요약」(CardText.Short) — 기본
-        public string KeywordName, KeywordText;   // KeywordText = 자세히(CardText.Detail)
-        public string KeywordShort;               // 고유 효과 한 줄(CardText.Short) — 기본
+        public List<string> Passives = new List<string>();   // 고유 효과에 안 모인 패시브 「이름 — 글」(CardText.Traits 의 패시브 칸)
+        public string KeywordName, KeywordText;   // KeywordText = 부제 + 고유 효과 글(CardText.Trait — 그 키워드를 쓰는 패시브까지)
+        /// <summary>정보 창 칸 — 고학년 → 고유 효과 → 패시브(core CardText.Traits · 판 화면 사도 상세와 같은 차례 · 글).</summary>
+        public List<TraitLine> Traits = new List<TraitLine>();
         public int KeywordStacks;
         public List<StatusChip> Chips = new List<StatusChip>();
         public string Race;
@@ -122,6 +128,8 @@ namespace Bolzena.Battle
         public IntentKind Intent;
         public int IntentValue, IntentHits;
         public string IntentText, IntentSay;
+        public string UltName, UltHero;  // 보스 클론 고학년 — 예고(charge) · 사용(ult) 중이면 그 고학년 이름 · 사도 id(의도 칸에 얼굴 · 이름)
+        public bool UltNow;              // 이번 차례에 쓴다(ult) — 아니면 예고(다음 턴)
         public int RushNeed, RushCnt;    // 즉시 행동 — 카드 RushNeed 장이면 당겨서 한다(0 이면 안 당겨짐)
         public bool RushedTurn;
         public string Nature, Blurb;
@@ -173,10 +181,13 @@ namespace Bolzena.Battle
         UltReady,       // Actor(사도)
         Intent,         // Target(적) 예고가 바뀜
         PartyHurt,      // 파티가 맞음 — Target(맞는 사도) Value 피해 · Blocked
+        FxCue,          // 연출 쪽지(엔진 K="fx") — Actor(주인 사도) · Text = cue id(miro_hide · miro_flash · miro_beam) · Value = 수
+        FoeUlt,         // 보스 클론 고학년 — Actor(적) · Text warn(예고) · start(사용 시작) · hit(치는 수, Value 순번) · end · cut(끊김 — Anim 까닭 격파 · 기절, Up = 사용 턴에 끊김) · Say 고학년 이름 · Value 피해(warn · start)
         Form,           // 변신 — Actor(사도) · Text on/off · Say 변신 이름 · Anim 변신 쉬는 동작(Idle_DreamForm …) · Value 턴(0 = 전투 끝까지) · off 면 Anim 에 까닭
         Talk,           // Actor(사도) 대사 때 — Text(start · hit · kill · win · down · ego)
         Victory,
         Defeat,
+        Revive,         // Target(적) 되살아남 — core revive(재 속 부활 · 가사에서 일어섬) · HpAfter 체력
     }
 
     public class BattleEvent

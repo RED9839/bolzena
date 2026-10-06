@@ -188,7 +188,7 @@ namespace Bolzena.Demo
             var info = d.Hand.Cards[i].Info;
             if (seq != null) cap.BeginSeq(seq);
             if (target < 0 || target >= d.Enemies.Count || d.Battle.Snapshot.Enemies[target].Dead) target = d.FirstAliveEnemy();
-            Vector3 to = info.Target == TargetKind.Enemy ? EnemyCenter(target) : new Vector3(0.3f, 0.6f, 0);
+            Vector3 to = info.Target == TargetKind.Enemy ? EnemyCenter(target) : info.Target == TargetKind.Ally ? d.Hand.AllyDrop(info) : new Vector3(0.3f, 0.6f, 0);
             if (hoverShot != null) StartCoroutine(ShotLater(hoverShot, 0.45f));
             yield return d.Hand.DemoDrag(i, to, 0.4f, 0.5f, 0.3f, () => { if (aimShot != null) Shot(aimShot, 2); });
             yield return WaitTurnDone();
@@ -276,7 +276,66 @@ namespace Bolzena.Demo
         }
 
         bool aoeUlt;
+        bool powerShot;
+
+        // 강화 카드를 내고 파티 버프 줄의 강화 칩(이름 · 겹 · 반짝임)과 그 툴팁(남는 효과 글)을 찍는다
+        IEnumerator PowerCard()
+        {
+            int i = d.Hand.Cards.FindIndex(c => c.Info.Type == CardType.Power);
+            if (i < 0 || !d.Battle.CanPlay(i, out _)) yield break;
+            string name = d.Hand.Cards[i].Info.Name;
+            yield return Drag(i, d.FirstAliveEnemy());
+            yield return WaitInput();
+            var row = d.Hud.Chips;
+            var chip = d.Battle.Snapshot.PartyChips.Find(c => c.Kind == "power");
+            if (chip == null) { Debug.Log("[Demo] 강화 칩 없음 — " + name); powerShot = true; yield break; }
+            Shot("power_chip", 0);
+            var at = row != null ? row.PosOf(chip.Id) : null;
+            if (at.HasValue) { yield return MoveTo(at.Value, 0.3f); yield return Wait(0.8f); Shot("power_chip_tip", 0); }
+            Debug.Log("[Demo] 강화 칩 — " + chip.Id + " " + chip.Value);
+            powerShot = true;
+        }
         bool BossWave => d.Battle.Snapshot.Enemies.Exists(e => e.Boss);
+
+        // -holdzoom: 손패 길게 누르기 확대 — 누르기 전 · 누르는 중(마우스) · 키워드가 가장 많은 카드(터치) · 뗀 뒤 · 누른 채 끌면 확대가 접히나
+        IEnumerator HoldZoomShots()
+        {
+            var cards = d.Hand.Cards;
+            if (cards.Count == 0) yield break;
+            int many = 0;
+            for (int i = 1; i < cards.Count; i++) if ((cards[i].Info.Terms?.Count ?? 0) > (cards[many].Info.Terms?.Count ?? 0)) many = i;
+            Shot("hold_before", 0);
+            yield return Wait(0.2f);
+            var passes = new[] { (i: 0, touch: false, name: "hold_zoom"), (i: many, touch: true, name: "hold_zoom_many") };
+            foreach (var ps in passes)
+            {
+                if (ps.i >= cards.Count) continue;
+                PointerInput.SimTouch = ps.touch;
+                yield return MoveTo(cards[ps.i].transform.position + new Vector3(0, -0.3f, 0), 0.2f);
+                PointerInput.SimHeld = true;
+                yield return Wait(0.6f);
+                Debug.Log($"[HoldZoom] {ps.name} — 카드 {ps.i} 「{cards[ps.i].Info.Name}」 낱말 {cards[ps.i].Info.Terms?.Count ?? 0}개 · 확대 {(d.Hand.HoldZooming && CardZoom.Shown ? "켜짐" : "꺼짐")}");
+                Shot(ps.name, 0);
+                yield return Wait(0.2f);
+                PointerInput.SimHeld = false;
+                yield return Wait(0.4f);
+                Debug.Log($"[HoldZoom] {ps.name} 뗀 뒤 — 고른 카드 {(d.Hand.HasSelection ? "있음(틀림)" : "없음")} · 길게 누르기 확대 {(d.Hand.HoldZooming ? "남음(틀림)" : "접힘")}");
+                Shot(ps.name + "_released", 0);
+            }
+            // 누른 채 끌기 — 확대가 접히고 카드가 손가락을 따라오나(손 쪽으로 돌려 놓고 떼서 내지 않는다)
+            PointerInput.SimTouch = false;
+            Vector2 at = cards[0].transform.position + new Vector3(0, -0.3f, 0);
+            yield return MoveTo(at, 0.2f);
+            PointerInput.SimHeld = true;
+            yield return Wait(0.5f);
+            yield return MoveTo(at + new Vector2(1.2f, 0.6f), 0.25f);
+            yield return Wait(0.1f);
+            Debug.Log($"[HoldZoom] 누른 채 끌기 — 확대 {(CardZoom.Shown ? "남음(틀림)" : "접힘")}");
+            Shot("hold_then_drag", 0);
+            yield return MoveTo(at, 0.2f);
+            PointerInput.SimHeld = false;
+            yield return Wait(0.4f);
+        }
 
         IEnumerator Run()
         {
@@ -285,7 +344,10 @@ namespace Bolzena.Demo
             yield return WaitInput();
             yield return Wait(0.3f);
             Shot("battle_start", 0);
+            // -powershot: 첫 손에 강화 카드가 있으면 먼저 내고 강화 칩 · 툴팁을 찍는다(없으면 다음 턴들에서)
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-powershot") >= 0) yield return PowerCard();
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-toughshots") >= 0) { yield return ToughShots(); yield break; }
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-holdzoom") >= 0) { yield return HoldZoomShots(); yield break; }
 
             // ── 1턴 — 화면 둘러보기 ──
             // 카드 올려 두기 → 풀이 툴팁
@@ -307,13 +369,15 @@ namespace Bolzena.Demo
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-choicetest") >= 0 && d.Hand.Cards.Count > 0)
             {
                 var ci = d.Hand.Cards[0].Info;
-                var fake = new CardInfo { Id = ci.Id + "_t", Name = ci.Name, Hero = ci.Hero, Cost = ci.Cost, Type = ci.Type, TypeName = ci.TypeName, Text = ci.Text, Art = ci.Art, Nature = ci.Nature, Terms = ci.Terms, Tags = ci.Tags, Choices = new List<string> { "베어 가르기", "막아 서기" } };
+                var real = Arg("-choicecard") is string cid ? (d.Battle as CoreBattle)?.InfoOf(cid) : null;   // -choicecard 포셔_u1 — 그 카드의 진짜 갈래 창(글 속 <sprite> 아이콘 보기)
+                var fake = real != null && real.Choices != null && real.Choices.Count > 0 ? real : new CardInfo { Id = ci.Id + "_t", Name = ci.Name, Hero = ci.Hero, Cost = ci.Cost, Type = ci.Type, TypeName = ci.TypeName, Text = ci.Text, Art = ci.Art, Nature = ci.Nature, Terms = ci.Terms, Tags = ci.Tags, Choices = new List<string> { "베어 가르기", "막아 서기" } };
                 int got = -1;
                 StartCoroutine(UI.ChoiceWindow.Run(d.UiRoot, fake, b => got = b, 2));
                 yield return Wait(0.6f);
                 Shot("choice_window", 0);
                 while (got < 0) yield return null;
                 Debug.Log("[Demo] 두 갈래 고름 " + got);
+                if (real != null) { Debug.Log("[Demo] -choicecard 끝"); Application.Quit(0); yield break; }
             }
             // 고학년 원 툴팁 · 적 이름 줄(올림)
             if (d.Hud.Ults.Count > 0)
@@ -456,6 +520,7 @@ namespace Bolzena.Demo
                     continue;
                 }
                 yield return StatusInfo();
+                if (!powerShot) { yield return PowerCard(); if (powerShot) continue; }
                 if (!epi)
                 {
                     int g = d.Hand.Cards.FindIndex(c => c.Info.Epiphany);

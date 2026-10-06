@@ -69,7 +69,7 @@ namespace Bolzena.UI
             var t = Make.Text("t", root, "DEFEAT", new Vector3(0, 0.12f, 0), 0.95f, O + 3, Color.white);
             t.colorGradient = new VertexGradient(new Color(0.95f, 0.92f, 0.95f), new Color(0.95f, 0.92f, 0.95f), new Color(1f, 0.45f, 0.45f), new Color(1f, 0.45f, 0.45f));
             Make.Outline(t, 0.15f, new Color(0.12f, 0, 0.02f));
-            var sub = Make.Text("sub", root, "파티가 쓰러졌다", new Vector3(0, -0.5f, 0), 0.22f, O + 3, new Color(0.8f, 0.82f, 0.92f));
+            var sub = Make.Text("sub", root, "파티가 쓰러졌습니다", new Vector3(0, -0.5f, 0), 0.22f, O + 3, new Color(0.8f, 0.82f, 0.92f));
             sub.characterSpacing = 12;
             t.alpha = 0; sub.alpha = 0;
             yield return Clock.Tween(0.5f, k =>
@@ -205,6 +205,7 @@ namespace Bolzena.UI
             raysMat.SetFloat("_Spin", 0.06f);
             raysMat.SetFloat("_Boost", 1.6f);
             var rays = Make.Quad("rays", root, new Vector3(0, 1.4f, 0), new Vector2(16, 16), raysMat, O);
+            Make.Own(rays.gameObject, raysMat);
             var bandRoot = Make.Node("b", root, new Vector3(0, 1.4f, 0));
             var band = Band(bandRoot, 1.7f, new Color(0.95f, 0.83f, 0.55f), O + 1);
             var sub = Make.Text("sub", root, "승리", new Vector3(0, 0.82f, 0), 0.24f, O + 3, new Color(0.95f, 0.88f, 0.7f));

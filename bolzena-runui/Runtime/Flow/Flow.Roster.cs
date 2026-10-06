@@ -11,7 +11,7 @@ namespace Bolzena.RunUI
     //   편성(PartyScreen): 큰 세로 사도 카드 셋(스탠딩 · 이어진 수치 판) · 아래 왼쪽 추천 편성 · 시작 덱 평균 비용 · 오른쪽 이번 층 판 · 「모험 시작」
     //   사도 목록(HeroList): 왼쪽 성격 탭 · 카드 격자(스탠딩 상반신 · 파티 = 금 테 + 번호 · 보고 있는 사도 = 하늘 테) · 아래 「상세 정보」 · 「편성」
     //   사도 상세(HeroDetail): 왼쪽 초상 줄 · 세로 메뉴(능력치 · 카드 · 고유 효과) · 큰 스탠딩 + 기울어진 색 판 · 수치 표
-    // 그림: 스탠딩(CardArt.Standing · Upper) — 없으면 미니미 SD · 초상으로 대신.
+    // 그림: 스탠딩(CardArt.Standing · Upper) — 없으면 SD 전투 스파인 · 초상으로 대신.
     public partial class Flow
     {
         // ── 판 조각 ──
@@ -95,9 +95,9 @@ namespace Bolzena.RunUI
                 var im = Ui.Img(rt, up, tint ?? Color.white, "standing"); im.rectTransform.Fill();
                 return;
             }
-            var spot = Ui.Rect("mini", rt).At(0.5f, 0, 0, hgt * 0.06f, 10, 10);
-            var g = spineH > 0 ? SpineUi.Make(spot, "minimi", h?.MiniSkin, spineH, "Idle", "idle") : null;
-            if (g != null) { g.AnimationState.Update(phase); if (tint != null) g.color = tint.Value; return; }
+            var spot = Ui.Rect("hero", rt).At(0.5f, 0, 0, hgt * 0.06f, 10, 10);
+            var g = spineH > 0 && h != null ? SpineUi.Battle(spot, h, spineH * 0.8f, true) : null;   // 스탠딩 · 상반신이 없을 때 — SD 전투 스파인(고정 배율), 미니미는 없앴다
+            if (g != null) { g.gameObject.AddComponent<SceneHero.FixedScale>(); g.AnimationState.Update(phase); if (tint != null) g.color = tint.Value; return; }
             if (h?.Icon != null) { var face = Ui.Img(rt, h.Icon, tint ?? Color.white, "icon"); face.rectTransform.At(0.5f, 1, 0, 0, w * 1.08f, w * 1.08f); face.preserveAspect = true; }
         }
 
@@ -228,7 +228,7 @@ namespace Bolzena.RunUI
             var zoom = Btn.Icon(rt, Theme.S("ic_zoom"), () => HeroDetail(key, st.Slots.Where(x => x != null).ToList(), () => BuildPartyLight(root, st)), 44, "zoom");
             zoom.GetComponent<RectTransform>().At(1, 1, -10, -10, 44, 44);
             Stage.Hot["zoom" + i] = zoom;
-            // 고유 효과 · 패시브 · 고학년 — 짧은 글 판(누르면, 판마다 자세히)
+            // 고유 효과 · 패시브 · 고학년 — 누르면 판 묶음(수치가 다 든 글 · 길면 스크롤)
             if (hero.Playable)
             {
                 var tc = TraitsChip(rt, hero.CoreId, "고유 효과", "traits" + i);
@@ -284,33 +284,67 @@ namespace Bolzena.RunUI
                 Band("보스", null, "ic_crown");
                 var bossRow = Ui.Rect("boss", body); bossRow.Pref(-1, 78);
                 Ui.Row(bossRow, 10, TextAnchor.MiddleLeft, new RectOffset(4, 0, 0, 0), false, false);
-                foreach (var id in f.Boss.Distinct()) FoeCell(bossRow, id, true);
+                foreach (var id in f.Boss.Distinct()) FoeCell(bossRow, id, "보스");
             }
-            var foes = f.Pools.SelectMany(p => p).SelectMany(x => x).Concat(f.Elites.SelectMany(x => x)).Distinct().Where(id => !f.Boss.Contains(id)).ToList();
-            Band("나오는 적", foes.Count + "종", "ic_skull");
-            var foeGrid = Ui.Rect("foes", body); foeGrid.Pref(-1, Theme.C(176, 92));
-            var grid = foeGrid.gameObject.AddComponent<GridLayoutGroup>();
-            grid.cellSize = new Vector2(70, 80); grid.spacing = new Vector2(8, 8); grid.padding = new RectOffset(4, 0, 0, 0);
-            foreach (var id in foes.Take(Theme.Compact ? 4 : 10)) FoeCell(foeGrid, id, false);
-            var line = Ui.Text(body, v.Line ?? "", Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft); line.Pref(-1, 44);
+            // 나오는 적 — 층마다 가로 줄(보스 · 엘리트 · 일반 순, 그 판 적 속성 그림). 누르면 적 도감 상세(창이라 편성은 그대로 남는다)
+            int total = v.Floors.SelectMany(fl => FloorFoes(fl)).Select(x => x.id).Distinct().Count();
+            Band("나오는 적", total + "종 · 누르면 도감", "ic_skull");
+            for (int fi = 0; fi < Mathf.Min(2, v.Floors.Count); fi++) FoeStrip(body, v.Floors[fi], fi);
+            var line = Ui.Text(body, v.Line ?? "", Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft); line.Pref(-1, Theme.C(40, 0));
             line.enableAutoSizing = true; line.fontSizeMin = 11; line.fontSizeMax = Theme.FsSm;
+            if (Theme.Compact) line.gameObject.SetActive(false);
         }
 
-        void FoeCell(RectTransform parent, string id, bool boss)
+        /// <summary>한 층의 적(보스 → 엘리트 → 일반, 같은 적은 한 번).</summary>
+        static List<(string id, string grade)> FloorFoes(Core.FloorDef fl)
+        {
+            var o = new List<(string, string)>();
+            var seen = new HashSet<string>();
+            foreach (var id in fl.Boss) if (seen.Add(id)) o.Add((id, "보스"));
+            foreach (var id in fl.Elites.SelectMany(x => x)) if (seen.Add(id)) o.Add((id, "엘리트"));
+            foreach (var id in fl.Pools.SelectMany(p => p).SelectMany(x => x)) if (seen.Add(id)) o.Add((id, "일반"));
+            return o;
+        }
+
+        /// <summary>층 한 줄 — 왼쪽 「1층」 표 · 가로 스크롤 적 칸.</summary>
+        void FoeStrip(RectTransform body, Core.FloorDef fl, int floor)
+        {
+            float cellW = Theme.C(70, 54), cellH = Theme.C(86, 62);
+            var row = Ui.Rect("floor" + floor, body); row.Pref(-1, cellH + 6);
+            var tag = Ui.Title(row, $"{floor + 1}층", Theme.FsSm, Theme.Gold, TextAlignmentOptions.Center, "tag"); tag.rectTransform.At(0, 0.5f, 0, 6, 34, 30);
+            var area = Ui.Rect("strip", row).Fill(38, 0, 0, 0);
+            var content = Ui.Scroll(area, out var sr, true);
+            Ui.Row(content, 6, TextAnchor.MiddleLeft, new RectOffset(2, 8, 0, 0), false, false);
+            foreach (var (id, grade) in FloorFoes(fl)) FoeCell(content, id, grade, cellW, cellH);
+        }
+
+        /// <summary>적 칸 — 그 판 적 속성 그림(클론은 자기 성격) · 등급 테(보스 금 · 엘리트 보라 · 일반 회색) · 등급 표식 · 이름. 누르면 적 도감 상세.</summary>
+        void FoeCell(RectTransform parent, string id, string grade, float cw = 70, float chh = 86)
         {
             var e = P.Data.Enemy(id);
-            var cell = Ui.Rect("foe " + id, parent); cell.Pref(70, boss ? 78 : 80); cell.sizeDelta = new Vector2(70, 80);
-            string nat = RunPort.NatureIn(e, FoeNature);   // 이번 판은 모든 적(보스도)이 판의 적 속성
-            var nc = Theme.NatureCardOf(nat);
-            var disc = Ui.Img(cell, Theme.S("circle"), Color.Lerp(Theme.NavyWell, nc, 0.35f), "disc"); disc.rectTransform.At(0.5f, 1, 0, 0, 56, 56);
-            var ring = Ui.Img(disc.transform, Theme.S("ring"), (boss ? Theme.Gold : Theme.Edge).A(0.8f), "ring"); ring.rectTransform.Fill();
-            var ic = Ui.Img(disc.transform, Theme.S(boss ? "ic_crown" : "ic_skull"), Color.white.A(0.9f), "ic"); ic.rectTransform.Fill(14, 14, 14, 14); ic.preserveAspect = true;
+            string nat = RunPort.NatureIn(e, FoeNature);   // 이번 판은 모든 적(보스도)이 판의 적 속성 — 클론은 자기 성격
+            var gc = FoeGradeColor(grade);
+            var b = Btn.Make(parent, null, BtnStyle.Ghost, () => { if (e != null) EnemyDetail(id); }, 0, "foe " + id);
+            b.Bg.color = Color.clear; b.SetColor(Color.clear);
+            b.Pref(cw, chh);
+            var cell = b.GetComponent<RectTransform>();
+            float ds = cw - 12;
+            var disc = Ui.Img(cell, Theme.S("circle"), Color.Lerp(Theme.NavyWell, Theme.NatureCardOf(nat), 0.3f), "disc"); disc.rectTransform.At(0.5f, 1, 0, -2, ds, ds);
+            disc.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+            var art = FoeArtFor(e, nat);
+            if (art != null) { var im = Ui.Img(disc.transform, art, Color.white, "art"); im.rectTransform.Fill(-2, -2, -2, -2); im.preserveAspect = true; }
+            else if (FoeSilhouette(e) is Sprite sil) { var im = Ui.Img(disc.transform, sil, new Color(0.04f, 0.05f, 0.1f, 0.85f), "silhouette"); im.rectTransform.Fill(-2, -2, -2, -2); im.preserveAspect = true; }   // 그림 없는 적 — 같은 몬스터 실루엣
+            else { var ic = Ui.Img(disc.transform, Theme.S(grade == "보스" ? "ic_crown" : "ic_skull"), Color.white.A(0.9f), "ic"); ic.rectTransform.Fill(ds * 0.24f, ds * 0.24f, ds * 0.24f, ds * 0.24f); ic.preserveAspect = true; }
+            var ring = Ui.Img(cell, Theme.S("ring"), gc, "ring"); ring.rectTransform.At(0.5f, 1, 0, -2, ds, ds);
+            // 등급 표식(위 왼쪽) · 성격(아래 오른쪽)
+            var gb = Ui.Img(cell, Theme.Pill, gc, "grade"); gb.rectTransform.At(0, 1, 0, 0, 26, 16);
+            var gt = Ui.Title(gb.transform, grade == "보스" ? "보스" : grade == "엘리트" ? "엘" : "일", 10, Theme.Brown, TextAlignmentOptions.Center); gt.rectTransform.Fill();
             var ni = Icon("성격_" + nat);
-            if (ni != null) { var nb = Ui.Img(disc.transform, ni, Color.white, "nat"); nb.rectTransform.At(1, 0, 6, -6, 22, 22); nb.preserveAspect = true; }
-            var nm = Ui.Text(cell, e?.Name ?? id, Theme.FsCap - 1, Theme.Ink, TextAlignmentOptions.Top); nm.rectTransform.At(0.5f, 1, 0, -58, 76, 22);
-            nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 9; nm.fontSizeMax = Theme.FsCap - 1;
+            if (ni != null) { var nb = Ui.Img(cell, ni, Color.white, "nat"); nb.rectTransform.At(1, 1, 0, -(ds - 18), 20, 20); nb.preserveAspect = true; }
+            var nm = Ui.Text(cell, e?.Name ?? id, Theme.FsCap - 2, Theme.Ink, TextAlignmentOptions.Top); nm.rectTransform.At(0.5f, 0, 0, 0, cw + 6, chh - ds - 2);
+            nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 8; nm.fontSizeMax = Theme.FsCap - 2;
+            Stage.Hot["partyfoe:" + id] = b;
         }
-
         // ═════════════════════════════ 사도 목록 ═════════════════════════════
         // 목록 상태 — 다시 그려도(파티 넣기 · 상세에서 돌아오기) 필터 · 정렬 · 고른 사도 · 스크롤 자리를 그대로 둔다.
         class ListState { public string Nature; public string Sort = "성급"; public bool Quick = true; public string Focus; public float ScrollY; public bool Drawn; }
@@ -513,6 +547,7 @@ namespace Bolzena.RunUI
         /// <summary>사도 상세 — keys 는 왼쪽 초상 줄(위아래로 넘김), 없으면 그 사도 하나. back 이 없으면 닫기만.</summary>
         public void HeroDetail(string key, List<string> keys, Action back, string tab = "능력치")
         {
+            if (tab == "고유 효과") tab = "카드";   // 고유 효과 탭은 카드 탭 오른쪽 판으로 옮겼다
             keys = keys != null && keys.Count > 0 ? keys : new List<string> { key };
             var layer = Ui.Rect("modal herodetail", Stage.ModalLayer).Fill();
             RosterBg(layer);
@@ -553,11 +588,11 @@ namespace Bolzena.RunUI
                 rc.anchoredPosition = new Vector2(0, Mathf.Clamp(y, 0, Mathf.Max(0, rc.rect.height - viewH)));
             }
 
-            // 세로 메뉴 — 능력치 · 카드 · 고유 효과
+            // 세로 메뉴 — 능력치 · 카드(고유 효과 탭은 없앴다 — 고학년 · 고유 효과 · 패시브는 카드 탭 오른쪽 판)
             float menuX = Theme.Gutter + listW + 14, menuW = 150;
             var em = Ui.Img(layer, Theme.S("ic_spark"), Theme.Gold.A(0.7f), "emblem"); em.rectTransform.At(0, 1, menuX + menuW / 2 - 14, -108, 28, 28);
             int ti = 0;
-            foreach (var t in new[] { "능력치", "카드", "고유 효과" })
+            foreach (var t in new[] { "능력치", "카드" })
             {
                 bool on = t == tab;
                 var b = Btn.Make(layer, null, on ? BtnStyle.PillDark : BtnStyle.Ghost, () => Go(key, t), 0, "tab " + t);
@@ -573,7 +608,6 @@ namespace Bolzena.RunUI
             stage.offsetMin = new Vector2(menuX + menuW + 20, Theme.Gutter); stage.offsetMax = new Vector2(-Theme.Gutter, -92);
             if (h == null) return;
             if (tab == "카드") DetailCards(stage, h, d);
-            else if (tab == "고유 효과") DetailTraits(stage, h, d);
             else DetailStats(stage, h, d);
         }
 
@@ -609,9 +643,9 @@ namespace Bolzena.RunUI
             }
             else
             {
-                var spot = Ui.Rect("mini", fig).At(0.5f, 0.5f, 0, -Theme.C(170, 140), 10, 10);
-                var g = SpineUi.Make(spot, "minimi", h.MiniSkin, Theme.C(330, 280), "Idle", "idle");
-                if (g == null) { var im = Ui.Img(spot, h.Icon, Color.white, "icon"); im.rectTransform.At(0.5f, 0, 0, 0, 360, 360); im.preserveAspect = true; }
+                var spot = Ui.Rect("hero", fig).At(0.5f, 0.5f, 0, -Theme.C(170, 140), 10, 10);
+                var g = SceneHero.Make(spot, h, Theme.C(330, 280) * 0.8f, true, 0, true);   // 스탠딩이 없는 사도 — SD 전투 스파인(고정 배율), 미니미는 없앴다
+                if (g == null && spot.childCount <= 1) { var im = Ui.Img(spot, h.Icon, Color.white, "icon"); im.rectTransform.At(0.5f, 0, 0, 0, 360, 360); im.preserveAspect = true; }
                 Tw.Pop(spot, 0.05f, 0.8f, 0.4f);
             }
 
@@ -638,7 +672,7 @@ namespace Bolzena.RunUI
             {
                 ("공격력", (d?.Atk ?? h.atk).ToString()),
                 ("방어력", (d?.Def ?? h.def).ToString()),
-                ("체력", (d?.Hp ?? h.hp).ToString("N0")),
+                ("HP", (d?.Hp ?? h.hp).ToString("N0")),
                 ("치명 확률", (d?.Crit ?? h.crit) + "%"),
             };
             for (int i = 0; i < rows.Length; i++)
@@ -648,7 +682,14 @@ namespace Bolzena.RunUI
                 var v = Ui.Title(r.transform, rows[i].Item2, Theme.FsLg, Theme.Gold, TextAlignmentOptions.MidlineRight); v.rectTransform.Fill(0, 0, 16, 0);
             }
             var note = Ui.Img(body, Theme.Glass, Color.white, "grow"); note.Pref(-1, 56);
-            var nt = Ui.Text(note.transform, "판 안에서 강해지는 길 — 캠프 수련 · 장비 · 은총(고유 카드)", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); nt.rectTransform.Fill(12, 0, 12, 0);
+            var nt = Ui.Text(note.transform, "모험 안에서 강해지는 길 — 캠프 수련 · 장비 · 은총(고유 카드)", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); nt.rectTransform.Fill(12, 0, 12, 0);
+            // 이야기(옛 고유 효과 탭에서 옮김) — 남는 높이에 다 담기게 글자를 줄인다
+            if (!string.IsNullOrEmpty(h.blurb))
+            {
+                W.Section(body, "이야기", null, 34);
+                var bl = Ui.Text(body, h.blurb, Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft); bl.Pref(-1, 40, -1, 1);
+                bl.enableAutoSizing = true; bl.fontSizeMin = 10; bl.fontSizeMax = Theme.FsSm; bl.overflowMode = TextOverflowModes.Ellipsis;
+            }
             Tw.Rise(panel, 0.08f, 30, 0.4f, Vector2.right);
         }
 
@@ -690,93 +731,72 @@ namespace Bolzena.RunUI
                     Tw.Pop(c, 0.03f * i, 0.85f, 0.3f);
                 }
             }
-            Row("시작 카드", $"{d.Starter.Count}장 · 판을 시작할 때 덱에", d.Starter);
-            Row("고유 카드", "은총으로 얻는다 · 신탁 ①~⑤ · 축복", P.Data.UniquesOf(d.Id));
+            Row("시작 카드", $"{d.Starter.Count}장 · 모험을 시작할 때 덱에", d.Starter);
+            Row("고유 카드", "은총으로 얻습니다 · 신탁 · 축복", P.Data.UniquesOf(d.Id));
 
-            // 오른쪽 — 고학년 · 키워드 둥근 칸
+            // 오른쪽 — 고학년 → 고유 효과 → 패시브(2026-10 사용자: 「고유 효과 탭을 없애고 카드 목록 옆에, 자세히 없이 다 보이게」)
             var side = Ui.Rect("side", stage); side.anchorMin = new Vector2(0, 0); side.anchorMax = new Vector2(0, 1); side.pivot = new Vector2(0, 0.5f);
-            float sideW2 = Mathf.Clamp(stageW - gridW - 16, sideW, Theme.C(420, 300));   // 넓은 화면이면 판도 넓게
+            float sideW2 = Mathf.Clamp(stageW - gridW - 16, sideW, Theme.C(460, 300));   // 넓은 화면이면 판도 넓게
             side.sizeDelta = new Vector2(sideW2, 0); side.anchoredPosition = new Vector2(Mathf.Min(gridW + 16, stageW - sideW2), 0);   // 카드 옆에 붙인다
-            Ui.Col(side, 14, TextAnchor.UpperCenter, new RectOffset(0, 0, 6, 0), true, false);
-            int hi = 0;
-            void Hex(string head, Sprite pic, Color tint, string big, string name, string desc, string detail = null)
-            {
-                var box = NavyBox(side, head); box.Pref(-1, Theme.C(250, 214));
-                bool hasMore = !string.IsNullOrEmpty(detail) && detail != desc;
-                // 머리 글 — 왼쪽 위 「자세히」 · 오른쪽 위 게이지 알약 사이 가운데
-                var ht = Ui.Title(box, head, Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center); ht.rectTransform.Band(1, 28, hasMore ? 96 : 8, big != null ? 90 : hasMore ? 96 : 8, -10);
-                ht.textWrappingMode = TextWrappingModes.NoWrap; ht.enableAutoSizing = true; ht.fontSizeMin = 12; ht.fontSizeMax = Theme.FsMd;
-                var cell = Ui.Img(box, Theme.S("tile_glow"), tint, "cell"); cell.rectTransform.At(0.5f, 1, 0, -40, 120, 96);
-                var disc = Ui.Img(box, Theme.S("circle"), Color.Lerp(Theme.NavyWell, tint, 0.35f), "disc"); disc.rectTransform.At(0.5f, 1, 0, -46, 84, 84);
-                var dm = Ui.Rect("m", disc.rectTransform).Fill(); disc.gameObject.AddComponent<Mask>().showMaskGraphic = true;
-                if (pic != null) { var im = Ui.Img(dm, pic, Color.white, "pic"); im.rectTransform.Fill(-4, -10, -4, 0); im.preserveAspect = true; }
-                else { var gl = Ui.Img(dm, Theme.S("ic_spark"), Theme.Gold, "glyph"); gl.rectTransform.Fill(20, 20, 20, 20); gl.preserveAspect = true; }
-                if (big != null)
-                {
-                    var bp = Ui.Img(box, Theme.Pill, Theme.Gold, "cost"); bp.rectTransform.At(1, 1, -10, -8, 76, 26);
-                    var bt = Ui.Title(bp.transform, big, Theme.FsSm, Theme.Brown, TextAlignmentOptions.Center); bt.rectTransform.Fill();
-                }
-                var nm = Ui.Title(box, name, Theme.FsLg, Theme.Gold, TextAlignmentOptions.Center); nm.rectTransform.Band(1, 30, 10, 10, -136);
-                nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 12; nm.fontSizeMax = Theme.FsLg;
-                // 칸은 짧은 글 — 「자세히 ▾」를 누르면 칸 옆에 자세한 글 판(TermPop)
-                bool has = !string.IsNullOrEmpty(detail) && detail != desc;
-                var ds = Ui.Text(box, "", Theme.FsCap + 1, Theme.Ink, TextAlignmentOptions.Top); ds.rectTransform.Fill(12, 8, 12, Theme.C(166, 160));
-                ds.enableAutoSizing = true; ds.fontSizeMin = 9; ds.fontSizeMax = Theme.FsCap + 1;
-                TermPop.MarkAndAttach(ds, desc, CardTerms.OfText(P.Data, P.Text, desc, d.Id), Stage.ToastLayer, (p, id, w) => W.Card(p, this, id, w, "termcard"));
-                if (has)
-                {
-                    var mb = TermPop.MoreChip(box, false, "more");
-                    var mrt = mb.GetComponent<RectTransform>(); mrt.anchorMin = mrt.anchorMax = mrt.pivot = new Vector2(0, 1); mrt.anchoredPosition = new Vector2(8, -8);
-                    var term = new CardTerms.Term { Name = name, Body = detail, Kind = head, Hero = head == "고유 효과" };
-                    mb.OnClick = () => PopTerms(mrt, new[] { term });
-                    Stage.Hot["detail.hexmore" + hi] = mb;
-                }
-                hi++;
-            }
-            if (d.Ult != null) Hex("고학년", CardArt.Icon("icon_graduateskill_" + h.art) ?? CardArt.Icon("ultimate_icon_common3") ?? h.Icon, NatureCol(h), d.Ult.Cost + "%", d.Ult.Name, P.Text.Short(d.Ult), P.Text.Detail(d.Ult));   // 원작 고학년 「볼따구」 얼굴(copy_assets.py)
-            var kw = d.AllKeywords.FirstOrDefault();
-            if (kw != null) Hex("고유 효과", null, Theme.Gold, null, kw.Name, P.Text.Short(kw), P.Text.Detail(kw));
+            TraitsPanel(side, h, d);
         }
 
-        void DetailTraits(RectTransform stage, HeroInfo h, Core.HeroDef d)
+        /// <summary>
+        /// 고학년 · 고유 효과 · 패시브 한 판(사도 상세 카드 탭) — 「자세히」 없이 처음부터 끝까지 다 보인다(넘치면 판 안에서 스크롤).
+        ///   고학년: 볼따구 아이콘 · 이름(굵게) · 「게이지 N%」 · 효과 / 고유 효과: 키워드 이름 · 부제(작은 글) · 줄 목록(그 키워드를 쓰는 패시브까지)
+        ///   패시브: 이름 · 줄 목록(키워드를 안 쓰는 것만). 줄마다 「계기 → 결과 (턴당 N회)」 — core CardText.Traits · Docs/설명글.md.
+        ///   글 속 키워드 · 생성 카드는 밑줄 · 설명 판(TermPop).
+        /// </summary>
+        void TraitsPanel(RectTransform host, HeroInfo h, Core.HeroDef d)
         {
-            var panel = NavyBox(stage, "traits"); panel.Fill();
-            var area = Ui.Rect("area", panel).Fill(28, 20, 20, 20);
+            var panel = NavyBox(host, "traits"); panel.Fill();
+            var area = Ui.Rect("area", panel).Fill(18, 14, 10, 14);
             var content = Ui.Scroll(area, out var sr);
-            ScrollBar(area, sr);
-            Ui.Col(content, 10, TextAnchor.UpperLeft, new RectOffset(0, 18, 0, 10), true, false);
-            // 기본은 짧은 글(CardText.Short) — 「자세히 ▾」를 누르면 그 자리에서 자세한 글(Detail)로. 글 속 키워드 · 생성 카드는 밑줄 · 설명 판
-            int bi = 0;
-            void Block(string title, string text, string detail = null, bool terms = true)
+            Ui.Col(content, 6, TextAnchor.UpperLeft, new RectOffset(2, 12, 2, 8), true, false);
+            int ti = 0;
+            void Head(string t)
             {
-                if (string.IsNullOrEmpty(text)) return;
-                W.Section(content, title, null, 38);
-                var t = ShortMore(content, text, detail, Theme.FsBody, Theme.Ink, d?.Id, "trait" + bi, terms: terms);
-                var more = t.transform.parent.GetComponentInChildren<Btn>();
-                if (more != null) Stage.Hot["detail.more" + bi] = more;
-                bi++;
+                if (ti > 0) { var gap = Ui.Rect("gap", content); gap.Pref(-1, 6); var rule = Ui.Img(content, Theme.White, Theme.Line, "rule"); rule.Pref(-1, 1); }
+                var hd = Ui.Title(content, t, Theme.FsMd, Theme.Sub, TextAlignmentOptions.MidlineLeft, "head " + t); hd.Pref(-1, 30);
+                ti++;
             }
-            if (d != null)
+            TextMeshProUGUI Body(string text, float size, Color c, bool terms = true)
             {
-                foreach (var kw in d.AllKeywords) Block("키워드 · " + kw.Name, P.Text.Short(kw), P.Text.Detail(kw));
-                string last = null;
-                foreach (var r in d.Passives)
+                var t = Ui.Text(content, "", size, c, TextAlignmentOptions.TopLeft);
+                t.textWrappingMode = TextWrappingModes.Normal; t.overflowMode = TextOverflowModes.Overflow; t.lineSpacing = 2;
+                if (terms) TermPop.MarkAndAttach(t, text, CardTerms.OfText(P.Data, P.Text, text, d.Id), Stage.ToastLayer, (p, id, w) => W.Card(p, this, id, w, "termcard"));
+                else t.text = text;
+                if (string.IsNullOrEmpty(t.text)) t.text = text;
+                return t;
+            }
+            if (d.Ult != null)
+            {
+                Head("고학년");
+                var row = Ui.Rect("ult", content); row.Pref(-1, 64);
+                var disc = Ui.Img(row, Theme.S("circle"), Color.Lerp(Theme.NavyWell, NatureCol(h), 0.35f), "disc"); disc.rectTransform.At(0, 0.5f, 0, 0, 60, 60);
+                disc.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+                var pic = CardArt.Icon("icon_graduateskill_" + h.art) ?? CardArt.Icon("ultimate_icon_common3") ?? h.Icon;   // 원작 고학년 「볼따구」 얼굴(copy_assets.py)
+                if (pic != null) { var im = Ui.Img(disc.transform, pic, Color.white, "pic"); im.rectTransform.Fill(-3, -8, -3, 0); im.preserveAspect = true; }
+                var nm = Ui.Title(row, d.Ult.Name, Theme.FsLg, Theme.Gold, TextAlignmentOptions.TopLeft, "ult name"); nm.rectTransform.Fill(72, 30, 0, 2);
+                nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 13; nm.fontSizeMax = Theme.FsLg;
+                var ga = Ui.Text(row, $"게이지 {d.Ult.Cost}%", Theme.FsSm, Theme.Sub, TextAlignmentOptions.BottomLeft, false, "gauge"); ga.rectTransform.Fill(72, 6, 0, 34);
+                Body(P.Text.Fx(d.Ult.Fx), Theme.FsSm, Theme.Ink);
+            }
+            // 고유 효과 · 패시브 — core CardText.Traits(세 칸 따로 — 패시브 칸은 passives 전부, 없으면 「없음」 · 줄마다 「계기 → 결과」)
+            var traits = P.Text.Traits(d);
+            foreach (var kind in new[] { "고유 효과", "패시브" })
+            {
+                var part = traits.Where(x => x.Kind == kind).ToList();
+                if (part.Count == 0) continue;
+                Head(kind);
+                foreach (var t in part)
                 {
-                    // 같은 이름 둘째 규칙부터는 앞 칸의 자세히에 붙인다(짧은 글은 ShortPassives 처럼 한 줄)
-                    if (r.Name != null && r.Name == last) continue;
-                    var same = d.Passives.Where(x => x.Name != null && x.Name == r.Name).ToList();
-                    string detail = same.Count > 1 ? string.Join("\n", same.Select(x => P.Text.Detail(x))) : P.Text.Detail(r);
-                    Block("패시브 · " + (r.Name ?? "패시브"), P.Text.Short(r) + (same.Count > 1 ? " 등" : ""), detail);
-                    last = r.Name;
+                    var kn = Ui.Title(content, t.Name, Theme.FsMd, kind == "고유 효과" ? Theme.Gold : Theme.Ink, TextAlignmentOptions.TopLeft, "kw " + t.Name);
+                    kn.textWrappingMode = TextWrappingModes.Normal; kn.Pref(-1, 26);
+                    if (!string.IsNullOrEmpty(t.Sub)) Body(t.Sub, Theme.FsCap + 1, Theme.Sub, false);
+                    Body(t.Body, Theme.FsSm, Theme.Ink);
                 }
-                if (d.Ult != null) Block("고학년 · " + d.Ult.Name, P.Text.Short(d.Ult), P.Text.Detail(d.Ult));
             }
-            else
-            {
-                Block("키워드", h.keyword);
-                Block("고학년", h.ult);
-            }
-            Block("이야기", h.blurb, terms: false);   // 소개 글은 게임 용어가 아니다 — 「처치」 · 「제자」 같은 보통 낱말에 밑줄을 걸지 않는다
-        }
-    }
+            if (ti == 0) Body($"<color={Theme.SubTag}>고학년 · 고유 효과 · 패시브가 없는 사도입니다.</color>", Theme.FsSm, Theme.Sub, false);
+        }    }
 }

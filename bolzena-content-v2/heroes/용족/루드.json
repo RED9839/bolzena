@@ -12,10 +12,10 @@
       "atk": 101,
       "def": 67,
       "crit": 5,
-      "blurb": "근육으로 다 해결하는 루비의 용족 헬창. 쉬지 않고 자기 카드만 잇달아 내면 세트가 쌓여 실드가 두꺼워진다 — 다른 사람이 끼어들면 세트가 끊긴다.",
+      "blurb": "근육으로 다 해결하는 루비의 용족 헬창. 쉬지 않고 자기 카드만 잇달아 내면 세트가 쌓여 실드가 두꺼워지고 숨도 돌리며, 세트가 넘치면 기합 소리가 적 전체를 때립니다. 다른 사람이 끼어들면 세트가 끊깁니다.",
       "keyword": {
         "name": "한 세트 더",
-        "desc": "쉬지 않고 이어 가는 세트 — 루드의 카드를 잇달아 낼수록 실드가 붙고, 넷째에 결의",
+        "desc": "자기 카드를 이어 내는 세트",
         "carrier": "self",
         "cap": 4,
         "wipe": true,
@@ -44,7 +44,7 @@
             },
             "fx": [
               {
-                "k": "shield",
+                "k": "heal",
                 "ratio": 0.6
               }
             ]
@@ -65,6 +65,24 @@
                 "k": "status",
                 "id": "결의",
                 "v": 1
+              }
+            ]
+          },
+          {
+            "name": "오버 트레이닝",
+            "when": {
+              "on": "stackOver",
+              "id": "한 세트 더"
+            },
+            "fx": [
+              {
+                "k": "perEvent"
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.3,
+                "target": "allEnemies",
+                "base": "def"
               }
             ]
           }
@@ -105,6 +123,12 @@
             "k": "stack",
             "id": "한 세트 더",
             "v": 3
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 1,
+            "target": "allEnemies"
           }
         ]
       },
@@ -154,12 +178,19 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
-          "target": "oneEnemy"
+          "ratio": 0.4,
+          "target": "allEnemies",
+          "base": "def"
         },
         {
-          "k": "shield",
-          "ratio": 0.8
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.5
         }
       ],
       "oracles": [
@@ -169,12 +200,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
+              "ratio": 0.25,
+              "target": "allEnemies",
+              "base": "def"
             },
             {
-              "k": "shield",
-              "ratio": 0.7
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -183,12 +217,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
+              "ratio": 0.5,
+              "target": "allEnemies",
+              "base": "def"
             },
             {
-              "k": "shield",
-              "ratio": 1
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.6
             }
           ]
         },
@@ -197,17 +238,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.8
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "base": "def"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.5
             }
           ]
         },
@@ -216,12 +259,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "allEnemies",
+              "base": "def"
             },
             {
-              "k": "shield",
-              "ratio": 0.8
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -238,12 +284,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "allEnemies",
+              "base": "def"
             },
             {
-              "k": "shield",
-              "ratio": 0.9
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.55
             }
           ]
         }

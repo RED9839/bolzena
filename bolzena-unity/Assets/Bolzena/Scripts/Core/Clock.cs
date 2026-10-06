@@ -42,7 +42,7 @@ namespace Bolzena
         public static void HitStop(float sec)
         {
             Ensure();
-            inst.stopUntil = Mathf.Max(inst.stopUntil, Now + sec);
+            inst.stopUntil = Mathf.Max(inst.stopUntil, Now + sec / Mathf.Max(1f, Speed));   // 2× 면 멈칫도 반으로(배속 설정을 따른다)
             if (!Paused) Time.timeScale = 0.0001f;
         }
 

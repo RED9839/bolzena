@@ -68,8 +68,9 @@ namespace Bolzena.RunUI
 
         public static readonly Dictionary<string, Color> Grade = new Dictionary<string, Color>
         {
-            ["일반"] = new Color(0.8f, 0.8f, 0.85f), ["고급"] = new Color(0.5f, 0.85f, 1f),
-            ["희귀"] = new Color(0.78f, 0.6f, 1f), ["전설"] = new Color(1f, 0.75f, 0.3f),
+            // 2026-10 사용자: 일반 회색 · 고급 연두 · 희귀 하늘 · 전설 보라 — 원작 아티팩트 카드 바탕(Ingame_CardBase_Artifact_Grade_1~4)에서 뽑은 색
+            ["일반"] = Hex("B0B0B0"), ["고급"] = Hex("60D880"),
+            ["희귀"] = Hex("60A0E8"), ["전설"] = Hex("B070F0"),
         };
         public static Color GradeOf(string g) => g != null && Grade.TryGetValue(g, out var c) ? c : Sub;
 
@@ -100,6 +101,8 @@ namespace Bolzena.RunUI
 
         // ── 그림 ──
         static readonly Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
+        const int ArtKeep = 300;
+        static int artHeld;
 
         /// <summary>패키지의 화면 그림(Tools~/make_ui.py) — border 를 주면 9칸으로 늘린다.</summary>
         public static Sprite S(string name, float border = 0) => Load("RunUI/Sprites/" + name, border);
@@ -125,6 +128,15 @@ namespace Bolzena.RunUI
             var b = new Vector4(border, border, border, border);
             s = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect, b);
             s.name = path;
+            // 원작 그림(RunArt — 카드 · 장비 · 적 아이콘 …)은 많다 — 붙든 수가 넘치면 원작 그림만 비운다(화면 그림 RunUI/Sprites 는 둔다).
+            //   화면에 떠 있는 것은 Image 가 쥐어 살고, 나머지는 다음 장면 정리 때 풀린다(2026-10-06 연속 싸움 시험: 싸움마다 몇 장씩 쌓였다)
+            if (path.StartsWith("RunArt/") && ++artHeld > ArtKeep)
+            {
+                var drop = new List<string>();
+                foreach (var k in sprites.Keys) if (k.StartsWith("RunArt/")) drop.Add(k);
+                foreach (var k in drop) sprites.Remove(k);
+                artHeld = 1;
+            }
             sprites[key] = s;
             return s;
         }

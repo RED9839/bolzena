@@ -45,6 +45,7 @@ namespace Bolzena.Fx
         public int Gen { get; private set; }
         static int gens;
         public float T => t;
+        public Vector3 OriginWorld => transform.TransformPoint(origin);   // 지금 터지는 자리(월드) — 점검
         public float Duration => sheet != null ? sheet.Frames / Mathf.Max(1, sheet.Fps) : (fx != null ? fx.Dur : 0);
 
         FxEffect fx;
@@ -140,6 +141,17 @@ namespace Bolzena.Fx
             return r;
         }
 
+        // 원작 셰이더 그래프([SG])로만 뜻이 있는 텍스처 — 우리 판(알파 · 가산)으로 그리면 색 검사판이 거대한 자홍 사각형으로 화면을 덮는다(키샤 강공 · 저학년, 카드 몸짓 대조 2026-10-06)
+        //   가로 그라데이션 · 격자 · 결정 무늬도 같은 꼴(극좌표 · 마스크 셰이더로만 둥글게 보인다) — 레비(졸업) 갈색 네모 · 네르(빡침) 파란 판 · 마카샤 회색 네모.
+        //   목록은 card_fix/edges.py(카드 장 이미터 가운데 텍스처 가장자리 알파가 100 넘는 [SG] 판)로 뽑았다
+        static readonly string[] SHADER_ONLY_TEX = { "Colorchek", "Canta_Graygra_lum", "NerRage_Gra_lum", "Crystal_Diamond_lum", "Water_Tile_01_lum", "Iceground_lum", "FX_In_Grid", "Kishya_Attack_2_Back_1" };
+        static bool ShaderOnly(FxEmitter e)
+        {
+            if (e.TexPath == null) return false;
+            foreach (var s in SHADER_ONLY_TEX) if (e.TexPath.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+            return false;
+        }
+
         void InitFx()
         {
             k = BolzenaFx.UnitWorld * o.Scale;
@@ -161,10 +173,15 @@ namespace Bolzena.Fx
                 if (hi * k > room && room > 0) ys = room / (hi * k);
             }
             var list = new List<Em>();
+            // 입체 메시 이미터만 있는 이펙트(디아나 shockwave · 로니 skill_1_1 · 루포 wind — 51장)는 다 빼면 아무것도 안 보인다 —
+            // 그때만 메시 판을 사각형 한 장으로 옅게(0.6) 그린다(웹판 추출 주석 「옅게 그린다」). 2D 이미터가 하나라도 있으면 전처럼 뺀다
+            bool only3d = true;
+            foreach (var e0 in fx.Em) if (!e0.M3d && e0.Tex != null) { only3d = false; break; }
             for (int i = 0; i < fx.Em.Count; i++)
             {
                 var e = fx.Em[i];
-                if (e.M3d || e.Tex == null) continue;
+                if ((e.M3d && !only3d) || e.Tex == null) continue;
+                if (ShaderOnly(e) && fx.name.IndexOf("ultimate", StringComparison.Ordinal) < 0) continue;   // 카드 장만(고학년 장은 이펙트 담당 판단에 둔다)
                 if (o.Only != null && Array.IndexOf(o.Only, i) < 0) continue;
                 var em = new Em { E = e, T0 = Rand(e.Delay) };
                 int nb = e.Bursts == null ? 0 : e.Bursts.Length;
@@ -275,6 +292,9 @@ namespace Bolzena.Fx
             moving = false; ems = null; matCount = -1;
             mesh.Clear();
         }
+
+        /// <summary>장면을 닫을 때 — 쉬는 무대 목록을 비운다(장면과 함께 부서진 것이 이펙트 · 옵션 람다를 쥐고 남지 않게).</summary>
+        public static void ClearPool() => idle.Clear();
 
         // 지금 도는 것을 모두 걷는다(장면을 닫을 때 · 시험). fadeSec 0 이면 다음 프레임에 걷힌다
         public static void StopAll(float fadeSec = 0)
@@ -555,7 +575,10 @@ namespace Bolzena.Fx
                 UseTex(e.Tex);
                 float add = e.Add ? 1 : 0;
                 bool edge = true;
+                float f0 = fade;
+                if (e.M3d) fade *= 0.6f;
                 foreach (var p in em.Parts) Quad(e, p, ox, oy, add, edge);
+                fade = f0;
             }
         }
 

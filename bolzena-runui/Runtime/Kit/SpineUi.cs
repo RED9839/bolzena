@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Spine.Unity;
 using UnityEngine;
@@ -45,8 +45,8 @@ namespace Bolzena.RunUI
         public static SkeletonDataAsset Data(string folder)
         {
             if (cache.TryGetValue(folder, out var a)) return a;
-            var all = Resources.LoadAll<SkeletonDataAsset>("Spine/" + folder);
-            a = all.Length > 0 ? all[0] : null;
+            a = SpineStencil.Fix(SpineSource.Load(folder));   // 원작 스텐실 가리기(미로 거울) → 클리핑. 웹 빌드는 번들에서(SpineSource)
+            if (a == null && SpineSource.IsPending(folder)) return null;   // 아직 받는 중 — 붙들지 않고 다음에 다시
             if (a == null) Debug.Log("[RunUI] 스파인 없음: " + folder);
             cache[folder] = a;
             return a;
@@ -173,6 +173,90 @@ namespace Bolzena.RunUI
             rt.anchoredPosition = off * ppu;
             rt.sizeDelta = new Vector2(w, h) / Mathf.Max(0.0001f, s);   // 칸을 덮는 크기(RectMask2D 가 통째로 걸러 내지 않게)
             return g;
+        }
+
+        /// <summary>
+        /// 사도 전투 SD 스파인(본 게임 Resources/Spine/&lt;사도 키&gt; — 원작 assets/spine/ingame/&lt;사도 키&gt;, 없으면 Spine/sd_&lt;그림 키&gt;) — 전투 화면과 같은 모습.
+        ///   스킨 Normal(없으면 기본) · 쉬는 동작 Idle · 원작 전투처럼 모두 같은 배율(몸 키 중앙값 636 단위 = bodyPx). 발이 부모의 (0.5, 0).
+        ///   faceRight = 오른쪽을 본다(파티 — 원작 SD 를 좌우로 뒤집는다), false = 원작 그대로 왼쪽(대상). 없으면 null(부르는 쪽이 정지 그림으로 대신).
+        /// </summary>
+        public static SkeletonGraphic Battle(Transform parent, HeroInfo h, float bodyPx, bool faceRight = true)
+        {
+            if (h == null) return null;
+            // 시험 프로젝트(runui-test)는 Spine/<roster 키(한글)>, 본 게임(bolzena-unity copy_run_assets.py)은 Spine/<그림 키> 에 SD 전투 스파인을 둔다 —
+            //   본 게임에서 앞 둘만 찾으면 이벤트 장면 · 캠프의 사도가 모두 정지 스탠딩으로 떨어졌다(2026-10-06 빠진 그림 조사)
+            var data = (h.key != null ? DataQuiet(h.key) : null) ?? (h.art != null ? DataQuiet("sd_" + h.art) : null) ?? (h.art != null ? DataQuiet(h.art) : null);
+            if (data == null || Mat == null) return null;
+            SkeletonGraphic g;
+            try { g = SkeletonGraphic.NewSkeletonGraphicGameObject(data, parent, Mat); }
+            catch (System.Exception e) { Debug.LogWarning("[RunUI] 전투 스파인 실패 " + h.key + ": " + e.Message); return null; }
+            g.name = "battle " + h.key;
+            g.raycastTarget = false;
+            var sk = g.Skeleton; var sd = sk.Data;
+            var normal = sd.Skins.FirstOrDefault(x => string.Equals(x.Name, "Normal", System.StringComparison.OrdinalIgnoreCase)) ?? (sd.DefaultSkin == null ? sd.Skins.FirstOrDefault() : null);
+            if (normal != null) { sk.SetSkin(normal); sk.SetSlotsToSetupPose(); }
+            var anim = PickAnim(sd, "Idle", "idle", "Wait", "Stand");
+            if (anim != null) g.AnimationState.SetAnimation(0, anim, true);
+            g.Update(0); g.UpdateMesh();
+            float unit = (g.skeletonDataAsset != null ? g.skeletonDataAsset.scale : 0.01f) * (g.MeshScale > 0 ? g.MeshScale : 100f);
+            float ls = bodyPx / 636f / Mathf.Max(0.0001f, unit);
+            var rt = g.rectTransform;
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0);
+            rt.anchoredPosition = Vector2.zero;
+            rt.localScale = new Vector3(faceRight ? -ls : ls, ls, 1);   // 원작 SD 는 왼쪽을 보고 그려졌다 — 오른쪽을 보려면 뒤집는다(전투 파티와 같이)
+            return g;
+        }
+
+        static readonly Dictionary<string, SkeletonDataAsset> quiet = new Dictionary<string, SkeletonDataAsset>();
+        static SkeletonDataAsset DataQuiet(string folder)
+        {
+            if (cache.TryGetValue(folder, out var a)) return a;
+            if (quiet.TryGetValue(folder, out a)) return a;
+            a = SpineStencil.Fix(SpineSource.Load(folder));
+            if (a == null && SpineSource.IsPending(folder)) return null;   // 아직 받는 중
+            quiet[folder] = a;
+            return a;
+        }
+
+        /// <summary>
+        /// 그려진 메시가 화면(screenRoot — 캔버스 뿌리) 높이의 maxShare 를 넘거나 box 가로를 넘으면 발(아래 끝)을 그대로 두고 줄이고, 가로는 box 안으로 민다.
+        /// 표 · 캔버스 배율 · 스켈레톤 데이터 배율이 어긋나는 빌드(웹 · 통합 빌드)에서도 화면보다 크게 나오지 않게 하는 마지막 울타리(2026-10 「고해상도 에르핀 너무 큼」).
+        /// 돌려줌: 줄인 비율(1 = 그대로).
+        /// </summary>
+        public static float ClampInto(SkeletonGraphic g, RectTransform box, RectTransform screenRoot, float maxShare = 0.93f)
+        {
+            if (g == null || box == null) return 1;
+            // 장면용 SD(SceneHero) 는 전투와 같은 고정 배율 · 원점 바닥선 — 메시 경계로 줄이거나 옮기지 않는다.
+            //   메시에는 Idle 에서 투명한 슬롯(멜루나의 머리 위 3000 단위 슬롯 · 죠안의 사슬 · 에피카 …)도 들어 있어 경계가 몸보다 훨씬 크다(2026-10-06 「멜루나 엄청 작게」)
+            if (g.GetComponent<SceneHero.FixedScale>() != null) return 1;
+            g.UpdateMesh();
+            var mesh = g.GetLastMesh();
+            if (mesh == null || mesh.vertexCount == 0) return 1;
+            var b = mesh.bounds;
+            var space = screenRoot != null && screenRoot.rect.height > 100 ? screenRoot : box;
+            var rt = g.rectTransform;
+            Vector3 P(Vector3 local) => space.InverseTransformPoint(rt.TransformPoint(local));
+            Vector3 lo = P(b.min), hi = P(b.max);
+            float h = Mathf.Abs(hi.y - lo.y), lim = space.rect.height * maxShare;
+            float s = h > lim && h > 1 ? lim / h : 1;
+            Vector3 blo = space.InverseTransformPoint(box.TransformPoint(box.rect.min)), bhi = space.InverseTransformPoint(box.TransformPoint(box.rect.max));
+            float w = Mathf.Abs(hi.x - lo.x) * s, bw = Mathf.Abs(bhi.x - blo.x);
+            if (w > bw && w > 1) s *= bw / w;
+            if (s < 0.999f)
+            {
+                // 발(메시 아래 끝 · 가로 가운데)을 그 자리에 두고 줄인다
+                var foot = new Vector3(b.center.x, b.min.y, 0);
+                Vector3 before = rt.TransformPoint(foot);
+                rt.localScale = rt.localScale * s;
+                rt.position += before - rt.TransformPoint(foot);
+            }
+            // 위 끝이 화면 위 여백을 넘으면 내리고, 가로로 box 를 넘으면 안으로
+            lo = P(b.min); hi = P(b.max);
+            float top = space.rect.yMax - space.rect.height * (1 - maxShare) * 0.5f;
+            if (hi.y > top) rt.position += space.TransformVector(new Vector3(0, top - hi.y, 0));
+            float dx = lo.x < blo.x ? blo.x - lo.x : hi.x > bhi.x ? bhi.x - hi.x : 0;
+            if (dx != 0) rt.position += space.TransformVector(new Vector3(dx, 0, 0));
+            return s;
         }
 
         public static string PickAnim(Spine.SkeletonData sd, params string[] prefs)

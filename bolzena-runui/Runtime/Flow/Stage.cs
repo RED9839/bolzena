@@ -77,6 +77,9 @@ namespace Bolzena.RunUI
         /// <summary>창 크기가 바뀌면(폰 ↔ PC 크기) 기준 해상도를 다시 고른다 — 새 화면부터 맞는 크기로 선다.</summary>
         void Update()
         {
+            // 뒤로 키(Esc · 안드로이드 뒤로) — 맨 위 창을 닫는다. 잠긴 창(반드시 골라야 하는 것)이면 아무 일도 없다
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null && kb.escapeKey.wasPressedThisFrame) Back();
             var now = new Vector2Int(Screen.width, Screen.height);
             if (now == lastScreen) return;
             lastScreen = now;
@@ -161,6 +164,7 @@ namespace Bolzena.RunUI
                 yield return Lerp(0.2f, t => SetFade(Mathf.Lerp(a0, 1, t)));
             }
             Hot.Clear();
+            OnBack = null;
             Ui.Clear(ScreenLayer);
             Ui.Clear(ModalLayer);
             Current = name;
@@ -180,6 +184,22 @@ namespace Bolzena.RunUI
 
         void SetFade(float a) { fade.color = new Color(fade.color.r, fade.color.g, fade.color.b, a); }
 
+        /// <summary>화면을 검게 덮는다(dur 초) — 전투로 넘어갈 때 그 동안 장면 읽기 · 정리를 한다. 덮은 동안은 누르기를 막는다.</summary>
+        public IEnumerator Blackout(float dur)
+        {
+            fade.raycastTarget = true;
+            float a0 = fade.color.a;
+            if (a0 < 0.99f) yield return Lerp(dur, t => SetFade(Mathf.Lerp(a0, 1, t)));
+            SetFade(1);
+        }
+
+        /// <summary>덮개를 곧장 걷는다(전투 장면이 제 암전을 이어받은 뒤 — 판 화면 캔버스를 끈 다음에).</summary>
+        public void ClearFade()
+        {
+            SetFade(0);
+            fade.raycastTarget = false;
+        }
+
         IEnumerator Lerp(float dur, Action<float> f)
         {
             if (Settings.ReduceMotion) dur *= 0.3f;
@@ -187,6 +207,32 @@ namespace Bolzena.RunUI
             while (t < dur) { f(Tw.OutCubic(t / dur)); t += Time.unscaledDeltaTime; yield return null; }
             f(1);
         }
+
+        // ── 뒤로 키 ──
+        /// <summary>뒤로 키를 눌렀을 때 — 맨 위 창(BackClose)을 닫는다. 잠겼으면 막는다. 창이 없으면 화면의 OnBack(없으면 아무 일도 없음).
+        /// 돌려줌: 무언가 닫혔나. 화면마다 OnBack 은 Show 가 비운다.</summary>
+        public bool Back()
+        {
+            Backs++;
+            BackClose top = null;
+            for (int i = ModalLayer.childCount - 1; i >= 0 && top == null; i--)
+            {
+                var c = ModalLayer.GetChild(i);
+                if (c.gameObject.activeInHierarchy) top = c.GetComponent<BackClose>();
+            }
+            if (top != null)
+            {
+                if (top.Locked || top.Close == null) { Debug.Log("[Stage] 뒤로 — 잠긴 창이라 그대로"); return false; }
+                top.Close(); return true;
+            }
+            if (OnBack != null) { OnBack(); return true; }
+            Debug.Log("[Stage] 뒤로 — " + Current + " 화면은 뒤로가 없습니다");
+            return false;
+        }
+        /// <summary>창이 없을 때 뒤로 키가 할 일(화면이 단다). 없으면 그 화면은 뒤로가 없다(캠프처럼 반드시 고르는 화면).</summary>
+        public Action OnBack;
+        /// <summary>뒤로 키를 받은 횟수(자동 데모가 키가 닿았는지 본다).</summary>
+        public int Backs { get; private set; }
 
         // ── 창(모달) ──
         /// <summary>어둡게 깐 위에 가운데 판을 띄운다(캔버스보다 크면 줄인다). 돌려줌: 판(안에 채운다)과 닫기.</summary>
@@ -211,6 +257,7 @@ namespace Bolzena.RunUI
                 Tw.Run(layer, 0.18f, t => { if (g) g.alpha = 1 - t; }, Tw.Linear, 0, () => { if (layer) Destroy(layer.gameObject); onClose?.Invoke(); });
             };
             if (closeOnDim) { var b = dim.gameObject.AddComponent<Btn>(); b.Bg = null; b.OnClick = close; }
+            var bc = layer.gameObject.AddComponent<BackClose>(); bc.Close = close; bc.Locked = !closeOnDim;   // ModalBox 의 × 가 있으면 풀린다
             Tw.Run(dim, 0.25f, t => { if (dim) dim.color = new Color(0.01f, 0.015f, 0.04f, 0.74f * t); });
             Tw.Pop(panel, 0, 0.92f, 0.3f);
             return (panel, close);
@@ -242,6 +289,7 @@ namespace Bolzena.RunUI
                 var x = Btn.Icon(panel, Theme.S("ic_x"), close, 44, "close");
                 x.GetComponent<RectTransform>().At(1, 1, -18, -14, 44, 44);
                 Hot["modal.x"] = x;
+                var bc = panel.parent.GetComponent<BackClose>(); if (bc != null) bc.Locked = false;
             }
             RectTransform foot = null;
             if (footH > 0)
@@ -253,5 +301,12 @@ namespace Bolzena.RunUI
             var body = Ui.Rect("body", panel).Fill(20, footH + (footH > 0 ? 8 : 18), 20, headH + 12);
             return (body, close, foot);
         }
+    }
+
+    /// <summary>창 하나에 붙는 뒤로 키 정보 — Close 를 부르면 닫힌다. Locked 면 뒤로 키로 닫지 못한다(반드시 고르는 창).</summary>
+    public sealed class BackClose : MonoBehaviour
+    {
+        public Action Close;
+        public bool Locked;
     }
 }

@@ -12,10 +12,10 @@
       "atk": 135,
       "def": 28,
       "crit": 10,
-      "blurb": "마녀 왕궁의 참모. 적 앞에 가시 덫을 깔아 두고, 계획이 어긋나도 덫은 거두지 않는다 — 다음 공격까지 기다릴 뿐.",
+      "blurb": "마녀 왕궁의 참모. 적 앞에 가시 덫을 깔아 두고, 계획이 어긋나도 덫은 거두지 않습니다 — 다음 공격까지 기다릴 뿐.",
       "keyword": {
         "name": "봉인 함정",
-        "desc": "적 앞에 깔아 둔 덫 — 그 적이 공격하기 직전 쌓인 만큼 터진다",
+        "desc": "적 앞에 깔아 두는 덫",
         "carrier": "enemy",
         "cap": 4
       },
@@ -61,6 +61,10 @@
         "cost": 200,
         "fx": [
           {
+            "k": "cue",
+            "id": "prickle_vine"
+          },
+          {
             "k": "dmg",
             "ratio": 1,
             "target": "allEnemies"
@@ -70,6 +74,11 @@
             "id": "봉인 함정",
             "v": 2,
             "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "가시 덩굴",
+            "v": 1
           }
         ]
       },
@@ -78,6 +87,58 @@
         "프리클_s1",
         "프리클_s2",
         "프리클_s3"
+      ],
+      "keywords": [
+        {
+          "name": "가시 덩굴",
+          "desc": "적을 감싸 조이는 덩굴",
+          "carrier": "self",
+          "cap": 1,
+          "rules": [
+            {
+              "name": "덩굴이 시들면",
+              "when": {
+                "on": "turnStart"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "가시 덩굴",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "prickle_tentacle"
+                },
+                {
+                  "k": "stack",
+                  "id": "가시 촉수",
+                  "v": 2
+                },
+                {
+                  "k": "spend",
+                  "id": "가시 덩굴",
+                  "all": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "가시 촉수",
+          "desc": "덩굴에서 돋아난 촉수",
+          "carrier": "self",
+          "cap": 3,
+          "decay": 1,
+          "per": [
+            {
+              "stat": "dot",
+              "ratio": 0.35
+            }
+          ]
+        }
       ]
     }
   ],
@@ -149,7 +210,7 @@
           "v": 1
         }
       ],
-      "blurb": "발밑을 보지 않는 적이 잘못이다",
+      "blurb": "발밑을 보지 않는 적이 잘못입니다",
       "oracles": [
         {
           "name": "겹겹이 덫",
@@ -299,7 +360,7 @@
           "target": "oneEnemy"
         }
       ],
-      "blurb": "꽂힌 가시가 그대로 덫이 된다",
+      "blurb": "꽂힌 가시가 그대로 덫이 됩니다",
       "oracles": [
         {
           "name": "굵은 작살",
@@ -554,39 +615,86 @@
       "fx": [
         {
           "k": "atkMod",
-          "v": 0.15,
+          "v": 0.1,
           "run": true,
           "target": "self"
         },
         {
-          "k": "stack",
-          "id": "봉인 함정",
-          "v": 1,
-          "target": "allEnemies"
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "봉인 함정",
+                  "v": 1,
+                  "target": "oneEnemy"
+                }
+              ]
+            }
+          ]
         }
       ],
-      "blurb": "계획이 어긋나면 그 자리에서 고쳐 쓴다",
+      "blurb": "계획이 어긋나면 그 자리에서 고쳐 씁니다",
       "oracles": [
         {
           "name": "완벽한 수정안",
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
             {
-              "k": "stack",
-              "id": "봉인 함정",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "봉인 함정",
+                      "v": 2,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "메모 한 줄",
           "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "봉인 함정",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "두 번째 계획",
           "fx": [
             {
               "k": "atkMod",
@@ -598,24 +706,25 @@
               "k": "stack",
               "id": "봉인 함정",
               "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "두 번째 계획",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "봉인 함정",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "봉인 함정",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -624,19 +733,31 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
             {
-              "k": "stack",
-              "id": "봉인 함정",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "봉인 함정",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -655,8 +776,26 @@
             {
               "k": "stack",
               "id": "봉인 함정",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "봉인 함정",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -732,7 +871,7 @@
           ]
         }
       ],
-      "blurb": "여왕 대리의 인장. 찍히는 쪽은 꼼짝 못 한다."
+      "blurb": "여왕 대리의 인장. 찍히는 쪽은 꼼짝 못 합니다."
     }
   ]
 }

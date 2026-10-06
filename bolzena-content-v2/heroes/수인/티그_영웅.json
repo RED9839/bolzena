@@ -15,13 +15,40 @@
       "blurb": "\"허접\"이라며 날 세우던 수인 양아치가 디아나의 뒤를 이어 진짜 영웅이 된 모습.",
       "keyword": {
         "name": "영웅담",
-        "desc": "영웅의 길 — 격파할 때마다 쌓여 자신의 피해가 오른다",
+        "desc": "격파로 쌓는 무용담",
         "carrier": "self",
-        "cap": 3,
+        "cap": 2,
         "per": [
           {
             "stat": "dealt",
             "v": 0.2
+          }
+        ],
+        "rules": [
+          {
+            "name": "맹호 일섬",
+            "when": {
+              "on": "stackReach",
+              "id": "영웅담",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "영웅담",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.6,
+                "target": "allEnemies"
+              },
+              {
+                "k": "tough",
+                "v": 1,
+                "target": "allEnemies"
+              }
+            ]
           }
         ]
       },
@@ -29,13 +56,12 @@
         {
           "name": "영웅의 길",
           "when": {
-            "on": "break",
-            "mine": true
+            "on": "break"
           },
           "fx": [
             {
               "k": "gauge",
-              "v": 20
+              "v": 15
             },
             {
               "k": "stack",
@@ -74,6 +100,30 @@
             "k": "tough",
             "v": 1,
             "target": "allEnemies"
+          },
+          {
+            "k": "ifFoe",
+            "id": "hp",
+            "pct": 0.3
+          },
+          {
+            "k": "dmg",
+            "ratio": 1.0,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "ifFoe",
+            "id": "hpMob",
+            "pct": 0.3
+          },
+          {
+            "k": "cue",
+            "id": "tig_finish"
+          },
+          {
+            "k": "dmg",
+            "ratio": 3.0,
+            "target": "oneEnemy"
           }
         ]
       },
@@ -151,44 +201,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 사슴류 베기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "ifBreak"
-            },
-            {
-              "k": "gauge",
-              "v": 30
-            }
-          ]
-        },
-        {
-          "name": "가벼운 사슴류 베기",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "ifBreak"
-            },
-            {
-              "k": "gauge",
-              "v": 30
-            }
-          ]
-        },
-        {
-          "name": "영웅의 사슴류 베기",
+          "name": "뿔 꺾기 베기",
           "fx": [
             {
               "k": "dmg",
@@ -202,24 +215,58 @@
             {
               "k": "gauge",
               "v": 30
+            }
+          ]
+        },
+        {
+          "name": "한 칼만",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "gauge",
+              "v": 30
+            }
+          ]
+        },
+        {
+          "name": "무용담 베기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "stack",
               "id": "영웅담",
               "v": 1
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "gauge",
+              "v": 30
             }
           ]
         },
         {
-          "name": "재빠른 사슴류 베기",
-          "tags": [
-            "신속"
-          ],
+          "name": "사슴 뿔 휘돌리기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy",
+              "ratio": 0.82,
+              "target": "allEnemies",
               "hits": 2
             },
             {
@@ -232,45 +279,37 @@
           ]
         },
         {
-          "name": "꿰뚫는 사슴류 베기",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "삼단 베기",
+          "cost": 3,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.2,
               "target": "oneEnemy",
-              "hits": 2
+              "hits": 3
             },
             {
               "k": "ifBreak"
             },
             {
               "k": "gauge",
-              "v": 30
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "날 선 롱소드",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "사냥꾼의 눈",
           "kind": "weakSpot"
         },
         {
-          "name": "전해질 무용담",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "영웅담",
-              "v": 1
-            }
-          ]
+          "name": "발걸음 고르기",
+          "kind": "draw"
         }
       ]
     },
@@ -294,11 +333,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 훈련의 성과",
+          "name": "매일의 성과",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.35,
               "target": "oneEnemy"
             },
             {
@@ -308,12 +347,12 @@
           ]
         },
         {
-          "name": "가벼운 훈련의 성과",
+          "name": "기초 훈련",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
@@ -323,11 +362,11 @@
           ]
         },
         {
-          "name": "영웅의 훈련의 성과",
+          "name": "영웅담 한 줄",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
@@ -342,58 +381,54 @@
           ]
         },
         {
-          "name": "재빠른 훈련의 성과",
-          "tags": [
-            "신속"
-          ],
+          "name": "필살기 연습",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
               "k": "tough",
               "v": 1
+            },
+            {
+              "k": "gauge",
+              "v": 20
             }
           ]
         },
         {
-          "name": "꿰뚫는 훈련의 성과",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "대련 상대",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
               "k": "tough",
               "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.0
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "반복 숙달",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "목검 자국",
+          "kind": "frost"
         },
         {
-          "name": "전해질 무용담",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "영웅담",
-              "v": 1
-            }
-          ]
+          "name": "몸에 밴 동작",
+          "kind": "cost"
         }
       ]
     },
@@ -425,14 +460,14 @@
       ],
       "oracles": [
         {
-          "name": "힘준 영웅의 검",
+          "name": "전설의 일격",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.45,
+              "ratio": 2.3,
               "target": "oneEnemy"
             },
             {
@@ -441,13 +476,13 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.2,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "가벼운 영웅의 검",
+          "name": "뽑아 든 단검",
           "cost": 1,
           "tags": [
             "약점 공격"
@@ -455,7 +490,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.7,
+              "ratio": 1.35,
               "target": "oneEnemy"
             },
             {
@@ -464,48 +499,30 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.75,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "영웅의 영웅의 검",
+          "name": "무용담의 검",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 1.9,
               "target": "oneEnemy"
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
+              "k": "ifStack",
               "id": "영웅담",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 영웅의 검",
-          "tags": [
-            "약점 공격",
-            "신속"
-          ],
-          "fx": [
+              "n": 2
+            },
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
@@ -514,21 +531,21 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.25,
+              "ratio": 1.0,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "꿰뚫는 영웅의 검",
+          "name": "영웅의 검무",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
-              "target": "oneEnemy"
+              "ratio": 1.45,
+              "target": "allEnemies"
             },
             {
               "k": "ifFoe",
@@ -536,7 +553,34 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.6,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "결착의 검",
+          "cost": 3,
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.6,
               "target": "oneEnemy"
             }
           ]
@@ -544,22 +588,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "영웅의 각오",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "흔들린 적을 노려",
           "kind": "weakSpot"
         },
         {
-          "name": "전해질 무용담",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "영웅담",
-              "v": 1
-            }
-          ]
+          "name": "이름값",
+          "kind": "draw"
         }
       ]
     },
@@ -573,7 +611,7 @@
       "fx": [
         {
           "k": "gauge",
-          "v": 50
+          "v": 30
         },
         {
           "k": "status",
@@ -581,53 +619,115 @@
           "v": 2
         },
         {
-          "k": "stack",
-          "id": "영웅담",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "gauge",
+                  "v": 15
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 영웅의 길",
+          "name": "전해질 무용담",
           "fx": [
             {
               "k": "gauge",
-              "v": 50
+              "v": 30
             },
             {
               "k": "status",
               "id": "잔광",
-              "v": 3
+              "v": 2
             },
             {
-              "k": "stack",
-              "id": "영웅담",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 35
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 영웅의 길",
+          "name": "첫 무용담",
           "cost": 0,
           "fx": [
             {
-              "k": "gauge",
-              "v": 50
-            },
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "영웅담",
+              "k": "draw",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 15
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "영웅의 영웅의 길",
+          "name": "영웅의 이름",
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 30
+            },
+            {
+              "k": "stack",
+              "id": "영웅담",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 45
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "각성 직전",
           "fx": [
             {
               "k": "gauge",
@@ -636,43 +736,35 @@
             {
               "k": "status",
               "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "영웅담",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 25
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "든든한 영웅의 길",
-          "fx": [
-            {
-              "k": "gauge",
-              "v": 50
-            },
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "영웅담",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 영웅의 길",
+          "name": "광기의 영웅",
           "tags": [
             "축복"
           ],
           "fx": [
             {
               "k": "gauge",
-              "v": 50
+              "v": 30
             },
             {
               "k": "status",
@@ -680,31 +772,36 @@
               "v": 3
             },
             {
-              "k": "stack",
-              "id": "영웅담",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 15
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
-          "kind": "ap"
+          "name": "첫걸음",
+          "kind": "cost"
         },
         {
-          "name": "한 장 더",
+          "name": "길잡이",
           "kind": "draw"
         },
         {
-          "name": "전해질 무용담",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "영웅담",
-              "v": 1
-            }
-          ]
+          "name": "영웅의 기개",
+          "kind": "atkUp"
         }
       ]
     }

@@ -57,7 +57,7 @@ namespace Bolzena.Core
         };
         public static readonly Dictionary<string, string> DIVINE_KO = new()
         {
-            ["power"] = "불타는 웅변 — 피해 ×1.3", ["cost"] = "가벼운 발걸음 — 코스트 -1", ["weakSpot"] = "약점 공략 — 취약인 적에게 피해 ×1.3",
+            ["power"] = "불타는 웅변 — 피해 ×1.3", ["cost"] = "가벼운 발걸음 — 비용 -1", ["weakSpot"] = "약점 공략 — 취약인 적에게 피해 ×1.3",
             ["frost"] = "눈보라 예보 — 맞은 적 취약 1", ["ap"] = "발맞추기 — 내면 AP +1", ["draw"] = "끝없는 이야기 — 내면 드로우 1",
             ["heal"] = "괜찮아 — 회복 ×1.3", ["guard"] = "양보하는 마음 — 방어 · 실드 ×1.3",
             ["atkUp"] = "한 땀 한 땀 — 내면 이번 전투 이 사도 공격력 +10%", ["defUp"] = "꺾이지 않는 실 — 내면 이번 전투 이 사도 방어력 +10%",
@@ -185,13 +185,16 @@ namespace Bolzena.Core
         public static class TOUGH
         {
             /// <summary>
-            /// 적 데이터에 tough 가 없을 때의 칸(2026-10-05 다시 — Docs/데이터.md §15 강인도 기준): 일반 4 · 엘리트 6 · 보스 10.
+            /// 적 데이터에 tough 가 없을 때의 칸(Docs/데이터.md §15 강인도 기준): 일반 4 · 엘리트 6 · 보스 7(사용자 2026-10-06 — 클론 몸 7, 옛 10).
+            /// 회복(사용자 2026-10-06): 강인도는 저절로 차지 않는다 — 격파되면 다음 내 턴 시작에 가득, 그 밖엔 회복 스킬(수 brace · 수에 붙은 tough)이 있는 적만. 판(phase)이 바뀌어도 안 찬다.
             /// 단위 = 약점 공격 AP 1. 엘리트 싸움에 같이 선 여린 적(칸이 Elite 보다 작은)은 EliteMinion 만큼 더.
             /// 잔광은 강인도 피해 +Glow.
             /// </summary>
-            public const double Fight = 4, Elite = 6, Boss = 10, EliteMinion = 1, Glow = 1;
+            public const double Fight = 4, Elite = 6, Boss = 7, EliteMinion = 1, Glow = 1;
             /// <summary>모든 적의 최대 강인도 최소치(사용자 규칙 2026-10-05 — 소환물 · 잔챙이 포함). 데이터가 이보다 작으면 검사 오류, 엔진도 이 아래로 세우지 않는다.</summary>
             public const double Min = 3;
+            /// <summary>등급별 최소치(사용자 2026-10-06): 엘리트 몬스터 5 · 보스 7. 엘리트 싸움에는 강인도 MinElite 이상인 몬스터가 하나는 선다(검사기). 보스가 세운 소환물(수 summon 의 noTough)만 예외 — 강인도 없음.</summary>
+            public const double MinElite = 5, MinBoss = 7;
             public const int Ap = 1;
             /// <summary>소수 찌꺼기를 지우는 눈금(1/60 — 1/2 · 1/3 · 1/4 · 1/5 · 1/6 · ×0.8 이 다 맞아떨어진다).</summary>
             public const double Grid = 60;
@@ -251,9 +254,9 @@ namespace Bolzena.Core
         /// <summary>희귀종 덧붙임(엘리트) — id → 뜻. EnemyDef.Rare 에 쓴다.</summary>
         public static readonly Dictionary<string, string> RARES = new()
         {
-            ["poisonHand"] = "턴 시작에 손 2장에 독", ["reshuffle"] = "행동할 때마다 손을 모두 버리고 섞은 뒤 상태 카드 1장(card)",
-            ["anxietyHits"] = "덱에 든 상태 카드(card) 수만큼 타격 +1", ["autoCard"] = "턴 시작에 손의 무작위 카드 1장이 저절로 나간다",
-            ["costUp"] = "턴 시작에 손 2장 비용 +1", ["crystal"] = "전투 시작에 결정화 3", ["actDebuff"] = "행동할 때 파티에 취약 2(st 로 약화도)",
+            ["poisonHand"] = "턴 시작에 손 2장에 독", ["reshuffle"] = "행동할 때마다 손패를 모두 버리고 섞은 뒤 상태 카드 1장",
+            ["anxietyHits"] = "덱에 든 그 상태 카드 수만큼 타격 +1", ["autoCard"] = "턴 시작에 손의 무작위 카드 1장 저절로 나감",
+            ["costUp"] = "턴 시작에 손 2장 비용 +1", ["crystal"] = "전투 시작에 결정화 3", ["actDebuff"] = "행동할 때 파티에 디버프 2",
             ["toughGuard"] = "받는 강인도 피해 -20%",
         };
 

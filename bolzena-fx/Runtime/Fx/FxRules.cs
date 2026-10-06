@@ -49,7 +49,7 @@ namespace Bolzena.Fx
                 case FxAnchor.Body: return Bone("Middle") ?? Guess(a);
                 case FxAnchor.Head: return Bone("Top") ?? Guess(a);
                 case FxAnchor.Front: return Bone("Front") ?? Guess(a);
-                case FxAnchor.Cast: return (castPoint != null ? Bone(castPoint) : null) ?? Muzzle?.Invoke() ?? Bone("Front") ?? Guess(a);
+                case FxAnchor.Cast: return (castPoint != null ? Bone(castPoint) : null) ?? Muzzle?.Invoke() ?? Bone("SkillReady") ?? Bone("Middle") ?? Guess(a);   // Front 는 땅 높이라 뺐다
                 case FxAnchor.Screen: return BolzenaFx.ScreenCenter();
             }
             return Feet;
@@ -88,7 +88,7 @@ namespace Bolzena.Fx
         // ── 고학년 · 카드 시각(웹판 fight-screen · fx-burst) ──
         public const int HIT_AFTER = 60;          // 때리는 순간(스파인 이벤트) + 투사체 몫 + 이만큼 = 숫자 · 체력 · 맞음 이펙트
         public const int CARD_HIT = 260;          // 카드 동작의 때리는 순간을 모를 때(이벤트 없음)
-        public const int CARD_MAX = 6;            // 카드 이펙트 한 번에 이만큼만
+        public const int CARD_MAX = 8;            // 카드 이펙트 한 번에 이만큼만
         public const float TOP_PAD = 0.24f;       // 화면 위끝에서 이만큼 아래가 이펙트 위끝(웹판 field.top + 24px)
 
         // 동작 → 카드 이펙트 갈래(원작 이펙트 이름의 attack · attack2 · skill · signaturecard) — 앞에서부터 있는 것
@@ -148,7 +148,7 @@ namespace Bolzena.Fx
         // ── 카드 이펙트 고르기 ── 원작은 동작 이벤트마다 이름을 콕 집어 트는데(데이터 테이블 — 열지 않는다), 여기서는 이름 낱말로 고른다.
         // 같은 이름의 번호만 다른 판(slash04 · slash05 …)은 하나만, 갈래마다 몇 개까지(모으기 2 · 투사체 1 · 시전자 2 · 대상 3)
         static readonly Regex HITW = new Regex(@"_hit(_|\d|$)|hitslash");
-        static readonly Regex TAIL = new Regex(@"(_?\d+)?(_default)?$");
+        static readonly Regex TAIL = new Regex(@"((?<=[a-z])\d+)?(_default)?$");   // slash04 · slash05 같은 번호 판만 하나로(_1_1 · _1_2 는 다른 판이라 둔다)
         public static List<UltPart> CardPlan(string heroKey, string anim, string tier)
         {
             foreach (var kind in CardKinds(anim, tier))
@@ -168,7 +168,7 @@ namespace Bolzena.Fx
                     if (p.At == "move") { if (mv++ < 1) res.Add(p); continue; }
                     if (p.At == "caster") { if (cs++ < 2) res.Add(p); continue; }
                     if (p.At == "screen") { if (sc++ < 1) res.Add(p); continue; }
-                    if (tg++ < 3) res.Add(p);
+                    if (tg++ < 5) res.Add(p);
                 }
                 return res.Take(CARD_MAX).ToList();
             }

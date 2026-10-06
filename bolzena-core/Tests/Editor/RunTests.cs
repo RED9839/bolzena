@@ -77,6 +77,99 @@ namespace Bolzena.Core.Tests
             CollectionAssert.Contains(run.S.Deck, g.Options[0]);
         }
 
+        // ── 한 전투에 사도마다 신탁 · 은총 가운데 하나만(2026-10-06 사용자) ──
+        /// <summary>빛나는 카드를 주인 사도별로 센다 — 은총은 Glow.Hero, 카드 신탁은 그 카드의 주인(교주 카드는 주인 사도).</summary>
+        static List<string> GlowOwners(Run run, Dictionary<string, Glow> glow) =>
+            glow.Select(kv => kv.Value.Kind == "hero" ? kv.Value.Hero : run.ViewOf(kv.Key).Hero ?? "neutral").ToList();
+
+        [Test] public void 한_전투에_사도마다_신탁_은총_가운데_하나만()
+        {
+            int both = 0, cards = 0, graces = 0;
+            foreach (var kind in new[] { "fight", "elite", "boss" })
+                for (long seed = 1; seed <= 300; seed++)
+                {
+                    var run = New(seed);
+                    run.S.Deck.AddRange(new[] { "rico_u1", "carrot_u1", "sion_u1" });   // 사도마다 신탁을 받을 고유 카드 · 아직 얻을 고유 카드도 남았다
+                    run.S.Elite = kind == "elite"; run.S.Node = kind == "boss" ? 3 : 1;
+                    var glow = run.RollEpiphany();
+                    var owners = GlowOwners(run, glow);
+                    Assert.AreEqual(owners.Count, owners.Distinct().Count(), $"{kind} 씨앗 {seed}: 한 사도에 빛이 둘 — {string.Join(", ", owners)}");
+                    int h = glow.Values.Count(g => g.Kind == "hero"), c = glow.Values.Count(g => g.Kind == "card");
+                    Assert.GreaterOrEqual(h, 1, $"{kind}: 은총 하나는 반드시");
+                    if (kind == "elite") Assert.GreaterOrEqual(c, 1, "엘리트: 빈 사도가 있으면 카드 신탁도 반드시");
+                    graces += h; cards += c; if (h > 0 && c > 0) both++;
+                }
+            Assert.Greater(both, 0, "다른 사도끼리는 은총 · 신탁이 한 전투에 같이 선다");
+            Assert.Greater(cards, 0); Assert.Greater(graces, 0);
+        }
+
+        [Test] public void 교주_카드는_주인_사도_몫으로_센다()
+        {
+            int lit = 0;
+            for (long seed = 1; seed <= 300; seed++)
+            {
+                var run = New(seed);
+                run.Data.Cards["nz"] = new CardDef
+                {
+                    Id = "nz", Name = "시험 교주 카드", Type = "공격", Cost = 1,
+                    Oracles = Enumerable.Range(1, 5).Select(i => new OracleDef { Name = "시험 신탁 " + i }).ToList(),
+                };
+                run.S.Deck.Add(GameData.WithOwner("nz", "rico"));   // 신탁을 받을 카드는 리코타 몫의 교주 카드 하나뿐
+                run.S.Elite = true;
+                var glow = run.RollEpiphany();
+                bool rGrace = glow.Values.Any(g => g.Kind == "hero" && g.Hero == "rico");
+                bool nCard = glow.TryGetValue(GameData.WithOwner("nz", "rico"), out var ng) && ng.Kind == "card";
+                Assert.IsFalse(rGrace && nCard, $"씨앗 {seed}: 리코타 은총과 리코타 몫 교주 카드 신탁이 같이 섰다");
+                if (nCard) lit++;
+            }
+            Assert.Greater(lit, 0, "리코타에게 은총이 없으면 교주 카드 신탁은 선다");
+        }
+
+        [Test] public void 다음_전투_신탁_약속은_은총을_바꿔서라도_지킨다()
+        {
+            for (long seed = 1; seed <= 200; seed++)
+            {
+                var run = New(seed);
+                run.S.Deck.Add("rico_u1");          // 신탁을 받을 카드는 리코타 것 하나뿐
+                run.S.RewardFlash = true;           // 이벤트 「다음 전투에서 신탁이 꼭 뜹니다」
+                var glow = run.RollEpiphany();
+                var owners = GlowOwners(run, glow);
+                Assert.AreEqual(owners.Count, owners.Distinct().Count(), $"씨앗 {seed}: 한 사도에 빛이 둘");
+                Assert.IsTrue(glow.TryGetValue("rico_u1", out var g) && g.Kind == "card", $"씨앗 {seed}: 약속한 신탁이 없다");
+                Assert.IsFalse(run.S.RewardFlash, "약속은 한 번 쓰면 끝");
+            }
+        }
+
+        // ── 보상 골드는 화면이 열리면 저절로(2026-10-06 사용자) — 두 번 받거나 못 받는 일이 없게 ──
+        [Test] public void 보상_골드는_한_번만_저장_불러오기에도()
+        {
+            var run = New(5);
+            run.EnterNode(run.Reachable()[0]);
+            var saved = run.Save();                         // 싸움 직전 저장(판 화면의 「fight」)
+            var (b, loot) = run.OpenFight();
+            var bots = new Bots(run.Data);
+            while (b.Over == null) { bots.SmartPlay(b); if (b.Over == null) b.EndTurn(); }
+            run.AfterFight(b);
+            int g0 = run.S.Gold;
+            run.TakeGold();                                 // 보상 화면이 열리며 저절로
+            Assert.AreEqual(g0 + loot.Gold, run.S.Gold);
+            run.TakeGold();                                 // 다시 그려도 · 떠날 때 한 번 더 불러도
+            Assert.AreEqual(g0 + loot.Gold, run.S.Gold, "골드는 한 번만");
+            // 받은 뒤 저장(장비 고르기 「gear」)하고 불러오면 — 받은 채 · 다시 불러도 그대로
+            var back = Run.Load(run.Data, run.Save());
+            Assert.IsTrue(back.S.Reward.GoldTaken);
+            back.TakeGold();
+            Assert.AreEqual(g0 + loot.Gold, back.S.Gold, "불러온 뒤에도 두 번 받지 않는다");
+            // 받기 전 저장(싸움 직전)으로 돌아가면 — 골드는 아직 없고, 싸움을 다시 열면 새 보상을 한 번 받는다
+            var before = Run.Load(run.Data, saved);
+            int s0 = before.S.Gold;
+            var (b2, loot2) = before.OpenFight();
+            while (b2.Over == null) { bots.SmartPlay(b2); if (b2.Over == null) b2.EndTurn(); }
+            before.AfterFight(b2);
+            before.TakeGold(); before.TakeGold();
+            Assert.AreEqual(s0 + loot2.Gold, before.S.Gold, "끄고 다시 켜도 못 받거나 두 번 받지 않는다");
+        }
+
         [Test] public void 캠프는_쉬기_또는_수련_하나()
         {
             var run = New();
@@ -164,6 +257,98 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(3, run.ViewOf(cid).Cost, "신탁 ②(코스트 3)");
         }
 
+        [Test] public void 보스_복제_후보는_덱의_파티_고유_카드_무작위_셋_같은_카드는_한_번()
+        {
+            var seen = new HashSet<string>();
+            for (long seed = 1; seed <= 60; seed++)
+            {
+                var run = New(seed);
+                run.S.Deck.AddRange(new[] { "rico_u1", "rico_u1", "rico_u2", "sion_u2", "carrot_u2", "rico_u3", "n_bond@rico" });
+                run.AddCopy("rico_u2");
+                var off = run.BossCopyOffer();
+                Assert.AreEqual(3, off.Count, $"씨앗 {seed}");
+                Assert.AreEqual(3, off.Distinct().Count(), "같은 카드는 한 번");
+                foreach (var id in off)
+                {
+                    var c = run.Data.Card(id);
+                    Assert.IsTrue(c.Unique && c.Hero != null && run.S.Party.Contains(c.Hero), $"{id}: 파티 사도 고유 카드만");
+                    Assert.IsFalse(GameData.IsCopy(id), "복제본은 후보가 아니다");
+                    Assert.AreNotEqual("rico_u3", id, "유일은 복제하지 않는다");
+                    Assert.IsTrue(run.S.Deck.Contains(id), "덱에 든 것만");
+                    seen.Add(id);
+                }
+            }
+            CollectionAssert.AreEquivalent(new[] { "rico_u1", "rico_u2", "sion_u2", "carrot_u2" }, seen, "넷 가운데 무작위 셋");
+
+            var one = New();
+            one.S.Deck.Add("sion_u2");
+            CollectionAssert.AreEqual(new[] { "sion_u2" }, one.BossCopyOffer(), "셋보다 적으면 있는 만큼");
+            var none = New();
+            none.AddCopy("rico_u1");
+            Assert.AreEqual(0, none.BossCopyOffer().Count, "고유 카드가 없으면(복제본뿐) 빈 목록 — 화면이 건너뛴다");
+        }
+
+        [Test] public void 복제본은_복제한_순간_모습에_묶이고_원본이_신탁을_받아도_그대로()
+        {
+            var run = New();
+            run.S.Deck.Add("rico_u1");
+            run.S.Flash["rico_u1"] = 2; run.S.Shin["rico_u1"] = "own";
+            var a = run.AddCopy("rico_u1");
+            Assert.AreEqual("rico_u1^", a);
+            Assert.AreEqual(2, run.S.Flash[a]); Assert.AreEqual("own", run.S.Shin[a]);
+            var ma = run.MarkOf(a); var mo = run.MarkOf("rico_u1");
+            Assert.IsTrue(ma.Copy); Assert.IsFalse(mo.Copy);
+            Assert.AreEqual(mo.Oracle, ma.Oracle); Assert.AreEqual(mo.Bless, ma.Bless); Assert.IsNotNull(ma.Bless);
+            StringAssert.Contains(CardMark.COPY_LINE, ma.Lines());
+
+            // 신탁 없는 원본을 복제 → 원본이 신탁을 받는다 → 복제본은 그대로, 다시 복제하면 새 모습의 복제본(꼬리 하나 더)
+            run.S.Deck.Add("rico_u2");
+            var b = run.AddCopy("rico_u2");
+            Assert.AreEqual("rico_u2^", b);
+            var g = new Glow { Kind = "card", Picks = new List<GlowPick> { new GlowPick { N = 3, Shin = "draw" } } };
+            Assert.IsNull(run.ClaimGlow("rico_u2", g, 0));
+            Assert.AreEqual(3, run.S.Flash["rico_u2"]);
+            Assert.IsFalse(run.S.Flash.ContainsKey(b), "원본이 신탁을 받아도 복제본은 그대로");
+            Assert.IsFalse(run.S.Shin.ContainsKey(b));
+            var b2 = run.AddCopy("rico_u2");
+            Assert.AreEqual("rico_u2^^", b2, "모습이 다르면 따로 된 복제본");
+            Assert.AreEqual(3, run.S.Flash[b2]); Assert.AreEqual("draw", run.S.Shin[b2]);
+            Assert.AreEqual("rico_u2", GameData.BaseId(b2)); Assert.AreEqual(2, GameData.CopyNo(b2));
+            Assert.AreEqual("rico_u2^^", run.AddCopy("rico_u2"), "같은 모습이면 같은 id 로 한 장 더");
+            Assert.AreEqual(2, run.S.Deck.Count(x => x == b2));
+
+            // 저장 · 불러오기에서도 그대로
+            var r2 = Run.Load(run.Data, run.Save());
+            Assert.IsFalse(r2.MarkOf(b).Oracle != null);
+            Assert.AreEqual(run.MarkOf(b2).Oracle, r2.MarkOf(b2).Oracle);
+            Assert.IsTrue(r2.MarkOf(b2).Copy && r2.MarkOf(b2).Blessed);
+        }
+
+        [Test] public void 복제본은_빛_수련_이벤트_신탁_축복_후보에_들지_않는다()
+        {
+            for (long seed = 1; seed <= 80; seed++)
+            {
+                var run = New(seed);
+                run.S.Deck.Add("rico_u1");
+                var cid = run.AddCopy("rico_u1");
+                run.S.Deck.Remove("rico_u1");   // 원본을 빼도 복제본은 대상이 아니다
+                run.S.Deck.AddRange(new[] { "carrot_u1", "sion_u1" });
+                CollectionAssert.DoesNotContain(run.FlashTargets(), cid);
+                run.S.RewardFlash = true; run.S.Elite = seed % 2 == 0; run.S.Node = 1;
+                var glow = run.RollEpiphany();
+                Assert.IsFalse(glow.Keys.Any(GameData.IsCopy), $"씨앗 {seed}: 복제본이 빛났다");
+                var camp = run.EnterCamp("camp");
+                Assert.IsFalse(GameData.IsCopy(camp.Train?.CardId), "수련 후보");
+                Assert.IsFalse(GameData.IsCopy(run.OfferFlash()?.CardId), "이벤트 신탁 후보");
+                CollectionAssert.DoesNotContain(run.ShinAble(null), cid, "축복 얹기");
+                CollectionAssert.DoesNotContain(run.ShinAble("power"), cid);
+                Assert.IsFalse(run.FlashOk(cid, 1));
+                var g = new Glow { Kind = "card", Picks = new List<GlowPick> { new GlowPick { N = 1 } } };
+                Assert.IsNotNull(run.ClaimGlow(cid, g, 0), "보상 신탁도 막힌다");
+                Assert.IsFalse(run.S.Flash.ContainsKey(cid));
+            }
+        }
+
         [Test] public void 유일과_강화_카드는_덱에_한_장()
         {
             var run = New();
@@ -193,13 +378,46 @@ namespace Bolzena.Core.Tests
             Assert.IsNull(run.S.NextFight, "한 번만");
         }
 
+        [Test] public void 이벤트_은총은_사도를_골라_그_사도의_남은_고유_카드를_얻는다()
+        {
+            var run = New();
+            run.S.Event = new EventState { Key = "t", Id = "X", Phase = "result" };
+            run.ApplyOutcomes(new List<Outcome> { new Outcome { K = "unique", N = 2 } });
+            var p = run.S.Event.Pending[0];
+            Assert.AreEqual("grace", p.K); Assert.AreEqual(2, p.N);
+            // 저장 · 불러오기 중간에도 그대로
+            run = Run.Load(run.Data, run.Save());
+            Assert.AreEqual("grace", run.S.Event.Pending[0].K);
+            Assert.IsNotNull(run.ResolvePending("nobody"), "파티에 없는 사도");
+            var left = run.UniquesLeft("carrot");
+            Assert.Greater(left.Count, 0);
+            int deck = run.S.Deck.Count;
+            Assert.IsNull(run.ResolvePending("carrot"));
+            var got = run.S.Deck.Skip(deck).ToList();
+            Assert.AreEqual(System.Math.Min(2, left.Count), got.Count, "고른 사도의 고유 카드 n 장");
+            Assert.IsTrue(got.All(id => left.Contains(id) && run.Data.Card(id).Hero == "carrot"));
+            Assert.AreEqual(0, run.S.Event.Pending.Count);
+            // 남은 고유 카드가 없는 사도는 고를 수 없다
+            foreach (var id in run.UniquesLeft("carrot")) run.S.Deck.Add(id);
+            CollectionAssert.DoesNotContain(run.GraceHeroes(), "carrot");
+            run.S.Event.Pending.Add(new Pending { K = "grace", N = 1 });
+            Assert.IsNotNull(run.ResolvePending("carrot"));
+            Assert.IsNull(run.ResolvePending(null), "받지 않기");
+            // 파티 셋 다 없으면 대신 골드
+            foreach (var k in run.S.Party) foreach (var id in run.UniquesLeft(k)) run.S.Deck.Add(id);
+            int g = run.S.Gold;
+            run.ApplyOutcomes(new List<Outcome> { new Outcome { K = "unique" } });
+            Assert.AreEqual(0, run.S.Event.Pending.Count);
+            Assert.AreEqual(g + Run.GRACE_GOLD, run.S.Gold);
+        }
+
         [Test] public void 이벤트_사도_조건_골드_잠금_판정_고르는_것()
         {
             var run = New();
             var c1 = run.Data.Event("C1");
             Assert.AreEqual(3, run.OptionsOf(c1).Count, "선택지 둘 + 떠나기");
             run.Data.Add(null, null, null, null, "[{\"id\":\"H1\",\"name\":\"사도 선택지\",\"options\":[{\"label\":\"리코타만\",\"hero\":[\"rico\"],\"out\":[{\"k\":\"gold\",\"v\":1}]},{\"label\":\"없는 사도만\",\"hero\":[\"nobody\"],\"out\":[]}]}]", null);
-            CollectionAssert.AreEqual(new[] { "리코타만", "떠납니다" }, run.OptionsOf(run.Data.Event("H1")).Select(o => o.Label));
+            CollectionAssert.AreEqual(new[] { "리코타만", "떠나기" }, run.OptionsOf(run.Data.Event("H1")).Select(o => o.Label));
             run.S.Gold = 10;
             Assert.IsNotNull(run.LockOf(c1.Options[0]));
             run.S.Gold = 500;

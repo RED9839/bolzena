@@ -15,7 +15,7 @@
    "blurb": "오이에 인생을 건 요정. 말끝마다 \"오이\"를 붙이고 오이 레시피를 퍼뜨리며, 소원은 요정들이 오이를 좋아하게 되는 것. 어디든 \"오이 심어도 돼요?\"라고 묻는 게 특기이고, 오이 덩굴의 달팽이는 원수.",
    "keyword": {
     "name": "오이",
-    "desc": "몰래 심은 오이 — 붙은 아군이 카드를 내면 한 입 먹고 떨어진다",
+    "desc": "아군 카드에 몰래 심는 오이",
     "carrier": "hero",
     "cap": 2
    },
@@ -124,7 +124,7 @@
    ],
    "oracles": [
     {
-     "name": "싱싱한 오이 심기",
+     "name": "오이 두 개 심기",
      "tags": [
       "연계"
      ],
@@ -142,10 +142,45 @@
      ]
     },
     {
-     "name": "가벼운 오이 심기",
+     "name": "오이 꼭지",
      "cost": 0,
+     "fx": [
+      {
+       "k": "stack",
+       "id": "오이",
+       "v": 1,
+       "target": "oneAlly"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "오이 밭 습격",
      "tags": [
       "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "오이",
+       "v": 2,
+       "target": "otherAllies"
+      },
+      {
+       "k": "draw",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "몰래몰래",
+     "tags": [
+      "연계",
+      "신속",
+      "보존"
      ],
      "fx": [
       {
@@ -161,7 +196,7 @@
      ]
     },
     {
-     "name": "덩굴진 오이 심기",
+     "name": "심고 튀기",
      "tags": [
       "연계"
      ],
@@ -169,69 +204,28 @@
       {
        "k": "stack",
        "id": "오이",
-       "v": 3,
+       "v": 1,
        "target": "oneAlly"
       },
       {
        "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "절여 둔 오이 심기",
-     "tags": [
-      "연계",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "oneAlly"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "축복의 오이 심기",
-     "tags": [
-      "연계",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "oneAlly"
-      },
-      {
-       "k": "draw",
-       "v": 1
+       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "싱싱한 잎",
+     "kind": "draw"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "수분 충전",
+     "kind": "ap"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "살금살금",
+     "kind": "cost"
     }
    ]
   },
@@ -261,12 +255,11 @@
    ],
    "oracles": [
     {
-     "name": "싱싱한 오이 오일",
-     "tags": [],
+     "name": "진한 오이 오일",
      "fx": [
       {
        "k": "heal",
-       "ratio": 4.3
+       "ratio": 4.6
       },
       {
        "k": "stack",
@@ -282,13 +275,52 @@
      ]
     },
     {
-     "name": "가벼운 오이 오일",
+     "name": "오일 한 방울",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "heal",
-       "ratio": 2.4
+       "ratio": 1.8
+      },
+      {
+       "k": "stack",
+       "id": "오이",
+       "v": 1,
+       "target": "otherAllies"
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "온몸 오이 팩",
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 4.2
+      },
+      {
+       "k": "stack",
+       "id": "오이",
+       "v": 2,
+       "target": "allAllies"
+      },
+      {
+       "k": "status",
+       "id": "결의",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "오일 코팅",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.5
       },
       {
        "k": "stack",
@@ -304,12 +336,11 @@
      ]
     },
     {
-     "name": "덩굴진 오이 오일",
-     "tags": [],
+     "name": "오이 향 결의",
      "fx": [
       {
        "k": "heal",
-       "ratio": 4.15
+       "ratio": 3.0
       },
       {
        "k": "stack",
@@ -320,72 +351,23 @@
       {
        "k": "status",
        "id": "결의",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "절여 둔 오이 오일",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 3.95
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "축복의 오이 오일",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 3.95
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
+       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "포근한 숨결",
-     "kind": "heal",
-     "fx": []
+     "name": "상큼한 향",
+     "kind": "heal"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "미끌미끌",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "촉촉한 피부",
+     "kind": "defUp"
     }
    ]
   },
@@ -415,12 +397,11 @@
    ],
    "oracles": [
     {
-     "name": "싱싱한 오이 행렬",
-     "tags": [],
+     "name": "오이 대행진",
      "fx": [
       {
        "k": "heal",
-       "ratio": 3.6
+       "ratio": 3.2
       },
       {
        "k": "status",
@@ -430,19 +411,18 @@
       {
        "k": "stack",
        "id": "오이",
-       "v": 1,
+       "v": 2,
        "target": "otherAllies"
       }
      ]
     },
     {
-     "name": "가벼운 오이 행렬",
+     "name": "한 입만 권하기",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "heal",
-       "ratio": 2
+       "ratio": 1.2
       },
       {
        "k": "status",
@@ -458,17 +438,16 @@
      ]
     },
     {
-     "name": "덩굴진 오이 행렬",
-     "tags": [],
+     "name": "오이 축제",
      "fx": [
       {
        "k": "heal",
-       "ratio": 3.45
+       "ratio": 2.2
       },
       {
        "k": "status",
        "id": "사기",
-       "v": 1
+       "v": 2
       },
       {
        "k": "stack",
@@ -479,14 +458,14 @@
      ]
     },
     {
-     "name": "절여 둔 오이 행렬",
+     "name": "행렬의 선두",
      "tags": [
-      "보존"
+      "개전"
      ],
      "fx": [
       {
        "k": "heal",
-       "ratio": 3.3
+       "ratio": 3.1
       },
       {
        "k": "status",
@@ -502,24 +481,22 @@
      ]
     },
     {
-     "name": "축복의 오이 행렬",
-     "tags": [
-      "축복"
-     ],
+     "name": "끝없는 행렬",
+     "cost": 3,
      "fx": [
       {
        "k": "heal",
-       "ratio": 3
+       "ratio": 4.0
       },
       {
        "k": "status",
        "id": "사기",
-       "v": 1
+       "v": 2
       },
       {
        "k": "stack",
        "id": "오이",
-       "v": 1,
+       "v": 2,
        "target": "otherAllies"
       }
      ]
@@ -527,19 +504,16 @@
    ],
    "blesses": [
     {
-     "name": "포근한 숨결",
-     "kind": "heal",
-     "fx": []
+     "name": "오이 냉국",
+     "kind": "heal"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "행렬 박자",
+     "kind": "ap"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "흥겨운 장단",
+     "kind": "atkUp"
     }
    ]
   },
@@ -570,8 +544,7 @@
    ],
    "oracles": [
     {
-     "name": "싱싱한 샌드위치",
-     "tags": [],
+     "name": "두툼한 샌드위치",
      "fx": [
       {
        "k": "dmg",
@@ -592,13 +565,12 @@
      ]
     },
     {
-     "name": "가벼운 샌드위치",
+     "name": "한 입 샌드위치",
      "cost": 0,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.85,
+       "ratio": 0.7,
        "target": "oneEnemy"
       },
       {
@@ -615,18 +587,18 @@
      ]
     },
     {
-     "name": "덩굴진 샌드위치",
-     "tags": [],
+     "name": "샌드위치 뿌리기",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.4,
-       "target": "oneEnemy"
+       "ratio": 0.8,
+       "target": "allEnemies"
       },
       {
        "k": "status",
        "id": "약화",
-       "v": 1
+       "v": 1,
+       "target": "allEnemies"
       },
       {
        "k": "stack",
@@ -637,38 +609,35 @@
      ]
     },
     {
-     "name": "절여 둔 샌드위치",
+     "name": "오이 듬뿍 샌드위치",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "오이",
+       "v": 2,
+       "target": "otherAllies"
+      }
+     ]
+    },
+    {
+     "name": "도시락 습격",
      "tags": [
-      "보존"
+      "연계"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      }
-     ]
-    },
-    {
-     "name": "축복의 샌드위치",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.3,
+       "ratio": 1.25,
        "target": "oneEnemy"
       },
       {
@@ -687,19 +656,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "바삭한 식빵",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "차가운 오이",
+     "kind": "frost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "빈틈에 오이",
+     "kind": "weakSpot"
     }
    ]
   }

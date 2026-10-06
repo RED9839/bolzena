@@ -12,10 +12,10 @@
       "atk": 75,
       "def": 58,
       "crit": 5,
-      "blurb": "자재난 속에서도 우주선을 띄운 노력파 발명가. 어떤 카드든 소멸하면 자재로 주워 모으고, 스킬을 낼 때 자재 셋으로 발명품을 뚝딱 만든다.",
+      "blurb": "자재난 속에서도 우주선을 띄운 노력파 발명가. 어떤 카드든 소멸하면 자재로 주워 모으고, 스킬을 낼 때 자재 셋으로 발명품을 뚝딱 만듭니다.",
       "keyword": {
         "name": "자재",
-        "desc": "사라진 카드에서 주운 부품 — 셋이면 발명품 하나",
+        "desc": "사라진 카드에서 주운 부품",
         "carrier": "self",
         "cap": 6
       },
@@ -636,17 +636,29 @@
         {
           "k": "defMod",
           "v": 0.15,
-          "target": "self",
-          "run": true
-        },
-        {
-          "k": "stack",
-          "id": "자재",
-          "v": 2
+          "run": true,
+          "target": "self"
         },
         {
           "k": "ap",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "자재",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -655,18 +667,30 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.2,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "자재",
-              "v": 3
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "ap",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "자재",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -675,19 +699,31 @@
           "cost": 1,
           "fx": [
             {
+              "k": "draw",
+              "v": 1
+            },
+            {
               "k": "defMod",
               "v": 0.15,
-              "target": "self",
-              "run": true
+              "run": true,
+              "target": "self"
             },
             {
-              "k": "stack",
-              "id": "자재",
-              "v": 2
-            },
-            {
-              "k": "ap",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "자재",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -699,18 +735,46 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.18,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "자재",
-              "v": 3
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "ap",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "자재",
+                      "v": 2
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -719,18 +783,30 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.22,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "자재",
-              "v": 3
+              "v": 0.25,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "ap",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "자재",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -742,18 +818,30 @@
           "fx": [
             {
               "k": "defMod",
-              "v": 0.18,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "자재",
-              "v": 3
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "ap",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "자재",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

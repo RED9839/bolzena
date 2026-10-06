@@ -12,12 +12,48 @@
       "atk": 86,
       "def": 63,
       "crit": 5,
-      "blurb": "꿈속 계시를 받고 깨어나 옛 교리대로 세상을 되돌리려 교단을 장악했던 고대 요정 사제. 계시를 내린 쪽에게 버려져 무너졌고, 교주에게 용서받은 뒤 신앙의 과녁을 교주 한 명으로 옮기고 세계수를 등졌다. 권능은 거의 잃었지만 빵만은 여전히 무에서 짓고, 새벽마다 말장난을 적는다.",
+      "blurb": "꿈속 계시를 받고 깨어나 옛 교리대로 세상을 되돌리려 교단을 장악했던 고대 요정 사제. 계시를 내린 쪽에게 버려져 무너졌고, 교주에게 용서받은 뒤 신앙의 과녁을 교주 한 명으로 옮기고 세계수를 등졌습니다. 권능은 거의 잃었지만 빵만은 여전히 무에서 짓고, 새벽마다 말장난을 적습니다.",
       "keyword": {
         "name": "목도",
-        "desc": "교주 곁에서 보고 들은 것 — 자리를 옮길 때마다 쌓인다",
+        "desc": "교주 곁에서 보고 들은 것",
         "carrier": "self",
-        "cap": 3
+        "cap": 3,
+        "rules": [
+          {
+            "name": "보고 들은 것",
+            "when": {
+              "on": "play"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "목도",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "넘치는 증언",
+            "when": {
+              "on": "stackOver",
+              "id": "목도"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "shield",
+                "ratio": 0.4
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
@@ -89,6 +125,11 @@
         "cost": 250,
         "fx": [
           {
+            "k": "dmg",
+            "ratio": 0.8,
+            "target": "allEnemies"
+          },
+          {
             "k": "shield",
             "ratio": 3
           },
@@ -107,7 +148,7 @@
         {
           "id": "죠안_꿈결",
           "name": "꿈결 형상",
-          "desc": "꿈속 계시를 받던 때의 모습 — 어느 열에 서 있든 세 자리의 교리를 한꺼번에 행해 파티를 받친다",
+          "desc": "꿈속 계시를 받던 때의 모습 — 어느 열에 서 있든 세 자리의 교리를 한꺼번에 행해 파티를 받침",
           "turns": 2,
           "cards": {
             "죠안_s1": "죠안_f1"
@@ -181,7 +222,7 @@
       "token": true,
       "cost": 1,
       "type": "스킬",
-      "blurb": "꿈결 형상의 사슬이 파티를 감싸 지킨다 — 때리는 손이 아니라 받치는 손",
+      "blurb": "꿈결 형상의 사슬이 파티를 감싸 지킵니다 — 때리는 손이 아니라 받치는 손",
       "fx": [
         {
           "k": "shield",
@@ -243,8 +284,65 @@
       ],
       "oracles": [
         {
-          "name": "경건한 걸음",
-          "tags": [],
+          "name": "깊은 묵상",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목도",
+              "v": 3
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "moveRow",
+              "id": "front"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "moveRow",
+              "id": "back"
+            }
+          ]
+        },
+        {
+          "name": "발 빠른 순례",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목도",
+              "v": 1
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "moveRow",
+              "id": "front"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "moveRow",
+              "id": "back"
+            }
+          ]
+        },
+        {
+          "name": "앞서 걷는 순례",
+          "tags": [
+            "주도"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -270,34 +368,7 @@
           ]
         },
         {
-          "name": "가벼운 걸음",
-          "tags": [],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "목도",
-              "v": 2
-            },
-            {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "moveRow",
-              "id": "front"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "moveRow",
-              "id": "back"
-            }
-          ]
-        },
-        {
-          "name": "목도한 걸음",
+          "name": "순례 일지",
           "tags": [
             "보존"
           ],
@@ -326,38 +397,9 @@
           ]
         },
         {
-          "name": "간직한 걸음",
+          "name": "새벽 순례",
           "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "목도",
-              "v": 2
-            },
-            {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "moveRow",
-              "id": "front"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "moveRow",
-              "id": "back"
-            }
-          ]
-        },
-        {
-          "name": "교리의 걸음",
-          "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
@@ -386,19 +428,22 @@
       ],
       "blesses": [
         {
-          "name": "넘치는 숨결",
-          "kind": "ap",
-          "fx": []
+          "name": "성지의 이정표",
+          "kind": "draw"
         },
         {
-          "name": "번뜩이는 숨결",
-          "kind": "draw",
-          "fx": []
+          "name": "순례자의 지팡이",
+          "kind": "defUp"
         },
         {
-          "name": "버티는 숨결",
-          "kind": "defUp",
-          "fx": []
+          "name": "길 위의 기도",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목도",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -431,33 +476,7 @@
       ],
       "oracles": [
         {
-          "name": "경건한 교리",
-          "tags": [],
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 3
-            },
-            {
-              "k": "perStack",
-              "id": "목도"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.55
-            }
-          ]
-        },
-        {
-          "name": "가벼운 교리",
-          "cost": 2,
-          "tags": [],
+          "name": "교리 완수",
           "fx": [
             {
               "k": "status",
@@ -475,49 +494,69 @@
             },
             {
               "k": "shield",
-              "ratio": 0.8
-            }
-          ]
-        },
-        {
-          "name": "목도한 교리",
-          "tags": [],
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 3
-            },
-            {
-              "k": "perStack",
-              "id": "목도"
-            },
-            {
-              "k": "shield",
               "ratio": 1.5
             }
           ]
         },
         {
-          "name": "간직한 교리",
-          "tags": [
-            "보존"
-          ],
+          "name": "작은 교리",
+          "cost": 2,
           "fx": [
             {
               "k": "status",
               "id": "사기",
-              "v": 3
+              "v": 2
             },
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "perStack",
+              "id": "목도"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "목도의 증언",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목도",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "perStack",
+              "id": "목도"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.6
+            }
+          ]
+        },
+        {
+          "name": "굳건한 교리",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
             },
             {
               "k": "perStack",
@@ -530,10 +569,8 @@
           ]
         },
         {
-          "name": "교리의 교리",
-          "tags": [
-            "축복"
-          ],
+          "name": "꿈속 계시",
+          "cost": 4,
           "fx": [
             {
               "k": "status",
@@ -543,7 +580,7 @@
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 3
+              "v": 4
             },
             {
               "k": "perStack",
@@ -551,26 +588,23 @@
             },
             {
               "k": "shield",
-              "ratio": 1.45
+              "ratio": 2.0
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "단단한 숨결",
-          "kind": "guard",
-          "fx": []
+          "name": "성가 한 소절",
+          "kind": "ap"
         },
         {
-          "name": "번뜩이는 숨결",
-          "kind": "draw",
-          "fx": []
+          "name": "경건한 침묵",
+          "kind": "guard"
         },
         {
-          "name": "버티는 숨결",
-          "kind": "defUp",
-          "fx": []
+          "name": "흔들림 없는 믿음",
+          "kind": "defUp"
         }
       ]
     },
@@ -598,12 +632,11 @@
       ],
       "oracles": [
         {
-          "name": "경건한 빵",
-          "tags": [],
+          "name": "풍성한 빵",
           "fx": [
             {
               "k": "heal",
-              "ratio": 5.45
+              "ratio": 5.4
             },
             {
               "k": "draw",
@@ -617,17 +650,16 @@
           ]
         },
         {
-          "name": "가벼운 빵",
+          "name": "빵 반쪽",
           "cost": 1,
-          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 3.35
+              "ratio": 3.2
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
@@ -637,58 +669,58 @@
           ]
         },
         {
-          "name": "목도한 빵",
-          "tags": [],
+          "name": "기적의 빵",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "목도",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "목도"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.9
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "나눔의 식탁",
           "fx": [
             {
               "k": "heal",
-              "ratio": 5.8
+              "ratio": 4.2
             },
             {
               "k": "draw",
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "목도",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
         },
         {
-          "name": "간직한 빵",
+          "name": "끝없는 빵 바구니",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "heal",
-              "ratio": 5.05
+              "ratio": 4.2
             },
             {
               "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "목도",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "교리의 빵",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 5.05
-            },
-            {
-              "k": "draw",
-              "v": 2
+              "v": 3
             },
             {
               "k": "stack",
@@ -700,19 +732,16 @@
       ],
       "blesses": [
         {
-          "name": "포근한 숨결",
-          "kind": "heal",
-          "fx": []
+          "name": "따뜻한 빵",
+          "kind": "heal"
         },
         {
-          "name": "번뜩이는 숨결",
-          "kind": "draw",
-          "fx": []
+          "name": "빵 바구니",
+          "kind": "draw"
         },
         {
-          "name": "버티는 숨결",
-          "kind": "defUp",
-          "fx": []
+          "name": "신실한 마음",
+          "kind": "defUp"
         }
       ]
     },
@@ -739,12 +768,11 @@
       ],
       "oracles": [
         {
-          "name": "경건한 사슬",
-          "tags": [],
+          "name": "무거운 사슬",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.95,
+              "ratio": 1.9,
               "target": "allEnemies",
               "base": "def"
             },
@@ -757,9 +785,25 @@
           ]
         },
         {
-          "name": "가벼운 사슬",
+          "name": "짧은 사슬",
           "cost": 1,
-          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "목도한 심판",
           "fx": [
             {
               "k": "dmg",
@@ -768,6 +812,16 @@
               "base": "def"
             },
             {
+              "k": "perStack",
+              "id": "목도"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
               "k": "status",
               "id": "약화",
               "v": 1,
@@ -776,8 +830,24 @@
           ]
         },
         {
-          "name": "목도한 사슬",
-          "tags": [],
+          "name": "단죄의 사슬",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "옭아매는 사슬",
           "fx": [
             {
               "k": "dmg",
@@ -792,47 +862,8 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "목도",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "간직한 사슬",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.8,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "교리의 사슬",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.8,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
+              "id": "둔화",
               "v": 1,
               "target": "allEnemies"
             }
@@ -841,19 +872,16 @@
       ],
       "blesses": [
         {
-          "name": "세찬 숨결",
-          "kind": "power",
-          "fx": []
+          "name": "쇠사슬 울림",
+          "kind": "power"
         },
         {
-          "name": "틈새 노리기",
-          "kind": "weakSpot",
-          "fx": []
+          "name": "차가운 쇠",
+          "kind": "frost"
         },
         {
-          "name": "번뜩이는 숨결",
-          "kind": "draw",
-          "fx": []
+          "name": "죄의 무게",
+          "kind": "weakSpot"
         }
       ]
     }

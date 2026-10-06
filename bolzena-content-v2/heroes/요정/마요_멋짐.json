@@ -12,10 +12,10 @@
    "atk": 125,
    "def": 32,
    "crit": 10,
-   "blurb": "방구석 수집광이던 마요가 벨라 사건 때의 거짓말을 자책한 끝에, 교주에게 도움이 되겠다며 아끼던 수집품으로 무장했다. 모나티엄 경매장 방패를 던지고 은방울꽃 종을 울리며, \"~임\" 말투로 교주를 대놓고 \"최고 수집품\"이라 부른다.",
+   "blurb": "방구석 수집광이던 마요가 벨라 사건 때의 거짓말을 자책한 끝에, 교주에게 도움이 되겠다며 아끼던 수집품으로 무장했습니다. 모나티엄 경매장 방패를 던지고 은방울꽃 종을 울리며, \"~임\" 말투로 교주를 대놓고 \"최고 수집품\"이라 부릅니다.",
    "keyword": {
     "name": "진열품",
-    "desc": "가장 아끼는 수집품 — 다음 피해 한 번이 세진다",
+    "desc": "다음 공격을 세게 하는 수집품",
     "carrier": "self",
     "cap": 1,
     "consumeAll": true,
@@ -154,7 +154,7 @@
    ],
    "oracles": [
     {
-     "name": "번쩍이는 칭찬",
+     "name": "더 칭찬해줌.",
      "tags": [
       "보존"
      ],
@@ -162,16 +162,16 @@
       {
        "k": "stack",
        "id": "진열품",
-       "v": 2
+       "v": 1
       },
       {
        "k": "draw",
-       "v": 2
+       "v": 3
       }
      ]
     },
     {
-     "name": "가벼운 칭찬",
+     "name": "칭찬 한 마디",
      "cost": 0,
      "tags": [
       "보존"
@@ -184,12 +184,12 @@
       },
       {
        "k": "draw",
-       "v": 2
+       "v": 1
       }
      ]
     },
     {
-     "name": "진열된 칭찬",
+     "name": "칭찬받으면 셈",
      "tags": [
       "보존"
      ],
@@ -197,66 +197,74 @@
       {
        "k": "stack",
        "id": "진열품",
-       "v": 3
+       "v": 1
       },
       {
        "k": "draw",
        "v": 2
+      },
+      {
+       "k": "atkMod",
+       "v": 0.2,
+       "target": "self"
       }
      ]
     },
     {
-     "name": "아끼는 칭찬",
+     "name": "방패 자랑",
      "tags": [
-      "보존",
-      "신속"
+      "보존"
      ],
      "fx": [
       {
        "k": "stack",
        "id": "진열품",
-       "v": 2
+       "v": 1
       },
       {
        "k": "draw",
        "v": 2
+      },
+      {
+       "k": "shield",
+       "ratio": 1.0
       }
      ]
     },
     {
-     "name": "축복받은 칭찬",
+     "name": "다음은 멋지게",
      "tags": [
-      "보존",
-      "축복"
+      "보존"
      ],
      "fx": [
       {
        "k": "stack",
        "id": "진열품",
-       "v": 2
+       "v": 1
       },
       {
        "k": "draw",
-       "v": 2
+       "v": 1
+      },
+      {
+       "k": "nextCheaper",
+       "v": 1
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "으쓱으쓱",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "기대하는 눈빛",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "지금 당장",
+     "kind": "cost"
     }
    ]
   },
@@ -285,8 +293,7 @@
    ],
    "oracles": [
     {
-     "name": "번쩍이는 은방울꽃 종",
-     "tags": [],
+     "name": "맑은 종소리",
      "fx": [
       {
        "k": "dmg",
@@ -305,13 +312,12 @@
      ]
     },
     {
-     "name": "가벼운 은방울꽃 종",
+     "name": "방울 하나",
      "cost": 0,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.9,
+       "ratio": 0.75,
        "target": "oneEnemy"
       },
       {
@@ -326,56 +332,54 @@
      ]
     },
     {
-     "name": "진열된 은방울꽃 종",
-     "tags": [],
+     "name": "꽃종 진열",
      "fx": [
+      {
+       "k": "stack",
+       "id": "진열품",
+       "v": 1
+      },
       {
        "k": "dmg",
        "ratio": 1.5,
        "target": "oneEnemy"
       },
       {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      },
-      {
        "k": "tough",
        "v": 1
       }
      ]
     },
     {
-     "name": "아끼는 은방울꽃 종",
-     "tags": [
-      "보존"
-     ],
+     "name": "온 동네 울림",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.45,
-       "target": "oneEnemy"
+       "ratio": 0.8,
+       "target": "allEnemies"
       },
       {
        "k": "status",
        "id": "약화",
-       "v": 1
+       "v": 1,
+       "target": "allEnemies"
       },
       {
        "k": "tough",
-       "v": 1
+       "v": 1,
+       "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "축복받은 은방울꽃 종",
+     "name": "딸랑",
      "tags": [
-      "축복"
+      "신속"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.45,
+       "ratio": 1.35,
        "target": "oneEnemy"
       },
       {
@@ -392,19 +396,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "쨍한 울림",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "흔들리는 틈",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "귀 따가운 종",
+     "kind": "frost"
     }
    ]
   },
@@ -430,8 +431,7 @@
    ],
    "oracles": [
     {
-     "name": "번쩍이는 수집품",
-     "tags": [],
+     "name": "최강 중의 최강",
      "fx": [
       {
        "k": "stack",
@@ -440,16 +440,15 @@
       },
       {
        "k": "dmg",
-       "ratio": 0.7,
+       "ratio": 0.67,
        "target": "randomEnemy",
        "hits": 6
       }
      ]
     },
     {
-     "name": "가벼운 수집품",
+     "name": "주머니 소장품",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "stack",
@@ -458,34 +457,35 @@
       },
       {
        "k": "dmg",
-       "ratio": 0.45,
+       "ratio": 0.38,
        "target": "randomEnemy",
        "hits": 6
       }
      ]
     },
     {
-     "name": "진열된 수집품",
-     "tags": [],
+     "name": "앙코르 전시",
      "fx": [
       {
        "k": "stack",
        "id": "진열품",
-       "v": 2
+       "v": 1
       },
       {
        "k": "dmg",
        "ratio": 0.6,
        "target": "randomEnemy",
        "hits": 6
+      },
+      {
+       "k": "stack",
+       "id": "진열품",
+       "v": 1
       }
      ]
     },
     {
-     "name": "아끼는 수집품",
-     "tags": [
-      "보존"
-     ],
+     "name": "한 점 집중",
      "fx": [
       {
        "k": "stack",
@@ -494,17 +494,15 @@
       },
       {
        "k": "dmg",
-       "ratio": 0.65,
-       "target": "randomEnemy",
+       "ratio": 0.6,
+       "target": "oneEnemy",
        "hits": 6
       }
      ]
     },
     {
-     "name": "축복받은 수집품",
-     "tags": [
-      "축복"
-     ],
+     "name": "비장의 컬렉션",
+     "cost": 3,
      "fx": [
       {
        "k": "stack",
@@ -513,28 +511,25 @@
       },
       {
        "k": "dmg",
-       "ratio": 0.65,
+       "ratio": 0.72,
        "target": "randomEnemy",
-       "hits": 6
+       "hits": 8
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "진품 인증",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "번쩍 섬광",
+     "kind": "frost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "다음 진열장",
+     "kind": "draw"
     }
    ]
   },
@@ -558,9 +553,21 @@
      "v": 1
     },
     {
-     "k": "stack",
-     "id": "진열품",
-     "v": 1
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "진열품",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -580,15 +587,60 @@
        "v": 1
       },
       {
-       "k": "stack",
-       "id": "진열품",
-       "v": 1
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "진열품",
+           "v": 2
+          }
+         ]
+        }
+       ]
       }
      ]
     },
     {
-     "name": "가벼운 교주",
+     "name": "손바닥 교주",
      "cost": 1,
+     "tags": [],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "진열품",
+           "v": 1
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "진열된 교주",
      "tags": [],
      "fx": [
       {
@@ -603,31 +655,37 @@
        "v": 1
       },
       {
-       "k": "stack",
-       "id": "진열품",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "진열된 교주",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "진열품",
-       "v": 1
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "진열품",
+           "v": 1
+          }
+         ]
+        },
+        {
+         "when": {
+          "on": "play",
+          "type": "스킬"
+         },
+         "limit": {
+          "per": "turn",
+          "n": 1
+         },
+         "fx": [
+          {
+           "k": "draw",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -639,19 +697,31 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
       {
        "k": "status",
        "id": "사기",
-       "v": 1
+       "v": 2
       },
       {
-       "k": "stack",
-       "id": "진열품",
-       "v": 1
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "진열품",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -668,33 +738,42 @@
        "target": "self"
       },
       {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
        "k": "stack",
        "id": "진열품",
        "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "진열품",
+           "v": 2
+          }
+         ]
+        }
+       ]
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "가벼운 숨결",
-     "kind": "cost",
-     "fx": []
+     "name": "교주 먼저 모심",
+     "kind": "cost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "멋짐 폭발",
+     "kind": "atkUp"
     },
     {
-     "name": "기세의 숨결",
-     "kind": "atkUp",
-     "fx": []
+     "name": "교주 사진 한 장",
+     "kind": "draw"
     }
    ]
   }

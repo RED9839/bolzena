@@ -11,10 +11,10 @@
    "atk": 145,
    "def": 25,
    "crit": 10,
-   "blurb": "세상에 한 획 긋기가 소원인 먹물 정령. 공격할 때마다 적 전체에 먹이 번지고, 스킬로 번진 먹을 한 획에 긋는다.",
+   "blurb": "세상에 한 획 긋기가 소원인 먹물 정령. 공격할 때마다 적 전체에 먹이 번지고, 스킬로 번진 먹을 한 획에 긋습니다.",
    "keyword": {
     "name": "번짐",
-    "desc": "적에게 스며든 먹물",
+    "desc": "공격으로 번지는 먹물",
     "carrier": "enemy",
     "cap": 5,
     "per": [
@@ -524,10 +524,22 @@
      "target": "allEnemies"
     },
     {
-     "k": "stack",
-     "id": "번짐",
-     "v": 2,
-     "target": "allEnemies"
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "번짐",
+         "v": 1,
+         "target": "allEnemies"
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -541,10 +553,22 @@
        "target": "allEnemies"
       },
       {
-       "k": "stack",
-       "id": "번짐",
-       "v": 2,
-       "target": "allEnemies"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "번짐",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -553,16 +577,22 @@
      "cost": 0,
      "fx": [
       {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "번짐",
-       "v": 2,
-       "target": "allEnemies"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "번짐",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -576,16 +606,28 @@
        "target": "allEnemies"
       },
       {
-       "k": "stack",
-       "id": "번짐",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
        "k": "atkMod",
        "v": 0.15,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "번짐",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -599,10 +641,22 @@
        "target": "allEnemies"
       },
       {
-       "k": "stack",
-       "id": "번짐",
-       "v": 3,
-       "target": "allEnemies"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "번짐",
+           "v": 2,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -613,16 +667,28 @@
      ],
      "fx": [
       {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
        "k": "stack",
        "id": "번짐",
        "v": 2,
        "target": "allEnemies"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "번짐",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     }

@@ -165,7 +165,7 @@ namespace Bolzena.Demo
                 {
                     var info = d.Hand.Cards[pick].Info;
                     int t = Weakest();
-                    Vector3 to = info.Target == TargetKind.Enemy ? EnemyCenter(t) : new Vector3(0.3f, 0.6f, 0);
+                    Vector3 to = info.Target == TargetKind.Enemy ? EnemyCenter(t) : info.Target == TargetKind.Ally ? d.Hand.AllyDrop(info) : new Vector3(0.3f, 0.6f, 0);
                     yield return d.Hand.DemoDrag(pick, to, 0.15f, 0.3f, 0.15f);
                     yield return WaitTurnDone();
                     continue;

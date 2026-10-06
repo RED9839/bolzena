@@ -120,10 +120,43 @@ namespace Bolzena.RunUI
             }
             var ic = e.Art?.Icon;
             if (ic == null) FoeIcons().TryGetValue(e.Id, out ic);
-            return string.IsNullOrEmpty(ic) ? null : Resources.Load<Sprite>("Art/Monster/" + ic);
+            return string.IsNullOrEmpty(ic) ? null : MonsterSprite(ic);
+        }
+
+        // 원작 몬스터 아이콘(Resources/Art/Monster) — 스프라이트로 들여온 것이 아니면 텍스처로 읽어 만든다(시험 프로젝트)
+        static readonly Dictionary<string, Sprite> monSprites = new Dictionary<string, Sprite>();
+        static Sprite MonsterSprite(string name)
+        {
+            if (monSprites.TryGetValue(name, out var s)) return s;
+            s = Resources.Load<Sprite>("Art/Monster/" + name);
+            if (s == null) { var t = Resources.Load<Texture2D>("Art/Monster/" + name); if (t != null) s = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0.5f, 0.5f), 100); }
+            return monSprites[name] = s;
+        }
+
+        /// <summary>이 판의 적 속성(nature)에 맞는 적 그림 — 클론은 그 사도(자기 성격 그대로), 아니면 그 성격 아이콘, 없으면 기본 그림.</summary>
+        Sprite FoeArtFor(EnemyDef e, string nature, float ratio = 1f)
+        {
+            if (e == null) return null;
+            if (e.Clone == null && nature != null)
+                foreach (var (ko, sp) in NatureLooks(e)) if (ko == nature) return sp;
+            return FoeArt(e, ratio);
         }
 
         static readonly (string ko, string en)[] NatEn = { ("순수", "naive"), ("광기", "mad"), ("활발", "jolly"), ("우울", "gloomy"), ("냉정", "cool") };
+
+        /// <summary>그림이 없는 적의 대체 — 같은 몬스터(id 의 첫 「_」 앞)의 다른 성격 아이콘 · still 가운데 처음 찾은 것. 화면이 검게 칠해 실루엣으로 쓴다(그 적의 그림이라고 속이지 않게). 없으면 null.</summary>
+        static Sprite FoeSilhouette(EnemyDef e)
+        {
+            if (e?.Id == null || e.Clone != null) return null;
+            int us = e.Id.IndexOf('_');
+            string mon = us > 0 ? e.Id.Substring(0, us) : e.Id;
+            foreach (var (_, en) in NatEn)
+            {
+                var sp = MonsterSprite("icon_" + mon + en) ?? MonsterSprite("still_" + mon + "_" + en);
+                if (sp != null) return sp;
+            }
+            return null;
+        }
 
         /// <summary>같은 몬스터의 성격별 아이콘 — 이 적 아이콘 이름(icon_<몬스터><성격>)에서 몬스터를 떼어 다섯 성격을 찾는다(있는 것만).</summary>
         List<(string nature, Sprite sp)> NatureLooks(EnemyDef e)
@@ -137,7 +170,7 @@ namespace Bolzena.RunUI
             if (mon == null) return o;
             foreach (var (ko, en) in NatEn)
             {
-                var sp = Resources.Load<Sprite>("Art/Monster/icon_" + mon + en);
+                var sp = MonsterSprite("icon_" + mon + en);
                 if (sp != null) o.Add((ko, sp));
             }
             return o;
@@ -255,7 +288,7 @@ namespace Bolzena.RunUI
             var fbg = Ui.Img(host, Theme.White, Theme.NavyPanel.A(0.96f), "footbg", true); fbg.rectTransform.Band(0, footH, 0, 0, 0);
             var line = Ui.Img(host, Theme.White, Theme.Edge.A(0.35f), "rule"); line.rectTransform.Band(0, 1, 0, 0, footH);
             var foot = Ui.Rect("foot", host).Band(0, footH, Theme.Gutter, Theme.Gutter, 0);
-            var info = Ui.Text(foot, focusName != null ? $"<b>{focusName}</b>  <color={Theme.SubTag}>{focusSub}</color>" : $"적 {shown.Count}종 · 누르면 상세 정보  <color={Theme.SubTag}>— 판마다 모든 적의 성격은 판의 적 속성 하나로 맞춰진다</color>", Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+            var info = Ui.Text(foot, focusName != null ? $"<b>{focusName}</b>  <color={Theme.SubTag}>{focusSub}</color>" : $"적 {shown.Count}종 · 누르면 상세 정보  <color={Theme.SubTag}>— 모험마다 모든 적의 성격이 그 모험의 적 속성 하나로 맞춰집니다</color>", Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft);
             info.rectTransform.Fill(0, 0, 280, 0); info.textWrappingMode = TextWrappingModes.NoWrap; info.overflowMode = TextOverflowModes.Ellipsis;
             var detail = Btn.Make(foot, null, BtnStyle.PillDark, () => { if (ls.Focus != null) EnemyDetail(ls.Focus); }, 0, "detail");
             var drt = detail.GetComponent<RectTransform>(); drt.At(1, 0.5f, 0, 0, 250, 58);
@@ -310,8 +343,10 @@ namespace Bolzena.RunUI
             }
             else
             {
-                // 그림 없는 적 — 대역 글리프 + 이름
-                var g = Ui.Img(win, Theme.S(s.Grade == "보스" ? "ic_crown" : "ic_skull"), gc.A(0.8f), "glyph"); g.preserveAspect = true; g.rectTransform.At(0.5f, 0.5f, 0, 10, w * 0.36f, w * 0.36f);
+                // 그림 없는 적 — 같은 몬스터의 다른 성격 그림이 있으면 그 실루엣(검게), 없으면 대역 글리프 + 이름
+                var sil = FoeSilhouette(e);
+                var g = sil != null ? Ui.Img(win, sil, new Color(0.04f, 0.05f, 0.1f, 0.85f), "silhouette") : Ui.Img(win, Theme.S(s.Grade == "보스" ? "ic_crown" : "ic_skull"), gc.A(0.8f), "glyph");
+                g.preserveAspect = true; if (sil != null) g.rectTransform.At(0.5f, 0.5f, 0, -2, w * 0.86f, w * 0.86f); else g.rectTransform.At(0.5f, 0.5f, 0, 10, w * 0.36f, w * 0.36f);
                 var gn = Ui.Text(win, "그림 없음", Theme.FsCap - 1, Theme.Dim, TextAlignmentOptions.Center); gn.rectTransform.Band(0, 20, 4, 4, 8);
             }
             // 위 — 성격 아이콘(기본 성격) · 등급 알약
@@ -339,6 +374,7 @@ namespace Bolzena.RunUI
             var gc = FoeGradeColor(s.Grade);
             string where = $"{s.VillageName}{(s.Floor >= 0 ? $" · {s.Floor + 1}층" : "")} · {s.Grade}";
             var (body, close, _) = Stage.ModalBox("foezoom", 1120, Theme.C(640, 660), e.Name, where);
+            FitScale.Fit(body.parent as RectTransform, Stage.Size, 1120, Theme.C(640, 660), 0.72f, 0.74f);   // 화면 비례 — Compact(캔버스 720)에서 화면을 다 덮지 않게(PC 의 몫 그대로)
             float aw = Theme.C(340, 300);
             var well = Ui.Img(body, Theme.Round, Color.Lerp(Theme.NavyWell, gc, 0.2f), "well"); well.rectTransform.At(0, 0.5f, 10, 0, aw, aw * 1.25f);
             var mask = Ui.Rect("mask", well.rectTransform).Fill(4, 4, 4, 4); mask.gameObject.AddComponent<RectMask2D>();
@@ -352,7 +388,9 @@ namespace Bolzena.RunUI
             }
             else
             {
-                var g = Ui.Img(mask, Theme.S(s.Grade == "보스" ? "ic_crown" : "ic_skull"), gc.A(0.8f), "glyph"); g.preserveAspect = true; g.rectTransform.At(0.5f, 0.56f, 0, 0, aw * 0.4f, aw * 0.4f);
+                var sil = FoeSilhouette(e);
+                var g = sil != null ? Ui.Img(mask, sil, new Color(0.04f, 0.05f, 0.1f, 0.85f), "silhouette") : Ui.Img(mask, Theme.S(s.Grade == "보스" ? "ic_crown" : "ic_skull"), gc.A(0.8f), "glyph");
+                g.preserveAspect = true; g.rectTransform.At(0.5f, 0.56f, 0, 0, aw * (sil != null ? 0.86f : 0.4f), aw * (sil != null ? 0.86f : 0.4f));
                 var gn = Ui.Text(mask, "그림 없음", Theme.FsSm, Theme.Dim, TextAlignmentOptions.Center); gn.rectTransform.At(0.5f, 0.3f, 0, 0, aw, 30);
             }
             var gp = Ui.Img(well.transform, Theme.Pill, gc, "grade"); gp.rectTransform.At(0.5f, 0, 0, 16, 150, 34);
@@ -384,26 +422,29 @@ namespace Bolzena.RunUI
             if (e.Clone != null)
             {
                 var owner = Roster.All.FirstOrDefault(x => x.CoreId == e.Clone || x.key == e.Clone);
-                Line($"<color={Theme.SubTag}>사도 클론({owner?.ko ?? e.Clone}) — 원래 성격 그대로. 판의 적 속성이 다르면 이 자리에는 그 성격의 사도 클론이 선다.</color>", Theme.FsSm, Theme.Sub);
+                Line($"<color={Theme.SubTag}>사도 클론({owner?.ko ?? e.Clone}) — 원래 성격 그대로. 모험의 적 속성이 다르면 이 자리에는 그 성격의 사도 클론이 섭니다.</color>", Theme.FsSm, Theme.Sub);
                 if (s.Village != null)
                 {
                     var alts = new List<string>();
+                    // 이 몸이 서는 층의 후보 — 마을 종족 · 그 속성 사도만(1층 1~2성, 없으면 3성 · 2층 3성 — Run.FloorCandidates). 닫힌 속성은 NaturesFor 에서 빠진다
+                    var oh = P.Data.Hero(e.Clone);
+                    int fl = s.Floor >= 0 ? Math.Min(1, s.Floor) : oh != null && Bolzena.Core.Run.StarFits(0, oh.Star) ? 0 : 1;
                     foreach (var n in Bolzena.Core.Run.NaturesFor(P.Data, s.Village))
                     {
-                        var c = Bolzena.Core.Run.CloneCandidates(P.Data, s.Village, n).Select(k => Roster.All.FirstOrDefault(x => x.CoreId == k)?.ko ?? k).Distinct().Take(4).ToList();
-                        if (c.Count > 0) alts.Add($"<color={Hx(Theme.NatureCardOf(n))}>{n}</color> 판이면 {string.Join(" · ", c)} 가운데 클론");
+                        var c = Bolzena.Core.Run.FloorCandidates(P.Data, s.Village, n, fl).Select(k => Roster.All.FirstOrDefault(x => x.CoreId == k)?.ko ?? k).Distinct().ToList();
+                        if (c.Count > 0) alts.Add($"<color={Hx(Theme.NatureCardOf(n))}>{n}</color> 판이면 {string.Join(" · ", c.Take(4))}{(c.Count > 4 ? $" 외 {c.Count - 4}명" : "")} 가운데 클론");
                     }
                     if (alts.Count > 0) Line(string.Join("\n", alts), Theme.FsSm, Theme.Ink);
                 }
             }
-            else Line($"<color={Theme.SubTag}>기본 성격 — 판에서는 모든 적(보스 포함)의 성격이 그 판의 적 속성 하나로 맞춰진다.</color>", Theme.FsSm, Theme.Sub);
+            else Line($"<color={Theme.SubTag}>기본 성격 — 모험에서는 모든 적(보스 포함)의 성격이 그 모험의 적 속성 하나로 맞춰집니다.</color>", Theme.FsSm, Theme.Sub);
             // 성격별 모습 — 같은 몬스터의 다섯 성격 그림(원작 icon_<몬스터><성격>, 있는 것만). 판 속성이 바뀌면 그 성격 모습으로 나온다
             if (e.Clone == null)
             {
                 var looks = NatureLooks(e);
                 if (looks.Count > 1)
                 {
-                    W.Section(content, "성격별 모습", "판 속성에 따라", 36);
+                    W.Section(content, "성격별 모습", "모험의 적 속성에 따라", 36);
                     var lr = Ui.Rect("looks", content); lr.Pref(-1, 118);
                     Ui.Row(lr, 10, TextAnchor.MiddleLeft, new RectOffset(4, 0, 0, 0), false, false);
                     foreach (var (n, sp) in looks)
@@ -421,8 +462,8 @@ namespace Bolzena.RunUI
             var acts = new List<(Intent it, string head)>();
             if (e.Open != null) acts.Add((e.Open, "첫 턴"));
             foreach (var it in e.Intents) acts.Add((it, null));
-            if (e.Phase != null) foreach (var it in e.Phase.Intents) acts.Add((it, $"체력 {e.Phase.At * 100:0}% 아래"));
-            if (e.Phase2 != null) foreach (var it in e.Phase2.Intents) acts.Add((it, $"체력 {e.Phase2.At * 100:0}% 아래"));
+            if (e.Phase != null) foreach (var it in e.Phase.Intents) acts.Add((it, $"HP {e.Phase.At * 100:0}% 아래"));
+            if (e.Phase2 != null) foreach (var it in e.Phase2.Intents) acts.Add((it, $"HP {e.Phase2.At * 100:0}% 아래"));
             if (acts.Count > 0)
             {
                 W.Section(content, "행동", e.Pick == "shuffle" ? "무작위" : "차례대로", 36);

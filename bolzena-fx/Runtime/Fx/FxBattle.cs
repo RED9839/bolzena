@@ -44,6 +44,9 @@ namespace Bolzena.Fx
         public int Parts;                               // 계획한 이펙트 장 수(이펙트가 없으면 0 — 맞는 시각만 준다)
         public int Played => Runs.Count;                 // 실제로 튼 장 수(다시 틀기 포함)
         public bool Done { get; internal set; }
+        // 점검 — 틀어진 장들(이름 · 그때의 Time.time ms(게임 시계) · 대상 쪽인가 · 그 장 안의 터지는 때 ms). 대상 쪽 충격 = ms + ImpactMs
+        public readonly List<(float Ms, string Name, Vector3 World)> Places = new List<(float, string, Vector3)>();   // 점검 — 틀린 자리(월드)
+        public readonly List<(string Name, float Ms, bool Target, float ImpactMs)> Fired = new List<(string, float, bool, float)>();
         internal Coroutine Co, HitCo;
         internal bool FxLeft, HitsLeft;   // 아직 도는 몫 — 둘 다 끝나면 Done
         internal void Check() { if (!FxLeft && !HitsLeft) Done = true; }
@@ -142,8 +145,9 @@ namespace Bolzena.Fx
         static FxCall Launch(List<UltPart> plan, UltOptions o, List<int> hits, Action<int> onHit)
         {
             var call = new FxCall { HitTimes = hits, Parts = plan.Count };
+            o.OnFire = (p, ms) => call.Fired.Add((p.Name, Time.time * 1000f, (p.At == "target" && !p.Pre) || p.At == "move", p.At == "move" ? UltFx.PROJ_LAG : 1000f * FxLibrary.ImpactSec(p.Name)));
             var d = FxDriver.I;
-            o.OnPart = r => call.Runs.Add(new KeyValuePair<FxRun, int>(r, r.Gen));
+            o.OnPart = r => { call.Runs.Add(new KeyValuePair<FxRun, int>(r, r.Gen)); call.Places.Add((Time.time * 1000f, r.Name, r.OriginWorld)); };
             call.FxLeft = plan.Count > 0 && !Calm;
             call.HitsLeft = onHit != null;
             if (call.FxLeft) call.Co = d.StartCoroutine(Wrap(UltFx.RunPlan(plan, o), call));
@@ -175,24 +179,42 @@ namespace Bolzena.Fx
 
         // ── 고학년 ── 원작 이펙트 한 벌 + 맞는 시각. sync 를 주면 스파인 이벤트에 맞춘다(없으면 UltFx.ImpactMs)
         // allies — 아군 쪽 판(벨라 hit_a · 회복 · 강화 · 부활)을 시전자와 함께 이 아군들에게도
-        public static FxCall Ult(string heroKey, FxActor caster, IList<FxActor> targets, Action<int> onHit = null, FxSync sync = null, bool aoe = false, IList<FxActor> allies = null)
+        // 고학년에서 뺄 장(사도 키, 장 이름) — 원작 방식 고학년(키샤 열기 폭발 · 이드(재활) 깨기 · 오로라 플라즈마)은 그 장을 시전 때 안 틀고 발동 때 따로 튼다
+        public static Func<string, string, bool> UltDrop;
+        // 원작이 대상 장을 적마다 차례로(앞 적 먼저) 피우는 사도 — 원작 영상 비교(아야 연꽃 · 아네트 금지 표지)
+        static readonly HashSet<string> SEQ_PER_TARGET = new HashSet<string> { "아야", "아네트" };
+        // 고학년 장 자리 · 시각 고침(사도 키, 계획) — 원작 영상 맞춤. 전투가 고학년마다 걸고(그 사도만 고친다) 다 쓰면 null
+        public static Func<string, List<UltPart>, List<UltPart>> UltTweak;
+
+        public static FxCall Ult(string heroKey, FxActor caster, IList<FxActor> targets, Action<int> onHit = null, FxSync sync = null, bool aoe = false, IList<FxActor> allies = null,
+            IList<float> hitMs = null, UltClock clock = null)
         {
             if (caster == null) return null;
             sync = sync?.Scaled();
             FxLibrary.PreloadUlt(heroKey);
             var plan = UltFx.Plan(heroKey, sync?.Pick);
+            if (UltDrop != null) plan = plan.Where(p => !UltDrop(heroKey, p.Name)).ToList();
+            if (UltTweak != null) plan = UltTweak(heroKey, plan) ?? plan;
             int lag = plan.Any(p => p.At == "move") ? UltFx.PROJ_LAG : 0;
-            Aim(caster, targets, aoe, out var to, out _, out var width);
+            Aim(caster, targets, aoe, out var to, out var body, out var width);
             var o = new UltOptions
             {
+                ToBody = body, CasterActor = caster, CastPoint = FxRules.CastPoint(sync?.Anim) ?? "Ult1",
                 From = sync != null && sync.Dash && sync.DashFrom.HasValue ? sync.DashFrom.Value : caster.Feet,
                 To = sync != null && sync.Dash && sync.DashTo.HasValue ? sync.DashTo.Value : to,
                 ToWidth = aoe ? width : 0, Top = TopY(),
                 Impact = sync?.Impact, End = sync?.End, Marks = sync?.Marks?.Select(x => (float)x).ToList(),
-                Pick = sync?.Pick, Dash = sync != null && sync.Dash, Muzzle = caster.Muzzle,
-                Order = UltOrder, Parent = Parent,
+                Pick = sync?.Pick, Dash = sync != null && sync.Dash,
+                // 총구 · 쏘는 자리 — 총구 본이 없으면 고학년 자리 본(Point_Ult_Shot · UltLaser · Ult1 …), 그것도 없으면 평타 자리(Attack1_Shot · Attack1). 매 프레임 그 본을 따라간다
+                Muzzle = caster.Muzzle ?? UltCast(caster), ShotFrom = (caster.Muzzle ?? UltCast(caster))?.Invoke(),
+                Order = UltOrder, Parent = Parent, HitMs = hitMs, Clock = clock,
                 Allies = allies?.Where(a => a != null && a != caster && a.Alive).Select(a => (Func<Vector3>)(() => a.At(FxAnchor.Feet))).ToList(),
             };
+            if (SEQ_PER_TARGET.Contains(heroKey))
+            {
+                o.SeqPerTarget = true;
+                o.TargetFeet = targets?.Where(t => t != null && t.Alive).Select(t => t.Feet).OrderBy(p => p.x).ToList();
+            }
             int fallback = sync?.Impact ?? (plan.Count > 0 ? UltFx.ImpactMs(plan) : MotionTables.ULT_HIT);
             var hits = HitTimes(sync, lag, fallback);
             if (Sound)
@@ -205,7 +227,8 @@ namespace Bolzena.Fx
 
         // ── 카드 몸짓 ── 그 사도의 원작 평타 · 센 공격 · 스킬 · 시그니처 이펙트(동작 이름으로 갈래). 원작 이펙트가 없는 동작이면
         // 이펙트 없이 맞는 시각만(onHit 은 그대로 불린다). 강화 · 방어처럼 대상이 아군이면 targets 에 아군을 넣는다
-        public static FxCall Card(string heroKey, FxActor caster, IList<FxActor> targets, FxSync sync, Action<int> onHit = null, bool aoe = false)
+        public static FxCall Card(string heroKey, FxActor caster, IList<FxActor> targets, FxSync sync, Action<int> onHit = null, bool aoe = false,
+            IList<float> hitMs = null, UltClock clock = null)
         {
             if (caster == null) return null;
             sync = sync?.Scaled();
@@ -216,14 +239,28 @@ namespace Bolzena.Fx
             var o = new UltOptions
             {
                 From = caster.Feet, To = to, ToBody = body, ToWidth = aoe ? width : 0, Top = TopY(),
-                ShotFrom = caster.At(FxAnchor.Cast, castPoint),
+                ShotFrom = caster.At(FxAnchor.Cast, castPoint), CasterActor = caster, CastPoint = castPoint,
                 Impact = sync?.Impact ?? FxRules.CARD_HIT, End = sync?.End, Marks = sync?.Marks?.Select(x => (float)x).ToList(),
-                Muzzle = caster.Muzzle, Order = CardOrder, Parent = Parent,
+                // 쏘는 자리는 쏘는 그 순간에 읽는다(총구 → 이 동작 시전 본 → 고학년 사슬). 쉬는 자세에서 한 번 읽던 것(전수 조사 D)
+                Muzzle = caster.Muzzle ?? (castPoint != null && caster.Point != null && caster.Point(castPoint).HasValue ? () => caster.Point(castPoint) : UltCast(caster)),
+                Order = CardOrder, Parent = Parent, HitMs = hitMs, Clock = clock,
             };
             var hits = HitTimes(sync, lag, FxRules.CARD_HIT);
             if (Sound && sync != null && sync.Group != null) BolzenaAudio.Action(heroKey, sync.Group, sync.Snd, sync.Group);
             return Launch(plan, o, hits, onHit);
         }
+
+        static readonly string[] ULT_CAST = { "Ult_Shot", "UltLaser", "Ult1", "Ult", "Ultimate1", "Attack1_Shot", "WeaponTip", "HandR", "Attack1" };   // WeaponTip · HandR — 전투 쪽 FxActor.Point 가 무기 끝 · 오른손으로 푼다(없으면 null)
+        static Func<Vector3?> UltCast(FxActor a)
+        {
+            if (a?.Point == null) return null;
+            foreach (var n in ULT_CAST) if (a.Point(n).HasValue) { var nn = n; return () => a.Point(nn); }
+            return null;
+        }
+
+        // 투사체가 날아가는 몫(ms) — 전투가 맞는 시각에 더한다(탄이 닿는 순간이 타격). 이펙트가 없으면 0
+        public static int UltLagMs(string heroKey, UltPick? pick) => UltFx.LagMs(heroKey, pick);
+        public static int CardLagMs(string heroKey, string anim, string tier) => FxRules.CardPlan(heroKey, anim, tier).Any(p => p.At == "move") ? UltFx.PROJ_LAG : 0;
 
         // ── 맞음 ── 웹판 sparkFx 그대로: 공용 타격 낱장(갈래) + 치명 덧불 · 세게 맞음(또는 고학년 첫 타격) 덧불, 몸 가운데를 조금 흩어.
         // kind: MotionTables.HitKindHero(dmgType, backRow) · HitKindEnemy(enemyKey). 사도가 맞으면 좌우를 뒤집는다

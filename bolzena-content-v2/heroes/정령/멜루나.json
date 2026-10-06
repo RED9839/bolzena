@@ -11,12 +11,37 @@
    "atk": 86,
    "def": 58,
    "crit": 5,
-   "blurb": "법의 빈틈으로 회사를 굴리는 멜론 회장. 이번 턴 AP 를 묻어 두면 두 턴 뒤 두 배로 돌아오고, 그 사이 적을 쓰러뜨리면 수익이 붙는다.",
+   "blurb": "법의 빈틈으로 회사를 굴리는 멜론 회장. 멜론비가 적을 때린 만큼 모두를 배부르게 하고, 묻어 둔 AP 는 두 턴 뒤 불어나 돌아오며, 적을 쓰러뜨리면 수익이 붙습니다.",
    "keyword": {
     "name": "수익",
-    "desc": "투자하는 동안 처치로 붙은 이자 — 투자가 돌아올 때 AP 로 더 받는다",
+    "desc": "처치로 붙은 이자",
     "carrier": "self",
-    "cap": 3
+    "cap": 3,
+    "rules": [
+     {
+      "name": "이자 수령",
+      "when": {
+       "on": "stackReach",
+       "id": "수익",
+       "n": 3
+      },
+      "fx": [
+       {
+        "k": "spend",
+        "id": "수익",
+        "all": true
+       },
+       {
+        "k": "ap",
+        "v": 1
+       },
+       {
+        "k": "draw",
+        "v": 1
+       }
+      ]
+     }
+    ]
    },
    "passives": [
     {
@@ -46,11 +71,16 @@
     "cost": 150,
     "fx": [
      {
-      "k": "ap",
-      "v": 2
+      "k": "dmg",
+      "ratio": 1.0,
+      "target": "allEnemies"
      },
      {
-      "k": "draw",
+      "k": "drain",
+      "ratio": 0.4
+     },
+     {
+      "k": "ap",
       "v": 2
      },
      {
@@ -350,6 +380,10 @@
      "hits": 3
     },
     {
+     "k": "drain",
+     "ratio": 0.3
+    },
+    {
      "k": "ifKill"
     },
     {
@@ -369,6 +403,10 @@
        "hits": 3
       },
       {
+       "k": "drain",
+       "ratio": 0.3
+      },
+      {
        "k": "ifKill"
       },
       {
@@ -383,9 +421,13 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.33,
+       "ratio": 0.36,
        "target": "randomEnemy",
        "hits": 5
+      },
+      {
+       "k": "drain",
+       "ratio": 0.3
       },
       {
        "k": "ifKill"
@@ -402,9 +444,13 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.45,
+       "ratio": 0.55,
        "target": "oneEnemy",
        "hits": 3
+      },
+      {
+       "k": "drain",
+       "ratio": 0.25
       },
       {
        "k": "ifKill"
@@ -427,6 +473,10 @@
        "hits": 3
       },
       {
+       "k": "drain",
+       "ratio": 0.2
+      },
+      {
        "k": "ifKill"
       },
       {
@@ -441,7 +491,7 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.4,
+       "ratio": 0.7,
        "target": "oneEnemy",
        "hits": 3
       },
@@ -478,80 +528,41 @@
   },
   {
    "id": "멜루나_u3",
-   "name": "법의 빈틈",
+   "name": "올 때 멜루나~",
    "hero": "멜루나",
    "unique": true,
-   "cost": 0,
-   "type": "스킬",
+   "cost": 2,
+   "type": "공격",
    "fx": [
     {
-     "k": "status",
-     "id": "저장",
-     "v": 1
+     "k": "dmg",
+     "ratio": 0.4,
+     "target": "randomEnemy",
+     "hits": 5
     },
     {
-     "k": "draw",
+     "k": "drain",
+     "ratio": 0.4
+    },
+    {
+     "k": "stack",
+     "id": "수익",
      "v": 1
     }
    ],
    "oracles": [
     {
-     "name": "절세",
+     "name": "멜론비 폭우",
      "fx": [
       {
-       "k": "status",
-       "id": "저장",
-       "v": 2
+       "k": "dmg",
+       "ratio": 0.55,
+       "target": "randomEnemy",
+       "hits": 5
       },
       {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "회계 감사",
-     "fx": [
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "보험 가입",
-     "fx": [
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1
-      }
-     ]
-    },
-    {
-     "name": "내부 정보",
-     "fx": [
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
+       "k": "drain",
+       "ratio": 0.4
       },
       {
        "k": "stack",
@@ -561,18 +572,84 @@
      ]
     },
     {
-     "name": "사전 공시",
+     "name": "한 입 크기",
+     "cost": 1,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.32,
+       "target": "randomEnemy",
+       "hits": 4
+      },
+      {
+       "k": "drain",
+       "ratio": 0.3
+      },
+      {
+       "k": "stack",
+       "id": "수익",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "배부른 정산",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.4,
+       "target": "randomEnemy",
+       "hits": 5
+      },
+      {
+       "k": "drain",
+       "ratio": 0.5
+      },
+      {
+       "k": "stack",
+       "id": "수익",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "거대 멜론",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.5,
+       "target": "allEnemies"
+      },
+      {
+       "k": "drain",
+       "ratio": 0.4
+      },
+      {
+       "k": "stack",
+       "id": "수익",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "사내 식당",
      "tags": [
-      "개전"
+      "보존"
      ],
      "fx": [
       {
-       "k": "status",
-       "id": "저장",
-       "v": 1
+       "k": "dmg",
+       "ratio": 0.5,
+       "target": "randomEnemy",
+       "hits": 5
       },
       {
-       "k": "draw",
+       "k": "drain",
+       "ratio": 0.4
+      },
+      {
+       "k": "stack",
+       "id": "수익",
        "v": 1
       }
      ]
@@ -580,8 +657,8 @@
    ],
    "blesses": [
     {
-     "name": "빠른 결재",
-     "kind": "draw"
+     "name": "잘 익은 멜론",
+     "kind": "power"
     },
     {
      "name": "특별 보너스",
@@ -612,14 +689,21 @@
      "v": 1
     },
     {
-     "k": "stack",
-     "id": "수익",
-     "v": 2
-    },
-    {
-     "k": "status",
-     "id": "저장",
-     "v": 2
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "수익",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -632,14 +716,26 @@
        "v": 1
       },
       {
-       "k": "stack",
-       "id": "수익",
-       "v": 3
-      },
-      {
        "k": "status",
        "id": "저장",
-       "v": 3
+       "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "수익",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -648,19 +744,21 @@
      "cost": 0,
      "fx": [
       {
-       "k": "status",
-       "id": "근면",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "수익",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -670,17 +768,29 @@
       {
        "k": "status",
        "id": "근면",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 2
+       "v": 1
       },
       {
        "k": "status",
        "id": "불굴",
        "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "수익",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -693,14 +803,21 @@
        "v": 2
       },
       {
-       "k": "stack",
-       "id": "수익",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "수익",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -713,7 +830,7 @@
       {
        "k": "status",
        "id": "근면",
-       "v": 2
+       "v": 1
       },
       {
        "k": "stack",
@@ -721,9 +838,21 @@
        "v": 2
       },
       {
-       "k": "status",
-       "id": "저장",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "수익",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     }

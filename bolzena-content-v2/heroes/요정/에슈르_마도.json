@@ -12,10 +12,10 @@
    "atk": 135,
    "def": 28,
    "crit": 10,
-   "blurb": "정령 예속 주문을 쓰려다 기절한 사이, 다른 세계에서 마법의 정점을 찍은 대신 친구를 모두 잃은 '대-에슈르'를 보고 돌아온 빵집 요정. 이제 마법사로서의 자신을 증명하려 한다. 목표는 빵과 마법을 합친 '마법의 빵'으로 모두가 행복한 미래를 만드는 것.",
+   "blurb": "정령 예속 주문을 쓰려다 기절한 사이, 다른 세계에서 마법의 정점을 찍은 대신 친구를 모두 잃은 「대-에슈르」를 보고 돌아온 빵집 요정. 이제 마법사로서의 자신을 증명하려 합니다. 큰 주문을 외우면 거울 속 대-에슈르가 나타나 한동안 함께 마법을 쏩니다.",
    "keyword": {
     "name": "노트",
-    "desc": "사라진 마법의 연구 기록 — 소멸할 때마다 쌓이고, 셋이면 한 장을 되살린다",
+    "desc": "소멸할 때 적는 연구 노트",
     "carrier": "self",
     "cap": 5,
     "per": [
@@ -63,8 +63,12 @@
     "cost": 200,
     "fx": [
      {
+      "k": "cue",
+      "id": "eshur_mirror_summon"
+     },
+     {
       "k": "dmg",
-      "ratio": 1.5,
+      "ratio": 1.0,
       "target": "allEnemies"
      },
      {
@@ -73,10 +77,9 @@
       "v": 2
      },
      {
-      "k": "atkMod",
-      "v": 0.15,
-      "run": true,
-      "target": "self"
+      "k": "stack",
+      "id": "거울 형상",
+      "v": 3
      }
     ]
    },
@@ -85,6 +88,45 @@
     "에슈르_마도_s1",
     "에슈르_마도_s2",
     "에슈르_마도_s3"
+   ],
+   "keywords": [
+    {
+     "name": "거울 형상",
+     "desc": "함께 마법을 쏘는 거울 속 대-에슈르",
+     "carrier": "self",
+     "cap": 3,
+     "rules": [
+      {
+       "name": "함께 쏘기",
+       "when": {
+        "on": "play",
+        "type": "공격"
+       },
+       "conds": [
+        {
+         "c": "stack",
+         "id": "거울 형상",
+         "n": 1
+        }
+       ],
+       "fx": [
+        {
+         "k": "cue",
+         "id": "eshur_mirror_shot"
+        },
+        {
+         "k": "extra",
+         "ratio": 0.6
+        },
+        {
+         "k": "spend",
+         "id": "거울 형상",
+         "v": 1
+        }
+       ]
+      }
+     ]
+    }
    ]
   }
  ],
@@ -155,14 +197,14 @@
    ],
    "oracles": [
     {
-     "name": "증폭된 빵타지아",
+     "name": "빵타지아 대폭발",
      "tags": [
       "소멸 2"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.95,
+       "ratio": 1.9,
        "target": "allEnemies"
       },
       {
@@ -174,7 +216,7 @@
      ]
     },
     {
-     "name": "가벼운 빵타지아",
+     "name": "미니 빵타지아",
      "cost": 1,
      "tags": [
       "소멸 2"
@@ -182,7 +224,7 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.2,
+       "ratio": 1.05,
        "target": "allEnemies"
       },
       {
@@ -194,14 +236,14 @@
      ]
     },
     {
-     "name": "기록된 빵타지아",
+     "name": "연구 성과 발표",
      "tags": [
       "소멸 2"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.65,
+       "ratio": 1.6,
        "target": "allEnemies"
       },
       {
@@ -213,66 +255,72 @@
       {
        "k": "stack",
        "id": "노트",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "단일 표적 실험",
+     "tags": [
+      "소멸 2"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.8,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 2,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "선제 시연",
+     "tags": [
+      "소멸 2",
+      "주도"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.7,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "draw",
        "v": 1
-      }
-     ]
-    },
-    {
-     "name": "덮어 둔 빵타지아",
-     "tags": [
-      "소멸 2",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.8,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "마도의 빵타지아",
-     "tags": [
-      "소멸 2",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.8,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "부푼 반죽",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "취약점 표기",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "여백 메모",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "노트",
+       "v": 1
+      }
+     ]
     }
    ]
   },
@@ -295,20 +343,20 @@
    ],
    "oracles": [
     {
-     "name": "증폭된 레이저",
+     "name": "출력 최대",
      "tags": [
       "소멸"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 5.7,
+       "ratio": 5.4,
        "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "가벼운 레이저",
+     "name": "휴대용 레이저",
      "cost": 2,
      "tags": [
       "소멸"
@@ -316,73 +364,77 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.85,
+       "ratio": 3.65,
        "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "기록된 레이저",
+     "name": "관통 레이저",
      "tags": [
       "소멸"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 4.85,
+       "ratio": 3.3,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "노트 연동 사격",
+     "tags": [
+      "소멸"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 4.2,
        "target": "oneEnemy"
       },
       {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "덮어 둔 레이저",
-     "tags": [
-      "소멸",
-      "보존"
-     ],
-     "fx": [
+       "k": "perStack",
+       "id": "노트"
+      },
       {
        "k": "dmg",
-       "ratio": 5.3,
+       "ratio": 0.3,
        "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "마도의 레이저",
+     "name": "붕괴 광선",
      "tags": [
       "소멸",
-      "축복"
+      "약점 공격"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 5.3,
+       "ratio": 4.6,
        "target": "oneEnemy"
+      },
+      {
+       "k": "tough",
+       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "렌즈 연마",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "초점 맞추기",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "달군 궤적",
+     "kind": "frost"
     }
    ]
   },
@@ -414,7 +466,7 @@
    ],
    "oracles": [
     {
-     "name": "증폭된 반격의 시간",
+     "name": "반격 개시",
      "tags": [
       "소멸 2"
      ],
@@ -436,10 +488,76 @@
      ]
     },
     {
-     "name": "가벼운 반격의 시간",
+     "name": "짧은 반격",
      "cost": 0,
      "tags": [
       "소멸 2"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "노트",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "억까 일지",
+     "tags": [
+      "소멸 2"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "stack",
+       "id": "노트",
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "억까 처리반",
+     "tags": [
+      "소멸 2"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 2
+      },
+      {
+       "k": "ap",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "노트",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "긴급 탈출",
+     "tags": [
+      "소멸 2",
+      "신속"
      ],
      "fx": [
       {
@@ -454,94 +572,23 @@
       {
        "k": "status",
        "id": "잔광",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "기록된 반격의 시간",
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "덮어 둔 반격의 시간",
-     "tags": [
-      "소멸 2",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "마도의 반격의 시간",
-     "tags": [
-      "소멸 2",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
+       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "분노 충전",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "다음 장 넘기기",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "오기",
+     "kind": "atkUp"
     }
    ]
   },
@@ -554,15 +601,27 @@
    "type": "강화",
    "fx": [
     {
-     "k": "stack",
-     "id": "노트",
-     "v": 2
-    },
-    {
      "k": "atkMod",
      "v": 0.1,
      "run": true,
      "target": "self"
+    },
+    {
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "노트",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -571,33 +630,51 @@
      "tags": [],
      "fx": [
       {
-       "k": "stack",
-       "id": "노트",
-       "v": 3
-      },
-      {
        "k": "atkMod",
        "v": 0.1,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "노트",
+           "v": 2
+          }
+         ]
+        }
+       ]
       }
      ]
     },
     {
-     "name": "가벼운 연구",
+     "name": "쪽지 연구",
      "cost": 0,
      "tags": [],
      "fx": [
       {
-       "k": "stack",
-       "id": "노트",
-       "v": 2
-      },
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "노트",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -606,15 +683,32 @@
      "tags": [],
      "fx": [
       {
-       "k": "stack",
-       "id": "노트",
-       "v": 4
-      },
-      {
        "k": "atkMod",
        "v": 0.1,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "노트",
+       "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "노트",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -625,15 +719,27 @@
      ],
      "fx": [
       {
-       "k": "stack",
-       "id": "노트",
-       "v": 3
-      },
-      {
        "k": "atkMod",
-       "v": 0.1,
+       "v": 0.15,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "노트",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -644,34 +750,48 @@
      ],
      "fx": [
       {
-       "k": "stack",
-       "id": "노트",
-       "v": 3
-      },
-      {
        "k": "atkMod",
        "v": 0.1,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "노트",
+       "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "노트",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "가벼운 숨결",
-     "kind": "cost",
-     "fx": []
+     "name": "요약 정리",
+     "kind": "cost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "참고 자료",
+     "kind": "draw"
     },
     {
-     "name": "기세의 숨결",
-     "kind": "atkUp",
-     "fx": []
+     "name": "연구 몰입",
+     "kind": "atkUp"
     }
    ]
   }

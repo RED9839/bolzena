@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bolzena.Core;
@@ -131,6 +131,7 @@ namespace Bolzena.RunUI
             hpRt.At(0, 0, 176, 14, 226, 10);
             foreach (var t in hpRt.GetComponentsInChildren<TextMeshProUGUI>()) t.gameObject.SetActive(false);
             setHp(P.S.PartyHp, P.S.PartyMaxHp);
+            f.HudHp = (cur, max) => { if (num) num.text = $"{cur:N0}<color={Theme.DimTag}> / {max:N0}</color>"; setHp(cur, max); };   // 휴식 쉬기 · 회복 연출이 이 막대에서 보이게
             Tw.Rise(left, 0.05f, 16, 0.4f, Vector2.left);
 
             // 가운데 — 화면 이름
@@ -258,27 +259,28 @@ namespace Bolzena.RunUI
             Color red = Theme.Hex("FF7A86"), blue = Theme.Hex("78C6FF"), green = Theme.Good, gold = Theme.Gold, purple = Theme.Hex("C29BFF"), gray = Theme.Sub;
             switch (it?.T)
             {
-                case "attack": return ("ic_sword", red, "사도 하나를 친다");
-                case "back": return ("ic_sword", red, "방어 · 실드를 무시하고 사도 하나를 친다");
-                case "attackAll": return ("ic_swords", red, "파티 모두를 친다");
-                case "multi": return ("ic_swords", red, "여러 번 나눠 친다 — 한 대씩 방어가 깎인다");
-                case "charge": return ("ic_fire", gold, "이번 차례는 힘을 모으고, 다음 차례에 그 수를 한다");
-                case "block": return ("ic_shield", blue, "자기 방어를 얻는다 — 피해를 먼저 받아 낸다");
-                case "guard": return ("ic_shield", blue, "적 모두가 방어를 얻는다");
-                case "heal": return ("ic_heart", green, "적의 체력을 채운다");
-                case "selfHeal": return ("ic_heart", green, "자기 체력을 채운다");
-                case "revive": return ("ic_heart", green, "쓰러져도 다시 일어선다");
-                case "buff": return ("ic_spark", gold, it.All ? "적 모두가 이로운 효과를 얻는다" : "이로운 효과를 얻는다");
-                case "count": return ("ic_spark", gold, "이 적이 세는 수가 바뀐다");
-                case "debuff": return ("ic_skull", purple, "파티에 해로운 효과를 건다");
-                case "jam": return ("ic_lock", purple, "다음 턴에 쓸 수 있는 AP 가 줄어든다");
-                case "addCard": case "cardDebuff": case "handCost": case "reshuffle": case "autoPlay": return ("ic_deck", purple, "덱 · 손의 카드를 어지럽힌다");
-                case "summon": return ("ic_plus", gold, "적을 더 불러낸다");
-                case "shift": return ("ic_refresh", gold, "하려던 수를 바꾼다");
-                case "thorns": return ("ic_shield", red, "치면 되돌려 받는다");
-                case "feign": return ("ic_question", gray, "쓰러진 척한다");
+                case "attack": return ("ic_sword", red, "사도 1명 공격");
+                case "back": return ("ic_sword", red, "방어 · 실드를 무시하고 사도 1명 공격");
+                case "attackAll": return ("ic_swords", red, "파티 전체 공격");
+                case "multi": return ("ic_swords", red, "여러 번 나눠 공격 — 한 대마다 방어 감소");
+                case "charge": return ("ic_fire", gold, "이번 차례에 힘을 모으고 다음 차례에 그 수를 씀");
+                case "block": return ("ic_shield", blue, "자기 방어 획득 — 피해를 먼저 받아 냄");
+                case "guard": return ("ic_shield", blue, "적 전체 방어 획득");
+                case "heal": return ("ic_heart", green, "적 HP 회복");
+                case "selfHeal": return ("ic_heart", green, "자기 HP 회복");
+                case "brace": return ("ic_shield", purple, "자기 강인도 회복(강인도는 저절로 차지 않음)");
+                case "revive": return ("ic_heart", green, "쓰러져도 다시 일어섬");
+                case "buff": return ("ic_spark", gold, it.All ? "적 전체 버프 획득" : "버프 획득");
+                case "count": return ("ic_spark", gold, "이 적이 세는 수 변화");
+                case "debuff": return ("ic_skull", purple, "파티에 디버프");
+                case "jam": return ("ic_lock", purple, "다음 턴에 쓸 수 있는 AP 감소");
+                case "addCard": case "cardDebuff": case "handCost": case "reshuffle": case "autoPlay": return ("ic_deck", purple, "덱 · 손패의 카드 방해");
+                case "summon": return ("ic_plus", gold, "적을 더 불러냄");
+                case "shift": return ("ic_refresh", gold, "하려던 수를 바꿈");
+                case "thorns": return ("ic_shield", red, "치면 되돌려 받음");
+                case "feign": return ("ic_question", gray, "쓰러진 척");
             }
-            return ("ic_info", gray, null);
+            return ("ic_question", gray, null);   // 모르는 수 — 작은 「i」 는 「!」 로 읽혔다
         }
 
         public static RectTransform IntentRow(Transform parent, Flow f, Intent it, string head = null)
@@ -346,14 +348,16 @@ namespace Bolzena.RunUI
         {
             if (v == null) return Theme.LeaderCard;
             if (v.IsStatus || v.IsCurse) return Theme.StatusCard;
+            if (v.Hero == null && !string.IsNullOrEmpty(v.Def?.Grade)) return Theme.GradeOf(v.Def.Grade);   // 교주 카드 = 등급 색(2026-10-06 사용자)
             var key = v.Hero ?? owner;
             if (key == null) return Theme.LeaderCard;
             var hd = f.P.Data.Hero(key);
             return Theme.NatureCardOf(hd?.Nature ?? Roster.OfCore(key)?.nature);
         }
 
-        /// <summary>view 를 주면 그 모습(신탁을 얹은 후보 따위)으로 그린다. owner = 교주 카드를 넣은 사도(core 키) — 안 주면 판(RunPort.LeaderOwner)에 묻는다.</summary>
-        public static RectTransform Card(Transform parent, Flow f, string id, float w = 200, string name = "card", CardView view = null, string owner = null)
+        /// <summary>view 를 주면 그 모습(신탁을 얹은 후보 따위)으로 그린다. owner = 교주 카드를 넣은 사도(core 키) — 안 주면 판(RunPort.LeaderOwner)에 묻는다.
+        /// noFace — 오른쪽 위 주인 얼굴 핀을 숨긴다(신탁 고르기 창만 — 2026-10-06 사용자). 틀 색은 그대로 주인 성격.</summary>
+        public static RectTransform Card(Transform parent, Flow f, string id, float w = 200, string name = "card", CardView view = null, string owner = null, bool noFace = false)
         {
             var P = f.P;
             var v = view ?? P.View(id);
@@ -477,7 +481,7 @@ namespace Bolzena.RunUI
                 var star = Ui.Img(rt, Theme.S("ic_spark"), Theme.Gold, "unique");
                 star.rectTransform.At(1, 1, -8 * k, -9 * k, 20 * k, 20 * k);
             }
-            else if (owner != null)
+            else if (owner != null && !noFace)
             {
                 // 교주 카드 주인 핀 — 오른쪽 위 작은 초상(테 = 주인 성격 색, 전투 CardView 의 핀과 같은 자리)
                 var pin = Face(rt, Roster.OfCore(owner), 26 * k, true, "ownerpin");
@@ -505,17 +509,58 @@ namespace Bolzena.RunUI
             if (terms != null && terms.Count > 0) TermPop.MarkAndAttach(desc, full, terms, f.Stage.ToastLayer, (p, cid, cw2) => Card(p, f, cid, cw2, "termcard"));
             desc.enableAutoSizing = need > 112 * k; desc.fontSizeMin = 8.5f * k; desc.fontSizeMax = 13.5f * k;
             desc.Outline(0.2f);
-            // 신탁 표시 — 장식 선 바로 위
+            // ── 표식(신탁 · 축복 · 복제, 2026-10-06) — 겹쳐도 읽히게 자리를 나눈다:
+            //   신탁 = 장식 선 바로 위 금빛 이름 띠 + 테 바깥 금빛 · 축복 = 그 위 겨우살이(초록) 띠(후광 아이콘 + 이름) · 복제 = 오른쪽 위 셋째 줄 겹친 카드 표(「복제 — 신탁 · 축복 불가」)
+            //   view 를 준 미리보기(신탁 고르기 후보 따위)는 신탁만 view 에서 — 축복은 고르기 창이 따로 그린다
+            var mark = view == null ? f.P.Mark(id) : CardMark.Of(P.Data, id, 0, null);
+            float chipY = decoY + 8 * k;
             if (v != null && v.Oracle != null)
             {
-                var (ob, otx) = Ui.Chip(rt, Theme.S("ic_spark"), v.Oracle.Name, 22 * k, new Color(0.35f, 0.25f, 0.05f, 0.95f), Theme.Gold, 12.5f * k);
-                ob.rectTransform.At(0.5f, 0, 0, decoY + 8 * k, 150 * k, 22 * k);
-                UnityEngine.Object.Destroy(ob.GetComponent<HorizontalLayoutGroup>());
-                otx.rectTransform.Fill(22 * k, 0, 6 * k, 0);
-                otx.alignment = TextAlignmentOptions.Center;
-                ob.transform.GetChild(0).GetComponent<RectTransform>().At(0, 0.5f, 6 * k, 0, 14 * k, 14 * k);
+                var og = Ui.Img(rt, Theme.S("frame_thick", 24), Theme.Gold.A(0.95f), "oracleglow");
+                og.rectTransform.Fill(-3 * k, -3 * k, -3 * k, -3 * k);
+                og.transform.SetSiblingIndex(frame.transform.GetSiblingIndex());   // 성격 테 밑 — 성격 색은 그대로, 바깥으로 금빛이 번진다
+                MarkBand(rt, "ic_spark", v.Oracle.Name, new Color(0.35f, 0.25f, 0.05f, 0.95f), Theme.Gold, Theme.Gold, chipY, w, k, "oracle");
+                chipY += 25 * k;
+            }
+            if (mark.Blessed)
+                MarkBand(rt, "ic_bless", mark.Bless, new Color(0.06f, 0.27f, 0.2f, 0.95f), new Color(0.75f, 1f, 0.82f), new Color(0.85f, 1f, 0.9f), chipY, w, k, "bless");
+            if (mark.Copy)
+            {
+                bool small = w < 150;
+                bool brief = Theme.Compact || w < 200;   // 폰 · 작은 카드는 「복제」 만 크게 — 「신탁 · 축복 불가」 는 카드 크게 · 툴팁에서
+                string copyLine = small ? "" : brief ? "복제" : CardMark.COPY_LINE;
+                float cfs = brief ? 13f * k : 10.5f * k;
+                var cb = Ui.Img(rt, Theme.Pill, new Color(0.04f, 0.05f, 0.1f, 0.88f), "copymark");
+                var cic = Ui.Img(cb.rectTransform, Theme.S("ic_copy"), new Color(0.78f, 0.86f, 1f), "icon"); cic.preserveAspect = true;
+                float bh = 20 * k, iw = 14 * k;
+                if (small) { cb.rectTransform.At(1, 1, -5 * k, -34 * k, bh + 6 * k, bh); cic.rectTransform.At(0.5f, 0.5f, 0, 0, iw, iw); }
+                else
+                {
+                    var cl = Ui.Text(cb.rectTransform, copyLine, cfs, new Color(0.85f, 0.9f, 1f), TextAlignmentOptions.MidlineLeft, false, "text");
+                    cl.textWrappingMode = TextWrappingModes.NoWrap; cl.overflowMode = TextOverflowModes.Overflow;
+                    float tw = Mathf.Min(w - 24 * k - iw - 14 * k, cl.GetPreferredValues(copyLine).x + 1);
+                    cb.rectTransform.At(1, 1, -6 * k, brief ? -34 * k : -58 * k, tw + iw + 14 * k, brief ? 22 * k : bh);
+                    cic.rectTransform.At(0, 0.5f, 5 * k, 0, iw, iw);
+                    cl.rectTransform.Fill(iw + 8 * k, 0, 5 * k, 0);
+                    cl.enableAutoSizing = true; cl.fontSizeMin = 8 * k; cl.fontSizeMax = cfs;
+                }
             }
             return rt;
+        }
+
+        /// <summary>카드 아래 표식 띠 하나(신탁 · 축복) — 가운데, 이름 길이만큼(카드 폭 안).</summary>
+        static void MarkBand(RectTransform rt, string icon, string text, Color bg, Color iconTint, Color ink, float y, float w, float k, string name)
+        {
+            var (ob, otx) = Ui.Chip(rt, Theme.S(icon), text, 22 * k, bg, iconTint, 12.5f * k);
+            ob.name = name;
+            UnityEngine.Object.Destroy(ob.GetComponent<HorizontalLayoutGroup>());
+            otx.color = ink;
+            float tw = Mathf.Min(w - 50 * k, otx.GetPreferredValues(text).x + 1);
+            ob.rectTransform.At(0.5f, 0, 0, y, Mathf.Max(110 * k, tw + 34 * k), 22 * k);
+            otx.rectTransform.Fill(22 * k, 0, 8 * k, 0);
+            otx.alignment = TextAlignmentOptions.Center;
+            otx.enableAutoSizing = true; otx.fontSizeMin = 9 * k; otx.fontSizeMax = 12.5f * k;
+            ob.transform.GetChild(0).GetComponent<RectTransform>().At(0, 0.5f, 6 * k, 0, 14 * k, 14 * k);
         }
 
         public static Sprite SlotIcon(string slot) => Theme.S(slot == "무기" ? "ic_sword" : slot == "방어구" ? "ic_shield" : "ic_ring_slot");

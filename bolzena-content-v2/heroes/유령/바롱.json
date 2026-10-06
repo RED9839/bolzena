@@ -12,17 +12,18 @@
       "atk": 125,
       "def": 35,
       "crit": 10,
-      "blurb": "토끼 인형을 꿰매며 거짓말과 이간질을 즐기는 착각의 유령. 적 하나에게 「뒷담」 을 쌓아 기를 꺾고, 셋이 차면 그 적이 엉뚱한 동료를 치게 만든다.",
+      "blurb": "토끼 인형을 꿰매며 거짓말과 이간질을 즐기는 착각의 유령. 눈여겨본 적에게 뒷담을 쌓을수록 바롱의 손길이 더 아프게 박히고, 저주받은 못이 따라 꽂힙니다. 뒷담이 가득 차면 그 적은 엉뚱한 동료를 치게 됩니다.",
       "keyword": {
         "name": "뒷담",
-        "desc": "바롱이 속삭인 거짓말 — 들은 적은 동료를 의심한다",
+        "desc": "한 적에게 속삭이는 거짓말",
         "carrier": "enemy",
         "hunt": true,
         "cap": 3,
         "per": [
           {
-            "stat": "dealt",
-            "v": -0.1
+            "stat": "taken",
+            "v": 0.15,
+            "from": "owner"
           }
         ],
         "rules": [
@@ -65,6 +66,32 @@
               "id": "뒷담",
               "v": 2,
               "target": "topEnemy"
+            }
+          ]
+        },
+        {
+          "name": "저주받은 못질",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "뒷담",
+              "n": 1
+            }
+          ],
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 0.35,
+              "hits": 2,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -165,7 +192,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
@@ -176,30 +203,12 @@
           ]
         },
         {
-          "name": "작은 인형",
+          "name": "손가락 인형",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "뒷담",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "품에 둔 인형",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 0.5,
               "target": "oneEnemy"
             },
             {
@@ -214,7 +223,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
@@ -225,19 +234,36 @@
           ]
         },
         {
-          "name": "축복의 인형",
-          "tags": [
-            "축복"
-          ],
+          "name": "소문 퍼뜨리기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 0.85,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "바늘 콕",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "뒷담",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
               "v": 1
             }
           ]
@@ -275,72 +301,69 @@
         {
           "k": "stack",
           "id": "뒷담",
-          "v": 2
-        },
-        {
-          "k": "confuse"
+          "v": 3,
+          "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "약화",
-          "v": 1
+          "v": 1,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "깊은 이간",
+          "name": "완벽한 이간질",
           "fx": [
             {
               "k": "stack",
               "id": "뒷담",
-              "v": 3
-            },
-            {
-              "k": "confuse"
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "짧은 이간",
+          "name": "귓속말 한마디",
           "cost": 1,
           "fx": [
             {
               "k": "stack",
               "id": "뒷담",
-              "v": 2
-            },
-            {
-              "k": "confuse"
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "묵혀 둔 이간",
-          "tags": [
-            "보존"
-          ],
+          "name": "소문이 소문을",
           "fx": [
             {
               "k": "stack",
               "id": "뒷담",
-              "v": 3
-            },
-            {
-              "k": "confuse"
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
@@ -351,10 +374,8 @@
             {
               "k": "stack",
               "id": "뒷담",
-              "v": 2
-            },
-            {
-              "k": "confuse"
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
@@ -365,22 +386,19 @@
           ]
         },
         {
-          "name": "축복의 이간",
+          "name": "거짓 편지",
           "tags": [
-            "축복"
+            "보존"
           ],
           "fx": [
             {
               "k": "stack",
               "id": "뒷담",
-              "v": 3
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
-              "k": "confuse"
-            },
-            {
-              "k": "status",
-              "id": "약화",
+              "k": "draw",
               "v": 1
             }
           ]
@@ -392,7 +410,7 @@
           "kind": "draw"
         },
         {
-          "name": "재빠른 혀",
+          "name": "혀 놀림",
           "kind": "cost"
         },
         {
@@ -438,9 +456,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "hits": 2,
-              "target": "oneEnemy"
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "ifStack",
@@ -460,8 +478,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "hits": 2,
+              "ratio": 0.55,
               "target": "oneEnemy"
             },
             {
@@ -477,16 +494,39 @@
           ]
         },
         {
-          "name": "아껴 둔 못",
-          "tags": [
-            "보존"
-          ],
+          "name": "소문 못 박기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
-              "hits": 2,
-              "target": "oneEnemy"
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "뒷담",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "못 흩뿌리기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "ifStack",
@@ -502,36 +542,15 @@
         },
         {
           "name": "저주받은 못",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "hits": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "뒷담",
-              "n": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "축복의 못",
           "tags": [
-            "축복"
+            "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "hits": 2,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "ifStack",
@@ -589,7 +608,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.75
+              "ratio": 1.8
             },
             {
               "k": "stack",
@@ -608,42 +627,17 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.9
+              "ratio": 0.7
             },
             {
               "k": "stack",
               "id": "뒷담",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "꿰매 둔 인형",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "stack",
-              "id": "뒷담",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "주인님이 보고 있다",
+          "name": "주인님이 보는 중",
           "fx": [
             {
               "k": "shield",
@@ -661,14 +655,33 @@
           ]
         },
         {
-          "name": "축복의 바느질",
+          "name": "바늘 든 인형",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "밤새 꿰맨 인형",
           "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.55
+              "ratio": 1.4
             },
             {
               "k": "stack",
@@ -688,7 +701,7 @@
           "kind": "guard"
         },
         {
-          "name": "재빠른 바늘",
+          "name": "바늘귀 꿰기",
           "kind": "draw"
         },
         {

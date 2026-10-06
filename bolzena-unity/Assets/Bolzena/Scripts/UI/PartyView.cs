@@ -97,7 +97,7 @@ namespace Bolzena.UI
             Make.Sliced("hpbg", R, Res.UI("bar_fill_9s"), pc, new Vector2(pw, ph), OC + 1, new Color(bc.r, bc.g, bc.b, 0.4f));
             Make.Sliced("hpf", R, Res.UI("bar_fill_9s"), pc + new Vector3(-pw / 2 + pw * pct / 2, 0, 0), new Vector2(Mathf.Max(0.3f, pw * pct), ph), OC + 1, bc);
             T("hpb", R, band, pc + new Vector3(-pw / 2 + 0.2f * k, 0, 0), Tone.Md * k, Color.white, TextAlignmentOptions.Left, false, 10, 1);
-            T("hpv", R, $"체력 {s.PartyHp:N0}({Mathf.RoundToInt(pct * 100)}%)" + (s.PartyBlock > 0 ? $"  <color={Tone.SkyTag}>방어 {s.PartyBlock}</color>" : ""),
+            T("hpv", R, $"HP {s.PartyHp:N0}({Mathf.RoundToInt(pct * 100)}%)" + (s.PartyBlock > 0 ? $"  <color={Tone.SkyTag}>방어 {s.PartyBlock}</color>" : ""),
                 pc + new Vector3(pw / 2 - 0.2f * k, 0, 0), Tone.Md * k, Color.white, TextAlignmentOptions.Right, false, 10, 1);
             top = hh - 1.0f * k;
             Make.Box("headline", R, Res.UI("white"), new Vector3((lineX + hw - 0.3f) / 2, top, 0), new Vector2(hw - 0.3f - lineX, 0.012f), OC, new Color(1, 1, 1, 0.16f));
@@ -123,8 +123,8 @@ namespace Bolzena.UI
             var pas = new List<(string head, string text, string who, bool gold)>();
             foreach (var h in s.Heroes)
             {
-                if (!string.IsNullOrEmpty(h.KeywordName)) pas.Add(($"「{h.KeywordName}」 <color={Tone.GoldTag}>{h.KeywordStacks}</color>", h.KeywordShort ?? h.KeywordText, h.Key, true));   // 두 줄 칸 — 짧은 글
-                foreach (var p in h.PassivesShort.Count > 0 ? h.PassivesShort : h.Passives) pas.Add((null, p, h.Key, false));
+                if (!string.IsNullOrEmpty(h.KeywordName)) pas.Add(($"「{h.KeywordName}」 <color={Tone.GoldTag}>{h.KeywordStacks}</color>", h.KeywordText, h.Key, true));   // 고유 효과 글(CardText.Trait)
+                foreach (var p in h.Passives) pas.Add((null, p, h.Key, false));
                 foreach (var g in h.Gear) if (g.Id != null && !string.IsNullOrEmpty(g.Text)) pas.Add((g.Name, g.Text, h.Key, false));
             }
             Column(R, mid + 0.3f, r - 0.1f, y0, k, "적용 중인 패시브", "적용 중인 패시브가 없습니다.", pas.Count, (i, x, w, y) => PassiveRow(R, pas[i].head, pas[i].text, pas[i].who, x, w, y, k));
@@ -248,7 +248,8 @@ namespace Bolzena.UI
             if (zi != null) Make.Box("zi", R, zi, zoom.transform.localPosition, new Vector2(0.22f, 0.22f) * k, OC + 2, Tone.Night);
             var zb = zoom.gameObject.AddComponent<Button>();
             zb.Size = Vector2.one * 0.5f * k / zoom.transform.localScale.x;
-            zb.OnClick = () => { if (!opened.Remove(idx)) opened.Add(idx); focus = idx; Draw(0); };
+            // 돋보기 — 그 사도의 정보 창(고학년 → 고유 효과 → 패시브, 수치가 다 든 글 · 「자세히」 없음)
+            zb.OnClick = () => { var par = m.transform.parent; var snap = s; InfoPanel.Hero(par, snap, idx, default); };
             y -= 0.44f * k;
             Make.Box("nl", R, Res.UI("white"), new Vector3(x + w / 2, y, 0), new Vector2(w, 0.012f), OC, new Color(1, 1, 1, 0.25f));
             y -= 0.08f * k;
@@ -279,13 +280,13 @@ namespace Bolzena.UI
             if (opened.Contains(idx))
             {
                 Band(R, x, w, ref y, k, "고학년 · " + h.UltName);
-                var u = T("ut", R, string.IsNullOrEmpty(h.UltShort) ? h.UltText : h.UltShort, new Vector3(x + 0.1f, y - 0.04f, 0), Tone.Sm * k, Tone.Ink, TextAlignmentOptions.TopLeft, true, w - 0.2f);
+                var u = T("ut", R, h.UltText, new Vector3(x + 0.1f, y - 0.04f, 0), Tone.Sm * k, Tone.Ink, TextAlignmentOptions.TopLeft, true, w - 0.2f);
                 u.textWrappingMode = TextWrappingModes.Normal; u.rectTransform.sizeDelta = new Vector2(w - 0.2f, 2); u.ForceMeshUpdate();
                 y -= u.preferredHeight + 0.12f;
-                foreach (var p in h.PassivesShort.Count > 0 ? h.PassivesShort : h.Passives)
+                // 고유 효과 · 패시브 글 전부는 돋보기 → 사도 정보 창(InfoPanel.Hero — core CardText.Traits, 길면 판 안에서 내린다). 여기서 줄을 자르지 않는다
+                if (y - 0.3f * k >= floor)
                 {
-                    if (y - 0.3f * k < floor) break;
-                    var pt = T("pt", R, "· " + p, new Vector3(x + 0.1f, y - 0.02f, 0), Tone.Cap * k, Tone.Sub, TextAlignmentOptions.TopLeft, true, w - 0.2f);
+                    var pt = T("pt", R, "돋보기 — 고유 효과 · 패시브 글 전부(사도 정보 창)", new Vector3(x + 0.1f, y - 0.02f, 0), Tone.Cap * k, Tone.Dim, TextAlignmentOptions.TopLeft, true, w - 0.2f);
                     pt.textWrappingMode = TextWrappingModes.Normal; pt.rectTransform.sizeDelta = new Vector2(w - 0.2f, 2); pt.ForceMeshUpdate();
                     y -= pt.preferredHeight + 0.06f;
                 }

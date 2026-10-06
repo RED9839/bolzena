@@ -12,10 +12,10 @@
    "atk": 125,
    "def": 27,
    "crit": 10,
-   "blurb": "왕국 하나쯤 날려 버릴 폭탄도 만드는 천재 폭파 전문가이자, 과거엔 '황금손'이라 불린 좀도둑. 이제는 도둑이 아닌 모험가로 인정받고 싶은데, 도무지 존재감이 없다.",
+   "blurb": "왕국 하나쯤 날려 버릴 폭탄도 만드는 천재 폭파 전문가이자, 과거엔 「황금손」이라 불린 좀도둑. 이제는 도둑이 아닌 모험가로 인정받고 싶은데, 도무지 존재감이 없습니다.",
    "keyword": {
     "name": "폭탄",
-    "desc": "저절로는 안 터지는 특제 폭탄 — 마리가 스킬을 쓰면 한꺼번에 터진다",
+    "desc": "스킬로 터뜨리는 폭탄",
     "carrier": "enemy",
     "cap": 5,
     "rules": [
@@ -30,6 +30,18 @@
        {
         "k": "tough",
         "v": 2
+       },
+       {
+        "k": "status",
+        "id": "잔불",
+        "v": 1,
+        "target": "oneEnemy"
+       },
+       {
+        "k": "spend",
+        "id": "폭탄",
+        "all": true,
+        "target": "oneEnemy"
        }
       ]
      }
@@ -56,22 +68,21 @@
       "on": "play",
       "type": "스킬"
      },
+     "limit": {
+      "per": "turn",
+      "n": 1
+     },
      "fx": [
       {
        "k": "perStack",
-       "id": "폭탄"
+       "id": "폭탄",
+       "each": true
       },
       {
        "k": "dmg",
-       "ratio": 0.8,
-       "target": "oneEnemy",
+       "ratio": 0.5,
+       "target": "allEnemies",
        "fixed": true
-      },
-      {
-       "k": "spend",
-       "id": "폭탄",
-       "all": true,
-       "target": "oneEnemy"
       }
      ]
     }
@@ -167,16 +178,21 @@
      "id": "폭탄",
      "v": 1,
      "target": "allEnemies"
+    },
+    {
+     "k": "status",
+     "id": "잔불",
+     "v": 1,
+     "target": "allEnemies"
     }
    ],
    "oracles": [
     {
-     "name": "큼직한 폭탄 배달",
-     "tags": [],
+     "name": "특급 배달",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.1,
+       "ratio": 2.0,
        "target": "allEnemies"
       },
       {
@@ -184,59 +200,88 @@
        "id": "폭탄",
        "v": 1,
        "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "잔불",
+       "v": 1,
+       "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "가벼운 폭탄 배달",
+     "name": "소포 배달",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.3,
+       "ratio": 1.1,
        "target": "allEnemies"
       },
       {
        "k": "stack",
        "id": "폭탄",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "잔불",
        "v": 1,
        "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "도화선의 폭탄 배달",
-     "tags": [],
+     "name": "두 개씩 배달",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.75,
+       "ratio": 1.7,
        "target": "allEnemies"
       },
       {
        "k": "stack",
        "id": "폭탄",
+       "v": 2,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "잔불",
        "v": 1,
        "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "한 집 몰아 배달",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.8,
+       "target": "oneEnemy"
       },
       {
        "k": "stack",
        "id": "폭탄",
-       "v": 1,
+       "v": 3,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "잔불",
+       "v": 2,
        "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "숨겨 둔 폭탄 배달",
-     "tags": [
-      "보존"
-     ],
+     "name": "깜짝 선물 상자",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.9,
+       "ratio": 1.8,
        "target": "allEnemies"
       },
       {
@@ -244,24 +289,11 @@
        "id": "폭탄",
        "v": 1,
        "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "황금손의 폭탄 배달",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.9,
-       "target": "allEnemies"
       },
       {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
+       "k": "status",
+       "id": "잔불",
+       "v": 2,
        "target": "allEnemies"
       }
      ]
@@ -269,19 +301,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "화약 듬뿍",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "파편 세례",
+     "kind": "frost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "빠른 배송",
+     "kind": "cost"
     }
    ]
   },
@@ -303,16 +332,15 @@
      "v": 1
     },
     {
-     "k": "stack",
-     "id": "폭탄",
+     "k": "status",
+     "id": "잔불",
      "v": 1,
-     "target": "oneEnemy"
+     "target": "allEnemies"
     }
    ],
    "oracles": [
     {
-     "name": "큼직한 스위치",
-     "tags": [],
+     "name": "두 번 딸깍",
      "fx": [
       {
        "k": "status",
@@ -324,17 +352,32 @@
        "v": 1
       },
       {
-       "k": "stack",
-       "id": "폭탄",
+       "k": "status",
+       "id": "잔불",
        "v": 1,
-       "target": "oneEnemy"
+       "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "가벼운 스위치",
+     "name": "딸깍",
      "cost": 0,
-     "tags": [],
+     "fx": [
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1
+      },
+      {
+       "k": "status",
+       "id": "잔불",
+       "v": 1,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "폭탄 장전",
      "fx": [
       {
        "k": "status",
@@ -348,94 +391,76 @@
       {
        "k": "stack",
        "id": "폭탄",
-       "v": 1,
+       "v": 2,
        "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "도화선의 스위치",
-     "tags": [],
+     "name": "연쇄 기폭",
      "fx": [
       {
        "k": "status",
        "id": "취약",
-       "v": 2
+       "v": 1,
+       "target": "allEnemies"
       },
       {
        "k": "draw",
        "v": 1
       },
       {
-       "k": "stack",
-       "id": "폭탄",
+       "k": "status",
+       "id": "잔불",
        "v": 1,
-       "target": "oneEnemy"
+       "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "숨겨 둔 스위치",
+     "name": "원격 기폭",
      "tags": [
+      "신속",
       "보존"
      ],
      "fx": [
       {
        "k": "status",
        "id": "취약",
-       "v": 2
+       "v": 1
       },
       {
        "k": "draw",
        "v": 1
       },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "황금손의 스위치",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
       {
        "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
+       "id": "잔불",
        "v": 1,
-       "target": "oneEnemy"
+       "target": "allEnemies"
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "스위치 연타",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "도화선 정리",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "심지 하나 더",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "폭탄",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
     }
    ]
   },
@@ -463,7 +488,7 @@
    ],
    "oracles": [
     {
-     "name": "큼직한 황금손",
+     "name": "황금기의 손맛",
      "tags": [
       "신속"
      ],
@@ -481,8 +506,26 @@
      ]
     },
     {
-     "name": "가벼운 황금손",
+     "name": "손가락 풀기",
      "cost": 0,
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "폭탄",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
+    },
+    {
+     "name": "추억의 폭죽 두 개",
      "tags": [
       "신속"
      ],
@@ -494,83 +537,71 @@
       {
        "k": "stack",
        "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "도화선의 황금손",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
        "v": 2,
        "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "숨겨 둔 황금손",
+     "name": "황금손 손재주",
      "tags": [
-      "신속",
-      "보존"
+      "신속"
      ],
      "fx": [
       {
        "k": "draw",
-       "v": 3
+       "v": 2
       },
       {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
+       "k": "nextCheaper",
+       "v": 1
       }
      ]
     },
     {
-     "name": "황금손의 황금손",
+     "name": "첫 무대의 추억",
      "tags": [
       "신속",
-      "축복"
+      "개전"
      ],
      "fx": [
       {
        "k": "draw",
-       "v": 3
+       "v": 2
       },
       {
        "k": "stack",
        "id": "폭탄",
        "v": 1,
-       "target": "oneEnemy"
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "황금 동전",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "손때 묻은 장갑",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "덤 폭죽",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "폭탄",
+       "v": 1,
+       "target": "oneEnemy"
+      }
+     ]
     }
    ]
   },
@@ -599,14 +630,14 @@
    ],
    "oracles": [
     {
-     "name": "큼직한 존재감",
+     "name": "여기요 여기!",
      "tags": [
       "연계"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.85,
+       "ratio": 1.75,
        "target": "oneEnemy"
       },
       {
@@ -618,7 +649,7 @@
      ]
     },
     {
-     "name": "가벼운 존재감",
+     "name": "빼꼼",
      "cost": 0,
      "tags": [
       "연계"
@@ -626,7 +657,7 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1,
+       "ratio": 0.8,
        "target": "oneEnemy"
       },
       {
@@ -638,14 +669,14 @@
      ]
     },
     {
-     "name": "도화선의 존재감",
+     "name": "폭탄 두 개 들고",
      "tags": [
       "연계"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.45,
+       "ratio": 1.4,
        "target": "oneEnemy"
       },
       {
@@ -657,35 +688,33 @@
      ]
     },
     {
-     "name": "숨겨 둔 존재감",
+     "name": "존재감 폭발",
      "tags": [
-      "연계",
-      "보존"
+      "연계"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.55,
-       "target": "oneEnemy"
+       "ratio": 1.1,
+       "target": "allEnemies"
       },
       {
        "k": "stack",
        "id": "폭탄",
        "v": 1,
-       "target": "oneEnemy"
+       "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "황금손의 존재감",
+     "name": "잊지 말아 줘요",
      "tags": [
-      "연계",
-      "축복"
+      "연계"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.55,
+       "ratio": 1.3,
        "target": "oneEnemy"
       },
       {
@@ -693,25 +722,26 @@
        "id": "폭탄",
        "v": 1,
        "target": "oneEnemy"
+      },
+      {
+       "k": "draw",
+       "v": 1
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "목소리 키우기",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "빈틈 끼어들기",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "손 번쩍",
+     "kind": "draw"
     }
    ]
   }

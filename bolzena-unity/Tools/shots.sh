@@ -6,7 +6,7 @@
 # 지킴이: 하나당 330초, 끝나면 남은 Bolzena.exe 를 지운다.
 cd /c/projects/bolzena-unity
 LOGS=/c/projects/bolzena-unity-tmp
-STATUS="-party 니콜,포셔,벨라 -foes fairymobcloserange_naive,fairymoblongrange_jolly"
+STATUS="-party 니콜,포셔,벨라 -foes fairymobcloserange,fairymoblongrange"
 all="pc phone fhd wqhd uhd uw uwqhd w1610 status status_phone"
 [ $# -gt 0 ] && all="$*"
 for n in $all; do
@@ -22,8 +22,8 @@ for n in $all; do
     status) a="-screen-width 1600 -screen-height 900 $STATUS" ;;
     status_phone) a="-screen-width 844 -screen-height 390 $STATUS" ;;
     bless) a="-screen-width 1600 -screen-height 900 -blesstest" ;;
-    v2foes) a="-screen-width 1600 -screen-height 900 -party 니콜,포셔,벨라 -foes hatchling_cool,golem_cool_elite,magicfork_mad" ;;
-    v2foes_phone) a="-screen-width 844 -screen-height 390 -party 니콜,포셔,벨라 -foes hatchling_cool,golem_cool_elite,magicfork_mad" ;;
+    v2foes) a="-screen-width 1600 -screen-height 900 -party 니콜,포셔,벨라 -foes hatchling,golem_elite,magicfork -nature 냉정" ;;
+    v2foes_phone) a="-screen-width 844 -screen-height 390 -party 니콜,포셔,벨라 -foes hatchling,golem_elite,magicfork -nature 냉정" ;;
     v2summon) a="-screen-width 1600 -screen-height 900 -party 리코타,캬롯,시온더다크불릿 -foes clone_canna" ;;
     v2boss) a="-screen-width 1600 -screen-height 900 -party 리코타,캬롯,시온더다크불릿 -foes clone_rude" ;;
     *) echo "모름: $n"; continue ;;

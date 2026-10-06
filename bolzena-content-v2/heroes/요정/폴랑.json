@@ -12,10 +12,10 @@
    "atk": 86,
    "def": 58,
    "crit": 5,
-   "blurb": "요정 왕국 에르피엔의 경비대장으로, 네르와 함께 왕국의 양날개로 꼽힌다. 한때 롤렛의 이간질에 넘어가 반란을 일으켰지만 지금은 에르핀에게 광적으로 충성한다. '셋이서 120도로 둘러싸 패기'라는 전통 전술을 신봉한다.",
+   "blurb": "요정 왕국 에르피엔의 경비대장으로, 네르와 함께 왕국의 양날개로 꼽힙니다. 한때 롤렛의 이간질에 넘어가 반란을 일으켰지만 지금은 에르핀에게 광적으로 충성합니다. 「셋이서 120도로 둘러싸 패기」라는 전통 전술을 신봉합니다.",
    "keyword": {
     "name": "포위",
-    "desc": "셋이서 둘러싼 적 — 한 턴에 셋이 차면 포위 완성",
+    "desc": "셋이 함께 둘러싸는 포위",
     "carrier": "enemy",
     "cap": 3,
     "endClear": true,
@@ -148,7 +148,7 @@
    ],
    "oracles": [
     {
-     "name": "정렬된 삼각 편대",
+     "name": "완벽한 편대",
      "tags": [
       "연계"
      ],
@@ -162,13 +162,74 @@
       {
        "k": "status",
        "id": "피해 감소",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "두 명 편대",
+     "cost": 0,
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 1,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
        "v": 1
       }
      ]
     },
     {
-     "name": "가벼운 삼각 편대",
-     "cost": 0,
+     "name": "전면 포위",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 3,
+       "target": "allEnemies"
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "방패 편대",
+     "tags": [
+      "연계"
+     ],
+     "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "shield",
+       "ratio": 1.5
+      },
+      {
+       "k": "status",
+       "id": "피해 감소",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "협공 편대",
      "tags": [
       "연계"
      ],
@@ -181,62 +242,8 @@
       },
       {
        "k": "status",
-       "id": "피해 감소",
+       "id": "협공",
        "v": 1
-      }
-     ]
-    },
-    {
-     "name": "포위하는 삼각 편대",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "대기 중인 삼각 편대",
-     "tags": [
-      "연계",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "왕국의 삼각 편대",
-     "tags": [
-      "연계",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 3,
-       "target": "oneEnemy"
       },
       {
        "k": "status",
@@ -248,19 +255,16 @@
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "전령",
+     "kind": "draw"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "구령 한 마디",
+     "kind": "ap"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "신속 전개",
+     "kind": "cost"
     }
    ]
   },
@@ -293,8 +297,7 @@
    ],
    "oracles": [
     {
-     "name": "정렬된 일제 사격",
-     "tags": [],
+     "name": "전열 일제 사격",
      "fx": [
       {
        "k": "dmg",
@@ -317,13 +320,12 @@
      ]
     },
     {
-     "name": "가벼운 일제 사격",
+     "name": "두 발 사격",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.8,
+       "ratio": 0.65,
        "target": "allEnemies",
        "base": "def"
       },
@@ -342,35 +344,37 @@
      ]
     },
     {
-     "name": "포위하는 일제 사격",
-     "tags": [],
+     "name": "조준 사격",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.25,
-       "target": "allEnemies",
+       "ratio": 2.2,
+       "target": "oneEnemy",
        "base": "def"
       },
       {
        "k": "stack",
        "id": "포위",
-       "v": 1,
-       "target": "allEnemies"
+       "v": 2,
+       "target": "oneEnemy"
       },
       {
        "k": "status",
        "id": "약화",
        "v": 1,
-       "target": "allEnemies"
+       "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "대기 중인 일제 사격",
-     "tags": [
-      "보존"
-     ],
+     "name": "십자 포화",
      "fx": [
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 2,
+       "target": "allEnemies"
+      },
       {
        "k": "dmg",
        "ratio": 1.2,
@@ -378,35 +382,28 @@
        "base": "def"
       },
       {
-       "k": "stack",
-       "id": "포위",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
        "k": "status",
-       "id": "약화",
+       "id": "취약",
        "v": 1,
        "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "왕국의 일제 사격",
-     "tags": [
-      "축복"
-     ],
+     "name": "연속 일제 사격",
+     "cost": 3,
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.2,
+       "ratio": 0.9,
        "target": "allEnemies",
+       "hits": 2,
        "base": "def"
       },
       {
        "k": "stack",
        "id": "포위",
-       "v": 1,
+       "v": 2,
        "target": "allEnemies"
       },
       {
@@ -420,19 +417,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "화약 증량",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "탄환 세례",
+     "kind": "frost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "포위망 조준",
+     "kind": "weakSpot"
     }
    ]
   },
@@ -461,8 +455,7 @@
    ],
    "oracles": [
     {
-     "name": "정렬된 경례",
-     "tags": [],
+     "name": "충성의 경례",
      "fx": [
       {
        "k": "status",
@@ -471,7 +464,7 @@
       },
       {
        "k": "heal",
-       "ratio": 4.7
+       "ratio": 3.5
       },
       {
        "k": "status",
@@ -481,9 +474,8 @@
      ]
     },
     {
-     "name": "가벼운 경례",
+     "name": "짧은 경례",
      "cost": 2,
-     "tags": [],
      "fx": [
       {
        "k": "status",
@@ -492,7 +484,7 @@
       },
       {
        "k": "heal",
-       "ratio": 2.4
+       "ratio": 1.6
       },
       {
        "k": "status",
@@ -502,8 +494,45 @@
      ]
     },
     {
-     "name": "포위하는 경례",
-     "tags": [],
+     "name": "왕국 수호 선서",
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 3.7
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "사열식",
+     "fx": [
+      {
+       "k": "status",
+       "id": "사기",
+       "v": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 3.0
+      },
+      {
+       "k": "status",
+       "id": "협공",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "경례 후 돌격",
      "fx": [
       {
        "k": "status",
@@ -512,55 +541,10 @@
       },
       {
        "k": "heal",
-       "ratio": 4.5
+       "ratio": 2.0
       },
       {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "대기 중인 경례",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 2
-      },
-      {
-       "k": "heal",
-       "ratio": 4.3
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "왕국의 경례",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 3.95
-      },
-      {
-       "k": "status",
-       "id": "협공",
+       "k": "ap",
        "v": 1
       }
      ]
@@ -568,19 +552,16 @@
    ],
    "blesses": [
     {
-     "name": "포근한 숨결",
-     "kind": "heal",
-     "fx": []
+     "name": "왕국의 가호",
+     "kind": "heal"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "힘찬 구령",
+     "kind": "ap"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "반듯한 자세",
+     "kind": "defUp"
     }
    ]
   },
@@ -611,14 +592,14 @@
    ],
    "oracles": [
     {
-     "name": "정렬된 경비대장",
+     "name": "경비대 총출동",
      "tags": [
       "개전"
      ],
      "fx": [
       {
        "k": "shield",
-       "ratio": 3.1
+       "ratio": 3.0
       },
       {
        "k": "status",
@@ -632,7 +613,7 @@
      ]
     },
     {
-     "name": "가벼운 경비대장",
+     "name": "야간 순찰",
      "cost": 1,
      "tags": [
       "개전"
@@ -640,33 +621,51 @@
      "fx": [
       {
        "k": "shield",
-       "ratio": 1.6
+       "ratio": 2.2
       },
       {
        "k": "status",
        "id": "협공",
        "v": 1
-      },
-      {
-       "k": "ap",
-       "v": 1
       }
      ]
     },
     {
-     "name": "포위하는 경비대장",
+     "name": "경비대장의 지휘",
      "tags": [
       "개전"
      ],
      "fx": [
       {
        "k": "shield",
-       "ratio": 3
+       "ratio": 2.6
       },
       {
        "k": "status",
        "id": "협공",
-       "v": 2
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "경계 태세",
+     "tags": [
+      "개전"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.4
+      },
+      {
+       "k": "stack",
+       "id": "포위",
+       "v": 3,
+       "target": "allEnemies"
       },
       {
        "k": "ap",
@@ -675,42 +674,19 @@
      ]
     },
     {
-     "name": "대기 중인 경비대장",
+     "name": "경비대장의 각오",
      "tags": [
-      "개전",
-      "보존"
+      "개전"
      ],
      "fx": [
       {
        "k": "shield",
-       "ratio": 2.9
+       "ratio": 3.6
       },
       {
        "k": "status",
-       "id": "협공",
-       "v": 2
-      },
-      {
-       "k": "ap",
+       "id": "불굴",
        "v": 1
-      }
-     ]
-    },
-    {
-     "name": "왕국의 경비대장",
-     "tags": [
-      "개전",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.9
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 2
       },
       {
        "k": "ap",
@@ -721,19 +697,16 @@
    ],
    "blesses": [
     {
-     "name": "단단한 숨결",
-     "kind": "guard",
-     "fx": []
+     "name": "철통 경비",
+     "kind": "guard"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "순찰 보고",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "경비대장 직권",
+     "kind": "atkUp"
     }
    ]
   }

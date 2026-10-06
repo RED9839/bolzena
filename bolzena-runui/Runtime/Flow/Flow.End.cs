@@ -54,7 +54,7 @@ namespace Bolzena.RunUI
                 var vr = Ui.Img(panel, Theme.White, Theme.Line, "vrule"); vr.rectTransform.Column(0, 1, 24, 24, 392);
                 var hist = Ui.Rect("hist", panel).Fill(412, 24, 24, 24);
                 Ui.Col(hist, 4, TextAnchor.UpperLeft, null, true, false);
-                W.Section(hist, "지나온 싸움", null, 34);
+                W.Section(hist, "지나온 전투", null, 34);
                 foreach (var r in P.S.Hist.TakeLast(Theme.Compact ? 7 : 9))
                 {
                     string kindKo = r.Kind == "boss" ? "보스" : r.Kind == "elite" ? "엘리트" : r.Kind == "event" ? "이벤트" : "일반";
@@ -62,7 +62,7 @@ namespace Bolzena.RunUI
                     line.Pref(-1, Theme.C(34, 30));
                     line.textWrappingMode = TextWrappingModes.NoWrap;
                 }
-                if (P.S.Hist.Count == 0) Ui.Text(hist, "싸움이 없었습니다", 18, Theme.Sub).Pref(-1, 30);
+                if (P.S.Hist.Count == 0) Ui.Text(hist, "전투가 없었습니다", 18, Theme.Sub).Pref(-1, 30);
 
                 var go = Btn.Make(root, "로비로", BtnStyle.PillGold, Lobby, Theme.FsLg);
                 go.GetComponent<RectTransform>().At(0.5f, 0, 0, Theme.C(34, 22), 340, Theme.C(70, 64));

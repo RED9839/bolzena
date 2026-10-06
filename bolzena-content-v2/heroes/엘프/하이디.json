@@ -12,20 +12,70 @@
       "atk": 145,
       "def": 25,
       "crit": 10,
-      "blurb": "세상 최고의 특종은 자기 자신인 기자. 특종감으로 찍은 적은 모두의 표적이 되고, 쓰러지면 셀카 한 장이 1면 기사가 된다.",
+      "blurb": "세상 최고의 특종은 자기 자신인 기자. 상자 속에 잠복해 한 컷을 노리다가, 특종감으로 찍은 적에게 셔터를 몰아칩니다. 특종감이 쓰러지면 셀카 한 장이 1면 기사가 됩니다.",
       "keyword": {
         "name": "특종감",
-        "desc": "하이디가 쫓는 특종 — 쓰러지면 「특종 기사」를 쓰고 다음 특종을 찾는다",
+        "desc": "쫓는 특종 표시",
         "carrier": "enemy",
         "cap": 1,
         "hunt": true,
         "per": [
           {
             "stat": "taken",
-            "v": 0.25
+            "v": 0.3,
+            "from": "owner"
           }
         ]
       },
+      "keywords": [
+        {
+          "name": "잠복",
+          "desc": "상자 속에서 노리는 한 컷",
+          "carrier": "self",
+          "cap": 3,
+          "consumeAll": true,
+          "per": [
+            {
+              "stat": "dealt",
+              "v": 0.25
+            }
+          ]
+        },
+        {
+          "name": "초 집중 취재",
+          "desc": "특종만 쫓는 취재 모드",
+          "carrier": "self",
+          "cap": 2,
+          "decay": 1,
+          "rules": [
+            {
+              "name": "다음 특종",
+              "when": {
+                "on": "huntDown",
+                "id": "특종감"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "초 집중 취재",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "heidi_next_scoop"
+                },
+                {
+                  "k": "stack",
+                  "id": "잠복",
+                  "v": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
       "passives": [
         {
           "name": "목표 포착!",
@@ -67,21 +117,26 @@
         "cost": 200,
         "fx": [
           {
-            "k": "status",
-            "id": "피해 감소",
-            "v": 3
+            "k": "stack",
+            "id": "특종감",
+            "v": 1,
+            "target": "lowEnemy"
           },
           {
-            "k": "status",
-            "id": "표식",
-            "v": 2,
-            "target": "oneEnemy"
+            "k": "stack",
+            "id": "초 집중 취재",
+            "v": 2
           },
           {
             "k": "dmg",
-            "ratio": 0.4,
-            "hits": 5,
-            "target": "oneEnemy"
+            "ratio": 0.45,
+            "hits": 6,
+            "target": "lowEnemy"
+          },
+          {
+            "k": "status",
+            "id": "회피",
+            "v": 1
           }
         ]
       },
@@ -169,18 +224,17 @@
       "fx": [
         {
           "k": "status",
-          "id": "피해 감소",
-          "v": 2
-        },
-        {
-          "k": "draw",
+          "id": "회피",
           "v": 1
         },
         {
           "k": "stack",
-          "id": "특종감",
-          "v": 1,
-          "target": "oneEnemy"
+          "id": "잠복",
+          "v": 3
+        },
+        {
+          "k": "draw",
+          "v": 1
         }
       ],
       "oracles": [
@@ -189,18 +243,17 @@
           "fx": [
             {
               "k": "status",
-              "id": "피해 감소",
+              "id": "회피",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
               "v": 3
             },
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "특종감",
-              "v": 2,
-              "target": "oneEnemy"
             }
           ]
         },
@@ -210,18 +263,17 @@
           "fx": [
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "draw",
+              "id": "회피",
               "v": 1
             },
             {
               "k": "stack",
-              "id": "특종감",
-              "v": 1,
-              "target": "oneEnemy"
+              "id": "잠복",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -233,17 +285,18 @@
           "fx": [
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 3
+              "id": "회피",
+              "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "잠복",
+              "v": 3
             },
             {
               "k": "stack",
               "id": "특종감",
-              "v": 2,
+              "v": 1,
               "target": "oneEnemy"
             }
           ]
@@ -256,18 +309,17 @@
           "fx": [
             {
               "k": "status",
-              "id": "피해 감소",
+              "id": "회피",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
               "v": 3
             },
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "특종감",
-              "v": 2,
-              "target": "oneEnemy"
             }
           ]
         },
@@ -276,18 +328,17 @@
           "fx": [
             {
               "k": "status",
-              "id": "피해 감소",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
               "v": 3
             },
             {
               "k": "draw",
               "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "특종감",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         }
@@ -317,14 +368,8 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
-          "hits": 2,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
+          "ratio": 0.45,
+          "hits": 3,
           "target": "oneEnemy"
         }
       ],
@@ -334,14 +379,8 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.72,
-              "hits": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.58,
+              "hits": 3,
               "target": "oneEnemy"
             }
           ]
@@ -352,14 +391,8 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "hits": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.45,
+              "hits": 3,
               "target": "oneEnemy"
             }
           ]
@@ -369,14 +402,8 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "hits": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.45,
+              "hits": 3,
               "target": "oneEnemy"
             },
             {
@@ -392,14 +419,8 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "hits": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.65,
+              "hits": 3,
               "target": "oneEnemy"
             }
           ]
@@ -412,14 +433,8 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.66,
-              "hits": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.54,
+              "hits": 3,
               "target": "oneEnemy"
             }
           ]
@@ -618,8 +633,8 @@
         {
           "k": "critMod",
           "v": 0.1,
-          "target": "self",
-          "run": true
+          "run": true,
+          "target": "self"
         },
         {
           "k": "make",
@@ -627,8 +642,24 @@
           "v": 1
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "crit"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "draw",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -637,9 +668,9 @@
           "fx": [
             {
               "k": "critMod",
-              "v": 0.14,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "make",
@@ -647,8 +678,24 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "crit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -659,17 +706,28 @@
             {
               "k": "critMod",
               "v": 0.1,
-              "target": "self",
-              "run": true
+              "run": true,
+              "target": "self"
             },
             {
-              "k": "make",
-              "id": "하이디_t1",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "crit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -681,18 +739,34 @@
           "fx": [
             {
               "k": "critMod",
-              "v": 0.13,
-              "target": "self",
-              "run": true
+              "v": 0.1,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "make",
               "id": "하이디_t1",
-              "v": 1
+              "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "crit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -701,9 +775,9 @@
           "fx": [
             {
               "k": "critMod",
-              "v": 0.14,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "make",
@@ -711,8 +785,28 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "crit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    },
+                    {
+                      "k": "gauge",
+                      "v": 15
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -724,9 +818,9 @@
           "fx": [
             {
               "k": "critMod",
-              "v": 0.12,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "make",
@@ -734,8 +828,24 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "crit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

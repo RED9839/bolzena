@@ -137,7 +137,7 @@ namespace Bolzena.RunUI
             P.ClearElite();
             if (!P.IsBoss) { MapStep(); return; }
             var offer = P.IsLastFloor ? new System.Collections.Generic.List<string>() : P.BossCopyOffer();
-            if (offer.Count > 0) { P.Save("map"); BossCopyPick(offer, id => { P.BossCopy(id); NextFloor(); }); return; }
+            if (offer.Count > 0) { P.Save("map"); BossCopyPick(offer, id => { var cs = CardSnap(); P.BossCopy(id); GainCards(NewCards(cs), NextFloor); }); return; }
             NextFloor();
         }
 

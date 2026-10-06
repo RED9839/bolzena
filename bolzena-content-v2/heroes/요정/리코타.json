@@ -12,10 +12,10 @@
    "atk": 90,
    "def": 67,
    "crit": 5,
-   "blurb": "요정이 요리를 한다고 무시당하던 모나티엄에서 밤잠과 단맛까지 포기하며 버텨 수석으로 졸업한 요정 왕궁 셰프. 요리 실력은 완벽한데 상황을 읽는 눈썰미가 없어 접객만 하면 사고가 나고, 돌맛이 궁금하다며 궁전 바닥까지 핥아 본다. 파인애플 피자만큼은 용서 못 한다.",
+   "blurb": "요정이 요리를 한다고 무시당하던 모나티엄에서 밤잠과 단맛까지 포기하며 버텨 수석으로 졸업한 요정 왕궁 셰프. 요리 실력은 완벽한데 상황을 읽는 눈썰미가 없어 접객만 하면 사고가 나고, 돌맛이 궁금하다며 궁전 바닥까지 핥아 봅니다. 파인애플 피자만큼은 용서 못 합니다.",
    "keyword": {
     "name": "코스",
-    "desc": "한 턴의 식탁 — 0코 → 1코 → 2코 이상 카드를 차례로 내면 완성",
+    "desc": "비용 순서대로 차리는 한 턴의 코스",
     "carrier": "self",
     "cap": 2,
     "endClear": true,
@@ -67,7 +67,7 @@
       ]
      },
      {
-      "name": "풀코스",
+      "name": "오늘의 디저트",
       "when": {
        "on": "play",
        "who": "any",
@@ -86,19 +86,34 @@
       },
       "fx": [
        {
-        "k": "shield",
-        "ratio": 1.5
+        "k": "roll",
+        "n": 3
        },
        {
-        "k": "dmg",
-        "ratio": 1,
-        "target": "oneEnemy",
-        "base": "def"
+        "k": "ifRoll",
+        "n": 1
        },
        {
-        "k": "spend",
-        "id": "코스",
-        "all": true
+        "k": "status",
+        "id": "사기",
+        "v": 1
+       },
+       {
+        "k": "ifRoll",
+        "n": 2
+       },
+       {
+        "k": "status",
+        "id": "협공",
+        "v": 1
+       },
+       {
+        "k": "ifRoll",
+        "n": 3
+       },
+       {
+        "k": "ap",
+        "v": 1
        }
       ]
      }
@@ -111,17 +126,23 @@
     "fx": [
      {
       "k": "dmg",
-      "ratio": 2.5,
-      "target": "oneEnemy",
-      "base": "def"
+      "ratio": 0.7,
+      "base": "def",
+      "hits": 4,
+      "target": "topEnemy"
      },
      {
       "k": "tough",
-      "v": 2
+      "v": 2,
+      "target": "topEnemy"
+     },
+     {
+      "k": "drain",
+      "ratio": 0.3
      },
      {
       "k": "shield",
-      "ratio": 2
+      "ratio": 1.5
      }
     ]
    },
@@ -181,12 +202,11 @@
    ],
    "oracles": [
     {
-     "name": "진한 전채",
-     "tags": [],
+     "name": "셰프 특선 전채",
      "fx": [
       {
        "k": "shield",
-       "ratio": 1.55
+       "ratio": 1.6
       },
       {
        "k": "stack",
@@ -196,27 +216,29 @@
      ]
     },
     {
-     "name": "가벼운 전채",
-     "tags": [],
+     "name": "한 입 카나페",
      "fx": [
       {
        "k": "shield",
-       "ratio": 1.7
+       "ratio": 1.0
       },
       {
        "k": "stack",
        "id": "코스",
        "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
       }
      ]
     },
     {
-     "name": "코스의 전채",
-     "tags": [],
+     "name": "두 접시째",
      "fx": [
       {
        "k": "shield",
-       "ratio": 1.3
+       "ratio": 1.0
       },
       {
        "k": "stack",
@@ -226,14 +248,15 @@
      ]
     },
     {
-     "name": "숙성한 전채",
-     "tags": [
-      "보존"
-     ],
+     "name": "식전 수프",
      "fx": [
       {
+       "k": "heal",
+       "ratio": 1.2
+      },
+      {
        "k": "shield",
-       "ratio": 1.45
+       "ratio": 0.8
       },
       {
        "k": "stack",
@@ -243,14 +266,14 @@
      ]
     },
     {
-     "name": "축복의 전채",
+     "name": "미리 차린 식탁",
      "tags": [
-      "축복"
+      "개전"
      ],
      "fx": [
       {
        "k": "shield",
-       "ratio": 1.45
+       "ratio": 1.2
       },
       {
        "k": "stack",
@@ -262,19 +285,16 @@
    ],
    "blesses": [
     {
-     "name": "단단한 숨결",
-     "kind": "guard",
-     "fx": []
+     "name": "뜨끈한 접시",
+     "kind": "guard"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "메뉴판",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "셰프의 자존심",
+     "kind": "defUp"
     }
    ]
   },
@@ -302,25 +322,25 @@
    ],
    "oracles": [
     {
-     "name": "진한 조림",
+     "name": "푹 조리기",
      "tags": [
       "분쇄"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.05,
+       "ratio": 1.0,
        "target": "oneEnemy",
        "base": "def"
       },
       {
        "k": "shield",
-       "ratio": 1.3
+       "ratio": 1.2
       }
      ]
     },
     {
-     "name": "가벼운 조림",
+     "name": "살짝 데치기",
      "cost": 0,
      "tags": [
       "분쇄"
@@ -328,31 +348,31 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.6,
+       "ratio": 0.55,
        "target": "oneEnemy",
        "base": "def"
       },
       {
        "k": "shield",
-       "ratio": 0.75
+       "ratio": 0.6
       }
      ]
     },
     {
-     "name": "코스의 조림",
+     "name": "졸이며 다음 코스",
      "tags": [
       "분쇄"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.9,
+       "ratio": 0.8,
        "target": "oneEnemy",
        "base": "def"
       },
       {
        "k": "shield",
-       "ratio": 1.1
+       "ratio": 1.0
       },
       {
        "k": "stack",
@@ -362,59 +382,59 @@
      ]
     },
     {
-     "name": "숙성한 조림",
+     "name": "냄비째 끼얹기",
      "tags": [
-      "분쇄",
-      "보존"
+      "분쇄"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.95,
-       "target": "oneEnemy",
+       "ratio": 0.7,
+       "target": "allEnemies",
        "base": "def"
       },
       {
        "k": "shield",
-       "ratio": 1.2
+       "ratio": 0.9
       }
      ]
     },
     {
-     "name": "축복의 조림",
+     "name": "졸아붙은 소스",
      "tags": [
-      "분쇄",
-      "축복"
+      "분쇄"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.95,
+       "ratio": 0.8,
        "target": "oneEnemy",
        "base": "def"
       },
       {
        "k": "shield",
-       "ratio": 1.2
+       "ratio": 1.0
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "센 불",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "칼끝 손질",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "두꺼운 냄비",
+     "kind": "guard"
     }
    ]
   },
@@ -444,12 +464,11 @@
    ],
    "oracles": [
     {
-     "name": "진한 메인 요리",
-     "tags": [],
+     "name": "셰프의 메인",
      "fx": [
       {
        "k": "shield",
-       "ratio": 4.55
+       "ratio": 4.2
       },
       {
        "k": "ifStack",
@@ -458,20 +477,19 @@
       },
       {
        "k": "dmg",
-       "ratio": 1.55,
+       "ratio": 1.4,
        "target": "oneEnemy",
        "base": "def"
       }
      ]
     },
     {
-     "name": "가벼운 메인 요리",
+     "name": "한 그릇 요리",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "shield",
-       "ratio": 2.8
+       "ratio": 2.4
       },
       {
        "k": "ifStack",
@@ -480,19 +498,46 @@
       },
       {
        "k": "dmg",
-       "ratio": 0.95,
+       "ratio": 0.9,
        "target": "oneEnemy",
        "base": "def"
       }
      ]
     },
     {
-     "name": "코스의 메인 요리",
-     "tags": [],
+     "name": "코스 마무리",
      "fx": [
       {
        "k": "shield",
-       "ratio": 3.85
+       "ratio": 3.5
+      },
+      {
+       "k": "perStack",
+       "id": "코스"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.6,
+       "target": "oneEnemy",
+       "base": "def"
+      },
+      {
+       "k": "spend",
+       "id": "코스",
+       "all": true
+      }
+     ]
+    },
+    {
+     "name": "모두의 만찬",
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 1.5
+      },
+      {
+       "k": "shield",
+       "ratio": 3.0
       },
       {
        "k": "ifStack",
@@ -501,26 +546,22 @@
       },
       {
        "k": "dmg",
-       "ratio": 1.3,
-       "target": "oneEnemy",
+       "ratio": 0.9,
+       "target": "allEnemies",
        "base": "def"
+      }
+     ]
+    },
+    {
+     "name": "디저트까지",
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 3.5
       },
       {
-       "k": "stack",
-       "id": "코스",
+       "k": "draw",
        "v": 1
-      }
-     ]
-    },
-    {
-     "name": "숙성한 메인 요리",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 4.2
       },
       {
        "k": "ifStack",
@@ -529,30 +570,7 @@
       },
       {
        "k": "dmg",
-       "ratio": 1.45,
-       "target": "oneEnemy",
-       "base": "def"
-      }
-     ]
-    },
-    {
-     "name": "축복의 메인 요리",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 4.2
-      },
-      {
-       "k": "ifStack",
-       "id": "코스",
-       "n": 1
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.45,
+       "ratio": 1.2,
        "target": "oneEnemy",
        "base": "def"
       }
@@ -561,19 +579,16 @@
    ],
    "blesses": [
     {
-     "name": "단단한 숨결",
-     "kind": "guard",
-     "fx": []
+     "name": "은 접시 뚜껑",
+     "kind": "guard"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "다음 메뉴",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "서빙 종",
+     "kind": "ap"
     }
    ]
   },
@@ -587,7 +602,7 @@
    "fx": [
     {
      "k": "defMod",
-     "v": 0.2,
+     "v": 0.15,
      "run": true,
      "target": "self"
     },
@@ -595,30 +610,153 @@
      "k": "status",
      "id": "반격",
      "v": 2
+    },
+    {
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "play",
+        "who": "any",
+        "minCost": 2
+       },
+       "limit": {
+        "per": "turn",
+        "n": 1
+       },
+       "fx": [
+        {
+         "k": "shield",
+         "ratio": 0.4
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
     {
-     "name": "진한 셰프의 자존심",
+     "name": "진한 육수",
      "tags": [],
      "fx": [
       {
        "k": "defMod",
-       "v": 0.25,
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
       {
        "k": "status",
        "id": "반격",
-       "v": 3
+       "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "play",
+          "who": "any",
+          "minCost": 2
+         },
+         "limit": {
+          "per": "turn",
+          "n": 2
+         },
+         "fx": [
+          {
+           "k": "shield",
+           "ratio": 0.8
+          }
+         ]
+        }
+       ]
       }
      ]
     },
     {
-     "name": "가벼운 셰프의 자존심",
+     "name": "한 입 시식",
      "cost": 1,
      "tags": [],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "defMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "play",
+          "who": "any",
+          "minCost": 2
+         },
+         "limit": {
+          "per": "turn",
+          "n": 1
+         },
+         "fx": [
+          {
+           "k": "shield",
+           "ratio": 0.6
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "코스 요리",
+     "tags": [],
+     "fx": [
+      {
+       "k": "defMod",
+       "v": 0.3,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "play",
+          "who": "any",
+          "minCost": 2
+         },
+         "limit": {
+          "per": "turn",
+          "n": 1
+         },
+         "fx": [
+          {
+           "k": "shield",
+           "ratio": 1.0
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "숙성 소스",
+     "tags": [
+      "보존"
+     ],
      "fx": [
       {
        "k": "defMod",
@@ -630,85 +768,91 @@
        "k": "status",
        "id": "반격",
        "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "play",
+          "who": "any",
+          "minCost": 2
+         },
+         "limit": {
+          "per": "turn",
+          "n": 1
+         },
+         "fx": [
+          {
+           "k": "shield",
+           "ratio": 0.4
+          }
+         ]
+        }
+       ]
       }
      ]
     },
     {
-     "name": "코스의 셰프의 자존심",
-     "tags": [],
-     "fx": [
-      {
-       "k": "defMod",
-       "v": 0.25,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "코스",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "숙성한 셰프의 자존심",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "defMod",
-       "v": 0.25,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "축복의 셰프의 자존심",
+     "name": "셰프의 정찬",
      "tags": [
       "축복"
      ],
      "fx": [
       {
        "k": "defMod",
-       "v": 0.25,
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
       {
        "k": "status",
        "id": "반격",
-       "v": 2
+       "v": 3
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "play",
+          "who": "any",
+          "minCost": 2
+         },
+         "limit": {
+          "per": "turn",
+          "n": 1
+         },
+         "fx": [
+          {
+           "k": "shield",
+           "ratio": 0.4
+          }
+         ]
+        }
+       ]
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "가벼운 숨결",
-     "kind": "cost",
-     "fx": []
+     "name": "밑준비",
+     "kind": "cost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "셰프의 긍지",
+     "kind": "defUp"
     },
     {
-     "name": "기세의 숨결",
-     "kind": "atkUp",
-     "fx": []
+     "name": "맛보기 한 숟갈",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "코스",
+       "v": 1
+      }
+     ]
     }
    ]
   }

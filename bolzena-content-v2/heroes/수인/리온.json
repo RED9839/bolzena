@@ -12,10 +12,10 @@
       "atk": 84,
       "def": 70,
       "crit": 5,
-      "blurb": "정의로운 히어로 '스핑크스'를 꿈꾸는 사자 수인.",
+      "blurb": "정의로운 히어로 「스핑크스」를 꿈꾸는 사자 수인.",
       "keyword": {
         "name": "수수께끼",
-        "desc": "턴마다 새로 내는 문제 — 1 이면 공격, 2 면 스킬 카드를 파티가 2장 내면 정답",
+        "desc": "턴마다 바뀌는 문제",
         "carrier": "self",
         "cap": 2,
         "wrap": true,
@@ -197,31 +197,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 유죄 선언",
+          "name": "중형 선고",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.6
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가벼운 유죄 선언",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.8
+              "ratio": 2.5
             },
             {
               "k": "status",
@@ -231,21 +211,22 @@
             {
               "k": "status",
               "id": "반격",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "정의의 유죄 선언",
+          "name": "약식 판결",
+          "cost": 1,
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.6
+              "ratio": 1.3
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 3
+              "v": 1
             },
             {
               "k": "status",
@@ -255,19 +236,36 @@
           ]
         },
         {
-          "name": "든든한 유죄 선언",
-          "tags": [
-            "보존"
-          ],
+          "name": "수수께끼 판결",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.5
+              "ratio": 2.0
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "수수께끼",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "집단 유죄",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 3
+              "v": 2,
+              "target": "allEnemies"
             },
             {
               "k": "status",
@@ -277,14 +275,12 @@
           ]
         },
         {
-          "name": "복 받은 유죄 선언",
-          "tags": [
-            "축복"
-          ],
+          "name": "즉결 재판",
+          "cost": 3,
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.5
+              "ratio": 3.4
             },
             {
               "k": "status",
@@ -294,29 +290,23 @@
             {
               "k": "status",
               "id": "반격",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "든든함",
+          "name": "히어로 망토",
           "kind": "guard"
         },
         {
-          "name": "한 장 더",
+          "name": "증거 서류",
           "kind": "draw"
         },
         {
-          "name": "히어로 포즈",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
+          "name": "법정의 위엄",
+          "kind": "defUp"
         }
       ]
     },
@@ -344,16 +334,16 @@
       ],
       "oracles": [
         {
-          "name": "힘준 수수께끼 하나 더",
+          "name": "어려운 수수께끼",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 2.0
             },
             {
               "k": "stack",
               "id": "수수께끼",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
@@ -362,12 +352,12 @@
           ]
         },
         {
-          "name": "가벼운 수수께끼 하나 더",
+          "name": "쉬운 수수께끼",
           "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.25
+              "ratio": 0.6
             },
             {
               "k": "stack",
@@ -381,61 +371,60 @@
           ]
         },
         {
-          "name": "정의의 수수께끼 하나 더",
+          "name": "스무고개",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 1.4
             },
             {
               "k": "stack",
               "id": "수수께끼",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "든든한 수수께끼 하나 더",
+          "name": "정답은 너!",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.7
+            },
+            {
+              "k": "stack",
+              "id": "수수께끼",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "풀리지 않는 문제",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.75
+              "ratio": 1.6
             },
             {
               "k": "stack",
               "id": "수수께끼",
-              "v": 2
-            },
-            {
-              "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 수수께끼 하나 더",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.75
             },
             {
-              "k": "stack",
-              "id": "수수께끼",
-              "v": 2
-            },
-            {
-              "k": "draw",
+              "k": "status",
+              "id": "반격",
               "v": 1
             }
           ]
@@ -443,22 +432,16 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
+          "name": "갈기 방패",
           "kind": "guard"
         },
         {
-          "name": "한 장 더",
+          "name": "힌트 하나",
           "kind": "draw"
         },
         {
-          "name": "히어로 포즈",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
+          "name": "번뜩이는 정답",
+          "kind": "ap"
         }
       ]
     },
@@ -488,13 +471,13 @@
       ],
       "oracles": [
         {
-          "name": "힘준 심판의 망치",
+          "name": "무거운 망치",
           "fx": [
             {
               "k": "dmg",
               "ratio": 1.8,
-              "base": "def",
-              "target": "oneEnemy"
+              "target": "oneEnemy",
+              "base": "def"
             },
             {
               "k": "tough",
@@ -503,19 +486,19 @@
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 심판의 망치",
+          "name": "판결봉 톡",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.25,
-              "base": "def",
-              "target": "oneEnemy"
+              "ratio": 0.9,
+              "target": "oneEnemy",
+              "base": "def"
             },
             {
               "k": "tough",
@@ -529,90 +512,84 @@
           ]
         },
         {
-          "name": "정의의 심판의 망치",
+          "name": "수수께끼의 망치",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.8,
-              "base": "def",
-              "target": "oneEnemy"
+              "ratio": 1.4,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "수수께끼"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "법정 흔들기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "allEnemies",
+              "base": "def"
             },
             {
               "k": "tough",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "최후의 판결",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "tough",
+              "v": 2
             },
             {
               "k": "status",
               "id": "취약",
               "v": 2
-            }
-          ]
-        },
-        {
-          "name": "재빠른 심판의 망치",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.75,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 심판의 망치",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.7,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "정의의 무게",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "죄목 확인",
           "kind": "weakSpot"
         },
         {
-          "name": "히어로 포즈",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
+          "name": "단단한 갈기",
+          "kind": "defUp"
         }
       ]
     },
@@ -626,114 +603,207 @@
       "fx": [
         {
           "k": "status",
-          "id": "반격",
-          "v": 2
-        },
-        {
-          "k": "status",
           "id": "결의",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "play",
+                "every": 3,
+                "perTurn": true,
+                "who": "any"
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "반격",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 라이온 시그널",
+          "name": "정의의 시그널",
           "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 3
-            },
             {
               "k": "status",
               "id": "결의",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "every": 3,
+                    "perTurn": true,
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 라이온 시그널",
+          "name": "작은 시그널",
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "every": 3,
+                    "perTurn": true,
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "정의의 라이온 시그널",
+          "name": "수수께끼 정답",
           "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 3
-            },
             {
               "k": "status",
               "id": "결의",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "every": 3,
+                    "perTurn": true,
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "든든한 라이온 시그널",
+          "name": "사자의 포효",
           "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 3
-            },
             {
               "k": "status",
               "id": "결의",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "every": 3,
+                    "perTurn": true,
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 2
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 라이온 시그널",
+          "name": "히어로 등장",
           "tags": [
             "축복"
           ],
           "fx": [
             {
               "k": "status",
-              "id": "반격",
-              "v": 3
+              "id": "결의",
+              "v": 1
             },
             {
               "k": "status",
-              "id": "결의",
+              "id": "반격",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "every": 3,
+                    "perTurn": true,
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
+          "name": "신호탄",
           "kind": "ap"
         },
         {
-          "name": "한 장 더",
+          "name": "사건 파일",
           "kind": "draw"
         },
         {
-          "name": "히어로 포즈",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
+          "name": "히어로 자세",
+          "kind": "defUp"
         }
       ]
     }

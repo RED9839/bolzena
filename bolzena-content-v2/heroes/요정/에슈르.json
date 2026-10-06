@@ -12,10 +12,10 @@
    "atk": 145,
    "def": 25,
    "crit": 10,
-   "blurb": "마법 이론만큼은 엘리아스 최정상급인데 학생이 안 모여 차린 빵집 '에심당'이 요정 왕국 명물이 되어 버린 교장. \"여긴 빵집이 아니라 마법학교\"라고 오늘도 우긴다.",
+   "blurb": "마법 이론만큼은 엘리아스 최정상급인데 학생이 안 모여 차린 빵집 「에심당」이 요정 왕국 명물이 되어 버린 교장. \"여긴 빵집이 아니라 마법학교\"라고 오늘도 우깁니다.",
    "keyword": {
     "name": "빵 센디오",
-    "desc": "빵이냐 마법이냐 — 카드를 낼 때마다 부풀고, 셋이면 둘 다",
+    "desc": "카드마다 부푸는 빵",
     "carrier": "self",
     "cap": 3,
     "rules": [
@@ -169,8 +169,7 @@
    ],
    "oracles": [
     {
-     "name": "갓 구운 빵템피드",
-     "tags": [],
+     "name": "오븐 폭주",
      "fx": [
       {
        "k": "dmg",
@@ -184,7 +183,7 @@
       },
       {
        "k": "heal",
-       "ratio": 1.95
+       "ratio": 1.9
       },
       {
        "k": "ifChoice",
@@ -198,13 +197,12 @@
      ]
     },
     {
-     "name": "가벼운 빵템피드",
+     "name": "빵 부스러기 탄",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.3,
+       "ratio": 0.25,
        "target": "oneEnemy",
        "hits": 6
       },
@@ -214,7 +212,7 @@
       },
       {
        "k": "heal",
-       "ratio": 1.2
+       "ratio": 1.1
       },
       {
        "k": "ifChoice",
@@ -223,15 +221,41 @@
       {
        "k": "status",
        "id": "고통",
-       "v": 3
+       "v": 2
       }
      ]
     },
     {
-     "name": "부푼 빵템피드",
-     "tags": [
-      "보존"
-     ],
+     "name": "반죽 폭풍",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.25,
+       "target": "allEnemies",
+       "hits": 6
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 1.5
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 3,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "센디오 굽기",
      "fx": [
       {
        "k": "dmg",
@@ -244,8 +268,9 @@
        "n": 1
       },
       {
-       "k": "heal",
-       "ratio": 1.75
+       "k": "stack",
+       "id": "빵 센디오",
+       "v": 2
       },
       {
        "k": "ifChoice",
@@ -254,21 +279,19 @@
       {
        "k": "status",
        "id": "고통",
-       "v": 3
+       "v": 5
       }
      ]
     },
     {
-     "name": "발효시킨 빵템피드",
-     "tags": [
-      "보존"
-     ],
+     "name": "교장실 대폭발",
+     "cost": 3,
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.4,
+       "ratio": 0.5,
        "target": "oneEnemy",
-       "hits": 6
+       "hits": 7
       },
       {
        "k": "ifChoice",
@@ -276,7 +299,7 @@
       },
       {
        "k": "heal",
-       "ratio": 1.8
+       "ratio": 2.4
       },
       {
        "k": "ifChoice",
@@ -285,57 +308,23 @@
       {
        "k": "status",
        "id": "고통",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "교장의 빵템피드",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.4,
-       "target": "oneEnemy",
-       "hits": 6
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.8
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3
+       "v": 5
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "바삭한 빵가루",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "갈라진 껍질",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "버터 듬뿍",
+     "kind": "heal"
     }
    ]
   },
@@ -377,12 +366,11 @@
    ],
    "oracles": [
     {
-     "name": "갓 구운 입자 이론",
-     "tags": [],
+     "name": "심화 이론",
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.15,
+       "v": 0.2,
        "run": true,
        "target": "self"
       },
@@ -392,7 +380,7 @@
       },
       {
        "k": "heal",
-       "ratio": 3.1
+       "ratio": 2.6
       },
       {
        "k": "ifChoice",
@@ -406,13 +394,12 @@
      ]
     },
     {
-     "name": "가벼운 입자 이론",
+     "name": "쪽지 시험",
      "cost": 0,
-     "tags": [],
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.15,
+       "v": 0.1,
        "run": true,
        "target": "self"
       },
@@ -422,7 +409,35 @@
       },
       {
        "k": "heal",
-       "ratio": 1.5
+       "ratio": 1.4
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "공동 연구",
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "allAllies"
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 2
       },
       {
        "k": "ifChoice",
@@ -436,9 +451,36 @@
      ]
     },
     {
-     "name": "부푼 입자 이론",
+     "name": "복습 시간",
+     "fx": [
+      {
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 2.2
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "draw",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "교장 직강",
      "tags": [
-      "보존"
+      "개전"
      ],
      "fx": [
       {
@@ -453,69 +495,7 @@
       },
       {
        "k": "heal",
-       "ratio": 2.55
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "발효시킨 입자 이론",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.65
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "교장의 입자 이론",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.4
+       "ratio": 2.2
       },
       {
        "k": "ifChoice",
@@ -531,19 +511,16 @@
    ],
    "blesses": [
     {
-     "name": "포근한 숨결",
-     "kind": "heal",
-     "fx": []
+     "name": "따끈한 빵",
+     "kind": "heal"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "참고 문헌",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "교장의 자존심",
+     "kind": "atkUp"
     }
    ]
   },
@@ -585,12 +562,11 @@
    ],
    "oracles": [
     {
-     "name": "갓 구운 화염 주문",
-     "tags": [],
+     "name": "겁화 주문",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.9,
+       "ratio": 3.8,
        "target": "oneEnemy"
       },
       {
@@ -599,7 +575,7 @@
       },
       {
        "k": "heal",
-       "ratio": 2.6
+       "ratio": 2.5
       },
       {
        "k": "ifChoice",
@@ -614,13 +590,12 @@
      ]
     },
     {
-     "name": "가벼운 화염 주문",
+     "name": "불씨 주문",
      "cost": 2,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.65,
+       "ratio": 2.5,
        "target": "oneEnemy"
       },
       {
@@ -629,7 +604,7 @@
       },
       {
        "k": "heal",
-       "ratio": 1.75
+       "ratio": 1.6
       },
       {
        "k": "ifChoice",
@@ -644,14 +619,42 @@
      ]
     },
     {
-     "name": "부푼 화염 주문",
+     "name": "화염 폭풍",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.3,
+       "target": "allEnemies"
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "heal",
+       "ratio": 2
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "status",
+       "id": "고통",
+       "v": 3,
+       "target": "allEnemies"
+      }
+     ]
+    },
+    {
+     "name": "불꽃 심판",
      "tags": [
-      "보존"
+      "약점 공격"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.45,
+       "ratio": 3.4,
        "target": "oneEnemy"
       },
       {
@@ -675,14 +678,14 @@
      ]
     },
     {
-     "name": "발효시킨 화염 주문",
+     "name": "마지막 장작",
      "tags": [
-      "보존"
+      "소멸"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.6,
+       "ratio": 7.0,
        "target": "oneEnemy"
       },
       {
@@ -691,38 +694,7 @@
       },
       {
        "k": "heal",
-       "ratio": 2.4
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "교장의 화염 주문",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.4
+       "ratio": 2
       },
       {
        "k": "ifChoice",
@@ -739,19 +711,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "장작 한 단",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "불붙은 틈",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "구운 빵 냄새",
+     "kind": "heal"
     }
    ]
   },
@@ -770,9 +739,22 @@
      "target": "self"
     },
     {
-     "k": "stack",
-     "id": "빵 센디오",
-     "v": 2
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "stackReach",
+        "id": "빵 센디오",
+        "n": 3
+       },
+       "fx": [
+        {
+         "k": "draw",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -781,23 +763,9 @@
      "tags": [],
      "fx": [
       {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
+       "k": "draw",
+       "v": 1
       },
-      {
-       "k": "stack",
-       "id": "빵 센디오",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "가벼운 그리모어",
-     "cost": 0,
-     "tags": [],
-     "fx": [
       {
        "k": "atkMod",
        "v": 0.1,
@@ -805,9 +773,55 @@
        "target": "self"
       },
       {
-       "k": "stack",
-       "id": "빵 센디오",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "stackReach",
+          "id": "빵 센디오",
+          "n": 3
+         },
+         "fx": [
+          {
+           "k": "draw",
+           "v": 1
+          },
+          {
+           "k": "heal",
+           "ratio": 0.5
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "빵 한 조각",
+     "cost": 0,
+     "tags": [],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "stackReach",
+          "id": "빵 센디오",
+          "n": 3
+         },
+         "fx": [
+          {
+           "k": "draw",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -824,21 +838,31 @@
        "target": "self"
       },
       {
-       "k": "stack",
-       "id": "빵 센디오",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "stackReach",
+          "id": "빵 센디오",
+          "n": 3
+         },
+         "fx": [
+          {
+           "k": "draw",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
     {
      "name": "발효시킨 그리모어",
-     "tags": [
-      "보존"
-     ],
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.15,
+       "v": 0.1,
        "run": true,
        "target": "self"
       },
@@ -846,6 +870,24 @@
        "k": "stack",
        "id": "빵 센디오",
        "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "stackReach",
+          "id": "빵 센디오",
+          "n": 3
+         },
+         "fx": [
+          {
+           "k": "draw",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -857,33 +899,55 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.15,
+       "v": 0.1,
        "run": true,
        "target": "self"
       },
       {
-       "k": "stack",
-       "id": "빵 센디오",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "stackReach",
+          "id": "빵 센디오",
+          "n": 3
+         },
+         "fx": [
+          {
+           "k": "draw",
+           "v": 1
+          }
+         ]
+        },
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "빵 센디오",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "가벼운 숨결",
-     "kind": "cost",
-     "fx": []
+     "name": "얇은 판본",
+     "kind": "cost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "책갈피",
+     "kind": "draw"
     },
     {
-     "name": "기세의 숨결",
-     "kind": "atkUp",
-     "fx": []
+     "name": "마도서의 위엄",
+     "kind": "atkUp"
     }
    ]
   }

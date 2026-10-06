@@ -12,29 +12,27 @@
       "atk": 75,
       "def": 70,
       "crit": 5,
-      "blurb": "남의 화난 표정을 수집하는 엘튜버 유령. 적을 약 올릴 때마다 「표정」 이 모이고, 둘이 차면 「화난 얼굴」 한 장을 갤러리에서 꺼내 다시 약을 올린다.",
+      "blurb": "남의 화난 표정을 수집하는 도발의 여왕 엘튜버 유령. 약을 올리거나 얻어맞을 때마다 「표정」 이 모이고, 모은 표정으로 적을 얼어붙게 하거나 갤러리째 들이밉니다. 넘친 표정은 반격이 됩니다.",
       "keyword": {
         "name": "표정",
-        "desc": "약 올린 상대의 찡그린 얼굴 — 디버프를 걸 때마다 한 장, 둘이면 「화난 얼굴」",
+        "desc": "약 올려서 모은 화난 표정",
         "carrier": "self",
-        "cap": 2,
+        "cap": 3,
         "rules": [
           {
-            "name": "화난 얼굴 갤러리",
+            "name": "표정 관리 실패",
             "when": {
-              "on": "stackReach",
-              "id": "표정",
-              "n": 2
+              "on": "stackOver",
+              "id": "표정"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
             },
             "fx": [
               {
-                "k": "spend",
-                "id": "표정",
-                "all": true
-              },
-              {
-                "k": "make",
-                "id": "셀리네_t1",
+                "k": "status",
+                "id": "반격",
                 "v": 1
               }
             ]
@@ -58,6 +56,24 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "도발 전문 엘튜버",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            }
+          ]
         }
       ],
       "ult": {
@@ -70,9 +86,10 @@
             "target": "oneEnemy"
           },
           {
-            "k": "stack",
-            "id": "표정",
-            "v": 2
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "randomEnemy"
           },
           {
             "k": "ifBroken"
@@ -129,106 +146,156 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy",
+          "ratio": 0.6,
+          "target": "allEnemies",
           "base": "def"
         },
         {
+          "k": "ifStack",
+          "id": "표정",
+          "n": 2
+        },
+        {
           "k": "status",
-          "id": "약화",
-          "v": 1
+          "id": "기절",
+          "v": 1,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "표정",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "진심 어린 도발",
+          "name": "하트 에너지 충전",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy",
+              "ratio": 0.8,
+              "target": "allEnemies",
               "base": "def"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가벼운 도발",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy",
-              "base": "def"
+              "k": "ifStack",
+              "id": "표정",
+              "n": 2
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "준비한 멘트",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "oneEnemy",
-              "base": "def"
+              "id": "기절",
+              "v": 1,
+              "target": "randomEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "구독 좋아요 알림",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "반격",
+              "k": "spend",
+              "id": "표정",
               "v": 2
             }
           ]
         },
         {
-          "name": "축복의 도발",
-          "tags": [
-            "축복"
-          ],
+          "name": "가벼운 하트",
+          "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 0.35,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "ifStack",
+              "id": "표정",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "표정",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "팬서비스",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "ifStack",
+              "id": "표정",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "표정",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "모아 둔 표정",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "ifStack",
+              "id": "표정",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "하트 원샷",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
               "target": "oneEnemy",
               "base": "def"
             },
             {
+              "k": "ifStack",
+              "id": "표정",
+              "n": 2
+            },
+            {
               "k": "status",
-              "id": "약화",
-              "v": 1
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "표정",
+              "v": 2
             }
           ]
         }
@@ -258,13 +325,17 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.2
+          "ratio": 2.0
         },
         {
           "k": "status",
-          "id": "약화",
-          "v": 1,
-          "target": "allEnemies"
+          "id": "피해 감소",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
         }
       ],
       "oracles": [
@@ -273,13 +344,17 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.2
+              "ratio": 2.8
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
             }
           ]
         },
@@ -289,12 +364,55 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.85
+              "ratio": 1.2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "라이브 방송",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.0
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "흑역사 박제",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -307,51 +425,17 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.95
+              "ratio": 2.6
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "라이브 방송",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.2
+              "id": "피해 감소",
+              "v": 2
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "표정",
+              "id": "반격",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "축복의 사진",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.85
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
             }
           ]
         }
@@ -392,9 +476,19 @@
           "base": "def"
         },
         {
-          "k": "make",
-          "id": "셀리네_t1",
-          "v": 1
+          "k": "perStack",
+          "id": "표정"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "oneEnemy",
+          "base": "def"
+        },
+        {
+          "k": "spend",
+          "id": "표정",
+          "all": true
         }
       ],
       "oracles": [
@@ -403,14 +497,24 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 1.0,
               "target": "oneEnemy",
               "base": "def"
             },
             {
-              "k": "make",
-              "id": "셀리네_t1",
-              "v": 1
+              "k": "perStack",
+              "id": "표정"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "spend",
+              "id": "표정",
+              "all": true
             }
           ]
         },
@@ -420,33 +524,24 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.5,
               "target": "oneEnemy",
               "base": "def"
             },
             {
-              "k": "make",
-              "id": "셀리네_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "소장품",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
+              "k": "perStack",
+              "id": "표정"
+            },
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.3,
               "target": "oneEnemy",
               "base": "def"
             },
             {
-              "k": "make",
-              "id": "셀리네_t1",
-              "v": 1
+              "k": "spend",
+              "id": "표정",
+              "all": true
             }
           ]
         },
@@ -455,32 +550,75 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.95,
               "target": "oneEnemy",
               "base": "def"
             },
             {
-              "k": "make",
-              "id": "셀리네_t1",
+              "k": "perStack",
+              "id": "표정"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "spend",
+              "id": "표정",
               "v": 2
             }
           ]
         },
         {
-          "name": "축복의 전시",
-          "tags": [
-            "축복"
-          ],
+          "name": "순회 전시",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
+              "ratio": 0.55,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "perStack",
+              "id": "표정"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "spend",
+              "id": "표정",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "혹평",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
               "target": "oneEnemy",
               "base": "def"
             },
             {
-              "k": "make",
-              "id": "셀리네_t1",
+              "k": "perStack",
+              "id": "표정"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "spend",
+              "id": "표정",
               "v": 1
             }
           ]
@@ -496,8 +634,8 @@
           "kind": "draw"
         },
         {
-          "name": "액자 테두리",
-          "kind": "guard"
+          "name": "액자 모서리",
+          "kind": "frost"
         }
       ]
     },
@@ -527,17 +665,17 @@
             {
               "k": "status",
               "id": "약화",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
               "id": "반격",
-              "v": 2
+              "v": 3
             }
           ]
         },
         {
-          "name": "살짝 반말",
+          "name": "반말 한마디",
           "cost": 0,
           "fx": [
             {
@@ -548,20 +686,22 @@
             {
               "k": "status",
               "id": "반격",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "아껴 둔 반말",
-          "tags": [
-            "보존"
-          ],
+          "name": "찡긋 반말",
           "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
             },
             {
               "k": "status",
@@ -581,21 +721,9 @@
             },
             {
               "k": "status",
-              "id": "반격",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "축복의 반말",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "status",
@@ -603,16 +731,38 @@
               "v": 2
             }
           ]
+        },
+        {
+          "name": "반말로 인사",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "콕 찌르는 말",
-          "kind": "frost"
+          "name": "툭 던진 말",
+          "kind": "cost"
         },
         {
-          "name": "재빠른 말",
-          "kind": "cost"
+          "name": "말대꾸",
+          "kind": "draw"
         },
         {
           "name": "윙크",
@@ -622,28 +772,6 @@
               "ratio": 0.6
             }
           ]
-        }
-      ]
-    },
-    {
-      "id": "셀리네_t1",
-      "name": "화난 얼굴",
-      "hero": "셀리네",
-      "token": true,
-      "cost": 0,
-      "type": "스킬",
-      "tags": [
-        "소멸"
-      ],
-      "fx": [
-        {
-          "k": "status",
-          "id": "약화",
-          "v": 1
-        },
-        {
-          "k": "shield",
-          "ratio": 0.8
         }
       ]
     }
@@ -705,7 +833,7 @@
           ]
         }
       ],
-      "blurb": "한밤의 무대 의상. 넘치는 기운이 신기루처럼 몸을 감싼다."
+      "blurb": "한밤의 무대 의상. 넘치는 기운이 신기루처럼 몸을 감쌉니다."
     }
   ]
 }

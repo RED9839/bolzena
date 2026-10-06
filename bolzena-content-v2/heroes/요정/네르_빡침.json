@@ -12,10 +12,10 @@
       "atk": 156,
       "def": 26,
       "crit": 10,
-      "blurb": "차원 침공 때 고문당하는 에르핀을 보고 교주와 '분노의 공명'을 일으켜 각성한 보모 네르. 본인은 성전 모드라 부르지만 다들 빡침 모드라 부른다. 교주와 여왕에게 손대는 놈은 도끼창으로 심판한다.",
+      "blurb": "차원 침공 때 고문당하는 에르핀을 보고 교주와 「분노의 공명」을 일으켜 각성한 보모 네르. 본인은 성전 모드라 부르지만 다들 빡침 모드라 부릅니다. 교주와 여왕에게 손대는 놈은 도끼창으로 심판합니다.",
       "keyword": {
         "name": "빡침",
-        "desc": "교주와 여왕에게 손댄 놈을 향한 분노 — 맞을 때마다 쌓이고 다섯이면 터진다",
+        "desc": "맞을 때마다 쌓이는 분노",
         "carrier": "self",
         "cap": 5,
         "per": [
@@ -64,7 +64,7 @@
         {
           "id": "네르_빡침_성전",
           "name": "성전 모드",
-          "desc": "본인은 성전 모드, 다들 빡침 모드라 부르는 분노 폭주 — 참격이 세 번이 되고 맞을수록 더 빡친다",
+          "desc": "본인은 성전 모드, 다들 빡침 모드라 부르는 분노 폭주 — 참격이 세 번이 되고 맞을수록 더 빡침",
           "turns": 3,
           "until": {
             "on": "stackGone",
@@ -196,14 +196,14 @@
       ],
       "oracles": [
         {
-          "name": "격노한 손 떼",
+          "name": "손대지 마!",
           "tags": [
             "연계"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.0,
               "target": "oneEnemy",
               "hits": 2
             },
@@ -224,7 +224,7 @@
           ]
         },
         {
-          "name": "가벼운 손 떼",
+          "name": "툭 밀치기",
           "cost": 0,
           "tags": [
             "연계"
@@ -232,7 +232,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.5,
               "target": "oneEnemy",
               "hits": 2
             },
@@ -253,67 +253,9 @@
           ]
         },
         {
-          "name": "빡친 손 떼",
+          "name": "터져 버린 분노",
           "tags": [
             "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "빡침",
-              "n": 4
-            },
-            {
-              "k": "tough",
-              "v": 2
-            },
-            {
-              "k": "spend",
-              "id": "빡침",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "삭여 둔 손 떼",
-          "tags": [
-            "연계",
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "빡침",
-              "n": 5
-            },
-            {
-              "k": "tough",
-              "v": 2
-            },
-            {
-              "k": "spend",
-              "id": "빡침",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "성전의 손 떼",
-          "tags": [
-            "연계",
-            "축복"
           ],
           "fx": [
             {
@@ -323,13 +265,13 @@
               "hits": 2
             },
             {
-              "k": "ifStack",
-              "id": "빡침",
-              "n": 5
+              "k": "perStack",
+              "id": "빡침"
             },
             {
-              "k": "tough",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
@@ -337,23 +279,74 @@
               "all": true
             }
           ]
+        },
+        {
+          "name": "휘두르며 밀어내기",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "빡침",
+              "n": 5
+            },
+            {
+              "k": "tough",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "빡침",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "건드렸겠다?",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "빡침",
+              "v": 2
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "세찬 숨결",
-          "kind": "power",
-          "fx": []
+          "name": "분노의 날",
+          "kind": "power"
         },
         {
-          "name": "틈새 노리기",
-          "kind": "weakSpot",
-          "fx": []
+          "name": "빈틈 포착",
+          "kind": "weakSpot"
         },
         {
-          "name": "번뜩이는 숨결",
-          "kind": "draw",
-          "fx": []
+          "name": "부글부글",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빡침",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -388,12 +381,11 @@
       ],
       "oracles": [
         {
-          "name": "격노한 도끼창",
-          "tags": [],
+          "name": "도끼창 대회전",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.35,
+              "ratio": 2.3,
               "target": "allEnemies"
             },
             {
@@ -414,9 +406,8 @@
           ]
         },
         {
-          "name": "가벼운 도끼창",
+          "name": "반쯤 휘두르기",
           "cost": 2,
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -441,22 +432,20 @@
           ]
         },
         {
-          "name": "빡친 도끼창",
-          "tags": [],
+          "name": "분노 대폭발",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 1.7,
               "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "빡침",
-              "n": 4
+              "k": "perStack",
+              "id": "빡침"
             },
             {
-              "k": "tough",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.3,
               "target": "allEnemies"
             },
             {
@@ -467,15 +456,12 @@
           ]
         },
         {
-          "name": "삭여 둔 도끼창",
-          "tags": [
-            "보존"
-          ],
+          "name": "정수리 내려찍기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.15,
-              "target": "allEnemies"
+              "ratio": 3.4,
+              "target": "oneEnemy"
             },
             {
               "k": "ifStack",
@@ -484,8 +470,7 @@
             },
             {
               "k": "tough",
-              "v": 1,
-              "target": "allEnemies"
+              "v": 2
             },
             {
               "k": "spend",
@@ -495,49 +480,39 @@
           ]
         },
         {
-          "name": "성전의 도끼창",
-          "tags": [
-            "축복"
-          ],
+          "name": "분노의 포효",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.15,
+              "ratio": 1.8,
               "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "빡침",
-              "n": 5
-            },
-            {
-              "k": "tough",
+              "k": "status",
+              "id": "약화",
               "v": 1,
               "target": "allEnemies"
             },
             {
-              "k": "spend",
+              "k": "stack",
               "id": "빡침",
-              "all": true
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "세찬 숨결",
-          "kind": "power",
-          "fx": []
+          "name": "무거운 창날",
+          "kind": "power"
         },
         {
-          "name": "틈새 노리기",
-          "kind": "weakSpot",
-          "fx": []
+          "name": "쩍 갈라지는 땅",
+          "kind": "frost"
         },
         {
-          "name": "번뜩이는 숨결",
-          "kind": "draw",
-          "fx": []
+          "name": "고쳐 잡기",
+          "kind": "cost"
         }
       ]
     },
@@ -562,8 +537,7 @@
       ],
       "oracles": [
         {
-          "name": "격노한 성전",
-          "tags": [],
+          "name": "성전 개시",
           "fx": [
             {
               "k": "dmg",
@@ -578,13 +552,12 @@
           ]
         },
         {
-          "name": "가벼운 성전",
+          "name": "짧게 외치기",
           "cost": 1,
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 0.7,
               "target": "allEnemies"
             },
             {
@@ -595,12 +568,11 @@
           ]
         },
         {
-          "name": "빡친 성전",
-          "tags": [],
+          "name": "빡침 선언",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.2,
               "target": "allEnemies"
             },
             {
@@ -611,32 +583,34 @@
             {
               "k": "stack",
               "id": "빡침",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "삭여 둔 성전",
-          "tags": [
-            "보존"
-          ],
+          "name": "교단 총동원",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.0,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "사기",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
             }
           ]
         },
         {
-          "name": "성전의 성전",
+          "name": "선봉의 외침",
           "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
@@ -654,19 +628,16 @@
       ],
       "blesses": [
         {
-          "name": "넘치는 숨결",
-          "kind": "ap",
-          "fx": []
+          "name": "드높은 외침",
+          "kind": "power"
         },
         {
-          "name": "번뜩이는 숨결",
-          "kind": "draw",
-          "fx": []
+          "name": "진군 나팔",
+          "kind": "ap"
         },
         {
-          "name": "버티는 숨결",
-          "kind": "defUp",
-          "fx": []
+          "name": "성전의 기세",
+          "kind": "atkUp"
         }
       ]
     },
@@ -680,14 +651,26 @@
       "fx": [
         {
           "k": "atkMod",
-          "v": 0.15,
+          "v": 0.1,
           "run": true,
           "target": "self"
         },
         {
-          "k": "stack",
-          "id": "빡침",
-          "v": 3
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "빡침",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -697,32 +680,50 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
             {
-              "k": "stack",
-              "id": "빡침",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빡침",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 맹세",
+          "name": "짧은 맹세",
           "cost": 0,
           "tags": [],
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "stack",
-              "id": "빡침",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빡침",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -732,14 +733,31 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
             {
               "k": "stack",
               "id": "빡침",
-              "v": 4
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빡침",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -751,14 +769,26 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
+              "v": 0.15,
               "run": true,
               "target": "self"
             },
             {
-              "k": "stack",
-              "id": "빡침",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빡침",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -770,33 +800,53 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
             {
               "k": "stack",
               "id": "빡침",
-              "v": 3
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빡침",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "가벼운 숨결",
-          "kind": "cost",
-          "fx": []
+          "name": "서두른 맹세",
+          "kind": "cost"
         },
         {
-          "name": "번뜩이는 숨결",
-          "kind": "draw",
-          "fx": []
+          "name": "양 날개 펼치기",
+          "kind": "atkUp"
         },
         {
-          "name": "기세의 숨결",
-          "kind": "atkUp",
-          "fx": []
+          "name": "분노 한 스푼",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빡침",
+              "v": 1
+            }
+          ]
         }
       ]
     }

@@ -49,7 +49,7 @@ namespace Bolzena.EditorTools
 
         void OnPreprocessTexture()
         {
-            var p = assetPath.Replace('\\', '/');
+            var p = WebImport.Original(assetPath);   // 웹 빌드 동안 옮겨 둔 스파인(WebBundleBuild)도 원래 자리 규칙대로
             if (!p.StartsWith("Assets/Bolzena/Resources/")) return;
             var ti = (TextureImporter)assetImporter;
             if (p.Contains("/Resources/Spine/st_"))

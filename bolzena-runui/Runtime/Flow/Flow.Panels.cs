@@ -23,12 +23,15 @@ namespace Bolzena.RunUI
             SliderRow(left, "효과음", Settings.SfxVol, v => Settings.SfxVol = v);
             SliderRow(left, "목소리", Settings.Voice, v => Settings.Voice = v);
             Toggle(left, "움직임 줄이기", "전환 · 등장 연출을 짧게", Settings.ReduceMotion, v => Settings.ReduceMotion = v);
+            Toggle(left, "화면 흔들림 끄기", "타격 · 고학년 흔들림 없이", Settings.NoShake, v => Settings.NoShake = v);
             Toggle(left, "글자 크게", "다음 화면부터", Settings.BigText, v => Settings.BigText = v);
+            Toggle(left, "컷인 건너뛰기", "고학년 컷인 없이 바로", Settings.SkipCutin, v => Settings.SkipCutin = v);
+            Toggle(left, "고학년 짧게 보기", "끄면 판에서 처음 쓸 때만 길게", Settings.UltShort, v => Settings.UltShort = v);
             DisplaySection(right);
             Ui.Row(bar, Theme.Gap, TextAnchor.MiddleRight, new RectOffset(10, 10, 14, 14), false, true);
             if (inRun)
             {
-                var lobby = Btn.Make(bar, "로비로(판은 저장)", BtnStyle.Dark, () => { close(); Lobby(); }, Theme.FsMd);
+                var lobby = Btn.Make(bar, "로비로(모험은 저장)", BtnStyle.Dark, () => { close(); Lobby(); }, Theme.FsMd);
                 lobby.Pref(280);
                 Stage.Hot["settings.lobby"] = lobby;
             }
@@ -145,7 +148,7 @@ namespace Bolzena.RunUI
                 fps[i] = Choice(frow, DisplayOptions.FrameCapName(i), null, () => { DisplayOptions.SetFrameCap(k); Paint(); });
                 Stage.Hot["disp.fps" + i] = fps[i];
             }
-            Toggle(col, "수직동기", "주사율에 맞춰 찢김 없이 · 켜면 프레임 제한은 쉰다", DisplayOptions.VSync, v => { DisplayOptions.SetVSync(v); Paint(); });
+            Toggle(col, "수직동기", "주사율에 맞춰 찢김 없이 그립니다 · 켜면 프레임 제한은 쉽니다", DisplayOptions.VSync, v => { DisplayOptions.SetVSync(v); Paint(); });
 
             void Paint()
             {
@@ -287,17 +290,11 @@ namespace Bolzena.RunUI
             x.GetComponent<RectTransform>().At(1, 1, -16, -16, 44, 44);
             Stage.Hot["hero.close"] = x;
             var rule = Ui.Img(panel, Theme.White, Theme.Line, "rule"); rule.rectTransform.Band(1, 1, 24, 24, -154);
-            var body = Ui.Text(panel, d != null ? P.Text.HeroShort(d) : h.blurb, Theme.FsSm + 1, Theme.Ink, TextAlignmentOptions.TopLeft);   // 짧은 글 — 「자세히 ▼」로 자세한 글(CardText.Hero)
-            body.rectTransform.Fill(32, 70, 32, 170);
-            body.enableAutoSizing = true; body.fontSizeMin = 12; body.fontSizeMax = Theme.FsSm + 1;
-            if (d != null)
-            {
-                bool more = false;
-                var mb = TermPop.MoreChip(panel, false, "more");
-                mb.GetComponent<RectTransform>().At(1, 1, -72, -112, mb.GetComponent<RectTransform>().sizeDelta.x, 30);
-                mb.OnClick = () => { more = !more; body.text = more ? P.Text.Hero(d) : P.Text.HeroShort(d); body.color = more ? Theme.Sub : Theme.Ink; mb.Label.text = more ? "접기 ▲" : "자세히 ▼"; };
-                Stage.Hot["hero.more"] = mb;
-            }
+            // 고학년 · 고유 효과 · 패시브 — 수치가 다 든 한 가지 글(core CardText.HeroShort = Traits), 길면 칸 안에서 스크롤(「자세히」 없음)
+            var area = Ui.Rect("area", panel).Fill(32, 70, 32, 170);
+            var content = Ui.Scroll(area, out _);
+            Ui.Col(content, 4, TextAnchor.UpperLeft, null, true, false);
+            FullText(content, d != null ? P.Text.HeroShort(d) : h.blurb, Theme.FsSm + 1, Theme.Ink, coreId, "body", d != null);
             var gear = string.Join(" · ", P.GearOf(coreId).Select(kv => $"{kv.Key} {P.Data.Equip(kv.Value)?.Name}"));
             var rule2 = Ui.Img(panel, Theme.White, Theme.Line, "rule2"); rule2.rectTransform.Band(0, 1, 24, 24, 58);
             var g = Ui.Text(panel, $"<color={Theme.GoldTag}>장비</color>  " + (gear.Length > 0 ? gear : $"<color={Theme.DimTag}>없음</color>"), Theme.FsSm + 1, Theme.Ink);

@@ -52,7 +52,7 @@ namespace Bolzena.RunUI
             if (crops.TryGetValue(key, out var s)) return s;
             var tex = Resources.Load<Texture2D>("RunArt/CardPic/" + name);
             if (tex != null) { tex.wrapMode = TextureWrapMode.Clamp; s = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100); s.name = "cardpic " + name; }
-            crops[key] = s;
+            Keep(); crops[key] = s;
             return s;
         }
 
@@ -115,6 +115,8 @@ namespace Bolzena.RunUI
         public static Sprite Blur(string name) => name == null ? null : Theme.Art("Skill/" + name + "_blur") ?? Theme.Art("Item/" + name + "_blur");
 
         static readonly Dictionary<string, Sprite> crops = new Dictionary<string, Sprite>();
+        // 자른 그림 · 스탠딩은 넘치면 비운다(쓰는 화면이 쥔 것은 산다) — 판을 오래 하면 사도 · 카드 그림이 끝없이 쌓였다
+        static void Keep() { if (crops.Count >= 200) crops.Clear(); }
 
         // 스탠딩 그림 자리 — 2의 거듭제곱 판 왼쪽 위에 붙여 두었다(_meta.json 의 너비 · 높이). 표가 없으면 판 전체
         static bool Content(string art, out Texture2D tex, out Rect r, out float cx, out float tp)
@@ -142,7 +144,7 @@ namespace Bolzena.RunUI
             if (crops.TryGetValue(key, out var s)) return s;
             s = Content(art, out var tex, out var r, out _, out _) ? Sprite.Create(tex, r, new Vector2(0.5f, 0.5f), 100) : null;
             if (s != null) s.name = "standing " + art;
-            crops[key] = s;
+            Keep(); crops[key] = s;
             return s;
         }
 
@@ -157,7 +159,7 @@ namespace Bolzena.RunUI
             if (snapFirst) { var snap = StandingSnap.Upper(art, ratio, frac); if (snap != null) return snap; }
             string key = art + "|" + ratio.ToString("F3") + "|" + frac.ToString("F2");
             if (crops.TryGetValue(key, out var s)) return s;
-            if (!Content(art, out var tex, out var r, out var hx, out var tp)) { crops[key] = null; return null; }
+            if (!Content(art, out var tex, out var r, out var hx, out var tp)) { Keep(); crops[key] = null; return null; }
             float w = r.width, h = r.height;
             float ch = h * Mathf.Clamp01(frac), cw = ch * ratio;
             if (cw > w) { cw = w; ch = cw / ratio; }
@@ -165,7 +167,7 @@ namespace Bolzena.RunUI
             float top = Mathf.Clamp(tp * h - h * 0.03f, 0, h - ch);   // 머리 끝(가는 장식은 건너뛴 자리) 조금 위부터
             s = Sprite.Create(tex, new Rect(r.x + x, r.y + h - top - ch, cw, ch), new Vector2(0.5f, 0.5f), 100);
             s.name = "upper " + art;
-            crops[key] = s;
+            Keep(); crops[key] = s;
             return s;
         }
 

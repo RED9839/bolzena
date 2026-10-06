@@ -15,7 +15,7 @@
       "blurb": "사료스탕스의 먹보 곰.",
       "keyword": {
         "name": "한 입",
-        "desc": "먹고 나면 힘 — 적이 쓰러질 때마다 한 입, 다음 공격 카드에 다 쓴다",
+        "desc": "처치하고 먹는 한 입",
         "carrier": "self",
         "cap": 2,
         "per": [
@@ -136,11 +136,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 생선 꿀~꺽!",
+          "name": "두 마리째",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.55
+              "ratio": 1.2
             },
             {
               "k": "stack",
@@ -154,14 +154,10 @@
           ]
         },
         {
-          "name": "가벼운 생선 꿀~꺽!",
+          "name": "한 입 간식",
           "cost": 0,
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.1
-            },
-            {
               "k": "stack",
               "id": "한 입",
               "v": 1
@@ -173,16 +169,16 @@
           ]
         },
         {
-          "name": "배부른 생선 꿀~꺽!",
+          "name": "사료 나눠 먹기",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.45
+              "ratio": 1.0
             },
             {
-              "k": "stack",
-              "id": "한 입",
-              "v": 2
+              "k": "status",
+              "id": "사기",
+              "v": 1
             },
             {
               "k": "draw",
@@ -191,59 +187,56 @@
           ]
         },
         {
-          "name": "든든한 생선 꿀~꺽!",
+          "name": "배 터지게 먹기",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.2
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아침 생선",
           "tags": [
-            "보존"
+            "개전"
           ],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.5
+              "ratio": 1.2
             },
             {
               "k": "stack",
               "id": "한 입",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 생선 꿀~꺽!",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.5
-            },
-            {
-              "k": "stack",
-              "id": "한 입",
               "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "따뜻한 손",
+          "name": "기름 오른 생선",
           "kind": "heal"
         },
         {
-          "name": "한 장 더",
+          "name": "생선 냄새",
           "kind": "draw"
         },
         {
-          "name": "든든한 한 끼",
+          "name": "입가심",
           "fx": [
             {
               "k": "stack",
@@ -270,86 +263,83 @@
       ],
       "oracles": [
         {
-          "name": "힘준 힘으로 하는 공사",
+          "name": "곡괭이질",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
+              "ratio": 1.45,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "가벼운 힘으로 하는 공사",
+          "name": "벽돌 나르기",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.75,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "배부른 힘으로 하는 공사",
+          "name": "밥심 공사",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "한 입",
+              "k": "ifStack",
+              "id": "한 입"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "철거 현장",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "강제 철거",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 힘으로 하는 공사",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 힘으로 하는 공사",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "굵은 팔뚝",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "망치 자국",
+          "kind": "frost"
         },
         {
-          "name": "든든한 한 끼",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "한 입",
-              "v": 1
-            }
-          ]
+          "name": "현장 체력",
+          "kind": "atkUp"
         }
       ]
     },
@@ -362,108 +352,189 @@
       "type": "강화",
       "fx": [
         {
-          "k": "stack",
-          "id": "한 입",
-          "v": 2
-        },
-        {
           "k": "status",
           "id": "불굴",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "한 입",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 사료스탕스 뽀너스",
+          "name": "곱빼기",
           "fx": [
-            {
-              "k": "stack",
-              "id": "한 입",
-              "v": 3
-            },
             {
               "k": "status",
               "id": "불굴",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "한 입",
+                      "v": 2
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 사료스탕스 뽀너스",
+          "name": "간식 한 알",
           "cost": 0,
           "fx": [
             {
-              "k": "stack",
-              "id": "한 입",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "한 입",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "배부른 사료스탕스 뽀너스",
+          "name": "배부른 낮잠",
           "fx": [
             {
-              "k": "stack",
-              "id": "한 입",
-              "v": 4
-            },
-            {
               "k": "status",
               "id": "불굴",
               "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "한 입",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "든든한 사료스탕스 뽀너스",
+          "name": "든든한 밥심",
           "fx": [
             {
-              "k": "stack",
-              "id": "한 입",
-              "v": 3
-            },
-            {
               "k": "status",
               "id": "불굴",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "한 입",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 사료스탕스 뽀너스",
+          "name": "사료 축제",
           "tags": [
             "축복"
           ],
           "fx": [
             {
-              "k": "stack",
-              "id": "한 입",
-              "v": 3
-            },
-            {
               "k": "status",
               "id": "불굴",
               "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "한 입",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "한 입",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
-          "kind": "ap"
+          "name": "뽀너스 쿠폰",
+          "kind": "cost"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "두툼한 뱃살",
+          "kind": "defUp"
         },
         {
-          "name": "든든한 한 끼",
+          "name": "덤 사료",
           "fx": [
             {
               "k": "stack",
@@ -497,11 +568,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 배고픈 곰의 도끼",
+          "name": "통나무 쪼개기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.1,
+              "ratio": 2.9,
               "target": "oneEnemy"
             },
             {
@@ -514,12 +585,12 @@
           ]
         },
         {
-          "name": "가벼운 배고픈 곰의 도끼",
+          "name": "손도끼",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.15,
+              "ratio": 1.6,
               "target": "oneEnemy"
             },
             {
@@ -532,36 +603,20 @@
           ]
         },
         {
-          "name": "배부른 배고픈 곰의 도끼",
+          "name": "한 입 거리",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.9,
+              "ratio": 2.0,
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
+              "k": "ifStack",
+              "id": "한 입"
             },
-            {
-              "k": "ap",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "한 입",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 배고픈 곰의 도끼",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
             {
               "k": "dmg",
-              "ratio": 3,
+              "ratio": 0.9,
               "target": "oneEnemy"
             },
             {
@@ -574,15 +629,34 @@
           ]
         },
         {
-          "name": "꿰뚫는 배고픈 곰의 도끼",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "휘두르는 도끼",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.9,
+              "ratio": 1.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "만찬의 도끼",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.8,
               "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "ifKill"
@@ -596,22 +670,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "날 선 도끼날",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "배고픈 눈빛",
           "kind": "weakSpot"
         },
         {
-          "name": "든든한 한 끼",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "한 입",
-              "v": 1
-            }
-          ]
+          "name": "포만감",
+          "kind": "defUp"
         }
       ]
     }

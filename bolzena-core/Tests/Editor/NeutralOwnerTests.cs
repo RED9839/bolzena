@@ -127,5 +127,32 @@ namespace Bolzena.Core.Tests
             run.S.Deck.Add("n_bond@sion");
             Assert.IsNotNull(run.PowerWhy("n_bond"));
         }
+
+        const string OCARDS = @"[
+ {id:'cz', name:'골칫덩이', cost:1, type:'저주', grade:'일반', price:0, fx:[]},
+ {id:'gz', name:'작은 선물', cost:0, type:'스킬', grade:'일반', price:0, gift:true, fx:[{k:'draw', n:1}]}
+]";
+
+        [Test] public void 선물_카드는_주인을_고르고_저주는_주인_없이_덱에_전투_모습은_그대로()
+        {
+            var d = K.Sample().Add(null, NCARDS, null, null, null, null).Add(null, OCARDS, null, null, null, null);
+            var run = Run.New(d, new List<string> { "rico", "carrot", "sion" }, 1);
+            Assert.IsTrue(d.Card("gz").Ownable && d.Card("nx").Ownable);
+            Assert.IsFalse(d.Card("cz").Ownable, "저주는 사도 덱에 넣지 않는다(2026-10-06)");
+            Assert.IsFalse(d.Card("hit")?.Ownable ?? false, "사도 카드는 주인을 고르지 않는다");
+            Assert.AreEqual("cz", run.GainCard("cz"), "저주 — 주인 없이 바로 덱에");
+            Assert.IsNull(run.PendingNeutral);
+            CollectionAssert.Contains(run.S.Deck, "cz");
+            // 옛 저장의 주인 붙은 저주(cz@carrot)도 그대로 읽힌다
+            run.S.Deck.Add("cz@carrot");
+            Assert.AreEqual("gz@sion", run.GainCard("gz", "sion"), "선물 — 바로 주인을 주는 길");
+            // 주인은 덱 묶음 표시만 — 전투 모습에는 사도가 실리지 않는다(주인이 쓰러져도 저주 · 선물은 그대로)
+            Assert.IsNull(run.ViewOf("cz@carrot").Hero);
+            Assert.IsNull(run.ViewOf("gz@sion").Hero);
+            Assert.IsTrue(run.ViewOf("cz@carrot").IsCurse);
+            var back = Run.Load(run.Data, run.Save());
+            CollectionAssert.Contains(back.S.Deck, "cz@carrot");
+            CollectionAssert.Contains(back.S.Deck, "gz@sion");
+        }
     }
 }

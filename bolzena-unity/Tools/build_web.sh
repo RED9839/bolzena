@@ -6,9 +6,10 @@ cd /c/projects/bolzena-unity
 mkdir -p /c/projects/bolzena-unity-tmp
 PYTHONIOENCODING=utf-8 python Tools/copy_assets.py >/dev/null || exit 1
 PYTHONIOENCODING=utf-8 python Tools/copy_run_assets.py | tail -3 || exit 1
+PYTHONIOENCODING=utf-8 python Tools/pad4.py | tail -1 || exit 1   # 4의 배수가 아닌 그림 채우기(웹 DXT — WebImport)
 timeout -k 10 7200 "/c/Program Files/Unity/Hub/Editor/6000.6.4f1/Editor/Unity.exe" -batchmode -quit -buildTarget WebGL -projectPath "C:\projects\bolzena-unity" \
   -executeMethod Bolzena.EditorTools.ProjectSetup.SetupAndBuildWeb -logFile "C:\projects\bolzena-unity-tmp\build_web.log"
 code=$?
-grep -E "error CS|Shader error|\[Build\]|\[Setup\]" /c/projects/bolzena-unity-tmp/build_web.log | sort -u | head -30
+grep -E "error CS|Shader error|\[Build\]|\[Setup\]|\[WebTex\] [^안]|\[Bundles\]" /c/projects/bolzena-unity-tmp/build_web.log | sort -u | head -30
 [ $code -eq 0 ] || exit $code
 PYTHONIOENCODING=utf-8 python Tools/web_post.py

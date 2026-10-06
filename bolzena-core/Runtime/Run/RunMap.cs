@@ -166,7 +166,7 @@ namespace Bolzena.Core
         public List<string> EnemiesAt(MapNode node)
         {
             var f = CurrentFloor;
-            if (node.Type == "boss") return S.Bosses != null && S.Floor < S.Bosses.Count ? S.Bosses[S.Floor] : f.Boss;
+            if (node.Type == "boss") { var bl = Bosses; return S.Floor < bl.Count ? bl[S.Floor] : OneBoss(Data, f.Boss); }
             if (node.Type == "fight" || node.Type == "elite") return node.Foes ?? f.Pools[node.Fight][0];
             return new List<string>();
         }

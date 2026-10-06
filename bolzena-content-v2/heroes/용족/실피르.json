@@ -12,12 +12,31 @@
       "atk": 115,
       "def": 27,
       "crit": 10,
-      "blurb": "루드와 티격태격하는 사파이어의 용족, 자칭 2인자. 다른 아군이 공격 카드를 낼 때마다 기록을 세어 두었다가, 제 공격으로 그 기록을 넘으면 기세가 오른다.",
+      "blurb": "루드와 티격태격하는 사파이어의 용족, 자칭 2인자. 동료가 공격할 때마다 기록을 세어 두었다가 제 공격으로 그 기록을 깨면, 하늘을 가르는 기세에 적들이 한꺼번에 굼떠집니다.",
       "keyword": {
         "name": "2인자 쟁탈전",
-        "desc": "다른 아군의 공격 기록 — 둘 이상일 때 실피르가 공격하면 모두 써서 AP · 사기",
+        "desc": "아군 공격을 세는 기록",
         "carrier": "self",
-        "cap": 3
+        "cap": 3,
+        "rules": [
+          {
+            "name": "청금이라 부르지 마",
+            "when": {
+              "on": "stackOver",
+              "id": "2인자 쟁탈전"
+            },
+            "fx": [
+              {
+                "k": "perEvent"
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.4,
+                "target": "randomEnemy"
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
@@ -58,12 +77,13 @@
           },
           "fx": [
             {
-              "k": "ap",
-              "v": 1
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "사기",
+              "k": "nextCheaper",
               "v": 1
             },
             {
@@ -80,7 +100,7 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.4,
+            "ratio": 0.45,
             "target": "randomEnemy",
             "hits": 8
           },
@@ -88,6 +108,12 @@
             "k": "stack",
             "id": "2인자 쟁탈전",
             "v": 2
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 1,
+            "target": "allEnemies"
           }
         ]
       },
@@ -140,9 +166,15 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.6,
           "target": "randomEnemy",
           "hits": 4
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
@@ -155,9 +187,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.55,
               "target": "randomEnemy",
               "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -169,9 +207,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.6,
               "target": "randomEnemy",
               "hits": 5
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -183,13 +227,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.6,
               "target": "randomEnemy",
               "hits": 4
             },
             {
               "k": "status",
               "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
               "v": 1,
               "target": "allEnemies"
             }
@@ -203,7 +253,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.65,
               "target": "randomEnemy",
               "hits": 4
             },
@@ -211,6 +261,12 @@
               "k": "stack",
               "id": "2인자 쟁탈전",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -222,13 +278,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.6,
               "target": "randomEnemy",
               "hits": 4
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -552,9 +614,21 @@
           "v": 1
         },
         {
-          "k": "stack",
-          "id": "2인자 쟁탈전",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "2인자 쟁탈전",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -563,14 +637,21 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자 쟁탈전",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -583,9 +664,21 @@
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자 쟁탈전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -598,13 +691,25 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 1
-            },
-            {
               "k": "draw",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자 쟁탈전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -619,7 +724,24 @@
             {
               "k": "stack",
               "id": "2인자 쟁탈전",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자 쟁탈전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -631,14 +753,26 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
               "k": "stack",
               "id": "2인자 쟁탈전",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자 쟁탈전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

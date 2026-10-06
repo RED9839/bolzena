@@ -12,16 +12,43 @@
       "atk": 146,
       "def": 29,
       "crit": 10,
-      "blurb": "영원살이 마녀 자매의 맏이. 탄환마다 서리를 묻혀 두고, 그 적이 무너지는 순간 눈꽃으로 피워 낸다.",
+      "blurb": "영원살이 마녀 자매의 맏이이자 만년설의 현자. 공격마다 적에게 서리를 묻혀 파티의 칼이 깊이 박히게 하고, 눈보라로 적 전체를 쓸며, 넘친 서리는 그 자리에서 얼어 터집니다.",
       "keyword": {
         "name": "서리",
-        "desc": "눈꽃 개화 — 공격으로 묻히는 서리. 묻은 적은 약해지고, 격파되면 적 전체로 터진다",
+        "desc": "맞을수록 깊이 박히는 눈꽃 서리",
         "carrier": "enemy",
         "cap": 5,
         "per": [
           {
+            "stat": "taken",
+            "v": 0.05
+          },
+          {
             "stat": "dealt",
-            "v": -0.05
+            "v": -0.03
+          }
+        ],
+        "rules": [
+          {
+            "name": "얼어 터지는 서리",
+            "when": {
+              "on": "stackOver",
+              "id": "서리"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "perEvent"
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.3,
+                "target": "oneEnemy"
+              }
+            ]
           }
         ]
       },
@@ -298,13 +325,19 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
-          "target": "oneEnemy",
-          "hits": 3
+          "ratio": 0.45,
+          "target": "allEnemies",
+          "hits": 2
         },
         {
-          "k": "tough",
-          "v": 1
+          "k": "stack",
+          "id": "서리",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "gauge",
+          "v": 15
         }
       ],
       "blurb": "눈보라 속에서도 과녁은 하나",
@@ -314,13 +347,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.6,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "gauge",
+              "v": 15
             }
           ]
         },
@@ -330,13 +369,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.3,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "gauge",
+              "v": 10
             }
           ]
         },
@@ -345,14 +390,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.45,
               "target": "allEnemies",
               "hits": 3
             },
             {
-              "k": "tough",
-              "v": 0.5,
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "gauge",
+              "v": 15
             }
           ]
         },
@@ -361,19 +411,21 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.5,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "취약",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             }
           ]
         },
@@ -383,18 +435,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy",
+              "ratio": 0.65,
+              "target": "allEnemies",
               "hits": 3
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "k": "gauge",
+              "v": 25
             }
           ]
         }
@@ -439,7 +492,7 @@
           "v": 1
         }
       ],
-      "blurb": "먼저 얼려 두고, 그다음에 쏜다",
+      "blurb": "먼저 얼려 두고, 그다음에 쏩니다",
       "oracles": [
         {
           "name": "깊은 동상",
@@ -577,15 +630,28 @@
       "type": "강화",
       "fx": [
         {
-          "k": "status",
-          "id": "잔광",
-          "v": 2
-        },
-        {
           "k": "atkMod",
-          "v": 0.15,
+          "v": 0.1,
           "run": true,
           "target": "self"
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "서리",
+                  "v": 1,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ]
         }
       ],
       "blurb": "눈보라 속에서 희망을 찾아낸 맏이의 각오",
@@ -594,15 +660,28 @@
           "name": "맏이의 각오",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
-            },
-            {
               "k": "atkMod",
               "v": 0.15,
               "run": true,
               "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -611,15 +690,22 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
-            },
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -627,15 +713,28 @@
           "name": "만개의 예감",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
-            },
-            {
               "k": "atkMod",
-              "v": 0.2,
+              "v": 0.1,
               "run": true,
               "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 2,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -643,13 +742,8 @@
           "name": "겨울 지킴이",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
-            },
-            {
               "k": "atkMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
@@ -657,6 +751,24 @@
               "k": "status",
               "id": "피해 감소",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -667,15 +779,34 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
-            },
-            {
               "k": "atkMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true,
               "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

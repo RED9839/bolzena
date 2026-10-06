@@ -29,6 +29,8 @@ string Card(CardDef c)
 string Oracle(CardDef c, OracleDef o)   // 신탁 고르기 창의 한 줄(코스트가 바뀌면 「코스트 N.」)
 string Bless(BlessDef b)
 string Passives(List<PassiveRule> r)    // 「맞불: 피해를 받으면 반격 1 (턴당 1회) · …」
+string PowerText(Fx power)              // 강화 지속 규칙 — 「이 전투 동안 매 턴 시작 시 아군 전원에게 「물총」 +1」(카드 면도 이 글을 쓴다)
+string PowerRules(List<PassiveRule> r)  // 같은 글에서 「이 전투 동안」 머리만 뺀 것(강화 칩 툴팁)
 string Keyword(KeywordDef k)
 string Ult(UltDef u)
 string Hero(HeroDef h)             // 도감 한 장(여러 줄)
@@ -119,7 +121,8 @@ int    b.StackOf(string heroKey, string kw)   // 자기 주머니 키워드 겹.
 Dictionary<string,KwRt> b.Kw            // 이 전투의 키워드 — kw.Def(KeywordDef) · kw.Owner
 double b.StatMod(Unit u, string stat)   // "atk" · "def" · "crit" · "dealt" · "taken" 증감 합
 int    b.AtkNow(Unit u), b.DefNow(Unit u)
-int?   b.IntentHit(Unit e)              // 머리 위 피해 숫자(층 배율 · 약화 · 사기 반영). 치는 수가 아니면 null
+int?   b.IntentHit(Unit e)              // 머리 위 피해 숫자(층 배율 · 약화 · 사기 반영). 치는 수가 아니면 null. 보스 고학년(T "ult")이면 안의 치는 수 합
+int?   b.UltHit(Unit e)                 // 보스 클론 고학년 피해 — 예고 턴(charge → Next "ult")에도 다음 턴 피해를 준다. 고학년이 아니면 null
 int    b.RushOf(Unit e)                 // 즉시 행동까지 장수(0 = 안 당겨짐). 남은 장수 = RushOf(e) - e.RushCnt
 int?   b.ActionCount(Unit e)            // 행동 카운트 — 이 적이 행동하기까지 남은 카드 수(둔화 · 급속 반영). 당겨지지 않는 수 · 이미 행동했으면 null
 List<StatusView> b.StatusViews(Unit u)  // 상태 칩 + 건 쪽 — 적이면 그 적, b.Pool 이면 파티 층, 사도면 개인 층(구속) + 그 사도 고유 효과
@@ -166,6 +169,22 @@ void     b.EnterForm(Unit hero, string formId) · b.EndForm(Unit hero, string wh
 - **칩** — `b.StatusViews(사도)` 에 `StatusView.Form == true` 칩(Id = 변신 이름 · Stacks = 남은 턴, 0 = 전투 끝까지). 설명은 `text.Tips()[이름]`.
 - 같은 변신을 다시 쓰면 지속이 처음으로(`formOn` 이 다시 온다, `formOff` 없음). 다른 변신이면 `formOff`(Label `switch`) → `formOn`.
 
+### 강화 카드 지속 규칙(power) — 강화 칩
+
+강화 카드 효과 `power`(데이터 틀은 [데이터.md](데이터.md) §17)를 내면 그 규칙이 **이 전투 끝까지** 카드 주인의 패시브처럼 켜져 있다.
+UI 는 아직 붙이지 않았다 — 붙일 때 아래만 읽으면 된다.
+
+```csharp
+List<PowerView> b.PowersOf(string heroKey = null)   // 켜진 강화(켠 차례) — { Hero(주인 사도 키), Id, Name(카드 이름), Card(카드 id — 그림), Stacks(겹), Text(규칙 글, 「매 턴 시작 시 …」) }
+int             b.PowerStacks(string heroKey, string id)   // 그 강화 겹(없으면 0)
+List<PowerRt>   b.Powers                            // 저장되는 상태 — { Hero, Id, Name, Card, N(겹), Rules }
+```
+
+- **칩** — `b.StatusViews(b.Pool)`(파티 버프 목록) 끝에 강화마다 `StatusView.Power == true` 칩: Id = 카드 이름 · Stacks = 겹 · Layer `"party"` · Sources[0].Hero = 주인 사도. 툴팁은 `b.PowersOf()` 의 `Text`(또는 `text.PowerRules(pw.Rules)`).
+- **쪽지** — 켜질 때 · 겹이 늘 때 `powerOn`(Hero · Id · Name · CardId · V = 겹). 화면은 이 쪽지로 칩을 띄우거나 겹 숫자를 올린다. 규칙이 발동하면 평소 쪽지(status · shield · hurt …)가 오고, 기록 줄은 「사도 · 강화 「이름」」.
+- **이어하기** — `Battle.Load` 가 `Powers` 를 되살린다. 칩은 `b.StatusViews(b.Pool)` 로 다시 그린다.
+- **겹치기** — 같은 사도가 같은 id(없으면 카드 이름)를 또 켜면 겹 +1(칩은 하나). 발동할 때 효과가 겹 수만큼 돌고, 횟수 제한은 발동 수로 센다.
+
 ### 이벤트(연출 쪽지) — `Cue`
 
 `Battle.Start(..., cues, onCue)` 또는 `b.OnCue += c => …`(둘 다 됨). `b.OnLog += line => …`(기록 한 줄).
@@ -194,9 +213,16 @@ void     b.EnterForm(Unit hero, string formId) · b.EndForm(Unit hero, string wh
 | `revive` | 쓰러진 적이 되살아났다(재 속 · 가사) | V(HP) · Name |
 | `formOn` | **사도가 변신했다**(같은 변신이면 지속 갱신) | Hero · Id(변신 id) · Name · **Label(모습 키 Skin)** · T(애니 접두어 Anim) · V(턴, 0 = 전투 끝까지) |
 | `formOff` | **변신이 풀렸다** | Hero · Id · Name · Label(까닭 — time 지속이 다함 · until 풀리는 계기 · card 효과 formEnd · switch 다른 변신) |
+| `powerOn` | **강화가 켜졌다**(같은 강화를 또 내면 겹이 늘었다) | Hero · Id(강화 id) · Name(카드 이름) · CardId(카드 — 그림) · V(겹) |
+| `foeUltWarn` | **보스 클론이 고학년을 예고**(내 턴 시작 — 그 적의 수가 charge, Next 가 ult) | Hero(사도 키) · Name(고학년 이름) · V(다음 턴 피해 — `b.UltHit`) · T(치는 꼴 attackAll · attack · multi) |
+| `foeUlt` | **보스 고학년 시작**(적의 차례 — 바로 뒤에 `act` T "ult") | Hero · Name · V(피해 합) |
+| `foeUltHit` | 보스 고학년의 치는 수 하나(바로 뒤에 그 수의 `hurt` · `status` …) | Hero · Name · V(몇 번째, 0부터) · T(attackAll · attack · multi) |
+| `foeUltEnd` | 보스 고학년 끝 | Hero · Name |
+| `foeUltCut` | **보스 고학년이 끊김**(예고 · 사용 턴에 격파 — 그 자리, 기절 — 적의 차례에 쉴 때) | Hero · Name · Label("격파" · "기절") · T(charge = 예고 중 · ult = 사용 턴) |
 
 카드를 내면: `card`(hand → play) → `act` → (효과의 hurt · tough · break · status …) → `card`(play → discard/gone/hand).
 즉시 행동은 `act` 의 `Rush == true`. 고학년은 `act` 의 `Anim == "ult"`.
+보스 클론의 고학년(`BossUlt` — 데이터.md §18): `foeUlt` → `act`(Side Enemy · **T "ult"** · Anim 은 치는 수가 있으면 "attack" — 옛 화면도 그대로 돈다 · Hero · Name) → (`foeUltHit` → `hurt` · `status` …) 반복 → `foeUltEnd`.
 
 ### 저장
 
@@ -328,6 +354,17 @@ MetaSim.Run(data, rounds, seed, hpx, dmgx, threads) → MetaSim.Result;  MetaSim
 ---
 
 ## 바뀐 것
+
+- **v2.7(2026-10-06) — 강인도 회복 규칙.** API 꼴은 그대로(덧붙이기만: 적의 수 `brace` — 글 `text.Intent` 가 「강인도 회복 v」). **규칙이 바뀐 것**: 강인도는 저절로 차지 않는다 — 격파되면 다음 내 턴 시작에 가득(전과 같음), 그 밖엔 회복 스킬(수 `brace` · 수에 붙은 `tough` · 패시브 `do: brace`)이 있는 적만. 판(phase)이 바뀌어도 안 찬다(옛: 다 참). 수의 `tough` 는 그 적 자신만(옛: guard 면 적 전체). `R.TOUGH.Boss` 10 → 7. tough 쪽지 `Up` 은 회복 스킬 · 격파에서 일어섬에서만 나온다. 글: `TIPS["강인도"]` · `TIPS["격파"]` 고침, 수의 덧글 「강인도 +1」 → 「강인도 회복 1」.
+
+- **v2.6(2026-10-06) — 보스 클론의 고학년.** 덧붙이기만. 보스 클론(`boss` + `clone`)이 그 사도 고학년을 예고(charge) → 다음 턴 사용(T "ult" · `Intent.Then`). `BossUlt`(변환 · 손보정 표 `FIX` · `On` · `Plan` · `Table`) · `b.UltHit(e)` · `b.IntentHit` 가 ult 를 센다 · `Unit.UltAt`(저장됨) · 쪽지 `foeUltWarn` · `foeUlt` · `foeUltHit` · `foeUltEnd` · `foeUltCut` · 글 `text.Intent` 가 「고학년 예고 — 다음 턴 고학년 「…」: …」. 콘솔 `bz bossult [--out]` · 모든 명령에 `--bossult 0`(끄기).
+
+- **v2.5(2026-10-06) — 한 전투에 사도마다 신탁 · 은총 하나만.** API 꼴은 그대로, 값이 바뀐 것: `run.RollEpiphany()`(= `run.OpenFight` 의 `b.Glow`)가 같은 사도(교주 카드는 주인 사도)에게 은총과 카드 신탁을 같이 세우지 않는다. 꼭 떠야 하는 카드 신탁(엘리트 · `rewardFlash`)에 빈 사도가 없으면 은총 하나를 카드 신탁으로 바꾼다(엘리트는 은총이 둘 이상일 때만). `CardText.TIPS` 에 「신탁」 · 「은총」. 화면은 신탁 번호(`GlowPick.N` · `OracleOption.N`)를 보이지 않는다 — 번호는 고르는 값으로만 쓴다.
+
+- **v2.4(2026-10-05 일곱째) — 강화 카드 지속 규칙(power).** 덧붙이기만. 효과 `power`(`Fx.Rules` — 패시브 규칙 배열) · `FxK.Power`.
+  전투: `b.Powers`(+ `PowerRt`, 저장 `BattleSave.Powers`) · `b.PowersOf`(+ `PowerView`) · `b.PowerStacks` · `b.AddPower` · 쪽지 `powerOn` · `StatusView.Power`(파티 층 칩) · `RuleRt.Power`.
+  글: `text.PowerText(fx)` · `text.PowerRules(rules)` · 강화 카드 면의 세기형 버프(사기 · 결의 · 결정화 · 불굴 · 고동 · 근면 · 계몽 · 집중)는 「이 전투 동안 …」 으로 읽힌다 · 사도 표시(hero) 고유 효과에 대상이 있으면 「아군 전원에게 「물총」 +1」.
+  값어치: `CardValue.PowerValue(fx)` · `RuleWorth(rule)` · `RuleFires(rule)` · `POWER_T` · `POWER_W` — 봇 점수(`Bots.Score`)가 켜진 강화의 남은 몫을 센다. 검사: power 는 강화 카드(· 그 신탁)에만 · rules 필수 · fightStart 금지 · always 는 증감만 · 강화 카드에 남는 효과가 없으면 주의.
 
 - **v2.3(2026-10-05 여섯째) — 변신(form).** 덧붙이기만. 효과 `form`(id) · `formEnd` · `HeroDef.Forms`(`FormDef` · `FormBonus`) · `GameData.Form(id)` · `GameData.HeroOfForm(id)`.
   전투: `b.InForm` · `b.FormOf`(+ `FormView`) · `b.FormSkin` · `b.FormDefOf` · `b.Forms`(+ `FormRt`, 저장 `BattleSave.Forms`) · `b.EnterForm` · `b.EndForm` · `b.FormKeyOf`(봇 캐시) · 쪽지 `formOn` · `formOff` · card 쪽지 Label `form` · `StatusView.Form` · `RuleRt.Own` · `RuleRt.Form`.

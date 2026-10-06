@@ -10,6 +10,8 @@ namespace Bolzena.Fx
     public static class FxLibrary
     {
         public static string Root = "BolzenaFx";
+        /// <summary>읽어 붙드는 이펙트 · 낱장 수의 상한(넘치면 비우고 다시 읽는다).</summary>
+        public static int Keep = 512;
         static FxLibraryAsset index;
         static Dictionary<string, FxLibraryAsset.Hero> heroes;
         static Dictionary<string, FxLibraryAsset.Hero> heroesByArt;
@@ -84,6 +86,44 @@ namespace Bolzena.Fx
             return effects.TryGetValue(name.ToLowerInvariant(), out var e) ? e : (effects.TryGetValue(name, out e) ? e : null);
         }
 
+        // 이펙트 안의 충격 순간(초, 틀고 나서) — 가장 큰 터짐(버스트 수 × 크기가 가장 큰 이미터)이 시작하는 때.
+        // 원작 폭발 이펙트는 모으는 빛이 먼저 돌고 0.1~0.5초 뒤에 터진다 — 그 터짐을 맞는 순간에 맞추려고 그만큼 일찍 튼다. 구운 낱장은 0
+        static readonly Dictionary<string, float> impactCache = new Dictionary<string, float>();
+        public static float ImpactSec(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return 0;
+            if (impactCache.TryGetValue(name, out var got)) return got;
+            float at = 0;
+            if (Sheet(name) == null)
+            {
+                var fx = Effect(name);
+                float best = -1;
+                if (fx != null)
+                    foreach (var e in fx.Em)
+                    {
+                        if (e.M3d || e.Tex == null || e.Bursts == null || e.Bursts.Length == 0) continue;
+                        var b0 = e.Bursts[0];
+                        float w = b0.y * Mathf.Max(0.01f, e.Size.y) * (e.Add ? 1.5f : 1f);
+                        if (w > best) { best = w; at = e.Delay.x + b0.x; }
+                    }
+            }
+            at = Mathf.Clamp(at, 0f, 0.8f);
+            impactCache[name] = at;
+            return at;
+        }
+
+        // 이미터가 짜인 가장 높은 자리(원작 단위) — 이미 머리 위 · 하늘에 짜인 판은 뼈에 붙이지 않는다
+        static readonly Dictionary<string, float> topCache = new Dictionary<string, float>();
+        public static float EmitterTop(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return 0;
+            if (topCache.TryGetValue(name, out var got)) return got;
+            float hi = 0;
+            var fx = Sheet(name) == null ? Effect(name) : null;
+            if (fx != null) foreach (var e in fx.Em) if (!e.M3d) hi = Mathf.Max(hi, e.Pos.y);
+            return topCache[name] = hi;
+        }
+
         public static float Duration(string name)
         {
             var e = Info(name);
@@ -95,6 +135,7 @@ namespace Bolzena.Fx
             if (string.IsNullOrEmpty(name)) return null;
             if (fxCache.TryGetValue(name, out var fx)) return fx;
             fx = Resources.Load<FxEffect>(Root + "/Effects/" + name);
+            if (fxCache.Count >= Keep) fxCache.Clear();   // 상한 — 다 붙들면 사도마다 이펙트 · 텍스처가 쌓였다(점검 135판)
             fxCache[name] = fx;
             return fx;
         }
@@ -105,6 +146,7 @@ namespace Bolzena.Fx
             var key = name.ToLowerInvariant();
             if (sheetCache.TryGetValue(key, out var s)) return s;
             s = Resources.Load<FxSheet>(Root + "/Baked/" + key);
+            if (sheetCache.Count >= Keep) sheetCache.Clear();
             sheetCache[key] = s;
             return s;
         }

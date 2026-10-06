@@ -12,10 +12,10 @@
       "atk": 84,
       "def": 79,
       "crit": 5,
-      "blurb": "소설 속 주인공이 현실로 걸어 나온 유령 소녀. 파티가 위태로울수록 「존속」 이 쌓여 실드도 공격도 단단해지고, 셋이 모이면 쓰러질 한 대를 버텨 내 존재를 증명한다.",
+      "blurb": "소설 속 주인공이 현실로 걸어 나온 유령 소녀. 쌓이는 존재감이 실드를 두껍게 하고 파티 모두의 공격까지 끌어올리며, 존재가 또렷해지면 쓰러질 한 대를 버텨 내 자신을 증명합니다.",
       "keyword": {
         "name": "존속",
-        "desc": "나는 여기 있다 — 위기일수록 또렷해지는 존재감",
+        "desc": "위기일수록 또렷한 존재감",
         "carrier": "self",
         "cap": 5,
         "per": [
@@ -25,7 +25,8 @@
           },
           {
             "stat": "dealt",
-            "v": 0.1
+            "v": 0.06,
+            "who": "allies"
           }
         ],
         "rules": [
@@ -45,6 +46,22 @@
                 "k": "status",
                 "id": "끈기",
                 "v": 1
+              }
+            ]
+          },
+          {
+            "name": "넘치는 존재감",
+            "when": {
+              "on": "stackOver",
+              "id": "존속"
+            },
+            "fx": [
+              {
+                "k": "perEvent"
+              },
+              {
+                "k": "shield",
+                "ratio": 0.4
               }
             ]
           }
@@ -138,11 +155,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.6
-        },
-        {
-          "k": "ifHp",
-          "pct": 0.5
+          "ratio": 1.4
         },
         {
           "k": "stack",
@@ -156,11 +169,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.3
-            },
-            {
-              "k": "ifHp",
-              "pct": 0.5
+              "ratio": 2.0
             },
             {
               "k": "stack",
@@ -175,11 +184,40 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 0.6
             },
             {
-              "k": "ifHp",
-              "pct": 0.5
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "여기 있어",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "희미한 손짓",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
             },
             {
               "k": "stack",
@@ -196,46 +234,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.15
-            },
-            {
-              "k": "ifHp",
-              "pct": 0.5
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "여기 있어",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "축복의 경계",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.1
-            },
-            {
-              "k": "ifHp",
-              "pct": 0.5
+              "ratio": 1.7
             },
             {
               "k": "stack",
@@ -268,7 +267,7 @@
     },
     {
       "id": "벨라_u2",
-      "name": "존재의 보호막",
+      "name": "존재의 실드",
       "hero": "벨라",
       "unique": true,
       "cost": 2,
@@ -291,90 +290,7 @@
       ],
       "oracles": [
         {
-          "name": "찬란한 보호막",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.75
-            },
-            {
-              "k": "status",
-              "id": "실드 유지",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "얇은 보호막",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.2
-            },
-            {
-              "k": "status",
-              "id": "실드 유지",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "이어지는 보호막",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.5
-            },
-            {
-              "k": "status",
-              "id": "실드 유지",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꺼지지 않는 막",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.2
-            },
-            {
-              "k": "status",
-              "id": "실드 보존",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "축복의 보호막",
-          "tags": [
-            "축복"
-          ],
+          "name": "찬란한 실드",
           "fx": [
             {
               "k": "shield",
@@ -391,11 +307,94 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "얇은 실드",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "존재 증명",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.8
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꺼지지 않는 막",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.1
+            },
+            {
+              "k": "status",
+              "id": "실드 보존",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "처음부터 여기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.0
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "두꺼운 막",
+          "name": "겹겹이 막",
           "kind": "guard"
         },
         {
@@ -438,7 +437,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.05
+              "ratio": 1.8
             },
             {
               "k": "status",
@@ -453,24 +452,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.05
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "챙겨 둔 간식",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.9
+              "ratio": 0.6
             },
             {
               "k": "status",
@@ -499,14 +481,32 @@
           ]
         },
         {
-          "name": "축복의 챙김",
+          "name": "서툰 붕대",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.0
+            },
+            {
+              "k": "shield",
+              "ratio": 1.0
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "챙겨 둔 간식",
           "tags": [
-            "축복"
+            "보존"
           ],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.8
+              "ratio": 1.7
             },
             {
               "k": "status",
@@ -568,7 +568,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.6,
               "target": "oneEnemy",
               "base": "def"
             },
@@ -578,7 +578,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.15,
+              "ratio": 0.14,
               "target": "oneEnemy",
               "base": "def"
             }
@@ -590,7 +590,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.3,
               "target": "oneEnemy",
               "base": "def"
             },
@@ -600,21 +600,18 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.1,
+              "ratio": 0.08,
               "target": "oneEnemy",
               "base": "def"
             }
           ]
         },
         {
-          "name": "꺼지지 않는 불",
-          "tags": [
-            "보존"
-          ],
+          "name": "존재의 불꽃",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.5,
               "target": "oneEnemy",
               "base": "def"
             },
@@ -624,9 +621,14 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.15,
+              "ratio": 0.12,
               "target": "oneEnemy",
               "base": "def"
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
             }
           ]
         },
@@ -635,7 +637,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.36,
               "target": "allEnemies",
               "base": "def"
             },
@@ -645,21 +647,21 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.1,
+              "ratio": 0.09,
               "target": "allEnemies",
               "base": "def"
             }
           ]
         },
         {
-          "name": "축복의 불꽃",
+          "name": "도깨비 장난",
           "tags": [
-            "축복"
+            "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.55,
               "target": "oneEnemy",
               "base": "def"
             },
@@ -669,7 +671,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.15,
+              "ratio": 0.13,
               "target": "oneEnemy",
               "base": "def"
             }

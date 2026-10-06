@@ -12,16 +12,46 @@
       "atk": 155,
       "def": 25,
       "crit": 10,
-      "blurb": "명령엔 칼 같고 휴가 신청서는 늘 반려되는 진압반장. 아군이 적을 격파할 때마다 양자폭탄 충전이 빨라지고, 쏘고 나면 반려 도장이 하나 더 쌓인다.",
+      "blurb": "명령엔 칼 같고 휴가 신청서는 늘 반려되는 진압반장. 아군이 적을 격파할 때마다 양자폭탄 충전이 빨라지고, 가장 먼저 움직이려는 녀석부터 포격하며, 쏘고 나면 반려 도장이 하나 더 쌓입니다.",
       "keyword": {
         "name": "반려 도장",
-        "desc": "또 반려된 휴가 신청서 — 고학년 스킬을 쓸 때마다 쌓여 자신의 피해가 오른다",
+        "desc": "큰 결재마다 찍히는 반려 도장",
         "carrier": "self",
-        "cap": 5,
+        "cap": 3,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.1
+            "v": 0.15
+          }
+        ],
+        "rules": [
+          {
+            "name": "결재 서류 더미",
+            "when": {
+              "on": "play",
+              "type": "공격",
+              "minCost": 2
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "반려 도장",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "결재 밀림",
+            "when": {
+              "on": "stackOver",
+              "id": "반려 도장"
+            },
+            "fx": [
+              {
+                "k": "gauge",
+                "v": 15
+              }
+            ]
           }
         ]
       },
@@ -35,6 +65,11 @@
             {
               "k": "gauge",
               "v": 25
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
             }
           ]
         },
@@ -67,11 +102,18 @@
           {
             "k": "dmg",
             "ratio": 4.2,
-            "target": "oneEnemy"
+            "target": "nextEnemy"
           },
           {
             "k": "tough",
-            "v": 2
+            "v": 2,
+            "target": "nextEnemy"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "nextEnemy"
           },
           {
             "k": "stack",
@@ -144,12 +186,17 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 3,
-          "target": "oneEnemy"
+          "ratio": 2.2,
+          "target": "nextEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "allEnemies"
         },
         {
           "k": "gauge",
-          "v": 25
+          "v": 20
         }
       ],
       "oracles": [
@@ -161,12 +208,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.9,
-              "target": "oneEnemy"
+              "ratio": 2.86,
+              "target": "nextEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "allEnemies"
             },
             {
               "k": "gauge",
-              "v": 33
+              "v": 26
             }
           ]
         },
@@ -179,12 +231,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3,
-              "target": "oneEnemy"
+              "ratio": 2.2,
+              "target": "nextEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
             },
             {
               "k": "gauge",
-              "v": 25
+              "v": 20
             }
           ]
         },
@@ -197,12 +254,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.6,
-              "target": "oneEnemy"
+              "ratio": 2.64,
+              "target": "nextEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "allEnemies"
             },
             {
               "k": "gauge",
-              "v": 30
+              "v": 24
             }
           ]
         },
@@ -214,12 +276,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.3,
-              "target": "oneEnemy"
+              "ratio": 2.5,
+              "target": "nextEnemy"
             },
             {
-              "k": "gauge",
-              "v": 25
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -237,12 +300,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.6,
-              "target": "oneEnemy"
+              "ratio": 2.64,
+              "target": "nextEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "allEnemies"
             },
             {
               "k": "gauge",
-              "v": 30
+              "v": 24
             }
           ]
         }
@@ -581,17 +649,28 @@
         {
           "k": "atkMod",
           "v": 0.15,
-          "target": "self",
-          "run": true
-        },
-        {
-          "k": "stack",
-          "id": "반려 도장",
-          "v": 1
+          "run": true,
+          "target": "self"
         },
         {
           "k": "draw",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "gauge",
+                  "v": 20
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -600,18 +679,29 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 2
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 40
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -620,19 +710,30 @@
           "cost": 1,
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 1
-            },
-            {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 20
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -644,18 +745,30 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.18,
-              "target": "self",
-              "run": true
+              "v": 0.2,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "stack",
               "id": "반려 도장",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 30
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -664,18 +777,29 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.22,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 2
+              "v": 0.2,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 20
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -687,18 +811,29 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.18,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 2
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 30
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

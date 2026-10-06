@@ -27,7 +27,7 @@ namespace Bolzena.RunUI
         {
             Ui.Clear(root);
             var shop = P.S.Shop;
-            W.StatusBar(root, this, true, true, false, "골디의 상점", "황금에서 태어난 용족 상인 · 정품만 팝니다");
+            W.StatusBar(root, this, true, false, false, "골디의 상점", "황금에서 태어난 용족 상인 · 정품만 팝니다");
             var size = Stage.Size;
             float L = Theme.C(430, 380);          // 왼쪽 상인 자리
             float top = 104, foot = Theme.C(100, 92);
@@ -91,10 +91,11 @@ namespace Bolzena.RunUI
                     tile.At(0, 1, pad + c * (tw + Theme.Gap), y, tw, rowH);
                     var pb = PriceBtn(tile, it, () =>
                     {
+                        var cs = CardSnap();
                         var why = P.Buy(idx);
                         if (why != null) { Toast.Show(why); return; }
-                        // 교주 카드는 누구 덱에 넣을지 고른 뒤(PendingNeutral → AssignNeutral)
-                        PickOwners(() => Bought(it.Kind == "neutral" ? $"「{P.Data.Card(it.Id)?.Name}」 — 덱에 넣었습니다" : $"「{P.Data.Equip(it.Id)?.Name}」 — 샀습니다"));
+                        // 교주 카드는 가운데에 크게 → 누구 덱에 넣을지 고른 뒤(GainCards → PendingNeutral → AssignNeutral)
+                        GainCards(NewCards(cs), () => Bought(it.Kind == "neutral" ? $"「{P.Data.Card(it.Id)?.Name}」 — 덱에 넣었습니다" : $"「{P.Data.Equip(it.Id)?.Name}」 — 샀습니다"));
                     });
                     pb.GetComponent<RectTransform>().At(1, 0, -12, 12, Theme.C(128, 120), Theme.C(42, 44));
                     Stage.Hot["shop.item" + idx] = pb;
@@ -226,13 +227,14 @@ namespace Bolzena.RunUI
 
         void RemovePicker(RectTransform root, string kind, int li)
         {
-            var (area, close, _) = Stage.ModalBox("remove", 1240, 780, "뺄 카드를 고르세요", $"{P.RemovePrice} 골드 · 한 번 들를 때 한 장 · 누르면 한 번 더 묻습니다");
+            float mw = Theme.Compact ? 1240 : Mathf.Min(Stage.Size.x - 40, Mathf.Max(1240, 8 * (170 + 12) + 80));   // 넓은 화면은 한 줄 6~8칸
+            var (area, close, _) = Stage.ModalBox("remove", mw, 780, "뺄 카드를 고르세요", $"{P.RemovePrice} 골드 · 한 번 들를 때 한 장 · 누르면 한 번 더 묻습니다");
             var content = Ui.Scroll(area, out _);
             // 사도별 묶음(기본 → 고유) · 상태 · 저주 · 교주 카드 순 — CardOrder
-            CardGroups(content, P.S.Deck, 170, 6, true, (c, id, i) =>
+            CardGroups(content, P.S.Deck, 170, Theme.Compact ? 6 : GridCols(mw - 80, 170, 12, 6, 8), (c, id, i) =>   // 같은 카드도 한 장마다 한 칸
             {
                 var b = c.gameObject.AddComponent<Btn>();
-                b.OnClick = () => Confirm($"「{P.Data.Card(id)?.Name}」 을 뺄까요?", $"{P.RemovePrice} 골드 — 덱에서 한 장이 빠집니다.", "뺍니다", () =>
+                b.OnClick = () => Confirm($"「{P.Data.Card(id)?.Name}」 을 뺄까요?", $"{P.RemovePrice} 골드 — 덱에서 한 장이 빠집니다.", "빼기", () =>
                 {
                     var why = P.Remove(id);
                     if (why != null) { Toast.Show(why); return; }

@@ -15,7 +15,7 @@
       "blurb": "사료스탕스의 브레인이자 티그의 오른팔.",
       "keyword": {
         "name": "계획",
-        "desc": "계획대로인 것이다 — 다음 턴 안에 격파하면 AP · 드로우, 못 하면 손패 1장을 버린다",
+        "desc": "다음 턴까지 노리는 계획",
         "carrier": "self",
         "cap": 2,
         "decay": 1,
@@ -39,7 +39,7 @@
       },
       "passives": [
         {
-          "name": "계획대로인 것이다",
+          "name": "계획대로",
           "when": {
             "on": "break"
           },
@@ -165,86 +165,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 루포류 신속베기",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "계획"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가벼운 루포류 신속베기",
-          "cost": 1,
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "계획"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "계산된 루포류 신속베기",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "계획"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 루포류 신속베기",
+          "name": "루포류 쾌속베기",
           "tags": [
             "신속"
           ],
@@ -270,15 +191,15 @@
           ]
         },
         {
-          "name": "꿰뚫는 루포류 신속베기",
+          "name": "한 박자 베기",
+          "cost": 1,
           "tags": [
-            "신속",
-            "약점 공격"
+            "신속"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 0.6,
               "target": "oneEnemy",
               "hits": 3
             },
@@ -295,25 +216,99 @@
               "v": 1
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "힘껏",
-          "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "작전 회의",
+          "name": "계획대로 베기",
+          "tags": [
+            "신속"
+          ],
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "tough",
+              "v": 2
+            },
             {
               "k": "draw",
               "v": 1
             }
           ]
+        },
+        {
+          "name": "여우 회오리",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오의 신속베기",
+          "cost": 3,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "tough",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "바람 가르기",
+          "kind": "power"
+        },
+        {
+          "name": "계획된 급소",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "발 빠른 여우",
+          "kind": "cost"
         }
       ]
     },
@@ -342,16 +337,16 @@
       ],
       "oracles": [
         {
-          "name": "힘준 작전 지도 펼치기",
+          "name": "세밀한 지도",
           "fx": [
             {
               "k": "stack",
               "id": "계획",
-              "v": 3
+              "v": 2
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 3
             },
             {
               "k": "status",
@@ -361,32 +356,45 @@
           ]
         },
         {
-          "name": "가벼운 작전 지도 펼치기",
+          "name": "쪽지 작전",
           "cost": 0,
           "fx": [
             {
               "k": "stack",
               "id": "계획",
-              "v": 3
-            },
-            {
-              "k": "draw",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "계산된 작전 지도 펼치기",
+          "name": "치밀한 계획",
           "fx": [
             {
               "k": "stack",
               "id": "계획",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "약점 표시",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 2
             },
             {
               "k": "draw",
@@ -394,21 +402,21 @@
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "id": "취약",
+              "v": 2
             }
           ]
         },
         {
-          "name": "든든한 작전 지도 펼치기",
+          "name": "비밀 작전",
           "tags": [
-            "보존"
+            "개전"
           ],
           "fx": [
             {
               "k": "stack",
               "id": "계획",
-              "v": 3
+              "v": 2
             },
             {
               "k": "draw",
@@ -417,50 +425,23 @@
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 작전 지도 펼치기",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "계획",
-              "v": 3
-            },
-            {
-              "k": "draw",
               "v": 2
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "든든함",
-          "kind": "guard"
-        },
-        {
-          "name": "한 장 더",
+          "name": "접힌 귀퉁이",
           "kind": "draw"
         },
         {
-          "name": "작전 회의",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
+          "name": "작전 개시",
+          "kind": "ap"
+        },
+        {
+          "name": "수풀에 숨기",
+          "kind": "defUp"
         }
       ]
     },
@@ -487,63 +468,7 @@
       ],
       "oracles": [
         {
-          "name": "힘준 눈속임 단검",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가벼운 눈속임 단검",
-          "cost": 0,
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "계산된 눈속임 단검",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 눈속임 단검",
+          "name": "깊이 찌르기",
           "tags": [
             "신속"
           ],
@@ -560,7 +485,67 @@
           ]
         },
         {
-          "name": "꿰뚫는 눈속임 단검",
+          "name": "잔꾀",
+          "cost": 0,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 0.5
+            }
+          ]
+        },
+        {
+          "name": "계획된 눈속임",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "단검 흩뿌리기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "뒤통수",
           "tags": [
             "신속",
             "약점 공격"
@@ -568,7 +553,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.7,
+              "ratio": 1.65,
               "target": "oneEnemy"
             },
             {
@@ -580,21 +565,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "날 선 단검",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "허 찌르기",
+          "kind": "frost"
         },
         {
-          "name": "작전 회의",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
+          "name": "한 수 앞",
+          "kind": "ap"
         }
       ]
     },
@@ -623,11 +603,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 오의 여우 꼬리",
+          "name": "오의 구미호 꼬리",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.65,
+              "ratio": 3.3,
               "target": "oneEnemy"
             },
             {
@@ -636,85 +616,37 @@
             },
             {
               "k": "dmg",
-              "ratio": 2.15,
+              "ratio": 2.0,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "가벼운 오의 여우 꼬리",
+          "name": "꼬리 휘두르기",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "계산된 오의 여우 꼬리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재빠른 오의 여우 꼬리",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
               "ratio": 2.05,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "꿰뚫는 오의 여우 꼬리",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "계획의 마무리",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.35,
+              "ratio": 3.1,
               "target": "oneEnemy"
             },
             {
@@ -723,7 +655,55 @@
             },
             {
               "k": "dmg",
-              "ratio": 2,
+              "ratio": 1.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "계획"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꼬리 쓸기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.0,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "오의 여우불",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 4.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.6,
               "target": "oneEnemy"
             }
           ]
@@ -731,21 +711,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "매서운 꼬리",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "틈 노리는 꼬리",
           "kind": "weakSpot"
         },
         {
-          "name": "작전 회의",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
+          "name": "살랑이는 꼬리",
+          "kind": "cost"
         }
       ]
     }

@@ -42,28 +42,25 @@ namespace Bolzena.RunUI
                 stage.offsetMin = Vector2.zero; stage.offsetMax = Vector2.zero;
                 var floor = Ui.Img(stage, Theme.S("soft"), new Color(0, 0, 0, 0.45f), "shadow");
                 floor.rectTransform.At(0.5f, 0, 40, 10, 520, 90);
-                var holder = Ui.Rect("stand", stage).At(0.5f, 0, 40, -10, 10, 10);
-                var hero = Roster.ByKey(Settings.LobbyHero) ?? Roster.ByKey("에르핀");
-                SkeletonGraphic sg = SpineUi.Make(holder, "st_" + (hero?.art ?? "erpin"), null, 800, "Idle_1", "Idle");
-                if (sg == null && hero?.Icon != null)
-                {
-                    var im = Ui.Img(holder, hero.Icon, Color.white, "still");
-                    im.rectTransform.At(0.5f, 0, 0, 340, 520, 520);
-                }
+                // 스탠딩 — 캔버스 높이에 비례(예전 800 고정은 폰 · 저해상도 캔버스 720 에서 줄지 않았다) · 표(standing_fit)로 같은 구도
+                var hero = LobbyHeroInfo();
+                var standHost = Ui.Rect("standhost", stage).Fill();
+                SkeletonGraphic sg = LobbyStanding(standHost, hero);
                 var tap = Ui.Img(stage, Theme.White, new Color(0, 0, 0, 0), "tap", true);
-                tap.rectTransform.At(0.5f, 0, 40, 0, 460, 800);
+                tap.rectTransform.At(0.5f, 0, 40, 0, Stage.Size.y * 0.52f, Stage.Size.y * 0.89f);
                 var tb = tap.gameObject.AddComponent<Btn>();
                 tb.Bg = null;
 
                 // 말풍선
-                var bubbleT = W.Bubble(stage, hero?.ko ?? "에르핀", LobbyLines[0], 360, out var bubble);
+                var lines = LinesOf(hero);
+                var bubbleT = W.Bubble(stage, hero?.ko ?? "에르핀", lines[0], 360, out var bubble);
                 bubble.At(0, 1, 70, -200, 360, 100);
                 Tw.Pop(bubble, 0.5f, 0.7f, 0.5f);
                 int li = 0;
                 tb.OnClick = () =>
                 {
-                    li = (li + 1) % LobbyLines.Length;
-                    bubbleT.text = LobbyLines[li];
+                    li = (li + 1) % lines.Length;
+                    bubbleT.text = lines[li];
                     Tw.Pop(bubble, 0, 0.85f, 0.35f);
                     if (sg != null)
                     {
@@ -81,6 +78,26 @@ namespace Bolzena.RunUI
                 pt.rectTransform.Fill(26, 0, 10, 0);
                 pt.textWrappingMode = TextWrappingModes.NoWrap;
                 Tw.Rise(plate.rectTransform, 0.3f, 20, 0.4f, Vector2.down);
+                // 메인 사도 바꾸기 — 이름판 오른쪽 동그란 단추 → 사도 고르기 창(Flow.LobbyHero.cs). 고르면 스탠딩만 부드럽게 바꾼다
+                var swap = Btn.Icon(stage, Theme.S("ic_refresh"), null, 56, "swaphero");
+                swap.GetComponent<RectTransform>().At(0, 0, Theme.Gutter + 6 + 430 + 12, Theme.Gutter + 10, 56, 56);
+                Stage.Hot["lobby.swap"] = swap;
+                swap.OnClick = () => LobbyHeroPicker(newHero =>
+                {
+                    hero = newHero;
+                    lines = LinesOf(hero); li = 0;
+                    var old = sg;
+                    sg = null;
+                    if (old != null) Tw.Run(old.rectTransform, 0.22f, t => { if (old) old.color = new Color(1, 1, 1, 1 - t); }, Tw.Linear, 0, () => { if (old) Destroy(old.gameObject); });
+                    foreach (Transform c in standHost) if (c.name.StartsWith("still")) Destroy(c.gameObject);
+                    sg = LobbyStanding(standHost, hero);
+                    if (sg != null) { sg.color = new Color(1, 1, 1, 0); var ng = sg; Tw.Run(ng.rectTransform, 0.3f, t => { if (ng) ng.color = new Color(1, 1, 1, t); }, Tw.Linear, 0.12f); Tw.Rise(ng.rectTransform, 0.12f, 18, 0.35f); }
+                    pt.text = $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}   <size=60%><color={Theme.SubTag}>누르면 반응합니다</color></size>";
+                    if (bubble) Destroy(bubble.gameObject);
+                    bubbleT = W.Bubble(stage, hero?.ko ?? "에르핀", lines[0], 360, out bubble);
+                    bubble.At(0, 1, 70, -200, 360, 100);
+                    Tw.Pop(bubble, 0.25f, 0.7f, 0.4f);
+                });
 
                 // 오른쪽 — 메뉴
                 var menu = Ui.Rect("menu", root);
@@ -95,8 +112,8 @@ namespace Bolzena.RunUI
                     () => { if (hasSave) Resume(); else NewAdventure(); });
                 Stage.Hot["start"] = start;
                 if (hasSave)
-                    Stage.Hot["new"] = MenuItem(menu, Theme.S("ic_spark"), "새 모험", "지금 판을 버리고 사도 셋을 새로 고릅니다", new Color(0.95f, 0.75f, 0.35f), () =>
-                        Confirm("지금 판을 버릴까요?", "이어하던 판은 사라집니다. 새 마을로 떠납니다.", "버리고 떠납니다", () => { RunPort.ClearSave(); NewAdventure(); }, true));
+                    Stage.Hot["new"] = MenuItem(menu, Theme.S("ic_spark"), "새 모험", "지금 모험을 버리고 사도 셋을 새로 고릅니다", new Color(0.95f, 0.75f, 0.35f), () =>
+                        Confirm("지금 모험을 버릴까요?", "이어하던 모험은 사라집니다. 새 마을로 떠납니다.", "버리고 출발", () => { RunPort.ClearSave(); NewAdventure(); }, true));
                 Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", $"사도 {Roster.All.Count}명 · 적 · 장비 · 교주 카드", Theme.Hex("7FE0B4"), () => Dex(Lobby));
                 Stage.Hot["settings"] = MenuItem(menu, Theme.S("ic_cog"), "설정", "소리 · 움직임 · 글자 · 화면", Theme.Hex("B9A8FF"), () => SettingsPanel(false));
 
@@ -167,7 +184,7 @@ namespace Bolzena.RunUI
             b.rectTransform.Band(1, 70, 40, 40, -88);
             var row = Ui.Rect("row", panel).Band(0, 62, 36, 36, 30);
             Ui.Row(row, Theme.Gap + 4, TextAnchor.MiddleCenter, null, true, true);
-            var no = Btn.Make(row, "그만둡니다", BtnStyle.Dark, close, Theme.FsMd);
+            var no = Btn.Make(row, "취소", BtnStyle.Dark, close, Theme.FsMd);
             var ok = Btn.Make(row, yes, danger ? BtnStyle.Red : BtnStyle.Gold, () => { close(); onYes(); }, Theme.FsMd);
             Stage.Hot["confirm.yes"] = ok;
             Stage.Hot["confirm.no"] = no;

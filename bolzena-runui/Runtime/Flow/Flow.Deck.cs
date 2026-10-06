@@ -23,6 +23,7 @@ namespace Bolzena.RunUI
             Tw.Run(layer, 0.22f, k => { if (lg) lg.alpha = k; });
             Action close = null;
             close = () => { var g = lg; Tw.Run(layer, 0.16f, k => { if (g) g.alpha = 1 - k; }, Tw.Linear, 0, () => { if (layer) Destroy(layer.gameObject); }); };
+            layer.gameObject.AddComponent<BackClose>().Close = () => close();   // 뒤로 키로 닫힌다(신탁 창 위에 열었을 때도 덱 보기만 닫힘)
 
             // 왼쪽 세로 탭 줄 — 덱(지금) · 낀 장비 · 사도 한 장
             float railW = 84;
@@ -69,12 +70,15 @@ namespace Bolzena.RunUI
 
             float areaW = size.x - railW - 20 - Theme.Gutter - 18;
             float tickW = 64, headW = Theme.C(158, 140), gap = 12;
-            float cw = Mathf.Clamp((areaW - tickW - headW - 24 - gap * 3 - 12) / 4f, 150, 232), ch = cw * 1.4f;
+            // 한 줄 칸 수 — 화면 폭에 맞춰 4~8칸(카드 폭은 232 를 넘지 않게, 2026-10-06 사용자). 좁은 화면 · 폰은 전처럼 4칸
+            float cardsW = areaW - tickW - headW - 24 - 12;
+            int cols = Theme.Compact ? 4 : GridCols(cardsW, 210, gap, 4, 8);   // 210 폭으로 세어 16:9 에서도 5칸(카드는 ~230 그대로)
+            float cw = Mathf.Clamp((cardsW - gap * (cols - 1)) / cols, 150, 232), ch = cw * 1.4f;
             float headH = headW * 1.42f;
             int gi = 0, ci = 0;
             foreach (var g in CardOrder.Groups(P.S.Deck, P.Data, P.S.Party))
             {
-                int rows = Mathf.CeilToInt(g.Ids.Count / 4f);
+                int rows = Mathf.CeilToInt(g.Ids.Count / (float)cols);
                 float gh = Mathf.Max(headH, rows * (ch + gap) - gap);
                 var grp = Ui.Rect("group " + g.Title, content); grp.Pref(-1, gh);
                 // 장수 + 세로 눈금
@@ -87,12 +91,12 @@ namespace Bolzena.RunUI
                 var head = GroupHead(grp, g, headW, headH);
                 head.At(0, 1, tickW + 12, 0, headW, headH);
                 // 카드
-                var holder = Ui.Rect("cards", grp).At(0, 1, tickW + headW + 24, 0, cw * 4 + gap * 3, gh);
+                var holder = Ui.Rect("cards", grp).At(0, 1, tickW + headW + 24, 0, cw * cols + gap * (cols - 1), gh);
                 for (int i = 0; i < g.Ids.Count; i++)
                 {
                     var id = g.Ids[i];
                     var c = W.Card(holder, this, id, cw);
-                    c.At(0, 1, (i % 4) * (cw + gap), -(i / 4) * (ch + gap), cw, ch);
+                    c.At(0, 1, (i % cols) * (cw + gap), -(i / cols) * (ch + gap), cw, ch);
                     var b = c.gameObject.AddComponent<Btn>();
                     b.OnClick = () => CardZoom(id);
                     Stage.Hot["deck.card" + ci] = b;
@@ -108,7 +112,7 @@ namespace Bolzena.RunUI
         {
             var hd = g.Hero != null ? P.Data.Hero(g.Hero) : null;
             var info = g.Hero != null ? Roster.OfCore(g.Hero) : null;
-            Color tint = g.Kind == CardOrder.Kind.Leader ? Theme.LeaderCard : g.Kind == CardOrder.Kind.Status ? Theme.StatusCard : Theme.NatureCardOf(hd?.Nature ?? info?.nature);
+            Color tint = g.Kind == CardOrder.Kind.Leader ? Theme.LeaderCard : g.Kind == CardOrder.Kind.Status || g.Kind == CardOrder.Kind.Curse ? Theme.StatusCard : Theme.NatureCardOf(hd?.Nature ?? info?.nature);
             var bg = Ui.Img(parent, Theme.Cell, Color.white, "head");
             var rt = bg.rectTransform;
             var well = Ui.Img(rt, Theme.Round, Color.Lerp(Theme.NavyWell, tint, 0.25f), "well"); well.rectTransform.Fill(6, 6, 6, 6);
@@ -135,7 +139,7 @@ namespace Bolzena.RunUI
                     var ic = Ui.Img(col, sp, Color.white, key); ic.Pref(26, 26); ic.preserveAspect = true;
                 }
             }
-            var name = Ui.Title(rt, g.Kind == CardOrder.Kind.Leader ? "교주" : g.Kind == CardOrder.Kind.Status ? "상태 · 저주" : info?.ko ?? g.Hero, Theme.FsLg, Theme.Ink, TextAlignmentOptions.BottomLeft);
+            var name = Ui.Title(rt, g.Kind == CardOrder.Kind.Leader ? "교주" : g.Kind == CardOrder.Kind.Status ? "상태" : g.Kind == CardOrder.Kind.Curse ? "저주" : info?.ko ?? g.Hero, Theme.FsLg, Theme.Ink, TextAlignmentOptions.BottomLeft);
             name.rectTransform.Band(0, 30, 12, 8, 12);
             name.textWrappingMode = TextWrappingModes.NoWrap; name.enableAutoSizing = true; name.fontSizeMin = 12; name.fontSizeMax = Theme.FsLg; name.Outline(0.2f);
             var sub = Ui.Text(rt, g.Kind == CardOrder.Kind.Hero ? new string('★', Mathf.Clamp(info?.star ?? 3, 1, 5)) : g.Kind == CardOrder.Kind.Leader ? "교주 카드" : "적 · 이벤트가 넣은 카드", Theme.FsSm, g.Kind == CardOrder.Kind.Hero ? Theme.Gold : Theme.Sub, TextAlignmentOptions.BottomLeft);
@@ -144,7 +148,7 @@ namespace Bolzena.RunUI
             return rt;
         }
 
-        /// <summary>카드 크게 — 왼쪽 카드 한 장, 오른쪽 신탁 ①~⑤ · 겨우살이의 축복.</summary>
+        /// <summary>카드 크게 — 왼쪽 카드 한 장, 오른쪽 신탁(이름만 — 번호는 보이지 않는다) · 겨우살이의 축복.</summary>
         public void CardZoom(string id)
         {
             var v = P.View(id);
@@ -161,11 +165,20 @@ namespace Bolzena.RunUI
                 t.textWrappingMode = TextWrappingModes.Normal;
                 var fit = t.gameObject.AddComponent<ContentSizeFitter>(); fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             }
+            // 이 카드에 얹힌 것 — 받은 신탁 · 축복(효과 글) · 복제(카드의 표식과 같은 색)
+            var mark = P.Mark(id);
+            if (mark.Any)
+            {
+                W.Section(content, "이 카드에 얹힌 것", mark.Copy ? "복제할 때 모습 그대로 묶였습니다" : null, 36);
+                if (mark.Oracle != null) Line($"<color={Theme.GoldTag}>신탁 「{mark.Oracle}」</color>", Theme.FsBody, Theme.Ink);
+                if (mark.Blessed) Line($"<color=#BFFFD1>축복 「{mark.Bless}」</color>  <size=90%>{mark.BlessText}</size>", Theme.FsBody, Theme.Ink);
+                if (mark.Copy) Line($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color>  <size=90%><color={Theme.SubTag}>원본이 나중에 받는 신탁 · 축복은 따라오지 않습니다</color></size>", Theme.FsBody, Theme.Ink);
+            }
             // 이 카드의 낱말 — 키워드 · 상태 · 고유 효과 · 생성 카드 판을 세로로(카드 글의 밑줄 낱말과 같은 판)
             var terms = v != null ? CardTerms.Of(P.Data, P.Text, v, P.Text.Card(v)) : new List<CardTerms.Term>();
             if (terms.Count > 0)
             {
-                W.Section(content, "낱말", "카드 글의 밑줄 낱말 — 올리거나 누르면 그 자리에도 뜬다", 36);
+                W.Section(content, "낱말", "카드 글의 밑줄 낱말 — 올리거나 누르면 그 자리에도 뜹니다", 36);
                 float bw = Mathf.Min(1180, Stage.Size.x - 32) - 40 - cw - 40 - 6 - 14;
                 int ti = 0;
                 foreach (var t0 in terms)
@@ -178,29 +191,26 @@ namespace Bolzena.RunUI
                             Body = cv != null ? $"<color={Theme.SubTag}>{W.TypeLabel(cv.Type)} · 비용 {(cv.X ? "X" : cv.Cost.ToString())}</color>  {P.Text.Card(cv)}" : null };
                     }
                     var holder = Ui.Rect("term" + ti, content);
-                    RectTransform bx = null;
-                    bx = TermPop.Box(holder, t, bw, () => { if (holder && bx) { holder.Pref(-1, bx.sizeDelta.y); LayoutRebuilder.MarkLayoutForRebuild(content); } });
+                    var bx = TermPop.Box(holder, t, bw);   // 수치가 다 든 글 하나(「자세히」 없음) — 오른쪽 칸이 스크롤된다
                     holder.Pref(-1, bx.sizeDelta.y);
-                    var more = bx.GetComponentInChildren<Btn>();
-                    if (more != null) Stage.Hot["zoom.more" + ti] = more;
                     ti++;
                 }
             }
             if (def != null && def.Oracles.Count > 0)
             {
-                W.Section(content, "신탁", "카드를 내면 빛나고 · 보상에서 하나를 얹는다", 36);
+                W.Section(content, "신탁", "카드를 내면 빛나고 · 보상에서 하나를 얹습니다", 36);
                 for (int i = 0; i < def.Oracles.Count; i++)
                 {
                     var o = def.Oracles[i];
                     bool cur = v?.Oracle == o;
-                    Line($"<color={(cur ? Theme.GoodTag : Theme.GoldTag)}>{"①②③④⑤⑥"[Mathf.Min(i, 5)]} {o.Name}</color>{(cur ? "  <size=80%>(얹은 것)</size>" : "")}\n<size=90%>{P.Text.Oracle(def, o)}</size>", Theme.FsBody, Theme.Ink);
+                    Line($"<color={(cur ? Theme.GoodTag : Theme.GoldTag)}>{o.Name}</color>{(cur ? "  <size=80%>(얹은 것)</size>" : "")}\n<size=90%>{P.Text.Oracle(def, o)}</size>", Theme.FsBody, Theme.Ink);
                 }
             }
             if (def != null && def.Hero != null)
             {
                 W.Section(content, "겨우살이의 축복", def.Blesses.Count > 0 ? "이 카드만의 축복" : "공용 축복에서", 36);
                 if (def.Blesses.Count > 0)
-                    foreach (var b in def.Blesses) Line($"<color={Theme.GoldTag}>{b.Name}</color>  <size=90%>{P.Text.Bless(b)}</size>", Theme.FsBody, Theme.Ink);
+                    foreach (var b in def.Blesses) Line($"<color={Theme.GoldTag}>{b.Name}</color>{(b.Name == mark.Bless ? $"  <size=80%><color={Theme.GoodTag}>(얹은 것)</color></size>" : "")}  <size=90%>{P.Text.Bless(b)}</size>", Theme.FsBody, Theme.Ink);
                 else Line($"<color={Theme.SubTag}>이 카드만의 축복은 없습니다 — 축복을 받으면 공용 축복 가운데 하나가 붙습니다.</color>", Theme.FsSm, Theme.Sub);
             }
             if (def == null || (def.Oracles.Count == 0 && def.Hero == null))
@@ -208,8 +218,11 @@ namespace Bolzena.RunUI
             Stage.Hot["zoom.close"] = Stage.Hot["modal.x"];
         }
 
-        /// <summary>사도별 카드 묶음(작은 머리표 + 격자) — 카드 제거 · 이벤트 카드 고르기. stack 이면 같은 카드는 한 장 + ×N.</summary>
-        void CardGroups(RectTransform content, IEnumerable<string> ids, float cw, int cols, bool stack, Action<RectTransform, string, int> each)
+        /// <summary>사도별 카드 묶음(작은 머리표 + 격자) — 카드 제거 · 이벤트 카드 고르기. 같은 카드도 한 장마다 한 칸(×N 으로 묶지 않는다 — 신탁 · 축복 · 복제 표식이 칸마다 보이게, 2026-10-06 사용자).</summary>
+        /// <summary>격자 한 줄 칸 수 — 폭 avail 에 최대 폭 cwMax 카드가 몇 장 드나(min~max). 덱 보기 · 고르기 목록이 같이 쓴다.</summary>
+        public static int GridCols(float avail, float cwMax, float gap, int min, int max) => Mathf.Clamp(Mathf.FloorToInt((avail + gap) / (cwMax + gap)), min, max);
+
+        void CardGroups(RectTransform content, IEnumerable<string> ids, float cw, int cols, Action<RectTransform, string, int> each)
         {
             Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(8, 8, 4, 12), true, false);
             float ch = cw * 1.4f, gap = 12;
@@ -220,18 +233,17 @@ namespace Bolzena.RunUI
                 var info = g.Hero != null ? Roster.OfCore(g.Hero) : null;
                 if (info != null) { var fc = W.Face(hrow, info, 38); fc.At(0, 0.5f, 0, 0, 38, 38); }
                 else { var ic = Ui.Img(hrow, Theme.S(g.Kind == CardOrder.Kind.Leader ? "ic_crown" : "ic_skull"), g.Kind == CardOrder.Kind.Leader ? Theme.Gold : Theme.Sub, "ic"); ic.rectTransform.At(0, 0.5f, 4, 0, 30, 30); ic.preserveAspect = true; }
-                var list = stack ? g.Ids.GroupBy(x => x).Select(x => (x.Key, x.Count())).ToList() : g.Ids.Select(x => (x, 1)).ToList();
-                var t = Ui.Title(hrow, $"{(g.Kind == CardOrder.Kind.Leader ? "교주 카드" : g.Kind == CardOrder.Kind.Status ? "상태 · 저주" : info?.ko ?? g.Hero)}  <size=70%><color={Theme.SubTag}>{g.Ids.Count}장</color></size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+                var list = g.Ids;
+                var t = Ui.Title(hrow, $"{(g.Kind == CardOrder.Kind.Leader ? "교주 카드" : g.Kind == CardOrder.Kind.Status ? "상태" : g.Kind == CardOrder.Kind.Curse ? "저주" : info?.ko ?? g.Hero)}  <size=70%><color={Theme.SubTag}>{g.Ids.Count}장</color></size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
                 t.rectTransform.Fill(48, 0, 0, 0);
                 var line = Ui.Img(hrow, Theme.White, Theme.Line, "rule"); line.rectTransform.Band(0, 1, 48, 0, 0);
                 int rows = Mathf.CeilToInt(list.Count / (float)cols);
                 var holder = Ui.Rect("cards", content); holder.Pref(-1, rows * (ch + gap));
                 for (int j = 0; j < list.Count; j++)
                 {
-                    var (id, n) = list[j];
+                    var id = list[j];
                     var c = W.Card(holder, this, id, cw);
                     c.At(0, 1, (j % cols) * (cw + gap), -(j / cols) * (ch + gap), cw, ch);
-                    if (n > 1) { var (cb, ct) = Ui.Chip(c, null, "×" + n, 30, Theme.Gold, null, 18); cb.rectTransform.At(1, 0, -6, 6, 50, 30); ct.color = Theme.Brown; }
                     each(c, id, i);
                     if (i < 30) Tw.Pop(c, 0.02f * i, 0.85f, 0.3f);
                     i++;
@@ -252,10 +264,8 @@ namespace Bolzena.RunUI
                 var o = opts[i];
                 var holder = Ui.Rect("oracle" + o.N, row); holder.Pref(cw, cw * 1.4f + 70);
                 var view = P.Data.View(cardId, o.N);
-                var face = W.Card(holder, this, cardId, cw, "card", view);
+                var face = W.Card(holder, this, cardId, cw, "card", view, noFace: true);   // 신탁 창은 주인 얼굴 핀 없이
                 face.At(0.5f, 1, 0, -6, cw, cw * 1.4f);
-                var num = Ui.Img(face, Theme.S("circle"), Theme.Gold, "n"); num.rectTransform.At(0.5f, 1, 0, 14, 30, 30);
-                var nt = Ui.Title(num.transform, "①②③④⑤⑥"[Mathf.Clamp(o.N - 1, 0, 5)].ToString(), Theme.FsMd, Theme.Brown, TextAlignmentOptions.Center); nt.rectTransform.Fill();
                 if (o.Blessed)
                 {
                     var rib = Ui.Img(face, Theme.Pill, Theme.Gold, "bless"); rib.rectTransform.At(0.5f, 0, 0, -16, cw * 0.62f, 30);

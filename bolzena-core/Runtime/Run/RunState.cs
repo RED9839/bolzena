@@ -163,6 +163,8 @@ namespace Bolzena.Core
         public List<List<Outcome>> Options;
         /// <summary>remove — 시작 카드만.</summary>
         public bool Basic;
+        /// <summary>grace — 고른 사도의 남은 고유 카드 몇 장(1 이상).</summary>
+        public int N;
     }
 
     public sealed class EventState

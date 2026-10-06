@@ -41,12 +41,17 @@ namespace Bolzena.UI
             }
         }
 
-        public static IEnumerator Play(Transform parent, string hero, string heroName, string ultName, Color tint)
+        // foe — 보스 클론 고학년: 화면 전체를 좌우로 뒤집어(스탠딩은 오른쪽 칸 · 왼쪽을 봄, 오른쪽에서 들어옴) 붉은 테 · 붉은 줄무늬 · 「보스 고학년」 띠. 글은 다시 뒤집어 바로 읽힌다
+        // label — 작은 띠 글(기본 「고학년」 · 보스 「보스 고학년」 · 클론 등장 「보스 클론」) · hold — 글이 선 뒤 머무는 길이 · skippable — 누르면 바로 끝 · voice — 목소리 갈래
+        public static IEnumerator Play(Transform parent, string hero, string heroName, string ultName, Color tint, bool foe = false, string label = null, float hold = 1.35f, bool skippable = false, string voice = "ultimate")
         {
+            Bolzena.Demo.UltLap.Begin("컷인 시작 " + hero);
             var root = Make.Node("Cutin", parent);
+            float fl = foe ? -1f : 1f;
+            if (foe) root.localScale = new Vector3(-1, 1, 1);
             var fx = ScreenFx.I;
             Sfx.Play("ult_cutin", 0.9f);
-            Sfx.Voice(hero, "ultimate", "shout");
+            if (voice != null) Sfx.Voice(hero, voice, "shout");
 
             // 1) 어둡게 + 집중선
             var dim = Make.Box("dim", root, Res.UI("white"), Vector3.zero, new Vector2(44, 16), O, new Color(0.02f, 0.01f, 0.05f, 0));
@@ -59,6 +64,7 @@ namespace Bolzena.UI
             var lines = Make.Quad("lines", root, Vector3.zero, new Vector2(16.4f, 9.4f), linesMat, O + 1);
             ScreenFit.Add(lines.transform);
             fx.Bars(true);
+            Bolzena.Demo.UltLap.End();
             yield return Clock.Tween(0.14f, t =>
             {
                 Make.Alpha(dim, 0.8f * t);
@@ -67,6 +73,7 @@ namespace Bolzena.UI
             OnStage?.Invoke("ult1_dim");
 
             // 2) 띠 — 바탕(사도 빛깔) · 흰 줄 둘
+            Bolzena.Demo.UltLap.Begin("컷인 띠 " + hero);
             var band = Make.Node("band", root, new Vector3(0, 0.35f, 0));
             band.localRotation = Quaternion.Euler(0, 0, Angle);
             var bandBack = Make.Box("back", band, Res.UI("white"), new Vector3(-26, 0, 0), new Vector2(26, 3.6f), O + 2, Color.Lerp(tint, Color.black, 0.35f));
@@ -86,6 +93,19 @@ namespace Bolzena.UI
             var mask = maskT.gameObject.AddComponent<SpriteMask>();
             mask.sprite = Res.UI("white");
             maskT.localScale = new Vector3(40f / Res.UI("white").bounds.size.x, 3.6f / Res.UI("white").bounds.size.y, 1);
+            if (foe)
+            {
+                // 붉은 줄무늬(띠 안 · 비스듬히) · 띠 위아래 붉은 테
+                for (int i = -8; i <= 8; i++)
+                {
+                    var sr = Make.Box("redStripe", band, Res.UI("white"), new Vector3(i * 1.4f, 0, 0), new Vector2(0.32f, 5f), O + 3, new Color(0.75f, 0.05f, 0.05f, 0.45f));
+                    sr.transform.localRotation = Quaternion.Euler(0, 0, 30);
+                    sr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+                }
+                lineA.color = new Color(1f, 0.3f, 0.25f); lineB.color = new Color(1f, 0.3f, 0.25f);
+                foreach (var s in streaks) s.color = new Color(1f, 0.45f, 0.4f, s.color.a);
+            }
+            Bolzena.Demo.UltLap.End();
             yield return Clock.Tween(0.16f, t =>
             {
                 float k = Ease.OutExpo(t);
@@ -103,14 +123,18 @@ namespace Bolzena.UI
             float boxL = -hw + 0.25f, boxR = Mathf.Min(1.2f, hw * 0.12f), boxB = -hh * 0.96f, boxT = hh * 0.9f;   // 위는 여백 1할 — 쉬는 동작이 첫 자세보다 커지는 사도(이프리트 불꽃)
             float boxW = boxR - boxL, boxH = boxT - boxB;
             var boxC = new Vector3((boxL + boxR) / 2, (boxB + boxT) / 2, 0);
+            Bolzena.Demo.UltLap.Begin("컷인 스탠딩 " + hero);
             Transform stRoot = Make.Node("standing", root, boxC);
+            if (foe) stRoot.localScale = new Vector3(-1, 1, 1);   // 화면은 뒤집어도 스탠딩은 다시 뒤집어 왼쪽(파티 쪽)을 보게(보스 고학년 · 클론 등장 같은 규칙)
             SkeletonAnimation st = null;
             var data = Res.Spine("st_" + hero);
+            Bolzena.Demo.UltLap.Lap("Res.Spine");
             LastArt = data != null ? "spine" : "none";
             LastFit = 0; LastHow = null;
             if (data != null)
             {
                 st = SkeletonAnimation.NewSkeletonAnimationGameObject(data);
+                Bolzena.Demo.UltLap.Lap("NewSkeletonAnimation");
                 st.transform.SetParent(stRoot, false);
                 var sd = data.GetSkeletonData(true);
                 var wear = Bolzena.Fx.SpineMotion.Wear(sd, null, true);
@@ -121,6 +145,7 @@ namespace Bolzena.UI
                 if (anim != null) st.AnimationState.SetAnimation(0, anim, true);
                 st.AnimationState.Apply(st.Skeleton);
                 st.Skeleton.UpdateWorldTransform();
+                Bolzena.Demo.UltLap.Lap("스킨 · 동작");
                 // 다리 기준 — 골반→바닥이 칸 높이의 LegShare 가 되게, 발은 칸 아래 바닥선에(전신이 넘치면 줄인다)
                 float floorPad = boxH * 0.015f;
                 FloorY = boxB + floorPad; CenterX = boxC.x;
@@ -177,7 +202,8 @@ namespace Bolzena.UI
             // 4) 글 — 「고학년 스킬」 · 기술 이름 · 사도 이름
             var txtRoot = Make.Node("text", root, new Vector3(2.9f, 0.55f, 0));
             txtRoot.localRotation = Quaternion.Euler(0, 0, Angle);
-            var small = Make.Text("label", txtRoot, "고학년 스킬", new Vector3(0, 0.95f, 0), 0.3f, O + 14, new Color(1f, 0.92f, 0.7f));
+            if (foe) txtRoot.localScale = new Vector3(-1, 1, 1);
+            var small = Make.Text("label", txtRoot, label ?? (foe ? "보스 고학년" : "고학년"), new Vector3(0, 0.95f, 0), label == "클론" ? 0.46f : 0.3f, O + 14, foe ? new Color(1f, 0.55f, 0.45f) : new Color(1f, 0.92f, 0.7f));
             Make.Outline(small, 0.25f, new Color(0, 0, 0, 0.9f));
             small.characterSpacing = 18;
             var big = Make.Text("ult", txtRoot, ultName, new Vector3(0, 0.05f, 0), 0.95f, O + 15, Color.white);
@@ -187,9 +213,11 @@ namespace Bolzena.UI
             var name = Make.Text("hero", txtRoot, heroName, new Vector3(1.6f, -0.8f, 0), 0.42f, O + 14, Color.Lerp(tint, Color.white, 0.4f), TextAlignmentOptions.Right);
             Make.Outline(name, 0.25f, new Color(0, 0, 0, 0.9f));
             foreach (var t in new[] { small, big, name }) t.alpha = 0;
+            Bolzena.Demo.UltLap.Lap("빛 · 글");
+            Bolzena.Demo.UltLap.End();
 
             float stIn = 0.22f;
-            float tTotal = 1.35f;
+            float tTotal = hold;
             float time = 0;
             bool shotName = false, shotSlide = false;
             Vector3 textFrom = new Vector3(5.5f, 0.55f, 0), textTo = new Vector3(2.9f, 0.55f, 0);
@@ -202,7 +230,7 @@ namespace Bolzena.UI
                 float x = Mathf.LerpUnclamped(9f, -2.3f, Ease.OutBack(k, 1.2f)) - 0.35f * Mathf.Max(0, time - stIn);
                 // 전신은 칸 자리에서 — 오른쪽에서 들어와 조금 흐른다(흐름은 칸 여백 안: 0.12 까지만)
                 // (넘쳐 들어오지 않게 OutCubic — 넘치면 잠깐 왼쪽 끝이 잘린다)
-                stRoot.localPosition = boxC + new Vector3(Mathf.Lerp(11.3f, 0f, Ease.OutCubic(k)) - Mathf.Min(0.12f, 0.12f * Mathf.Max(0, time - stIn)), 0, 0);
+                stRoot.localPosition = boxC + new Vector3(Mathf.Lerp(11.3f * fl, 0f, Ease.OutCubic(k)) - Mathf.Min(0.12f, 0.12f * Mathf.Max(0, time - stIn)), 0, 0);
                 Make.Alpha(halo, 0.6f * k);
                 halo.transform.localPosition = new Vector3(x + 0.1f, 0.2f, 0);
                 // 띠 안 빛줄 흐름
@@ -220,6 +248,7 @@ namespace Bolzena.UI
                 foreach (var tx in new[] { small, big, name }) tx.alpha = tk;
                 if (!shotSlide && time > stIn * 0.6f) { shotSlide = true; OnStage?.Invoke("ult2_slide"); }
                 if (!shotName && time > 0.55f) { shotName = true; OnStage?.Invoke("ult3_name"); }
+                if (skippable && time > 0.15f && PointerInput.Tap) break;   // 누르면 건너뛴다(클론 등장)
                 yield return null;
             }
 
@@ -230,13 +259,16 @@ namespace Bolzena.UI
             {
                 float k = Ease.InCubic(t);
                 band.localScale = new Vector3(1 + k * 0.4f, 1 - k, 1);
-                stRoot.localScale = new Vector3(1 + k * 0.15f, 1 - k, 1);
-                txtRoot.localScale = new Vector3(1 + k * 0.6f, 1 - k, 1);
+                stRoot.localScale = new Vector3((1 + k * 0.15f) * fl, 1 - k, 1);
+                txtRoot.localScale = new Vector3((1 + k * 0.6f) * fl, 1 - k, 1);
                 Make.Alpha(dim, 0.8f * (1 - k));
                 linesMat.SetFloat("_Alpha", 0.75f * (1 - k));
             }, true);
             fx.Bars(false);
             Object.Destroy(root.gameObject);
+            Object.Destroy(linesMat);                     // 컷인마다 새로 만든 재질 — 남기지 않는다
+            Ends++;
         }
+        public static int Ends;                           // 끝난 컷인 수(점검이 「컷인 끝 → SD 시작」 프레임을 가린다)
     }
 }

@@ -7,14 +7,20 @@ using UnityEngine;
 namespace Bolzena.UI
 {
     // 카드 확대(배치는 카제나 카드 확대를 따른다 · 그림 · 글은 우리 것) — 카드를 크게(화면 높이의 약 60%) 띄우고,
-    // 오른쪽에 카드 글에 나온 키워드마다 설명 판을 세로로 쌓는다(이름 / 풀이, 수치 금빛, 해로운 상태는 위 테두리 붉게).
-    // 오른쪽에 자리가 없으면 왼쪽에. 손패에서 올리거나 고를 때 · 더미 보기에서 누를 때 쓴다. 한 번에 하나.
+    // 오른쪽에 카드 글에 나온 키워드마다 설명 판을 세로로 쌓는다(판 화면 TermPop 톤 — 아이콘 + 이름 / 풀이, 수치 금빛, 해로운 것은 붉은 테).
+    // 오른쪽에 자리가 없으면 왼쪽에. 판 묶음이 화면보다 길면 여러 줄(열)로 나누고, 그래도 자리가 없으면 휠 · 끌기로 내린다.
+    // 전투 · 판 밖 카드 확대는 모두 이것 하나: 손패 길게 누르기(가운데 위) · 마우스 올려 두기(그 카드 위) · 고른 카드(왼쪽) · 더미 보기 · 편성 화면.
     public static class CardZoom
     {
         static Transform root;
         static CardView card;
         static string shownId;
         public static bool Shown => root != null;
+        /// <summary>점검 — 확대 카드 가운데(월드) · 확대 배율 · 키워드 판이 카드 오른쪽인가 · 판 수.</summary>
+        public static Vector3 At => root != null ? root.position : Vector3.zero;
+        public static float Scale => root != null && card != null ? card.TargetScale : 0;
+        public static bool PanelsRight { get { var pn = root != null ? root.Find("panels") : null; return pn == null || pn.localPosition.x > 0; } }
+        public static int PanelCount => root != null ? boxes.Count : 0;
         public const int O = 1500;
         const float PanelW = 3.5f;
 
@@ -35,49 +41,94 @@ namespace Bolzena.UI
             card.SetOrder(O);
             Make.Box("shadow", root, Res.UI("soft"), new Vector3(0, -0.2f, 0), new Vector2(CardView.W * s * 1.5f, CardView.H * s * 1.2f), O - 5, new Color(0, 0, 0, 0.55f));
 
-            // 키워드 판들
+            // 키워드 판들 — 판 하나 = 마디 하나(Place 가 한 줄 또는 여러 줄로 세운다)
             var panels = Make.Node("panels", root);
+            boxes.Clear(); boxH.Clear();
             float y = 0;
             var terms = new List<Term>(info.Terms ?? new List<Term>());
             if (note != null) terms.Insert(0, new Term("지금은 못 냅니다", note, "no"));
-            foreach (var t in terms)
+            for (int i = 0; i < terms.Count; i++)
             {
-                if (t.Kind == "card" && t.Card != null)
-                {
-                    // 생성 카드 — 이름 줄 + 작은 카드(코스트 · 이름 · 종류 · 효과 글)
-                    float cs = 0.62f * k, chh = CardView.H * cs;
-                    var hd = Tone.Text("h", panels, "<color=#8FD3FF>▣</color> " + t.Word, new Vector3(0.2f, y - 0.14f, 0), Tone.Md * k, O + 3, Tone.Ink, TextAlignmentOptions.TopLeft, false, PanelW * k);
-                    var sub = Tone.Text("s", panels, t.Text, new Vector3(0.2f, y - 0.14f - 0.3f * k, 0), Tone.Cap * k, O + 3, Tone.Sub, TextAlignmentOptions.TopLeft, false, PanelW * k);
-                    float top = 0.14f + 0.3f * k + 0.26f * k;
-                    var mini = CardView.Create(panels, t.Card);
-                    mini.ShowDesc = true; mini.ShowPin = false; mini.Playable = true;
-                    mini.TargetScale = cs; mini.TargetRot = 0; mini.TargetPos = new Vector3(PanelW * k / 2, y - top - chh / 2, 0);
-                    mini.Snap(); mini.SetOrder(O + 4);
-                    float hc = top + chh + 0.16f;
-                    Make.Sliced("bg", panels, Res.UI("bar_fill_9s"), new Vector3(PanelW * k / 2, y - hc / 2, 0), new Vector2(PanelW * k, hc), O + 1, new Color(0.03f, 0.04f, 0.08f, 1f));
-                    Make.Box("top", panels, Res.UI("white"), new Vector3(PanelW * k / 2, y - 0.012f, 0), new Vector2(PanelW * k - 0.1f, 0.024f), O + 2, new Color(0.56f, 0.83f, 1f, 0.8f));
-                    y -= hc + 0.08f;
-                    continue;
-                }
-                bool bad = t.Kind == "no" || (t.Kind == "status" && Bolzena.Core.R.IsBadSt(t.Word));
-                var head = Tone.Text("h", panels, t.Word, new Vector3(0.2f, y - 0.14f, 0), Tone.Md * k, O + 3, t.Kind == "flash" ? Tone.Gold : Tone.Ink, TextAlignmentOptions.TopLeft, false, PanelW * k);
-                string bodyText = Hilite(t.Text) + (string.IsNullOrEmpty(t.Detail) || t.Detail == t.Text ? "" : "\n<size=88%><color=" + Tone.DimTag + ">자세히 — </color>" + Hilite(t.Detail) + "</size>");
-                var body = Tone.Text("b", panels, bodyText, new Vector3(0.2f, y - 0.14f - 0.34f * k, 0), Tone.Sm * k, O + 3, Tone.Sub, TextAlignmentOptions.TopLeft, true, (PanelW - 0.4f) * k);
-                body.textWrappingMode = TextWrappingModes.Normal;
-                body.lineSpacing = -2;
-                body.rectTransform.sizeDelta = new Vector2((PanelW - 0.4f) * k, 10);
-                body.ForceMeshUpdate();
-                float h = 0.14f + 0.34f * k + body.preferredHeight + 0.18f;
-                var bg = Make.Sliced("bg", panels, Res.UI("bar_fill_9s"), new Vector3(PanelW * k / 2, y - h / 2, 0), new Vector2(PanelW * k, h), O + 1, new Color(0.03f, 0.04f, 0.08f, 1f));
-                Make.Box("top", panels, Res.UI("white"), new Vector3(PanelW * k / 2, y - 0.012f, 0), new Vector2(PanelW * k - 0.1f, 0.024f), O + 2,
-                    bad ? new Color(1f, 0.38f, 0.42f) : t.Kind == "flash" ? Tone.Gold : new Color(1, 1, 1, 0.25f));
-                y -= h + 0.08f;
+                var pn = Make.Node("p" + i, panels, new Vector3(0, y, 0));
+                float h = Panel(pn, terms[i], k);
+                boxes.Add(pn); boxH.Add(h);
+                y -= h + Gap;
             }
             panelsH = -y;
             Place(at, s, panelsLeft);
         }
 
         static float panelsH;
+        static readonly List<Transform> boxes = new List<Transform>();
+        static readonly List<float> boxH = new List<float>();
+        const float Gap = 0.08f, ColGap = 0.12f;
+
+        // 낱말 판 하나(판 화면 TermPop.Box 와 같은 톤) — 남색 판 · 성격 테두리(해로운 것 붉게 · 고유 효과 · 신탁 금 · 생성 카드 하늘) ·
+        // 머리줄 = 아이콘 + 이름(금) + 작은 갈래 글, 그 아래 수치가 다 든 글(수치 금빛). 돌려줌: 판 높이
+        static float Panel(Transform pn, Term t, float k)
+        {
+            float pw = PanelW * k;
+            bool isCard = t.Kind == "card" && t.Card != null;
+            bool bad = t.Kind == "no" || (t.Kind == "status" && Bolzena.Core.R.IsBadSt(t.Word));
+            bool hero = t.Kind == "kw" && !Terms.Words.ContainsKey(t.Word);   // 엔진 화면 낱말이 아닌 「X」 = 사도 고유 효과
+            Color edge = bad ? Tone.Bad : isCard ? Tone.Sky : (hero || t.Kind == "flash") ? Tone.Gold : Tone.Edge;
+            string kind = hero ? "고유 효과" : isCard ? "카드" : t.Kind == "status" && bad ? "디버프" : null;
+            Color nameC = bad ? Tone.Bad : isCard ? Tone.Sky : Tone.Gold;
+
+            // 머리줄 — 아이콘 + 이름
+            float ic = 0.24f * k, hx = 0.2f, hy = -0.14f;
+            string stIc = t.Kind == "status" ? ChipRow.IconOf(t.Word, !bad) : null;   // 상태 — 적 머리 위 칩과 같은 그림
+            Color tint = stIc == null ? edge : stIc.StartsWith("state:") ? Color.white : bad ? Tone.Bad : Tone.Good;
+            if (t.Kind == "kw" || t.Kind == "tag") ic *= 0.7f;   // 키워드 · 태그는 작은 마름모
+            var icon = Make.Box("ic", pn, stIc != null ? ChipRow.IconSprite(stIc) : IconFor(t), new Vector3(hx + 0.12f * k, hy - 0.13f * k, 0), new Vector2(ic, ic), O + 3, tint);
+            ic = 0.24f * k;
+            if (icon.sprite == null) icon.enabled = false;
+            float nx = hx + (icon.enabled ? ic + 0.08f : 0);
+            Tone.Text("h", pn, t.Word + (kind != null ? $"  <size=66%><color={Tone.SubTag}>{kind}</color></size>" : ""), new Vector3(nx, hy, 0), Tone.Md * k, O + 3, nameC, TextAlignmentOptions.TopLeft, false, pw - nx - 0.15f);
+            float h;
+            if (isCard)
+            {
+                // 생성 카드 — 머리줄 + 작은 글 + 작은 카드(코스트 · 이름 · 종류 · 효과 글)
+                float cs = 0.62f * k, chh = CardView.H * cs;
+                Tone.Text("s", pn, t.Text, new Vector3(hx, hy - 0.3f * k, 0), Tone.Cap * k, O + 3, Tone.Sub, TextAlignmentOptions.TopLeft, false, pw - 0.4f);
+                float top = 0.14f + 0.3f * k + 0.26f * k;
+                var mini = CardView.Create(pn, t.Card);
+                mini.ShowDesc = true; mini.ShowPin = false; mini.Playable = true;
+                mini.TargetScale = cs; mini.TargetRot = 0; mini.TargetPos = new Vector3(pw / 2, -top - chh / 2, 0);
+                mini.Snap(); mini.SetOrder(O + 4);
+                h = top + chh + 0.16f;
+            }
+            else
+            {
+                string bodyText = Hilite(t.Text);   // 수치 · 지속이 다 든 한 가지 글(고유 효과 = CardText.Trait · 엔진 낱말 = CardText.TIPS) — 「자세히」 없음
+                var body = Tone.Text("b", pn, bodyText, new Vector3(hx, hy - 0.34f * k, 0), Tone.Sm * k, O + 3, Tone.Ink, TextAlignmentOptions.TopLeft, true, pw - 0.4f * k);
+                body.textWrappingMode = TextWrappingModes.Normal;
+                body.lineSpacing = -2;
+                body.rectTransform.sizeDelta = new Vector2(pw - 0.4f * k, 10);
+                body.ForceMeshUpdate();
+                h = 0.14f + 0.34f * k + body.preferredHeight + 0.18f;
+            }
+            Make.Sliced("rim", pn, Res.UI("bar_fill_9s"), new Vector3(pw / 2, -h / 2, 0), new Vector2(pw + 0.03f, h + 0.03f), O, Tone.A(edge, bad || hero || t.Kind == "flash" || isCard ? 0.75f : 0.45f));
+            Make.Sliced("bg", pn, Res.UI("bar_fill_9s"), new Vector3(pw / 2, -h / 2, 0), new Vector2(pw, h), O + 1, Tone.A(Tone.Navy, 0.97f));
+            Make.Box("top", pn, Res.UI("white"), new Vector3(pw / 2, -0.03f, 0), new Vector2(pw - 0.16f, 0.03f), O + 2, Tone.A(edge, bad || hero || t.Kind == "flash" ? 1f : 0.6f));
+            return h;
+        }
+
+        static Sprite IconFor(Term t)
+        {
+            if (t.Kind == "card") return Res.UI("ic_cards");
+            if (t.Kind == "no") return Res.UI("ic_close");
+            if (t.Kind == "flash")
+            {
+                if (t.Word.StartsWith("축복")) return Bolzena.RunUI.Theme.S("ic_bless");
+                if (t.Word == "복제") return Bolzena.RunUI.Theme.S("ic_copy");
+                return Bolzena.RunUI.Theme.S("ic_spark");
+            }
+            return Res.UI("diamond");
+        }
+
+        static readonly List<float> rightX = new List<float>(), leftX = new List<float>(), slots = new List<float>();
+        static readonly List<Vector3> pos = new List<Vector3>();
 
         static void Place(Vector3 at, float s, bool left)
         {
@@ -89,12 +140,87 @@ namespace Bolzena.UI
             root.localPosition = at;
             var panels = root.Find("panels");
             float pw = PanelW * k;
-            bool rightFits = at.x + cw / 2 + 0.15f + pw <= hw - 0.1f;
-            bool useLeft = left || !rightFits;
-            float px = useLeft ? -cw / 2 - 0.15f - pw : cw / 2 + 0.15f;
+            // 판 줄(열)이 설 자리 — 먼저 고른 쪽(보통 오른쪽)에서 바깥으로, 모자라면 반대쪽
+            rightX.Clear(); leftX.Clear(); slots.Clear(); pos.Clear();   // 손패 확대는 매 프레임 부른다 — 목록을 새로 만들지 않는다
+            for (float x = cw / 2 + 0.15f; at.x + x + pw <= hw - 0.1f; x += pw + ColGap) rightX.Add(x);
+            for (float x = -cw / 2 - 0.15f - pw; at.x + x >= -hw + 0.1f; x -= pw + ColGap) leftX.Add(x);
+            if (left) { slots.AddRange(leftX); slots.AddRange(rightX); } else { slots.AddRange(rightX); slots.AddRange(leftX); }
+            if (slots.Count == 0) slots.Add(left ? -cw / 2 - 0.15f - pw : cw / 2 + 0.15f);
+            float room = hh * 2 - 0.2f;
             float py = Mathf.Min(ch / 2 - 0.1f, hh - 0.1f - at.y);
-            if (at.y + py - panelsH < -hh + 0.1f) py = -hh + 0.1f - at.y + panelsH;
+            var sc = panels.GetComponent<ZoomScroll>() ?? panels.gameObject.AddComponent<ZoomScroll>();
+
+            // 한 줄로 화면에 들면 한 줄(아래가 넘치면 위로 올린다)
+            float oneH = panelsH - Gap;
+            if (oneH > room && slots.Count > 1)
+            {
+                // 화면보다 길면 여러 줄로 나눈다 — 위는 화면 위에 맞추고, 판을 차례대로 채운다
+                py = hh - 0.1f - at.y;
+                int col = 0; float cy = 0; bool fits = true;
+                for (int i = 0; i < boxes.Count; i++)
+                {
+                    if (cy > 0 && cy + boxH[i] > room) { col++; cy = 0; }
+                    if (col >= slots.Count || boxH[i] > room) { fits = false; break; }
+                    pos.Add(new Vector3(slots[col], -cy, 0));
+                    cy += boxH[i] + Gap;
+                }
+                if (fits)
+                {
+                    for (int i = 0; i < boxes.Count; i++) boxes[i].localPosition = pos[i];
+                    panels.localPosition = new Vector3(0, py, 0);
+                    sc.Setup(panels.localPosition, 0, pw);
+                    return;
+                }
+            }
+            // 한 줄 — 판을 차례대로 쌓는다
+            float y = 0;
+            for (int i = 0; i < boxes.Count; i++) { boxes[i].localPosition = new Vector3(0, y, 0); y -= boxH[i] + Gap; }
+            float px = slots[0];
+            if (at.y + py - oneH < -hh + 0.1f) py = -hh + 0.1f - at.y + oneH;
+            // 그래도 화면보다 길면(자리가 한 줄뿐인 좁은 화면) 위를 화면 위에 맞추고 휠 · 끌기로 내린다 — 글을 자르거나 접지 않는다
+            if (oneH > room) py = hh - 0.1f - at.y;
             panels.localPosition = new Vector3(px, py, 0);
+            sc.Setup(panels.localPosition, Mathf.Max(0, oneH - room), pw);
+        }
+
+        /// <summary>카드 확대 옆 낱말 판 묶음 — 화면보다 길면 휠 · 끌기로 내린다(화면 밖 조각은 숨긴다).</summary>
+        public class ZoomScroll : MonoBehaviour
+        {
+            Vector3 home; float max, cur, w, dragY; bool drag;
+            readonly List<Renderer> hidden = new List<Renderer>();   // 화면 밖이라 이 스크롤이 끈 조각만(카드가 일부러 끈 빛줄기 따위는 건드리지 않는다)
+            public void Setup(Vector3 h, float m, float width) { home = h; max = m; w = width; cur = Mathf.Clamp(cur, 0, max); Apply(); }
+            void Apply()
+            {
+                transform.localPosition = home + new Vector3(0, cur, 0);
+                if (max <= 0)
+                {
+                    // 스크롤이 필요 없어졌다(여러 줄로 나눔) — 숨겼던 조각을 다시 켠다
+                    if (hidden.Count > 0) { foreach (var r in hidden) if (r) r.enabled = true; hidden.Clear(); }
+                    return;
+                }
+                foreach (var r in GetComponentsInChildren<Renderer>(true))
+                {
+                    bool vis = r.bounds.max.y <= Tone.HalfH + 0.05f && r.bounds.min.y >= -Tone.HalfH - 0.05f;
+                    if (!vis && r.enabled) { r.enabled = false; hidden.Add(r); }
+                    else if (vis && !r.enabled && hidden.Remove(r)) r.enabled = true;
+                }
+            }
+            void Update()
+            {
+                if (max <= 0) return;
+                var p = PointerInput.Pos;
+                var lp = transform.parent.InverseTransformPoint(p);
+                bool inside = lp.x >= home.x && lp.x <= home.x + w;
+                if (!inside) { drag = false; return; }
+                float dlt = 0;
+                if (!PointerInput.Simulated && UnityEngine.InputSystem.Mouse.current != null) dlt = -UnityEngine.InputSystem.Mouse.current.scroll.ReadValue().y * 0.01f;
+                if (PointerInput.Down) { drag = true; dragY = p.y; }
+                if (!PointerInput.Held) drag = false;
+                if (drag && PointerInput.Moved) { dlt += p.y - dragY; dragY = p.y; }
+                if (Mathf.Abs(dlt) < 1e-4f) return;
+                cur = Mathf.Clamp(cur + dlt, 0, max);
+                Apply();
+            }
         }
 
         public static void Hide()

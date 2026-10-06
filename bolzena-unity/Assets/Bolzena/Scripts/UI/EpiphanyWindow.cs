@@ -17,7 +17,7 @@ namespace Bolzena.UI
         public static List<CardView> Options { get; private set; }
 
         // card — 손에서 뽑아 낸 그 카드(이 창이 끝나면 바뀐 모습으로 돌려준다). demoPick 이 0 이상이면 그것을 고른다(자동 데모)
-        public static IEnumerator Run(Transform parent, CardView card, IReadOnlyList<CardInfo> options, System.Action<int> picked, int demoPick = -1)
+        public static IEnumerator Run(Transform parent, CardView card, IReadOnlyList<CardInfo> options, System.Action<int> picked, int demoPick = -1, System.Action openDeck = null)
         {
             var root = Make.Node("Epiphany", parent);
             // 창이 열린 동안은 시간이 흐르게 — 일시정지 · 맞는 순간 멈칫이 남아 있으면 창 안의 연출(화면 시계)이 멈춘다
@@ -33,15 +33,25 @@ namespace Bolzena.UI
             raysMat.SetFloat("_Inner", 0.08f);
             raysMat.SetFloat("_Outer", 0.55f);
             var rays = Make.Quad("rays", root, new Vector3(0, 0.2f, 0), new Vector2(18, 18), raysMat, O + 1);
+            Make.Own(rays.gameObject, raysMat);
             var title = Make.Text("title", root, "신탁!", new Vector3(0, 3.55f, 0), 0.95f, O + 40, new Color(1f, 0.95f, 0.75f));
             title.colorGradient = new VertexGradient(Color.white, Color.white, new Color(1f, 0.78f, 0.3f), new Color(1f, 0.78f, 0.3f));
             Make.Outline(title, 0.2f, new Color(0.35f, 0.15f, 0));
             Make.Glow(title, Color.white, 1.5f);
-            var sub = Make.Text("sub", root, "<color=#ffd76a>" + card.Info.Name + "</color>에 신탁 — 카드를 눌러 하나를 고르세요(1~" + options.Count + " · ←→ 엔터). 이번에는 코스트 0",
+            var sub = Make.Text("sub", root, "<color=#ffd76a>" + card.Info.Name + "</color>에 신탁 — 카드를 눌러 하나를 고르세요(←→ 엔터). 이번에는 비용 0",
                 new Vector3(0, 2.85f, 0), 0.24f, O + 40, new Color(1f, 0.92f, 0.8f));
             Make.Outline(sub, 0.25f, Color.black);
             var subBg = Make.Box("subbg", root, Res.UI("band"), new Vector3(0, 2.85f, 0), new Vector2(13f, 0.56f), O + 39, new Color(1, 1, 1, 0));
             title.alpha = 0; sub.alpha = 0;
+            // 덱 보기(2026-10-06 사용자: 「신탁 때 자기 덱 눌러서 덱 풀 볼 수 있게」) — 오른쪽 위. 더미 보기 창이 이 창 위에 열리고, 닫으면 고르기가 그대로 이어진다
+            SpriteRenderer deckBg = null; TextMeshPro deckTx = null;
+            if (openDeck != null)
+            {
+                float halfW = Camera.main != null ? Camera.main.orthographicSize * Camera.main.aspect : 8f;
+                var at = new Vector3(Mathf.Max(5.5f, halfW - 1.6f), 3.55f, 0);
+                deckBg = Make.Sliced("deckbtn", root, Res.UI("panel_9s"), at, new Vector2(2.4f, 0.62f), O + 41);
+                deckTx = Make.Text("decktx", root, "덱 보기", at, 0.26f, O + 42, new Color(1f, 0.92f, 0.8f));
+            }
 
             // 카드를 가운데로
             card.Follow = 10f;
@@ -65,6 +75,7 @@ namespace Bolzena.UI
             for (int i = 0; i < options.Count; i++)
             {
                 var c = CardView.Create(root, options[i]);
+                c.ShowPin = false;   // 신탁 창은 오른쪽 위 주인 얼굴 없이(2026-10-06 사용자)
                 c.transform.localPosition = new Vector3(0, 0.1f, 0);
                 c.transform.localScale = Vector3.one * 1.2f;
                 c.Follow = 9f;
@@ -74,7 +85,7 @@ namespace Bolzena.UI
                 c.SetOrder(O + 10 + i * 10);
                 opts.Add(c);
                 var lbg = Make.Sliced("labelbg" + i, c.transform, Res.UI("panel_9s"), new Vector3(0, 1.64f, 0), new Vector2(1.8f, 0.44f), O + 17 + i * 10);
-                var lb = Make.Text("label" + i, c.transform, $"<size=70%><color=#9aa6c8>{i + 1}</color></size>  " + (options[i].EpiphanyLabel ?? ""), new Vector3(0, 1.635f, 0), 0.24f, O + 18 + i * 10, new Color(0.953f, 0.831f, 0.549f));
+                var lb = Make.Text("label" + i, c.transform, (options[i].EpiphanyLabel ?? ""), new Vector3(0, 1.635f, 0), 0.24f, O + 18 + i * 10, new Color(0.953f, 0.831f, 0.549f));
                 Make.Outline(lb, 0.25f, new Color(0.02f, 0.03f, 0.08f));
                 lb.ForceMeshUpdate();
                 lbg.size = new Vector2(Mathf.Max(1.6f, lb.preferredWidth + 0.4f), 0.44f);
@@ -111,7 +122,13 @@ namespace Bolzena.UI
             float waited = 0;
             while (choice < 0)
             {
+                if (Modal.Open != null) { waited = 0; yield return null; continue; }   // 덱 보기가 열린 동안은 고르기 멈춤(건너뛰는 길 없음)
                 var p = PointerInput.Pos;
+                if (deckBg != null && PointerInput.Down)
+                {
+                    var dl = deckBg.transform.InverseTransformPoint(p);
+                    if (Mathf.Abs(dl.x) < 1.2f && Mathf.Abs(dl.y) < 0.31f) { openDeck(); yield return null; continue; }
+                }
                 // 키보드 — 숫자로 바로, ←→ 로 옮기고 엔터 · 스페이스로 고른다(마우스가 카드 위에 없을 때 키보드 자리가 산다)
                 for (int k = 0; k < opts.Count && k < 9; k++)
                     if (PointerInput.Key(UnityEngine.InputSystem.Key.Digit1 + k) || PointerInput.Key(UnityEngine.InputSystem.Key.Numpad1 + k)) choice = k;
@@ -143,6 +160,7 @@ namespace Bolzena.UI
                 yield return null;
             }
             Options = null;
+            if (deckBg != null) { deckBg.enabled = false; deckTx.alpha = 0; }
             picked?.Invoke(choice);
 
             // 고른 것 — 나머지는 흩어지고, 고른 카드가 가운데로

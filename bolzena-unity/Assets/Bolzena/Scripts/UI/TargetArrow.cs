@@ -30,10 +30,14 @@ namespace Bolzena.UI
 
         static Vector3 Bez(Vector3 a, Vector3 b, Vector3 c, float t) => (1 - t) * (1 - t) * a + 2 * (1 - t) * t * b + t * t * c;
 
-        public void Show(Vector3 from, Vector3 to, bool locked)
+        public void Show(Vector3 from, Vector3 to, bool locked) => Show(from, to, locked, null);
+
+        /// <summary>tint 를 주면 그 빛깔의 호(겨누면 짙게, 아니면 옅게) — 끌기(적 붉게 · 아군 초록 파랑). 호는 위로 볼록하다.</summary>
+        public void Show(Vector3 from, Vector3 to, bool locked, Color? tint)
         {
             var mid = (from + to) / 2 + new Vector3(0, 1.6f + Vector3.Distance(from, to) * 0.12f, 0);
-            var col = locked ? new Color(1f, 0.38f, 0.3f) : new Color(1f, 0.95f, 0.85f);
+            var col = tint.HasValue ? (locked ? tint.Value : Color.Lerp(tint.Value, Color.white, 0.35f))
+                    : locked ? new Color(1f, 0.38f, 0.3f) : new Color(1f, 0.95f, 0.85f);
             float flow = (Clock.Now * 1.6f) % 1f;
             for (int i = 0; i < N; i++)
             {

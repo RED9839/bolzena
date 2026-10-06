@@ -48,8 +48,34 @@ namespace Bolzena
             // 이기면 판 화면의 「배경 없이 보상 열기」(Flow.RewardOverlay)를 전투 장면 위에 띄운다 — 판 자동 데모는 예전 길(보상 화면)로
             EndHold = Overlay;   // runui RewardOverlay 가 시작 때 Fighting 을 끄므로 판 자동 데모도 이 길로
             Debug.Log($"[Bridge] 싸움 열기 — {string.Join(", ", t.Foes)} (배경 {t.Bg ?? "-"}, 이벤트 {t.Event})");
-            Flow.Me.Stage.Canvas.enabled = false;
-            SceneManager.LoadScene(BattleScene);
+            Demo.EnterLeak.MarkOpen();
+            Flow.Me.StartCoroutine(Enter());
+        }
+
+        /// <summary>암전 길이(초) — 판 화면을 검게 덮는 동안 남은 정리를 하고 전투 장면을 읽는다.</summary>
+        public const float BlackoutSec = 0.18f;
+
+        // 전투로 — ① 판 화면을 검게 덮고 ② 덮인 동안 지난 화면의 찌꺼기를 치운다(GC · UnloadUnusedAssets, 비동기)
+        //   ③ 전투 장면을 비동기로 읽는다(그 장면 읽기에 딸린 정리도 검은 화면 뒤에서) ④ 전투가 서면(제 암전 ScreenFx 가 검게 시작한다)
+        //   판 화면 캔버스를 끄고 덮개를 걷는다. 예전에는 캔버스를 끄자마자 같은 프레임에 장면을 통째로 읽어, 지도가 멈춘 채 굳어 보였다
+        static System.Collections.IEnumerator Enter()
+        {
+            var stage = Flow.Me.Stage;
+            yield return stage.Blackout(BlackoutSec);
+            yield return null;                                   // 검은 화면이 한 번 그려진 뒤에
+            GC.Collect();
+            yield return Resources.UnloadUnusedAssets();
+            yield return WebBundles.WaitAll();                   // 웹 — 전투 스파인 번들을 덜 받았으면 여기서 기다린다(로딩 화면)
+            void Loaded(Scene s, LoadSceneMode m)
+            {
+                if (s.name != BattleScene) return;
+                SceneManager.sceneLoaded -= Loaded;
+                if (Flow.Me == null) return;
+                Flow.Me.Stage.Canvas.enabled = false;
+                Flow.Me.Stage.ClearFade();
+            }
+            SceneManager.sceneLoaded += Loaded;
+            yield return SceneManager.LoadSceneAsync(BattleScene);
         }
 
         // 끝 자세 위에 보상 — 결과를 넣고(Finish) 판 화면 캔버스를 켜 보상 줄을 띄운 뒤, 「떠나기」 가 눌리면 Run 장면으로(판은 Flow 가 이어 간다)

@@ -72,10 +72,14 @@ namespace Bolzena
         }
 
         // 미리 불러 두기 — 첫 고학년에서 목소리 묶음을 처음 풀며 멈칫하지 않게
+        // 목소리 묶음은 최근 사도 몇만 — 넘치면 비운다(싸움을 열 때 파티 것을 다시 채운다). 다 붙들면 사도가 바뀔 때마다 쌓였다
+        const int VoiceKeep = 12;
+        static void KeepVoices(Sfx me) { if (me.voices.Count >= VoiceKeep) me.voices.Clear(); }
+
         public static void Preload(string hero)
         {
             var me = Ensure();
-            if (!me.voices.ContainsKey(hero)) me.voices[hero] = Resources.LoadAll<AudioClip>("Voice/" + hero);
+            if (!me.voices.ContainsKey(hero)) { KeepVoices(me); me.voices[hero] = Resources.LoadAll<AudioClip>("Voice/" + hero); }
             foreach (var c in me.voices[hero]) c.LoadAudioData();
             foreach (var c in Resources.LoadAll<AudioClip>("Sfx/hero/" + hero)) c.LoadAudioData();
         }
@@ -87,6 +91,7 @@ namespace Bolzena
             if (!me.voices.TryGetValue(hero, out var all))
             {
                 all = Resources.LoadAll<AudioClip>("Voice/" + hero);
+                KeepVoices(me);
                 me.voices[hero] = all;
             }
             foreach (var p in prefixes)

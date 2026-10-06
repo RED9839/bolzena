@@ -12,10 +12,10 @@
       "atk": 155,
       "def": 25,
       "crit": 10,
-      "blurb": "보석 감정이 취미인 다이아몬드의 용족. 약점을 찔러 원석을 캐내고, 원석이 둘 모이면 진품 다이아로 친다 — 혼자면 그냥 유리다.",
+      "blurb": "보석 감정이 취미인 다이아몬드의 용족. 약점을 찔러 원석을 캐내고, 쓰러뜨린 적마다 다이아가 다시 솟아 주변을 꿰뚫습니다. 원석은 짝이 맞아야 진품, 혼자면 그냥 유리입니다.",
       "keyword": {
         "name": "감정 의뢰",
-        "desc": "들어온 보석 감정 의뢰 — 셋이면 「원석」 한 장",
+        "desc": "약점 공격으로 받는 감정 의뢰",
         "carrier": "self",
         "cap": 3,
         "rules": [
@@ -43,7 +43,7 @@
       },
       "passives": [
         {
-          "name": "다이아몬드 커터",
+          "name": "연쇄 피어스",
           "when": {
             "on": "break",
             "mine": true
@@ -53,6 +53,30 @@
               "k": "make",
               "id": "다야_gem",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "연쇄 피어스",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -77,12 +101,18 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 2,
+            "ratio": 2.0,
             "target": "allEnemies"
           },
           {
             "k": "tough",
             "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "고통",
+            "v": 2,
             "target": "allEnemies"
           },
           {
@@ -130,7 +160,7 @@
     },
     {
       "id": "다야_u1",
-      "name": "완벽한 일격",
+      "name": "다이아 피어스",
       "hero": "다야",
       "unique": true,
       "cost": 2,
@@ -141,35 +171,47 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.2,
-          "target": "oneEnemy"
+          "ratio": 1.3,
+          "target": "allEnemies"
         },
         {
-          "k": "ifBreak"
+          "k": "status",
+          "id": "고통",
+          "v": 1,
+          "target": "allEnemies"
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "ifKill"
+        },
+        {
+          "k": "recast",
+          "ratio": 0.5
         }
       ],
       "oracles": [
         {
-          "name": "깔끔한 일격",
+          "name": "솟구치는 다이아",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.6,
-              "target": "oneEnemy"
+              "ratio": 1.6,
+              "target": "allEnemies"
             },
             {
-              "k": "ifBreak"
+              "k": "status",
+              "id": "고통",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "ifKill"
+            },
+            {
+              "k": "recast",
+              "ratio": 0.5
             }
           ]
         },
@@ -182,15 +224,21 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.8,
-              "target": "oneEnemy"
+              "ratio": 2.2,
+              "target": "allEnemies"
             },
             {
-              "k": "ifBreak"
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
-              "k": "draw",
-              "v": 2
+              "k": "ifKill"
+            },
+            {
+              "k": "recast",
+              "ratio": 0.5
             }
           ]
         },
@@ -202,15 +250,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.35,
-              "target": "oneEnemy"
+              "ratio": 1.4,
+              "target": "allEnemies"
             },
             {
-              "k": "ifBreak"
+              "k": "status",
+              "id": "고통",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "ifKill"
             },
             {
               "k": "make",
@@ -227,42 +277,50 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
-              "target": "oneEnemy"
+              "ratio": 1.4,
+              "target": "allEnemies"
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 1
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
-              "k": "ifBreak"
+              "k": "ifKill"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "recast",
+              "ratio": 0.5
             }
           ]
         },
         {
-          "name": "찍은 대로",
+          "name": "작은 다이아",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
-              "target": "oneEnemy"
+              "ratio": 0.9,
+              "target": "allEnemies"
             },
             {
-              "k": "ifBreak"
+              "k": "status",
+              "id": "고통",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "ap",
-              "v": 1
+              "k": "ifKill"
+            },
+            {
+              "k": "recast",
+              "ratio": 0.5
             }
-          ]
+          ],
+          "cost": 1
         }
       ],
       "blesses": [
@@ -295,13 +353,14 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 1.0,
           "target": "oneEnemy"
         },
         {
           "k": "status",
-          "id": "취약",
-          "v": 1
+          "id": "고통",
+          "v": 2,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
@@ -314,13 +373,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.8,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 1
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -337,8 +397,9 @@
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 1
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -351,13 +412,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 2
+              "id": "고통",
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -369,13 +431,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 1
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -397,7 +460,7 @@
             },
             {
               "k": "status",
-              "id": "취약",
+              "id": "고통",
               "v": 1,
               "target": "allEnemies"
             }
@@ -551,7 +614,7 @@
           ]
         }
       ],
-      "blurb": "유리 구슬을 다이아라며 들고 오는 단골 — 다야는 매번 사 준다."
+      "blurb": "유리 구슬을 다이아라며 들고 오는 단골 — 다야는 매번 사 줍니다."
     },
     {
       "id": "다야_u4",
@@ -569,7 +632,24 @@
         {
           "k": "stack",
           "id": "감정 의뢰",
-          "v": 2
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "감정 의뢰",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -580,12 +660,24 @@
             {
               "k": "status",
               "id": "잔광",
-              "v": 3
+              "v": 2
             },
             {
-              "k": "stack",
-              "id": "감정 의뢰",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "감정 의뢰",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -595,17 +687,29 @@
             {
               "k": "status",
               "id": "잔광",
-              "v": 4
-            },
-            {
-              "k": "stack",
-              "id": "감정 의뢰",
               "v": 3
             },
             {
               "k": "status",
               "id": "사기",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "감정 의뢰",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -618,14 +722,26 @@
               "v": 3
             },
             {
-              "k": "stack",
-              "id": "감정 의뢰",
-              "v": 2
-            },
-            {
               "k": "make",
               "id": "다야_gem",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "감정 의뢰",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -635,12 +751,24 @@
             {
               "k": "status",
               "id": "잔광",
-              "v": 5
+              "v": 3
             },
             {
-              "k": "stack",
-              "id": "감정 의뢰",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "감정 의뢰",
+                      "v": 3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -654,12 +782,29 @@
             {
               "k": "status",
               "id": "잔광",
-              "v": 3
+              "v": 2
             },
             {
               "k": "stack",
               "id": "감정 의뢰",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "감정 의뢰",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -784,7 +929,7 @@
           ]
         }
       ],
-      "blurb": "흠이 있는 원석만 골라 자르는 커터. 디버프가 걸린 적에게 더 잘 든다."
+      "blurb": "흠이 있는 원석만 골라 자르는 커터. 디버프가 걸린 적에게 더 잘 듭니다."
     }
   ]
 }

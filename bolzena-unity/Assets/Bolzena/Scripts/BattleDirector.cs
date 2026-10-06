@@ -87,6 +87,33 @@ namespace Bolzena
                 else Demo.DemoRunner.Attach(this);                              // 전투 시범(-battle)
             }
             StartCoroutine(Main());
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-layoutshot") >= 0) StartCoroutine(LayoutShot());
+        }
+
+        // -layoutshot <이름> — 첫 입력 대기에서 화면을 한 장 찍고(<-captures>/<이름>_<가로>x<세로>.png) 적 자리 겹침을 적은 뒤 끝낸다(배치 점검)
+        IEnumerator LayoutShot()
+        {
+            var a = Environment.GetCommandLineArgs();
+            int ni = Array.IndexOf(a, "-layoutshot");
+            string nm = ni + 1 < a.Length ? a[ni + 1] : "layout";
+            int ci = Array.IndexOf(a, "-captures");
+            string dir = ci >= 0 && ci + 1 < a.Length ? a[ci + 1] : System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "..", "..", "Captures"));
+            System.IO.Directory.CreateDirectory(dir);
+            PointerInput.Simulated = true;
+            PointerInput.SimPos = new Vector2(0, -6);
+            float t = 0;
+            while (!WaitingInput && t < 40f) { t += Time.unscaledDeltaTime; yield return null; }
+            yield return new WaitForSecondsRealtime(1.6f);
+            yield return new WaitForEndOfFrame();
+            var tex = ScreenCapture.CaptureScreenshotAsTexture();
+            var path = System.IO.Path.Combine(dir, $"{nm}_{Screen.width}x{Screen.height}.png");
+            System.IO.File.WriteAllBytes(path, tex.EncodeToPNG());
+            Destroy(tex);
+            var items = LayoutItems();
+            foreach (var it in items) { it.Pos = it.U.Home; it.Bar = it.Hud.BarPos; }
+            Debug.Log($"[LayoutShot] {System.IO.Path.GetFileName(path)} — {EnemyLayout.Report(items, AliveItem)}");
+            yield return new WaitForSecondsRealtime(0.3f);
+            Application.Quit(0);
         }
 
         // 창 크기가 바뀌면(설정 창의 해상도 · 전체화면) 카메라 높이 · 배경을 다시 맞춘다 — 21:9 는 옆이 넓게, 16:10 은 위아래가 넓게
@@ -102,13 +129,37 @@ namespace Bolzena
 
         void LateUpdate()
         {
-            if (Cam != null && bgSprite != null && !Mathf.Approximately(Cam.aspect, lastAspect)) FitBg();
+            if (Cam != null && bgSprite != null && !Mathf.Approximately(Cam.aspect, lastAspect)) { FitBg(); layoutDirty = true; }
+            // 화면 비율이 바뀌면(창 크기 · 시작 직후 창이 자리를 잡을 때) 적 자리 · 묶음을 다시 — 입력을 기다릴 때만(움직이는 중엔 미룬다)
+            if (layoutDirty && WaitingInput && !EnemyHud.OldLayout && Enemies.Count > 0)
+            {
+                layoutDirty = false;
+                LayoutEnemies();
+                foreach (var u in Enemies) if (u != null) u.transform.localPosition = u.Home;
+            }
         }
+        bool layoutDirty;
 
         bool hangulWas;
+        static Func<Vector3> fxCenter0;
+        static Func<float?> fxTop0;
         void OnDestroy()
         {
             if (TMPro.TMP_Settings.instance != null) TMPro.TMP_Settings.useModernHangulLineBreakingRules = hangulWas;
+            // 정적 자리에 남은 이 전투의 손잡이를 놓는다 — 다음 장면을 여는 정리(UnloadUnusedAssets)가 지난 싸움의 감독 · 유닛 · 스파인을
+            //   「아직 쓰는 것」 으로 보고 붙들지 않게(람다가 this · FieldRoot 를 쥐고 있었다)
+            if (I == this) I = null;
+            CardView.HeroOf = null;
+            BattleBridge.OnOverlay = null;
+            Vfx.Field = Vfx.Screen = null;
+            ScreenFx.I = null;
+            PostFx.I = null;
+            Tooltip.I = null;
+            Bolzena.Fx.BolzenaFx.Parent = null;
+            Bolzena.Fx.FxRun.ClearPool();
+            if (fxCenter0 != null) Bolzena.Fx.BolzenaFx.ScreenCenter = fxCenter0;
+            if (fxTop0 != null) Bolzena.Fx.BolzenaFx.TopY = fxTop0;
+            CardZoom.Hide();
         }
 
         void Build()
@@ -128,8 +179,12 @@ namespace Bolzena
             // 원작 이펙트(com.bolzena.fx) — 싸움터 아래에 · 싸움터 좌표로. 소리는 이 전투의 Sfx 가 낸다(두 번 나지 않게 패키지 소리는 끈다)
             Bolzena.Fx.BolzenaFx.Parent = FieldRoot;
             Bolzena.Fx.BolzenaFx.Sound = false;
+            Bolzena.Fx.BolzenaFx.UltDrop = UltDropPart;
+            mirror = null; mirrorLeft = 0; sleeping.Clear();   // 원작 방식 고학년 — 발동 때 틀 장은 시전 때 빼기
             Bolzena.Fx.BolzenaFx.Calm = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-nofx") >= 0;   // 원작 이펙트 끄고 재 보기(점검)
             Bolzena.Fx.BolzenaFx.UltOrder = 325; Bolzena.Fx.BolzenaFx.CardOrder = 150; Bolzena.Fx.BolzenaFx.CommonOrderAdd = -150;
+            fxCenter0 ??= Bolzena.Fx.BolzenaFx.ScreenCenter;
+            fxTop0 ??= Bolzena.Fx.BolzenaFx.TopY;
             Bolzena.Fx.BolzenaFx.ScreenCenter = () => FieldRoot ? FieldRoot.InverseTransformPoint(Camera.main ? Camera.main.transform.position : Vector3.zero) : Vector3.zero;
             Bolzena.Fx.BolzenaFx.TopY = () => { var c = Camera.main; if (!FieldRoot || !c || !c.orthographic) return null; return FieldRoot.InverseTransformPoint(c.transform.position + new Vector3(0, c.orthographicSize, 0)).y - Bolzena.Fx.FxRules.TOP_PAD; };
             Vfx.Screen = ScreenRoot;
@@ -177,6 +232,11 @@ namespace Bolzena
             Hand.EnemyNear = NearestEnemy;
             Hand.EnemyAim = i => FieldRoot.TransformPoint(Enemies[i].Center);
             Hand.NextEnemy = NextEnemy;
+            Hand.EnemyCount = () => Enemies.Count;
+            Hand.AllyCount = () => Heroes.Count;
+            Hand.EnemyFoot = i => i >= 0 && i < Enemies.Count && Enemies[i] != null && !Dead(i) ? (FieldRoot.TransformPoint(Enemies[i].Feet), Enemies[i].ArtBounds.size.x) : ((Vector3, float)?)null;
+            Hand.AllyFoot = i => i >= 0 && i < Heroes.Count && Heroes[i] != null ? (FieldRoot.TransformPoint(Heroes[i].Feet), Heroes[i].ArtBounds.size.x * 0.8f) : ((Vector3, float)?)null;
+            Hand.AllyAt = HeroAt;
             Hand.CanPlay = c =>
             {
                 int idx = Hand.Cards.FindIndex(v => v.Info == c);
@@ -201,6 +261,7 @@ namespace Bolzena
             var keys = new List<string>();
             Bolzena.Fx.BolzenaFx.Prewarm(System.Linq.Enumerable.Select(s.Heroes, h => h.Id), sounds: false);
             foreach (var hv in Heroes) { hv.PrewarmTravel(); HeroClips(hv.name.Replace("hero_", "")); }   // 고학년 순간에 재지 않게(몸짓 이동 · 소리 목록)   // 원작 이펙트 — 파티의 고학년 · 카드 · 맞음 · 공용
+            PrewarmUlt(s);
             foreach (var h in s.Heroes) { keys.Add("st_" + h.Key); Sfx.Preload(h.Key); foreach (Motion m in Enum.GetValues(typeof(Motion))) { HeroSfx(h.Key, m, true); HeroSfx(h.Key, m, false); } }
             if (Battle is CoreBattle cb) keys.AddRange(cb.SpineKeys());
             foreach (var k in keys)
@@ -218,7 +279,48 @@ namespace Bolzena
             Shader.WarmupAllShaders();
         }
 
+        // 고학년 첫 순간의 몫을 싸움 시작으로 — 2026-10-05 점검(-ultaudit -ultprobe): 프로세스 첫 고학년의 SD 시작 프레임이 40.7ms,
+        //   그 가운데 PlanUlt 23ms(ult_motion.json 670KB 를 처음 읽고 푸는 일 · 9MB 할당) · OrigFx 7.5ms(고학년 이펙트 경로 첫 실행 JIT).
+        //   갈래 0 으로 계획만 세우고(난수를 쓰지 않는다), 이펙트는 화면 밖에서 한 번 틀자마자 걷는다
+        void PrewarmUlt(BattleSnapshot s)
+        {
+            bool fxWarm = false;
+            for (int i = 0; i < Heroes.Count && i < s.Heroes.Count; i++)
+            {
+                var u = Heroes[i];
+                if (u == null || !u.SpineArt || u.SkelData == null) continue;
+                try
+                {
+                    var plan = Bolzena.Fx.SpineMotion.PlanUlt(u.SkelData, s.Heroes[i].Id, 0);
+                    if (fxWarm || plan == null || plan.Anim == null || !Bolzena.Fx.FxLibrary.HasUlt(s.Heroes[i].Id)) continue;
+                    fxWarm = true;
+                    var far = new Bolzena.Fx.FxActor { FeetAt = () => new Vector3(1e5f, 1e5f, 0), Party = true, Key = u.Fx.Key };
+                    var foe = new Bolzena.Fx.FxActor { FeetAt = () => new Vector3(1e5f + 3, 1e5f, 0) };
+                    var call = Bolzena.Fx.BolzenaFx.Ult(s.Heroes[i].Id, far, new List<Bolzena.Fx.FxActor> { foe }, null, Bolzena.Fx.SpineFx.Sync(plan), false, null);
+                    call?.Stop(0);
+                }
+                catch (Exception ex) { Debug.LogWarning("[Preload] 고학년 데우기 실패 " + s.Heroes[i].Id + " — " + ex.Message); }
+            }
+        }
+
         IReadOnlyList<BattleEvent> pendingBegin;
+
+        // 적 그리는 차례 = 화면 앞뒤(발 y) — 아래(앞줄)에 선 적이 위(뒷줄)에 선 적보다 늘 앞에. 넷 이상 엇갈려 서면(2 4 / 1 3)
+        //   번호 순으로 그리던 때는 뒷줄 2 가 앞줄 1 · 3 위에 겹쳤다. 보스 · 소환 · 쓰러진 자리도 같은 규칙(y 가 같으면 번호 순).
+        //   적 몸은 22~38(사도 40~46 아래) — HP 막대 · 강인도 · 칩 · 의도(EnemyHud 430~)는 그대로 모든 몸 위
+        const int EnemyOrderBase = 22, EnemyOrderMax = 38;
+        void ResetEnemyOrder()
+        {
+            var idx = new List<int>();
+            for (int i = 0; i < Enemies.Count; i++) if (Enemies[i] != null) idx.Add(i);
+            idx.Sort((a, b) => { int c = Enemies[b].Home.y.CompareTo(Enemies[a].Home.y); return c != 0 ? c : a.CompareTo(b); });
+            for (int r = 0; r < idx.Count; r++)
+            {
+                var u = Enemies[idx[r]];
+                u.BaseOrder = Mathf.Min(EnemyOrderMax, EnemyOrderBase + r * 2);
+                if (!Dead(idx[r])) u.SetOrder(u.BaseOrder);
+            }
+        }
 
         void ResetHeroOrder()
         {
@@ -627,6 +729,8 @@ namespace Bolzena
                 int ii = i;
                 hud.OnInfo = () => OpenEnemyInfo(ii);
                 EnemyHuds.Add(hud);
+                PlaceSummon(u, hud, pos);
+                pos = u.Home;
                 u.Play(u.Resolve("Spawn") ?? "Idle", 1.4f);
                 Vfx.Burst(pos + new Vector3(0, 0.3f, 0), new Vfx.BurstOpt
                 {
@@ -637,6 +741,7 @@ namespace Bolzena
                 Vfx.Word(pos + new Vector3(0, 2.2f, 0), "소환!", 0.36f, new Color(0.9f, 0.8f, 1f), new Color(0.15f, 0.05f, 0.25f));
                 Debug.Log($"[Battle] 소환 — {es.Name} ({i})");
             }
+            ResetEnemyOrder();
         }
 
         IEnumerator Present(IReadOnlyList<BattleEvent> evs)
@@ -653,8 +758,28 @@ namespace Bolzena
                     int j = i + 1;
                     var group = new List<BattleEvent>();
                     while (j < evs.Count && !Boundary(evs[j].Kind)) group.Add(evs[j++]);
-                    if (e.Actor.Side == Side.Party) yield return HeroAct(e, group);
+                    // 처치해서 고학년을 한 번 더(란 · 키디언 cue) — cue 앞은 첫 고학년, 뒤는 두 번째 고학년으로 따로 튼다
+                    int again = e.Actor.Side == Side.Party ? group.FindIndex(x => x.Kind == EventKind.FxCue && (x.Text == "ran_again" || x.Text == "kidian_again")) : -1;
+                    if (again >= 0)
+                    {
+                        yield return HeroAct(e, group.GetRange(0, again));
+                        yield return FxCueFx(group[again]);
+                        yield return HeroAct(e, group.GetRange(again + 1, group.Count - again - 1));
+                    }
+                    else if (e.Actor.Side == Side.Party) yield return HeroAct(e, group);
                     else yield return EnemyAct(e, group);
+                    i = j;
+                    continue;
+                }
+                if (e.Kind == EventKind.FxCue && IsCueStrike(e.Text))
+                {
+                    // 턴 시작 발동 — 뒤따르는 피해를 묶어 그 박자에(미로 광선 V 발 · 오로라 기둥 V 대 · 키샤 · 이드(재활)는 적 전체 한 번)
+                    int j = i + 1, dmg = 0, cap = CueCap(e);
+                    var group = new List<BattleEvent>();
+                    while (j < evs.Count && dmg < cap && !Boundary(evs[j].Kind) && evs[j].Kind != EventKind.FxCue) { if (evs[j].Kind == EventKind.Damage) dmg++; group.Add(evs[j++]); }
+                    // 이드(재활) — 꿈이 무너지며 파티 실드(바로 뒤 방어 · 실드)
+                    if (e.Text == "ide_wake") while (j < evs.Count && (evs[j].Kind == EventKind.Block || evs[j].Kind == EventKind.Status) && evs[j].Target.Side == Side.Party) group.Add(evs[j++]);
+                    yield return e.Text == "miro_beam" ? MiroBeam(e, group) : CUE2.TryGetValue(e.Text, out var c2) ? Cue2Strike(e, group, c2) : CueStrike(e, group);
                     i = j;
                     continue;
                 }
@@ -672,6 +797,7 @@ namespace Bolzena
             RefreshHud();
         }
 
+        public void RefreshAll() => RefreshHud();   // 점검이 판을 바꾼 뒤
         void RefreshHud()
         {
             var s = Battle.Snapshot;
@@ -781,6 +907,12 @@ namespace Bolzena
                     Hud.SetSnapshot(s);
                     break;
                 }
+                case EventKind.FxCue:
+                    yield return FxCueFx(e);
+                    break;
+                case EventKind.FoeUlt:
+                    yield return FoeUltFx(e);
+                    break;
                 case EventKind.Form:
                     yield return FormFx(e);
                     break;
@@ -862,6 +994,69 @@ namespace Bolzena
             }
         }
 
+        // ── 적 자리 · 머리 위 묶음 자리(EnemyLayout) ──
+        List<EnemyLayout.Item> LayoutItems()
+        {
+            var l = new List<EnemyLayout.Item>();
+            for (int i = 0; i < Enemies.Count && i < EnemyHuds.Count; i++)
+                if (Enemies[i] != null && EnemyHuds[i] != null) l.Add(new EnemyLayout.Item { U = Enemies[i], Hud = EnemyHuds[i], Want = Enemies[i].Slot, Pos = Enemies[i].Home, Bar = EnemyHuds[i].BarPos });
+            return l;
+        }
+
+        bool AliveItem(EnemyLayout.Item it) { int i = Enemies.IndexOf(it.U); return i >= 0 && !Dead(i); }
+
+        void LayoutEnemies()
+        {
+            var items = LayoutItems();
+            var rep = EnemyLayout.Place(items);
+            LayoutCheck(items, "웨이브", rep);
+        }
+
+        // 소환 — 빈자리 후보(촘촘한 칸) 가운데 산 적들의 몸 · 묶음과 겹침이 가장 적은 곳(같으면 원래 소환 자리에 가까운 곳). 그 뒤 묶음을 다시 쌓는다
+        void PlaceSummon(UnitView u, EnemyHud hud, Vector3 want)
+        {
+            if (EnemyHud.OldLayout) return;
+            var items = LayoutItems();
+            var me = items.Find(x => x.U == u);
+            if (me == null) return;
+            foreach (var o in items) if (o != me && AliveItem(o)) { u.Rescale(o.U.ScaleMul); hud.SetHudMul(o.Hud.HudMul); break; }   // 이웃과 같은 배율로
+            Vector3 best = want; float bestS = float.MaxValue;
+            for (float y = -1.5f; y <= 0.31f; y += 0.45f)
+                for (float x = EnemyLayout.XMin + 0.6f; x <= EnemyLayout.XMax - 0.6f; x += 0.3f)
+                {
+                    me.Pos = new Vector3(x, y, 0);
+                    bool ok = EnemyLayout.Huds(items, AliveItem);
+                    float sc = EnemyLayout.Overlap(items, null, AliveItem) * 100 + Vector2.Distance(me.Pos, want) * 0.05f + (ok ? 0 : 10);
+                    if (sc < bestS) { bestS = sc; best = me.Pos; }
+                }
+            me.Pos = best;
+            u.Home = u.Slot = best;
+            u.transform.localPosition = best;
+            RestackHuds("소환");
+        }
+
+        /// <summary>머리 위 묶음만 다시 쌓는다(소환 · 쓰러짐 뒤) — 몸 자리는 그대로.</summary>
+        void RestackHuds(string why)
+        {
+            if (EnemyHud.OldLayout) return;
+            var items = LayoutItems();
+            EnemyLayout.Huds(items, AliveItem);
+            foreach (var it in items) if (AliveItem(it)) it.Hud.BarPos = it.Bar;
+            EnemyLayout.Layer(items);
+            LayoutCheck(items, why, EnemyLayout.Report(items, AliveItem));
+        }
+
+        // 점검 단언 — 서로 다른 적끼리 몸 · 묶음 겹침이 0 이어야 한다(데모 · 점검이면 오류로 적는다)
+        public float LastOverlap { get; private set; }
+        void LayoutCheck(List<EnemyLayout.Item> items, string why, string rep)
+        {
+            LastOverlap = EnemyLayout.Overlap(items, null, AliveItem);
+            bool test = Array.IndexOf(Environment.GetCommandLineArgs(), "-demo") >= 0 || Array.IndexOf(Environment.GetCommandLineArgs(), "-layoutshot") >= 0;
+            string line = $"[Layout] {why} — {rep}";
+            if (LastOverlap > 1e-3f && test) Debug.LogError(line + " — 겹침 단언 실패");
+            else Debug.Log(line);
+        }
+
         // 웨이브 — 적이 들어온다(보스면 등장 띠부터)
         IEnumerator WaveIn(BattleEvent e)
         {
@@ -870,13 +1065,27 @@ namespace Bolzena
             EnemyHuds.Clear();
             summoned = 0;
             var s = Battle.Snapshot;
-            if (e.Boss)
+            var cloneE = s.Enemies.Find(x => Look.Data?.Enemy(x.Id)?.Clone != null);   // 사도 클론은 늘 보스(점검 판처럼 Boss 표시가 없어도)
+            if (e.Boss || cloneE != null)
             {
-                var b = s.Enemies.Find(x => x.Boss) ?? s.Enemies[0];
+                var b = s.Enemies.Find(x => x.Boss) ?? cloneE ?? s.Enemies[0];
                 yield return Clock.Wait(0.3f);
                 Hud.SetTurn(s.Turn, s.Wave, s.WaveCount);
                 Emit("boss_banner_start");
-                yield return Banners.Boss(ScreenRoot, b.Key, b.Skin, b.Name, (b.ToughMaxV > 0 ? "구역 보스  ·  강인도 " + EnemyHud.Thirds(b.ToughMaxV) : "구역 보스"));
+                string bsub = b.ToughMaxV > 0 ? "구역 보스  ·  강인도 " + EnemyHud.Thirds(b.ToughMaxV) : "구역 보스";
+                var cdef = Look.Data?.Enemy(b.Id);
+                if (cdef?.Clone != null)
+                {
+                    // 사도 클론 보스 — SD 띠 대신 그 사도의 스탠딩 일러로 등장 컷(붉은 톤 · 오른쪽에서 · 「보스 클론」). 짧게, 누르면 건너뜀, 「컷인 건너뛰기」면 생략
+                    if (!Bolzena.RunUI.Settings.SkipCutin)
+                    {
+                        Sfx.Play("boss_entry", 0.8f);
+                        string hname = Look.Data.Hero(cdef.Clone)?.Name ?? b.Name;
+                        yield return UltCutin.Play(ScreenRoot, Look.Hero(cdef.Clone).Art, "", hname, new Color(0.85f, 0.12f, 0.12f), true, "클론", 1.0f, true, "spawn");
+                        Emit("clone_entry");
+                    }
+                }
+                else yield return Banners.Boss(ScreenRoot, b.Key, b.Skin, b.Name, bsub);
             }
             int n = s.Enemies.Count;
             int bossI = s.Enemies.FindIndex(x => x.Boss);
@@ -897,6 +1106,15 @@ namespace Bolzena
                 int ii = i;
                 hud.OnInfo = () => OpenEnemyInfo(ii);
                 EnemyHuds.Add(hud);
+            }
+            // 자리 — 몸 · 머리 위 묶음이 서로 겹치지 않게(EnemyLayout). 예전 자리(-oldlayout)면 표 그대로
+            if (!EnemyHud.OldLayout) LayoutEnemies();
+            for (int i = 0; i < n; i++)
+            {
+                var es = s.Enemies[i];
+                var u = Enemies[i];
+                var pos = u.Home;
+                u.transform.localPosition = pos;
                 if (es.Boss)
                 {
                     u.Play(u.Resolve("Spawn"), 1.6f);
@@ -915,6 +1133,7 @@ namespace Bolzena
                     StartCoroutine(RunIn(u, pos, 0.75f + i * 0.1f));
                 }
             }
+            ResetEnemyOrder();
             yield return Clock.Wait(e.Boss ? 1.4f : 0.9f);
             if (e.Boss) Emit("boss_in");
         }
@@ -936,7 +1155,7 @@ namespace Bolzena
             if (info.Epiphany)
             {
                 var opts = Battle.EpiphanyOptions(handIndex);
-                if (opts.Count > 0) yield return EpiphanyWindow.Run(ScreenRoot, cv, opts, c => choice = c, DemoEpiphanyPick);
+                if (opts.Count > 0) yield return EpiphanyWindow.Run(ScreenRoot, cv, opts, c => choice = c, DemoEpiphanyPick, () => OpenPile(0));   // 덱 보기 — 뽑을 더미 창(사도별 묶음)
             }
             int branch = 0;
             if (info.Choices != null && info.Choices.Count == 2)

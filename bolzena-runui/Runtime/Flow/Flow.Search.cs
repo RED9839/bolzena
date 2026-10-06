@@ -144,6 +144,7 @@ namespace Bolzena.RunUI
             cb.gameObject.SetActive(false);
             clear = cb;
             bg.gameObject.SetActive(true);
+            WebInput.Attach(input);   // 한글 입력 — PC 는 IME 켜기 · 조합 글자, 웹은 HTML input 겹치기(Kit/WebInput.cs)
             return input;
         }
     }

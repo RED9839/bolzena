@@ -12,10 +12,10 @@
    "atk": 75,
    "def": 58,
    "crit": 5,
-   "blurb": "과로 끝에 애마 슈파볼트에 엘프가 심어 둔 고장장치를 알아채고 복수극을 벌인 뒤 프리랜서가 된 과속 배달부. 소포는 던지고, 흘리고, 가끔 쌍손가락 욕도 곁들인다. 그래도 달리고 싶다.",
+   "blurb": "과로 끝에 애마 슈파볼트에 엘프가 심어 둔 고장장치를 알아채고 복수극을 벌인 뒤 프리랜서가 된 과속 배달부. 소포는 던지고, 흘리고, 가끔 쌍손가락 욕도 곁들입니다. 그래도 달리고 싶습니다.",
    "keyword": {
     "name": "배송",
-    "desc": "한 턴에 몰아치는 과속 배달 — 신속 카드로 쌓고, 셋째 건에 소포가 날아간다",
+    "desc": "신속 카드로 쌓는 배달",
     "carrier": "self",
     "cap": 3,
     "endClear": true,
@@ -29,18 +29,17 @@
       },
       "limit": {
        "per": "turn",
-       "n": 1
+       "n": 2
       },
       "fx": [
+       {
+        "k": "heal",
+        "ratio": 1.0
+       },
        {
         "k": "dmg",
         "ratio": 0.8,
         "target": "randomEnemy"
-       },
-       {
-        "k": "status",
-        "id": "다음 턴 드로우",
-        "v": 1
        },
        {
         "k": "spend",
@@ -73,20 +72,24 @@
     "cost": 250,
     "fx": [
      {
-      "k": "dmg",
-      "ratio": 1.5,
-      "target": "allEnemies"
-     },
-     {
-      "k": "status",
-      "id": "약화",
-      "v": 2,
-      "target": "allEnemies"
+      "k": "heal",
+      "ratio": 2.5
      },
      {
       "k": "status",
       "id": "피해 감소",
       "v": 2
+     },
+     {
+      "k": "dmg",
+      "ratio": 1.0,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "약화",
+      "v": 1,
+      "target": "allEnemies"
      }
     ]
    },
@@ -154,52 +157,7 @@
    ],
    "oracles": [
     {
-     "name": "총알 같은 배달부",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 2.6
-      },
-      {
-       "k": "status",
-       "id": "행동 둔화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "가벼운 배달부",
-     "cost": 0,
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.35
-      },
-      {
-       "k": "status",
-       "id": "행동 둔화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "과속한 배달부",
+     "name": "대충 배달",
      "tags": [
       "신속"
      ],
@@ -221,15 +179,15 @@
      ]
     },
     {
-     "name": "쟁여 둔 배달부",
+     "name": "현관 앞 투척",
+     "cost": 0,
      "tags": [
-      "신속",
-      "보존"
+      "신속"
      ],
      "fx": [
       {
        "k": "heal",
-       "ratio": 2.15
+       "ratio": 1.1
       },
       {
        "k": "status",
@@ -244,19 +202,61 @@
      ]
     },
     {
-     "name": "배송의 배달부",
+     "name": "배송 두 건",
      "tags": [
-      "신속",
-      "축복"
+      "신속"
      ],
      "fx": [
       {
        "k": "heal",
-       "ratio": 2.15
+       "ratio": 1.8
       },
       {
        "k": "status",
        "id": "행동 둔화",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "배송",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "뽁뽁이 포장",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "shield",
+       "ratio": 2.2
+      },
+      {
+       "k": "status",
+       "id": "행동 둔화",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "배송",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "두고 감",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 2.3
+      },
+      {
+       "k": "draw",
        "v": 1
       },
       {
@@ -269,19 +269,16 @@
    ],
    "blesses": [
     {
-     "name": "포근한 숨결",
-     "kind": "heal",
-     "fx": []
+     "name": "따끈한 소포",
+     "kind": "heal"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "영수증",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "급배송 수당",
+     "kind": "ap"
     }
    ]
   },
@@ -308,7 +305,7 @@
    ],
    "oracles": [
     {
-     "name": "총알 같은 질주",
+     "name": "전력 질주",
      "tags": [
       "신속"
      ],
@@ -325,7 +322,7 @@
      ]
     },
     {
-     "name": "가벼운 질주",
+     "name": "제자리 뛰기",
      "cost": 0,
      "tags": [
       "신속"
@@ -333,7 +330,7 @@
      "fx": [
       {
        "k": "draw",
-       "v": 2
+       "v": 1
       },
       {
        "k": "stack",
@@ -343,14 +340,14 @@
      ]
     },
     {
-     "name": "과속한 질주",
+     "name": "배송 러시",
      "tags": [
       "신속"
      ],
      "fx": [
       {
        "k": "draw",
-       "v": 3
+       "v": 2
       },
       {
        "k": "stack",
@@ -360,33 +357,35 @@
      ]
     },
     {
-     "name": "쟁여 둔 질주",
+     "name": "바람 가르기",
      "tags": [
-      "신속",
-      "보존"
+      "신속"
      ],
      "fx": [
       {
        "k": "draw",
-       "v": 3
+       "v": 2
       },
       {
-       "k": "stack",
-       "id": "배송",
+       "k": "status",
+       "id": "회피",
        "v": 1
       }
      ]
     },
     {
-     "name": "배송의 질주",
+     "name": "지름길",
      "tags": [
-      "신속",
-      "축복"
+      "신속"
      ],
      "fx": [
       {
        "k": "draw",
-       "v": 3
+       "v": 1
+      },
+      {
+       "k": "nextCheaper",
+       "v": 1
       },
       {
        "k": "stack",
@@ -398,19 +397,22 @@
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "급가속",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "바람 냄새",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "짐 하나 더",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "배송",
+       "v": 1
+      }
+     ]
     }
    ]
   },
@@ -427,25 +429,58 @@
    "fx": [
     {
      "k": "dmg",
-     "ratio": 1,
+     "ratio": 1.2,
      "target": "allEnemies",
      "base": "def"
     },
     {
-     "k": "status",
-     "id": "약화",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
      "k": "stack",
      "id": "배송",
-     "v": 1
+     "v": 2
     }
    ],
    "oracles": [
     {
-     "name": "총알 같은 코너링",
+     "name": "드리프트",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 1.5,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "stack",
+       "id": "배송",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "살짝 코너링",
+     "cost": 1,
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.9,
+       "target": "allEnemies",
+       "base": "def"
+      },
+      {
+       "k": "stack",
+       "id": "배송",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "배송 코스 질주",
      "tags": [
       "신속"
      ],
@@ -457,111 +492,46 @@
        "base": "def"
       },
       {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
        "k": "stack",
        "id": "배송",
-       "v": 1
+       "v": 3
       }
      ]
     },
     {
-     "name": "가벼운 코너링",
-     "cost": 1,
+     "name": "케이크에 처박기",
      "tags": [
       "신속"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.8,
-       "target": "allEnemies",
+       "ratio": 2.4,
+       "target": "oneEnemy",
        "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
       },
       {
        "k": "stack",
        "id": "배송",
-       "v": 1
+       "v": 2
       }
      ]
     },
     {
-     "name": "과속한 코너링",
+     "name": "크림 범벅",
      "tags": [
       "신속"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.25,
+       "ratio": 1.45,
        "target": "allEnemies",
        "base": "def"
       },
       {
        "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "쟁여 둔 코너링",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.2,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "배송의 코너링",
-     "tags": [
-      "신속",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.2,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
+       "id": "취약",
        "v": 1,
        "target": "allEnemies"
       },
@@ -575,19 +545,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "풀 스로틀",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "미끄러운 크림",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "인코스 파고들기",
+     "kind": "cost"
     }
    ]
   },
@@ -615,7 +582,7 @@
    ],
    "oracles": [
     {
-     "name": "총알 같은 손가락 인사",
+     "name": "양손 인사",
      "tags": [
       "신속"
      ],
@@ -633,7 +600,7 @@
      ]
     },
     {
-     "name": "가벼운 손가락 인사",
+     "name": "인사하고 튀기",
      "tags": [
       "신속"
      ],
@@ -641,17 +608,21 @@
       {
        "k": "status",
        "id": "약화",
-       "v": 3
+       "v": 2
       },
       {
        "k": "stack",
        "id": "배송",
        "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
       }
      ]
     },
     {
-     "name": "과속한 손가락 인사",
+     "name": "배송 완료 인사",
      "tags": [
       "신속"
      ],
@@ -659,7 +630,7 @@
       {
        "k": "status",
        "id": "약화",
-       "v": 3
+       "v": 2
       },
       {
        "k": "stack",
@@ -669,16 +640,16 @@
      ]
     },
     {
-     "name": "쟁여 둔 손가락 인사",
+     "name": "모두에게 인사",
      "tags": [
-      "신속",
-      "보존"
+      "신속"
      ],
      "fx": [
       {
        "k": "status",
        "id": "약화",
-       "v": 3
+       "v": 2,
+       "target": "allEnemies"
       },
       {
        "k": "stack",
@@ -688,16 +659,20 @@
      ]
     },
     {
-     "name": "배송의 손가락 인사",
+     "name": "도발 인사",
      "tags": [
-      "신속",
-      "축복"
+      "신속"
      ],
      "fx": [
       {
        "k": "status",
        "id": "약화",
-       "v": 3
+       "v": 2
+      },
+      {
+       "k": "status",
+       "id": "취약",
+       "v": 1
       },
       {
        "k": "stack",
@@ -709,19 +684,22 @@
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "뻔뻔함",
+     "kind": "defUp"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "윙크",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "메롱",
+     "fx": [
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1
+      }
+     ]
     }
    ]
   }

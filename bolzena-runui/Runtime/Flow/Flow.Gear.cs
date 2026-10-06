@@ -233,10 +233,12 @@ namespace Bolzena.RunUI
             confirm.Interactable = false;
             confirm.Why = "낄 사도를 먼저 고르세요";
             Stage.Hot["gear.ok"] = confirm;
+            // 애착 장비 — 그 사도가 파티에 있으면 미리 골라 둔다(누르면 바로 그 사도에게 · 다른 사도로 바꿀 수도 있음)
+            if (e?.Affinity != null && rows.Exists(r => r.key == e.Affinity)) Select(e.Affinity);
             if (!bought)
             {
                 int price = P.SellPrice(equipId);
-                var sellB = Btn.Make(foot, null, BtnStyle.PillRose, () => Confirm($"「{e.Name}」 을 팔까요?", $"아무에게도 끼지 않고 {price} 골드를 받습니다.", "팝니다", () =>
+                var sellB = Btn.Make(foot, null, BtnStyle.PillRose, () => Confirm($"「{e.Name}」 을 팔까요?", $"아무에게도 끼지 않고 {price} 골드를 받습니다.", "팔기", () =>
                 {
                     string why = P.Sell(equipId);
                     if (why != null) { Toast.Show(why); return; }
@@ -297,7 +299,7 @@ namespace Bolzena.RunUI
         /// <summary>낀 장비 보기(지도 · 캠프의 「장비」).</summary>
         public void GearView()
         {
-            var (row, close, _) = Stage.ModalBox("gearview", 1100, 500, "낀 장비", "사도 하나에 무기 · 방어구 · 장신구 한 칸씩 · 애착 장비는 그 사도가 끼면 더 세다");
+            var (row, close, _) = Stage.ModalBox("gearview", 1100, 500, "낀 장비", "사도 하나에 무기 · 방어구 · 장신구 한 칸씩 · 애착 장비는 그 사도가 끼면 더 셉니다");
             Ui.Row(row, Theme.Gap, TextAnchor.UpperCenter, null, true, true);
             foreach (var k in P.S.Party)
             {

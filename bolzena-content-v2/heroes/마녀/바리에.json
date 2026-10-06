@@ -12,10 +12,10 @@
       "atk": 64,
       "def": 55,
       "crit": 5,
-      "blurb": "「정숙해주세요오」 도서관 사서 마녀. 버린 더미에서 쓸 만한 책을 당일 대출해 손에 돌려 주고, 도장이 차면 서가를 정리한다.",
+      "blurb": "「정숙해주세요오」 도서관 사서 마녀. 가장 바쁜 동료에게 오늘 안에 돌려받을 책을 빌려 주고, 도장이 차면 버린 더미에서 그 손에 맞는 책을 다시 찾아 줍니다.",
       "keyword": {
         "name": "대출 도장",
-        "desc": "당일 반납 — 버린 더미에서 카드를 대출할 때마다 찍고, 셋이면 서가 정리",
+        "desc": "도서 대출 도장",
         "carrier": "self",
         "cap": 3,
         "rules": [
@@ -28,13 +28,16 @@
             },
             "fx": [
               {
-                "k": "status",
-                "id": "다음 턴 드로우",
-                "v": 2
+                "k": "pull",
+                "from": "discard",
+                "n": 1,
+                "who": "other"
               },
               {
-                "k": "heal",
-                "ratio": 0.8
+                "k": "stack",
+                "id": "빌린 책",
+                "v": 2,
+                "target": "strongestAlly"
               },
               {
                 "k": "spend",
@@ -45,25 +48,55 @@
           }
         ]
       },
+      "keywords": [
+        {
+          "name": "빌린 책",
+          "desc": "오늘 안에 돌려받는 추천 도서",
+          "carrier": "hero",
+          "hunt": true,
+          "cap": 4,
+          "decayAll": true,
+          "per": [
+            {
+              "stat": "dealt",
+              "v": 0.1
+            }
+          ]
+        }
+      ],
+      "passives": [
+        {
+          "name": "북카트 순회",
+          "when": {
+            "on": "play",
+            "every": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "대출 도장",
+              "v": 1
+            }
+          ]
+        }
+      ],
       "ult": {
         "name": "당일 반납해주세요오",
         "cost": 200,
         "fx": [
           {
-            "k": "pull",
-            "from": "discard",
-            "n": 2
-          },
-          {
             "k": "stack",
-            "id": "대출 도장",
-            "v": 2
+            "id": "빌린 책",
+            "v": 4,
+            "target": "strongestAlly"
           },
           {
-            "k": "atkMod",
-            "v": 0.15,
-            "run": true,
-            "target": "oneAlly"
+            "k": "shield",
+            "ratio": 2.0
+          },
+          {
+            "k": "draw",
+            "v": 2
           }
         ]
       },
@@ -114,9 +147,14 @@
       "signature": true,
       "fx": [
         {
-          "k": "pull",
-          "from": "discard",
-          "n": 1
+          "k": "stack",
+          "id": "빌린 책",
+          "v": 2,
+          "target": "oneAlly"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.8
         },
         {
           "k": "stack",
@@ -130,9 +168,14 @@
           "name": "두 권 대출",
           "fx": [
             {
-              "k": "pull",
-              "from": "discard",
-              "n": 2
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 3,
+              "target": "oneAlly"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
             },
             {
               "k": "stack",
@@ -145,9 +188,10 @@
           "name": "대출과 추천",
           "fx": [
             {
-              "k": "pull",
-              "from": "discard",
-              "n": 1
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 3,
+              "target": "oneAlly"
             },
             {
               "k": "stack",
@@ -164,9 +208,14 @@
           "name": "연장 대출",
           "fx": [
             {
-              "k": "pull",
-              "from": "discard",
-              "n": 1
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
             },
             {
               "k": "stack",
@@ -179,18 +228,19 @@
           "name": "조용한 대출",
           "fx": [
             {
-              "k": "pull",
-              "from": "discard",
-              "n": 1
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.4
             },
             {
               "k": "stack",
               "id": "대출 도장",
               "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 0.6
             }
           ]
         },
@@ -201,14 +251,19 @@
           ],
           "fx": [
             {
-              "k": "pull",
-              "from": "discard",
-              "n": 1
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
             },
             {
               "k": "stack",
               "id": "대출 도장",
-              "v": 2
+              "v": 1
             }
           ]
         }
@@ -395,7 +450,7 @@
           "v": 1
         }
       ],
-      "blurb": "사서의 한마디에 열람실이 얼어붙는다",
+      "blurb": "사서의 한마디에 열람실이 얼어붙습니다",
       "oracles": [
         {
           "name": "엄중 경고",
@@ -537,9 +592,21 @@
           "v": 1
         },
         {
-          "k": "stack",
-          "id": "대출 도장",
-          "v": 2
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "대출 도장",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "blurb": "모든 책은 제자리에",
@@ -553,9 +620,21 @@
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "대출 도장",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -564,14 +643,21 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "대출 도장",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -584,13 +670,25 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 2
-            },
-            {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "대출 도장",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -603,14 +701,32 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "다음 턴 드로우",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "대출 도장",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "shuffle"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -623,12 +739,29 @@
             {
               "k": "status",
               "id": "결의",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
               "id": "대출 도장",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "대출 도장",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

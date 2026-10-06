@@ -239,14 +239,14 @@ namespace Bolzena.View
         }
 
         // ── 피해 숫자 ──
-        public static void Number(Vector3 pos, int value, bool crit, int hitIndex, Color? tint = null, bool hurt = false, int blocked = 0)
+        public static void Number(Vector3 pos, int value, bool crit, int hitIndex, Color? tint = null, bool hurt = false, int blocked = 0, int order = 460)
         {
             var root = Make.Node("dmg", Field, pos + new Vector3(Random.Range(-0.25f, 0.25f), hitIndex * 0.32f, 0));
             float size = crit ? 0.85f : 0.62f;
             if (hurt) size = 0.6f;
             string s = value.ToString("N0");
             if (hurt && value == 0 && blocked > 0) { s = "<size=60%>막음</size> " + blocked; blocked = 0; tint = new Color(0.6f, 0.85f, 1f); }
-            var t = Make.Text("n", root, s, Vector3.zero, size, 460 + hitIndex, Color.white);
+            var t = Make.Text("n", root, s, Vector3.zero, size, order + hitIndex, Color.white);
             t.fontStyle = FontStyles.Normal;
             t.characterSpacing = -4;
             Make.Shadow(t, new Color(0, 0, 0, 0.55f), 0.35f, 0.7f, -0.9f);     // 밝은 이펙트 위에서도 숫자가 떠 보이게
@@ -257,7 +257,7 @@ namespace Bolzena.View
                 Make.Glow(t, Color.white, 1.12f);
                 if (hitIndex == 0)
                 {
-                var label = Make.Text("crit", root, "CRITICAL", new Vector3(0, size * 0.85f, 0), 0.26f, 461 + hitIndex, new Color(1f, 0.9f, 0.5f));
+                var label = Make.Text("crit", root, "CRITICAL", new Vector3(0, size * 0.85f, 0), 0.26f, order + 1 + hitIndex, new Color(1f, 0.9f, 0.5f));
                 Make.Outline(label, 0.3f, new Color(0.3f, 0.05f, 0f));
                 label.characterSpacing = 6;
                 }
@@ -274,7 +274,7 @@ namespace Bolzena.View
             }
             if (blocked > 0)
             {
-                var b = Make.Text("blk", root, "<size=70%>막음</size> " + blocked, new Vector3(0, -size * 0.75f, 0), 0.32f, 459, new Color(0.6f, 0.85f, 1f));
+                var b = Make.Text("blk", root, "<size=70%>막음</size> " + blocked, new Vector3(0, -size * 0.75f, 0), 0.32f, order - 1, new Color(0.6f, 0.85f, 1f));
                 Make.Outline(b, 0.25f, new Color(0, 0.05f, 0.15f));
             }
             var p = root.gameObject.AddComponent<Popup>();

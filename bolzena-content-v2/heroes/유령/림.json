@@ -12,10 +12,10 @@
       "atk": 129,
       "def": 40,
       "crit": 10,
-      "blurb": "입만 열면 아재개그로 분위기를 얼리는 질서의 2인자. 개그를 치면 적이 얼어붙어 굼떠지지만 파티도 김이 빠진다. 공격과 스킬을 같은 장수 낸 턴엔 저울이 맞아 낫 자국이 깊어진다.",
+      "blurb": "입만 열면 아재개그로 분위기를 얼리는 질서의 2인자. 개그를 치면 적이 얼어붙어 굼떠지지만 파티도 김이 빠집니다. 공격과 스킬을 같은 장수 낸 턴엔 저울이 맞아 낫 자국이 깊어집니다.",
       "keyword": {
         "name": "낫 자국",
-        "desc": "균형을 지키는 낫의 흔적 — 깊을수록 잘 벌어진다",
+        "desc": "적에게 남는 낫의 흔적",
         "carrier": "enemy",
         "cap": 5,
         "per": [
@@ -145,11 +145,11 @@
       ],
       "oracles": [
         {
-          "name": "깊은 할퀴기",
+          "name": "크게 한 바퀴",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.75,
+              "ratio": 1.45,
               "target": "allEnemies"
             },
             {
@@ -161,12 +161,12 @@
           ]
         },
         {
-          "name": "얕은 할퀴기",
+          "name": "옆구리 긋기",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.8,
               "target": "allEnemies"
             },
             {
@@ -178,14 +178,42 @@
           ]
         },
         {
-          "name": "겨눠 둔 낫",
-          "tags": [
-            "보존"
-          ],
+          "name": "겹쳐 긋기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "외길 베기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "저승 바람",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
               "target": "allEnemies"
             },
             {
@@ -193,40 +221,10 @@
               "id": "낫 자국",
               "v": 1,
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "쌍낫 할퀴기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "hits": 2,
-              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "낫 자국",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "축복의 낫",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.55,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "낫 자국",
+              "k": "status",
+              "id": "약화",
               "v": 1,
               "target": "allEnemies"
             }
@@ -235,16 +233,16 @@
       ],
       "blesses": [
         {
-          "name": "예리한 날",
+          "name": "벼린 대낫",
           "kind": "power"
         },
         {
-          "name": "차가운 바람",
+          "name": "서늘한 칼바람",
           "kind": "frost"
         },
         {
-          "name": "빠른 회수",
-          "kind": "draw"
+          "name": "상처 따라 긋기",
+          "kind": "weakSpot"
         }
       ]
     },
@@ -273,7 +271,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
@@ -284,12 +282,12 @@
           ]
         },
         {
-          "name": "작은 기역",
+          "name": "손목 튕기기",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 0.5,
               "target": "oneEnemy"
             },
             {
@@ -300,20 +298,33 @@
           ]
         },
         {
-          "name": "접어 둔 기역",
-          "tags": [
-            "보존"
-          ],
+          "name": "두 줄 긋기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 1.0,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "낫 자국",
-              "v": 1
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "휘도는 기역",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -325,25 +336,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "낫 자국",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "축복의 기역",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.15,
               "target": "oneEnemy"
             },
             {
@@ -416,7 +409,7 @@
             {
               "k": "status",
               "id": "둔화",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             },
             {
@@ -425,12 +418,12 @@
             },
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 2.6
             }
           ]
         },
         {
-          "name": "짧은 개그",
+          "name": "아재 개그",
           "cost": 0,
           "fx": [
             {
@@ -449,64 +442,12 @@
             },
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 1.1
             }
           ]
         },
         {
-          "name": "준비한 개그",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 1.6
-            }
-          ]
-        },
-        {
-          "name": "아무도 안 웃음",
-          "fx": [
-            {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 1.6
-            }
-          ]
-        },
-        {
-          "name": "축복의 개그",
-          "tags": [
-            "축복"
-          ],
+          "name": "베는 농담",
           "fx": [
             {
               "k": "ifChoice",
@@ -521,7 +462,36 @@
             {
               "k": "stack",
               "id": "낫 자국",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.8
+            }
+          ]
+        },
+        {
+          "name": "아무도 안 웃음",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
               "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
               "target": "allEnemies"
             },
             {
@@ -533,12 +503,40 @@
               "ratio": 1.6
             }
           ]
+        },
+        {
+          "name": "꾹 참는 얼굴",
+          "fx": [
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.0
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "더 썰렁하게",
-          "kind": "frost"
+          "name": "얼어붙은 분위기",
+          "kind": "guard"
         },
         {
           "name": "순발력",
@@ -564,9 +562,22 @@
           "v": 1
         },
         {
-          "k": "status",
-          "id": "불굴",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnEnd"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "낫 자국",
+                  "v": 1,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -579,9 +590,22 @@
               "v": 2
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낫 자국",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -590,14 +614,26 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낫 자국",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -610,12 +646,30 @@
             {
               "k": "status",
               "id": "사기",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
               "id": "불굴",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낫 자국",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -628,20 +682,33 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
               "k": "stack",
               "id": "낫 자국",
               "v": 2,
               "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낫 자국",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "축복의 저울",
+          "name": "균형의 축복",
           "tags": [
             "축복"
           ],
@@ -649,32 +716,51 @@
             {
               "k": "status",
               "id": "사기",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낫 자국",
+                      "v": 1,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.2,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "무거운 추",
-          "kind": "defUp"
+          "name": "심판의 무게",
+          "kind": "atkUp"
         },
         {
-          "name": "재빠른 눈금",
-          "kind": "draw"
+          "name": "덜어 낸 추",
+          "kind": "cost"
         },
         {
-          "name": "균형 감각",
+          "name": "첫 눈금",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -740,7 +826,7 @@
           ]
         }
       ],
-      "blurb": "균형을 지키는 낫. 다 기운 목숨은 단숨에 거둔다."
+      "blurb": "균형을 지키는 낫. 다 기운 목숨은 단숨에 거둡니다."
     }
   ]
 }

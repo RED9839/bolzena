@@ -10,8 +10,8 @@ using UnityEngine.UI;
 namespace Bolzena.RunUI
 {
     // 지도 — 웹판 ui.js mapScreen(docs/10-지도.md). 한 층은 출발(N-0)에서 보스(N-10)까지 열 줄, 줄마다 갈래가 1~4.
-    // 왼쪽 → 오른쪽으로 나아가고, 파티(미니미 셋)가 지금 칸에 선다. 갈 수 있는 칸은 숨쉬며 빛나고, 못 닿는 칸은 흐리다.
-    // 웹판보다: 칸이 줄마다 차례로 튀어나오고, 길이 그어지고, 누르면 미니미가 걸어가서 들어간다.
+    // 왼쪽 → 오른쪽으로 나아가고, 파티(SD 셋)가 지금 칸에 선다. 갈 수 있는 칸은 숨쉬며 빛나고, 못 닿는 칸은 흐리다.
+    // 웹판보다: 칸이 줄마다 차례로 튀어나오고, 길이 그어지고, 누르면 파티가 걸어가서 들어간다.
     public partial class Flow
     {
         const float ColW = 196, MapPad = 150;
@@ -89,7 +89,7 @@ namespace Bolzena.RunUI
                     MapNodeView(nodes, n, pos[n.Id], canGo, done, dim, n.Id == here, n.Row * 0.06f + (canGo ? 0.35f : 0.1f));
                 }
 
-            // 파티 — 지금 칸에 미니미 셋
+            // 파티 — 지금 칸에 SD 셋
             var at = here != null && pos.ContainsKey(here) ? pos[here] : pos[m.Rows[0][0].Id];
             var troop = Ui.Rect("troop", party);
             troop.anchorMin = troop.anchorMax = new Vector2(0, 1);
@@ -101,14 +101,10 @@ namespace Bolzena.RunUI
             foreach (var k in P.S.Party)
             {
                 var hero = Roster.OfCore(k);
-                var slot = Ui.Rect("mini" + i, troop).At(0.5f, 0, (i - 1) * 46, (i == 1 ? 8 : 0), 10, 10);
-                var g = SpineUi.Make(slot, "minimi", hero.MiniSkin, 92, "Idle", "idle", "Stand");
-                if (g != null) { minis.Add(g); g.AnimationState.Update(i * 0.37f); }
-                else
-                {
-                    var face = W.Face(slot, hero, 58);
-                    face.At(0.5f, 0, 0, 0, 58, 58);
-                }
+                // 지도 말 — SD 전투 스파인을 지도용 고정 몸 키 74(옛 미니미 키 92 와 비슷한 칸 크기 · 셋이 한 칸 위에 겹치지 않게 52 간격)
+                var slot = Ui.Rect("hero" + i, troop).At(0.5f, 0, (i - 1) * 52, (i == 1 ? 8 : 0), 10, 10);
+                var g = SceneHero.Make(slot, hero, 74, true, i * 0.37f, false);
+                if (g != null) minis.Add(g);
                 i++;
             }
             Tw.Pop(troop, 0.2f, 0.5f, 0.5f);
@@ -258,15 +254,9 @@ namespace Bolzena.RunUI
                 hb.Bg = gem;
                 hb.SetColor(Color.white);
                 Tw.Breathe(gem.transform, 0.04f, 1.3f, n.Col * 0.4f);
-                // 나오는 적 미리보기
-                var foes = P.FoesAt(n);
-                if (foes.Count > 0)
-                {
-                    var tip = Ui.Text(holder, string.Join(" · ", foes.Select(id => P.Data.Enemy(id)?.Name ?? id).Distinct()), Theme.FsCap, Theme.Ink, TextAlignmentOptions.Center);
-                    tip.rectTransform.At(0.5f, 0, 0, -46, 230, 22);
-                    tip.Outline(0.3f);
-                    tip.textWrappingMode = TextWrappingModes.NoWrap;
-                }
+                // 나오는 적 미리보기는 두지 않는다(2026-10-06 사용자: 「어떤 스테이지에 무슨 몬스터가 나오는지 모르고 있어야 재미있다」).
+                //   칸 종류(일반 · 엘리트 · 보스 · 이벤트 · 휴식 · 상점) 타일 · 글리프 · 이름만 — 보스 칸도 어느 클론인지는 들어가서 안다.
+                //   이 마을 적 목록은 편성 화면 「나오는 적」 · 적 도감에 그대로 있다.
             }
             Tw.Pop(holder, delay, 0.3f, 0.45f);
         }
@@ -274,10 +264,11 @@ namespace Bolzena.RunUI
         IEnumerator Walk(RectTransform troop, List<SkeletonGraphic> minis, Vector2 to, System.Action arrive)
         {
             walking = true;
-            foreach (var g in minis) SpineUi.Play(g, true, "Jump1", "Walk", "Run");
+            foreach (var g in minis) SpineUi.Play(g, true, "Move", "Walk", "Run", "Jump1", "Idle");
             var from = troop.anchoredPosition;
             float t = 0, dur = Settings.ReduceMotion ? 0.15f : Mathf.Clamp((to - from).magnitude / 420f, 0.45f, 0.9f);
-            if (to.x < from.x) foreach (var g in minis) g.transform.localScale = new Vector3(-Mathf.Abs(g.transform.localScale.x), g.transform.localScale.y, 1);
+            // SD 전투 스파인은 원작이 왼쪽을 본다 — 왼쪽으로 갈 때는 +x, 오른쪽은 -x(SpineUi.Battle 규칙)
+            if (to.x != from.x) foreach (var g in minis) g.transform.localScale = new Vector3((to.x < from.x ? 1 : -1) * Mathf.Abs(g.transform.localScale.x), g.transform.localScale.y, 1);
             Sfx.Play("step");
             while (t < dur && troop)
             {

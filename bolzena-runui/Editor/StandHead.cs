@@ -196,6 +196,81 @@ namespace Bolzena.RunUI.EditorTools
             if (Application.isBatchMode) UnityEditor.EditorApplication.Exit(0);
         }
 
+        // ═════ 몸 중심 · 얼굴 중심 다시 재기(2026-10 사용자: 「벨라 · 클로에 · 쥬비 스탠딩 중심 다시」) ═════
+        //   몸 중심 x = 골반 뼈 x · 몸통 뼈 x · 몸 슬롯 상자 가운데(소품 · 날개 · 무기 · 탈것 · 머리카락 · 꼬리 낱말 뺌) 셋의 가운데값
+        //   얼굴 중심 x = 눈 · 입 · 얼굴 슬롯(머리 뼈 아래)의 꼭짓점 가운데 — 없으면 머리 뼈 x
+        //   결과: Resources/RunUI/standing_center.json { "<그림 키>": { cx, faceCx, bodyW, how } } — StandingFit 이 표의 centerX · 얼굴 가운데 위에 덮는다.
+        //   지금 표의 centerX 와 몸 너비의 15% 넘게 어긋난 사도 목록 Tools~/standing_center_report.txt
+        //   Unity.exe -batchmode -quit -projectPath <시험 프로젝트> -executeMethod Bolzena.RunUI.EditorTools.StandHead.Centers
+        static readonly HashSet<string> NotBody = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "hair", "braid", "ponytail", "twintail", "bang", "bangs", "fringe", "tail", "tails", "cape", "mantle", "cloak", "skirt", "dress", "ear", "horn", "bg", "back", "seat", "chair", "moon", "rock", "frog", "plant", "mirror", "frame", "box", "plush", "bear", "doll" };
+        static readonly HashSet<string> FaceWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "eye", "eyes", "eyel", "eyer", "pupil", "eyeball", "mouth", "face", "cheek", "nose", "brow", "eyebrow", "lash", "eyelash" };
+
+        public static void Centers()
+        {
+            var fit = (Dictionary<string, object>)FitJson.Parse(File.ReadAllText(Path.Combine(PackageRoot(), "Runtime/Resources/RunUI/standing_fit.json")));
+            var outJ = new StringBuilder("{\n \"_meta\": {\"note\": \"몸 중심 · 얼굴 중심(원본 단위 · Normal · Idle_1 첫 프레임). cx = 골반 · 몸통 뼈 · 몸 슬롯 상자 가운데(소품 · 날개 · 무기 · 탈것 · 머리카락 뺌)의 가운데값, faceCx = 눈 · 입 · 얼굴 슬롯 가운데, bodyW = 몸 슬롯 상자 너비. StandingFit 이 표의 centerX · 얼굴 가운데 위에 덮는다. Editor/StandHead.cs Centers\"}");
+            var rep = new StringBuilder("그림 키\t사도\t표 centerX\t새 몸 cx\t어긋남(몸 너비 비)\t얼굴 표(머리 상자)\t새 얼굴 cx\t얼굴 어긋남(머리 너비 비)\t근거\n");
+            int n = 0;
+            var headJ = FitJson.Parse(File.ReadAllText(Path.Combine(PackageRoot(), "Runtime/Resources/RunUI/standing_head.json"))) as Dictionary<string, object>;
+            foreach (var kv in fit)
+            {
+                if (kv.Key.StartsWith("_") || !(kv.Value is Dictionary<string, object> f)) continue;
+                string art = kv.Key, hero = f.TryGetValue("hero", out var hv) ? hv as string : "";
+                try
+                {
+                    var sk = Load(art);
+                    if (sk == null) continue;
+                    string Bare(Bone b) => Regex.Replace(b.Data.Name, @"^S\d+_", "");
+                    Bone head = null;
+                    foreach (var hn in Heads) { head = sk.Bones.FirstOrDefault(b => Bare(b).Equals(hn, StringComparison.OrdinalIgnoreCase)); if (head != null) break; }
+                    bool Under(Bone b, Bone top) { for (var x = b; x != null; x = x.Parent) if (x == top) return true; return false; }
+                    var pelvis = sk.Bones.FirstOrDefault(b => Regex.IsMatch(Bare(b), "^(?i)(pelvis|plevis|hip|hips)(_?ct|_?vct|_?hct)?$"));
+                    var chest = sk.Bones.FirstOrDefault(b => Regex.IsMatch(Bare(b), "^(?i)(body|body_1|spine|spine_1|chest|chest_root|upperbody)$"));
+                    float[] buf = new float[4096];
+                    float bl = float.MaxValue, br = float.MinValue; var face = new List<float>(); var faceY = new List<float>();
+                    foreach (var slot in sk.DrawOrder)
+                    {
+                        var at = slot.Attachment;
+                        if (at == null || !slot.Bone.Active || slot.A <= 0.01f) continue;
+                        var words = Words(slot.Data.Name).Concat(Words(at.Name)).ToList();
+                        bool chainBad = false;
+                        for (var x = slot.Bone; x != null; x = x.Parent) if (Words(x.Data.Name).Any(w => NotHead.Contains(w) || NotBody.Contains(w))) { chainBad = true; break; }
+                        int cnt = 0;
+                        if (at is RegionAttachment ra) { ra.ComputeWorldVertices(slot, buf, 0, 2); cnt = 4; }
+                        else if (at is MeshAttachment ma) { if (ma.WorldVerticesLength > buf.Length) buf = new float[ma.WorldVerticesLength]; ma.ComputeWorldVertices(slot, 0, ma.WorldVerticesLength, buf, 0, 2); cnt = ma.WorldVerticesLength / 2; }
+                        if (cnt == 0) continue;
+                        if (head != null && Under(slot.Bone, head) && words.Any(w => FaceWords.Contains(w)) && !words.Any(w => NotHead.Contains(w)))
+                            for (int i = 0; i < cnt; i++) { face.Add(buf[i * 2]); faceY.Add(buf[i * 2 + 1]); }
+                        if (chainBad || words.Any(w => NotHead.Contains(w) || NotBody.Contains(w))) continue;
+                        for (int i = 0; i < cnt; i++) { bl = Mathf.Min(bl, buf[i * 2]); br = Mathf.Max(br, buf[i * 2]); }
+                    }
+                    var cands = new List<float>(); var how = new List<string>();
+                    if (pelvis != null) { cands.Add(pelvis.WorldX); how.Add("골반 " + Bare(pelvis)); }
+                    if (chest != null) { cands.Add(chest.WorldX); how.Add("몸통 " + Bare(chest)); }
+                    if (bl < br) { cands.Add((bl + br) / 2); how.Add("몸 슬롯 상자"); }
+                    if (cands.Count == 0) continue;
+                    cands.Sort();
+                    float cx = cands.Count == 2 ? (cands[0] + cands[1]) / 2 : cands[cands.Count / 2];
+                    float bodyW = bl < br ? br - bl : 300;
+                    float faceCx = face.Count > 0 ? (face.Min() + face.Max()) / 2 : head != null ? head.WorldX : cx;
+                    string faceHow = face.Count > 0 ? "눈 · 입 슬롯" : "머리 뼈";
+                    float oldCx = o2f(f, "centerX");
+                    float oldFace = headJ != null && headJ.TryGetValue(art, out var ho) && ho is Dictionary<string, object> hd ? o2f(hd, "cx") : oldCx;
+                    float headW = headJ != null && headJ.TryGetValue(art, out var ho2) && ho2 is Dictionary<string, object> hd2 ? Mathf.Max(60, o2f(hd2, "fr") - o2f(hd2, "fl")) : 200;
+                    float d = Mathf.Abs(cx - oldCx) / Mathf.Max(60, bodyW), df = Mathf.Abs(faceCx - oldFace) / headW;
+                    rep.Append($"{art}\t{hero}\t{oldCx:0}\t{cx:0}\t{d:0.00}{(d > 0.15f ? " ★" : "")}\t{oldFace:0}\t{faceCx:0}\t{df:0.00}{(df > 0.15f ? " ★" : "")}\t{string.Join(" · ", how)} / 얼굴 {faceHow}\n");
+                    outJ.Append($",\n \"{art}\": {{\"hero\": \"{hero}\", \"cx\": {N(cx)}, \"faceCx\": {N(faceCx)}, \"bodyW\": {N(bodyW)}, \"faceT\": {N(faceY.Count > 0 ? faceY.Max() : 0)}, \"faceB\": {N(faceY.Count > 0 ? faceY.Min() : 0)}, \"how\": \"{string.Join(" · ", how)} / {faceHow}\"}}");
+                    n++;
+                }
+                catch (Exception e) { Debug.LogWarning($"[StandHead] {art} 중심 실패 — {e.Message}"); }
+            }
+            outJ.Append("\n}\n");
+            File.WriteAllText(Path.Combine(PackageRoot(), "Runtime/Resources/RunUI/standing_center.json"), outJ.ToString(), new UTF8Encoding(false));
+            File.WriteAllText(Path.Combine(PackageRoot(), "Tools~/standing_center_report.txt"), rep.ToString(), new UTF8Encoding(false));
+            Debug.Log($"[StandHead] 중심 {n}명");
+            if (Application.isBatchMode) UnityEditor.EditorApplication.Exit(0);
+        }
+
         static Skeleton Load(string art)
         {
             var dir = Path.Combine(Src, art);

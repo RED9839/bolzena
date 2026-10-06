@@ -75,6 +75,8 @@ namespace Bolzena.Fx.EditorTools
             // 고학년 몸짓 표(읽기만) — 런타임이 Resources 로 읽게 옮긴다
             var um = Path.GetFullPath("Packages/com.bolzena.fx/Runtime/Motion/ult_motion.json");
             if (File.Exists(um)) { File.Copy(um, Out + "/ult_motion.json", true); AssetDatabase.ImportAsset(Out + "/ult_motion.json"); Debug.Log("[FxImport] 고학년 몸짓 표 ult_motion.json"); }
+            var uh = Path.GetFullPath("Packages/com.bolzena.fx/Runtime/Motion/ult_hits.json");   // 원작 고학년 타수 · 타격 시각
+            if (File.Exists(uh)) { File.Copy(uh, Out + "/ult_hits.json", true); AssetDatabase.ImportAsset(Out + "/ult_hits.json"); Debug.Log("[FxImport] 고학년 타수 표 ult_hits.json"); }
             EditorUtility.SetDirty(lib);
             AssetDatabase.SaveAssets();
             Debug.Log($"[FxImport] 사도 {lib.Heroes.Count}명 · 이펙트 {Converted}개 변환 · 실패 {Failed} · 근사(이미터) {Approx} · 입체 메시로 뺀 이미터 {Skipped3d} · 구운 낱장 {Baked}");
@@ -127,6 +129,7 @@ namespace Bolzena.Fx.EditorTools
                     lib.Heroes.Add(he); byKey[kv.Key] = he;
                 }
                 he.Attack = L(h, "attack"); he.Power = L(h, "power"); he.Skill = L(h, "skill"); he.Sig = L(h, "sig");
+                if (he.Ult.Count == 0) he.Ult.AddRange(L(h, "ult"));   // 고학년 추출에 없던 사도(우이 — 원작 uieru)
             }
             if (idx.TryGetValue("common", out var co) && co is Dictionary<string, object> cd)
                 foreach (var kv in cd)

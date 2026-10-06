@@ -12,10 +12,10 @@
       "atk": 104,
       "def": 23,
       "crit": 10,
-      "blurb": "어디든 들어가면 거기가 내 집이 되는 태평한 유령. 적 하나에 「입주」 해 눌러앉고, 적이 실드를 세우면 제 집 담장인 양 파티가 나눠 쓴다. 집주인이 쓰러지면 짐 싸서 다음 집으로.",
+      "blurb": "어디든 들어가면 거기가 내 집이 되는 태평한 유령. 적 1명에게 「입주」해 눌러앉고, 적이 실드를 세우면 제 집 담장인 양 파티가 나눠 씁니다. 집주인이 쓰러지면 짐 싸서 다음 집으로.",
       "keyword": {
         "name": "입주",
-        "desc": "메죵이 눌러앉은 집 — 집주인은 영 편하지 않다",
+        "desc": "한 적에게 눌러앉은 집",
         "carrier": "enemy",
         "hunt": true,
         "cap": 1,
@@ -159,9 +159,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "hits": 3,
-              "target": "oneEnemy"
+              "ratio": 0.9,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "stack",
@@ -176,28 +176,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "hits": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "입주",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "모아 둔 수리검",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "hits": 3,
-              "target": "oneEnemy"
+              "ratio": 0.75,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "stack",
@@ -212,8 +193,8 @@
             {
               "k": "dmg",
               "ratio": 0.75,
-              "hits": 3,
-              "target": "oneEnemy"
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "stack",
@@ -227,20 +208,38 @@
           ]
         },
         {
-          "name": "축복의 수리검",
-          "tags": [
-            "축복"
-          ],
+          "name": "수리검 흩뿌리기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "hits": 3,
-              "target": "oneEnemy"
+              "ratio": 0.56,
+              "target": "allEnemies",
+              "hits": 3
             },
             {
               "k": "stack",
               "id": "입주",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "수리검 폭풍",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "tough",
               "v": 1
             }
           ]
@@ -297,7 +296,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.5,
+              "ratio": 3.0,
               "target": "oneEnemy"
             },
             {
@@ -321,7 +320,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.05,
+              "ratio": 1.5,
               "target": "oneEnemy"
             },
             {
@@ -337,25 +336,22 @@
           ]
         },
         {
-          "name": "품에 든 문서",
+          "name": "명의 이전",
           "tags": [
-            "분쇄",
-            "보존"
+            "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.25,
+              "ratio": 2.95,
               "target": "oneEnemy"
             },
             {
               "k": "strip"
             },
             {
-              "k": "ifKill"
-            },
-            {
-              "k": "ap",
+              "k": "stack",
+              "id": "입주",
               "v": 1
             }
           ]
@@ -368,11 +364,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3,
-              "target": "oneEnemy"
+              "ratio": 1.85,
+              "target": "allEnemies"
             },
             {
-              "k": "strip"
+              "k": "strip",
+              "target": "allEnemies"
             },
             {
               "k": "ifKill"
@@ -384,15 +381,15 @@
           ]
         },
         {
-          "name": "축복의 문서",
+          "name": "허점 짚기",
           "tags": [
             "분쇄",
-            "축복"
+            "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.1,
+              "ratio": 2.7,
               "target": "oneEnemy"
             },
             {
@@ -447,7 +444,7 @@
       ],
       "oracles": [
         {
-          "name": "드러눕기",
+          "name": "대자로 눕기",
           "fx": [
             {
               "k": "stack",
@@ -456,7 +453,7 @@
             },
             {
               "k": "shield",
-              "ratio": 2.05
+              "ratio": 2.0
             },
             {
               "k": "draw",
@@ -465,7 +462,7 @@
           ]
         },
         {
-          "name": "살짝 앉기",
+          "name": "엉덩이 걸치기",
           "cost": 0,
           "fx": [
             {
@@ -475,11 +472,7 @@
             },
             {
               "k": "shield",
-              "ratio": 1.05
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "ratio": 0.8
             }
           ]
         },
@@ -496,7 +489,7 @@
             },
             {
               "k": "shield",
-              "ratio": 1.9
+              "ratio": 1.7
             },
             {
               "k": "draw",
@@ -514,7 +507,7 @@
             },
             {
               "k": "shield",
-              "ratio": 2
+              "ratio": 2.0
             },
             {
               "k": "status",
@@ -524,10 +517,8 @@
           ]
         },
         {
-          "name": "축복의 방석",
-          "tags": [
-            "축복"
-          ],
+          "name": "이사 완료",
+          "cost": 2,
           "fx": [
             {
               "k": "stack",
@@ -536,11 +527,11 @@
             },
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 3.4
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         }
@@ -551,7 +542,7 @@
           "kind": "guard"
         },
         {
-          "name": "재빠른 짐 풀기",
+          "name": "상자 뜯기",
           "kind": "draw"
         },
         {
@@ -586,17 +577,17 @@
             {
               "k": "stack",
               "id": "입주",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 3
             }
           ]
         },
         {
-          "name": "슬쩍 주인 행세",
+          "name": "문패 슬쩍",
           "cost": 0,
           "fx": [
             {
@@ -607,25 +598,7 @@
             {
               "k": "status",
               "id": "취약",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "익숙한 주인 행세",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "입주",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2
+              "v": 1
             }
           ]
         },
@@ -649,15 +622,31 @@
           ]
         },
         {
-          "name": "축복의 집",
+          "name": "온 동네 주인",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "이삿날",
           "tags": [
-            "축복"
+            "개전"
           ],
           "fx": [
             {
               "k": "stack",
               "id": "입주",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
@@ -669,12 +658,12 @@
       ],
       "blesses": [
         {
-          "name": "큰소리",
-          "kind": "frost"
-        },
-        {
           "name": "빠른 이사",
           "kind": "cost"
+        },
+        {
+          "name": "계약서 내밀기",
+          "kind": "draw"
         },
         {
           "name": "집주인 미소",

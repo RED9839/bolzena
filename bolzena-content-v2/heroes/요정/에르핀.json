@@ -12,10 +12,10 @@
    "atk": 155,
    "def": 25,
    "crit": 10,
-   "blurb": "요정 왕국 에르피엔의 먹보 여왕. 세계수가 씌운 왕관의 저주로 머리는 나빠지고 식욕은 폭발해 하루 12끼에 무전취식을 일삼고, 국정은 네르와 컨닝 페이퍼에 맡긴다. 그래도 산을 뽑아 던지는 괴력과 순한 본심으로 결정적 순간엔 모든 종족을 한데 묶는 트러블메이커.",
+   "blurb": "요정 왕국 에르피엔의 먹보 여왕. 세계수가 씌운 왕관의 저주로 머리는 나빠지고 식욕은 폭발해 하루 12끼에 무전취식을 일삼고, 국정은 네르와 컨닝 페이퍼에 맡깁니다. 그래도 산을 뽑아 던지는 괴력과 순한 본심으로 결정적 순간엔 모든 종족을 한데 묶는 트러블메이커.",
    "keyword": {
     "name": "외상",
-    "desc": "갚을 생각 없는 밥값 — 큰 카드를 낼 때마다 쌓이고, 처치하면 탕감돼 AP",
+    "desc": "큰 카드로 지는 밥값",
     "carrier": "self",
     "cap": 2
    },
@@ -162,7 +162,7 @@
    ],
    "oracles": [
     {
-     "name": "배부른 맨주먹",
+     "name": "진심 펀치",
      "tags": [
       "분쇄"
      ],
@@ -172,13 +172,13 @@
       },
       {
        "k": "dmg",
-       "ratio": 4.7,
+       "ratio": 4.4,
        "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "가벼운 맨주먹",
+     "name": "결계 툭툭",
      "cost": 2,
      "tags": [
       "분쇄"
@@ -189,13 +189,13 @@
       },
       {
        "k": "dmg",
-       "ratio": 2.9,
+       "ratio": 3.0,
        "target": "oneEnemy"
       }
      ]
     },
     {
-     "name": "외상의 맨주먹",
+     "name": "밥값은 했어",
      "tags": [
       "분쇄"
      ],
@@ -205,21 +205,22 @@
       },
       {
        "k": "dmg",
-       "ratio": 3.95,
+       "ratio": 4.0,
        "target": "oneEnemy"
       },
       {
-       "k": "make",
-       "id": "에르핀_cake",
+       "k": "ifKill"
+      },
+      {
+       "k": "ap",
        "v": 1
       }
      ]
     },
     {
-     "name": "몰래 둔 맨주먹",
+     "name": "결계째 박살",
      "tags": [
-      "분쇄",
-      "보존"
+      "분쇄"
      ],
      "fx": [
       {
@@ -227,16 +228,16 @@
       },
       {
        "k": "dmg",
-       "ratio": 4.3,
-       "target": "oneEnemy"
+       "ratio": 2.7,
+       "target": "allEnemies"
       }
      ]
     },
     {
-     "name": "왕관의 맨주먹",
+     "name": "한 방 올인",
      "tags": [
       "분쇄",
-      "축복"
+      "소멸"
      ],
      "fx": [
       {
@@ -244,27 +245,28 @@
       },
       {
        "k": "dmg",
-       "ratio": 4.3,
+       "ratio": 7.5,
        "target": "oneEnemy"
+      },
+      {
+       "k": "tough",
+       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "주먹에 마력",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "금 간 결계",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "밥 먹고 힘내기",
+     "kind": "ap"
     }
    ]
   },
@@ -293,12 +295,11 @@
    ],
    "oracles": [
     {
-     "name": "배부른 마력탄 폭주",
-     "tags": [],
+     "name": "마력 대방출",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.8,
+       "ratio": 0.72,
        "target": "randomEnemy",
        "hits": 5
       },
@@ -312,13 +313,12 @@
      ]
     },
     {
-     "name": "가벼운 마력탄 폭주",
+     "name": "마력탄 난사",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.5,
+       "ratio": 0.42,
        "target": "randomEnemy",
        "hits": 5
       },
@@ -332,8 +332,7 @@
      ]
     },
     {
-     "name": "외상의 마력탄 폭주",
-     "tags": [],
+     "name": "외상 탕감",
      "fx": [
       {
        "k": "dmg",
@@ -345,26 +344,22 @@
        "k": "ifKill"
       },
       {
-       "k": "draw",
+       "k": "ap",
        "v": 1
       },
       {
-       "k": "make",
-       "id": "에르핀_cake",
+       "k": "draw",
        "v": 1
       }
      ]
     },
     {
-     "name": "몰래 둔 마력탄 폭주",
-     "tags": [
-      "보존"
-     ],
+     "name": "과녁 하나",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.7,
-       "target": "randomEnemy",
+       "ratio": 0.65,
+       "target": "oneEnemy",
        "hits": 5
       },
       {
@@ -377,16 +372,19 @@
      ]
     },
     {
-     "name": "왕관의 마력탄 폭주",
-     "tags": [
-      "축복"
-     ],
+     "name": "눈먼 마력",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.7,
+       "ratio": 0.6,
        "target": "randomEnemy",
        "hits": 5
+      },
+      {
+       "k": "status",
+       "id": "약화",
+       "v": 1,
+       "target": "allEnemies"
       },
       {
        "k": "ifKill"
@@ -400,19 +398,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "과충전",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "흔들리는 표적",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "참지 못함",
+     "kind": "cost"
     }
    ]
   },
@@ -441,7 +436,7 @@
    ],
    "oracles": [
     {
-     "name": "배부른 케이크 공격",
+     "name": "진심 전력!!!",
      "tags": [
       "연계"
      ],
@@ -459,7 +454,7 @@
      ]
     },
     {
-     "name": "가벼운 케이크 공격",
+     "name": "한 입만",
      "cost": 0,
      "tags": [
       "연계"
@@ -467,7 +462,7 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.6,
+       "ratio": 0.45,
        "target": "oneEnemy"
       },
       {
@@ -478,20 +473,23 @@
      ]
     },
     {
-     "name": "외상의 케이크 공격",
+     "name": "케이크 하나 더!",
      "tags": [
       "연계"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.9,
+       "ratio": 0.8,
        "target": "oneEnemy"
       },
       {
        "k": "status",
        "id": "피해 감소",
        "v": 1
+      },
+      {
+       "k": "ifKill"
       },
       {
        "k": "make",
@@ -501,16 +499,15 @@
      ]
     },
     {
-     "name": "몰래 둔 케이크 공격",
+     "name": "케이크 폭탄!!!",
      "tags": [
-      "연계",
-      "보존"
+      "연계"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.05,
-       "target": "oneEnemy"
+       "ratio": 0.7,
+       "target": "allEnemies"
       },
       {
        "k": "status",
@@ -520,40 +517,40 @@
      ]
     },
     {
-     "name": "왕관의 케이크 공격",
+     "name": "크림 방패",
      "tags": [
-      "연계",
-      "축복"
+      "연계"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.95,
+       "ratio": 0.8,
        "target": "oneEnemy"
       },
       {
        "k": "status",
        "id": "피해 감소",
        "v": 1
+      },
+      {
+       "k": "shield",
+       "ratio": 0.8
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "설탕 듬뿍",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "휘핑크림",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "한 조각 더",
+     "kind": "draw"
     }
    ]
   },
@@ -577,25 +574,52 @@
    ],
    "oracles": [
     {
-     "name": "배부른 케이크 상자",
-     "tags": [],
+     "name": "두 판 굽기",
      "fx": [
       {
        "k": "make",
        "id": "에르핀_cake",
-       "v": 1
-      },
-      {
-       "k": "draw",
        "v": 2
       }
      ]
     },
     {
-     "name": "가벼운 케이크 상자",
+     "name": "부스러기",
      "cost": 0,
-     "tags": [],
      "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "외상으로 한 판",
+     "fx": [
+      {
+       "k": "make",
+       "id": "에르핀_cake",
+       "v": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "외상",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "나눠 먹는 케이크",
+     "fx": [
+      {
+       "k": "heal",
+       "ratio": 1.0
+      },
       {
        "k": "make",
        "id": "에르핀_cake",
@@ -608,24 +632,10 @@
      ]
     },
     {
-     "name": "외상의 케이크 상자",
-     "tags": [],
-     "fx": [
-      {
-       "k": "make",
-       "id": "에르핀_cake",
-       "v": 2
-      },
-      {
-       "k": "draw",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "몰래 둔 케이크 상자",
+     "name": "비상 케이크",
      "tags": [
-      "보존"
+      "보존",
+      "개전"
      ],
      "fx": [
       {
@@ -635,43 +645,23 @@
       },
       {
        "k": "draw",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "왕관의 케이크 상자",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "make",
-       "id": "에르핀_cake",
        "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "당 충전",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "포크 하나 더",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "배고파서 서두름",
+     "kind": "cost"
     }
    ]
   },
@@ -751,7 +741,7 @@
           ]
         }
       ],
-      "blurb": "요정 여왕의 마력 지팡이. 하나도 안 다친 날엔 마력이 넘친다."
+      "blurb": "요정 여왕의 마력 지팡이. 하나도 안 다친 날엔 마력이 넘칩니다."
     }
   ]
 }

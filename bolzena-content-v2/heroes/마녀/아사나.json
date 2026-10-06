@@ -12,10 +12,10 @@
       "atk": 90,
       "def": 67,
       "crit": 5,
-      "blurb": "볼-요가 전도사. 스킬로 숨을 고르면 명상에 들어 파티가 덜 다치고, 명상을 깨는 첫 일격은 두 배로 무겁다.",
+      "blurb": "볼-요가 전도사. 가장 센 동료를 붙잡고 「밀착 감시」 로 볼-요가를 시키면 그 동료가 더 세게 치고, 동료가 칠 때마다 아사나는 명상에 들어 파티를 지킵니다.",
       "keyword": {
         "name": "명상",
-        "desc": "명상 자세 — 고유 스킬로 들어가 덜 아프고, 다음 공격 카드에 힘을 싣고 풀린다",
+        "desc": "다음 공격에 힘을 싣는 명상 자세",
         "carrier": "self",
         "cap": 1,
         "consumeAll": true,
@@ -28,8 +28,78 @@
             "stat": "dealt",
             "v": 0.6
           }
+        ],
+        "rules": [
+          {
+            "name": "깊은 호흡",
+            "when": {
+              "on": "stackOver",
+              "id": "명상"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "shield",
+                "ratio": 0.5
+              }
+            ]
+          }
         ]
       },
+      "keywords": [
+        {
+          "name": "밀착 감시",
+          "desc": "아사나가 붙어 자세를 잡아 주는 동료",
+          "carrier": "hero",
+          "cap": 2,
+          "hunt": true,
+          "decay": 1,
+          "per": [
+            {
+              "stat": "dealt",
+              "v": 0.15
+            }
+          ]
+        }
+      ],
+      "passives": [
+        {
+          "name": "24시간 밀착 감시",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀착 감시",
+              "v": 2,
+              "target": "strongestAlly"
+            }
+          ]
+        },
+        {
+          "name": "같이 해요, 볼-요가",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "marked": "밀착 감시"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "명상",
+              "v": 1
+            }
+          ]
+        }
+      ],
       "ult": {
         "name": "명상 시간",
         "cost": 250,
@@ -103,8 +173,10 @@
           "ratio": 1.6
         },
         {
-          "k": "heal",
-          "ratio": 0.7
+          "k": "stack",
+          "id": "밀착 감시",
+          "v": 1,
+          "target": "oneAlly"
         },
         {
           "k": "stack",
@@ -122,8 +194,10 @@
               "ratio": 2.15
             },
             {
-              "k": "heal",
-              "ratio": 0.95
+              "k": "stack",
+              "id": "밀착 감시",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
               "k": "stack",
@@ -141,8 +215,10 @@
               "ratio": 1.2
             },
             {
-              "k": "heal",
-              "ratio": 0.5
+              "k": "stack",
+              "id": "밀착 감시",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
               "k": "stack",
@@ -160,13 +236,14 @@
             },
             {
               "k": "status",
-              "id": "결의",
+              "id": "사기",
               "v": 1
             },
             {
               "k": "stack",
-              "id": "명상",
-              "v": 1
+              "id": "밀착 감시",
+              "v": 2,
+              "target": "oneAlly"
             }
           ]
         },
@@ -175,7 +252,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.15
+              "ratio": 2.0
             },
             {
               "k": "status",
@@ -184,8 +261,9 @@
             },
             {
               "k": "stack",
-              "id": "명상",
-              "v": 1
+              "id": "밀착 감시",
+              "v": 2,
+              "target": "oneAlly"
             }
           ]
         },
@@ -200,8 +278,10 @@
               "ratio": 2.1
             },
             {
-              "k": "heal",
-              "ratio": 0.9
+              "k": "stack",
+              "id": "밀착 감시",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
               "k": "stack",
@@ -515,29 +595,70 @@
       "fx": [
         {
           "k": "status",
-          "id": "피해 감소",
-          "v": 2
+          "id": "사기",
+          "v": 1
         },
         {
-          "k": "status",
-          "id": "결의",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "밀착 감시",
+                  "v": 1,
+                  "target": "strongestAlly"
+                },
+                {
+                  "k": "stack",
+                  "id": "명상",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
-      "blurb": "함께하면 모두가 말랑해진다",
+      "blurb": "함께하면 모두가 말랑해집니다",
       "oracles": [
         {
           "name": "요가 교실",
           "fx": [
             {
               "k": "status",
-              "id": "불굴",
+              "id": "사기",
               "v": 1
             },
             {
               "k": "status",
-              "id": "결의",
-              "v": 2
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀착 감시",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "명상",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -546,9 +667,27 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀착 감시",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "명상",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -557,17 +696,35 @@
           "fx": [
             {
               "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "결의",
+              "id": "사기",
               "v": 1
             },
             {
               "k": "heal",
-              "ratio": 0.8
+              "ratio": 1.0
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀착 감시",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "명상",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -578,12 +735,39 @@
             {
               "k": "status",
               "id": "불굴",
-              "v": 3
+              "v": 2
             },
             {
               "k": "status",
-              "id": "결의",
+              "id": "사기",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀착 감시",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "명상",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.5
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -595,13 +779,36 @@
           "fx": [
             {
               "k": "status",
-              "id": "불굴",
+              "id": "사기",
               "v": 1
             },
             {
-              "k": "status",
-              "id": "결의",
+              "k": "stack",
+              "id": "명상",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀착 감시",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "명상",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

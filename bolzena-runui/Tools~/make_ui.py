@@ -469,10 +469,43 @@ def g_info(d, S, im):
     d.rounded_rectangle((55 * k, 50 * k, 73 * k, 110 * k), 6 * k, fill=W)
 
 
+def g_talk(d, S, im):
+    # 대화 — 둥근 말풍선 + 아래 왼쪽 꼬리, 속에 점 셋을 비운다(이벤트 「대화로 이어지는 선택지」 표 — 작은 「i」 는 「!」 로 읽혔다)
+    k = S / 128
+    d.rounded_rectangle((14 * k, 20 * k, 114 * k, 90 * k), 26 * k, fill=W)
+    d.polygon([(34 * k, 84 * k), (60 * k, 86 * k), (28 * k, 112 * k)], fill=W)
+    c = (0, 0, 0, 0)
+    for x in (40, 64, 88):
+        d.ellipse(((x - 8) * k, 47 * k, (x + 8) * k, 63 * k), fill=c)
+
+
+def g_bless(d, S, im):
+    # 축복 — 위에 후광 고리, 아래 반짝임(네 갈래 별)
+    k = S / 128
+    d.ellipse((30 * k, 10 * k, 98 * k, 38 * k), outline=W, width=int(9 * k))
+    pts = []
+    for i in range(8):
+        a = math.pi * i / 4 - math.pi / 2
+        r = (46 if i % 2 == 0 else 12) * k
+        pts.append((64 * k + r * math.cos(a), 78 * k + r * math.sin(a)))
+    d.polygon(pts, fill=W)
+
+
+def g_copy(d, S, im):
+    # 복제 — 겹친 카드 두 장(뒤는 테두리, 앞은 속을 채우고 가운데 「+」 를 비운다)
+    k = S / 128
+    d.rounded_rectangle((18 * k, 14 * k, 78 * k, 94 * k), 9 * k, outline=W, width=int(9 * k))
+    d.rounded_rectangle((50 * k, 34 * k, 110 * k, 114 * k), 9 * k, fill=W)
+    c = (0, 0, 0, 0)
+    d.rectangle((75 * k, 52 * k, 85 * k, 96 * k), fill=c)
+    d.rectangle((58 * k, 69 * k, 102 * k, 79 * k), fill=c)
+
+
 for n, f in [("menu", g_menu), ("zoom", g_zoom), ("info", g_info), ("swords", g_swords), ("skull", g_skull), ("crown", g_crown), ("question", g_q), ("fire", g_fire), ("bag", g_bag),
              ("flag", g_flag), ("check", g_check), ("heart", g_heart), ("deck", g_deck), ("cog", g_cog), ("back", g_back),
              ("plus", g_plus), ("sword", g_sword), ("shield", g_shield), ("ring_slot", g_ring), ("moon", g_moon), ("spark", g_spark),
-             ("trash", g_trash), ("refresh", g_refresh), ("lock", g_lock), ("book", g_book), ("x", g_x), ("full", g_full), ("play", g_play)]:
+             ("trash", g_trash), ("refresh", g_refresh), ("lock", g_lock), ("book", g_book), ("x", g_x), ("full", g_full), ("play", g_play),
+             ("bless", g_bless), ("copy", g_copy), ("talk", g_talk)]:
     glyph("ic_" + n + ".png", f)
 
 # 위 · 아래 띠(배경 위 글을 읽히게) — 세로 그라데이션

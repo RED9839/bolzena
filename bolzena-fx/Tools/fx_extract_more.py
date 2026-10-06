@@ -33,8 +33,8 @@ def load_x():
 
 X = load_x()
 
-# 카드 · 공용에서 빼는 것 — 고학년(따로 있다) · 어사이드 · 등장 · 걷기 · 표정 · 쓰러짐 연출 · 로비 · 미니게임
-NOT_CARD = re.compile(r"^(ultimate|ult_|ult\d|ulitmate|aside|spawn|move|emoji|die|fakedie|idle|victory|lobby|storybattle|minigame|halo|lamp|renewa|vividivineskin)")
+# 카드 · 공용에서 빼는 것 — 고학년(따로 있다 · 원작 오타 ultiamte · ulitmate 도) · 이스터에그 · 늘 도는 오라 · 어사이드 · 등장 · 걷기 · 표정 · 쓰러짐 연출 · 로비 · 미니게임
+NOT_CARD = re.compile(r"^(ultimate|ultiamte|ult_|ult\d|ulitmate|easteregg|aura|aside|spawn|move|emoji|die|fakedie|idle|victory|lobby|storybattle|minigame|halo|lamp|renewa|vividivineskin)")
 POWER = re.compile(r"^(attack_?2|attack2|power)")
 SKILL = re.compile(r"^(skill|personal)")
 SIG = re.compile(r"signaturecard")
@@ -52,6 +52,17 @@ COMMON = {
     "kill":    ["fx_kidian_kill", "fx_e0_die_smoke_1", "fx_momo_die_spark_1"],
     "oracle":  ["fx_vividivine_skill_1_buff_default", "fx_ui_vividivine_ultimate_1", "fx_epica_ultimate_buff_start", "fx_epica_ultimate_buff_top", "fx_haleysane_medal_buff"],
     "revive":  ["fx_common_waitrevive"],
+    # 교주 권능 — 1성 고학년 「교주의 천벌」(낙뢰) · 「교주의 보호」 · 그 밖 권능
+    "authority": ["fx_authority_thunder", "fx_authority_cheststrike", "fx_authority_poppinstar", "fx_authority_poppinstar_explosion"],
+}
+
+
+# 웹판 표가 못 찾는 철자 — 우이는 원작 이름이 uieru(fx_ui_* 는 화면 이펙트라 웹판이 통째로 뺐다)
+LOCAL_ALIAS = {"ui": "uieru"}
+# 고학년 장이 웹판 고학년 추출에 없는 사도(사도 키 → 장들)
+ULT_EXTRA = {
+    "우이": ["fx_uieru_ultimate_flower_1_default", "fx_uieru_ultimate_flowerbuff_1_default", "fx_uieru_ultimate_flowerbuff_2_default",
+             "fx_uieru_ultimate_flowerdebuff_1_default", "fx_uieru_ultimate_shield_1_default"],
 }
 
 
@@ -185,7 +196,7 @@ def main():
 
     for key, name in art.items():
         if only and name not in only and key not in only: continue
-        n = X.ALIAS.get(name, name)
+        n = LOCAL_ALIAS.get(name) or X.ALIAS.get(name, name)
         if n in X.NO_FX: continue
         g = groups(n, unit, hit)
         if n != name:   # 고학년만 다른 철자(beinibeni)인 사도 — 카드 쪽은 본 이름(benibeni)
@@ -194,6 +205,8 @@ def main():
         heroes[key] = dict(name=name, **g)
         for l in g.values():
             for f in l: job(f, name)
+        if key in ULT_EXTRA:   # 고학년 추출(웹판 extract-fx.py)이 빠뜨린 사도 — 여기서 고학년 장을 뽑아 index 의 ult 로(FxImport 가 비어 있을 때 쓴다)
+            heroes[key]["ult"] = [f for f in ULT_EXTRA[key] if job(f, name)]
     if not a.no_common:
         for k, l in COMMON.items():
             common[k] = [f for f in l if job(f, "_common")]

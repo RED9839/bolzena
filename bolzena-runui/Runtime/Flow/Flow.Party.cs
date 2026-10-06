@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -166,7 +166,7 @@ namespace Bolzena.RunUI
 
             if (!st.Dex)
             {
-                var go = Btn.Make(root, count < 3 ? $"사도 {3 - count}명 더" : "이 파티로 떠납니다", BtnStyle.PillGold, () =>
+                var go = Btn.Make(root, count < 3 ? $"사도 {3 - count}명 더" : "이 파티로 출발", BtnStyle.PillGold, () =>
                 {
                     var party = st.Slots.Select(k => Roster.ByKey(k).CoreId).ToList();
                     var rows = Enumerable.Range(0, 3).ToDictionary(i => party[i], i => RowKey[i]);
@@ -229,10 +229,9 @@ namespace Bolzena.RunUI
             glow.rectTransform.At(0.5f, 0, 0, base_ - 30, 320, mh + 70);
             var floor = Ui.Img(rt, Theme.S("soft"), new Color(0, 0, 0, 0.5f), "floor");
             floor.rectTransform.At(0.5f, 0, 0, base_ - 18, 220, 50);
-            var spot = Ui.Rect("mini", rt).At(0.5f, 0, 0, base_, 10, 10);
-            var g = SpineUi.Make(spot, "minimi", h.MiniSkin, mh, "Idle", "idle");
-            if (g == null) { var face = W.Face(spot, h, 150); face.At(0.5f, 0, 0, 0, 150, 150); }
-            else { g.AnimationState.SetAnimation(0, SpineUi.PickAnim(g.Skeleton.Data, "Spawn1", "Idle"), false); g.AnimationState.AddAnimation(0, SpineUi.PickAnim(g.Skeleton.Data, "Idle"), true, 0); }
+            // 편성 칸 — SD 전투 스파인(칸 고정 몸 키 mh × 0.8 · 사도마다 경계로 맞추지 않음). 미니미는 없앴다(2026-10-06)
+            var spot = Ui.Rect("hero", rt).At(0.5f, 0, 0, base_, 10, 10);
+            SceneHero.Make(spot, h, mh * 0.8f, true, 0, false);
             Tw.Pop(spot, 0, 0.6f, 0.4f);
             var shade = Ui.Img(rt, Theme.S("fade_card"), Color.white, "shade"); shade.rectTransform.Fill(3, 3, 3, 3);
             shade.transform.SetSiblingIndex(1);
@@ -348,7 +347,7 @@ namespace Bolzena.RunUI
             {
                 Ui.Title(box.transform, st.Tab == "장비" ? "장비 도감" : "교주 카드", 30, Theme.Ink).Pref(-1, 40);
                 Ui.Text(box.transform, st.Tab == "장비"
-                    ? $"{P.Data.Equips.Count}개 — 사도 하나에 무기 · 방어구 · 장신구 한 칸씩. 애착 장비는 그 사도가 끼면 더 세다. 얻으면 곧장 끼거나 팝니다."
+                    ? $"{P.Data.Equips.Count}개 — 사도 하나에 무기 · 방어구 · 장신구 한 칸씩. 애착 장비는 그 사도가 끼면 더 셉니다. 얻으면 곧장 끼거나 팝니다."
                     : "교주님이 직접 쓰는 카드와 사도 고유 카드. 교주 카드는 상점에서, 고유 카드는 싸우며 은총으로 얻습니다.", 18, Theme.Sub).Pref(-1, 120);
                 return;
             }
@@ -386,19 +385,18 @@ namespace Bolzena.RunUI
             {
                 var d = P.Data.Hero(h.CoreId);
                 string body = "";
-                // 짧은 글(CardText.Short) — 자세히는 사도 상세의 고유 효과 탭
-                if (d.Keyword != null) body += $"<color=#F2CF7A>키워드</color>  「{d.Keyword.Name}」 {P.Text.Short(d.Keyword)}\n";
-                if (d.Passives.Count > 0) body += $"<color=#F2CF7A>패시브</color>  {P.Text.ShortPassives(d.Passives)}\n";
-                if (d.Ult != null) body += $"<color=#F2CF7A>고학년</color>  「{d.Ult.Name}」 {P.Text.Short(d.Ult)}\n";
+                // 좁은 칸이라 이름만 — 글(수치 전부)은 아래 알약을 누르면 판으로(「자세히」 따로 없음 · core CardText.Traits)
+                foreach (var g in P.Text.Traits(d).GroupBy(x => x.Kind))
+                    body += $"<color=#F2CF7A>{g.Key}</color>  {string.Join(" · ", g.Select(x => $"「{x.Name}」"))}\n";
                 body += $"<color=#F2CF7A>시작 카드</color>  {string.Join(" · ", d.Starter.Select(id => P.Data.Card(id)?.Name ?? id))}\n";
                 body += $"<color=#F2CF7A>고유 카드</color>  {string.Join(" · ", P.Data.UniquesOf(d.Id).Select(id => P.Data.Card(id)?.Name ?? id))}";
                 var bt = Ui.Text(box.transform, body, Theme.FsSm, Theme.Ink, TextAlignmentOptions.TopLeft);
                 bt.Pref(-1, 120, -1, 1);
                 bt.enableAutoSizing = true; bt.fontSizeMin = 11; bt.fontSizeMax = Theme.FsSm;
-                // 자세히 — 고유 효과 · 패시브 · 고학년 판(판마다 짧은 글 + 자세히)
+                // 고학년 · 고유 효과 · 패시브 판(수치가 다 든 글 · 길면 판 묶음이 스크롤)
                 var mr = Ui.Rect("more", box.transform); mr.Pref(-1, 34);
                 Ui.Row(mr, 0, TextAnchor.MiddleLeft, null, false, false);
-                var tc = TraitsChip(mr, d.Id, "자세히");
+                var tc = TraitsChip(mr, d.Id, "고학년 · 고유 효과 · 패시브");
                 Stage.Hot["info.traits"] = tc;
             }
             else

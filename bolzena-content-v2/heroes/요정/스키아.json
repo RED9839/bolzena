@@ -12,10 +12,10 @@
    "atk": 145,
    "def": 25,
    "crit": 10,
-   "blurb": "요정을 교주로 추대한 일과 알아선 안 될 것을 알아 버린 일, 두 금기를 속죄하려 입을 닫은 세계수 교단의 초대 사제장. 긴 잠에서 홀로 먼저 깨어나 지금은 막내 사제로 지내지만, 본성은 밝고 칭찬받고 싶은 요정이라 침묵을 지키는 게 제일 큰 수행이다.",
+   "blurb": "요정을 교주로 추대한 일과 알아선 안 될 것을 알아 버린 일, 두 금기를 속죄하려 입을 닫은 세계수 교단의 초대 사제장. 긴 잠에서 홀로 먼저 깨어나 지금은 막내 사제로 지내지만, 본성은 밝고 칭찬받고 싶은 요정이라 침묵을 지키는 게 제일 큰 수행입니다.",
    "keyword": {
     "name": "침묵",
-    "desc": "참고 또 참은 말 — 둘이면 AP 가 된다",
+    "desc": "쥐고 넘기며 참는 말",
     "carrier": "self",
     "cap": 3,
     "rules": [
@@ -72,6 +72,63 @@
     "스키아_s1",
     "스키아_s2",
     "스키아_s3"
+   ],
+   "keywords": [
+    {
+     "name": "언약의 매듭",
+     "desc": "고대 사제가 맺어 둔 매듭",
+     "carrier": "self",
+     "cap": 1,
+     "rules": [
+      {
+       "name": "매듭 폭발",
+       "when": {
+        "on": "ult"
+       },
+       "conds": [
+        {
+         "c": "stack",
+         "id": "언약의 매듭",
+         "n": 1
+        }
+       ],
+       "fx": [
+        {
+         "k": "cue",
+         "id": "skia_knot_burst"
+        },
+        {
+         "k": "dmg",
+         "ratio": 1.2,
+         "target": "allEnemies"
+        },
+        {
+         "k": "status",
+         "id": "기절",
+         "v": 1,
+         "target": "randomEnemy"
+        }
+       ]
+      },
+      {
+       "name": "매듭 맺기",
+       "when": {
+        "on": "ult"
+       },
+       "fx": [
+        {
+         "k": "cue",
+         "id": "skia_knot"
+        },
+        {
+         "k": "stack",
+         "id": "언약의 매듭",
+         "v": 1
+        }
+       ]
+      }
+     ]
+    }
    ]
   }
  ],
@@ -157,7 +214,7 @@
    ],
    "oracles": [
     {
-     "name": "벼락 같은 맹세",
+     "name": "천년 묵은 벼락",
      "tags": [
       "신속",
       "보존"
@@ -165,7 +222,7 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.6,
+       "ratio": 2.5,
        "target": "oneEnemy"
       },
       {
@@ -191,7 +248,7 @@
      ]
     },
     {
-     "name": "가벼운 맹세",
+     "name": "속삭임",
      "cost": 1,
      "tags": [
       "신속",
@@ -200,8 +257,76 @@
      "fx": [
       {
        "k": "dmg",
+       "ratio": 1.25,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "침묵",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "when",
+       "on": "handEnd"
+      },
+      {
+       "k": "stack",
+       "id": "침묵",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "침묵의 맹세",
+     "tags": [
+      "신속",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.2,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifStack",
+       "id": "침묵",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "when",
+       "on": "handEnd"
+      },
+      {
+       "k": "stack",
+       "id": "침묵",
+       "v": 2
+      }
+     ]
+    },
+    {
+     "name": "맹세의 낙뢰",
+     "tags": [
+      "신속",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
        "ratio": 1.6,
-       "target": "oneEnemy"
+       "target": "allEnemies"
       },
       {
        "k": "ifStack",
@@ -226,7 +351,7 @@
      ]
     },
     {
-     "name": "참아 온 맹세",
+     "name": "금언의 봉인",
      "tags": [
       "신속",
       "보존"
@@ -234,7 +359,7 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.65,
+       "ratio": 2.0,
        "target": "oneEnemy"
       },
       {
@@ -244,78 +369,8 @@
       },
       {
        "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
+       "id": "기절",
        "v": 1
-      }
-     ]
-    },
-    {
-     "name": "깊이 묻은 맹세",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.65,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "사제의 맹세",
-     "tags": [
-      "신속",
-      "보존",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
       },
       {
        "k": "when",
@@ -331,19 +386,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "옛 사제의 힘",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "꿰뚫는 눈",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "서늘한 기운",
+     "kind": "frost"
     }
    ]
   },
@@ -386,7 +438,7 @@
    ],
    "oracles": [
     {
-     "name": "벼락 같은 끄덕임",
+     "name": "깊은 끄덕",
      "tags": [
       "신속",
       "보존"
@@ -419,8 +471,41 @@
      ]
     },
     {
-     "name": "가벼운 끄덕임",
+     "name": "눈짓",
      "cost": 0,
+     "tags": [
+      "신속",
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "ifStack",
+       "id": "침묵",
+       "n": 1
+      },
+      {
+       "k": "status",
+       "id": "둔화",
+       "v": 1,
+       "target": "allEnemies"
+      },
+      {
+       "k": "when",
+       "on": "handEnd"
+      },
+      {
+       "k": "stack",
+       "id": "침묵",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "말 없는 다짐",
      "tags": [
       "신속",
       "보존"
@@ -448,12 +533,12 @@
       {
        "k": "stack",
        "id": "침묵",
-       "v": 1
+       "v": 2
       }
      ]
     },
     {
-     "name": "참아 온 끄덕임",
+     "name": "대답은 내일",
      "tags": [
       "신속",
       "보존"
@@ -461,7 +546,7 @@
      "fx": [
       {
        "k": "draw",
-       "v": 3
+       "v": 2
       },
       {
        "k": "ifStack",
@@ -470,9 +555,8 @@
       },
       {
        "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
+       "id": "다음 턴 드로우",
+       "v": 1
       },
       {
        "k": "when",
@@ -486,49 +570,16 @@
      ]
     },
     {
-     "name": "깊이 묻은 끄덕임",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "사제의 끄덕임",
+     "name": "…(도리도리)",
      "tags": [
       "신속",
       "보존",
-      "축복"
+      "개전"
      ],
      "fx": [
       {
        "k": "draw",
-       "v": 3
+       "v": 2
       },
       {
        "k": "ifStack",
@@ -537,7 +588,7 @@
       },
       {
        "k": "status",
-       "id": "둔화",
+       "id": "약화",
        "v": 1,
        "target": "allEnemies"
       },
@@ -555,19 +606,22 @@
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "묵묵한 손짓",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "눈빛 교환",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "입 꾹",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "침묵",
+       "v": 1
+      }
+     ]
     }
    ]
   },
@@ -610,14 +664,14 @@
    ],
    "oracles": [
     {
-     "name": "벼락 같은 흐읍",
+     "name": "흐으읍!!",
      "tags": [
       "보존"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.55,
+       "ratio": 1.5,
        "target": "allEnemies"
       },
       {
@@ -643,7 +697,7 @@
      ]
     },
     {
-     "name": "가벼운 흐읍",
+     "name": "흡",
      "cost": 1,
      "tags": [
       "보존"
@@ -651,7 +705,7 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.95,
+       "ratio": 0.75,
        "target": "allEnemies"
       },
       {
@@ -677,15 +731,46 @@
      ]
     },
     {
-     "name": "참아 온 흐읍",
+     "name": "참았던 숨",
      "tags": [
       "보존"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.6,
+       "ratio": 1.0,
        "target": "allEnemies"
+      },
+      {
+       "k": "perStack",
+       "id": "침묵"
+      },
+      {
+       "k": "dmg",
+       "ratio": 0.25,
+       "target": "allEnemies"
+      },
+      {
+       "k": "when",
+       "on": "handEnd"
+      },
+      {
+       "k": "stack",
+       "id": "침묵",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "놀란 벼락",
+     "tags": [
+      "보존"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 2.4,
+       "target": "oneEnemy"
       },
       {
        "k": "ifStack",
@@ -710,15 +795,14 @@
      ]
     },
     {
-     "name": "깊이 묻은 흐읍",
+     "name": "숨 멎는 고함",
      "tags": [
-      "보존",
-      "신속"
+      "보존"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.45,
+       "ratio": 1.4,
        "target": "allEnemies"
       },
       {
@@ -728,41 +812,7 @@
       },
       {
        "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "사제의 흐읍",
-     "tags": [
-      "보존",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.45,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
+       "id": "취약",
        "v": 1,
        "target": "allEnemies"
       },
@@ -780,19 +830,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "터지는 숨",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "소름",
+     "kind": "frost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "들숨",
+     "kind": "cost"
     }
    ]
   },
@@ -806,14 +853,26 @@
    "fx": [
     {
      "k": "atkMod",
-     "v": 0.15,
+     "v": 0.1,
      "run": true,
      "target": "self"
     },
     {
-     "k": "stack",
-     "id": "침묵",
-     "v": 2
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "침묵",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -828,27 +887,45 @@
        "target": "self"
       },
       {
-       "k": "stack",
-       "id": "침묵",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "침묵",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
     {
-     "name": "가벼운 금기",
+     "name": "입술 다물기",
      "cost": 0,
      "tags": [],
      "fx": [
       {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "침묵",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -858,7 +935,7 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.1,
        "run": true,
        "target": "self"
       },
@@ -866,6 +943,23 @@
        "k": "stack",
        "id": "침묵",
        "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "침묵",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -877,14 +971,26 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.15,
        "run": true,
        "target": "self"
       },
       {
-       "k": "stack",
-       "id": "침묵",
-       "v": 2
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "침묵",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -896,33 +1002,53 @@
      "fx": [
       {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.1,
        "run": true,
        "target": "self"
       },
       {
        "k": "stack",
        "id": "침묵",
-       "v": 2
+       "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "침묵",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "가벼운 숨결",
-     "kind": "cost",
-     "fx": []
+     "name": "조용한 서약",
+     "kind": "cost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "봉인된 힘",
+     "kind": "atkUp"
     },
     {
-     "name": "기세의 숨결",
-     "kind": "atkUp",
-     "fx": []
+     "name": "입술 깨물기",
+     "fx": [
+      {
+       "k": "stack",
+       "id": "침묵",
+       "v": 1
+      }
+     ]
     }
    ]
   }

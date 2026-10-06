@@ -167,7 +167,18 @@ namespace Bolzena.Core
         }
         public static bool IsCopy(string id) => id != null && id.EndsWith(COPY);
         public static bool IsPlain(string id) => id != null && id.EndsWith(PLAIN);
-        static string Untail(string id) => id != null && id.Length > 1 && (id.EndsWith(PLAIN) || id.EndsWith(COPY)) ? id.Substring(0, id.Length - 1) : id;
+        /// <summary>복제본 번호 — 「x^」 1 · 「x^^」 2 …(복제할 때 원본 스펙이 앞 복제본과 다르면 꼬리가 하나 는다). 복제본이 아니면 0.</summary>
+        public static int CopyNo(string id) => IsCopy(id) ? TailLen(id) : 0;
+        /// <summary>꼬리 길이 — 「~」 은 1, 「^」 는 이어진 수만큼(이름 한 글자는 남긴다).</summary>
+        static int TailLen(string id)
+        {
+            if (id == null || id.Length < 2) return 0;
+            if (id.EndsWith(PLAIN)) return 1;
+            int n = 0;
+            while (n < id.Length - 1 && id[id.Length - 1 - n] == COPY[0]) n++;
+            return n;
+        }
+        static string Untail(string id) => id == null ? null : id.Substring(0, id.Length - TailLen(id));
 
         /// <summary>교주 카드 인스턴스의 주인 — 덱의 id 가 「카드@사도」(꼬리는 그 뒤: 「n_x@rico^」). 주인을 정한 교주 카드는 그 사도의 카드로 낸다.</summary>
         public const string OWNER = "@";
@@ -182,7 +193,7 @@ namespace Bolzena.Core
         public static string WithOwner(string id, string heroKey)
         {
             if (id == null) return null;
-            string tail = IsCopy(id) ? COPY : IsPlain(id) ? PLAIN : "";
+            string tail = id.Substring(id.Length - TailLen(id));
             return BaseId(id) + (heroKey != null ? OWNER + heroKey : "") + tail;
         }
         /// <summary>주인만 뗀 id(꼬리는 그대로) — 「덱에 한 장」(유일) 비교.</summary>

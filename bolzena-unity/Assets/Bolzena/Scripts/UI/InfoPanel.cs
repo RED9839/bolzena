@@ -13,15 +13,15 @@ namespace Bolzena.UI
     //   적: 이름(크게) · 체력 구간 알약(건강 · 부상 · 위험) / 성격 점 · 이름 · ⓘ 약점 / HP 막대 · 방어 · 강인도
     //       → 다음 행동 칸(의도 마름모 + 갈래 + 회색 알약 「즉시 행동까지 N장」 + 효과 글, 수치 주황)
     //       → 상태마다 한 칸(가는 선으로 구분 · 아이콘 + 겹 수 · 이름 · 풀이, 해로운 칸은 위 테두리 붉게, 오른쪽에 건 사도 초상 알약)
-    //       → 패시브(접힌 줄) · 소개
-    //   사도: 파티 HP · 방어 · 파티 상태 칸들 → 그 사도: 이름 · 성격 · 능력치 · 고학년(링 · 효과) · 고유 효과(키워드) · 상태 칸 · 패시브
+    //       → 패시브(다 보이는 칸) · 소개
+    //   사도: 파티 HP · 방어 · 파티 상태 칸들(강화 칩 포함) → 그 사도: 이름 · 성격 · 능력치 · 고학년(링 · 효과) → 고유 효과 → 패시브(core CardText.Traits) → 상태 칸
+    //   「자세히」 · 접기 없음 — 글은 다 보이고(수치 · 대상 · 지속 · 제한), 판이 길면 판 안에서 내린다.
     // 내용이 길면 판 안에서 휠 · 끌기로 내린다. 바깥(싸움터)을 누르면 · 오른쪽 클릭 · Esc 로 닫힌다.
     public static partial class InfoPanel
     {
         static float Wd = 6f;
         const float Pad = 0.3f;
         const int OC = Modal.O + 5;
-        static readonly HashSet<string> open = new HashSet<string>();
 
         class Stack
         {
@@ -156,24 +156,8 @@ namespace Bolzena.UI
                 string name = $"<color=#{ColorUtility.ToHtmlStringRGB(Color.Lerp(Color.white, kc, 0.55f))}>{c.Id}</color>" + (c.Turns > 0 ? $"  <size=80%><color={Tone.SubTag}>{c.Turns}턴</color></size>" : "");
                 st.Para(name, tx, tw, Tone.Body, Tone.Ink, false, 0.02f, top - 0.04f);
                 st.Y = top - 0.34f;
-                var desc = StripHead(c.Text, c.Id);
-                if (!string.IsNullOrEmpty(desc))
-                {
-                    string key = owner + "|st|" + c.Id;
-                    bool isOpen = open.Contains(key);
-                    var d = st.Para(Orange(desc), tx, tw, Tone.Sm, Tone.Sub, true, 0.04f);
-                    if (!isOpen && d.textInfo.lineCount > 2)
-                    {
-                        d.maxVisibleLines = 2;
-                        d.overflowMode = TextOverflowModes.Ellipsis;
-                        d.ForceMeshUpdate();
-                        st.Y = top - 0.34f - Mathf.Min(d.preferredHeight, 0.46f) - 0.04f;
-                    }
-                    var zone = Make.Node("st_" + c.Id, st.T, new Vector3(Wd / 2, (top + st.Y) / 2, 0));
-                    var b = zone.gameObject.AddComponent<Button>();
-                    b.Size = new Vector2(Wd, top - st.Y);
-                    b.OnClick = () => { if (!open.Remove(key)) open.Add(key); redraw(); };
-                }
+                var desc = StripHead(c.Text, c.Id);   // 수치 · 지속이 다 든 한 가지 글 — 자르지 않는다(「자세히」 없음)
+                if (!string.IsNullOrEmpty(desc)) st.Para(Orange(desc), tx, tw, Tone.Sm, Tone.Sub, true, 0.04f);
                 st.Y = Mathf.Min(st.Y, top - 0.46f);
             }
         }
@@ -188,31 +172,13 @@ namespace Bolzena.UI
             return ("", line);
         }
 
-        // 접힌 줄 — 「▶ 이름  짧은 풀이…」, 누르면 펼친다
-        static void Fold(Stack st, string key, string name, string text, Action redraw, string nameColor = null, string shortText = null)
+        // 한 칸 — 이름 · 부제(작게 흐리게) · 본문(「· 계기 → 결과」 줄, 수치 주황). 접지 않는다(2026-10-05 사용자: 「자세히 보기를 없애고 수치가 다 보이게」)
+        static void Entry(Stack st, string name, string sub, string body)
         {
-            bool isOpen = open.Contains(key);
-            float top = st.Y;
-            string head = $"<color={Tone.DimTag}>{(isOpen ? "▼" : "▶")}</color> <color={nameColor ?? "#EEF1FA"}>{name}</color>";
-            if (isOpen)
-            {
-                st.Para(head, Pad, Wd - Pad * 2, Tone.Body, Tone.Ink, true, 0.02f);
-                st.Para(Orange(text), Pad + 0.24f, Wd - Pad * 2 - 0.24f, Tone.Sm, Tone.Sub, true, 0.08f);
-            }
-            else
-            {
-                var t = st.Para(head + (string.IsNullOrEmpty(shortText ?? text) ? "" : $"  <size=86%><color={Tone.SubTag}>{Plain(shortText ?? text)}</color></size>"), Pad, Wd - Pad * 2, Tone.Body, Tone.Ink, true, 0.06f);
-                t.textWrappingMode = TextWrappingModes.NoWrap;
-                t.overflowMode = TextOverflowModes.Ellipsis;
-                t.rectTransform.sizeDelta = new Vector2(Wd - Pad * 2, t.rectTransform.sizeDelta.y);
-                t.ForceMeshUpdate();
-                st.Y = top - Mathf.Min(t.preferredHeight, 0.32f) - 0.08f;
-            }
-            if (string.IsNullOrEmpty(text)) return;
-            var zone = Make.Node("fold_" + key, st.T, new Vector3(Wd / 2, (top + st.Y) / 2, 0));
-            var b = zone.gameObject.AddComponent<Button>();
-            b.Size = new Vector2(Wd, top - st.Y);
-            b.OnClick = () => { if (!open.Remove(key)) open.Add(key); redraw(); };
+            st.Rule();
+            if (!string.IsNullOrEmpty(name)) st.Para(name, Pad, Wd - Pad * 2, Tone.Body, Tone.Ink, false, 0.02f);
+            if (!string.IsNullOrEmpty(sub)) st.Para($"<color={Tone.SubTag}>{sub}</color>", Pad, Wd - Pad * 2, Tone.Cap, Tone.Sub, true, 0.03f);
+            if (!string.IsNullOrEmpty(body)) st.Para(Orange(body), Pad + 0.06f, Wd - Pad * 2 - 0.06f, Tone.Sm, Tone.Ink, true, 0.08f);
         }
 
         // 고른 대상 발밑 — 흰 타원 고리(싸움터 위 · 유닛 아래)
@@ -318,18 +284,19 @@ namespace Bolzena.UI
                 st.Para(Orange(h.UltText), ux, uw, Tone.Sm, Tone.Ink, true, 0.06f);
                 st.Y = Mathf.Min(st.Y, ut - rd - 0.08f);
 
-                // 고유 효과(키워드) · 개인 상태
-                if (!string.IsNullOrEmpty(h.KeywordName))
+                // 고유 효과 → 패시브 — core CardText.Traits(판 화면 사도 상세와 같은 차례 · 글). 접지 않고 다 보인다(판이 길면 휠 · 끌기로 내린다)
+                foreach (var kind in new[] { "고유 효과", "패시브" })
                 {
-                    st.Head("고유 효과");
-                    Fold(st, h.Key + "|kw", $"「{h.KeywordName}」 <color={Tone.GoldTag}>{h.KeywordStacks}</color>", h.KeywordText, redraw, Tone.GoldTag, h.KeywordShort);   // 접힘 = 짧은 글 · 펼침 = 자세히
+                    bool any = false;
+                    foreach (var t in h.Traits)
+                    {
+                        if (t.Kind != kind) continue;
+                        if (!any) { st.Head(kind); any = true; }
+                        string stacks = kind == "고유 효과" && t.Name == h.KeywordName ? $"  <color={Tone.GoldTag}>{h.KeywordStacks}</color>" : "";
+                        Entry(st, (kind == "고유 효과" ? $"<color={Tone.GoldTag}>「{t.Name}」</color>" : t.Name) + stacks, t.Sub, t.Body);
+                    }
                 }
                 if (h.Chips.Count > 0) { st.Head("상태"); StatusRows(st, h.Chips, h.Key, redraw); }
-                if (h.Passives.Count > 0)
-                {
-                    st.Head("패시브");
-                    for (int p = 0; p < h.Passives.Count; p++) { var (n, t) = Split(h.Passives[p]); string sh = p < h.PassivesShort.Count ? Split(h.PassivesShort[p]).text : null; Fold(st, h.Key + "|p" + p, n, t, redraw, null, sh); }
-                }
             });
         }
 
@@ -385,11 +352,11 @@ namespace Bolzena.UI
                     var tb = ToughBar.Create(st.T, new Vector3(Pad + tw / 2, py, 0), tw, 0.11f, tmax, OC, false);
                     tb.Set(e.ToughV, false);
                     tb.SetBroken(e.Broken, false);
-                    Tone.Text("tt", st.T, e.Broken ? "<color=#ffd65a>격파됨</color>  <size=85%>— 이번 차례를 쉰다</size>"
+                    Tone.Text("tt", st.T, e.Broken ? "<color=#ffd65a>격파됨</color>  <size=85%>— 이번 차례를 쉽니다</size>"
                         : $"강인도 <color=#d9c9ff>{EnemyHud.Thirds(e.ToughV)}</color> <color={Tone.DimTag}>/ {EnemyHud.Thirds(tmax)}</color>",
                         new Vector3(Pad + tw + 0.14f, py, 0), Tone.Sm, OC, Tone.Sub, TextAlignmentOptions.Left, true);
                     py -= 0.24f;
-                    Tone.Text("tn", st.T, e.Broken ? "다음 차례가 오면 일어나 강인도가 다시 가득 찬다" : "격파되면 1턴 동안 행동하지 못한다 · 격파한 쪽 AP +1",
+                    Tone.Text("tn", st.T, e.Broken ? "다음 차례가 오면 일어나 강인도가 다시 가득 찹니다" : "격파되면 1턴 동안 행동하지 못합니다 · 격파한 쪽 AP +1",
                         new Vector3(Pad, py, 0), Tone.Cap, OC, Tone.Sub, TextAlignmentOptions.Left, true, Wd - Pad * 2);
                 }
                 else
@@ -402,7 +369,7 @@ namespace Bolzena.UI
                 // 다음 행동 칸
                 st.Head("다음 행동");
                 float it = st.Y;
-                if (e.Dead) st.Para("쓰러졌다", Pad, Wd - Pad * 2, Tone.Body, Tone.Dim);
+                if (e.Dead) st.Para("쓰러졌습니다", Pad, Wd - Pad * 2, Tone.Body, Tone.Dim);
                 else if (e.Broken || e.Intent == IntentKind.None) st.Para(e.Broken ? "격파 — 1턴 동안 행동하지 못한다(격파한 쪽 AP +1)." : "할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
                 else
                 {
@@ -429,7 +396,7 @@ namespace Bolzena.UI
                 if (e.Passives.Count > 0)
                 {
                     st.Head("패시브");
-                    for (int p = 0; p < e.Passives.Count; p++) { var (n, t) = Split(e.Passives[p]); Fold(st, e.Id + "|p" + p, n, t, redraw); }
+                    for (int p = 0; p < e.Passives.Count; p++) { var (n, t) = Split(e.Passives[p]); Entry(st, n, null, t); }
                 }
                 if (!string.IsNullOrEmpty(e.Blurb))
                 {
@@ -444,12 +411,12 @@ namespace Bolzena.UI
         public static string Rush(EnemyState e, bool longForm)
         {
             if (e.Sealed) return "<color=#a9a3b8>봉인됨</color>";
-            if (e.RushNeed <= 0) return longForm ? Tip.Dim("▶ 즉시 행동으로 당겨지지 않는다") : "";
-            if (e.RushedTurn) return longForm ? "<color=#a9a3b8>▶ 이번 턴에는 이미 즉시 행동했다</color>" : "<color=#a9a3b8>▶끝</color>";
+            if (e.RushNeed <= 0) return longForm ? Tip.Dim("▶ 즉시 행동으로 당겨지지 않습니다") : "";
+            if (e.RushedTurn) return longForm ? "<color=#a9a3b8>▶ 이번 턴에는 이미 즉시 행동했습니다</color>" : "<color=#a9a3b8>▶끝</color>";
             int left = e.RushNeed - e.RushCnt;
             string col = left <= 1 ? "#ff7a6a" : "#ffe28a";
             return longForm
-                ? $"<color={col}>▶{e.RushCnt}/{e.RushNeed}</color> — 카드를 {left}장 더 내면 이 수를 즉시 한다"
+                ? $"<color={col}>▶{e.RushCnt}/{e.RushNeed}</color> — 카드를 {left}장 더 내면 이 수를 즉시 씁니다"
                 : $"<color={col}>▶{e.RushCnt}/{e.RushNeed}</color>";
         }
     }

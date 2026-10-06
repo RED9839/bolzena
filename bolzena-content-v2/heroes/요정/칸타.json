@@ -12,10 +12,10 @@
    "atk": 115,
    "def": 27,
    "crit": 10,
-   "blurb": "'최강 팽이 배틀러'를 자처하는 뒷골목 팽이 도박꾼. 삼각회(스노키·피라) 시절 네르에게 사기를 쳐 감옥까지 다녀왔고, 연회장을 팽이 하우스 '칸타피아'로 바꿀 야심을 품는다. 소원은 무적의 팽이, 제일 싫은 건 애 취급. 지면 절규하며 무승부를 조른다.",
+   "blurb": "「최강 팽이 배틀러」를 자처하는 뒷골목 팽이 도박꾼. 삼각회(스노키·피라) 시절 네르에게 사기를 쳐 감옥까지 다녀왔고, 연회장을 팽이 하우스 「칸타피아」로 바꿀 야심을 품습니다. 소원은 무적의 팽이, 제일 싫은 건 애 취급. 지면 절규하며 무승부를 조릅니다.",
    "keyword": {
     "name": "판돈",
-    "desc": "다음 턴 AP 를 건 판 — 이번 턴 안에 격파 · 처치하면 AP 로 돌려받는다",
+    "desc": "다음 턴을 걸고 거는 판돈",
     "carrier": "self",
     "cap": 1,
     "endClear": true,
@@ -72,14 +72,89 @@
      }
     ]
    },
-   "passives": [],
+   "keywords": [
+    {
+     "name": "쇠팽이",
+     "desc": "판 위를 돌며 들이받는 팽이",
+     "carrier": "self",
+     "cap": 4,
+     "decay": 1,
+     "rules": [
+      {
+       "name": "튕겨 나간 팽이",
+       "when": {
+        "on": "stackOver",
+        "id": "쇠팽이"
+       },
+       "fx": [
+        {
+         "k": "perEvent"
+        },
+        {
+         "k": "dmg",
+         "ratio": 0.5,
+         "target": "randomEnemy"
+        }
+       ]
+      },
+      {
+       "name": "팽이판",
+       "when": {
+        "on": "turnEnd"
+       },
+       "fx": [
+        {
+         "k": "perStack",
+         "id": "쇠팽이"
+        },
+        {
+         "k": "dmg",
+         "ratio": 0.5,
+         "target": "randomEnemy"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "passives": [
+    {
+     "name": "네 번째 공격",
+     "when": {
+      "on": "play",
+      "type": "공격",
+      "every": 2
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "쇠팽이",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "진 놈 팽이 부수기",
+     "when": {
+      "on": "break",
+      "mine": true
+     },
+     "fx": [
+      {
+       "k": "stack",
+       "id": "쇠팽이",
+       "v": 2
+      }
+     ]
+    }
+   ],
    "ult": {
     "name": "탑스핀 크래쉬",
     "cost": 200,
     "fx": [
      {
       "k": "dmg",
-      "ratio": 3,
+      "ratio": 2.4,
       "target": "oneEnemy"
      },
      {
@@ -87,8 +162,18 @@
       "v": 2
      },
      {
-      "k": "ap",
-      "v": 1
+      "k": "perStack",
+      "id": "쇠팽이"
+     },
+     {
+      "k": "dmg",
+      "ratio": 0.6,
+      "target": "allEnemies"
+     },
+     {
+      "k": "spend",
+      "id": "쇠팽이",
+      "all": true
      }
     ]
    },
@@ -175,12 +260,11 @@
    ],
    "oracles": [
     {
-     "name": "회전하는 올인",
-     "tags": [],
+     "name": "풀 베팅",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.4,
+       "ratio": 3.3,
        "target": "oneEnemy"
       },
       {
@@ -199,13 +283,12 @@
      ]
     },
     {
-     "name": "가벼운 올인",
+     "name": "소액 베팅",
      "cost": 1,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.1,
+       "ratio": 1.9,
        "target": "oneEnemy"
       },
       {
@@ -224,38 +307,14 @@
      ]
     },
     {
-     "name": "올인한 올인",
-     "tags": [],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "숨겨 둔 올인",
+     "name": "판 엎기",
      "tags": [
-      "보존"
+      "약점 공격"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.1,
+       "ratio": 2.9,
        "target": "oneEnemy"
       },
       {
@@ -274,14 +333,39 @@
      ]
     },
     {
-     "name": "행운의 올인",
-     "tags": [
-      "축복"
-     ],
+     "name": "밑장 빼기",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 3.1,
+       "ratio": 2.4,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "ifChoice",
+       "n": 1
+      },
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "마지막 한 판",
+     "cost": 3,
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 4.6,
        "target": "oneEnemy"
       },
       {
@@ -302,19 +386,21 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "팽이 가속",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "허점 노리기",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "묵직한 축",
+     "fx": [
+      {
+       "k": "tough",
+       "v": 1
+      }
+     ]
     }
    ]
   },
@@ -352,8 +438,7 @@
    ],
    "oracles": [
     {
-     "name": "회전하는 팽이",
-     "tags": [],
+     "name": "고속 회전",
      "fx": [
       {
        "k": "dmg",
@@ -377,13 +462,12 @@
      ]
     },
     {
-     "name": "가벼운 팽이",
+     "name": "손끝 팽이",
      "cost": 0,
-     "tags": [],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.5,
+       "ratio": 0.45,
        "target": "oneEnemy",
        "hits": 2
       },
@@ -403,13 +487,36 @@
      ]
     },
     {
-     "name": "올인한 팽이",
-     "tags": [],
+     "name": "삼연 팽이",
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.8,
+       "ratio": 0.6,
        "target": "oneEnemy",
+       "hits": 3
+      },
+      {
+       "k": "ifChoice",
+       "n": 2
+      },
+      {
+       "k": "nextAp",
+       "v": -1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "흩뿌린 팽이",
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.55,
+       "target": "allEnemies",
        "hits": 2
       },
       {
@@ -428,41 +535,14 @@
      ]
     },
     {
-     "name": "숨겨 둔 팽이",
+     "name": "돌려 막기",
      "tags": [
-      "보존"
+      "신속"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.85,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "행운의 팽이",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.85,
+       "ratio": 0.75,
        "target": "oneEnemy",
        "hits": 2
       },
@@ -484,19 +564,16 @@
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "날 선 팽이",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "손목 스냅",
+     "kind": "cost"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "얼얼한 회전",
+     "kind": "frost"
     }
    ]
   },
@@ -520,29 +597,39 @@
      "k": "dmg",
      "ratio": 1.5,
      "target": "oneEnemy"
+    },
+    {
+     "k": "stack",
+     "id": "쇠팽이",
+     "v": 1
     }
    ],
    "oracles": [
     {
-     "name": "회전하는 탑스핀",
+     "name": "풀스핀 블레이드",
      "tags": [
       "약점 공격"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.05,
+       "ratio": 0.95,
        "target": "allEnemies"
       },
       {
        "k": "dmg",
-       "ratio": 1.95,
+       "ratio": 1.9,
        "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "쇠팽이",
+       "v": 1
       }
      ]
     },
     {
-     "name": "가벼운 탑스핀",
+     "name": "반바퀴 블레이드",
      "cost": 1,
      "tags": [
       "약점 공격"
@@ -550,92 +637,98 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.65,
+       "ratio": 0.6,
        "target": "allEnemies"
       },
       {
        "k": "dmg",
-       "ratio": 1.2,
+       "ratio": 1.0,
        "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "쇠팽이",
+       "v": 1
       }
      ]
     },
     {
-     "name": "올인한 탑스핀",
+     "name": "팽이판 독식",
      "tags": [
       "약점 공격"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.9,
+       "ratio": 0.85,
        "target": "allEnemies"
       },
       {
        "k": "dmg",
-       "ratio": 1.65,
+       "ratio": 1.6,
        "target": "oneEnemy"
       },
       {
-       "k": "tough",
+       "k": "stack",
+       "id": "쇠팽이",
+       "v": 3
+      }
+     ]
+    },
+    {
+     "name": "집중 연베기",
+     "tags": [
+      "약점 공격"
+     ],
+     "fx": [
+      {
+       "k": "dmg",
+       "ratio": 0.85,
+       "target": "oneEnemy",
+       "hits": 4
+      },
+      {
+       "k": "stack",
+       "id": "쇠팽이",
        "v": 1
       }
      ]
     },
     {
-     "name": "숨겨 둔 탑스핀",
+     "name": "탑스핀 피니시",
      "tags": [
-      "약점 공격",
-      "보존"
+      "약점 공격"
      ],
      "fx": [
       {
        "k": "dmg",
-       "ratio": 0.95,
+       "ratio": 0.8,
        "target": "allEnemies"
       },
       {
        "k": "dmg",
        "ratio": 1.8,
        "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "행운의 탑스핀",
-     "tags": [
-      "약점 공격",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.95,
-       "target": "allEnemies"
       },
       {
-       "k": "dmg",
-       "ratio": 1.8,
-       "target": "oneEnemy"
+       "k": "tough",
+       "v": 2
       }
      ]
     }
    ],
    "blesses": [
     {
-     "name": "세찬 숨결",
-     "kind": "power",
-     "fx": []
+     "name": "칼날 회전수",
+     "kind": "power"
     },
     {
-     "name": "틈새 노리기",
-     "kind": "weakSpot",
-     "fx": []
+     "name": "빈틈 베기",
+     "kind": "weakSpot"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "서늘한 칼바람",
+     "kind": "frost"
     }
    ]
   },
@@ -658,11 +751,16 @@
      "k": "status",
      "id": "잔광",
      "v": 1
+    },
+    {
+     "k": "stack",
+     "id": "쇠팽이",
+     "v": 1
     }
    ],
    "oracles": [
     {
-     "name": "회전하는 소매 속 팽이",
+     "name": "소매 가득 팽이",
      "tags": [
       "신속"
      ],
@@ -675,12 +773,56 @@
        "k": "status",
        "id": "잔광",
        "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "쇠팽이",
+       "v": 1
       }
      ]
     },
     {
-     "name": "가벼운 소매 속 팽이",
+     "name": "한 알 팽이",
      "cost": 0,
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "쇠팽이",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "숨겨 둔 판돈",
+     "tags": [
+      "신속"
+     ],
+     "fx": [
+      {
+       "k": "draw",
+       "v": 3
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "판돈",
+       "v": 1
+      }
+     ]
+    },
+    {
+     "name": "밑천 꺼내기",
      "tags": [
       "신속"
      ],
@@ -690,35 +832,18 @@
        "v": 2
       },
       {
-       "k": "status",
-       "id": "잔광",
+       "k": "ap",
        "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "쇠팽이",
+       "v": 2
       }
      ]
     },
     {
-     "name": "올인한 소매 속 팽이",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      },
-      {
-       "k": "tough",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "숨겨 둔 소매 속 팽이",
+     "name": "비장의 팽이",
      "tags": [
       "신속",
       "보존"
@@ -726,29 +851,16 @@
      "fx": [
       {
        "k": "draw",
-       "v": 3
+       "v": 2
       },
       {
        "k": "status",
        "id": "잔광",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "행운의 소매 속 팽이",
-     "tags": [
-      "신속",
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
+       "v": 2
       },
       {
-       "k": "status",
-       "id": "잔광",
+       "k": "stack",
+       "id": "쇠팽이",
        "v": 1
       }
      ]
@@ -756,19 +868,16 @@
    ],
    "blesses": [
     {
-     "name": "넘치는 숨결",
-     "kind": "ap",
-     "fx": []
+     "name": "여분의 팽이",
+     "kind": "ap"
     },
     {
-     "name": "번뜩이는 숨결",
-     "kind": "draw",
-     "fx": []
+     "name": "소매 털기",
+     "kind": "draw"
     },
     {
-     "name": "버티는 숨결",
-     "kind": "defUp",
-     "fx": []
+     "name": "승부사 눈빛",
+     "kind": "atkUp"
     }
    ]
   }

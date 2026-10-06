@@ -42,6 +42,13 @@ namespace Bolzena.Battle
                 f.Deck = d.BuildDeck(f.Party);
                 foreach (var h in f.Party)
                     f.Deck.AddRange(d.Cards.Values.Where(c => c.Hero == h && c.Unique).Select(c => c.Id).OrderBy(x => x, StringComparer.Ordinal));
+                // -deck 카드,카드: 덱을 이 카드들 + 다른 카드 3장으로 줄인다(점검 — 갈래가 다른 카드를 첫 손에 확실히 쥐게)
+                var only = Arg("-deck");
+                if (only != null)
+                {
+                    var keep = only.Split(',').ToList();
+                    f.Deck = f.Deck.Where(keep.Contains).Distinct().Concat(f.Deck.Where(id => !keep.Contains(id)).Distinct().Take(3)).ToList();
+                }
                 f.Waves.Add(foes.Split(',').ToList());
                 f.EnemyNature = Arg("-nature");
                 // -wavehp 배율: 적 체력 배율(시험 캡처 — 격파까지 버티게)
@@ -110,7 +117,7 @@ namespace Bolzena.Battle
                 // 시범 — 교주 카드 둘을 주인 사도와 함께(「카드@사도」 — 틀 빛깔 · 핀이 그 사도)
                 var neutral = d.NeutralIds().Take(2).ToList();
                 for (int i = 0; i < neutral.Count; i++) f.Deck.Add(GameData.WithOwner(neutral[i], f.Party[1 + i]));
-                f.Waves.Add(sample ? new List<string> { "fairy_close", "fairy_long" } : new List<string> { "fairymobcloserange_naive", "fairymoblongrange_jolly" });
+                f.Waves.Add(sample ? new List<string> { "fairy_close", "fairy_long" } : new List<string> { "fairymobcloserange", "fairymoblongrange" });
                 f.Waves.Add(new List<string> { sample ? "curburus" : "clone_carrot" });
                 f.WaveHp.Add(0.85); f.WaveHp.Add(0.55);
                 f.WaveGauge.Add(200); f.WaveGauge.Add(R.GAUGE_MAX);   // 시범 — 첫 웨이브에 전체 공격 고학년(리코타 200) 하나, 보스 웨이브는 가득
@@ -251,7 +258,7 @@ namespace Bolzena.Battle
                 }
                 // -blesstest: 축복 모양 확인용 — 얹힌 것이 없으면 둘째 선택지에 축복을 보이게만 단다(규칙에는 안 들어간다)
                 if (list.Count > 1 && !list.Exists(x => x.BlessName != null) && Array.IndexOf(Environment.GetCommandLineArgs(), "-blesstest") >= 0)
-                { list[1].BlessName = "(시험) 축복"; list[1].BlessText = "축복 모양 확인 — 실제로는 15% 로 얹힌다"; }
+                { list[1].BlessName = "(시험) 축복"; list[1].BlessText = "축복 모양 확인 — 실제로는 15% 확률로 얹힙니다"; }
             }
             else foreach (var opt in g.Options) list.Add(Info(b.CardOf(opt), null));
             return list;
@@ -267,11 +274,25 @@ namespace Bolzena.Battle
             cues.Clear();
             var id = b.Hand[i];
             if (b.GlowOf(id) != null) b.ApplyEpiphany(id, Math.Max(0, choice));
-            lastTarget = target;
+            lastTarget = b.CardOf(id)?.Target == "아군" ? -1 : target;   // 아군 카드의 target 은 사도 번호(코어 oneAlly) — 연출의 적 번호로 쓰지 않는다
             b.PlayCard(i, target, branch > 0 ? new PlayOpts { Choice = branch } : null);
             Translate(evs);
             After(evs);
             return evs;
+        }
+
+        /// <summary>점검(-ultaudit-prep) — 조건부 고학년 cue 를 보려고 판을 미리 세운다: 보스가 아닌 적 HP 25% · 충격 2 ·
+        /// 그 사도의 적 몫 고유 효과(꿀범벅 …) 4겹. 판에는 이 점검 전투에서만 쓴다.</summary>
+        public void AuditPrep(string heroId, double hpFrac = 0.25)
+        {
+            var kw = data.Hero(heroId)?.Keyword;
+            foreach (var e in b.Enemies)
+            {
+                if (e.Dead) continue;
+                if (!e.Boss) e.Hp = Math.Max(1, (int)(e.MaxHp * hpFrac));
+                e.Status["충격"] = 2;
+                if (kw != null && kw.Carrier == "enemy" && !string.IsNullOrEmpty(kw.Name)) e.Status[kw.Name] = 4;
+            }
         }
 
         public bool CanUlt(int hero, out string reason)
@@ -395,6 +416,13 @@ namespace Bolzena.Battle
                         {
                             actor = UnitRef.Enemy(c.Idx);
                             bool hit = c.Anim == "attack";
+                            if (c.T == "ult")
+                            {
+                                // 보스 클론 고학년 — 아군 고학년 표시(Text "ult")와 따로: "foeult". 그 사도의 고학년 몸짓(적 쪽이라 좌우가 뒤집혀 선다)
+                                heavy = true;
+                                evs.Add(new BattleEvent { Kind = EventKind.Act, Actor = actor, Motion = Motion.Ultimate, Text = "foeult", Say = c.Name ?? c.Say, Anim = c.Hero, Up = c.Rush });
+                                break;
+                            }
                             heavy = hit && (c.T == "back" || c.T == "attackAll" || c.Rush);
                             evs.Add(new BattleEvent
                             {
@@ -455,6 +483,9 @@ namespace Bolzena.Battle
                         if (c.Side == CSide.Enemy)
                             evs.Add(new BattleEvent { Kind = EventKind.Death, Target = UnitRef.Enemy(c.Idx), Boss = c.Idx < b.Enemies.Count && b.Enemies[c.Idx].Boss });
                         break;
+                    case "revive":
+                        if (c.Side == CSide.Enemy) evs.Add(new BattleEvent { Kind = EventKind.Revive, Target = UnitRef.Enemy(c.Idx), HpAfter = c.V, Say = c.Name });
+                        break;
                     case "auto":
                         evs.Add(new BattleEvent { Kind = EventKind.Status, Target = Ref(c), Text = c.Label ?? c.Tag, Up = true });
                         break;
@@ -470,6 +501,22 @@ namespace Bolzena.Battle
                         shownAp = b.Ap;
                         ResyncGuards(evs);
                         break;
+                    case "fx":
+                    {
+                        int hi = b.Party.FindIndex(p => p.Key == c.Hero);
+                        evs.Add(new BattleEvent { Kind = EventKind.FxCue, Actor = UnitRef.Party(Math.Max(0, hi)), Text = c.Id, Value = (int)Math.Round((double)c.V) });
+                        break;
+                    }
+                    case "foeUltWarn":
+                    case "foeUlt":
+                    case "foeUltHit":
+                    case "foeUltEnd":
+                    case "foeUltCut":
+                    {
+                        string sub = c.K == "foeUltWarn" ? "warn" : c.K == "foeUlt" ? "start" : c.K == "foeUltHit" ? "hit" : c.K == "foeUltEnd" ? "end" : "cut";
+                        evs.Add(new BattleEvent { Kind = EventKind.FoeUlt, Actor = UnitRef.Enemy(c.Idx), Text = sub, Say = c.Name, Value = c.V, Anim = sub == "cut" ? c.Label : c.Hero, Up = c.T == "ult" });
+                        break;
+                    }
                     case "formOn":
                     case "formOff":
                     {
@@ -576,6 +623,15 @@ namespace Bolzena.Battle
         }
 
         // ── 카드 · 상태 그리기 자료 ─────────────────────────────────────
+        /// <summary>사도 고유 효과 글 — 부제(desc) + CardText.Trait(그 키워드를 쓰는 패시브까지 · 「계기 → 결과」 줄). 칩 · 카드 확대 · 정보 창이 같은 글.</summary>
+        string KwText(KwRt kw)
+        {
+            var h = data.Hero(kw.Owner);
+            var body = h != null ? text.Trait(h, kw.Def) : text.Keyword(kw.Def);
+            var sub = h != null ? kw.Def.Desc?.TrimEnd('.') : null;
+            return Fmt(string.IsNullOrEmpty(sub) ? body : $"<color=#A7B1CC>{sub}</color>\n{body}");
+        }
+
         static string Fmt(string s)
         {
             if (string.IsNullOrEmpty(s)) return "";
@@ -592,6 +648,9 @@ namespace Bolzena.Battle
         }
 
         static CardType TypeOf(string t) => t == "공격" ? CardType.Attack : t == "스킬" ? CardType.Skill : t == "강화" ? CardType.Power : CardType.Status;
+
+        /// <summary>카드 id 하나의 화면 정보(점검 — 갈래 창 · 툴팁 시험).</summary>
+        public CardInfo InfoOf(string id) => Info(b.CardOf(id), null);
 
         CardInfo Info(CardView cv, int? handIdx, int depth = 0)
         {
@@ -612,13 +671,12 @@ namespace Bolzena.Battle
                 Motion = type == CardType.Attack ? (cv.Cost >= 2 ? Motion.Attack2 : Motion.Attack1) : dmg ? Motion.Skill1 : Motion.None,
                 Hit = Look.Hero(cv.Hero).Hit, Epiphany = b.GlowOf(cv.Id) != null,
                 EpiphanyLabel = cv.Oracle != null ? cv.Oracle.Name : null, Tags = cv.Tags.ToList(), Unplayable = cv.HasTag(Bolzena.Core.Tag.Unplayable),
-                Unique = cv.Unique, Owner = owner, Nature = hero >= 0 ? b.Party[hero].Nature : owner >= 0 ? b.Party[owner].Nature : null,
+                Unique = cv.Unique, Owner = owner, Grade = cv.Def.Hero == null ? cv.Def.Grade : null, Nature = hero >= 0 ? b.Party[hero].Nature : owner >= 0 ? b.Party[owner].Nature : null,
                 Choices = cv.Choices != null && cv.Choices.Count == 2 ? cv.Choices.ToList() : null,
             };
-            info.Terms = Terms.ForCard(text.Card(cv), cv.Tags, w => b.Kw.TryGetValue(w, out var kw) ? (kw.Id, Fmt(text.Short(kw.Def))) : ((string, string)?)null);
-            // 사도 고유 효과 — 짧은 글 + 자세히, 생성 카드 — 작은 카드(runui CardTerms: make · transform · 진화 · 결속 · 금기)
+            info.Terms = Terms.ForCard(text.Card(cv), cv.Tags, w => b.Kw.TryGetValue(w, out var kw) ? (kw.Id, KwText(kw)) : ((string, string)?)null);
+            // 사도 고유 효과 — 부제 + 수치가 다 든 글(CardText.Trait, 「자세히」 없음), 생성 카드 — 작은 카드(runui CardTerms: make · transform · 진화 · 결속 · 금기)
             var cterms = Bolzena.RunUI.CardTerms.Of(data, text, cv);
-            foreach (var tm in info.Terms) if (b.Kw.TryGetValue(tm.Word, out var kw2)) tm.Detail = Fmt(text.Detail(kw2.Def));
             if (depth == 0)
                 foreach (var ct in cterms)
                     if (ct.IsCard)
@@ -627,8 +685,13 @@ namespace Bolzena.Battle
                         if (gv != null) info.Terms.Add(new Term(ct.Name, "이 카드가 만드는 카드", "card") { Card = Info(gv, null, depth + 1) });
                     }
             info.Text = Bolzena.RunUI.CardTerms.Mark(info.Text, cterms);   // 글 속 낱말 밑줄 · 색(판 화면 W.Card 와 같은 표)
-            if (cv.Oracle != null) info.Terms.Insert(0, new Term("신탁 · " + cv.Oracle.Name, "이 판에서 붙은 신탁 — 카드 글이 바뀐 모습입니다", "flash"));
-            if (info.Epiphany) info.Terms.Insert(0, new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고릅니다(이번에는 코스트 0)", "flash"));
+            if (cv.Oracle != null) info.Terms.Insert(0, new Term("신탁 · " + cv.Oracle.Name, "이번 모험에서 붙은 신탁 — 카드 글이 바뀐 모습입니다", "flash"));
+            if (info.Epiphany) info.Terms.Insert(0, new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고릅니다(이번에는 비용 0)", "flash"));
+            // 표식 — 얹힌 축복 · 복제본(core CardMark, 판 화면 W.Card 와 같은 것)
+            var mk = b.MarkOf(cv.Id);
+            info.MarkBless = mk.Bless; info.MarkBlessText = mk.BlessText; info.Copy = mk.Copy;
+            if (mk.Blessed) info.Terms.Insert(info.Epiphany || cv.Oracle != null ? 1 : 0, new Term("축복 · " + mk.Bless, mk.BlessText, "flash"));
+            if (mk.Copy) info.Terms.Add(new Term("복제", "복제할 때 모습 그대로 묶인 카드 — 신탁 · 축복 불가", "flash"));
             return info;
         }
 
@@ -668,16 +731,27 @@ namespace Bolzena.Battle
                 if (kv.Value == 0) continue;
                 if (b.Kw.TryGetValue(kv.Key, out var kw))
                 {
-                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = $"「{kv.Key}」 {kv.Value} — {Fmt(text.Short(kw.Def))}", Detail = Fmt(text.Detail(kw.Def)) });
+                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = KwText(kw) });
                     continue;
                 }
                 bool bad = R.BAD_ST.Contains(kv.Key) || kv.Key == R.STUN;
-                res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = bad ? "debuff" : "buff", Text = $"{kv.Key} {kv.Value} — {Terms.StatusText(kv.Key) ?? ""}", From = from.TryGetValue(kv.Key, out var fl) ? fl : null });
+                res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = bad ? "debuff" : "buff", Text = Terms.StatusText(kv.Key) ?? "", From = from.TryGetValue(kv.Key, out var fl) ? fl : null });
             }
             if (hero && b.Stacks.TryGetValue(u.Key, out var bag))
                 foreach (var kv in bag)
                     if (kv.Value != 0 && b.Kw.TryGetValue(kv.Key, out var kw))
-                        res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = $"「{kv.Key}」 {kv.Value} — {Fmt(text.Short(kw.Def))}", Detail = Fmt(text.Detail(kw.Def)) });
+                        res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = KwText(kw) });
+            // 강화 칩(파티 버프 줄 끝) — 켜진 강화 카드마다: 카드 이름 · 겹, 풀이 = 남는 효과 글(core b.PowersOf · Docs/API.md 「강화 카드 지속 규칙」)
+            if (u == b.Pool)
+            {
+                List<PowerView> pws = null;
+                try { pws = b.PowersOf(); } catch (Exception) { }
+                if (pws != null)
+                    foreach (var pw in pws)
+                        res.Add(new StatusChip { Id = pw.Name, Value = pw.Stacks > 1 ? pw.Stacks.ToString() : "", Kind = "power",
+                            Text = $"강화 카드{(pw.Stacks > 1 ? $" · {pw.Stacks}겹(발동할 때 효과 ×{pw.Stacks})" : "")} · 이 전투 동안\n{Fmt(pw.Text)}",
+                            From = pw.Hero != null ? new List<string> { Look.Hero(pw.Hero).Art } : null });
+            }
             // 변신 칩 — 이름 · 남은 턴(0 = 전투 끝까지)
             if (hero)
             {
@@ -696,8 +770,8 @@ namespace Bolzena.Battle
             switch (it.T)
             {
                 case "attack": case "multi": return IntentKind.Attack;
-                case "back": case "attackAll": case "charge": return IntentKind.Heavy;
-                case "block": case "guard": return IntentKind.Defend;
+                case "back": case "attackAll": case "charge": case "ult": return IntentKind.Heavy;
+                case "block": case "guard": case "brace": return IntentKind.Defend;   // brace = 버티기(강인도 회복)
                 case "heal": case "buff": return IntentKind.Buff;
                 default: return IntentKind.Debuff;
             }
@@ -721,13 +795,19 @@ namespace Bolzena.Battle
                     var look = Look.Hero(u.Key);
                     var hs = new HeroState
                     {
-                        Key = look.Art, Id = u.Key, Name = u.Name, Tint = look.Tint, UltName = h?.Ult?.Name, UltText = h?.Ult != null ? Fmt(text.Fx(h.Ult.Fx)) : "", UltShort = h?.Ult != null ? Fmt(text.Short(h.Ult)) : "",
+                        Key = look.Art, Id = u.Key, Name = u.Name, Tint = look.Tint, UltName = h?.Ult?.Name, UltText = h?.Ult != null ? Fmt(text.Fx(h.Ult.Fx)) : "",
                         Atk = u.Atk, Def = u.Def, Crit = u.Crit, AtkNow = b.AtkNow(u), DefNow = b.DefNow(u), CritNow = u.Crit + Mathf.RoundToInt((float)b.StatMod(u, "crit") * 100),
                         Role = u.Role, Nature = u.Nature, Row = u.Row, Blurb = h?.Blurb, Ult = b.Gauge, UltMax = h?.Ult?.Cost ?? 999, Dead = u.Dead,
-                        KeywordName = h?.Keyword?.Name, KeywordText = h?.Keyword != null ? Fmt(text.Detail(h.Keyword)) : null, KeywordShort = h?.Keyword != null ? Fmt(text.Short(h.Keyword)) : null,
+                        KeywordName = h?.Keyword?.Name, KeywordText = h?.Keyword != null && b.Kw.TryGetValue(h.Keyword.Name, out var hk) ? KwText(hk) : null,
                         KeywordStacks = h?.Keyword != null ? b.StackOf(u.Key, h.Keyword.Name) : 0,
                     };
-                    if (h != null) foreach (var r in h.Passives) { hs.Passives.Add(Fmt(text.Detail(r))); hs.PassivesShort.Add((r.Name ?? "패시브") + " — " + Fmt(text.Short(r))); }
+                    // 고학년 → 고유 효과 → 패시브(core CardText.Traits — 판 화면 사도 상세와 같은 칸 · 글). 키워드를 쓰는 패시브는 고유 효과 칸 아래로
+                    if (h != null)
+                        foreach (var t in text.Traits(h))
+                        {
+                            hs.Traits.Add(new TraitLine { Kind = t.Kind, Name = t.Name, Sub = t.Sub, Body = Fmt(t.Body) });
+                            if (t.Kind == "패시브" && !string.IsNullOrEmpty(t.Body)) hs.Passives.Add(t.Name + " — " + Fmt(t.Body));   // passives 전부(없으면 「없음」 칸 — 목록엔 안 넣음)
+                        }
                     hs.Chips = ChipsOf(u, true);
                     hs.Race = h?.Race;
                     try
@@ -760,7 +840,9 @@ namespace Bolzena.Battle
                         Key = spine, Skin = skin, Id = e.Key, Name = e.Name, Boss = e.Boss, Hp = Math.Max(0, e.Hp), MaxHp = e.MaxHp, Block = e.Block + e.Shield,
                         ToughV = (float)tv.Left, ToughMaxV = (float)tv.Max, Broken = tv.Broken, Resting = tv.Resting, Sealed = e.Sealed, Dead = e.Dead,
                         Intent = e.Broken || e.Dead ? IntentKind.None : KindOf(it), IntentValue = shown ?? it?.V ?? 0, IntentHits = it != null && it.T == "multi" ? Math.Max(1, it.N) : 1,
-                        IntentText = it != null ? text.Intent(it, shown) : "", IntentSay = it?.Say, RushNeed = b.RushOf(e), RushCnt = e.RushCnt, RushedTurn = e.RushedTurn,
+                        IntentText = it != null ? text.Intent(it, shown) : "", IntentSay = it?.Say,
+                        UltName = BossUlt.IsUlt(it) && !e.Broken ? (it.T == "ult" ? it.Say : it.Next?.Say ?? it.Say) : null,
+                        UltHero = BossUlt.IsUlt(it) ? (it.T == "ult" ? it.Id : it.Next?.Id ?? it.Id) : null, UltNow = it != null && it.T == "ult", RushNeed = b.RushOf(e), RushCnt = e.RushCnt, RushedTurn = e.RushedTurn,
                         Nature = tv.Nature, Blurb = def?.Blurb, Weak = tv.Weak ?? new List<string>(),
                     };
                     if (def != null) foreach (var p in def.Passives) es.Passives.Add(p.Name + (p.Do != null ? " — " + text.Intent(p.Do) : ""));

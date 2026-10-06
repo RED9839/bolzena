@@ -12,22 +12,48 @@
       "atk": 95,
       "def": 61,
       "crit": 5,
-      "blurb": "여섯 보물을 모으던 비늘 수인 슈로가 불의 검에 주인으로 인정받는 순간, 보물에 깃든 옛 지배자 우로스의 사념이 깨어나 몸을 차지했다.",
+      "blurb": "몸과 힘은 옛 지배자 우로스, 마음은 비늘 수인 슈로입니다. 더미가 한 바퀴 돌 때마다 지배의 영역이 넓어지고, 그 위의 아군은 모두 힘을 나눠 받습니다.",
       "keyword": {
-        "name": "순환",
-        "desc": "거대한 뱀의 순환 — 더미를 섞을 때마다 한 바퀴, 돈 바퀴는 거대한 뱀에 실린다",
+        "name": "지배의 영역",
+        "desc": "가장 강한 자의 힘을 나누는 영역",
         "carrier": "self",
         "cap": 3,
+        "decay": 1,
+        "per": [
+          {
+            "stat": "atk",
+            "v": 0.1,
+            "who": "allies"
+          }
+        ],
         "rules": [
           {
-            "name": "허물",
+            "name": "영역 전개",
             "when": {
               "on": "fightStart"
             },
             "fx": [
               {
                 "k": "stack",
-                "id": "순환",
+                "id": "지배의 영역",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "넘치는 영역",
+            "when": {
+              "on": "stackOver",
+              "id": "지배의 영역"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "협공",
                 "v": 1
               }
             ]
@@ -36,7 +62,7 @@
       },
       "passives": [
         {
-          "name": "거대한 뱀의 순환",
+          "name": "순환",
           "when": {
             "on": "shuffle"
           },
@@ -46,18 +72,13 @@
           },
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 2
             },
             {
               "k": "status",
               "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "순환",
               "v": 1
             }
           ]
@@ -69,13 +90,18 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 1.1,
+            "ratio": 0.9,
             "target": "allEnemies",
             "hits": 2
           },
           {
             "k": "status",
             "id": "피해 감소",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "지배의 영역",
             "v": 3
           }
         ]
@@ -133,18 +159,14 @@
           "v": 3
         },
         {
-          "k": "ifPile",
-          "from": "discard",
-          "n": 4
-        },
-        {
-          "k": "ap",
+          "k": "stack",
+          "id": "지배의 영역",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "힘준 순환의 고리",
+          "name": "넓은 고리",
           "fx": [
             {
               "k": "discard",
@@ -155,18 +177,14 @@
               "v": 4
             },
             {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
-            },
-            {
-              "k": "ap",
+              "k": "stack",
+              "id": "지배의 영역",
               "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 순환의 고리",
+          "name": "짧은 고리",
           "cost": 0,
           "fx": [
             {
@@ -175,21 +193,12 @@
             },
             {
               "k": "draw",
-              "v": 4
-            },
-            {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
-            },
-            {
-              "k": "ap",
-              "v": 1
+              "v": 3
             }
           ]
         },
         {
-          "name": "순환하는 순환의 고리",
+          "name": "되감는 고리",
           "fx": [
             {
               "k": "discard",
@@ -197,24 +206,35 @@
             },
             {
               "k": "draw",
-              "v": 4
+              "v": 3
             },
             {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "통째로 갈아엎기",
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
             },
             {
-              "k": "ap",
+              "k": "draw",
+              "v": 5
+            },
+            {
+              "k": "stack",
+              "id": "지배의 영역",
               "v": 1
             }
           ]
         },
         {
-          "name": "든든한 순환의 고리",
-          "tags": [
-            "보존"
-          ],
+          "name": "다음 고리로",
           "fx": [
             {
               "k": "discard",
@@ -222,40 +242,10 @@
             },
             {
               "k": "draw",
-              "v": 4
+              "v": 3
             },
             {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
-            },
-            {
-              "k": "ap",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 순환의 고리",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "discard",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 4
-            },
-            {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
-            },
-            {
-              "k": "ap",
+              "k": "nextCheaper",
               "v": 1
             }
           ]
@@ -263,19 +253,19 @@
       ],
       "blesses": [
         {
-          "name": "든든함",
-          "kind": "guard"
-        },
-        {
-          "name": "한 장 더",
+          "name": "한 바퀴 더",
           "kind": "draw"
         },
         {
-          "name": "허물 벗기",
+          "name": "비워 낸 손",
+          "kind": "ap"
+        },
+        {
+          "name": "꼬리를 문 뱀",
           "fx": [
             {
               "k": "stack",
-              "id": "순환",
+              "id": "지배의 영역",
               "v": 1
             }
           ]
@@ -292,152 +282,128 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.2,
-          "target": "oneEnemy"
+          "ratio": 0.35,
+          "target": "randomEnemy",
+          "hits": 4
         },
         {
-          "k": "ifPile",
-          "from": "discard",
-          "n": 4
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.8,
-          "target": "oneEnemy"
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "힘준 마음이 비수가 되어",
+          "name": "깊이 꽂힌 비수",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "가벼운 마음이 비수가 되어",
+          "name": "작은 비수",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
+              "ratio": 0.3,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "순환하는 마음이 비수가 되어",
+          "name": "돌고 도는 비수",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
+              "ratio": 0.35,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "순환",
+              "id": "지배의 영역",
               "v": 1
             }
           ]
         },
         {
-          "name": "재빠른 마음이 비수가 되어",
-          "tags": [
-            "신속"
-          ],
+          "name": "비수 흩뿌리기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
+              "ratio": 0.7,
+              "target": "allEnemies"
             },
             {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "꿰뚫는 마음이 비수가 되어",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "마음 깊은 곳까지",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
+              "ratio": 0.7,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
-              "k": "ifPile",
-              "from": "discard",
-              "n": 4
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "벼린 마음",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "상처를 아는 칼",
           "kind": "weakSpot"
         },
         {
-          "name": "허물 벗기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "순환",
-              "v": 1
-            }
-          ]
+          "name": "되돌아온 비수",
+          "kind": "draw"
         }
       ]
     },
@@ -455,95 +421,175 @@
           "v": 1
         },
         {
-          "k": "stack",
-          "id": "순환",
-          "v": 2
+          "k": "status",
+          "id": "협공",
+          "v": 1
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "shuffle"
+              },
+              "fx": [
+                {
+                  "k": "draw",
+                  "v": 1
+                },
+                {
+                  "k": "stack",
+                  "id": "지배의 영역",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 세계수의 보물 파괴",
+          "name": "허물 벗는 뱀",
           "fx": [
             {
               "k": "status",
               "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "순환",
-              "v": 2
-            },
-            {
-              "k": "draw",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shuffle"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 2
+                    },
+                    {
+                      "k": "stack",
+                      "id": "지배의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 세계수의 보물 파괴",
+          "name": "작은 똬리",
           "cost": 0,
           "fx": [
             {
               "k": "status",
-              "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "순환",
-              "v": 2
-            },
-            {
-              "k": "draw",
+              "id": "협공",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shuffle"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "지배의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "순환하는 세계수의 보물 파괴",
+          "name": "또 한 바퀴",
           "fx": [
             {
               "k": "status",
               "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "순환",
-              "v": 3
-            },
-            {
-              "k": "draw",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shuffle"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 2
+                    },
+                    {
+                      "k": "stack",
+                      "id": "지배의 영역",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "든든한 세계수의 보물 파괴",
+          "name": "보물 상자 박살",
           "fx": [
             {
               "k": "status",
               "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "순환",
-              "v": 2
-            },
-            {
-              "k": "draw",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shuffle"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "지배의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "복 받은 세계수의 보물 파괴",
+          "name": "세계수의 숨결",
           "tags": [
             "축복"
           ],
@@ -551,35 +597,52 @@
             {
               "k": "status",
               "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "순환",
-              "v": 2
-            },
-            {
-              "k": "draw",
               "v": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shuffle"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "지배의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
-          "kind": "ap"
+          "name": "파괴의 손맛",
+          "kind": "atkUp"
         },
         {
-          "name": "한 장 더",
-          "kind": "draw"
+          "name": "단숨에 부수기",
+          "kind": "cost"
         },
         {
-          "name": "허물 벗기",
+          "name": "보물 조각",
           "fx": [
             {
               "k": "stack",
-              "id": "순환",
+              "id": "지배의 영역",
               "v": 1
             }
           ]
@@ -596,123 +659,99 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 1.0,
           "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "순환"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.5,
-          "target": "allEnemies"
+          "k": "stack",
+          "id": "지배의 영역",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "힘준 거대한 뱀",
+          "name": "몸을 감는 뱀",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "순환"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "가벼운 거대한 뱀",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "순환"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "순환하는 거대한 뱀",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "순환"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 1.25,
               "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "순환",
+              "id": "지배의 영역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "새끼 뱀",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "지배의 영역",
               "v": 1
             }
           ]
         },
         {
-          "name": "재빠른 거대한 뱀",
-          "tags": [
-            "신속"
-          ],
+          "name": "꼬리 무는 뱀",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 1.0,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "순환"
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies"
+              "k": "status",
+              "id": "사기",
+              "v": 1
             }
           ]
         },
         {
-          "name": "꿰뚫는 거대한 뱀",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "한 놈만 물기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "세계를 휘감는 뱀",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "순환"
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 3
             },
             {
-              "k": "dmg",
-              "ratio": 0.6,
+              "k": "tough",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
@@ -720,22 +759,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "거대한 독니",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "비늘 긁힘",
+          "kind": "frost"
         },
         {
           "name": "허물 벗기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "순환",
-              "v": 1
-            }
-          ]
+          "kind": "ap"
         }
       ]
     }

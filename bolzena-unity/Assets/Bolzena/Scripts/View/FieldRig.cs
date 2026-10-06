@@ -24,6 +24,8 @@ namespace Bolzena.View
         public static void Shake(float amount, float rollDeg = 0f)
         {
             if (I == null) return;
+            if (Bolzena.RunUI.Settings.NoShake) return;                       // 설정 「화면 흔들림 끄기」
+            if (Bolzena.RunUI.Settings.ReduceMotion) { amount *= 0.35f; rollDeg *= 0.35f; }   // 움직임 줄이기 — 약하게
             I.trauma = Mathf.Min(1.2f, I.trauma + amount);
             I.roll += rollDeg * (Random.value < 0.5f ? -1 : 1);
         }

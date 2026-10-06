@@ -12,13 +12,40 @@ namespace Bolzena
         static readonly Dictionary<string, Material> mats = new Dictionary<string, Material>();
         static TMP_FontAsset font, body, symbols;
 
+        // 무거운 것(사도 · 적 · 스탠딩 스파인, 사도 · 적 제 소리, 사도 그림)은 최근에 쓴 것만 붙든다 — 다 붙들면 싸움마다 새 적 · 새 사도가
+        //   쌓여(2026-10-06 고학년 점검 135판: 객체 1,682 → 12,875) 장면을 바꿀 때마다 정리(UnloadUnusedAssets)가 길어졌다.
+        //   밀려난 것은 사전에서만 뺀다 — 아직 화면에 있으면 그대로 살고, 아무도 안 쓰면 다음 장면 정리 때 풀린다. 다시 부르면 새로 읽는다.
+        public const int SpineKeep = 24, HeavyKeep = 160;
+        static readonly LinkedList<string> spineOrder = new LinkedList<string>(), heavyOrder = new LinkedList<string>();
+        static readonly Dictionary<string, LinkedListNode<string>> order = new Dictionary<string, LinkedListNode<string>>();
+
+        static bool Heavy(string path) => path.StartsWith("Sfx/hero/") || path.StartsWith("Sfx/monster/") || path.StartsWith("Art/") || path.StartsWith("Voice/");
+
+        static void Touch(string key, LinkedList<string> list, int keep)
+        {
+            if (order.TryGetValue(key, out var n)) { if (n.List == list && n != list.Last) { list.Remove(n); list.AddLast(n); } return; }
+            order[key] = list.AddLast(key);
+            while (list.Count > keep)
+            {
+                var old = list.First.Value;
+                list.RemoveFirst();
+                order.Remove(old);
+                cache.Remove(old);
+            }
+        }
+
+        /// <summary>붙든 무거운 것의 수(스파인 · 그 밖) — 점검용.</summary>
+        public static (int spine, int heavy, int all) Held => (spineOrder.Count, heavyOrder.Count, cache.Count);
+
         public static T Load<T>(string path) where T : Object
         {
             string key = typeof(T).Name + ":" + path;
-            if (cache.TryGetValue(key, out var o)) return o as T;
+            bool heavy = Heavy(path);
+            if (cache.TryGetValue(key, out var o)) { if (heavy) Touch(key, heavyOrder, HeavyKeep); return o as T; }
             var r = Resources.Load<T>(path);
             if (r == null) Debug.LogWarning("[Res] 없음: " + path);
             cache[key] = r;
+            if (heavy) Touch(key, heavyOrder, HeavyKeep);
             return r;
         }
 
@@ -30,11 +57,13 @@ namespace Bolzena
         public static SkeletonDataAsset Spine(string folder)
         {
             string key = "spine:" + folder;
-            if (cache.TryGetValue(key, out var o)) return o as SkeletonDataAsset;
-            var all = Resources.LoadAll<SkeletonDataAsset>("Spine/" + folder);
-            var a = all.Length > 0 ? all[0] : null;
+            if (cache.TryGetValue(key, out var o)) { Touch(key, spineOrder, SpineKeep); return o as SkeletonDataAsset; }
+            // 웹 빌드는 스파인을 번들로 받는다(WebBundles — SpineSource 가 번들 먼저, 없으면 Resources)
+            var a = Bolzena.RunUI.SpineStencil.Fix(Bolzena.RunUI.SpineSource.Load(folder));   // 원작 스텐실 가리기(미로 거울 · 셰이디(역전)) → 스파인 클리핑
+            if (a == null && Bolzena.RunUI.SpineSource.IsPending(folder)) { Debug.LogWarning("[Res] 스파인 아직 받는 중: " + folder); return null; }
             if (a == null) Debug.LogWarning("[Res] 스파인 없음: " + folder);
             cache[key] = a;
+            Touch(key, spineOrder, SpineKeep);
             return a;
         }
 

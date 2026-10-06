@@ -15,7 +15,7 @@
       "blurb": "언니 그윈을 따라 엘리아스 수인 마을에 자리 잡은 꼬마 펭귄.",
       "keyword": {
         "name": "미끄럼",
-        "desc": "필살 미끄럼 돌진 — 격파할 때마다 다른 적을 들이받으며 쌓여 이글루 배치기에 실린다",
+        "desc": "격파로 모으는 미끄럼 돌진",
         "carrier": "self",
         "cap": 3
       },
@@ -135,11 +135,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 델리아 화났어!",
+          "name": "진짜 화났어!",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.5,
               "target": "oneEnemy"
             },
             {
@@ -149,26 +149,26 @@
           ]
         },
         {
-          "name": "가벼운 델리아 화났어!",
+          "name": "삐짐",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
               "k": "tough",
-              "v": 1
+              "v": 0.5
             }
           ]
         },
         {
-          "name": "미끄러지는 델리아 화났어!",
+          "name": "미끄러지며 박치기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
@@ -183,15 +183,12 @@
           ]
         },
         {
-          "name": "재빠른 델리아 화났어!",
-          "tags": [
-            "신속"
-          ],
+          "name": "뒤뚱 회오리",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy"
+              "ratio": 0.85,
+              "target": "allEnemies"
             },
             {
               "k": "tough",
@@ -200,41 +197,34 @@
           ]
         },
         {
-          "name": "꿰뚫는 델리아 화났어!",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "분노 폭발",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
+              "ratio": 1.0,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "tough",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "빽 소리",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
-          "kind": "weakSpot"
+          "name": "차가운 눈초리",
+          "kind": "frost"
         },
         {
-          "name": "얼음 위 질주",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 1
-            }
-          ]
+          "name": "씩씩거림",
+          "kind": "atkUp"
         }
       ]
     },
@@ -262,30 +252,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 가방 속 민초",
+          "name": "민초 두 봉지",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.3
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가벼운 가방 속 민초",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.9
+              "ratio": 1.7
             },
             {
               "k": "stack",
@@ -299,7 +270,65 @@
           ]
         },
         {
-          "name": "미끄러지는 가방 속 민초",
+          "name": "한 입만",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.6
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "민초 썰매",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.0
+            },
+            {
+              "k": "stack",
+              "id": "미끄럼",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "나눠 먹자",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.0
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "민초 도시락",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "heal",
@@ -308,68 +337,26 @@
             {
               "k": "stack",
               "id": "미끄럼",
-              "v": 3
+              "v": 2
             },
             {
               "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "든든한 가방 속 민초",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.25
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 가방 속 민초",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.25
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "따뜻한 손",
+          "name": "민트 향",
           "kind": "heal"
         },
         {
-          "name": "한 장 더",
+          "name": "가방 뒤적이기",
           "kind": "draw"
         },
         {
-          "name": "얼음 위 질주",
+          "name": "얼음판 닦기",
           "fx": [
             {
               "k": "stack",
@@ -410,11 +397,11 @@
       ],
       "oracles": [
         {
-          "name": "힘준 이글루 배치기",
+          "name": "얼음집 무너뜨리기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.1,
+              "ratio": 2.0,
               "target": "oneEnemy"
             },
             {
@@ -434,12 +421,12 @@
           ]
         },
         {
-          "name": "가벼운 이글루 배치기",
+          "name": "작은 이글루",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.15,
               "target": "oneEnemy"
             },
             {
@@ -448,7 +435,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.35,
               "target": "allEnemies"
             },
             {
@@ -459,61 +446,7 @@
           ]
         },
         {
-          "name": "미끄러지는 이글루 배치기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "미끄럼"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "미끄럼",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "재빠른 이글루 배치기",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "미끄럼"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "미끄럼",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "꿰뚫는 이글루 배치기",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "미끄럼 아껴 두기",
           "fx": [
             {
               "k": "dmg",
@@ -528,6 +461,50 @@
               "k": "dmg",
               "ratio": 0.6,
               "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "이글루 통째로",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "미끄럼"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "미끄럼",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "대왕 배치기",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "미끄럼"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
             },
             {
               "k": "spend",
@@ -539,22 +516,16 @@
       ],
       "blesses": [
         {
-          "name": "힘껏",
+          "name": "통통한 배",
           "kind": "power"
         },
         {
-          "name": "급소 노리기",
+          "name": "틈새 노리기",
           "kind": "weakSpot"
         },
         {
-          "name": "얼음 위 질주",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 1
-            }
-          ]
+          "name": "도움닫기",
+          "kind": "cost"
         }
       ]
     },
@@ -572,43 +543,97 @@
           "v": 2
         },
         {
-          "k": "stack",
-          "id": "미끄럼",
-          "v": 2
-        },
-        {
-          "k": "draw",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "미끄럼",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "힘준 일어나! 탐험 가야지!",
+          "name": "눈썰매 질주",
           "fx": [
             {
               "k": "status",
               "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "미끄럼",
+                      "v": 2
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "break",
+                    "mine": true
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가벼운 일어나! 탐험 가야지!",
+          "name": "졸린 눈",
           "cost": 0,
           "fx": [
             {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "미끄럼",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "빙판 위로",
+          "fx": [
+            {
               "k": "status",
               "id": "잔광",
-              "v": 3
+              "v": 2
             },
             {
               "k": "stack",
@@ -616,13 +641,26 @@
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "미끄럼",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "미끄러지는 일어나! 탐험 가야지!",
+          "name": "탐험 장비",
           "fx": [
             {
               "k": "status",
@@ -630,37 +668,30 @@
               "v": 3
             },
             {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 3
-            },
-            {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "미끄럼",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "든든한 일어나! 탐험 가야지!",
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복 받은 일어나! 탐험 가야지!",
+          "name": "설원의 아침",
           "tags": [
             "축복"
           ],
@@ -668,31 +699,43 @@
             {
               "k": "status",
               "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
               "v": 2
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "미끄럼",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기운 북돋기",
-          "kind": "ap"
+          "name": "벌떡 일어나기",
+          "kind": "cost"
         },
         {
-          "name": "한 장 더",
+          "name": "탐험 짐 챙기기",
           "kind": "draw"
         },
         {
-          "name": "얼음 위 질주",
+          "name": "첫 미끄럼",
           "fx": [
             {
               "k": "stack",

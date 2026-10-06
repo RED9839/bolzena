@@ -246,16 +246,48 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(1, b.St(b.Enemies[1], "사기"));
         }
 
-        [Test] public void 판이_바뀌면_수가_바뀌고_강인도가_다_찬다()
+        [Test] public void 판이_바뀌면_수가_바뀌지만_강인도는_차지_않는다()
         {
             var d = K.Data(enemies: "[{id:'boss', name:'보스', hp:1000, boss:true, intents:[{t:'jam', v:0, rush:0}], phase:{at:0.5, say:'성났다', intents:[{t:'attack', v:50, rush:0}]}}]");
             var b = K.Fight(d, new[] { "a" }, new[] { "boss" });
-            Assert.AreEqual(R.TOUGH.Boss, K.E(b).ToughMax, "보스 강인도(데이터에 없으면 10)");
+            Assert.AreEqual(7, K.E(b).ToughMax, "보스 강인도(데이터에 없으면 7)");
             K.E(b).Hp = 400; K.E(b).Tough = 1;
             b.EndTurn();
             Assert.IsTrue(K.E(b).Phased);
-            Assert.AreEqual(R.TOUGH.Boss, K.E(b).Tough);
+            Assert.AreEqual(1, K.E(b).Tough, "판이 바뀌어도 강인도는 그대로(사용자 2026-10-06)");
             Assert.AreEqual("attack", K.E(b).Intent.T);
+        }
+
+        [Test] public void 강인도는_저절로_차지_않는다_격파되면_다음_턴_회복_스킬만_되찾는다()
+        {
+            var d = K.Data(enemies: @"[
+ {id:'plain', name:'보통', hp:1000, tough:4, intents:[{t:'attack', v:10, rush:0}, {t:'block', v:20, rush:0}]},
+ {id:'wall', name:'방패', hp:1000, tough:4, intents:[{t:'guard', v:20, tough:1, rush:0}]},
+ {id:'brace', name:'버팀', hp:1000, tough:6, intents:[{t:'brace', v:2, say:'버티기', rush:0}]},
+ {id:'core', name:'핵', hp:1000, tough:6, intents:[{t:'jam', v:0, rush:0}], passives:[{name:'단단한 핵', on:'turnStart', do:{t:'brace', v:1}}]}]");
+            var b = K.Fight(d, new[] { "a" }, new[] { "plain", "wall", "brace", "core" });
+            b.Enemies[0].Tough = 1; b.Enemies[1].Tough = 1; b.Enemies[2].Tough = 1; b.Enemies[3].Tough = 1;
+            b.EndTurn(); b.EndTurn();
+            Assert.AreEqual(1, b.Enemies[0].Tough, "회복 스킬이 없는 적은 깎인 채로 남는다");
+            Assert.AreEqual(3, b.Enemies[1].Tough, "guard 의 tough 는 그 적 자신만 — 두 번 1씩");
+            Assert.AreEqual(5, b.Enemies[2].Tough, "버티기 — 강인도 회복 2 를 두 번");
+            Assert.AreEqual(3, b.Enemies[3].Tough, "패시브 — 내 턴 시작마다 1(두 번)");
+            var tx = new CardText(d);
+            Assert.AreEqual("강인도 회복 2", tx.Intent(d.Enemy("brace").Intents[0]));
+            StringAssert.Contains("강인도 회복 1", tx.Intent(d.Enemy("wall").Intents[0]));
+        }
+
+        [Test] public void 격파_중에는_회복_스킬로_차지_않는다()
+        {
+            var d = K.Data(enemies: "[{id:'brace', name:'버팀', hp:1000, tough:3, intents:[{t:'jam', v:0, rush:0}], passives:[{name:'버팀', on:'broken', do:{t:'brace', v:2}}]}]",
+                cards: "[{id:'smash', name:'깨기', hero:'a', cost:0, type:'공격', fx:[{k:'dmg', ratio:1.0, target:'oneEnemy'}, {k:'tough', v:9, target:'oneEnemy'}]}]");
+            var b = K.Fight(d, new[] { "a" }, new[] { "brace" }); K.Hand(b, "smash");
+            K.Play(b, "smash");
+            Assert.IsTrue(K.E(b).Broken);
+            Assert.AreEqual(0, K.E(b).Tough, "격파 상태면 회복 스킬이 돌아도 0");
+            b.EndTurn();
+            Assert.IsFalse(K.E(b).Broken);
+            Assert.AreEqual(3, K.E(b).Tough, "다음 내 턴 시작에 가득");
         }
 
         [Test] public void 보스는_기절한_다음_한_턴은_버틴다()
@@ -536,6 +568,8 @@ namespace Bolzena.Core.Tests
  {id:'m3', name:'광기 셋', race:'시험족', role:'딜러', row:'back', hp:500, atk:100, def:20, crit:0, nature:'광기', star:3},
  {id:'c1', name:'냉정 하나', race:'시험족', role:'딜러', row:'back', hp:500, atk:100, def:20, crit:0, nature:'냉정', star:2},
  {id:'c2', name:'냉정 둘', race:'시험족', role:'딜러', row:'back', hp:500, atk:100, def:20, crit:0, nature:'냉정', star:1},
+ {id:'u1', name:'우울 하나', race:'시험족', role:'딜러', row:'back', hp:500, atk:100, def:20, crit:0, nature:'우울', star:3},
+ {id:'u2', name:'우울 둘', race:'시험족', role:'딜러', row:'back', hp:500, atk:100, def:20, crit:0, nature:'우울', star:3},
  {id:'x1', name:'남의 순수', race:'다른족', role:'딜러', row:'back', hp:500, atk:100, def:20, crit:0, nature:'순수'}]";
         const string FOES = @"[
  {id:'mob', name:'잔챙이', hp:300, nature:'우울', tough:3, intents:[{t:'attack', v:10, rush:0}]},
@@ -563,11 +597,11 @@ namespace Bolzena.Core.Tests
         {
             var d = D();
             Assert.AreEqual(2, Run.CloneSlots(d, "tv").Count);
-            CollectionAssert.AreEqual(new[] { "순수", "광기", "냉정" }, Run.NaturesFor(d, "tv"), "성급 무관 — 그 성격 사도가 자리 수(2)만큼: 냉정은 c1 · c2(둘 다 1~2성) · 활발 · 우울 0명");
+            CollectionAssert.AreEqual(new[] { "순수", "광기", "우울" }, Run.NaturesFor(d, "tv"),
+                "2층은 3성이 있어야 — 냉정은 c1 · c2 가 다 1~2성이라 못 고름 · 우울은 1~2성이 없어 두 층 다 3성(u1 · u2) · 활발 0명");
             for (int i = 0; i < 50; i++) CollectionAssert.Contains(Run.NaturesFor(d, "tv"), Run.RollNature(d, "tv", i / 50.0));
-            var r = Run.New(d, PARTY, 3, "tv", null, "냉정");
-            var r2 = Run.New(d, PARTY, 3, "tv", null, "우울");
-            CollectionAssert.Contains(new[] { "순수", "광기", "냉정" }, r2.EnemyNature, "못 고르는 속성을 주면 씨앗으로 고를 수 있는 것");
+            var r2 = Run.New(d, PARTY, 3, "tv", null, "냉정");
+            CollectionAssert.Contains(new[] { "순수", "광기", "우울" }, r2.EnemyNature, "못 고르는 속성을 주면 씨앗으로 고를 수 있는 것");
         }
 
         [Test] public void 한_판의_모든_싸움_적_속성이_같고_두_보스도_그_성격_사도_클론()
@@ -603,13 +637,14 @@ namespace Bolzena.Core.Tests
             // 2) 전투 저장 왕복
             var bl = Battle.Load(d, b.Save());
             Assert.AreEqual("광기", bl.Enemies[0].Nature); Assert.AreEqual("순수", bl.Enemies[1].Nature);
-            // 3) 판 — 옛 저장(보스 줄 없음)인데 판 속성이 클론과 다르다 → 보스 싸움의 클론은 제 성격
+            // 3) 판 — 옛 저장(보스 줄 없음): 고정 보스(마을 데이터의 광기 클론)를 쓰지 않고 판 속성(순수)에 맞춰 새로 고른다 · 보스 하나
             var run = Run.New(d, PARTY, 2, "tv", null, "순수"); run.S.Bosses = null;
             var back = Run.Load(d, run.Save());
             back.S.Floor = 0; back.S.Node = 3;
             var (bb, _) = back.OpenFight();
-            Assert.AreEqual("광기", bb.Enemies.First(e => e.Key == "clone_m1").Nature, "판 데이터 · 저장 · 보스 싸움");
-            Assert.AreEqual("순수", bb.Enemies.First(e => e.Key == "mob").Nature, "클론 아닌 적은 판의 속성");
+            Assert.AreEqual(1, bb.Enemies.Count, "보스 싸움은 보스 하나(졸개 mob 은 덜어 냄)");
+            Assert.AreEqual("순수", bb.Enemies[0].Nature, "옛 저장도 판 속성의 클론(p1)");
+            Assert.AreEqual("p1", d.Enemy(bb.Enemies[0].Key).Clone);
             // 4) 이벤트 싸움
             back.S.Node = 0; back.S.EventFight = new EventFightState { Name = "시험", Enemies = new List<string> { "clone_m1", "mob" } };
             var (eb, _) = back.OpenFight();
@@ -618,26 +653,65 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("광기", d.Enemy("clone_m1").Nature); Assert.AreEqual("순수", d.Enemy("clone_p2").Nature);
         }
 
-        [Test] public void 그_층_성급_사도가_없으면_그_층만_다른_성급_겹치지_않게()
+        [Test] public void 일층에_그_성격_1_2성이_없으면_두_층_모두_3성_겹치지_않게()
         {
             var d = D();
             for (long seed = 1; seed <= 8; seed++)
             {
-                var run = Run.New(d, PARTY, seed, "tv", null, "냉정");
+                var run = Run.New(d, PARTY, seed, "tv", null, "우울");
+                Assert.AreEqual("우울", run.EnemyNature);
                 var hs = run.BossHeroes;
-                Assert.LessOrEqual(d.Hero(hs[0]).Star, 2, "1층은 규칙대로 1~2성");
-                Assert.LessOrEqual(d.Hero(hs[1]).Star, 2, "2층은 3성 냉정이 없어 예외 — 1~2성");
+                Assert.AreEqual(3, d.Hero(hs[0]).Star, "1층 — 우울 1~2성이 없어 3성");
+                Assert.AreEqual(3, d.Hero(hs[1]).Star, "2층 3성");
                 Assert.AreNotEqual(hs[0], hs[1], "같은 사도 한 판 한 번");
-                Assert.IsTrue(hs.All(h => d.Hero(h).Nature == "냉정"));
+                Assert.IsTrue(hs.All(h => d.Hero(h).Nature == "우울"));
                 var back = Run.Load(d, run.Save());
                 Assert.AreEqual(GameData.ToJson(run.Bosses), GameData.ToJson(back.Bosses), "저장 왕복");
             }
+            // 같은 속성 전체에 3성이 없는 속성(냉정)은 안 뽑는다 — 옛 규칙 「그 층만 다른 성급」 은 없다
+            Assert.IsFalse(Run.NaturesFor(d, "tv").Contains("냉정"));
+            Assert.AreEqual(2, Run.FloorCandidates(d, "tv", "냉정", 0).Count); Assert.AreEqual(0, Run.FloorCandidates(d, "tv", "냉정", 1).Count);
+            CollectionAssert.AreEquivalent(new[] { "u1", "u2" }, Run.FloorCandidates(d, "tv", "우울", 0), "1층 대타는 3성");
             // 규칙 우선 — 광기는 1층 1성 m1 · 2층 3성(m2 · m3). 3성이 1층으로 내려오지 않는다
             for (long seed = 1; seed <= 8; seed++)
             {
                 var hs = Run.New(d, PARTY, seed, "tv", null, "광기").BossHeroes;
                 Assert.AreEqual("m1", hs[0]); Assert.AreEqual(3, d.Hero(hs[1]).Star);
             }
+        }
+
+        [Test] public void 다른_종족에서_빌리지_않고_못_채우면_그_속성을_닫는다()
+        {
+            // 활발: 시험족 1~2성 a1 · 3성 없음(다른족 o3 만) → 닫힘. 우울: 시험족 1~2성 없음 · 3성 u3 하나뿐(다른족 o1 · v3 는 안 씀) → 닫힘.
+            // 순수: 1~2성 없음 · 3성 둘(p3 · q3) → 두 층 다 3성 · 서로 다른 사도로 열림. 엘다인(란)은 후보가 아니다.
+            const string H = @"[
+ {id:'a1', name:'활발 하나', race:'시험족', role:'딜러', hp:500, atk:100, def:20, nature:'활발', star:2},
+ {id:'o3', name:'남의 활발', race:'다른족', role:'딜러', hp:500, atk:100, def:20, nature:'활발', star:3},
+ {id:'o1', name:'남의 우울', race:'다른족', role:'딜러', hp:500, atk:100, def:20, nature:'우울', star:1},
+ {id:'u3', name:'우울 셋', race:'시험족', role:'딜러', hp:500, atk:100, def:20, nature:'우울', star:3},
+ {id:'v3', name:'남의 우울 셋', race:'다른족', role:'딜러', hp:500, atk:100, def:20, nature:'우울', star:3},
+ {id:'p3', name:'순수 셋', race:'시험족', role:'딜러', hp:500, atk:100, def:20, nature:'순수', star:3},
+ {id:'q3', name:'순수 넷', race:'시험족', role:'딜러', hp:500, atk:100, def:20, nature:'순수', star:3},
+ {id:'란', name:'엘다인', race:'시험족', role:'딜러', hp:500, atk:100, def:20, nature:'순수', star:2}]";
+            var d = K.Data(heroes: H, enemies: FOES, villages: VILLAGE);
+            var ok = Run.NaturesFor(d, "tv");
+            CollectionAssert.DoesNotContain(ok, "활발", "3성이 다른 종족뿐 — 닫힘");
+            CollectionAssert.DoesNotContain(ok, "우울", "1~2성 없고 3성 하나뿐 — 닫힘");
+            CollectionAssert.Contains(ok, "순수");
+            CollectionAssert.DoesNotContain(Run.FloorCandidates(d, "tv", "순수", 0), "란", "엘다인은 클론 후보가 아니다");
+            for (long seed = 1; seed <= 8; seed++)
+            {
+                var hs = Run.New(d, PARTY, seed, "tv", null, "순수").BossHeroes;
+                CollectionAssert.IsSubsetOf(hs, new[] { "p3", "q3" }); Assert.AreNotEqual(hs[0], hs[1], "두 층은 다른 사도");
+            }
+            // 저장된 판이 닫힌 속성이면 불러올 때 다시 뽑는다
+            var r = Run.New(d, PARTY, 5, "tv", null, "순수");
+            r.S.EnemyNature = "활발"; r.S.Bosses = new List<List<string>> { new() { "clone_m1" }, new() { "clone_p2" } };
+            var back = Run.Load(d, r.Save());
+            CollectionAssert.Contains(ok, back.EnemyNature, "닫힌 속성(활발) → 열린 속성으로");
+            Assert.IsTrue(back.BossHeroes.All(h => d.Hero(h).Nature == back.EnemyNature), "보스도 새 속성으로");
+            Assert.IsTrue(Validator.Check(d).Warnings.Any(w => w.Contains("닫힌 적 속성")), "닫힌 속성은 검사기 주의(오류 아님)");
+            Assert.IsFalse(Validator.Check(d).Errors.Any(w => w.Contains("닫힌 적 속성")));
         }
 
         [Test] public void 같은_마을_속성이라도_씨앗이_다르면_보스가_달라진다()
@@ -659,7 +733,8 @@ namespace Bolzena.Core.Tests
             var d = D();
             var run = Run.New(d, PARTY, 1, "tv", null, "광기");
             Assert.AreEqual("clone_m1", run.Bosses[0][0], "1층 원래 클론(광기)은 그대로");
-            Assert.AreEqual("mob", run.Bosses[0][1], "클론이 아닌 보스 줄 칸은 그대로");
+            Assert.AreEqual(1, run.Bosses[0].Count, "보스 줄은 보스 하나 — 데이터의 졸개(mob)는 덜어 낸다");
+            Assert.IsTrue(run.Bosses.All(l => l.Count == 1));
             CollectionAssert.Contains(new[] { GameData.CloneId("m2", "clone_p2"), GameData.CloneId("m3", "clone_p2") }, run.Bosses[1][0], "2층은 광기 3성(m2 · m3)이 원래 클론 몸을 빌려");
             var made = d.Enemy(run.Bosses[1][0]);
             Assert.AreEqual("광기", made.Nature); CollectionAssert.Contains(new[] { "m2", "m3" }, made.Clone); Assert.AreEqual(d.Hero(made.Clone).Name + " (클론)", made.Name);
@@ -669,9 +744,57 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("clone_p2", pr.Bosses[1][0], "2층 원래 클론(순수 3성)은 그대로");
             Assert.AreEqual(GameData.CloneId("p1", "clone_m1"), pr.Bosses[0][0], "1층은 순수 1~2성 p1 이 몸을 빌려");
             Assert.AreEqual(d.Hero(pr.BossHeroes[0]).Nature, "순수");
-            // 옛 저장(보스 줄 없음)은 마을 데이터 그대로
+            // 옛 저장(보스 줄 없음)도 고정 보스(마을 데이터)를 쓰지 않고 그 판 씨앗 · 속성으로 새로 고른다
             var old = Run.New(d, PARTY, 1, "tv", null, "광기"); old.S.Bosses = null;
-            Assert.AreEqual("clone_p2", old.Bosses[1][0]);
+            Assert.AreEqual(GameData.ToJson(Run.PickBosses(d, "tv", "광기", 1)), GameData.ToJson(old.Bosses));
+            Assert.AreNotEqual("clone_p2", old.Bosses[1][0], "광기 판 2층에 순수 클론이 서지 않는다");
+            // 옛 저장의 보스 줄에 졸개가 있어도 보스 하나만
+            old.S.Bosses = new List<List<string>> { new() { "clone_m1", "mob" }, new() { "clone_p2" } };
+            CollectionAssert.AreEqual(new[] { "clone_m1" }, old.Bosses[0]);
+            old.S.Floor = 0; old.S.Node = 3; old.S.Map = null;
+            CollectionAssert.AreEqual(new[] { "clone_m1" }, old.CurrentEnemies());
+        }
+
+        [Test] public void 보스가_세운_강인도_없는_소환물은_보스와_같이_쓰러진다()
+        {
+            var d = K.Data(cards: "[{id:'nuke', name:'한 방', hero:'a', cost:0, type:'공격', fx:[{k:'dmg', ratio:100, target:'oneEnemy'}]}]", enemies: @"[
+ {id:'imp', name:'졸개', hp:300, tough:3, intents:[{t:'attack', v:1, rush:0}]},
+ {id:'boss1', name:'보스', hp:50, boss:true, tough:10, intents:[{t:'summon', id:'imp', n:2, max:2, noTough:true, rush:0}]},
+ {id:'elite1', name:'엘리트', hp:50, tough:6, intents:[{t:'summon', id:'imp', n:1, max:1, rush:0}]}]");
+            var b = K.Fight(d, new[] { "a" }, new[] { "boss1" });
+            b.EndTurn();
+            var imps = b.Enemies.Where(e => e.Key == "imp" && !e.Dead).ToList();
+            Assert.AreEqual(2, imps.Count, "보스가 소환");
+            Assert.IsTrue(imps.All(e => e.ToughMax == 0), "강인도 없음");
+            K.Hand(b, "nuke"); K.Play(b, "nuke", 0);
+            Assert.IsTrue(b.Enemies[0].Dead);
+            Assert.IsTrue(b.Enemies.Where(e => e.Key == "imp").All(e => e.Dead), "보스가 쓰러지면 소환물도");
+            Assert.AreEqual("win", b.Over, "보스 하나를 쓰러뜨리면 끝");
+            // 보스가 아닌 적이 세운 (강인도 있는) 적은 남는다
+            var b2 = K.Fight(d, new[] { "a" }, new[] { "elite1" });
+            b2.EndTurn();
+            Assert.AreEqual(1, b2.Enemies.Count(e => e.Key == "imp" && !e.Dead));
+            Assert.Greater(b2.Enemies.First(e => e.Key == "imp").ToughMax, 0);
+            K.Hand(b2, "nuke"); K.Play(b2, "nuke", 0);
+            Assert.AreEqual(1, b2.Enemies.Count(e => e.Key == "imp" && !e.Dead), "엘리트가 세운 적은 남는다");
+        }
+
+        [Test] public void 검사기_보스는_하나_강인도_엘리트_5_보스_7()
+        {
+            string Foes(int bossT, int eliteT) => @"[
+ {id:'mob', name:'잔챙이', hp:300, tough:3, intents:[{t:'attack', v:10, rush:0}]},
+ {id:'el', name:'엘리트', hp:600, tough:ET, intents:[{t:'attack', v:10, rush:0}]},
+ {id:'bs', name:'보스', hp:2000, boss:true, tough:BT, intents:[{t:'attack', v:10, rush:0}]}]".Replace("ET", eliteT.ToString()).Replace("BT", bossT.ToString());
+            string Vil(string boss, string elite) => @"[{id:'tv', name:'시험 마을', race:'시험족', floors:[
+ {name:'1층', land:'시험', pools:[[['mob']],[['mob']],[['mob']]], elites:[[ELITE]], boss:[BOSS]},
+ {name:'2층', land:'시험', pools:[[['mob']],[['mob']],[['mob']]], elites:[[ELITE]], boss:['bs']}]}]".Replace("ELITE", elite).Replace("BOSS", boss);
+            List<string> Errs(int bt, int et, string boss, string elite) => Validator.Check(K.Data(enemies: Foes(bt, et), villages: Vil(boss, elite))).Errors;
+            Assert.IsEmpty(Errs(7, 5, "'bs'", "'el','mob'").Where(x => x.Contains("보스") || x.Contains("엘리트")).ToList(), "기준을 지키면 오류 없음");
+            Assert.IsTrue(Errs(7, 5, "'bs','mob'", "'el'").Any(x => x.Contains("보스 칸은 하나")), "보스 칸에 졸개");
+            Assert.IsTrue(Errs(7, 4, "'bs'", "'el','mob'").Any(x => x.Contains("엘리트") && x.Contains("5")), "엘리트 싸움에 강인도 5 이상이 없다");
+            Assert.IsTrue(Errs(6, 5, "'bs'", "'el'").Any(x => x.Contains("보스 tough")), "보스 강인도 7 미만");
+            var b = K.Fight(K.Data(enemies: "[{id:'lo', name:'낮은 보스', hp:100, boss:true, tough:3, intents:[{t:'attack', v:1, rush:0}]}]"), new[] { "a" }, new[] { "lo" });
+            Assert.GreaterOrEqual(b.Enemies[0].ToughMax, 7, "엔진도 보스를 7 아래로 세우지 않는다");
         }
     }
 

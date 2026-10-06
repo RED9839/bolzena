@@ -15,6 +15,8 @@ namespace Bolzena.Core
         public bool Keyword, Counter;
         /// <summary>변신 칩(사도 개인 층) — Id 는 변신 이름, Stacks 는 남은 턴(0 = 전투 끝까지). 자세한 것은 b.FormOf(사도 키).</summary>
         public bool Form;
+        /// <summary>강화 칩(파티 층) — 켜진 강화 카드 지속 규칙. Id 는 카드 이름, Stacks 는 겹 수. 자세한 것(규칙 글 · 주인)은 b.PowersOf().</summary>
+        public bool Power;
         public List<StatusSource> Sources = new();
     }
 
@@ -138,6 +140,8 @@ namespace Bolzena.Core
                     else v.Sources = SourcesOf(Pool, kv.Key, kv.Value);
                     o.Add(v);
                 }
+                foreach (var pw in Powers)
+                    o.Add(new StatusView { Id = pw.Name, Stacks = pw.N, Layer = "party", Power = true, Sources = new List<StatusSource> { new StatusSource { Kind = "hero", Hero = pw.Hero, Stacks = pw.N } } });
                 return o;
             }
             foreach (var kv in u.Status.Where(kv => kv.Value != 0))

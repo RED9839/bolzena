@@ -12,10 +12,10 @@
       "atk": 125,
       "def": 28,
       "crit": 10,
-      "blurb": "돈까스를 끝내 입에 넣지 못하는 시장. 스킬을 낼 때마다 돈까스 도시락을 돌리고, 도시락이 비워질 때마다 지지율이 올라 시청 앞 축포가 터진다.",
+      "blurb": "돈까스를 끝내 입에 넣지 못하는 시장. 스킬을 낼 때마다 돈까스 도시락을 돌리고, 도시락이 비워질 때마다 지지율이 올라 시청 앞 축포가 터집니다.",
       "keyword": {
         "name": "지지율",
-        "desc": "도시락 한 그릇마다 오르는 민심 — 셋이면 축포",
+        "desc": "도시락으로 모으는 민심",
         "carrier": "self",
         "cap": 3,
         "rules": [
@@ -440,13 +440,30 @@
         {
           "k": "atkMod",
           "v": 0.1,
-          "target": "self",
-          "run": true
+          "run": true,
+          "target": "self"
         },
         {
-          "k": "stack",
-          "id": "지지율",
-          "v": 2
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "play",
+                "type": "스킬"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "지지율",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
@@ -455,14 +472,31 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.13,
-              "target": "self",
-              "run": true
+              "v": 0.1,
+              "run": true,
+              "target": "self"
             },
             {
-              "k": "stack",
-              "id": "지지율",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지지율",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -471,15 +505,30 @@
           "cost": 0,
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "target": "self",
-              "run": true
+              "k": "draw",
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "지지율",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지지율",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -489,17 +538,34 @@
             {
               "k": "atkMod",
               "v": 0.1,
-              "target": "self",
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "지지율",
-              "v": 2
+              "run": true,
+              "target": "self"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지지율",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -508,14 +574,36 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.14,
-              "target": "self",
-              "run": true
+              "v": 0.15,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "stack",
               "id": "지지율",
-              "v": 3
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지지율",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -527,14 +615,36 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.12,
-              "target": "self",
-              "run": true
+              "v": 0.1,
+              "run": true,
+              "target": "self"
             },
             {
               "k": "stack",
               "id": "지지율",
-              "v": 3
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지지율",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

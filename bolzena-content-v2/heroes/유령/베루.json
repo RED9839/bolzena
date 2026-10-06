@@ -12,10 +12,10 @@
       "atk": 104,
       "def": 25,
       "crit": 10,
-      "blurb": "남의 흠만 쏙쏙 찾아 험하게 늘어지는 결점의 유령. 베루가 친 적에게는 「흠」 이 남고, 흠 붙은 적을 치는 아군 공격은 한 장마다 약점으로 꽂힌다.",
+      "blurb": "남의 흠만 쏙쏙 찾아 험하게 늘어지는 결점의 유령. 베루가 친 적에게는 「흠」 이 남고, 흠 붙은 적을 치는 아군 공격은 한 장마다 약점으로 꽂힙니다.",
       "keyword": {
         "name": "흠",
-        "desc": "베루가 물고 늘어진 결점 — 아군 공격이 거기로 꽂힌다",
+        "desc": "아군 공격이 꽂히는 결점",
         "carrier": "enemy",
         "cap": 3,
         "weakens": true,
@@ -138,7 +138,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.1,
               "target": "allEnemies"
             },
             {
@@ -155,7 +155,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.6,
               "target": "allEnemies"
             },
             {
@@ -167,21 +167,33 @@
           ]
         },
         {
-          "name": "숨겨 둔 도끼",
-          "tags": [
-            "보존"
-          ],
+          "name": "흠집 내기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.9,
               "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "흠",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "정수리 도끼",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2
             }
           ]
         },
@@ -191,27 +203,8 @@
             {
               "k": "dmg",
               "ratio": 0.55,
-              "hits": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "축복의 도끼",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "allEnemies"
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "stack",
@@ -262,7 +255,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.75,
+              "ratio": 3.15,
               "target": "oneEnemy"
             },
             {
@@ -273,12 +266,12 @@
           ]
         },
         {
-          "name": "살짝 물기",
+          "name": "앙 물기",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.2,
+              "ratio": 1.65,
               "target": "oneEnemy"
             },
             {
@@ -289,20 +282,26 @@
           ]
         },
         {
-          "name": "벼르던 흠",
-          "tags": [
-            "보존"
-          ],
+          "name": "흠 잡아 뜯기",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.5,
-              "target": "oneEnemy"
-            },
             {
               "k": "stack",
               "id": "흠",
               "v": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.0,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "흠"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -327,14 +326,15 @@
           ]
         },
         {
-          "name": "축복의 흠",
+          "name": "벼르던 흠",
           "tags": [
-            "축복"
+            "약점 공격",
+            "주도"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.4,
+              "ratio": 2.6,
               "target": "oneEnemy"
             },
             {
@@ -416,41 +416,35 @@
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 1
-            },
-            {
-              "k": "status",
               "id": "잔광",
               "v": 1
             }
           ]
         },
         {
-          "name": "품에 든 계약서",
-          "tags": [
-            "보존"
-          ],
+          "name": "단체 계약",
           "fx": [
             {
               "k": "stack",
               "id": "흠",
-              "v": 3
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 1
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "잔광",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "갱신 조항",
+          "name": "위약금",
           "fx": [
             {
               "k": "stack",
@@ -459,7 +453,7 @@
             },
             {
               "k": "status",
-              "id": "취약",
+              "id": "약화",
               "v": 2
             },
             {
@@ -470,10 +464,8 @@
           ]
         },
         {
-          "name": "축복의 계약",
-          "tags": [
-            "축복"
-          ],
+          "name": "평생 계약",
+          "cost": 3,
           "fx": [
             {
               "k": "stack",
@@ -483,20 +475,20 @@
             {
               "k": "status",
               "id": "취약",
-              "v": 1
+              "v": 2
             },
             {
               "k": "status",
               "id": "잔광",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "빼곡한 약관",
-          "kind": "frost"
+          "name": "깨알 같은 약관",
+          "kind": "draw"
         },
         {
           "name": "빠른 도장",
@@ -558,7 +550,7 @@
           ]
         },
         {
-          "name": "살짝 숨기",
+          "name": "쏙 숨기",
           "cost": 0,
           "fx": [
             {
@@ -569,32 +561,6 @@
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "늘 숨는 자리",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "draw",
               "v": 1
             }
           ]
@@ -619,20 +585,38 @@
           ]
         },
         {
-          "name": "축복의 등",
+          "name": "메죵을 방패로",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "늘 숨는 자리",
           "tags": [
-            "축복"
+            "보존"
           ],
           "fx": [
             {
               "k": "stack",
               "id": "흠",
-              "v": 2
+              "v": 1
             },
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 1
+              "v": 2
             },
             {
               "k": "draw",
@@ -643,11 +627,11 @@
       ],
       "blesses": [
         {
-          "name": "넓은 등",
-          "kind": "guard"
+          "name": "쪼르르",
+          "kind": "cost"
         },
         {
-          "name": "재빠른 숨기",
+          "name": "힐끔",
           "kind": "draw"
         },
         {

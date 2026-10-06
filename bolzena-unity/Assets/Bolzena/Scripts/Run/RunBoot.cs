@@ -16,7 +16,22 @@ namespace Bolzena
         void Awake()
         {
             Demo.InputProbe.Install();     // -inputprobe(사람 입력 재현)
+            Demo.EnterLeak.Install();      // -leakprobe · -demo-loop(전투 들고 나기 저울)
             if (Flow.Me != null) return;   // 전투에서 돌아왔다
+            // 웹 빌드 — 스파인 번들(스탠딩)을 받은 뒤에 판 화면을 세운다(WebBundles). PC · 에디터는 곧바로
+            if (Application.platform == RuntimePlatform.WebGLPlayer && !WebBundles.Active) { StartCoroutine(BootWeb()); return; }
+            Begin();
+        }
+
+        System.Collections.IEnumerator BootWeb()
+        {
+            yield return WebBundles.Boot();
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-battle") >= 0) yield return WebBundles.WaitAll();   // 전투 시범은 곧바로 전투
+            Begin();
+        }
+
+        void Begin()
+        {
             DisplayOptions.RenderScaleHook = ApplyRenderScale;
             DisplayOptions.LoadAndApply(); // 화면 설정(창 모드 · 해상도 · 프레임 · 수직동기) — 판 · 전투가 같은 값. 명령줄 크기가 있으면 프레임만
             var args = Environment.GetCommandLineArgs();

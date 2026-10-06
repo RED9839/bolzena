@@ -11,10 +11,10 @@
    "atk": 86,
    "def": 60,
    "crit": 5,
-   "blurb": "좋은 걸 맛보게 한 뒤 빼앗는 빌런 지망생. 사기를 빌려주고 두 턴 뒤 거둬 가며 적을 약하게 만든다 — 그 사이 적을 쓰러뜨리면 빚은 없던 일.",
+   "blurb": "좋은 걸 맛보게 한 뒤 빼앗는 빌런 지망생. 사기를 빌려주고 두 턴 뒤 거둬 가며 적을 약하게 만듭니다 — 그 사이 적을 쓰러뜨리면 빚은 없던 일.",
    "keyword": {
     "name": "빌려준 맛",
-    "desc": "시저가 빌려준 사기 — 두 턴 뒤 거둬 간다(그 사이 처치하면 탕감)",
+    "desc": "빌려주고 거둬 갈 사기",
     "carrier": "self",
     "cap": 4
    },
@@ -695,6 +695,23 @@
      "id": "약화",
      "v": 1,
      "target": "allEnemies"
+    },
+    {
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "kill"
+       },
+       "fx": [
+        {
+         "k": "status",
+         "id": "사기",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -711,6 +728,23 @@
        "id": "약화",
        "v": 1,
        "target": "allEnemies"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "kill"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "사기",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -719,15 +753,25 @@
      "cost": 0,
      "fx": [
       {
-       "k": "status",
-       "id": "사기",
+       "k": "draw",
        "v": 1
       },
       {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "kill"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "사기",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -746,9 +790,21 @@
        "target": "allEnemies"
       },
       {
-       "k": "stack",
-       "id": "빌려준 맛",
-       "v": 1
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "kill"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "사기",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -762,14 +818,25 @@
       },
       {
        "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
        "id": "결의",
        "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "kill"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "사기",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -781,14 +848,30 @@
      "fx": [
       {
        "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "status",
        "id": "약화",
        "v": 2,
        "target": "allEnemies"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "kill"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "사기",
+           "v": 2
+          },
+          {
+           "k": "draw",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     }

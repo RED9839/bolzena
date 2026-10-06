@@ -11,11 +11,11 @@
    "atk": 86,
    "def": 58,
    "crit": 5,
-   "blurb": "나타와 뒤섞여 머릿속에서 늘 회의 중. 턴의 첫 카드가 공격이면 뮤트가, 스킬이면 나타가 그 턴 의장을 맡는다.",
+   "blurb": "나타와 뒤섞여 머릿속에서 늘 회의 중. 턴의 첫 카드가 공격이면 뮤트가 의장이 되어 공격마다 적을 「홀로그램」 그물로 감아 지지고, 스킬이면 나타가 의장이 되어 파티를 지킵니다.",
    "keywords": [
     {
      "name": "뮤트 의장",
-     "desc": "이번 턴 회의는 뮤트가 이끈다 — 뮤트 카드가 적을 무르게 만든다",
+     "desc": "뮤트가 이끄는 회의",
      "carrier": "self",
      "cap": 1,
      "endClear": true,
@@ -40,7 +40,7 @@
     },
     {
      "name": "나타 의장",
-     "desc": "이번 턴 회의는 나타가 이끈다 — 뮤트 카드가 파티를 지킨다",
+     "desc": "나타가 이끄는 회의",
      "carrier": "self",
      "cap": 1,
      "endClear": true,
@@ -62,13 +62,54 @@
        ]
       }
      ]
+    },
+    {
+     "name": "홀로그램",
+     "desc": "표적을 에워싸는 홀로그램 그물",
+     "carrier": "enemy",
+     "cap": 6,
+     "per": [
+      {
+       "stat": "dot",
+       "ratio": 0.15
+      }
+     ],
+     "rules": [
+      {
+       "name": "에러 메시지",
+       "when": {
+        "on": "stackReach",
+        "id": "홀로그램",
+        "n": 6
+       },
+       "fx": [
+        {
+         "k": "spend",
+         "id": "홀로그램",
+         "all": true
+        },
+        {
+         "k": "dmg",
+         "ratio": 1.5,
+         "target": "oneEnemy"
+        },
+        {
+         "k": "status",
+         "id": "취약",
+         "v": 2,
+         "target": "oneEnemy"
+        }
+       ]
+      }
+     ]
     }
    ],
    "passives": [
     {
      "name": "뮤트의 발언",
      "when": {
-      "on": "play"
+      "on": "play",
+      "type": "공격"
      },
      "conds": [
       {
@@ -79,9 +120,9 @@
      ],
      "fx": [
       {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
+       "k": "stack",
+       "id": "홀로그램",
+       "v": 3,
        "target": "oneEnemy"
       }
      ]
@@ -118,13 +159,18 @@
       "target": "allEnemies"
      },
      {
-      "k": "status",
-      "id": "피해 감소",
+      "k": "stack",
+      "id": "홀로그램",
+      "v": 3,
+      "target": "allEnemies"
+     },
+     {
+      "k": "ap",
       "v": 2
      },
      {
       "k": "draw",
-      "v": 2
+      "v": 1
      }
     ]
    },
@@ -365,7 +411,13 @@
    "fx": [
     {
      "k": "dmg",
-     "ratio": 2.2,
+     "ratio": 2.0,
+     "target": "oneEnemy"
+    },
+    {
+     "k": "stack",
+     "id": "홀로그램",
+     "v": 2,
      "target": "oneEnemy"
     },
     {
@@ -385,7 +437,13 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.97,
+       "ratio": 2.6,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "홀로그램",
+       "v": 2,
        "target": "oneEnemy"
       },
       {
@@ -406,7 +464,13 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.76,
+       "ratio": 1.5,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "홀로그램",
+       "v": 1,
        "target": "oneEnemy"
       },
       {
@@ -426,13 +490,13 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.4,
+       "ratio": 2.0,
        "target": "oneEnemy"
       },
       {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
+       "k": "stack",
+       "id": "홀로그램",
+       "v": 4,
        "target": "oneEnemy"
       },
       {
@@ -452,7 +516,13 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 1.86,
+       "ratio": 2.0,
+       "target": "allEnemies"
+      },
+      {
+       "k": "stack",
+       "id": "홀로그램",
+       "v": 1,
        "target": "allEnemies"
       },
       {
@@ -475,7 +545,13 @@
      "fx": [
       {
        "k": "dmg",
-       "ratio": 2.2,
+       "ratio": 2.4,
+       "target": "oneEnemy"
+      },
+      {
+       "k": "stack",
+       "id": "홀로그램",
+       "v": 2,
        "target": "oneEnemy"
       },
       {
@@ -487,10 +563,6 @@
        "id": "취약",
        "v": 2,
        "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
       }
      ]
     }
@@ -662,19 +734,27 @@
    "type": "강화",
    "fx": [
     {
-     "k": "stack",
-     "id": "뮤트 의장",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "나타 의장",
-     "v": 1
-    },
-    {
      "k": "status",
      "id": "사기",
      "v": 1
+    },
+    {
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnEnd"
+       },
+       "fx": [
+        {
+         "k": "status",
+         "id": "취약",
+         "v": 1,
+         "target": "allEnemies"
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -682,19 +762,27 @@
      "name": "완벽한 합의",
      "fx": [
       {
-       "k": "stack",
-       "id": "뮤트 의장",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "나타 의장",
-       "v": 1
-      },
-      {
        "k": "status",
        "id": "사기",
        "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnEnd"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "취약",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -703,19 +791,22 @@
      "cost": 0,
      "fx": [
       {
-       "k": "stack",
-       "id": "뮤트 의장",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "나타 의장",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnEnd"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "취약",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -723,30 +814,38 @@
      "name": "두 자아의 화해",
      "fx": [
       {
-       "k": "stack",
-       "id": "뮤트 의장",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "나타 의장",
+       "k": "status",
+       "id": "사기",
        "v": 1
       },
       {
        "k": "status",
        "id": "면역",
        "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnEnd"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "취약",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
     {
      "name": "합동 연설",
      "fx": [
-      {
-       "k": "stack",
-       "id": "뮤트 의장",
-       "v": 1
-      },
       {
        "k": "status",
        "id": "사기",
@@ -757,6 +856,24 @@
        "id": "취약",
        "v": 2,
        "target": "allEnemies"
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnEnd"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "취약",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -767,19 +884,32 @@
      ],
      "fx": [
       {
-       "k": "stack",
-       "id": "뮤트 의장",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "나타 의장",
-       "v": 1
-      },
-      {
        "k": "status",
        "id": "사기",
        "v": 1
+      },
+      {
+       "k": "stack",
+       "id": "뮤트 의장",
+       "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnEnd"
+         },
+         "fx": [
+          {
+           "k": "status",
+           "id": "취약",
+           "v": 1,
+           "target": "allEnemies"
+          }
+         ]
+        }
+       ]
       }
      ]
     }

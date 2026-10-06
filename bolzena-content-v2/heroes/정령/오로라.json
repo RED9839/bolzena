@@ -11,16 +11,65 @@
    "atk": 75,
    "def": 70,
    "crit": 5,
-   "blurb": "혼자 남겨지는 걸 두려워하는 다정한 방패. 아군이 카드를 낼 때마다 빛무리가 짙어지고, 셋이 함께 움직인 턴엔 극광이 한 겹 더 내려앉는다.",
+   "blurb": "혼자 남겨지는 걸 두려워하는 다정한 방패. 아군이 카드를 낼 때마다 빛무리가 짙어지고, 셋이 함께 움직인 턴엔 극광이 한 겹 더 내려앉습니다. 마음먹고 오로라를 불러내면 적 진영 위에 장막이 드리워, 한동안 턴마다 빛의 비가 쏟아집니다.",
    "keyword": {
     "name": "빛무리",
-    "desc": "곁에 있는 이들이 남긴 빛 — 쌓일수록 실드가 두꺼워진다",
+    "desc": "아군이 남긴 빛",
     "carrier": "self",
     "cap": 3,
     "per": [
      {
       "stat": "guard",
       "v": 0.15
+     }
+    ],
+    "rules": [
+     {
+      "name": "외롭지 않게",
+      "when": {
+       "on": "turnStart"
+      },
+      "conds": [
+       {
+        "c": "stack",
+        "id": "빛무리",
+        "n": 3
+       }
+      ],
+      "fx": [
+       {
+        "k": "draw",
+        "v": 1
+       }
+      ]
+     },
+     {
+      "name": "외롭지 않게",
+      "when": {
+       "on": "turnStart"
+      },
+      "conds": [
+       {
+        "c": "stack",
+        "id": "빛무리",
+        "n": 1
+       }
+      ],
+      "fx": [
+       {
+        "k": "perStack",
+        "id": "빛무리"
+       },
+       {
+        "k": "shield",
+        "ratio": 0.4
+       },
+       {
+        "k": "spend",
+        "id": "빛무리",
+        "all": true
+       }
+      ]
      }
     ]
    },
@@ -42,40 +91,21 @@
        "v": 1
       }
      ]
-    },
-    {
-     "name": "외롭지 않게",
-     "when": {
-      "on": "turnStart"
-     },
-     "conds": [
-      {
-       "c": "stack",
-       "id": "빛무리",
-       "n": 3
-      }
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 0.6
-      },
-      {
-       "k": "spend",
-       "id": "빛무리",
-       "v": 1
-      }
-     ]
     }
    ],
    "ult": {
     "name": "고요한 빛무리",
     "cost": 250,
     "fx": [
+     {
+      "k": "cue",
+      "id": "aurora_summon"
+     },
+     {
+      "k": "stack",
+      "id": "오로라 장막",
+      "v": 3
+     },
      {
       "k": "shield",
       "ratio": 3
@@ -97,6 +127,76 @@
     "오로라_s1",
     "오로라_s2",
     "오로라_s2"
+   ],
+   "keywords": [
+    {
+     "name": "오로라 장막",
+     "desc": "적 진영 위에 드리운 오로라",
+     "carrier": "self",
+     "cap": 3,
+     "decay": 1,
+     "rules": [
+      {
+       "name": "플라즈마 불꽃",
+       "when": {
+        "on": "turnStart"
+       },
+       "conds": [
+        {
+         "c": "stack",
+         "id": "오로라 장막",
+         "n": 1
+        }
+       ],
+       "fx": [
+        {
+         "k": "cue",
+         "id": "aurora_rain",
+         "v": 4
+        },
+        {
+         "k": "dmg",
+         "ratio": 0.25,
+         "hits": 4,
+         "target": "randomEnemy"
+        },
+        {
+         "k": "status",
+         "id": "취약",
+         "v": 1,
+         "target": "randomEnemy"
+        }
+       ]
+      },
+      {
+       "name": "플라즈마 불꽃",
+       "when": {
+        "on": "stackGone",
+        "id": "오로라 장막",
+        "decay": true
+       },
+       "fx": [
+        {
+         "k": "cue",
+         "id": "aurora_rain",
+         "v": 4
+        },
+        {
+         "k": "dmg",
+         "ratio": 0.25,
+         "hits": 4,
+         "target": "randomEnemy"
+        },
+        {
+         "k": "status",
+         "id": "취약",
+         "v": 1,
+         "target": "randomEnemy"
+        }
+       ]
+      }
+     ]
+    }
    ]
   }
  ],
@@ -587,12 +687,24 @@
     {
      "k": "status",
      "id": "결정화",
-     "v": 2
+     "v": 1
     },
     {
-     "k": "stack",
-     "id": "빛무리",
-     "v": 3
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "빛무리",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -602,12 +714,24 @@
       {
        "k": "status",
        "id": "결정화",
-       "v": 3
+       "v": 2
       },
       {
-       "k": "stack",
-       "id": "빛무리",
-       "v": 3
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "빛무리",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -616,14 +740,21 @@
      "cost": 0,
      "fx": [
       {
-       "k": "status",
-       "id": "결정화",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "빛무리",
-       "v": 3
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "빛무리",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -633,17 +764,29 @@
       {
        "k": "status",
        "id": "결정화",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "빛무리",
-       "v": 3
+       "v": 1
       },
       {
        "k": "status",
        "id": "불굴",
        "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "빛무리",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -653,17 +796,29 @@
       {
        "k": "status",
        "id": "결정화",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "빛무리",
-       "v": 3
+       "v": 1
       },
       {
        "k": "status",
        "id": "반격",
        "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "빛무리",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -676,12 +831,29 @@
       {
        "k": "status",
        "id": "결정화",
-       "v": 3
+       "v": 1
       },
       {
        "k": "stack",
        "id": "빛무리",
-       "v": 3
+       "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "빛무리",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     }

@@ -11,10 +11,10 @@
    "atk": 135,
    "def": 28,
    "crit": 10,
-   "blurb": "춤밖에 모르는 적포도 스트리트 댄서. 같은 결의 카드를 잇달아 이으면 스텝이 쌓이고, 세 번째 스텝에 브레이크가 터진다.",
+   "blurb": "춤밖에 모르는 적포도 스트리트 댄서. 같은 결의 카드를 잇달아 이으면 스텝이 쌓이고, 세 번째 스텝에 브레이크가 터집니다.",
    "keyword": {
     "name": "스텝",
-    "desc": "박자에 맞춰 밟은 스텝 — 셋이면 브레이크",
+    "desc": "박자에 맞춰 밟는 스텝",
     "carrier": "self",
     "cap": 3,
     "rules": [
@@ -78,13 +78,32 @@
      {
       "k": "dmg",
       "ratio": 0.5,
-      "target": "randomEnemy",
+      "target": "oneEnemy",
       "hits": 4
      },
      {
       "k": "stack",
       "id": "스텝",
       "v": 2
+     },
+     {
+      "k": "status",
+      "id": "회피",
+      "v": 1
+     },
+     {
+      "k": "ifFoe",
+      "id": "hp",
+      "pct": 0.5
+     },
+     {
+      "k": "cue",
+      "id": "arco_crit"
+     },
+     {
+      "k": "dmg",
+      "ratio": 1.0,
+      "target": "oneEnemy"
      }
     ]
    },
@@ -540,20 +559,32 @@
    "type": "강화",
    "fx": [
     {
+     "k": "atkMod",
+     "v": 0.1,
+     "run": true,
+     "target": "self"
+    },
+    {
      "k": "status",
      "id": "잔광",
      "v": 2
     },
     {
-     "k": "stack",
-     "id": "스텝",
-     "v": 1
-    },
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
+     "k": "power",
+     "rules": [
+      {
+       "when": {
+        "on": "turnStart"
+       },
+       "fx": [
+        {
+         "k": "stack",
+         "id": "스텝",
+         "v": 1
+        }
+       ]
+      }
+     ]
     }
    ],
    "oracles": [
@@ -561,20 +592,32 @@
      "name": "메인 스테이지",
      "fx": [
       {
-       "k": "status",
-       "id": "잔광",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "스텝",
-       "v": 1
-      },
-      {
        "k": "atkMod",
-       "v": 0.2,
+       "v": 0.15,
        "run": true,
        "target": "self"
+      },
+      {
+       "k": "status",
+       "id": "잔광",
+       "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "스텝",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -583,20 +626,29 @@
      "cost": 0,
      "fx": [
       {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "스텝",
+       "k": "draw",
        "v": 1
       },
       {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
+       "k": "draw",
+       "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "스텝",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -606,17 +658,29 @@
       {
        "k": "status",
        "id": "잔광",
-       "v": 4
-      },
-      {
-       "k": "stack",
-       "id": "스텝",
-       "v": 1
+       "v": 3
       },
       {
        "k": "status",
        "id": "사기",
        "v": 1
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "스텝",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -624,19 +688,32 @@
      "name": "크루 결성",
      "fx": [
       {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "스텝",
-       "v": 1
+       "k": "atkMod",
+       "v": 0.1,
+       "run": true,
+       "target": "self"
       },
       {
        "k": "status",
        "id": "협공",
        "v": 2
+      },
+      {
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "스텝",
+           "v": 1
+          }
+         ]
+        }
+       ]
       }
      ]
     },
@@ -647,9 +724,10 @@
      ],
      "fx": [
       {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
+       "k": "atkMod",
+       "v": 0.15,
+       "run": true,
+       "target": "self"
       },
       {
        "k": "stack",
@@ -657,10 +735,21 @@
        "v": 2
       },
       {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
+       "k": "power",
+       "rules": [
+        {
+         "when": {
+          "on": "turnStart"
+         },
+         "fx": [
+          {
+           "k": "stack",
+           "id": "스텝",
+           "v": 2
+          }
+         ]
+        }
+       ]
       }
      ]
     }
