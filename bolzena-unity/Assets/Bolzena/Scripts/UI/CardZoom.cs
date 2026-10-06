@@ -70,9 +70,10 @@ namespace Bolzena.UI
             float pw = PanelW * k;
             bool isCard = t.Kind == "card" && t.Card != null;
             bool bad = t.Kind == "no" || (t.Kind == "status" && Bolzena.Core.R.IsBadSt(t.Word));
-            bool hero = t.Kind == "kw" && !Terms.Words.ContainsKey(t.Word);   // 엔진 화면 낱말이 아닌 「X」 = 사도 고유 효과
+            bool form = t.Kind == "form";   // 사도 변신(성전 모드 · 맨주먹 전성기 …)
+            bool hero = form || (t.Kind == "kw" && !Terms.Words.ContainsKey(t.Word));   // 엔진 화면 낱말이 아닌 「X」 = 사도 고유 효과
             Color edge = bad ? Tone.Bad : isCard ? Tone.Sky : (hero || t.Kind == "flash") ? Tone.Gold : Tone.Edge;
-            string kind = hero ? "고유 효과" : isCard ? "카드" : t.Kind == "status" && bad ? "디버프" : null;
+            string kind = form ? "변신" : hero ? "고유 효과" : isCard ? "카드" : t.Kind == "status" && bad ? "디버프" : null;
             Color nameC = bad ? Tone.Bad : isCard ? Tone.Sky : Tone.Gold;
 
             // 머리줄 — 아이콘 + 이름
@@ -100,10 +101,11 @@ namespace Bolzena.UI
             }
             else
             {
-                string bodyText = Hilite(t.Text);   // 수치 · 지속이 다 든 한 가지 글(고유 효과 = CardText.Trait · 엔진 낱말 = CardText.TIPS) — 「자세히」 없음
+                string bodyText = Hilite(t.Text);   // 어절 단위 · 이름 · 수치 덩이는 끊지 않음   // 수치 · 지속이 다 든 한 가지 글(고유 효과 = CardText.Trait · 엔진 낱말 = CardText.TIPS) — 「자세히」 없음
                 var body = Tone.Text("b", pn, bodyText, new Vector3(hx, hy - 0.34f * k, 0), Tone.Sm * k, O + 3, Tone.Ink, TextAlignmentOptions.TopLeft, true, pw - 0.4f * k);
                 body.textWrappingMode = TextWrappingModes.Normal;
                 body.lineSpacing = -2;
+                body.text = Bolzena.RunUI.CardTerms.FitFor(body, bodyText, pw - 0.4f * k, body.fontSize);   // 어절 · 덩이 · 화살표 규칙
                 body.rectTransform.sizeDelta = new Vector2(pw - 0.4f * k, 10);
                 body.ForceMeshUpdate();
                 h = 0.14f + 0.34f * k + body.preferredHeight + 0.18f;

@@ -236,24 +236,53 @@ print("고학년 아이콘", ng, "새로")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cardpic
 picdir = f"{DST}/RunArt/CardPic"
-want = {}
+objdir = f"{DST}/RunArt/CardObj"
+# 사물 · SD(투명 그림)는 CardObj 에 알파 경계로 잘라 따로(cardpic.bake_obj) — 자리는 화면이 잡는다(CardArt.Place).
+#   BOLZENA_KEEP_OLD_CARDPIC=1 이면 예전 한 장 굽기(CardPic)도 남긴다(전후 시트 -oldpicfit 용)
+keep_old = os.environ.get("BOLZENA_KEEP_OLD_CARDPIC") == "1"
+want, objs = {}, {}
 for cid, p in cardpic.load().items():
     if p.get("file"):
-        want[cardpic.name_of(p)] = p
+        (objs if cardpic.is_obj(p) else want)[cardpic.name_of(p)] = p
+        if keep_old and cardpic.is_obj(p):
+            want[cardpic.name_of(p)] = p
+for i in range(len(cardpic.NATURES)):
+    want[f"_back_{i}"] = None
 np_ = 0
 for name, p in sorted(want.items()):
     dst = f"{picdir}/{name}.png"
-    if not os.path.exists(dst) and cardpic.bake(p, dst):
+    if os.path.exists(dst):
+        continue
+    if p is None:
+        cardpic.bake_back(int(name.split("_")[-1]), dst)
         np_ += 1
+    elif cardpic.bake(p, dst):
+        np_ += 1
+metap = f"{objdir}/_meta.json"
+meta = json.load(open(metap, encoding="utf-8")) if os.path.exists(metap) else {}
+no = 0
+for name, p in sorted(objs.items()):
+    dst = f"{objdir}/{name}.png"
+    if os.path.exists(dst) and name in meta:
+        continue
+    m = cardpic.bake_obj(p, dst)
+    if m:
+        meta[name] = m
+        no += 1
+meta = {k: v for k, v in meta.items() if k in objs}
+os.makedirs(objdir, exist_ok=True)
+json.dump(meta, open(metap, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 gone = 0
-if os.path.isdir(picdir):
-    for f in os.listdir(picdir):
-        if f.endswith(".png") and f[:-4] not in want:
-            os.remove(os.path.join(picdir, f))
-            if os.path.exists(os.path.join(picdir, f + ".meta")):
-                os.remove(os.path.join(picdir, f + ".meta"))
+for d, keep in ((picdir, want), (objdir, objs)):
+    if not os.path.isdir(d):
+        continue
+    for f in os.listdir(d):
+        if f.endswith(".png") and f[:-4] not in keep:
+            os.remove(os.path.join(d, f))
+            if os.path.exists(os.path.join(d, f + ".meta")):
+                os.remove(os.path.join(d, f + ".meta"))
             gone += 1
-print("카드 원작 그림", np_, "새로 ·", gone, "지움 ·", len(want), "장")
+print("카드 원작 그림", np_, "새로 · 사물", no, "새로 ·", gone, "지움 · 장면", len(want), "· 사물", len(objs), "장")
 # 장비 · 교주 카드(상태 · 저주 · 선물) 그림 — itemart.json(Tools~/build_itemart.py) 에 적힌 원작 아이콘만
 #   RunArt/Item/<이름>.png(256 판 가운데 — 128 짜리 재화 아이콘은 그대로) · <이름>_blur.png(카드 바탕용 흐린 그림)
 items = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Runtime", "Resources", "RunUI", "itemart.json"), encoding="utf-8"))

@@ -34,6 +34,7 @@ namespace Bolzena.RunUI
             var here2 = P.Here;
             W.StatusBar(root, this, true, true, true, $"{P.S.Floor + 1}층 · {P.Floor.Name}",
                 $"{v.Name} · {(here2 != null ? P.StageName(here2) : P.S.Floor + 1 + "-0")} / {P.S.Floor + 1}-10 · 빛나는 칸을 눌러 나아갑니다");
+            MapFoeNature(root);
 
             // 지도 칸 — 머리 띠(위 96) 와 범례(아래 64) 사이. 높이는 캔버스에 맞춘다(폰 720 · PC 900)
             float top = 104, bottom = 64;
@@ -148,6 +149,31 @@ namespace Bolzena.RunUI
             Tw.Rise(legend.rectTransform, 0.3f, 14, 0.4f);
         }
 
+        /// <summary>지도 머리 아래 작은 알약 — 「이번 모험의 적 속성 ○○」(마을 공개 · 편성과 같은 말 · 같은 색 · 같은 아이콘).</summary>
+        void MapFoeNature(RectTransform root)
+        {
+            var nat = P.S.EnemyNature;
+            if (string.IsNullOrEmpty(nat)) return;
+            var nc = Theme.NatureCardOf(nat);
+            var pill = Ui.Img(root, Theme.S("pill_dark", 46), new Color(1, 1, 1, 0.9f), "hud.foenature");
+            pill.rectTransform.At(0.5f, 1, 0, -82, 10, 32);
+            Ui.Row(pill.rectTransform, 8, TextAnchor.MiddleCenter, new RectOffset(14, 18, 2, 2), false, false);
+            var fit = pill.gameObject.AddComponent<ContentSizeFitter>(); fit.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            var ic = Ui.Img(pill.transform, Icon("성격_" + nat), Color.white, "ic"); ic.Pref(24, 24); ic.preserveAspect = true;
+            var t = Ui.Text(pill.transform, $"{FoeNatureLabel}  <b><color={Hex(nc)}>{nat}</color></b>", Theme.FsSm, Theme.Ink);
+            t.textWrappingMode = TextWrappingModes.NoWrap; t.overflowMode = TextOverflowModes.Overflow;
+            t.Pref(t.preferredWidth + 4, 28);
+            Tw.Rise(pill.rectTransform, 0.12f, 10, 0.4f, Vector2.up);
+        }
+
+        /// <summary>이 층 보스 줄의 사도 클론(없으면 첫 적) — 판이 고른 보스 줄(RunState.Bosses = Run.PickBosses), 옛 저장은 층 데이터.</summary>
+        string MapBossId()
+        {
+            var line = P.S.Bosses != null && P.S.Floor < P.S.Bosses.Count ? P.S.Bosses[P.S.Floor] : P.Floor?.Boss;
+            if (line == null || line.Count == 0) return null;
+            return line.FirstOrDefault(id => P.Data.Enemy(id)?.Clone != null) ?? line[0];
+        }
+
         IEnumerator ScrollTo(ScrollRect sr, RectTransform content, float x)
         {
             yield return null;
@@ -239,11 +265,32 @@ namespace Bolzena.RunUI
             var gl = Ui.Img(gem.rectTransform, Theme.S(done ? "ic_check" : GlyphOf(n.Type)), dim ? new Color(1, 1, 1, 0.35f) : Color.white, "glyph");
             gl.rectTransform.At(0.5f, 0.5f, 0, 1, gs, gs);
             gl.preserveAspect = true;
+            // 보스 칸 — 그 층 보스 클론의 얼굴(모험 시작 때 알려 준 그 클론). 일반 · 엘리트 칸의 적은 여전히 숨긴다
+            string bossName = null;
+            if (boss)
+            {
+                var be = P.Data.Enemy(MapBossId());
+                var bh = BossHero(be);
+                if (be != null)
+                {
+                    bossName = bh?.ko ?? (be.Name ?? "").Replace("(클론)", "").Trim();
+                    var bn = be.Nature ?? P.S.EnemyNature;
+                    var ring = Ui.Img(holder, Theme.S("circle"), Theme.NatureCardOf(bn), "bossface");
+                    ring.rectTransform.At(0.5f, 1, 0, 58, 70, 70);
+                    var well = Ui.Img(ring.transform, Theme.S("circle"), Theme.NavyWell, "well"); well.rectTransform.Fill(4, 4, 4, 4);
+                    var face = bh != null ? CardArt.Upper(bh.art, 1f, 0.34f) : null;
+                    var fm = Ui.Img(well.transform, Theme.S("circle"), Color.white, "mask"); fm.rectTransform.Fill(2, 2, 2, 2);
+                    fm.gameObject.AddComponent<Mask>().showMaskGraphic = false;
+                    if (face != null || bh?.Icon != null) { var fi = Ui.Img(fm.transform, face ?? bh.Icon, dim ? new Color(1, 1, 1, 0.5f) : Color.white, "face"); fi.rectTransform.Fill(); fi.preserveAspect = face == null; }
+                    else { var cr = Ui.Img(fm.transform, Theme.S("ic_crown"), Theme.Gold, "crown"); cr.rectTransform.Fill(14, 14, 14, 14); cr.preserveAspect = true; }
+                    var nb = Ui.Img(ring.transform, Icon("성격_" + bn), Color.white, "nat"); nb.rectTransform.At(1, 0, -4, 4, 26, 26); nb.preserveAspect = true;
+                }
+            }
             if (canGo || boss || here)
             {
-                var label = here ? "지금" : RunPort.KindKo(n.Type);
+                var label = here ? "지금" : boss && bossName != null ? $"보스 · {bossName}" : RunPort.KindKo(n.Type);
                 var lt = Ui.Title(holder, label, boss ? Theme.FsMd : Theme.FsSm, canGo ? Theme.Gold : boss ? Theme.Hex("FFB3BB") : Theme.Ink, TextAlignmentOptions.Center);
-                lt.rectTransform.At(0.5f, 0, 0, -24, 180, 24);
+                lt.rectTransform.At(0.5f, 0, 0, -24, boss ? 240 : 180, 24);
                 lt.Outline(0.28f);
                 lt.textWrappingMode = TextWrappingModes.NoWrap;
             }
@@ -255,7 +302,7 @@ namespace Bolzena.RunUI
                 hb.SetColor(Color.white);
                 Tw.Breathe(gem.transform, 0.04f, 1.3f, n.Col * 0.4f);
                 // 나오는 적 미리보기는 두지 않는다(2026-10-06 사용자: 「어떤 스테이지에 무슨 몬스터가 나오는지 모르고 있어야 재미있다」).
-                //   칸 종류(일반 · 엘리트 · 보스 · 이벤트 · 휴식 · 상점) 타일 · 글리프 · 이름만 — 보스 칸도 어느 클론인지는 들어가서 안다.
+                //   칸 종류(일반 · 엘리트 · 이벤트 · 휴식 · 상점) 타일 · 글리프 · 이름만. 보스 칸만 그 층 보스 클론 얼굴 · 이름을 보인다(같은 날 사용자 정정 — 「보스 클론은 보여 줘」).
                 //   이 마을 적 목록은 편성 화면 「나오는 적」 · 적 도감에 그대로 있다.
             }
             Tw.Pop(holder, delay, 0.3f, 0.45f);

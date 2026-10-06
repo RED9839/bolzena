@@ -127,12 +127,12 @@ namespace Bolzena.RunUI
                 var gi = Ui.Img(well.transform, Theme.S(g.Kind == CardOrder.Kind.Leader ? "ic_crown" : "ic_skull"), tint, "glyph"); gi.rectTransform.At(0.5f, 0.58f, 0, 0, w * 0.45f, w * 0.45f); gi.preserveAspect = true;
             }
             var shade = Ui.Img(well.transform, Theme.S("fade_down"), Color.black.A(0.85f), "shade"); shade.rectTransform.Band(0, h * 0.42f);
-            // 왼쪽 위 세로 아이콘 열 — 역할 · 성격 · 줄
+            // 왼쪽 위 세로 아이콘 열 — 역할 · 성격
             if (info != null)
             {
                 var col = Ui.Rect("icons", rt).At(0, 1, 10, -10, 28, 100);
                 Ui.Col(col, 4, TextAnchor.UpperLeft, null, false, false);
-                foreach (var key in new[] { "역할_" + info.role, "성격_" + info.nature, "위치_" + info.RowKo })
+                foreach (var key in new[] { "역할_" + info.role, "성격_" + info.nature })
                 {
                     var sp = Theme.Icon(key);
                     if (sp == null) continue;
@@ -155,7 +155,7 @@ namespace Bolzena.RunUI
             var def = P.Data.Card(id);
             var (body, close, _) = Stage.ModalBox("cardzoom", 1180, Theme.C(700, 690), v?.Name ?? id, def?.Blurb ?? (v?.Def.Hero != null ? Roster.OfCore(v.Def.Hero).ko + "의 카드" : v?.Owner != null ? $"교주 카드 · {Roster.OfCore(v.Owner).ko} 덱" : "교주 카드"));
             float cw = Theme.C(330, 300);
-            var card = W.Card(body, this, id, cw); card.At(0, 0.5f, 10, 0, cw, cw * 1.4f);
+            var card = W.Card(body, this, id, cw, "zoom"); card.At(0, 0.5f, 10, 0, cw, cw * 1.4f);
             var right = Ui.Rect("right", body).Fill(cw + 40, 0, 6, 0);
             var content = Ui.Scroll(right, out _);
             Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(4, 10, 4, 10), true, false);
@@ -165,20 +165,11 @@ namespace Bolzena.RunUI
                 t.textWrappingMode = TextWrappingModes.Normal;
                 var fit = t.gameObject.AddComponent<ContentSizeFitter>(); fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             }
-            // 이 카드에 얹힌 것 — 받은 신탁 · 축복(효과 글) · 복제(카드의 표식과 같은 색)
-            var mark = P.Mark(id);
-            if (mark.Any)
-            {
-                W.Section(content, "이 카드에 얹힌 것", mark.Copy ? "복제할 때 모습 그대로 묶였습니다" : null, 36);
-                if (mark.Oracle != null) Line($"<color={Theme.GoldTag}>신탁 「{mark.Oracle}」</color>", Theme.FsBody, Theme.Ink);
-                if (mark.Blessed) Line($"<color=#BFFFD1>축복 「{mark.Bless}」</color>  <size=90%>{mark.BlessText}</size>", Theme.FsBody, Theme.Ink);
-                if (mark.Copy) Line($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color>  <size=90%><color={Theme.SubTag}>원본이 나중에 받는 신탁 · 축복은 따라오지 않습니다</color></size>", Theme.FsBody, Theme.Ink);
-            }
             // 이 카드의 낱말 — 키워드 · 상태 · 고유 효과 · 생성 카드 판을 세로로(카드 글의 밑줄 낱말과 같은 판)
             var terms = v != null ? CardTerms.Of(P.Data, P.Text, v, P.Text.Card(v)) : new List<CardTerms.Term>();
             if (terms.Count > 0)
             {
-                W.Section(content, "낱말", "카드 글의 밑줄 낱말 — 올리거나 누르면 그 자리에도 뜹니다", 36);
+                W.Section(content, "낱말", "카드 글의 색 낱말 — 키워드 · 상태 · 고유 효과 · 변신 · 만들어지는 카드", 36);
                 float bw = Mathf.Min(1180, Stage.Size.x - 32) - 40 - cw - 40 - 6 - 14;
                 int ti = 0;
                 foreach (var t0 in terms)
@@ -195,6 +186,15 @@ namespace Bolzena.RunUI
                     holder.Pref(-1, bx.sizeDelta.y);
                     ti++;
                 }
+            }
+            // 이 카드에 얹힌 것 — 받은 신탁 · 축복(효과 글) · 복제(카드의 표식과 같은 색)
+            var mark = P.Mark(id);
+            if (mark.Any)
+            {
+                W.Section(content, "이 카드에 얹힌 것", mark.Copy ? "복제할 때 모습 그대로 묶였습니다" : null, 36);
+                if (mark.Oracle != null) Line($"<color={Theme.GoldTag}>신탁 「{mark.Oracle}」</color>", Theme.FsBody, Theme.Ink);
+                if (mark.Blessed) Line($"<color=#BFFFD1>축복 「{mark.Bless}」</color>  <size=90%>{mark.BlessText}</size>", Theme.FsBody, Theme.Ink);
+                if (mark.Copy) Line($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color>  <size=90%><color={Theme.SubTag}>원본이 나중에 받는 신탁 · 축복은 따라오지 않습니다</color></size>", Theme.FsBody, Theme.Ink);
             }
             if (def != null && def.Oracles.Count > 0)
             {

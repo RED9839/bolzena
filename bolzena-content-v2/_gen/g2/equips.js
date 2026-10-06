@@ -124,7 +124,7 @@ const DEF = {
     rule('붉은 오기', { on: 'hurt' }, [S('사기', 1)], { limit: perFight(1) }),
     '한 대 맞으면 붉게 빛난다. 알고 보니 말라붙은 석류 주스.'],
   '장난감 망원경': ['eq_toyscope', '장신구',
-    rule('멀리서 조준', { on: 'play', type: '공격' }, [E1('표식', 1)], { conds: [{ c: 'row', row: 'back' }], limit: perTurn(1) }),
+    rule('멀리서 조준', { on: 'play', type: '공격' }, [E1('표식', 1)], { limit: perTurn(1) }),
     '장난감인데 멀리 있는 적일수록 잘 보인다.'],
   '거대화 물약': ['eq_growpotion', '방어구',
     rule('쑥쑥', { on: 'fightStart' }, [S('초재생', 2)]),

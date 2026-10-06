@@ -131,9 +131,13 @@ namespace Bolzena.RunUI
                 foreach (Transform c in menu) Tw.Pop((RectTransform)c, 0.15f + 0.07f * i++, 0.85f, 0.4f);
 
                 logo.SetAsLastSibling();
-                var legal = Ui.Text(root, $"<color={Theme.GoldTag}>비공식 팬 게임 · 비영리</color> — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있습니다. 공식과 무관하며, 권리자의 요청이 있으면 즉시 내립니다.", Theme.FsCap, Theme.Sub, TextAlignmentOptions.BottomRight);
-                legal.rectTransform.At(1, 0, -Theme.Gutter - 8, 14, 640, 44);
-                legal.Outline(0.2f);
+                // 비공식 팬게임 안내 — 배경 위에서도 읽히게 마을 공개 창과 같은 남색 판(금 테 · 둥근 모서리)을 깔고 오른쪽 아래 작게(사용자 2026-10-07)
+                var legalBox = Ui.Panel(root, Theme.Panel, null, "legal").rectTransform;
+                legalBox.At(1, 0, -Theme.Gutter, 12, 560, 62);
+                legalBox.GetComponent<UnityEngine.UI.Image>().color = Color.white.A(0.9f);
+                var legal = Ui.Text(legalBox, $"<color={Theme.GoldTag}>비공식 팬 게임 · 비영리</color> — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있습니다. 공식과 무관하며, 권리자의 요청이 있으면 즉시 내립니다.", Theme.FsCap - 1, Theme.Sub, TextAlignmentOptions.MidlineLeft);
+                legal.rectTransform.Fill(16, 6, 14, 6); legal.textWrappingMode = TextWrappingModes.Normal;
+                legal.enableAutoSizing = true; legal.fontSizeMin = 10; legal.fontSizeMax = Theme.FsCap - 1;
             });
         }
 

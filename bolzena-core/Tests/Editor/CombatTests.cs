@@ -118,6 +118,50 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(700, b.Pool.Hp);
         }
 
+        // ── 무작위(shuffle) 고르기 — 사용자 2026-10-07 「평소 패턴은 무작위로」 ──
+        [Test] public void 무작위_힘_모으기는_간격을_둔다()
+        {
+            // 힘 모으기 무게가 아주 커도, 모은 뒤 CHARGE_GAP 번의 고르기 동안은 다시 모으지 않는다
+            var d = K.Data(enemies: "[{id:'ch', name:'모으기', hp:100000, pick:'shuffle', intents:[{t:'charge', w:100, say:'모은다', brk:true, next:{t:'attack', v:1, say:'쾅', brk:true}}, {t:'attack', v:1, rush:0}, {t:'block', v:1}]}]");
+            var b = K.Fight(d, new[] { "a" }, new[] { "ch" });
+            var seen = new List<string>();
+            for (int i = 0; i < 24; i++) { var it = K.E(b).Intent; seen.Add(it.T == "attack" && it.Say == "쾅" ? "쏟기" : it.T); b.EndTurn(); }
+            int charges = seen.Count(x => x == "charge");
+            Assert.Greater(charges, 3, "무게가 크니 자주 모은다: " + string.Join(",", seen));
+            for (int i = 0; i < seen.Count; i++)
+                if (seen[i] == "charge")
+                {
+                    if (i + 1 < seen.Count) Assert.AreEqual("쏟기", seen[i + 1], "모은 다음 턴은 쏟기");
+                    for (int k = 2; k <= 1 + Battle.CHARGE_GAP && i + k < seen.Count; k++) Assert.AreNotEqual("charge", seen[i + k], "간격 안에 다시 모았다: " + string.Join(",", seen));
+                }
+        }
+
+        [Test] public void 무작위_소환은_상한이_차면_고르지_않는다()
+        {
+            var d = K.Data(enemies: "[{id:'pup', name:'졸개', hp:100000, intents:[{t:'jam', v:0, rush:0}]}," +
+                "{id:'sm', name:'부르는 놈', hp:100000, pick:'shuffle', intents:[{t:'summon', id:'pup', n:1, max:1, w:100, say:'불러'}, {t:'attack', v:1, rush:0}, {t:'block', v:1}]}]");
+            var b = K.Fight(d, new[] { "a" }, new[] { "sm" });
+            int sums = 0;
+            for (int i = 0; i < 12; i++)
+            {
+                var e = K.E(b);
+                if (e.Intent?.T == "summon") { sums++; Assert.AreEqual(0, b.AliveEnemies().Count(x => x.Key == "pup"), "졸개가 살아 있는데 또 부르려 한다"); }
+                b.EndTurn();
+            }
+            Assert.AreEqual(1, sums, "졸개가 살아 있는 동안은 한 번만 부른다");
+        }
+
+        [Test] public void 예고_피해는_다음_턴_피해()
+        {
+            var d = K.Data(enemies: "[{id:'charger', name:'모으는 놈', hp:1000, intents:[{t:'charge', say:'모은다', next:{t:'multi', v:50, n:3, say:'쾅쾅쾅'}}]}]");
+            var cues = new List<Cue>();
+            var b = K.Fight(d, new[] { "a" }, new[] { "charger" }, cues: cues);
+            Assert.IsNull(b.IntentHit(K.E(b)), "모으는 턴엔 치지 않는다");
+            Assert.AreEqual(150, b.ChargeHit(K.E(b)), "예고 칸 — 다음 턴 피해 합");
+            var w = cues.Single(c => c.K == "foeChargeWarn");
+            Assert.AreEqual("쾅쾅쾅", w.Name); Assert.AreEqual(150, w.V); Assert.AreEqual("multi", w.T);
+        }
+
         // ── 즉시 행동 ──
         [Test] public void 카드를_수의_장수만큼_내면_적이_당겨서_하고_적의_차례엔_쉰다()
         {
@@ -600,7 +644,7 @@ namespace Bolzena.Core.Tests
             CollectionAssert.AreEqual(new[] { "순수", "광기", "우울" }, Run.NaturesFor(d, "tv"),
                 "2층은 3성이 있어야 — 냉정은 c1 · c2 가 다 1~2성이라 못 고름 · 우울은 1~2성이 없어 두 층 다 3성(u1 · u2) · 활발 0명");
             for (int i = 0; i < 50; i++) CollectionAssert.Contains(Run.NaturesFor(d, "tv"), Run.RollNature(d, "tv", i / 50.0));
-            var r2 = Run.New(d, PARTY, 3, "tv", null, "냉정");
+            var r2 = Run.New(d, PARTY, 3, "tv", "냉정");
             CollectionAssert.Contains(new[] { "순수", "광기", "우울" }, r2.EnemyNature, "못 고르는 속성을 주면 씨앗으로 고를 수 있는 것");
         }
 
@@ -610,7 +654,7 @@ namespace Bolzena.Core.Tests
             foreach (var nat in new[] { "순수", "광기" })
                 for (long seed = 1; seed <= 6; seed++)
                 {
-                    var run = Run.New(d, PARTY, seed, "tv", null, nat);
+                    var run = Run.New(d, PARTY, seed, "tv", nat);
                     Assert.AreEqual(nat, run.EnemyNature);
                     var heroes = run.BossHeroes;
                     Assert.AreEqual(2, heroes.Count);
@@ -638,7 +682,7 @@ namespace Bolzena.Core.Tests
             var bl = Battle.Load(d, b.Save());
             Assert.AreEqual("광기", bl.Enemies[0].Nature); Assert.AreEqual("순수", bl.Enemies[1].Nature);
             // 3) 판 — 옛 저장(보스 줄 없음): 고정 보스(마을 데이터의 광기 클론)를 쓰지 않고 판 속성(순수)에 맞춰 새로 고른다 · 보스 하나
-            var run = Run.New(d, PARTY, 2, "tv", null, "순수"); run.S.Bosses = null;
+            var run = Run.New(d, PARTY, 2, "tv", "순수"); run.S.Bosses = null;
             var back = Run.Load(d, run.Save());
             back.S.Floor = 0; back.S.Node = 3;
             var (bb, _) = back.OpenFight();
@@ -658,7 +702,7 @@ namespace Bolzena.Core.Tests
             var d = D();
             for (long seed = 1; seed <= 8; seed++)
             {
-                var run = Run.New(d, PARTY, seed, "tv", null, "우울");
+                var run = Run.New(d, PARTY, seed, "tv", "우울");
                 Assert.AreEqual("우울", run.EnemyNature);
                 var hs = run.BossHeroes;
                 Assert.AreEqual(3, d.Hero(hs[0]).Star, "1층 — 우울 1~2성이 없어 3성");
@@ -675,7 +719,7 @@ namespace Bolzena.Core.Tests
             // 규칙 우선 — 광기는 1층 1성 m1 · 2층 3성(m2 · m3). 3성이 1층으로 내려오지 않는다
             for (long seed = 1; seed <= 8; seed++)
             {
-                var hs = Run.New(d, PARTY, seed, "tv", null, "광기").BossHeroes;
+                var hs = Run.New(d, PARTY, seed, "tv", "광기").BossHeroes;
                 Assert.AreEqual("m1", hs[0]); Assert.AreEqual(3, d.Hero(hs[1]).Star);
             }
         }
@@ -701,11 +745,11 @@ namespace Bolzena.Core.Tests
             CollectionAssert.DoesNotContain(Run.FloorCandidates(d, "tv", "순수", 0), "란", "엘다인은 클론 후보가 아니다");
             for (long seed = 1; seed <= 8; seed++)
             {
-                var hs = Run.New(d, PARTY, seed, "tv", null, "순수").BossHeroes;
+                var hs = Run.New(d, PARTY, seed, "tv", "순수").BossHeroes;
                 CollectionAssert.IsSubsetOf(hs, new[] { "p3", "q3" }); Assert.AreNotEqual(hs[0], hs[1], "두 층은 다른 사도");
             }
             // 저장된 판이 닫힌 속성이면 불러올 때 다시 뽑는다
-            var r = Run.New(d, PARTY, 5, "tv", null, "순수");
+            var r = Run.New(d, PARTY, 5, "tv", "순수");
             r.S.EnemyNature = "활발"; r.S.Bosses = new List<List<string>> { new() { "clone_m1" }, new() { "clone_p2" } };
             var back = Run.Load(d, r.Save());
             CollectionAssert.Contains(ok, back.EnemyNature, "닫힌 속성(활발) → 열린 속성으로");
@@ -720,7 +764,7 @@ namespace Bolzena.Core.Tests
             var seen = new HashSet<string>();
             for (long seed = 1; seed <= 40; seed++)
             {
-                var run = Run.New(d, PARTY, seed, "tv", null, "광기");
+                var run = Run.New(d, PARTY, seed, "tv", "광기");
                 seen.Add(run.BossHeroes[1]);
                 Assert.AreEqual(GameData.ToJson(run.Bosses), GameData.ToJson(Run.PickBosses(d, "tv", "광기", seed)), "같은 씨앗이면 같은 보스");
                 Assert.AreEqual(GameData.ToJson(run.Bosses), GameData.ToJson(Run.Load(d, run.Save()).Bosses), "저장 왕복");
@@ -731,7 +775,7 @@ namespace Bolzena.Core.Tests
         [Test] public void 원래_클론이_그_성격이면_그대로_아니면_그_자리의_몸을_빌린_클론()
         {
             var d = D();
-            var run = Run.New(d, PARTY, 1, "tv", null, "광기");
+            var run = Run.New(d, PARTY, 1, "tv", "광기");
             Assert.AreEqual("clone_m1", run.Bosses[0][0], "1층 원래 클론(광기)은 그대로");
             Assert.AreEqual(1, run.Bosses[0].Count, "보스 줄은 보스 하나 — 데이터의 졸개(mob)는 덜어 낸다");
             Assert.IsTrue(run.Bosses.All(l => l.Count == 1));
@@ -740,12 +784,12 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("광기", made.Nature); CollectionAssert.Contains(new[] { "m2", "m3" }, made.Clone); Assert.AreEqual(d.Hero(made.Clone).Name + " (클론)", made.Name);
             Assert.AreEqual(2600, made.Hp); Assert.AreEqual(13, made.Tough, "몸의 체력 · 강인도");
             Assert.AreSame(made, d.Enemy(run.Bosses[1][0]), "한 번 만든 것을 쓴다");
-            var pr = Run.New(d, PARTY, 1, "tv", null, "순수");
+            var pr = Run.New(d, PARTY, 1, "tv", "순수");
             Assert.AreEqual("clone_p2", pr.Bosses[1][0], "2층 원래 클론(순수 3성)은 그대로");
             Assert.AreEqual(GameData.CloneId("p1", "clone_m1"), pr.Bosses[0][0], "1층은 순수 1~2성 p1 이 몸을 빌려");
             Assert.AreEqual(d.Hero(pr.BossHeroes[0]).Nature, "순수");
             // 옛 저장(보스 줄 없음)도 고정 보스(마을 데이터)를 쓰지 않고 그 판 씨앗 · 속성으로 새로 고른다
-            var old = Run.New(d, PARTY, 1, "tv", null, "광기"); old.S.Bosses = null;
+            var old = Run.New(d, PARTY, 1, "tv", "광기"); old.S.Bosses = null;
             Assert.AreEqual(GameData.ToJson(Run.PickBosses(d, "tv", "광기", 1)), GameData.ToJson(old.Bosses));
             Assert.AreNotEqual("clone_p2", old.Bosses[1][0], "광기 판 2층에 순수 클론이 서지 않는다");
             // 옛 저장의 보스 줄에 졸개가 있어도 보스 하나만

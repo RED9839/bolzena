@@ -381,17 +381,29 @@ namespace Bolzena.RunUI
             win.rectTransform.Fill(2 * k, 2 * k, 2 * k, 2 * k);
             win.gameObject.AddComponent<Mask>().showMaskGraphic = false;
             var wr = win.rectTransform;
+            System.Action<float, float, float, float> placeArt = null;   // 그림 자리(위 끝 · 장식 선 몫 · 창 너비 · 높이) — 아래 글 자리를 잰 뒤 부른다
             var kind = CardArt.Of(id, hero?.art, v != null && v.Unique);
             if (kind == CardArt.Kind.Standing)
             {
-                var im = Ui.Img(wr, CardArt.Upper(hero.art, (w - 4 * k) / (h - 4 * k), 0.56f), Color.white, "pic");
+                var im = Ui.Img(wr, CardArt.Card(hero.art), Color.white, "pic");   // 얼굴이 위 글 · 칩과 아래 효과 판 사이에(StandingSnap.CardRect)
                 im.rectTransform.Fill();
             }
             else if (kind == CardArt.Kind.Pic)
             {
-                // 고유 · 생성 카드의 원작 그림 — 그림 창 비율로 미리 잘라 둔 것(얼굴이 위 3.5할 자리)
-                var im = Ui.Img(wr, CardArt.Pic(CardArt.PicOf(id)), Color.white, "pic");
-                im.rectTransform.Fill();
+                // 고유 · 생성 카드의 원작 그림 — 장면(story · cg)은 그림 창 비율로 미리 잘라 둔 한 장(창을 덮는다 · 얼굴이 위 3.5할 자리)
+                //   사물 · SD(CardObj)는 성격 바탕 + 알파 경계로 자른 그림 — 자리는 아래 장식 선을 잰 뒤 CardArt.Place(전투 CardView 와 같은 규칙)
+                var pn = CardArt.PicOf(id);
+                if (CardArt.Obj(pn, out var op))
+                {
+                    var back = Ui.Img(wr, CardArt.Back(op.Nature), Color.white, "back"); back.rectTransform.Fill();
+                    var oi = Ui.Img(wr, op.Sprite, Color.white, "pic");
+                    placeArt = (top, bottom, ww, wh) => { var r = CardArt.PlaceObj(pn, op, ww / wh, top, bottom, out _, CardArt.RefBoard); oi.rectTransform.At(0, 1, r.x * ww, -r.y * wh, r.width * ww, r.height * wh); };
+                }
+                else
+                {
+                    var im = Ui.Img(wr, CardArt.Pic(pn), Color.white, "pic");
+                    im.rectTransform.Fill();
+                }
             }
             else if (kind == CardArt.Kind.Icon)
             {
@@ -401,6 +413,19 @@ namespace Bolzena.RunUI
                 var sh = Ui.Img(wr, Theme.S("shadow", 40), Color.black.A(0.6f), "shadow"); sh.rectTransform.At(0.5f, 0.5f, 0, 14 * k, 150 * k, 150 * k);
                 var plate = Ui.Img(wr, Theme.Round, Color.Lerp(tint, Color.white, 0.25f), "plate"); plate.pixelsPerUnitMultiplier = 2.4f;
                 plate.rectTransform.At(0.5f, 0.5f, 0, 22 * k, 134 * k, 134 * k);
+                if (!CardArt.OldFit)
+                {
+                    // 아이콘 판(정사각)도 같은 자리 규칙 — 위 글 · 칩 아래 칸을 채우고 아래를 장식 선에 붙인다(빛 · 그림자는 판 크기에 맞춰 따라간다)
+                    float icH = CardArt.Icon(icName) != null ? CardArt.Icon(icName).rect.height : 0;
+                    placeArt = (top, bottom, ww, wh) =>
+                    {
+                        var r = CardArt.Place(1, 1, icH, ww / wh, top, bottom, icName, out _, CardArt.RefBoard);
+                        float s = r.height * wh, cx = (r.center.x - 0.5f) * ww, cy = (0.5f - r.center.y) * wh;
+                        plate.rectTransform.At(0.5f, 0.5f, cx, cy, s, s);
+                        halo.rectTransform.At(0.5f, 0.5f, cx, cy, s * 1.72f, s * 1.72f);
+                        sh.rectTransform.At(0.5f, 0.5f, cx, cy - s * 0.06f, s * 1.12f, s * 1.12f);
+                    };
+                }
                 var icm = Ui.Img(plate.rectTransform, Theme.Round, Color.white, "clip"); icm.pixelsPerUnitMultiplier = 2.6f;
                 icm.rectTransform.Fill(3 * k, 3 * k, 3 * k, 3 * k); icm.gameObject.AddComponent<Mask>().showMaskGraphic = false;
                 var ic = Ui.Img(icm.rectTransform, CardArt.Icon(icName), Color.white, "icon"); ic.rectTransform.Fill();
@@ -437,13 +462,21 @@ namespace Bolzena.RunUI
                 full += CardTerms.Extra(full, terms);   // 글에 이름이 없는 진화 · 결속 · 금기 카드 한 줄
             }
             float descW = w - 22 * k;
-            var desc = Ui.Text(rt, full, 13.5f * k, Theme.Ink, TextAlignmentOptions.Bottom, false, "desc");
+            // 보이는 글 = 낱말 표시(Mark) + 낱말 단위 줄바꿈(KeepWords — TMP 옛 한글 규칙은 글자마다 꺾어 「그 / 적에게」 처럼 갈린다).
+            //   높이도 이 글로 잰다(낱말로 꺾으면 줄이 조금 늘 수 있다)
+            string shown = terms != null && terms.Count > 0 ? CardTerms.Mark(full, terms) : full;
+            var desc = Ui.Text(rt, shown, 13.5f * k, Theme.Ink, TextAlignmentOptions.Bottom, false, "desc");
             desc.lineSpacing = -2;
-            float need = string.IsNullOrEmpty(full) ? 0 : desc.GetPreferredValues(full, descW, 0).y;
+            shown = CardTerms.FitFor(desc, shown, descW, 13.5f * k);   // 어절 · 덩이 · 화살표 규칙(조건 → 결과가 안 들어가면 「→ 결과」 를 다음 줄 맨 앞으로)
+            desc.text = shown;
+            if (terms != null && terms.Count > 0) CardTerms.Prepare(desc);
+            float need = string.IsNullOrEmpty(full) ? 0 : desc.GetPreferredValues(shown, descW, 0).y;
             float descH = Mathf.Clamp(need + 2 * k, 20 * k, 112 * k);
             float descB = 12 * k;
             float tagY = descB + descH + 3 * k;              // 태그 줄 아래 끝
             float decoY = tagY + (hasTags ? 20 * k : 2 * k) + 5 * k;
+            // 그림 자리 — 위 = 종류 알약 아래(카드 위 54 + 여백), 아래 = 장식 선(그림 창 = 카드 안쪽 2k)
+            if (placeArt != null) { float wh = h - 4 * k; placeArt((56 * k) / wh, (h - 2 * k - decoY) / wh, w - 4 * k, wh); }
 
             var shadeT = Ui.Img(wr, Theme.S("fade_top"), new Color(0.01f, 0.02f, 0.06f, 0.9f), "shadeT"); shadeT.rectTransform.Band(1, 96 * k);
             var shadeB = Ui.Img(wr, Theme.S("fade_down"), new Color(0.01f, 0.02f, 0.06f, 0.96f), "shadeB"); shadeB.rectTransform.Band(0, Mathf.Min(h, decoY + 92 * k));
@@ -506,8 +539,15 @@ namespace Bolzena.RunUI
             desc.transform.SetAsLastSibling();
             desc.rectTransform.At(0.5f, 0, 0, descB, descW, descH);
             // 글 속 낱말 — 키워드 · 상태 · 사도 고유 효과 · 생성 카드에 밑줄 · 색, 올리면(폰은 누르면) 작은 설명 판(TermPop · CardTerms)
-            if (terms != null && terms.Count > 0) TermPop.MarkAndAttach(desc, full, terms, f.Stage.ToastLayer, (p, cid, cw2) => Card(p, f, cid, cw2, "termcard"));
-            desc.enableAutoSizing = need > 112 * k; desc.fontSizeMin = 8.5f * k; desc.fontSizeMax = 13.5f * k;
+            if (terms != null && terms.Count > 0) TermPop.Attach(desc, terms, f.Stage.ToastLayer, (p, cid, cw2) => Card(p, f, cid, cw2, "termcard"));   // 글은 위에서 Mark 해 두었다
+            // 카드에 마우스를 올려 두면 낱말을 모두 카드 옆에(CardSide — 전투 카드 확대와 같은 자리 · 판). 카드 크게 창의 큰 카드(「zoom」)는 오른쪽에 이미 판이 있어 빼고,
+            // 낱말 판 속 작은 카드(「termcard」)도 뺀다
+            if (terms != null && terms.Count > 0 && name != "termcard" && name != "zoom")
+            {
+                var side = bg.gameObject.AddComponent<CardSide>();
+                side.Terms = terms; side.Layer = f.Stage.ToastLayer; side.Cards = (p, cid, cw2) => Card(p, f, cid, cw2, "termcard");
+            }
+            desc.enableAutoSizing = true; desc.fontSizeMin = 8.5f * k; desc.fontSizeMax = 13.5f * k;   // 칸에 맞으면 13.5 그대로 · 넘치거나 한 덩이가 칸보다 넓으면 줄인다(끊지 않음)
             desc.Outline(0.2f);
             // ── 표식(신탁 · 축복 · 복제, 2026-10-06) — 겹쳐도 읽히게 자리를 나눈다:
             //   신탁 = 장식 선 바로 위 금빛 이름 띠 + 테 바깥 금빛 · 축복 = 그 위 겨우살이(초록) 띠(후광 아이콘 + 이름) · 복제 = 오른쪽 위 셋째 줄 겹친 카드 표(「복제 — 신탁 · 축복 불가」)

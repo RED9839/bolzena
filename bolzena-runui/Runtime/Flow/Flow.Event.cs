@@ -63,7 +63,7 @@ namespace Bolzena.RunUI
             {
                 var h = Roster.OfCore(k);
                 if (h == null) continue;
-                // 전투 화면과 같은 SD 전투 스파인 · 오른쪽을 본다 · 전열이 오른쪽(적 쪽)
+                // 전투 화면과 같은 SD 전투 스파인 · 오른쪽을 본다 · 편성 순서 맨 앞이 오른쪽(적 쪽)
                 float mh = size.y * 0.24f;
                 var spot = Ui.Rect("party" + pi, scene).At(0, 0, Theme.Gutter + mh * 1.05f + (pn - 1 - pi) * mh * 0.9f, floorY + (pi % 2) * 8, 10, 10);   // 날개 · 큰 소품이 왼쪽 끝에 잘리지 않게 들여 세운다
                 var psg = SceneHero.Make(spot, h, mh, true, pi * 0.4f);   // SD 전투 스파인(없으면 웹 렌더 · 얼굴) + 발밑 그림자 — 휴식과 같은 공용 부품

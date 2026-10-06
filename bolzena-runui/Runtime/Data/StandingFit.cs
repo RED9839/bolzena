@@ -21,6 +21,7 @@ namespace Bolzena.RunUI
     // 전투 쪽(컷인)도 같은 함수를 쓴다:
     //   StandingFit.Place(SkeletonGraphic g, string art, Rect slot, StandMode mode, float tallest = 0, float pad = 0) → k
     //   StandingFit.Place(RectTransform skeletonRt, float unitPx, string art, Rect slot, StandMode mode, float tallest = 0, float pad = 0) → k
+    //   lift = 화면 이름("detail" · "lobby" — 스탠딩 전신 화면만, 이벤트는 사도가 전투 SD)이면 떠 있는 사도(standing_center_fix.json float)의 얼굴을 그 화면 기준 얼굴 높이(_faceRef)에 맞춘다
     //   StandingFit.Tallest(IEnumerable<string> arts) — 함께 보일 사도들의 기준 키 · StandingFit.TryGet(art, out Fit) · Has(art) · MedSt
     public static class StandingFit
     {
@@ -34,6 +35,12 @@ namespace Bolzena.RunUI
             public bool HasHead;
             public float HeadX, FaceCx;
             public float FaceY;   // 얼굴(눈 · 입) 가운데 높이 — 손보정에만(0 = 없음). 얼굴 칸 자르기가 이 높이를 가운데 조금 아래에 둔다
+            public float ListTop; // 사도 목록 카드 위 끝 — 손보정에만(0 = 없음, StandingSnap.ListRect 가 머리 · 얼굴로 정한다)
+            public float CardTop; // 카드 그림 위 끝 — 손보정에만(0 = 없음, StandingSnap.CardRect 가 머리 · 얼굴로 정한다)
+            public float CardFaceY; // 카드 그림의 얼굴 가운데 높이 — 손보정에만(0 = 없음, 얼굴 상자 가운데)
+            public float IconFaceY; // 얼굴 칸(초상 줄 · 머리표)의 얼굴 가운데 높이 — 손보정에만(0 = 없음, 얼굴 상자로 정한다)
+            public float IconScale; // 얼굴 칸 자르기 높이 배수(1 보다 크면 덜 확대) — 손보정에만(0 = 1)
+            public float Lift;      // 떠 있는 사도 표시(손보정 「float」 — 값은 기준 얼굴 높이가 없을 때만 쓰는 공중 높이). 전신에서 lift(화면 이름)를 주면 얼굴을 그 화면의 기준 얼굴 높이에
             public Rect HeadBox, FaceBox;
             public bool Bent;     // 숙이거나 기운 포즈(머리가 몸 가운데선에서 옆으로 · 옛 자르기에서 얼굴이 잘리던 사도)
             public string Link;   // 키를 맞춘 원판(standing_height_link.json)
@@ -43,12 +50,16 @@ namespace Bolzena.RunUI
         }
 
         static Dictionary<string, Fit> table;
+        static readonly Dictionary<string, float> faceRef = new Dictionary<string, float>();   // 화면별 기준 얼굴 높이(바닥선 위, 원본 단위) — 떠 있는 사도를 맞출 때
         static float medSt = 630f, p95 = 760f;
 
         /// <summary>스탠딩 몸 키 중앙값(원본 단위) — 표의 _meta.med_st.</summary>
         public static float MedSt { get { Load(); return medSt; } }
 
         public static bool Has(string art) { Load(); return art != null && table.ContainsKey(art); }
+
+        /// <summary>떠 있는 사도인가(손보정 float · -nolift 아님) — 상세 · 로비 전신이 얼굴을 기준 얼굴 높이에 맞추고 ClampInto 로 줄이지 않는다.</summary>
+        public static bool Floats(string art) => !NoLift && TryGet(art, out var f) && f.Lift != 0;
 
         public static bool TryGet(string art, out Fit f)
         {
@@ -120,11 +131,14 @@ namespace Bolzena.RunUI
                         table[kv.Key] = f;
                         heads++;
                     }
-                // 중심 손보정(standing_center_fix.json — 벨라 · 클로에 · 쥬비): 바닥 · 몸 꼭대기 · 몸 가운데 · 얼굴 가운데 가운데 적은 것만 덮는다
+                // 중심 손보정(standing_center_fix.json — 벨라 · 클로에 · 쥬비 · 슈팡): 바닥 · 몸 꼭대기 · 몸 가운데 · 얼굴 가운데 · 목록 카드 위 끝 가운데 적은 것만 덮는다
                 bool noCenter = noHead || Array.IndexOf(Environment.GetCommandLineArgs(), "-nocenter") >= 0;
                 var cta = noCenter ? null : Resources.Load<TextAsset>("RunUI/standing_center_fix");
                 int centers = 0;
                 if (cta != null && FitJson.Parse(cta.text) is Dictionary<string, object> cj)
+                {
+                    if (cj.TryGetValue("_faceRef", out var fro) && fro is Dictionary<string, object> frd)
+                        foreach (var fk in frd) if (fk.Value is double fv) faceRef[fk.Key] = (float)fv;
                     foreach (var kv in cj)
                     {
                         if (kv.Key.StartsWith("_") || !(kv.Value is Dictionary<string, object> o) || !table.TryGetValue(kv.Key, out var f)) continue;
@@ -137,6 +151,12 @@ namespace Bolzena.RunUI
                         }
                         if (Num(o, "centerX") is float cx) f.CenterX = cx;
                         if (Num(o, "faceY") is float fyy) f.FaceY = fyy;
+                        if (Num(o, "listTop") is float lt) f.ListTop = lt;
+                        if (Num(o, "cardTop") is float ct) f.CardTop = ct;
+                        if (Num(o, "cardFaceY") is float cf) f.CardFaceY = cf;
+                        if (Num(o, "iconFaceY") is float ify) f.IconFaceY = ify;
+                        if (Num(o, "iconScale") is float isc && isc > 0) f.IconScale = isc;
+                        if (Num(o, "float") is float lf) f.Lift = lf;
                         if (Num(o, "faceCx") is float fc && f.HasHead)
                         {
                             float d = fc - f.FaceCx;
@@ -146,6 +166,7 @@ namespace Bolzena.RunUI
                         table[kv.Key] = f;
                         centers++;
                     }
+                }
                 // 키 손보정(standing_height_fix.json) — 앉거나 숙여 키가 줄었거나 탈것 · 의자를 키에 넣은 사도는 「편 키」(서 있을 때 몸 키)로. 짝보다 먼저
                 var fta = noHead ? null : Resources.Load<TextAsset>("RunUI/standing_height_fix");
                 int fixes = 0;
@@ -178,6 +199,9 @@ namespace Bolzena.RunUI
             catch (Exception e) { Debug.LogWarning("[RunUI] standing_fit.json 을 읽지 못했습니다 — 그 자리에서 잽니다: " + e.Message); table.Clear(); }
         }
 
+        /// <summary>공중 높이를 끈다(전후 비교 — 「-nolift」).</summary>
+        public static readonly bool NoLift = Array.IndexOf(Environment.GetCommandLineArgs(), "-nolift") >= 0;
+
         static float? Num(Dictionary<string, object> o, string n) => o.TryGetValue(n, out var v) && v is double d ? (float)d : (float?)null;
 
         /// <summary>
@@ -200,10 +224,20 @@ namespace Bolzena.RunUI
         /// Full: 발이 칸 아래 + pad. Knee · Upper: 기준 키 사도의 몸 꼭대기가 칸 위 끝에서 pad(없으면 칸 높이 6%) 아래가 되는 바닥선.
         /// 기준보다 큰 사도는 칸에 맞게 줄인다. 표에 없는 사도면 false.
         /// </summary>
-        public static bool Solve(string art, Rect slot, StandMode mode, float tallest, float pad, out float k, out Vector2 origin)
+        public static bool Solve(string art, Rect slot, StandMode mode, float tallest, float pad, out float k, out Vector2 origin, string lift = null)
         {
             k = 0; origin = Vector2.zero;
             if (!TryGet(art, out var f)) return false;
+            // 떠 있는 사도(손보정 float — 쥬비 · 벨라 · 아일라 · 다야 · 에르핀(왕도), 2026-10-07 사용자: 「공중에 뜬 만큼 다시 내려서 다른 사도와 얼굴 위치를 같게」):
+            //   전신이면 얼굴(iconFaceY · cardFaceY · faceY · 얼굴 상자 가운데)이 바닥선에서 그 화면의 기준 얼굴 높이(standing_center_fix.json _faceRef — 보통 사도 평균, 원본 단위)에
+            //   오게 발 자리를 옮긴다. 배율은 그대로 — 몸 아래(꼬리 · 연기 · 바위)가 바닥선 아래로 빠지면 그 부분은 잘린다. 기준이 없으면 float 값만큼 띄운다.
+            if (NoLift) lift = null;
+            if (lift != null && mode == StandMode.Full && f.Lift != 0)
+            {
+                float face = f.IconFaceY != 0 ? f.IconFaceY : f.CardFaceY != 0 ? f.CardFaceY : f.FaceY != 0 ? f.FaceY : f.HasHead ? f.FaceBox.center.y : f.HeadY;
+                f.FootY = faceRef.TryGetValue(lift, out var fr) && fr > 0 ? face - fr : f.FootY - f.Lift;
+                f.HairTop = Mathf.Max(f.HairTop, f.FootY + 1);
+            }
             if (tallest <= 0) tallest = p95;
             float top = mode == StandMode.Full ? 0 : pad > 0 ? pad : slot.height * 0.06f;
             float avail = mode == StandMode.Full ? slot.height - pad : slot.height - top;
@@ -241,19 +275,19 @@ namespace Bolzena.RunUI
         /// 스켈레톤(SkeletonGraphic)을 칸에 세운다 — 앵커 · 피벗을 부모 왼쪽 아래(0,0)로 두고 배율 · 자리를 건다. 돌려줌: k(원본 단위 1 당 px), 표에 없으면 0(그대로 둔다).
         /// tallest = 기준 키(Tallest(함께 보일 사도들), 0 이면 표 95%). 컷인 · 판 화면 모두 이것.
         /// </summary>
-        public static float Place(SkeletonGraphic g, string art, Rect slot, StandMode mode, float tallest = 0, float pad = 0)
+        public static float Place(SkeletonGraphic g, string art, Rect slot, StandMode mode, float tallest = 0, float pad = 0, string lift = null)
         {
             if (g == null) return 0;
             float asScale = g.skeletonDataAsset != null ? g.skeletonDataAsset.scale : 0.01f;
             g.UpdateMesh();   // 꼭짓점 배율(MeshScale = 캔버스 referencePixelsPerUnit × 레이아웃 배율)을 실제 값으로
             float ppu = g.MeshScale > 0 ? g.MeshScale : g.canvas != null ? g.canvas.referencePixelsPerUnit : 100f;
-            return Place(g.rectTransform, asScale * ppu, art, slot, mode, tallest, pad);
+            return Place(g.rectTransform, asScale * ppu, art, slot, mode, tallest, pad, lift);
         }
 
         /// <summary>같은 것(RectTransform 판) — unitPx = 원본 단위 1 이 배율 1 에서 몇 px 인가(SkeletonGraphic: 데이터 배율 0.01 × 캔버스 100 = 1).</summary>
-        public static float Place(RectTransform rt, float unitPx, string art, Rect slot, StandMode mode, float tallest = 0, float pad = 0)
+        public static float Place(RectTransform rt, float unitPx, string art, Rect slot, StandMode mode, float tallest = 0, float pad = 0, string lift = null)
         {
-            if (rt == null || !Solve(art, slot, mode, tallest, pad, out var k, out var o)) return 0;
+            if (rt == null || !Solve(art, slot, mode, tallest, pad, out var k, out var o, lift)) return 0;
             float ls = k / Mathf.Max(0.0001f, unitPx);
             rt.anchorMin = rt.anchorMax = Vector2.zero;
             rt.pivot = Vector2.zero;

@@ -19,6 +19,8 @@ namespace Bolzena.RunUI
     //   TermPop.MarkAndAttach(tmp, text, terms, layer, cardMaker)   — Mark + Prepare + Attach 한 번에
     //   TermPop.ShowAt(layer, screenPos, terms, cardMaker, cam)     — 낱말 여럿을 세로로 쌓아 띄우기(툴팁 · 길게 누르기)
     //   TermPop.Box(parent, term, width)                            — 판 하나만 만들어 원하는 곳에 끼우기(카드 크게 옆 목록)
+    //   TermPop.ShowBeside(layer, cardRect, terms, cardMaker, cam)  — 카드 오른쪽(넘치면 왼쪽)에 낱말 판을 세로로(전투 CardZoom 과 같은 자리)
+    //   CardSide(W.Card 가 붙임)                                    — 카드에 마우스를 올려 두면 그 카드의 낱말을 모두 옆에(2026-10-07 사용자 「카드 상세 옆에 키워드 설명」)
     //   TermPop.Close()
     public class TermPop : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
     {
@@ -155,8 +157,17 @@ namespace Bolzena.RunUI
         public static void Close()
         {
             if (open != null) Destroy(open.gameObject);
-            open = null; openBox = null; owner = null; openIdx = -1; demoHold = false; leaveT = 0;
+            open = null; openBox = null; owner = null; openIdx = -1; demoHold = false; leaveT = 0; SideOwner = null;
         }
+
+        /// <summary>카드 옆 판(CardSide)을 띄운 쪽 — 낱말 하나 판(밑줄 올림)과 가른다.</summary>
+        public static object SideOwner;
+        /// <summary>열린 판 묶음(마우스가 그 위에 있으면 닫지 않는다).</summary>
+        public static RectTransform OpenBox => openBox;
+
+        /// <summary>카드(target) 오른쪽 위에 맞춰(넘치면 왼쪽) 낱말 판을 세로로 띄운다 — 전투 카드 확대(CardZoom)와 같은 자리.</summary>
+        public static RectTransform ShowBeside(RectTransform layer, RectTransform target, IList<CardTerms.Term> list, CardMaker cardMaker = null, Camera cam = null, bool hover = true)
+            => ShowAt(layer, Vector2.zero, list, cardMaker, cam, hover, target);
 
         void Show(int n, Vector2 screen)
         {
@@ -170,7 +181,7 @@ namespace Bolzena.RunUI
         /// 낱말 판(여럿이면 세로로 쌓는다)을 screen 자리 오른쪽 위에(넘치면 왼쪽 · 화면 안으로) 띄운다. 앞에 띄운 판은 닫는다.
         /// 폰(터치)은 바깥을 누르면 닫히는 덮개를 깐다. 돌려줌: 판 묶음.
         /// </summary>
-        public static RectTransform ShowAt(RectTransform layer, Vector2 screen, IList<CardTerms.Term> list, CardMaker cardMaker = null, Camera cam = null, bool hover = false)
+        public static RectTransform ShowAt(RectTransform layer, Vector2 screen, IList<CardTerms.Term> list, CardMaker cardMaker = null, Camera cam = null, bool hover = false, RectTransform beside = null)
         {
             Close();
             if (layer == null || list == null || list.Count == 0) return null;
@@ -226,7 +237,8 @@ namespace Bolzena.RunUI
                 shown = view;
             }
             openBox = shown;
-            Place(shown, lp, layer.rect.size, shown.sizeDelta);
+            if (beside != null) PlaceBeside(shown, layer, beside);
+            else Place(shown, lp, layer.rect.size, shown.sizeDelta);
             Tw.Pop(shown, 0, 0.92f, 0.16f);
             return stack;
         }
@@ -295,6 +307,7 @@ namespace Bolzena.RunUI
                 Put(nm);
                 string bodyText = t.Body ?? (t.IsCard ? "만들어지는 카드" : "");
                 var body = Ui.Text(col, bodyText, Theme.FsSm, Theme.Ink, TextAlignmentOptions.TopLeft, false, "body");
+                body.text = CardTerms.FitFor(body, bodyText, inner, body.fontSize);   // 어절 단위 · 이름 · 수치 덩이 · 화살표 규칙
                 body.textWrappingMode = TextWrappingModes.Normal; body.overflowMode = TextOverflowModes.Overflow; body.lineSpacing = 2;
                 Put(body);
                 h += y;
@@ -311,6 +324,22 @@ namespace Bolzena.RunUI
             public void OnPointerDown(PointerEventData e) { }
         }
 
+        // 카드 오른쪽(위 끝을 맞춰) — 넘치면 왼쪽, 화면 안으로
+        static void PlaceBeside(RectTransform box, RectTransform layer, RectTransform target)
+        {
+            var c = new Vector3[4];
+            target.GetWorldCorners(c);
+            Vector2 bl = layer.InverseTransformPoint(c[0]), tr = layer.InverseTransformPoint(c[2]);
+            Vector2 size = layer.rect.size, bs = box.sizeDelta;
+            float x = tr.x + 14;
+            if (x + bs.x > size.x / 2 - 12) x = bl.x - 14 - bs.x;
+            if (x < -size.x / 2 + 12) x = -size.x / 2 + 12;
+            float y = tr.y - bs.y;
+            if (y < -size.y / 2 + 12) y = -size.y / 2 + 12;
+            if (y + bs.y > size.y / 2 - 12) y = size.y / 2 - 12 - bs.y;
+            box.anchoredPosition = new Vector2(x, y);
+        }
+
         // 낱말 오른쪽 위에, 화면 안으로
         static void Place(RectTransform box, Vector2 lp, Vector2 size, Vector2 bs)
         {
@@ -320,6 +349,65 @@ namespace Bolzena.RunUI
             if (y < -size.y / 2 + 12) y = -size.y / 2 + 12;
             if (x < -size.x / 2 + 12) x = -size.x / 2 + 12;
             box.anchoredPosition = new Vector2(x, y);
+        }
+    }
+
+    /// <summary>
+    /// 카드 한 장에 마우스를 잠깐 올려 두면 그 카드의 낱말(키워드 · 상태 · 사도 고유 효과 · 변신 · 생성 카드)을 카드 오른쪽(넘치면 왼쪽)에 세로로 띄운다
+    /// (2026-10-07 사용자 「카드 상세 옆에 키워드 · 낱말 설명」 — 전투 카드 확대와 같은 자리 · 같은 판). W.Card 가 낱말이 있는 카드(폭 150 이상)에 붙인다.
+    /// 밑줄 낱말 하나 판(TermPop)이 열려 있으면 그쪽이 먼저 · PC 만(폰은 밑줄 낱말을 누르거나 카드 크게 창에서 본다).
+    /// </summary>
+    public class CardSide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    {
+        public List<CardTerms.Term> Terms;
+        public RectTransform Layer;
+        public TermPop.CardMaker Cards;
+        public const float Delay = 0.35f;
+        bool over, pinned;   // pinned = 코드로 띄운 판(데모 · 점검) — 마우스가 한 번 들어왔다 나갈 때까지 닫지 않는다
+        float overT, leaveT;
+
+        static bool Touch => UnityEngine.InputSystem.Touchscreen.current != null && UnityEngine.InputSystem.Mouse.current == null || Theme.Compact;
+
+        public void OnPointerEnter(PointerEventData e) { over = true; overT = 0; pinned = false; }
+        public void OnPointerExit(PointerEventData e) { over = false; }
+        void OnDisable() { over = false; if (TermPop.SideOwner == (object)this) TermPop.Close(); }
+
+        void Update()
+        {
+            if (Touch || Terms == null || Terms.Count == 0 || Layer == null) return;
+            bool mine = TermPop.SideOwner == (object)this;
+            if (over)
+            {
+                leaveT = 0;
+                if (mine) return;
+                if (TermPop.IsOpen) { overT = 0; return; }   // 밑줄 낱말 판 · 다른 카드 판이 열려 있으면 기다린다
+                overT += Time.unscaledDeltaTime;
+                if (overT < Delay) return;
+                Show();
+                return;
+            }
+            if (!mine || pinned) return;
+            var box = TermPop.OpenBox;
+            var p = UnityEngine.InputSystem.Pointer.current != null ? UnityEngine.InputSystem.Pointer.current.position.ReadValue() : Vector2.zero;
+            bool onBox = box != null && RectTransformUtility.RectangleContainsScreenPoint(box, p, CamOf(box));
+            if (onBox) { leaveT = 0; return; }
+            leaveT += Time.unscaledDeltaTime;
+            if (leaveT > 0.2f) TermPop.Close();
+        }
+
+        static Camera CamOf(RectTransform r)
+        {
+            var c = r != null ? r.GetComponentInParent<Canvas>() : null;
+            return c != null && c.renderMode != RenderMode.ScreenSpaceOverlay ? c.worldCamera : null;
+        }
+
+        /// <summary>띄운다(점검 · 데모도 부른다).</summary>
+        public void Show()
+        {
+            TermPop.ShowBeside(Layer, (RectTransform)transform, Terms, Cards, CamOf(Layer), true);
+            TermPop.SideOwner = this;
+            overT = 0;
+            pinned = !over;
         }
     }
 }

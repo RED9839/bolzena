@@ -25,6 +25,23 @@ namespace Bolzena.Core
         HeroDef ctxHero;
         HeroDef OwnerOf(KeywordDef k) => data?.Heroes.Values.FirstOrDefault(h => h.AllKeywords.Contains(k));
 
+        /// <summary>단계 이름이 있는 고유 효과(KeywordDef.Stages)의 n 단계 이름 — 없으면 null.</summary>
+        string StageName(string kwId, int n)
+        {
+            if (kwId == null || n < 1) return null;
+            KeywordDef hit = null;
+            if (ctxHero != null) hit = ctxHero.AllKeywords.FirstOrDefault(k => k.Name == kwId);
+            if (hit == null && data != null) hit = data.Heroes.Values.SelectMany(h => h.AllKeywords).FirstOrDefault(k => k.Name == kwId);
+            return hit?.Stages != null && n <= hit.Stages.Count ? hit.Stages[n - 1] : null;
+        }
+        /// <summary>「「형상」이 꿈결이면」 — 단계 이름이 있고 한 단계만 가리킬 때. 아니면 null.</summary>
+        string StageIf(string kwId, int n, int max)
+        {
+            if (max <= 0 || max != Math.Max(1, n)) return null;
+            var st = StageName(kwId, max);
+            return st == null ? null : $"{Ko.J(Q(kwId), "이가")} {st}{(Ko.HasFinal(st) ? "이면" : "면")}";
+        }
+
         string Carrier(string kwId)
         {
             if (kwId == null) return null;
@@ -49,22 +66,38 @@ namespace Bolzena.Core
 
         // ── 카드 ───────────────────────────────────────────────────────
         /// <summary>카드 면의 글 — 태그 + 효과(신탁을 얹은 모습이면 신탁의 글).</summary>
-        public string Card(CardView c) { choices = c.Def.Choices; powerCard = c.Type == "강화"; try { return Head(c.Def) + Compose(c.Tags, c.Fx); } finally { choices = null; powerCard = false; } }
-        public string Card(CardDef c) { choices = c.Choices; powerCard = c.Type == "강화"; try { return Head(c) + Compose(c.Tags, c.Fx); } finally { choices = null; powerCard = false; } }
+        public string Card(CardView c) { choices = c.Def.Choices; powerCard = c.Type == "강화"; bool l0 = lines; lines = true; try { return CardLines(c.Def, c.Tags, c.Fx); } finally { choices = null; powerCard = false; lines = l0; } }
+        public string Card(CardDef c) { choices = c.Choices; powerCard = c.Type == "강화"; bool l0 = lines; lines = true; try { return CardLines(c, c.Tags, c.Fx); } finally { choices = null; powerCard = false; lines = l0; } }
+        /// <summary>카드 면 — 태그 줄(「소멸. 신속.」) · 머리 줄(AP 빚 · 갈래) · 효과 줄들.</summary>
+        string CardLines(CardDef d, IEnumerable<string> tags, List<Fx> fx)
+        {
+            var tagLine = string.Join(" ", (tags ?? Enumerable.Empty<string>()).Select(t => t + "."));
+            var parts = new List<string> { tagLine, Head(d).TrimEnd('\n'), Fx(fx) };
+            return string.Join("\n", parts.Where(x => x.Length > 0));
+        }
+        /// <summary>
+        /// 카드 · 신탁 · 축복 글을 짓는 중 — 문장(기본 효과 · 조건 하나 · 강화 규칙 하나)마다 줄을 바꾼다(2026-10-07 가독성, Docs/설명글.md §7).
+        /// 안쪽 글(예약 · 함정의 뒤 효과, 강화 규칙의 효과)은 한 줄 그대로.
+        /// </summary>
+        bool lines;
+        int fxDepth;
+        /// <summary>문장 이음 — 카드 글의 맨 바깥은 줄바꿈, 그 밖은 「. 」.</summary>
+        string SentJoin => !lines ? ". " : fxDepth <= 1 ? "\n" : "; ";
         /// <summary>강화 카드의 글을 짓는 중 — 세기형 버프(사기 · 결의 …)에 「이 전투 동안」 을 붙인다.</summary>
         bool powerCard;
         /// <summary>전투 끝까지 남는 세기형 상태(겹마다, 줄지 않는다) — 강화 카드 글에서 「이 전투 동안」 으로 읽힌다.</summary>
         static readonly HashSet<string> LASTING_ST = new() { "사기", "불굴", "결의", "결정화", "고동", "근면", "계몽", "집중" };
         bool Lasting(Fx f) => powerCard && f.K == FxK.Status && f.Target == null && f.Id != null && LASTING_ST.Contains(f.Id);
         List<string> choices;
-        /// <summary>카드 머리의 덤 — 고유 효과로 치르는 비용 · AP 빚 · 두 갈래.</summary>
-        static string Head(CardDef c)
+        /// <summary>카드 머리의 덤 — 고유 효과로 치르는 비용 · AP 빚 · 두 갈래(카드 글에서는 한 줄씩).</summary>
+        string Head(CardDef c)
         {
             var s = new List<string>();
             if (c.PayWith != null) s.Add($"비용은 {Q(c.PayWith)}로.");
-            if (c.Debt) s.Add("AP가 모자라도 사용 가능(모자란 만큼 다음 턴 AP -).");
+            if (c.Debt) s.Add("AP 빚 가능 — 모자란 AP만큼 다음 턴 AP -.");
             if (c.Choices != null && c.Choices.Count == 2) s.Add($"갈래 — {c.Choices[0]} / {c.Choices[1]}.");
-            return s.Count == 0 ? "" : string.Join(" ", s) + " ";
+            if (s.Count == 0) return "";
+            return lines ? string.Join("\n", s.Select(x => x.TrimEnd('.'))) + "\n" : string.Join(" ", s) + " ";
         }
         public string Oracle(CardDef baseCard, OracleDef o)
         {
@@ -72,53 +105,82 @@ namespace Bolzena.Core
             if (o.Power) head.Add("강화 카드.");
             if (o.Cost != null && o.Cost != baseCard.Cost) head.Add($"비용 {o.Cost}.");
             choices = baseCard.Choices; powerCard = baseCard.Type == "강화" || o.Power;
+            bool l0 = lines; lines = true;
             string body;
-            try { body = Compose(o.Tags, o.Fx); } finally { choices = null; powerCard = false; }
-            return string.Join(" ", head.Concat(new[] { body }).Where(s => s.Length > 0));
+            try { body = Compose(o.Tags, o.Fx); } finally { choices = null; powerCard = false; lines = l0; }
+            return string.Join(" ", head) + (head.Count > 0 && body.Length > 0 ? "\n" : "") + body;
         }
         public string Bless(BlessDef b)
         {
             var parts = new List<string>();
             if (b.Kind != null && R.DIVINE_KO.TryGetValue(b.Kind, out var k)) parts.Add(k.Split('—').Last().Trim() + ".");
-            var body = Compose(b.Tags, b.Fx);
+            bool l0 = lines; lines = true;
+            string body;
+            try { body = Compose(b.Tags, b.Fx); } finally { lines = l0; }
             if (body.Length > 0) parts.Add(body);
-            return string.Join(" ", parts);
+            return string.Join("\n", parts);
         }
         public string Ult(UltDef u) => $"「{u.Name}」 (게이지 {u.Cost}%) {Fx(u.Fx)}";
 
-        /// <summary>태그 + 효과.</summary>
+        /// <summary>태그 + 효과(카드 글이면 태그 줄 다음 줄에 효과).</summary>
         public string Compose(IEnumerable<string> tags, List<Fx> fx)
         {
             var head = string.Join(" ", (tags ?? Enumerable.Empty<string>()).Select(t => t + "."));
             var body = Fx(fx);
-            return head.Length == 0 ? body : body.Length == 0 ? head : head + " " + body;
+            return head.Length == 0 ? body : body.Length == 0 ? head : head + (lines ? "\n" : " ") + body;
         }
 
-        /// <summary>효과 조각 목록 → 한 줄(조건은 「파괴: …」 처럼 새 문장).</summary>
+        /// <summary>조건 머리가 키워드 꼴(「처치:」 · 「연속:」 · 갈래 이름)인가 — 아니면 말로 쓴 조건(「낸 뒤 손패가 없으면 →」).</summary>
+        static bool KwHead(Fx f) => f.K switch
+        {
+            FxK.IfBroken or FxK.IfTune or FxK.IfChain or FxK.IfLink or FxK.IfPrev or FxK.IfSwitched or FxK.IfRepeat or FxK.IfKill or FxK.IfBreak or FxK.IfChoice or FxK.IfRoll => true,
+            FxK.IfWounded => f.Target != "oneEnemy",
+            FxK.When => f.On != "handEnd",
+            _ => false,
+        };
+        /// <summary>조건 문장에서 기본 효과와 같은 갈래의 효과에 「더」 를 붙인다(조건 효과는 기본 효과에 얹힌다 — 바꾸지 않는다).</summary>
+        static string AddKind(string k) => k == FxK.Dmg ? "dmg" : k == FxK.Shield || k == FxK.Block ? "guard" : k == FxK.Heal ? "heal" : null;
+
+        /// <summary>앞에서 「적 1명」 을 짚었나(같은 글 안 — 뒤의 「적 1명」 은 「그 적」 으로).</summary>
+        bool sawOne;
+
+        /// <summary>효과 조각 목록 → 글(조건은 새 문장 — 카드 글이면 새 줄).</summary>
         public string Fx(List<Fx> fx)
         {
             if (fx == null || fx.Count == 0) return "";
+            fxDepth++;
+            bool one0 = sawOne; sawOne = false;
+            try { return FxBody(fx); }
+            finally { fxDepth--; sawOne = one0; }
+        }
+
+        string FxBody(List<Fx> fx)
+        {
             var sentences = new List<string>();
             var cur = new List<string>();
             string pending = null;    // 「「X」 1개당」 · 「리듬 1개당」 — 바로 뒤 한 줄의 머리
+            bool pendEach = false;    // 적마다 그 적의 「X」 1개당 — 뒤 효과의 「적 전체에」 를 뺀다
             string head = null;       // 문장의 머리(조건)
+            bool kwHead = false, choiceHead = false;
             string lastLead = null;   // 바로 앞 조각의 대상 머리(「적 1명 」 · 「이번 턴 자신의 」) — 같으면 「· 」 로 잇는다
+            var baseKinds = new HashSet<string>();
+            bool sawBase = false;     // 기본 문장(조건 없음)에서 「적 1명」 을 짚었나
             Fx prev = null;
             void Flush()
             {
                 if (cur.Count == 0 && head == null) return;
-                sentences.Add((head != null ? head + ": " : "") + string.Join(", ", cur));
+                sentences.Add((head != null ? head + (kwHead || inRule ? ": " : " → ") : "") + string.Join(", ", cur));
                 cur.Clear(); head = null; lastLead = null;
             }
             foreach (var f in fx)
             {
                 string cond = CondHead(f);
-                if (cond != null) { Flush(); head = cond; prev = f; continue; }
-                if (f.K == FxK.PerStack) { string lim = f.N > 0 && f.Max > 0 ? $"(최소 {f.N} · 최대 {f.Max})" : f.N > 0 ? $"(최소 {f.N})" : f.Max > 0 ? $"(최대 {f.Max})" : ""; pending = f.Each ? $"적마다 제 {Q(f.Id)} 1개당{lim} " : $"{Q(f.Id)} 1개당{lim} "; prev = f; continue; }
+                if (cond != null) { Flush(); if (f.K == FxK.IfChoice || f.K == FxK.When) sawOne = sawBase; head = cond; kwHead = KwHead(f); choiceHead = f.K == FxK.IfChoice || f.K == FxK.When; prev = f; continue; }
+                if (f.K == FxK.PerStack) { string lim = f.N > 0 && f.Max > 0 ? $"(최소 {f.N} · 최대 {f.Max})" : f.N > 0 ? $"(최소 {f.N})" : f.Max > 0 ? $"(최대 {f.Max})" : ""; pending = f.Each ? $"적마다 그 적의 {Q(f.Id)} 1개당{lim} " : $"{Q(f.Id)} 1개당{lim} "; pendEach = f.Each; prev = f; continue; }
                 if (f.K == FxK.PerRhythm) { pending = "리듬 1개당 "; prev = f; continue; }
                 if (f.K == FxK.PerDiscarded) { pending = "이 카드로 버린 카드 1장당 "; prev = f; continue; }
                 if (f.K == FxK.PerPaid) { pending = $"이번 턴 치른 HP {(f.Per > 0 ? f.Per : 100)}당 "; prev = f; continue; }
-                if (f.K == FxK.PerDebuff) { pending = "적 1명의 디버프 1가지당 "; prev = f; continue; }
+                if (f.K == FxK.PerDebuff) { pending = $"{(sawOne ? "그 적" : "적 1명")}의 디버프 1가지당 "; prev = f; continue; }
                 if (f.K == FxK.PerApLeft) { pending = "남은 AP 1당 "; prev = f; continue; }
                 if (f.K == FxK.PerTag) { pending = $"손의 {Q(f.Id)} 카드 1장당 "; prev = f; continue; }
                 if (f.K == FxK.PerPlayed) { pending = f.Id != null ? $"이번 턴 낸 {Q(f.Id)} 카드 1장당 " : "이번 턴 낸 카드 1장당 "; prev = f; continue; }
@@ -126,21 +188,46 @@ namespace Bolzena.Core
                 if (f.K == FxK.PerCardSt) { pending = $"이 카드의 {Q(f.Id)} 1당 "; prev = f; continue; }
                 if (f.K == FxK.PerEvent) { pending = f.Per > 1 ? $"그 값 {f.Per}당 " : "그 값 1당 "; prev = f; continue; }
                 // 강화 카드 지속 규칙 — 제 문장(앞의 조건에 걸리지 않게 보이도록 따로)
-                if (f.K == FxK.Power) { string ph = head; Flush(); string pt = PowerText(f); sentences.Add(ph != null ? ph + ": " + pt : pt); prev = f; continue; }
+                if (f.K == FxK.Power) { string ph = head; bool pk = kwHead; Flush(); string pt = PowerText(f); sentences.Add(ph != null ? ph + (pk ? ": " : " → ") + pt : pt); prev = f; continue; }
+                if ((f.K == FxK.Later || f.K == FxK.AfterCards) && cur.Count > 0 && head == null) Flush();
                 var t = One(f, prev);
                 if (t == null) { prev = f; continue; }
                 if (Lasting(f)) t = "이 전투 동안 " + t;
                 string lead = Lasting(f) ? "이 전투 동안 " : Lead(f);
                 if (lead != null && !t.StartsWith(lead)) lead = null;
-                if (pending != null) { t = pending + t; pending = null; lead = null; }
+                // 같은 글에서 두 번째부터의 「적 1명」 = 고른 그 적(엔진 Resolve oneEnemy = 카드의 대상)
+                if (t.StartsWith("적 1명"))
+                {
+                    if (sawOne) { t = "그 적" + t.Substring(4); if (lead != null && lead.StartsWith("적 1명")) lead = "그 적" + lead.Substring(4); }
+                    else sawOne = true;
+                }
+                else if (t.Contains("적 1명")) sawOne = true;
+                if (head == null) sawBase = sawOne;
+                if (pending != null)
+                {
+                    if (pendEach && t.StartsWith("적 전체에 ")) t = t.Substring("적 전체에 ".Length);
+                    t = pending + t; pending = null; pendEach = false; lead = null;
+                }
+                // 조건 효과는 기본 효과에 얹힌다 — 같은 갈래(피해 · 실드 · 회복)가 기본에 있으면 「더」
+                string ak = AddKind(f.K);
+                if (ak != null)
+                {
+                    if (head == null) baseKinds.Add(ak);
+                    else if (!choiceHead && baseKinds.Contains(ak) && !t.StartsWith("다른 적")) t += " 더";
+                }
                 // 같은 대상에 잇단 상태 · 증감은 대상을 한 번만 — 「적 1명 고통 3 · 손상 1」
-                if (lead != null && lead == lastLead && cur.Count > 0) cur[cur.Count - 1] += " · " + t.Substring(lead.Length);
+                const string RUN = "이 전투 동안 ";
+                static string NormLead(string l) => l != null && l.StartsWith("그 적") ? "적 1명" + l.Substring(3) : l;
+                if (lead != null && NormLead(lead) == NormLead(lastLead) && cur.Count > 0) cur[cur.Count - 1] += " · " + t.Substring(lead.Length);
+                else if (t.StartsWith(RUN) && cur.Count > 0 && cur[cur.Count - 1].StartsWith(RUN)) cur.Add(t.Substring(RUN.Length));
                 else cur.Add(t);
                 lastLead = lead;
                 prev = f;
+                // 예약 뒤의 효과는 지금 일어난다 — 예약 문장과 떼어 새 문장으로(조건 안이면 그 조건에 그대로)
+                if ((f.K == FxK.Later || f.K == FxK.AfterCards) && head == null) Flush();
             }
             Flush();
-            return string.Join(". ", sentences);
+            return string.Join(SentJoin, sentences);
         }
 
         /// <summary>대상 머리 — 적에게 거는 상태(「적 1명 」)와 능력치 증감(「이번 턴 자신의 」). 그 밖엔 null.</summary>
@@ -165,6 +252,11 @@ namespace Bolzena.Core
             }
         }
 
+        /// <summary>조건이 짚는 적 — 앞에서 「적 1명」 을 짚었으면 「그 적」, 아니면 「고른 적」(엔진: 카드의 대상).</summary>
+        string Foe() => sawOne || inRule ? "그 적" : "고른 적";
+        /// <summary>적에게 쌓는 고유 효과의 조건이면 「그 적에게 」(엔진 IfStack — carrier enemy 는 대상 적의 것을 본다).</summary>
+        string FoeStack(string id) => !inRule && Carrier(id) == "enemy" ? Foe() + "에게 " : "";
+
         string CondHead(Fx f) => f.K switch
         {
             FxK.IfBroken => "파괴",
@@ -174,28 +266,28 @@ namespace Bolzena.Core
             FxK.IfPrev => $"앞이 {f.Type}",
             FxK.IfRhythm => $"리듬이 {f.N} 이상이면",
             FxK.IfSwitched => "전환",
-            FxK.IfStack => f.Not ? $"{Ko.J(Q(f.Id), "이가")} 없으면" : f.Max > 0 && f.Max == Math.Max(1, f.N) ? $"{Ko.J(Q(f.Id), "이가")} {f.Max}{(Ko.HasFinal(f.Max.ToString()) ? "이면" : "면")}" : f.Max > 0 ? $"{Ko.J(Q(f.Id), "이가")} {Math.Max(1, f.N)}~{f.Max}{(Ko.HasFinal(f.Max.ToString()) ? "이면" : "면")}" : f.N > 1 ? $"{Ko.J(Q(f.Id), "이가")} {f.N}개 이상이면" : $"{Ko.J(Q(f.Id), "이가")} 있으면",
+            FxK.IfStack => FoeStack(f.Id) + (f.Not ? $"{Ko.J(Q(f.Id), "이가")} 없으면" : StageIf(f.Id, f.N, f.Max) is string sti ? sti : f.Max > 0 && f.Max == Math.Max(1, f.N) ? $"{Ko.J(Q(f.Id), "이가")} {f.Max}{(Ko.HasFinal(f.Max.ToString()) ? "이면" : "면")}" : f.Max > 0 ? $"{Ko.J(Q(f.Id), "이가")} {Math.Max(1, f.N)}~{f.Max}{(Ko.HasFinal(f.Max.ToString()) ? "이면" : "면")}" : f.N > 1 ? $"{Ko.J(Q(f.Id), "이가")} {f.N}개 이상이면" : $"{Ko.J(Q(f.Id), "이가")} 있으면"),
             FxK.When => f.On switch { "draw" => "영감", "drawAny" => "감응", "discard" => "안식", "handEnd" => "턴 끝에 손에 있으면", "burn" => "소각", "passion" => "열정", _ => f.On },
             FxK.IfRepeat => "되풀이",
             FxK.IfHeld => $"손에서 {Math.Max(1, f.N)}턴 묵혔으면",
-            FxK.IfPlayedMax => f.N == 0 ? "이번 턴 첫 장이면" : $"이번 턴 앞서 낸 카드가 {f.N}장 이하면",
-            FxK.IfApLeft => $"AP가 {Math.Max(1, f.N)} 이상 남으면",
+            FxK.IfPlayedMax => f.N == 0 ? "이번 턴 첫 카드면" : $"이번 턴 앞서 낸 카드가 {f.N}장 이하면",
+            FxK.IfApLeft => $"낸 뒤 AP가 {Math.Max(1, f.N)} 이상 남으면",
             FxK.IfSpent => $"이번 턴 쓴 AP가 꼭 {f.N}이면",
             FxK.IfBalanced => "공격과 스킬이 같은 장수면",
-            FxK.IfHunted => "찍은 적이면",
-            FxK.IfDebuffs => $"디버프가 {Math.Max(1, f.N)}가지 이상이면",
+            FxK.IfHunted => $"{Foe()}이 찍혀 있으면",
+            FxK.IfDebuffs => $"{Foe()}의 디버프가 {Math.Max(1, f.N)}가지 이상이면",
             FxK.IfHp => f.Not ? $"파티 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}%보다 많으면" : $"파티 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}% 이하이면",
             FxK.IfKill => "처치",
             FxK.IfBreak => "붕괴",
-            FxK.IfWounded => f.Target == "oneEnemy" ? "적이 부상이면" : "부상",
+            FxK.IfWounded => f.Target == "oneEnemy" ? $"{Foe()}이 부상이면" : "부상",
             FxK.IfChoice => choices != null && f.N >= 1 && f.N <= choices.Count ? choices[f.N - 1] : $"갈래 {f.N}",
             FxK.IfRandom => $"{Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}% 확률로",
-            FxK.IfHand => f.N <= 0 ? "손패가 없으면" : $"손패가 {f.N}장 이하면",
+            FxK.IfHand => (inRule ? "그 뒤 " : "낸 뒤 ") + (f.N <= 0 ? "손패가 없으면" : $"손패가 {f.N}장 이하면"),
             FxK.IfPile => $"{PileKo(f.From)}가 {Math.Max(1, f.N)}장 이상이면",
-            FxK.IfNth => $"이번 턴 {f.N}장째면",
+            FxK.IfNth => f.N <= 1 ? "이번 턴 첫 카드면" : $"이번 턴 {f.N}번째 카드면",
             FxK.IfStreak => $"같은 사도의 카드를 {Math.Max(2, f.N)}장째 잇달아 내면",
-            FxK.IfAllHeroes => "이번 턴 사도 모두가 카드를 냈으면",
-            FxK.IfFoe => (f.Id switch { "broken" => "적이 격파 상태면", "tough" => $"적 강인도가 {Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}% 이하면", "guarded" => "적에게 실드가 있으면", "attack" => "적이 공격하려 하면", "hp" => $"적의 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면", "hpMob" => $"보스가 아닌 적의 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면", var st when R.ALL_ST.Contains(st) => $"적에게 {Ko.J(st, "이가")} {(f.Not ? "없으면" : "있으면")}", _ => f.Id }) + (f.Not && !R.ALL_ST.Contains(f.Id ?? "") ? "(아니면)" : ""),
+            FxK.IfAllHeroes => "이번 턴 사도 모두가 카드를 냈으면(이 카드 포함)",
+            FxK.IfFoe => (f.Id switch { "broken" => $"{Foe()}이 격파 상태면", "tough" => $"{Foe()}의 강인도가 {Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}% 이하면", "guarded" => $"{Foe()}에게 실드가 있으면", "attack" => $"{Foe()}이 공격하려 하면", "hp" => $"{Foe()}의 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면", "hpMob" => $"{Foe()}이 보스가 아니고 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면", var st when R.ALL_ST.Contains(st) => $"{Foe()}에게 {Ko.J(st, "이가")} {(f.Not ? "없으면" : "있으면")}", _ => f.Id }) + (f.Not && !R.ALL_ST.Contains(f.Id ?? "") ? "(아니면)" : ""),
             FxK.IfRoll => $"{f.N}",
             FxK.IfPrevSame => f.Not ? "바로 앞 카드와 종류가 다르면" : "바로 앞 카드와 종류가 같으면",
             FxK.IfInHand => $"손에 다른 {Ko.J(Q(CardName(f.Id)), "이가")} 있으면",
@@ -225,9 +317,9 @@ namespace Bolzena.Core
 
         static string Dur(Fx f)
         {
-            if (f.Run) return "전투 내내 ";
+            if (f.Run) return "이 전투 동안 ";
             int t = f.TurnsOr1;
-            if (t >= 999) return "이번 전투 동안 ";
+            if (t >= 999) return "이 전투 동안 ";
             return t > 1 ? $"{t}턴간 " : "이번 턴 ";
         }
 
@@ -298,8 +390,8 @@ namespace Bolzena.Core
                 case FxK.Form: { var fd = data?.Form(f.Id); return fd == null ? $"변신 {Q(f.Id)}" : $"{Q(fd.Name)}{Ro(fd.Name)} 변신({FormDur(fd)})"; }
                 case FxK.FormEnd: return "변신 해제";
                 case FxK.Cue: return null;
-                case FxK.Later: return $"{Math.Max(1, f.N)}턴 뒤 턴 시작에: {Fx(f.Then)}";
-                case FxK.AfterCards: return $"카드를 {Math.Max(1, f.N)}장 더 내면: {Fx(f.Then)}";
+                case FxK.Later: return $"{Math.Max(1, f.N)}턴 뒤 턴 시작에 → {Fx(f.Then)}";
+                case FxK.AfterCards: return $"이 뒤로 카드를 {Math.Max(1, f.N)}장 더 내면 → {Fx(f.Then)}";
                 case FxK.Trap: return $"{WhoTo(f.Target)} 함정 — 다음에 공격하면: {Fx(f.Then)}";
                 case FxK.Confuse: return $"{Who(f.Target)} 혼란(다음 공격이 다른 적에게)";
                 case FxK.AutoPlay: return $"손의 무작위 {Filt(f)}{(f.Id != null ? Q(f.Id) + " " : "")}카드 {f.NOr1}장 저절로 나감{(f.Ratio > 0 && f.Ratio != 1 ? $"(효과 {P(f.Ratio)})" : "")}";
@@ -307,7 +399,6 @@ namespace Bolzena.Core
                 case FxK.Pull: return $"{PileKo(f.From)} {(f.At == "bottom" ? "맨 아래" : f.At == "random" ? "무작위" : "맨 위")} {Filt(f)}카드 {f.NOr1}장을 {(f.To == "top" ? "뽑을 더미 맨 위로" : "손으로")}";
                 case FxK.ExileFrom: return f.From == "pulled" ? "그 카드 소멸" : $"{PileKo(f.From)}에서 무작위 {Filt(f)}{f.NOr1}장 소멸";
                 case FxK.Dispel: return $"{Who(f.Target)}의 버프 {f.NOr1Of(f.IV)}개 제거";
-                case FxK.MoveRow: return $"{(f.Id == "front" ? "전열" : f.Id == "mid" ? "중열" : "후열")}로 이동";
                 case FxK.GrowRun: return $"{Whose(f.Target ?? "self")}{(f.Id == "def" ? "방어력" : f.Id == "crit" ? "치명" : "공격력")} +{f.IV} (모험이 끝날 때까지)";
                 case FxK.Tough:
                     {
@@ -343,7 +434,7 @@ namespace Bolzena.Core
                 case FxK.NextAp: return $"다음 턴 AP {(f.IV >= 0 ? "+" : "")}{f.IV}";
                 case FxK.Burn: return f.All ? "손패 전부 소멸" : $"{(f.Random ? "무작위 " : "")}손패 {f.IV}장 소멸";
                 case FxK.Reflect: return inRule ? $"그 피해의 {P(f.Ratio)}를 때린 적에게 고정 피해로" : $"지난 적의 차례에 받은 피해의 {P(f.Ratio)}를 {Who(f.Target)}에게 고정 피해로";
-                case FxK.PayHpPct: return $"파티 최대 HP의 {P(f.V)} 만큼 HP 소모";
+                case FxK.PayHpPct: return $"파티 최대 HP의 {P(f.V)}만큼 HP 소모";
                 default: return $"({f.K})";
             }
         }
@@ -360,7 +451,7 @@ namespace Bolzena.Core
                     {
                         bool any = w.Who == "any";
                         if (w.Seq != null && w.Seq.Count > 0) return $"{(any ? "이번 턴 " : "자신의 ")}{string.Join(" · ", w.Seq)} 카드를 차례로 내면";
-                        if (w.Nth > 0) return $"파티가 이번 턴 카드를 {w.Nth}장째 낼 때";
+                        if (w.Nth > 0) return w.Nth == 1 ? "파티가 한 턴에 첫 카드를 낼 때" : $"파티가 한 턴에 카드를 {w.Nth}장째 낼 때";
                         if (w.Sig) return $"{SelfOf(w)}시그니처 카드를 내면";
                         if (w.Repeat) return $"{(any ? "" : "자신의 ")}같은 카드를 잇달아 내면";
                         // 「0코 이하」 → 「0코」, 「1코 이상 1코 이하」 → 「1코」
@@ -422,6 +513,8 @@ namespace Bolzena.Core
                     {
                         // 적에게 쌓는 고유 효과는 「대상 적」 의 것을 본다(그 카드의 대상 · 쓰러진 적 · 때린 적)
                         string on = mine && Carrier(c.Id) == "enemy" ? "그 적에게 " : "";
+                        if (!c.Not && StageIf(c.Id, c.N, c.Max) is string sti) return on + sti;
+                        if (!c.Not && c.Max > 0) return c.Max == Math.Max(1, c.N) ? $"{on}{Ko.J(Q(c.Id), "이가")} {c.Max}{(Ko.HasFinal(c.Max.ToString()) ? "이면" : "면")}" : $"{on}{Ko.J(Q(c.Id), "이가")} {Math.Max(1, c.N)}~{c.Max}{(Ko.HasFinal(c.Max.ToString()) ? "이면" : "면")}";
                         return c.Not ? $"{on}{Ko.J(Q(c.Id), "이가")} 없으면" : c.N > 1 ? $"{on}{Ko.J(Q(c.Id), "이가")} {c.N}개 이상이면" : $"{on}{Ko.J(Q(c.Id), "이가")} 있으면";
                     }
                 case "hp": return $"{(mine ? "파티 " : "")}HP가 {Num.Round(c.Pct * 100)}% 이하이면";
@@ -429,7 +522,6 @@ namespace Bolzena.Core
                 case "status": return c.Id == R.RHYTHM ? $"리듬이 {c.N} 이상이면" : $"{(R.HERO_ST.Contains(c.Id) ? "자신" : "파티")} {Ko.J(c.Id, "이가")} {c.N} 이상이면";
                 case "foes": return $"적이 {c.N}명 이상이면";
                 case "foesMax": return $"적이 {c.N}명뿐이면";
-                case "row": return $"{(c.Row == "front" ? "전열" : c.Row == "mid" ? "중열" : "후열")}에 서 있으면";
                 case "playedMin": return $"파티가 이번 턴 카드를 {c.N}장 이상 냈으면";
                 case "playedMax": return $"파티가 이번 턴 카드를 {c.N}장 이하로 냈으면";
                 case "ownNone": return c.Type != null ? $"이번 턴 자신의 {c.Type} 카드를 내지 않았으면" : "이번 턴 자신의 카드를 내지 않았으면";
@@ -463,13 +555,13 @@ namespace Bolzena.Core
         /// 강화 카드 지속 규칙(power)의 글 — 「이 전투 동안 매 턴 시작 시 아군 전원에게 「물총」 +1 · 공격 카드를 낼 때마다 … (턴당 2회)」.
         /// 턴 시작 · 턴 종료는 「매 턴 …」, 항상(always)의 증감은 「이번 턴」 없이.
         /// </summary>
-        public string PowerText(Fx f) => "이 전투 동안 " + PowerRules(f.Rules);
+        public string PowerText(Fx f) => string.Join("\n", PowerRules(f.Rules).Split('\n').Select(x => "이 전투 동안 " + x));
 
         /// <summary>강화 규칙들 — 「 · 」 로 잇는다(「이 전투 동안」 머리는 빼고).</summary>
         public string PowerRules(List<PassiveRule> rules)
         {
             if (rules == null || rules.Count == 0) return "(규칙 없음)";
-            bool pc = powerCard; powerCard = false;
+            bool pc = powerCard, m0 = mine; powerCard = false; mine = true;
             inRule = true;
             try
             {
@@ -486,12 +578,12 @@ namespace Bolzena.Core
                     }
                     var fx = r.When?.On == "always" ? r.Fx.Select(x => FxK.Mods.Contains(x.K) && !x.Run ? AsRun(x) : x).ToList() : r.Fx;
                     string body = EvPer(r.When, Fx(fx));
-                    if (r.When?.On == "always") body = body.Replace("전투 내내 ", "");
+                    if (r.When?.On == "always") body = body.Replace("이 전투 동안 ", "");
                     outs.Add(RuleJoin(head, body, RuleLimit(r)));
                 }
-                return string.Join(" · ", outs);
+                return string.Join(lines && fxDepth <= 1 ? "\n" : " · ", outs);
             }
-            finally { inRule = false; powerCard = pc; }
+            finally { inRule = false; powerCard = pc; mine = m0; }
         }
         static Fx AsRun(Fx f) { var c = f.Copy(); c.Run = true; return c; }
 
@@ -534,7 +626,20 @@ namespace Bolzena.Core
         }
         /// <summary>계기가 넘친 값(stackOver)이면 「그 값 1당」 → 「넘친 1개당」.</summary>
         static string EvPer(When w, string fx) => w?.On == "stackOver" ? System.Text.RegularExpressions.Regex.Replace(fx, @"그 값 (\d+)당 ", "넘친 $1개당 ") : fx;
-        static string RuleLine(string head, string fx, string limit) => (fx.Length > 0 ? (head.Length > 0 ? head + " → " + fx : fx) : head) + limit;
+        /// <summary>계기 → 결과. 결과가 말로 쓴 조건 하나로 시작하면(「그 뒤 손패가 없으면 → …」) 계기에 붙여 화살표를 하나만.</summary>
+        static string RuleLine(string head, string fx, string limit)
+        {
+            if (fx.Length == 0) return head + limit;
+            if (head.Length == 0) return fx + limit;
+            // 규칙 속 조건은 「X면: Y」 로 온다 — 문장이 하나면 「계기 X면 → Y」 로 화살표 하나
+            int colon = fx.IndexOf(": ", StringComparison.Ordinal);
+            if (colon > 0 && fx.IndexOf(". ", StringComparison.Ordinal) < 0 && fx.IndexOf(": ", colon + 2, StringComparison.Ordinal) < 0)
+            {
+                string cond = fx.Substring(0, colon);
+                if ((cond.EndsWith("면") || cond.EndsWith("확률로")) && !cond.Contains(", ") && !cond.Contains(" → ")) return head + " " + cond + " → " + fx.Substring(colon + 2) + limit;
+            }
+            return head + " → " + fx + limit;
+        }
 
         /// <summary>
         /// 규칙의 계기 · 조건 글. 적에게 쌓는 고유 효과(carrier enemy)를 보는 조건이 처치 · 격파 계기와 붙으면 한 마디로 —
@@ -565,8 +670,8 @@ namespace Bolzena.Core
         }
         static string RuleLimit(PassiveRule r) => r.Limit != null ? $" ({(r.Limit.Per == "fight" ? "전투당" : "턴당")} {r.Limit.N}회)" : "";
         /// <summary>조건 머리 · 여러 문장이 없는 효과 글(「, 」 로 이어 붙여도 되는 것).</summary>
-        static bool Plain(string fx) => fx.Length > 0 && !fx.Contains(": ") && !fx.Contains(". ");
-        static string RuleJoin(string head, string fx, string limit) => (fx.Length > 0 ? (head.Length > 0 ? head + " " + fx : fx) : head) + limit;
+        static bool Plain(string fx) => fx.Length > 0 && !fx.Contains(": ") && !fx.Contains(". ") && !fx.Contains(" → ") && !fx.Contains("\n");
+        static string RuleJoin(string head, string fx, string limit) => RuleLine(head, fx, limit);
 
         /// <summary>패시브 — 「이름: 규칙」, 같은 이름이 잇달면 한 이름 아래 문장으로(계기 · 조건 · 횟수까지 같으면 효과만 잇는다).</summary>
         public string Passives(List<PassiveRule> rules)
@@ -646,6 +751,8 @@ namespace Bolzena.Core
         {
             if (fx.Contains(part + ", ")) return fx.Replace(part + ", ", "");
             if (fx.Contains(", " + part)) return fx.Replace(", " + part, "");
+            if (fx.Contains(". " + part)) return fx.Replace(". " + part, "");
+            if (fx.Contains(part + ". ")) return fx.Replace(part + ". ", "");
             return fx.Replace(part, "");
         }
 
@@ -717,6 +824,9 @@ namespace Bolzena.Core
             try { return Bullets(KeywordLines(k)); } finally { ctxHero = c0; }
         }
 
+        /// <summary>사도 칸(Traits)의 변신 갈래 이름.</summary>
+        public const string FormKind = "변신";
+
         /// <summary>패시브가 없는 사도의 패시브 칸 이름.</summary>
         public const string NoPassive = "없음";
 
@@ -733,6 +843,8 @@ namespace Bolzena.Core
             if (h.Ult != null) o.Add(new TraitText { Kind = "고학년", Name = h.Ult.Name, Sub = $"게이지 {h.Ult.Cost}%", Body = Fx(h.Ult.Fx) });
             var kws = h.AllKeywords.ToList();
             foreach (var k in kws) o.Add(new TraitText { Kind = "고유 효과", Name = k.Name, Sub = string.IsNullOrEmpty(k.Desc) ? null : k.Desc.TrimEnd('.'), Body = Trait(h, k), Keyword = k });
+            // 변신(2026-10-07 사용자 「네르의 성전 모드 · 디아나(왕년)의 맨주먹 전성기가 뭔지 안 나온다」) — 부제 = desc, 본문 = 규칙에서(FormBody)
+            foreach (var fm in h.Forms ?? new List<FormDef>()) o.Add(new TraitText { Kind = FormKind, Name = fm.Name, Sub = string.IsNullOrEmpty(fm.Desc) ? null : fm.Desc.TrimEnd('.'), Body = FormBody(fm) });
             var rest = h.Passives.ToList();
             if (rest.Count == 0) o.Add(new TraitText { Kind = "패시브", Name = NoPassive, Body = "" });
             for (int i = 0; i < rest.Count;)
@@ -755,6 +867,23 @@ namespace Bolzena.Core
             return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 == 8 ? "로" : "으로";
         }
         static string FormDur(FormDef f) => f.Turns > 0 ? $"{f.Turns}턴" : "전투 끝까지";
+
+        /// <summary>
+        /// 변신 본문 — 데이터 desc(부제) 없이 규칙에서 만든 줄(「· 」 머리, 한 줄 = 한 가지): 지속 · 풀리는 계기 · 능력치 · 바뀌는 카드 · 덤 · 패시브 · 풀릴 때 · 다시 쓰면.
+        /// 낱말 판(runui CardTerms) · 사도 칸(Traits 「변신」) · 전투 변신 칩이 같이 쓴다. desc 는 화면이 제목 아래 작은 글로 따로 보인다.
+        /// </summary>
+        public string FormBody(FormDef f)
+        {
+            var s = new List<string>();
+            string dur = f.Turns > 0 ? $"{f.Turns}턴 지속" : "전투 끝까지";
+            if (f.Until != null) dur += $" · {WhenText(f.Until).Replace("낼 때마다", "내면")} 풀림";
+            s.Add(dur);
+            s.AddRange(FormDuring(f, true));
+            if (f.Off != null && f.Off.Count > 0) s.Add($"풀릴 때 → {Fx(f.Off)}");
+            bool byMax = data != null && data.Heroes.Values.Any(h => h.AllKeywords.Any(k => k.OnMax?.Form == f.Id));
+            s.Add(byMax ? "변신 중에 다시 최대가 되어도 그대로" : "다시 쓰면 지속이 처음으로");
+            return Bullets(s);
+        }
 
         /// <summary>변신 자세히 — 설명 · 지속 · 풀리는 계기 · 그동안(능력치 · 카드 · 덤 · 패시브) · 풀릴 때.</summary>
         public string Form(FormDef f)
@@ -788,7 +917,7 @@ namespace Bolzena.Core
                 foreach (var kv in f.Cards)
                 {
                     var to = data?.Card(kv.Value);
-                    s.Add(full && to != null ? $"{Q(CardName(kv.Key))} → {Q(to.Name)}({Card(to)})" : $"{Q(CardName(kv.Key))} → {Q(CardName(kv.Value))}");
+                    s.Add(full && to != null ? $"{Q(CardName(kv.Key))} → {Q(to.Name)}({Card(to).Replace("\n", " / ")})" : $"{Q(CardName(kv.Key))} → {Q(CardName(kv.Value))}");
                 }
             foreach (var b in f.Bonus ?? new List<FormBonus>())
             {
@@ -797,7 +926,7 @@ namespace Bolzena.Core
                 if (b.Ratio > 0 && b.Ratio != 1) add.Add($"피해 ×{N(b.Ratio)}");
                 foreach (var t in b.Tags ?? new List<string>()) add.Add($"{t}.");
                 if (b.Fx != null && b.Fx.Count > 0) add.Add(Fx(b.Fx));
-                if (add.Count > 0) s.Add($"{who}: {string.Join(" ", add)}");
+                if (add.Count > 0) s.Add($"{Ko.J(who.TrimEnd(), "을를")} 내면 → {string.Join(" ", add)}");
             }
             if (f.Replace) s.Add("원래 패시브는 쉼");
             if (f.Passives != null && f.Passives.Count > 0) s.Add(full ? Passives(f.Passives) : string.Join(" · ", f.Passives.Select(r => $"{r.Name ?? "패시브"}: {Short(r)}")));
@@ -872,7 +1001,8 @@ namespace Bolzena.Core
             if (k.Mode) head.Add("켜짐 · 꺼짐 둘 중 하나(전환)");
             else if (k.Cap != null)
             {
-                if (k.Wrap) head.Add($"1 → {k.Cap} 다음은 다시 1");
+                if (k.Wrap && k.Stages != null && k.Stages.Count == k.Cap) head.Add($"{string.Join(" → ", k.Stages)} → 다시 {k.Stages[0]}");
+                else if (k.Wrap) head.Add($"1 → {k.Cap} 다음은 다시 1");
                 else if (car == "enemy") head.Add($"적마다 최대 {k.Cap}");
                 else if (car == "hero") head.Add(k.Cap == 1 ? "사도마다 하나" : $"사도마다 최대 {k.Cap}");
                 else head.Add($"최대 {k.Cap}");
@@ -1036,7 +1166,7 @@ namespace Bolzena.Core
         /// <summary>사도 한 장 — 짧은 글만(고유 효과 · 패시브 · 고학년 요약). 자세한 글은 Hero.</summary>
         public string HeroShort(HeroDef h)
         {
-            var lines = new List<string> { $"{h.Name} — {h.Role} · {h.Nature ?? "성격 없음"} · {(h.Row == "front" ? "전열" : h.Row == "mid" ? "중열" : "후열")}" };
+            var lines = new List<string> { $"{h.Name} — {h.Role} · {h.Nature ?? "성격 없음"}" };
             lines.AddRange(TraitSheet(h));
             foreach (var f in h.Forms ?? new List<FormDef>()) lines.Add($"변신 「{f.Name}」 {Form(f)}");
             return string.Join("\n", lines);
@@ -1049,7 +1179,7 @@ namespace Bolzena.Core
         {
             var lines = new List<string>
             {
-                $"{h.Name} — {h.Role} · {h.Nature ?? "성격 없음"} · {(h.Row == "front" ? "전열" : h.Row == "mid" ? "중열" : "후열")}{(h.Style != null ? " · " + h.Style : "")}",
+                $"{h.Name} — {h.Role} · {h.Nature ?? "성격 없음"}{(h.Style != null ? " · " + h.Style : "")}",
                 $"HP {h.Hp} · 공격력 {h.Atk} · 방어력 {h.Def} · 치명 {h.Crit}%",
             };
             lines.AddRange(TraitSheet(h));

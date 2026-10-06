@@ -83,8 +83,7 @@ namespace Bolzena.RunUI
 
         public void NewRun(List<string> party, string village, long seed, string foeNature = null)
         {
-            var rows = party.ToDictionary(k => k, k => Data.Hero(k)?.Row ?? "mid");
-            Run = Run.New(Data, party, seed, village, rows, foeNature);
+            Run = Run.New(Data, party, seed, village, foeNature);
         }
 
         public bool Has => Run != null;

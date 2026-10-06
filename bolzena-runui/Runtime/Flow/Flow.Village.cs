@@ -87,21 +87,40 @@ namespace Bolzena.RunUI
             return weak.Count == 0 ? "" : $"<color={Theme.SubTag}>약점</color>  <color={Hex(Theme.NatureCardOf(weak[0]))}>{string.Join(" · ", weak)}</color>";
         }
 
-        // 마을 공개 오른쪽 — 「이번 판 적 속성」 큰 아이콘 · 이름(슬롯처럼 돌다 멈춘다) · 약점 · 1층 / 2층 보스 초상
+        /// <summary>판의 적 속성 한 줄 표시 이름 — 마을 공개 · 편성 · 지도 머리에서 같은 말로 이어진다.</summary>
+        public const string FoeNatureLabel = "이번 모험의 적 속성";
+
+        /// <summary>적 속성 굴리기(RollNature)가 멈추기까지 걸리는 때 — 약점 · 보스처럼 속성을 알려 주는 것은 그 뒤에 보인다(먼저 보이면 굴리기 전에 답이 새어 나간다).</summary>
+        static float RollTime()
+        {
+            if (Settings.ReduceMotion) return 0;
+            float dt = 0.06f, el = 0;
+            while (el < 0.7f) { el += dt; dt *= 1.2f; }
+            return el;
+        }
+
+        // 마을 공개 오른쪽 — 「이번 모험의 적 속성」 큰 아이콘 · 이름(슬롯처럼 돌다 멈춘다) → 멈춘 뒤에 「모든 적이 ○○ 속성입니다」 · 약점(보조) · 1층 / 2층 보스 클론 초상
         void FoeSide(RectTransform panel, Bolzena.Core.VillageDef v, string nat, float delay)
         {
             var col = Ui.Rect("foeside", panel).Column(1, SideW, 0, 0, 0);
             var sep = Ui.Img(col, null, Color.white.A(0.1f), "sep"); sep.rectTransform.Column(0, 2, 28, 28, 0);
-            var kick = Ui.Title(col, "이번 모험 적 속성", Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center);
+            var kick = Ui.Title(col, FoeNatureLabel, Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center);
             kick.rectTransform.Band(1, 30, 0, 0, -30);
             var head = Ui.Rect("head", col).At(0.5f, 1, 0, -68, 260, 76);
             var glow = Ui.Img(head, Theme.S("soft"), Theme.NatureCardOf(nat).A(0), "glow"); glow.rectTransform.At(0, 0.5f, 38, 0, 170, 170);
             var ic = Ui.Img(head, Icon("성격_" + nat), Color.white, "ic"); ic.rectTransform.At(0, 0.5f, 38, 0, 68, 68); ic.preserveAspect = true;
             var nm = Ui.Title(head, nat, 60, Theme.NatureCardOf(nat), TextAlignmentOptions.MidlineLeft); nm.rectTransform.Fill(106, 0, 0, 0);
             nm.Outline(0.12f); nm.textWrappingMode = TextWrappingModes.NoWrap;
-            var wk = Ui.Title(col, WeakLine(nat), Theme.FsLg, Theme.Ink, TextAlignmentOptions.Center); wk.rectTransform.Band(1, 34, 20, 20, -150);
-            var hint = Ui.Text(col, "모든 적 · 두 보스가 이 성격 — 약점 사도(공명은 늘)로 치면\n강인도가 크게 깎입니다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Top);
-            hint.rectTransform.Band(1, 46, 16, 16, -186);
+            float done = delay + RollTime();   // 속성이 멈춘 때 — 이 뒤로만 속성을 드러내는 것(설명 · 약점 · 보스)을 띄운다
+            var nc = Theme.NatureCardOf(nat);
+            var say = Ui.Title(col, $"모든 적과 두 보스가 <color={Hex(nc)}>{nat}</color> 속성입니다", Theme.FsMd + 2, Theme.Ink, TextAlignmentOptions.Center);
+            say.rectTransform.Band(1, 32, 12, 12, -148); say.textWrappingMode = TextWrappingModes.NoWrap; say.enableAutoSizing = true; say.fontSizeMin = 14; say.fontSizeMax = Theme.FsMd + 2;
+            var weak = RunPort.WeakTo(nat);
+            var wk = Ui.Text(col, weak.Count == 0 ? "" : $"<color={Theme.SubTag}>약점</color>  <color={Hex(Theme.NatureCardOf(weak[0]))}>{string.Join(" · ", weak)}</color> <color={Theme.SubTag}>— {nat}에 강한 성격으로 치면 강인도가 크게 깎입니다(공명은 늘)</color>",
+                Theme.FsSm, Theme.Ink, TextAlignmentOptions.Top);
+            wk.rectTransform.Band(1, 46, 18, 18, -184);
+            Tw.Pop(say.rectTransform, done, 0.9f, 0.35f);
+            Tw.Pop(wk.rectTransform, done + 0.15f, 0.95f, 0.35f);
             int n = Mathf.Min(2, v.Floors.Count);
             float cw = 158, ch = 236, gap = 18;
             for (int i = 0; i < n; i++)
@@ -110,7 +129,7 @@ namespace Bolzena.RunUI
                 if (id == null) continue;
                 var card = BossCard(col, id, $"{i + 1}층 보스", nat, cw, ch);
                 card.At(0.5f, 1, (i - (n - 1) / 2f) * (cw + gap), -246, cw, ch);
-                Tw.Pop(card, delay + 0.5f + i * 0.15f, 0.8f, 0.4f);
+                Tw.Pop(card, done + 0.3f + i * 0.15f, 0.8f, 0.4f);
             }
             Tw.Pop(head, delay, 0.85f, 0.4f);
             StartCoroutine(RollNature(nm, ic, glow, nat, delay));
@@ -184,14 +203,14 @@ namespace Bolzena.RunUI
             Tw.Run(glow, 0.9f, k => { if (glow) glow.color = c.A(0.75f * (1 - k)); }, Tw.Linear);
         }
 
-        /// <summary>편성 오른쪽 판 — 「이번 판 적 속성」 띠(성격 아이콘 · 이름 · 약점).</summary>
+        /// <summary>편성 오른쪽 판 — 「이번 모험의 적 속성」 띠(성격 아이콘 · 이름 · 약점은 작게).</summary>
         void FoeNatureBand(RectTransform body, string nat)
         {
             if (string.IsNullOrEmpty(nat)) return;
             var nc = Theme.NatureCardOf(nat);
             var b = Ui.Img(body, Theme.Round, Color.Lerp(Theme.NavyWell, nc, 0.22f).A(0.9f), "foenature"); b.Pref(-1, 44);
             var ic = Ui.Img(b.transform, Icon("성격_" + nat), Color.white, "ic"); ic.rectTransform.At(0, 0.5f, 10, 0, 30, 30); ic.preserveAspect = true;
-            var l = Ui.Title(b.transform, "이번 모험 적 속성", Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); l.rectTransform.Fill(48, 0, 0, 0);
+            var l = Ui.Title(b.transform, FoeNatureLabel, Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); l.rectTransform.Fill(48, 0, 0, 0);
             var r = Ui.Title(b.transform, $"<color={Hex(nc)}>{nat}</color>  <size=78%>{WeakLine(nat)}</size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight);
             r.rectTransform.Fill(0, 0, 14, 0); r.textWrappingMode = TextWrappingModes.NoWrap;
         }

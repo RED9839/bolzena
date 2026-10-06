@@ -61,7 +61,7 @@ namespace Bolzena.RunUI
                     var face = W.Face(row, h, 68); face.At(0, 0.5f, 0, 0, 68, 68);
                     var t = Ui.Title(row, h.ko, 24, Theme.Ink); t.rectTransform.At(0, 1, 84, -6, 220, 32);
                     var d = P.Data.Hero(k);
-                    var s = Ui.Text(row, $"{(P.S.Rows.TryGetValue(k, out var r) ? (r == "front" ? "전열" : r == "mid" ? "중열" : "후열") : "")} · 공격 {d?.Atk} · 방어 {d?.Def}", 15, Theme.Sub);
+                    var s = Ui.Text(row, $"자리 {P.S.Party.IndexOf(k) + 1} · 공격 {d?.Atk} · 방어 {d?.Def}", 15, Theme.Sub);
                     s.rectTransform.At(0, 1, 86, -40, 240, 24);
                 }
                 var (hpRt, setHp) = W.HpBar(partyBox, 300, 28);

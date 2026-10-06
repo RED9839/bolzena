@@ -12,7 +12,9 @@ namespace Bolzena
         AudioSource voice;
         readonly Dictionary<string, float> lastAt = new Dictionary<string, float>();
         readonly Dictionary<string, AudioClip[]> voices = new Dictionary<string, AudioClip[]>();
-        public static float Volume = 0.8f;
+        // 크기는 설정 창 값(기본 0.8 — 예전 고정값과 같다). 전체 소리는 AudioListener.volume 이 곱한다
+        public static float Volume => Bolzena.RunUI.Settings.SfxVol;
+        static float VoiceVol => 0.9f * Bolzena.RunUI.Settings.Voice;
         /// <summary>점검(-ultaudit) — 실제로 튼 소리 이름(효과음 키 · 「voice:사도/클립」). 못 찾은 것은 「!」를 붙인다.</summary>
         public static System.Action<string> OnPlayed;
 
@@ -101,7 +103,7 @@ namespace Bolzena
                 if (hits.Count == 0) continue;
                 me.voice.Stop();
                 me.voice.clip = hits[Random.Range(0, hits.Count)];
-                me.voice.volume = 0.9f * Volume;
+                me.voice.volume = VoiceVol;
                 me.voice.Play();
                 OnPlayed?.Invoke("voice:" + hero + "/" + me.voice.clip.name);
                 return;

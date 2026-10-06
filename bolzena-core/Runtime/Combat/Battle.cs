@@ -8,7 +8,6 @@ namespace Bolzena.Core
     public sealed class BattleSetup
     {
         public List<string> Party = new();
-        public Dictionary<string, string> Rows;
         public List<string> Deck = new();
         public List<string> Enemies = new();
         /// <summary>파티 HP · 최대 HP — 없으면 세 사도 HP(장비 포함) 합으로 가득.</summary>
@@ -207,7 +206,6 @@ namespace Bolzena.Core
                     Side = Side.Party, Idx = i, Key = key, Name = h.Name, Role = h.Role, Nature = h.Nature,
                     Share = h.Hp + g.Hp, Atk = h.Atk + g.Atk, Def = h.Def + g.Def, Crit = h.Crit + g.Crit,
                     GearAdd = new Stats { Atk = g.Atk, Def = g.Def, Crit = g.Crit },
-                    Row = st.Rows != null && st.Rows.TryGetValue(key, out var row) ? row : h.Row ?? "mid",
                 });
             }
             int sumMax = Party.Sum(u => u.Share);

@@ -16,8 +16,10 @@ namespace Bolzena.Core
         public string EnemyNature;
         /// <summary>층마다 보스 줄(적 id) — 새 판에 적 속성에 맞춰 사도 클론을 고른다(Run.PickBosses). null = 옛 저장(마을 데이터 그대로).</summary>
         public List<List<string>> Bosses;
+        /// <summary>편성 순서 — 맨 앞 사도가 적의 공격에 맞는 모습을 보이고(관통은 맨 뒤), 전투 화면도 이 차례로 선다. 사도 열(전열 · 중열 · 후열)은 없다.</summary>
         public List<string> Party = new();
-        public Dictionary<string, string> Rows = new();
+        /// <summary>옛 저장의 「rows」(사도 열 — 2026-10-06 걷어냄) — 읽어도 깨지지 않게 받아서 버린다.</summary>
+        [Newtonsoft.Json.JsonProperty("rows")] object RowsOld { set { } }
         public int PartyHp, PartyMaxHp;
         public List<string> Deck = new();
         /// <summary>카드 id → 신탁 번호(1~5).</summary>

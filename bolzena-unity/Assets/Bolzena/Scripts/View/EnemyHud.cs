@@ -362,6 +362,25 @@ namespace Bolzena.View
                     Make.Outline(ultText, 0.3f, new Color(0.3f, 0, 0));
                 }
                 ultText.text = "「" + es.UltName + "」" + (es.UltNow ? " 이번 차례!" : " 다음 차례");
+                ultText.color = new Color(1f, 0.8f, 0.75f);
+                ultText.outlineColor = new Color(0.3f, 0, 0);
+                ultText.gameObject.SetActive(true);
+            }
+            // 엘리트 · 일반 힘 모으기 — 보스 고학년보다 한 단계 약하게: 주황 · 칼 아이콘 그대로 · 피해 숫자 조금 크게 · 아래에 쏟을 수 이름 「다음 차례」(맥동은 Update, 은은하게)
+            else if (es.ChargeName != null)
+            {
+                if (hit && es.IntentValue > 0) { s = "<size=118%>" + es.IntentValue + "</size>" + (es.IntentHits > 1 ? "<size=70%>×" + es.IntentHits + "</size>" : ""); intentText.text = s; }
+                intentText.color = new Color(1f, 0.66f, 0.3f);
+                intentRim.color = new Color(1f, 0.62f, 0.22f);
+                if (ultText == null)
+                {
+                    ultText = Make.Text("ult", intentRoot, "", new Vector3(-0.2f, -0.3f, 0), 0.17f, O + 8, new Color(1f, 0.8f, 0.75f), TextAlignmentOptions.Left);
+                    ultText.rectTransform.pivot = new Vector2(0, 0.5f);
+                    Make.Outline(ultText, 0.3f, new Color(0.3f, 0, 0));
+                }
+                ultText.text = "「" + es.ChargeName + "」" + (es.ChargeNow ? " 이번 차례!" : " 다음 차례");
+                ultText.color = new Color(1f, 0.82f, 0.5f);
+                ultText.outlineColor = new Color(0.3f, 0.12f, 0);
                 ultText.gameObject.SetActive(true);
             }
             else if (ultText != null) ultText.gameObject.SetActive(false);
@@ -372,7 +391,17 @@ namespace Bolzena.View
             if (!OldLayout)
             {
                 float mw = Mathf.Max(0.6f, barW / 2 + 0.3f - cx);   // 칩은 묶음(막대 오른끝 + 방패) 안에서 — 넘치면 둘째 줄
-                if (Mathf.Abs(mw - chips.MaxW) > 0.01f) { chips.MaxW = mw; if (chipsLast != null) chips.Set(chipsLast); }
+                // 의도 칸 아래 글(고학년 · 힘 모으기 이름)이 칩 둘째 줄 자리까지 뻗으면 칩은 한 줄로(남는 칩은 「+N」) — 겹치지 않게
+                int rows = 2;
+                if (ultText != null && ultText.gameObject.activeSelf)
+                {
+                    ultText.ForceMeshUpdate();
+                    float labelR = -barW / 2 + GemX + (-0.2f + ultText.preferredWidth) * 1.22f;   // 맥동으로 커지는 몫까지
+                    if (labelR > cx - 0.04f) rows = 1;
+                }
+                bool again = Mathf.Abs(mw - chips.MaxW) > 0.01f || rows != chips.Rows;
+                chips.MaxW = mw; chips.Rows = rows;
+                if (again && chipsLast != null) chips.Set(chipsLast);
             }
         }
 
@@ -517,6 +546,13 @@ namespace Bolzena.View
                 float p = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 6f);
                 intentRoot.localScale = Vector3.one * (1.12f + 0.1f * p);
                 intentGlow.color = new Color(1f, 0.15f, 0.1f, 0.45f + 0.45f * p);
+            }
+            else if (State != null && State.ChargeName != null && intentRoot.gameObject.activeSelf)
+            {
+                // 힘 모으기 — 은은한 주황 맥동(고학년보다 느리고 작게)
+                float p = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 3.6f);
+                intentRoot.localScale = Vector3.one * (1.1f + 0.05f * p);
+                intentGlow.color = new Color(1f, 0.5f, 0.15f, 0.3f + 0.3f * p);
             }
             if (!hidden)
             {

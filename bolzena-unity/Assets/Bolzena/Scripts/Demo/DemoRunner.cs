@@ -72,6 +72,18 @@ namespace Bolzena.Demo
             };
             Banners.OnStage += s => Shot(s, 0);
             StartCoroutine(Run());
+            // -shotevery 초 — 정해진 순간 말고도 게임 시간 그 초마다 한 장(every_NNN) — 소개용 장면 고르기(적 힘 모으기 예고 · 고학년 한창 등)
+            if (float.TryParse(Arg("-shotevery"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var every) && every > 0) StartCoroutine(Every(every));
+        }
+
+        IEnumerator Every(float sec)
+        {
+            int n = 0;
+            while (true)
+            {
+                yield return new WaitForSeconds(sec);
+                cap.Still("every_" + (n++).ToString("D3") + (d.InUlt ? "_ult" : ""));
+            }
         }
 
         static string Arg(string name)

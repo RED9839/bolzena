@@ -54,7 +54,8 @@ namespace Bolzena.Core
 
         // ── 사도 ──
         public int Atk, Def, Crit;
-        public string Row = "mid";
+        /// <summary>적의 줄(front · back — 배치 2 4 / 1 3). 사도는 열이 없다 — 맞는 모습은 파티 순서(PickTarget).</summary>
+        public string Row;
         public string Role;
         public string Nature;
         public int Share;

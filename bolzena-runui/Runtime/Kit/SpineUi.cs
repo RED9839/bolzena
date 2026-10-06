@@ -18,6 +18,63 @@ namespace Bolzena.RunUI
         /// <summary>캐시에서 뺀다(굽고 난 스탠딩 — Resources.UnloadUnusedAssets 로 풀리게).</summary>
         public static void Forget(string folder) { cache.Remove(folder); }
 
+        // ── 스탠딩(st_) 데이터 붙들기 — 띄운 스탠딩 수로 센다 ──
+        //   스탠딩 스켈레톤 데이터(파싱한 SkeletonData)는 사도 하나에 수 MB 이고 135명이다. 예전엔 띄운 스탠딩이 사라져도 캐시가 데이터를 붙들어
+        //   도감 · 상세를 오갈수록 쌓였다(2026-10-06 웹 OOM). 마지막 스탠딩이 사라지면 캐시에서 빼고 파싱한 데이터를 비운다(Clear —
+        //   관리 메모리는 프레임 끝 GC 에, 텍스처 · 원본은 가끔 도는 UnloadUnusedAssets 에 풀린다). 다시 쓰면 다시 읽는다.
+        static readonly Dictionary<string, int> users = new Dictionary<string, int>();
+        static int released;
+        static AsyncOperation unloading;
+
+        /// <summary>정리(UnloadUnusedAssets)가 도는 중 — 굽기를 잠깐 쉰다(LiveStanding).</summary>
+        public static bool Unloading => unloading != null && !unloading.isDone;
+
+        sealed class StandUser : MonoBehaviour
+        {
+            public string Folder;
+            void OnDestroy() { if (Folder != null) Unuse(Folder); Folder = null; }
+        }
+
+        static void Use(GameObject go, string folder)
+        {
+            users[folder] = users.TryGetValue(folder, out var n) ? n + 1 : 1;
+            go.AddComponent<StandUser>().Folder = folder;
+        }
+
+        static void Unuse(string folder)
+        {
+            if (!users.TryGetValue(folder, out var n)) return;
+            if (n > 1) { users[folder] = n - 1; return; }
+            users.Remove(folder);
+            Release(folder);
+        }
+
+        /// <summary>쓰는 스탠딩이 없으면 캐시에서 빼고 파싱한 데이터를 비운다. 여럿 놓으면 UnloadUnusedAssets 를 한 번(비동기).</summary>
+        public static void Release(string folder)
+        {
+            if (folder == null || users.ContainsKey(folder) || !cache.TryGetValue(folder, out var a)) return;
+            cache.Remove(folder);
+            if (a == null) return;
+            try
+            {
+                if (a.atlasAssets != null) foreach (var aa in a.atlasAssets) if (aa != null) aa.Clear();
+                a.Clear();
+            }
+            catch (System.Exception e) { Debug.LogWarning("[RunUI] 스탠딩 놓기 실패 " + folder + ": " + e.Message); }
+            if (++released >= 12) UnloadSoon();
+        }
+
+        /// <summary>놓은 것들을 실제로 내린다(UnloadUnusedAssets — 비동기, 이미 돌고 있으면 건너뜀).</summary>
+        public static void UnloadSoon()
+        {
+            if (Unloading) return;
+            released = 0;
+            unloading = Resources.UnloadUnusedAssets();
+        }
+
+        /// <summary>붙든 스탠딩 데이터 수(재기용).</summary>
+        public static int Held { get { int n = 0; foreach (var k in cache.Keys) if (k.StartsWith("st_")) n++; return n; } }
+
         static Material Mat
         {
             get
@@ -113,6 +170,7 @@ namespace Bolzena.RunUI
             catch (System.Exception e) { Debug.LogWarning("[RunUI] 스탠딩 실패 " + art + ": " + e.Message); return null; }
             g.name = "standing " + art;
             g.raycastTarget = false;
+            Use(g.gameObject, "st_" + art);
             var sk = g.Skeleton;
             var sd = sk.Data;
             // 옷은 Normal 만(덧스킨 · 이벤트 소품은 입히지 않는다 — 웹판 stand 규칙)
@@ -129,11 +187,11 @@ namespace Bolzena.RunUI
         /// 사도 스탠딩 스파인을 area 의 w×h 칸(왼쪽 아래 0,0)에 표(standing_fit.json)대로 세운다 — 모드 Full · Knee · Upper,
         /// tallest = 기준 키(StandingFit.Tallest(함께 보일 사도들) — 같은 값을 주면 같은 배율 · 같은 바닥선, 0 이면 표 전체 95%). 표에 없으면 그 자리에서 재서 대신.
         /// </summary>
-        public static SkeletonGraphic Standing(RectTransform area, string art, float w, float h, StandMode mode, float tallest = 0, float pad = 0)
+        public static SkeletonGraphic Standing(RectTransform area, string art, float w, float h, StandMode mode, float tallest = 0, float pad = 0, string lift = null)
         {
             var g = NewStanding(area, art);
             if (g == null) return null;
-            if (StandingFit.Place(g, art, new Rect(0, 0, w, h), mode, tallest, pad) > 0) return g;
+            if (StandingFit.Place(g, art, new Rect(0, 0, w, h), mode, tallest, pad, lift) > 0) return g;
             // 표에 없는 사도 — 옛 다리 기준(전신 = 다리 키 몫 · 무릎께 · 상반신은 발을 칸 아래로)
             float bodyPx = h * StandingFit.Fill(mode) * 0.85f;
             float leg = bodyPx / 2.6f;
@@ -223,7 +281,9 @@ namespace Bolzena.RunUI
         /// 표 · 캔버스 배율 · 스켈레톤 데이터 배율이 어긋나는 빌드(웹 · 통합 빌드)에서도 화면보다 크게 나오지 않게 하는 마지막 울타리(2026-10 「고해상도 에르핀 너무 큼」).
         /// 돌려줌: 줄인 비율(1 = 그대로).
         /// </summary>
-        public static float ClampInto(SkeletonGraphic g, RectTransform box, RectTransform screenRoot, float maxShare = 0.93f)
+        /// <param name="keepScale">떠 있는 사도(StandingFit.Floats — 얼굴을 기준 얼굴 높이에 맞춘 것): 줄이거나 위아래로 옮기지 않고 가로만 칸 안으로(2026-10-07 「얼굴 위치를 같게」 —
+        ///   벨라 · 쥬비는 꼬리 · 날개 · 이펙트로 메시가 커서 줄이면 얼굴이 다른 사도보다 한참 아래로 내려갔다)</param>
+        public static float ClampInto(SkeletonGraphic g, RectTransform box, RectTransform screenRoot, float maxShare = 0.93f, bool keepScale = false)
         {
             if (g == null || box == null) return 1;
             // 장면용 SD(SceneHero) 는 전투와 같은 고정 배율 · 원점 바닥선 — 메시 경계로 줄이거나 옮기지 않는다.
@@ -238,10 +298,10 @@ namespace Bolzena.RunUI
             Vector3 P(Vector3 local) => space.InverseTransformPoint(rt.TransformPoint(local));
             Vector3 lo = P(b.min), hi = P(b.max);
             float h = Mathf.Abs(hi.y - lo.y), lim = space.rect.height * maxShare;
-            float s = h > lim && h > 1 ? lim / h : 1;
+            float s = h > lim && h > 1 && !keepScale ? lim / h : 1;
             Vector3 blo = space.InverseTransformPoint(box.TransformPoint(box.rect.min)), bhi = space.InverseTransformPoint(box.TransformPoint(box.rect.max));
             float w = Mathf.Abs(hi.x - lo.x) * s, bw = Mathf.Abs(bhi.x - blo.x);
-            if (w > bw && w > 1) s *= bw / w;
+            if (w > bw && w > 1 && !keepScale) s *= bw / w;
             if (s < 0.999f)
             {
                 // 발(메시 아래 끝 · 가로 가운데)을 그 자리에 두고 줄인다
@@ -253,7 +313,7 @@ namespace Bolzena.RunUI
             // 위 끝이 화면 위 여백을 넘으면 내리고, 가로로 box 를 넘으면 안으로
             lo = P(b.min); hi = P(b.max);
             float top = space.rect.yMax - space.rect.height * (1 - maxShare) * 0.5f;
-            if (hi.y > top) rt.position += space.TransformVector(new Vector3(0, top - hi.y, 0));
+            if (hi.y > top && !keepScale) rt.position += space.TransformVector(new Vector3(0, top - hi.y, 0));
             float dx = lo.x < blo.x ? blo.x - lo.x : hi.x > bhi.x ? bhi.x - hi.x : 0;
             if (dx != 0) rt.position += space.TransformVector(new Vector3(dx, 0, 0));
             return s;

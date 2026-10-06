@@ -20,6 +20,7 @@ namespace Bolzena.EditorTools
             if (p.Contains("/BolzenaFxData/Src/")) return "fx 원본";
             if (p.Contains("/Resources/UI/") || p.Contains("/Resources/RunUI/")) return "UI(일부러 그대로)";
             if (p.Contains("/RunArt/CardPic/")) return "카드 그림";
+            if (p.Contains("/RunArt/CardObj/")) return "카드 사물 그림";
             if (p.Contains("/Spine/st_")) return "스탠딩 스파인";
             if (p.Contains("/Spine/")) return "스파인";
             if (p.Contains("/Art/Monster/")) return "적 아이콘";

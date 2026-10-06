@@ -185,17 +185,46 @@ namespace Bolzena.UI
             if (h != null) pinRim.color = info.Hero >= 0 ? Color.Lerp(h.Tint, Color.white, 0.4f) : Color.Lerp(rc, Color.white, 0.35f);
             string tags = Tone.TagLine(info.Tags);
             tagText.text = tags;
-            float decoY = -H / 2 + (tags.Length > 0 ? 1.06f : 0.9f);
+            // 효과 글 칸 높이 — 기본(태그 있으면 0.56 · 없으면 0.68)에서 글이 많으면 0.16까지 위로 늘린다(2026-10-07 카드 글을 조건마다 줄 나눔 —
+            // 줄 수가 늘어도 글자가 1.3 아래로 줄지 않게). 늘린 만큼 태그 줄 · 장식 선 · 어둠 판도 올린다(얼굴은 위 35% 칸이라 닿지 않음)
+            // 글 = 어절 단위 · 덩이 묶음 · 화살표 규칙(조건 → 결과가 칸에 안 들어가면 「→ 결과」 를 다음 줄 맨 앞으로 — CardTerms.Fit)
+            string rawDesc = Tone.CardText(info.Text);
+            float descW = W - 0.24f, baseH = tags.Length > 0 ? 0.56f : 0.68f, needH = 0;
+            descText.text = Bolzena.RunUI.CardTerms.FitFor(descText, rawDesc, descW, 1.3f);
+            if (!string.IsNullOrEmpty(descText.text))
+            {
+                bool auto = descText.enableAutoSizing; float fs = descText.fontSize;
+                descText.enableAutoSizing = false; descText.fontSize = 1.3f;
+                needH = descText.GetPreferredValues(descText.text, descW, 0).y;
+                descText.enableAutoSizing = auto; descText.fontSize = fs;
+            }
+            float descH = Mathf.Clamp(needH + 0.02f, baseH, baseH + 0.16f), extra = descH - baseH;
+            tagText.transform.localPosition = new Vector3(0, -H / 2 + 0.88f + extra, 0);
+            float decoY = -H / 2 + (tags.Length > 0 ? 1.06f : 0.9f) + extra;
+            PlaceArt(decoY);   // 그림 자리 — 장식 선에 붙인다
             deco.transform.localPosition = new Vector3(0, decoY, 0);
             decoDot.transform.localPosition = new Vector3(0, decoY, 0);
             epiText.transform.localPosition = new Vector3(0, decoY + 0.14f, 0);   // 신탁 이름표 — 장식 선 바로 위(그림 · 아이콘 가운데를 가리지 않게)
-            descText.text = Tone.CardText(info.Text);
-            descText.transform.localPosition = new Vector3(0, -H / 2 + (tags.Length > 0 ? 0.38f : 0.44f), 0);
-            descText.rectTransform.sizeDelta = new Vector2(W - 0.24f, tags.Length > 0 ? 0.56f : 0.68f);
+            descText.transform.localPosition = new Vector3(0, -H / 2 + (tags.Length > 0 ? 0.38f : 0.44f) + extra / 2, 0);
+            descText.rectTransform.sizeDelta = new Vector2(descW, descH);
+            // 화살표 규칙은 그릴 크기로 다시 — 자동 크기가 고른 크기에서 한 줄에 드는지 재고, 바뀌면 다시 고른다(두세 번이면 멈춘다)
+            if (!string.IsNullOrEmpty(rawDesc))
+            {
+                float fsNow = descText.fontSizeMax;
+                for (int it = 0; it < 3; it++)
+                {
+                    var fitted = Bolzena.RunUI.CardTerms.FitFor(descText, rawDesc, descW, fsNow);
+                    if (fitted == descText.text && it > 0) break;
+                    descText.text = fitted;
+                    descText.ForceMeshUpdate();
+                    if (Mathf.Abs(descText.fontSize - fsNow) < 0.001f) break;
+                    fsNow = descText.fontSize;
+                }
+            }
             // 어둠 판 — 글 줄 수만큼(태그 줄까지 덮는다)
             descText.ForceMeshUpdate();
             float th = string.IsNullOrEmpty(descText.text) ? 0 : Mathf.Min(descText.rectTransform.sizeDelta.y, descText.GetRenderedValues(true).y);
-            float bgTop = tags.Length > 0 ? -H / 2 + 0.98f : descText.transform.localPosition.y + th / 2 + 0.06f;
+            float bgTop = tags.Length > 0 ? -H / 2 + 0.98f + extra : descText.transform.localPosition.y + th / 2 + 0.06f;
             float bgBot = descText.transform.localPosition.y - th / 2 - 0.08f;
             descBg.enabled = th > 0;
             descBg.transform.localPosition = new Vector3(0, (bgTop + bgBot) / 2, 0);
@@ -255,17 +284,60 @@ namespace Bolzena.UI
 
         // 그림 — Info.Art: "st:<그림 키>" 스탠딩 상반신 · "pc:<그림>" 고유 · 생성 카드 원작 그림(창 비율로 미리 자른 것) · "ic:<아이콘>" 고유 카드 아이콘 · 그 밖은 Resources/Art 의 그림 이름(옛 꼴)
         bool iconKind;
+        // 그림 자리(2026-10-07 「카드 이미지가 너무 붕 뜬 것」) — 0 = 창을 덮는 한 장 · 1 = 사물 · SD(CardObj) · 2 = 스킬 아이콘 판
+        int artMode;
+        string artKey;
+        Bolzena.RunUI.CardArt.ObjPic objPic;
+        const float ArtTop = 0.26f;   // 위 글 · 칩 끝(그림 창 몫)
+
+        /// <summary>사물 · 아이콘 판 자리 — 위 글 · 칩 아래 ~ 장식 선(decoY) 위 칸을 채우고 아래를 장식 선에 붙인다(CardArt.Place — 판 W.Card 와 같은 규칙).</summary>
+        /// <summary>점검용 — 장식 선 자리(그림 창 몫, 위에서) · 그림 내용 자리(창 몫 · 사물 · 아이콘 판만, 없으면 0 크기) · 늘리는 상한에 걸렸나.</summary>
+        public float ArtBottom { get; private set; }
+        public Rect ArtRect { get; private set; }
+        public bool ArtCapped { get; private set; }
+
+        void PlaceArt(float decoY)
+        {
+            float bottom = (ArtY + ArtH / 2 - decoY) / ArtH;
+            ArtBottom = bottom; ArtRect = default; ArtCapped = false;
+            if (artMode == 0) return;
+            if (artMode == 1)
+            {
+                var cr = Bolzena.RunUI.CardArt.Place(objPic.Content.width, objPic.Content.height, objPic.Src.y, ArtW / ArtH, ArtTop, bottom, artKey, out bool cap);
+                ArtRect = cr; ArtCapped = cap;
+                var r = Bolzena.RunUI.CardArt.Full(objPic, cr);
+                icon.transform.localPosition = new Vector3((r.center.x - 0.5f) * ArtW, ArtY + (0.5f - r.center.y) * ArtH, 0);
+                Make.Fit(icon, new Vector2(r.width * ArtW, r.height * ArtH));
+            }
+            else
+            {
+                float srcH = icon.sprite != null ? icon.sprite.rect.height : 0;
+                var r = Bolzena.RunUI.CardArt.Place(1, 1, srcH, ArtW / ArtH, ArtTop, bottom, artKey, out bool cap);
+                ArtRect = r; ArtCapped = cap;
+                float sz = r.height * ArtH;
+                var c = new Vector3((r.center.x - 0.5f) * ArtW, ArtY + (0.5f - r.center.y) * ArtH, 0);
+                iconPlate.transform.localPosition = icon.transform.localPosition = c;
+                Make.Fit(iconPlate, new Vector2(sz, sz));
+                Make.Fit(icon, new Vector2(sz - 0.07f, sz - 0.07f));
+            }
+        }
         void SetArt(CardInfo info, Color rc)
         {
             string a = info.Art;
-            Sprite pic = null, ic = null;
+            Sprite pic = null, ic = null, obj = null;
+            artMode = 0; artKey = null;
             if (a != null && a.StartsWith("st:"))
             {
                 var key = a.Substring(3);
-                pic = Bolzena.RunUI.CardArt.Upper(key, ArtW / ArtH, 0.56f) ?? Crop(Res.Sprite("Art/" + key), ArtW / ArtH, 0.58f);
+                pic = Bolzena.RunUI.CardArt.Card(key) ?? Crop(Res.Sprite("Art/" + key), ArtW / ArtH, 0.58f);   // 판 화면 W.Card 와 같은 한 장(얼굴이 위 글 · 칩과 아래 효과 판 사이)
             }
             else if (a != null && a.StartsWith("pc:"))
-                pic = Bolzena.RunUI.CardArt.Pic(a.Substring(3));
+            {
+                // 장면(story · cg) = 창을 덮는 한 장 · 사물 · SD(CardObj) = 성격 바탕 + 알파 경계로 자른 그림(자리는 PlaceArt — 판 W.Card 와 같은 CardArt.Place)
+                artKey = a.Substring(3);
+                if (Bolzena.RunUI.CardArt.Obj(artKey, out objPic)) { artMode = 1; pic = Bolzena.RunUI.CardArt.Back(objPic.Nature); obj = objPic.Sprite; }
+                else pic = Bolzena.RunUI.CardArt.Pic(artKey);
+            }
             else if (a != null && a.StartsWith("ic:"))
             {
                 var key = a.Substring(3);
@@ -280,7 +352,9 @@ namespace Bolzena.UI
             if (pic != null) Make.Fit(art, new Vector2(ArtW, ArtH));
             icon.sprite = ic;
             icon.enabled = iconPlate.enabled = iconKind;
-            if (iconKind) { Make.Fit(icon, new Vector2(IconS, IconS)); iconPlate.color = Color.Lerp(rc, Color.white, 0.25f); }   // 교주 카드(원작 스펠 카드 그림)도 같은 꼴
+            if (iconKind) { Make.Fit(icon, new Vector2(IconS, IconS)); iconPlate.color = Color.Lerp(rc, Color.white, 0.25f); }
+            if (iconKind && !Bolzena.RunUI.CardArt.OldFit) { artMode = 2; artKey = a.Substring(3); }
+            if (obj != null) { icon.sprite = obj; icon.enabled = true; icon.transform.localPosition = new Vector3(0, IconY, 0); Make.Fit(icon, new Vector2(IconS, IconS)); }   // 교주 카드(원작 스펠 카드 그림)도 같은 꼴
         }
 
         void ApplyVisibility()

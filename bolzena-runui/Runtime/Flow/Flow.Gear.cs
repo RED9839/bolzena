@@ -155,7 +155,7 @@ namespace Bolzena.RunUI
                 var ic = h?.Icon;
                 if (ic != null) { var im = Ui.Img(well.transform, ic, Color.white, "portrait"); im.rectTransform.At(0.5f, 1, 0, 8, pw * 1.15f, pw * 1.15f); im.preserveAspect = true; }
                 var shade = Ui.Img(well.transform, Theme.S("fade_down"), Color.black.A(0.8f), "shade"); shade.rectTransform.Band(0, (rowH - 16) * 0.5f);
-                var tag = Ui.Title(well.transform, $"<size=68%><color={Theme.SubTag}>{h.role}</color></size>\n{h.RowKo}", Theme.FsMd, Theme.Ink, TextAlignmentOptions.BottomLeft);
+                var tag = Ui.Title(well.transform, $"<size=68%><color={Theme.SubTag}>{h.role}</color></size>\n{h.nature}", Theme.FsMd, Theme.Ink, TextAlignmentOptions.BottomLeft);
                 tag.rectTransform.Fill(8, 6, 4, 0); tag.lineSpacing = -12; tag.Outline(0.2f);
                 float sx = pw + 26;
                 var hn = Ui.Title(rt, h.ko, Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);

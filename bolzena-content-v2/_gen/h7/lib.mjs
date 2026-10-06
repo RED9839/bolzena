@@ -62,7 +62,7 @@ export function hero(key, h) {
     cards.push(c);
   }
   const H = {
-    id: key, name: h.name, nature: h.nature, race: h.race, row: h.row, role: h.role, star: h.star,
+    id: key, name: h.name, nature: h.nature, race: h.race, role: h.role, star: h.star,
     hp: h.hp, atk: h.atk, def: h.def, crit: h.crit, blurb: h.blurb,
     keyword: h.keyword,
   };

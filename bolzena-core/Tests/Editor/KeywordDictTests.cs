@@ -455,7 +455,7 @@ namespace Bolzena.Core.Tests
             var b = K.Fight(D("[{id:'ch', name:'갈래', hero:'a', cost:0, type:'스킬', choices:['불', '물'], fx:[{k:'ifChoice', n:1}, {k:'gauge', v:10}, {k:'ifChoice', n:2}, {k:'gauge', v:20}]}]"), new[] { "a" }, new[] { "dummy" }); K.Hand(b, "ch");
             K.Play(b, "ch", 0, new PlayOpts { Choice = 2 });
             Assert.AreEqual(20, b.Gauge);
-            Assert.AreEqual("갈래 — 불 / 물. 불: 고학년 게이지 +10%. 물: 고학년 게이지 +20%", new CardText(b.Data).Card(b.Data.Card("ch")));
+            Assert.AreEqual("갈래 — 불 / 물\n불: 고학년 게이지 +10%\n물: 고학년 게이지 +20%", new CardText(b.Data).Card(b.Data.Card("ch")));
         }
 
         [Test] public void 예약_N턴_뒤와_N장_뒤()
@@ -575,7 +575,7 @@ namespace Bolzena.Core.Tests
             var tips = t.Tips();
             StringAssert.Contains("째깍째깍", tips["초침"]); StringAssert.Contains("20%p", tips["사기"]);
             CollectionAssert.AreEqual(new[] { "보존", "소멸", "사기", "초침", "처치" }, t.Chips(d.View("cc")));
-            Assert.AreEqual("보존. 소멸 2. 사기 1, 「초침」 +1. 처치: AP +1", t.Card(d.Card("cc")));
+            Assert.AreEqual("보존. 소멸 2.\n사기 1, 「초침」 +1\n처치: AP +1", t.Card(d.Card("cc")));
             StringAssert.Contains("뽑을 더미 맨 위", CardText.Tip("망각"));
         }
 

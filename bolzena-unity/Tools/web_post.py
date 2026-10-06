@@ -116,6 +116,23 @@ window.bzBundles = %(bundles)s;   // 스파인 번들(Bundles/manifest.json)이 
 const LAST_MODIFIED = new Date(%(mtime)d).toUTCString(), ETAG = '"' + VERSION + '"';
 // 전체 화면 전환 신호를 유니티에 넘기지 않는다 — 유니티 6000.6 WebGL 이 이때 렌더 타깃을 지우고 다시 만들지 않아 화면이 깨진다(캔버스 크기는 resize 의 fit() 이 맞춤)
 for (const t of ["fullscreenchange", "webkitfullscreenchange"]) window.addEventListener(t, (e) => e.stopImmediatePropagation(), true);
+// 소리 깨우기 — 브라우저는 첫 입력 전에 만든 AudioContext 를 멈춰 둔다(자동 재생 정책). 유니티는 window 의 mousedown · touchstart 에서만
+// 다시 켜는데, 사파리 · 폰은 touchend · 키 입력이어야 풀리는 일이 있다 — 모든 첫 입력(누름 · 뗌 · 키)마다 멈춘 것을 깨운다.
+// 무엇을 했는지는 window.bzAudio() 로 본다(헤드리스 점검: 상태 · 깨운 횟수).
+(function () {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  const all = [];
+  let wakes = 0;
+  const Wrapped = function (...a) { const c = new AC(...a); all.push(c); return c; };
+  Wrapped.prototype = AC.prototype;
+  window.AudioContext = Wrapped;
+  if (window.webkitAudioContext) window.webkitAudioContext = Wrapped;
+  const wake = () => { for (const c of all) if (c.state === "suspended" || c.state === "interrupted") { wakes++; c.resume().catch(() => {}); } };
+  for (const t of ["pointerdown", "pointerup", "mousedown", "touchstart", "touchend", "keydown", "click"]) window.addEventListener(t, wake, { capture: true, passive: true });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) wake(); });
+  window.bzAudio = () => ({ contexts: all.map((c) => c.state), wakes: wakes });
+})();
 const realFetch = window.fetch.bind(window);
 let bigDone = 0, bigTotal = 0;
 for (const k in SPLIT) bigTotal += SPLIT[k].size;

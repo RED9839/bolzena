@@ -7,7 +7,8 @@ namespace Bolzena.RunUI
     //   판 화면 시험 프로젝트 · 본 게임이 이 패키지를 같이 쓰므로 둘 다 이것 하나로 된다(장면을 바꿔도 매 프레임 지킨다).
     public class TestMute : MonoBehaviour
     {
-        static readonly string[] TestArgs = { "-demo", "-battle", "-ultaudit", "-cutinaudit", "-artaudit", "-toughshots", "-demo-quick", "-demo-roster", "-perf", "-humanfight" };
+        // 이 인자가 있을 때만 음소거 — 배포판(웹 · PC)은 인자가 없으니 늘 소리가 난다. -mute 는 그 밖의 점검을 그냥 음소거로 띄울 때
+        static readonly string[] TestArgs = { "-mute", "-demo","-battle", "-ultaudit", "-cutinaudit", "-artaudit", "-toughshots", "-demo-quick", "-demo-roster", "-perf", "-humanfight" };
         public static bool On { get; private set; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

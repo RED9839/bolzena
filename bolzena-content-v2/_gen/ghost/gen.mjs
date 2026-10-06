@@ -87,7 +87,7 @@ function starters(key, role, names) {
 function hero(key, spec) {
   const d = design[key];
   const h = {
-    id: key, name: d.ko, nature: d.nature, race: '유령', row: d.row, role: d.role, star: d.star,
+    id: key, name: d.ko, nature: d.nature, race: '유령', role: d.role, star: d.star,
     hp: d.hp, atk: d.atk, def: d.def, crit: d.crit, blurb: spec.blurb,
   };
   if (spec.keyword) h.keyword = spec.keyword;

@@ -249,9 +249,8 @@ namespace Bolzena.UI
                 float x = Pad + fd + 0.2f, w = Wd - x - Pad;
                 float top = st.Y;
                 st.Para(h.Name, x, w, Tone.Xl, Tone.Ink, false, 0.02f);
-                string row = h.Row == "front" ? "앞줄" : h.Row == "back" ? "뒷줄" : "가운데";
                 Make.Box("nat", st.T, Res.UI("circle"), new Vector3(x + 0.08f, st.Y - 0.12f, 0), new Vector2(0.14f, 0.14f), OC, Tone.Nature(h.Nature));
-                st.Para($"<color=#{ColorUtility.ToHtmlStringRGB(Tone.Nature(h.Nature))}>{h.Nature}</color><color={Tone.DimTag}>  ·  </color>{h.Role} · {row}", x + 0.22f, w - 0.22f, Tone.Sm, Tone.Sub, true, 0.04f);
+                st.Para($"<color=#{ColorUtility.ToHtmlStringRGB(Tone.Nature(h.Nature))}>{h.Nature}</color><color={Tone.DimTag}>  ·  </color>{h.Role}", x + 0.22f, w - 0.22f, Tone.Sm, Tone.Sub, true, 0.04f);
                 st.Para(Stat("공격", h.Atk, h.AtkNow) + "    " + Stat("방어", h.Def, h.DefNow) + "    " + Stat("치명", h.Crit, h.CritNow, "%"), x, w, Tone.Sm, Tone.Ink, true, 0.04f);
                 st.Y = Mathf.Min(st.Y, top - fd - 0.08f);
 

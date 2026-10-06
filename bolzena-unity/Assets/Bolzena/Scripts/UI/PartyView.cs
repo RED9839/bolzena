@@ -230,9 +230,8 @@ namespace Bolzena.UI
             var sp = CardView.Face(h.Key, w / ph);
             if (sp != null) { var f = Make.Box("face", R, sp, pc + new Vector3(w * 0.12f, 0, 0), new Vector2(w, ph), OC + 1); f.maskInteraction = SpriteMaskInteraction.VisibleInsideMask; }
             if (hot) Frame(R, pc, new Vector2(w + 0.04f, ph + 0.04f), Tone.Gold, 0.035f, OC + 3);
-            // 왼쪽 위 아이콘 열 — 성격 · 역할 · 자리
-            string row = h.Row == "front" ? "전열" : h.Row == "back" ? "후열" : "중열";
-            string[] ics = { "성격_" + h.Nature, "역할_" + h.Role, "위치_" + row };
+            // 왼쪽 위 아이콘 열 — 성격 · 역할
+            string[] ics = { "성격_" + h.Nature, "역할_" + h.Role };
             for (int i = 0; i < ics.Length; i++)
             {
                 var sp2 = Bolzena.RunUI.Theme.Icon(ics[i]);

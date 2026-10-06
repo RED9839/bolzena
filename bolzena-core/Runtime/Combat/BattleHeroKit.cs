@@ -9,7 +9,7 @@ namespace Bolzena.Core
     /// 조건: 갈래(ifChoice) · 무작위(ifRandom) · 손 수(ifHand) · 더미 수(ifPile) · N장째(ifNth) · 같은 사도 연속(ifStreak) · 셋 다 냄(ifAllHeroes) · 적 상태(ifFoe) · 카드 값(ifCardSt).
     /// 비례: 이번 턴 낸 카드(perPlayed) · 더미 장수(perPile) · 카드 값(perCardSt) · 일의 값(perEvent — 초과 피해 · 넘친 치유 · 막아 낸 양).
     /// 효과: 예약(later · afterCards) · 함정(trap) · 혼란(confuse) · 저절로 내기(autoPlay) · 다른 사도 카드 대신 발동(castOther) ·
-    /// 더미 조작(pull · exileFrom) · 적 버프 지우기(dispel) · 열 옮기기(moveRow) · 판 단위 성장(growRun).
+    /// 더미 조작(pull · exileFrom) · 적 버프 지우기(dispel) · 판 단위 성장(growRun).
     /// </summary>
     public sealed partial class Battle
     {
@@ -161,9 +161,6 @@ namespace Bolzena.Core
                         ctx.EventV = gone;   // 지운 수 — 뒤의 perEvent 가 센다
                         return true;
                     }
-                case FxK.MoveRow:
-                    if (owner != null && Array.IndexOf(R.ROWS, f.Id) >= 0) { owner.Row = f.Id; Say($"{owner.Name}: {(f.Id == "front" ? "전열" : f.Id == "mid" ? "중열" : "후열")}로"); StatusCue(owner, "자리 옮김", true); }
-                    return true;
                 case FxK.GrowRun:
                     {   // 판 단위 성장 — 지금 바로 오르고, 판이 기억한다(다음 싸움부터 장비처럼)
                         var who = Resolve(ctx, f.Target ?? "self").Where(u => u.Side == Side.Party).ToList();

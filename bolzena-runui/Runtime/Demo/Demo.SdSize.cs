@@ -24,7 +24,7 @@ namespace Bolzena.RunUI
             yield return Wait(1.4f);
             yield return Press("go");
             yield return Screen_("party", 0.8f);
-            yield return Press("party.auto", 0.6f);
+            yield return PickParty(0.6f);
             yield return Press("party.go");
             yield return Screen_("map", 1.0f);
 

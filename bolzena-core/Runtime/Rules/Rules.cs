@@ -262,6 +262,5 @@ namespace Bolzena.Core
 
         public static readonly string[] CARD_TYPES = { "공격", "스킬", "강화", "상태", "저주" };
         public static readonly string[] ROLES = { "탱커", "서포터", "딜러" };
-        public static readonly string[] ROWS = { "front", "mid", "back" };
     }
 }

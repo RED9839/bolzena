@@ -454,24 +454,71 @@ namespace Bolzena
                 {
                     FoeFrame(false);
                     RefreshHud();
-                    var at = u ? u.Center : new Vector3(4f, 0, 0);
-                    Clock.HitStop(0.12f);
-                    FieldRig.Shake(0.5f, 2f);
-                    Vfx.Flash(new Color(1f, 1f, 1f, 0.35f), 0.2f);
-                    Vfx.Burst(at, new Vfx.BurstOpt
-                    {
-                        Tex = "FX_IN_Spark", Count = 26, Speed = new Vector2(4f, 11f), Life = new Vector2(0.35f, 0.7f), Size = new Vector2(0.08f, 0.22f),
-                        C0 = new Color(1f, 0.6f, 0.5f), C1 = new Color(0.6f, 0.1f, 0.1f), Gravity = 6f, Spin = true, Angle = 90, Spread = 360, Order = 476, Boost = 2.5f,
-                    });
-                    Vfx.Glow(at, 3.5f, new Color(1f, 0.85f, 0.7f, 0.9f), 0.35f, 3f, "FX_IN_Ring_ShockWave_03", 475);
-                    Vfx.Word(at + new Vector3(0, 1.2f, 0), "끊김!", 0.8f, new Color(1f, 0.95f, 0.85f), new Color(0.45f, 0.05f, 0.05f), 1.0f, 1.6f, null, 480, 0.3f);
-                    Vfx.Word(at + new Vector3(0, 0.55f, 0), $"{e.Anim ?? "격파"} — 「{e.Say}」", 0.3f, new Color(1f, 0.8f, 0.7f), new Color(0.2f, 0, 0), 1.0f, 1.2f, null, 478, 0.35f);
-                    Sfx.Play("block_hit", 0.8f, 0.7f);
-                    Sfx.Play("ult_impact", 0.5f, 0.8f);
-                    yield return Clock.Wait(0.7f);
+                    yield return CutFx(u, $"{e.Anim ?? "격파"} — 「{e.Say}」");
                     break;
                 }
             }
+        }
+
+        // 「끊김!」 — 예고한 큰 수를 격파로 끊었다(보스 고학년 foeUltCut · 엘리트 · 일반 힘 모으기). 깨지는 조각 · 흰 번쩍 · 약 1초
+        //   underBreak — 바로 앞 「격파!」 글(머리 위 Top+0.45)과 겹치지 않게 글을 몸 쪽으로 내린다(엘리트 · 일반 — 키가 작아 Center+1.2 가 머리 위와 겹쳤다)
+        IEnumerator CutFx(UnitView u, string sub, bool underBreak = false)
+        {
+            var at = u ? u.Center : new Vector3(4f, 0, 0);
+            float wy = 1.2f;
+            if (underBreak && u) wy = Mathf.Min(wy, u.Top.y - 0.5f - at.y);
+            Clock.HitStop(0.12f);
+            FieldRig.Shake(0.5f, 2f);
+            Vfx.Flash(new Color(1f, 1f, 1f, 0.35f), 0.2f);
+            Vfx.Burst(at, new Vfx.BurstOpt
+            {
+                Tex = "FX_IN_Spark", Count = 26, Speed = new Vector2(4f, 11f), Life = new Vector2(0.35f, 0.7f), Size = new Vector2(0.08f, 0.22f),
+                C0 = new Color(1f, 0.6f, 0.5f), C1 = new Color(0.6f, 0.1f, 0.1f), Gravity = 6f, Spin = true, Angle = 90, Spread = 360, Order = 476, Boost = 2.5f,
+            });
+            Vfx.Glow(at, 3.5f, new Color(1f, 0.85f, 0.7f, 0.9f), 0.35f, 3f, "FX_IN_Ring_ShockWave_03", 475);
+            Vfx.Word(at + new Vector3(0, wy, 0), "끊김!", 0.8f, new Color(1f, 0.95f, 0.85f), new Color(0.45f, 0.05f, 0.05f), 1.0f, 1.6f, null, 480, 0.3f);
+            Vfx.Word(at + new Vector3(0, wy - 0.65f, 0), sub, 0.3f, new Color(1f, 0.8f, 0.7f), new Color(0.2f, 0, 0), 1.0f, 1.2f, null, 478, 0.35f);
+            Sfx.Play("block_hit", 0.8f, 0.7f);
+            Sfx.Play("ult_impact", 0.5f, 0.8f);
+            yield return Clock.Wait(0.7f);
+        }
+
+        // ── 엘리트 · 일반 적 힘 모으기(엔진 cue foeChargeWarn · API v2.8) ── 보스 고학년보다 한 단계 약하게: 붉은 대신 주황, 얼굴 · 컷인 없음.
+        //   모으기: 주황 번쩍 · 고리 하나 + 머리 위 짧은 「힘 모으는 중」 띠(의도 칸은 EnemyHud 가 「다음 차례」 · 은은한 맥동) ·
+        //   쏟기: EnemyAct(Anim "charge") 가 그 수 이름 띠 · 조금 센 타격 · 끊김: 「끊김!」(CutFx)
+        IEnumerator FoeChargeFx(BattleEvent e)
+        {
+            int ei = e.Actor.Index;
+            var u = ei >= 0 && ei < Enemies.Count ? Enemies[ei] : null;
+            Debug.Log($"[FoeCharge] {e.Text} {(u ? u.name : "-")} 「{e.Say}」 v={e.Value} {e.Anim}");
+            Emit("foecharge_" + e.Text);
+            // 그 적의 머리 위만 새로(RefreshHud 는 손까지 맞춰서, 적 차례 중간에 부르면 아직 안 뽑은 손이 먼저 깔린다)
+            var snapE = ei >= 0 && ei < Battle.Snapshot.Enemies.Count ? Battle.Snapshot.Enemies[ei] : null;
+            if (snapE != null && ei < EnemyHuds.Count && EnemyHuds[ei] != null && !snapE.Dead) { EnemyHuds[ei].SetIntent(snapE); EnemyHuds[ei].SetChips(snapE.Chips); }
+            switch (e.Text)
+            {
+                case "warn":
+                    if (!u) break;
+                    u.Flash(new Color(1f, 0.62f, 0.3f), 0.3f, 0.6f);
+                    Vfx.Glow(u.Center, 2.4f, new Color(1f, 0.55f, 0.2f, 0.6f), 0.45f, 2.2f, "FX_IN_Ring_ShockWave_03", 186);
+                    ChargeBand(u, "힘 모으는 중", 0.28f, 1.3f);
+                    Sfx.Play("turn_start", 0.4f, 0.9f);
+                    yield return Clock.Wait(0.4f);
+                    break;
+                case "cut":
+                    yield return CutFx(u, $"격파 — 「{e.Say}」", true);
+                    break;
+            }
+        }
+
+        // 머리 위 짧은 띠 — 머리 위 묶음(EnemyHud) 위 끝 바로 위에, 화면 위 HUD 에 닿지 않게
+        void ChargeBand(UnitView u, string text, float size, float life)
+        {
+            float y = u.Top.y + 0.75f;
+            int ei = Enemies.IndexOf(u);
+            if (ei >= 0 && ei < EnemyHuds.Count && EnemyHuds[ei] != null)
+                y = u.transform.localPosition.y + EnemyHuds[ei].LocalBox.yMax + 0.22f;
+            Vfx.Word(new Vector3(u.Top.x, Mathf.Min(y, 3.35f), 0), text, size, new Color(1f, 0.78f, 0.45f), new Color(0.32f, 0.12f, 0), life, 1.15f, null, 474, 0.3f);
         }
 
         // 보스 고학년 한 수 — 붉은 번쩍 · 흔들림 · 붉은 충격 고리(마지막 수는 더 크게)
@@ -1582,6 +1629,9 @@ namespace Bolzena
                 case EventKind.FoeUlt:
                     yield return FoeUltFx(e);
                     break;
+                case EventKind.FoeCharge:
+                    yield return FoeChargeFx(e);
+                    break;
                 case EventKind.Form:
                     yield return FormFx(e);
                     break;
@@ -1783,6 +1833,7 @@ namespace Bolzena
             var u = Enemies[ei];
             Split(group, out var pre, out var byHit, out int hits);
             bool foeUlt = act.Text == "foeult";
+            bool spend = act.Anim == "charge";   // 모은 힘을 쏟는 턴(엘리트 · 일반 힘 모으기)
             bool heavy = act.Text == "heavy" || foeUlt;
             string anim = u.AnimFor(act.Motion);
             float speed = foeUlt ? 1.05f : heavy ? 1.1f : 1.25f;
@@ -1798,9 +1849,20 @@ namespace Bolzena
                 Sfx.Play("turn_start", 0.5f, 1.3f);
                 yield return Clock.Wait(0.35f);
             }
-            if (!string.IsNullOrEmpty(act.Say))
+            if (spend)
+            {
+                // 모은 힘을 쏟는다 — 그 수 이름 띠(주황, 보통 수 이름보다 크게) · 주황 고리 · 집중선
+                Emit("foecharge_spend");
+                ChargeBand(u, "「" + (act.Say ?? "") + "」", 0.42f, 1.5f);
+                u.Flash(new Color(1f, 0.6f, 0.25f), 0.35f, 0.5f);
+                Vfx.Glow(u.Center, 3f, new Color(1f, 0.5f, 0.15f, 0.75f), 0.4f, 2.6f, "FX_IN_Ring_ShockWave_03", 186);
+                if (heavy) ScreenFx.I.Lines(0.6f, new Color(1f, 0.55f, 0.25f), FieldRoot.TransformPoint(u.Center), 302, 0.3f);
+                Sfx.Play("turn_start", 0.45f, 0.8f);
+                yield return Clock.Wait(0.4f);
+            }
+            else if (!string.IsNullOrEmpty(act.Say))
                 Vfx.Word(new Vector3(u.Top.x, Mathf.Min(u.Top.y + 1.2f, 3.45f), 0), "「" + act.Say + "」", 0.24f, new Color(1f, 0.95f, 0.88f), new Color(0.1f, 0.05f, 0.1f), 1.3f, 1f, null, 472, 0.2f);
-            if (heavy && !foeUlt)
+            if (heavy && !foeUlt && !spend)
             {
                 // 큰 수 — 붉은 경고, 집중선
                 Vfx.Word(u.Top + new Vector3(0, 0.6f, 0), "강타!", 0.7f, new Color(1f, 0.5f, 0.35f), new Color(0.3f, 0, 0), 1.0f, 1.5f);
@@ -1822,6 +1884,7 @@ namespace Bolzena
                 float at = k < times.Count ? times[k] : times[times.Count - 1] + 0.12f;
                 while (elapsed < at) { yield return null; elapsed += Time.deltaTime; }
                 if (foeUlt) FoeUltBeat(u, k == byHit.Count - 1);
+                else if (spend && k == 0) { Vfx.Flash(new Color(1f, 0.55f, 0.2f, 0.2f), 0.15f); FieldRig.Shake(0.45f, 2f); }   // 쏟는 첫 수 — 조금 센 타격감(보스 고학년 붉은 번쩍보다 약하게)
                 foreach (var e in kv.Value)
                 {
                     if (e.Kind == EventKind.PartyHurt) Hurt(e, key, heavy);

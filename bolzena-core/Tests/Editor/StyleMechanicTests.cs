@@ -164,7 +164,7 @@ namespace Bolzena.Core.Tests
         {
             var t = new CardText(K.Data());
             Assert.AreEqual("되풀이: 드로우 1", t.Fx(new List<Fx> { new Fx { K = "ifRepeat" }, new Fx { K = "draw", V = 1 } }));
-            Assert.AreEqual("이번 턴 쓴 AP가 꼭 3이면: AP +1", t.Fx(new List<Fx> { new Fx { K = "ifSpent", N = 3 }, new Fx { K = "ap", V = 1 } }));
+            Assert.AreEqual("이번 턴 쓴 AP가 꼭 3이면 → AP +1", t.Fx(new List<Fx> { new Fx { K = "ifSpent", N = 3 }, new Fx { K = "ap", V = 1 } }));
             Assert.AreEqual("적 1명의 디버프 1가지당 적 1명에게 공격력 20% 피해", t.Fx(new List<Fx> { new Fx { K = "perDebuff" }, new Fx { K = "dmg", Ratio = 0.2, Target = "oneEnemy" } }));
             Assert.AreEqual("다음 턴 AP -1, 손패 1장 소멸", t.Fx(new List<Fx> { new Fx { K = "nextAp", V = -1 }, new Fx { K = "burn", V = 1 } }));
             Assert.AreEqual("가시: 공격을 방어 · 실드로 다 막으면 → 그 피해의 50%를 때린 적에게 고정 피해로",

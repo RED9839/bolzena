@@ -40,6 +40,7 @@ def mk(nid, src=None, *, mon, race, grade, concept, sec, spine, nat, skin=None, 
         ART[nid] = {'spine': 'monsterspine/' + spine, 'skin': skin, 'icon': icon}
     else:
         ART[nid] = {'spine': 'monsterspine/' + spine, 'skin': NAT_EN[nat], 'icon': icon or f'icon_{spine}{NAT_EN[nat]}'}
+    ART[nid]['race'] = race   # 몬스터 종족(없음 · 요정 …) — 적 도감이 종족 / 종족 없음으로 묶는다(화면용 표라 엔진은 안 본다)
     META[nid] = (mon, race, grade, concept, f'{NAMU} §{sec} · 스파인 {spine}')
     return E[nid]
 
@@ -396,10 +397,104 @@ regain('clone_beni', '배 내밀기', 2)
 E['clone_beni']['blurb'] = E['clone_beni']['blurb'].replace('부른 수련생은', '배를 내밀 때 강인도를 2 되찾습니다. 부른 수련생은')
 TOUGH_REGAIN = ['droneg', 'crayontanker', 'elfsoldiercloserange_elite', 'marshmallowtanker', 'golem_elite', 'clone_rude', 'clone_beni']
 
+# ═══════════════════════ 평소 수는 무작위 · 예고는 고학년과 힘 모으기만(사용자 2026-10-07) ═══════════════════════
+# 「고학년만 예고로 하고 … 나머지 평소 패턴은 무작위로」 · 「엘리트나 적들도 예고 패턴 같은 거 강화하고」.
+#   ① 모두 pick shuffle — 여는 수(open) · 판 바뀜(phase)은 그대로. 같은 종류 세 번 잇기 금지 · 힘 모으기 간격 · 꽉 찬 소환 빼기는 엔진(Battle.ShuffleOk).
+#   ② 무게: 보통 3 · 가장 센 치는 수 2 · 소환 1 · 힘 모으기(일반 2 · 엘리트 4). 회복 · 강인도 회복 수는 엔진이 형편 따라 곱한다(Battle.ShuffleW).
+#   ③ 보스 몸의 힘 모으기는 걷는다(예고는 고학년만) — 모아 쏟던 수는 바로 하는 수로, 값 × BOSS_UNCHARGE.
+#   ④ 엘리트는 몬스터마다 큰 힘 모으기 하나, 일반은 컨셉이 맞는 몇에만 약한 것 — 모으는 턴 · 쏟는 턴에 격파하면 끊긴다(brk).
+#   단계 측정용: FOE_CHARGE=0 이면 ④ 를 건너뛴다.
+W_BASE, W_TOP, W_SUMMON, W_CHARGE_MOB, W_CHARGE_ELITE = 3, 2, 1, 2, 4
+BOSS_UNCHARGE = 0.65
+ADD_CHARGE = os.environ.get('FOE_CHARGE', '1') != '0'
+
+def threat(i):
+    t = i.get('t')
+    if t in ('attack', 'back'): return i.get('v', 0)
+    if t == 'multi': return i.get('v', 0) * max(1, i.get('n', 1))
+    if t == 'attackAll': return i.get('v', 0) * 2
+    return 0
+
+def uncharge(i):
+    """보스 몸의 힘 모으기 → 바로 하는 수(안쪽 끝 수, 값 × BOSS_UNCHARGE)."""
+    while i.get('t') == 'charge': i = i['next']
+    i = copy.deepcopy(i); i.pop('brk', None)
+    if isinstance(i.get('v'), (int, float)) and i['t'] in ('attack', 'back', 'multi', 'attackAll'): i['v'] = int(round(i['v'] * BOSS_UNCHARGE / 5) * 5)
+    return i
+
+def charge(warn, nxt):
+    n = dict(nxt); n['brk'] = True
+    return {'t': 'charge', 'say': warn, 'next': n, 'brk': True}
+
+# 엘리트 — 몬스터마다 큰 힘 모으기 하나(원값 — 아래 BAL 이 곱한다). 평소 가장 센 수의 두 배 안팎.
+ELITE_CHARGE = {
+    'hatchling_elite': ('불씨 모으기', {'t': 'attackAll', 'v': 140, 'say': '창시자의 화염'}),
+    'proteindragon_elite': ('마지막 한 세트 준비', {'t': 'attack', 'v': 280, 'say': '한계 돌파 펀치'}),
+    'golem_elite': ('대지 끌어올리기', {'t': 'attackAll', 'v': 150, 'say': '대지 붕괴'}),
+    'fairymobcloserange_elite': ('토핑 몽땅 끌어안기', {'t': 'multi', 'v': 70, 'n': 4, 'say': '토핑 폭격'}),
+    'magicfork_elite': ('자루 높이 치켜들기', {'t': 'attack', 'v': 290, 'say': '밭 갈아엎기'}),
+    'ginseng_elite': ('양분 끌어올리기', {'t': 'attackAll', 'v': 110, 'id': '고통', 'n': 2, 'say': '쓴 즙 폭발'}),
+    'goldring_elite': ('금고 문 활짝 열기', {'t': 'multi', 'v': 65, 'n': 4, 'say': '금화 폭포'}),
+    'furrywarriorcloserange_elite': ('정신 집중', {'t': 'attack', 'v': 300, 'say': '천 번째 지르기'}),
+    'gluttonbear_elite': ('두목의 포효', {'t': 'attackAll', 'v': 130, 'say': '두목의 내려찍기'}),
+    'foodscavenger_elite': ('식탁 차리기', {'t': 'multi', 'v': 60, 'n': 4, 'say': '풀코스 포크질'}),
+    'furring_elite': ('돈다발 쌓기', {'t': 'attackAll', 'v': 125, 'say': '돈다발 폭탄'}),
+    'blanketghost_elite': ('악몽 불러오기', {'t': 'attackAll', 'v': 110, 'id': '약화', 'n': 1, 'say': '가위눌림 악몽'}),
+    'shadyfollowercloserange_elite': ('친위대 집결', {'t': 'multi', 'v': 55, 'n': 4, 'id': '충격', 'say': '친위대 총공격'}),
+    'pumpkin_elite': ('서러움 꾹꾹 담기', {'t': 'attackAll', 'v': 130, 'say': '서러움 폭발'}),
+    'hatsnail_elite': ('의식 주문 외우기', {'t': 'attackAll', 'v': 125, 'say': '마녀의 대주문'}),
+    'elfsoldiercloserange_elite': ('철거 장비 돌리기', {'t': 'attack', 'v': 290, 'say': '철거 망치'}),
+    'droneg_elite': ('경보 최고 단계', {'t': 'attackAll', 'v': 110, 'id': '충격', 'n': 2, 'say': '전체 진압 사격'}),
+    'wisps_elite': ('원소 응축', {'t': 'attackAll', 'v': 120, 'id': '고통', 'n': 2, 'say': '원소 대폭발'}),
+    'lupalu_elite': ('냉기 모으기', {'t': 'multi', 'v': 65, 'n': 4, 'id': '균열', 'say': '얼음 병 난타'}),
+    'oldtree_elite': ('뿌리 깊이 박기', {'t': 'attackAll', 'v': 140, 'say': '뿌리째 휩쓸기'}),
+}
+# 일반 — 컨셉이 맞는 몇(돌격병 · 거대형 · 마법사)에만 약한 힘 모으기. 평소 가장 센 수의 1.6배 안팎.
+MOB_CHARGE = {
+    'elfsoldiercloserange': ('돌격 대열 갖추기', {'t': 'attack', 'v': 170, 'say': '대열 돌격'}),
+    'golem': ('보석 주먹 치켜들기', {'t': 'attack', 'v': 180, 'say': '보석 내려찍기'}),
+    'gluttonbear': ('크게 숨 들이쉬기', {'t': 'attack', 'v': 175, 'say': '곰 몸통 박치기'}),
+    'marshmallowtanker': ('크게 부풀기', {'t': 'attack', 'v': 165, 'say': '말랑 깔아뭉개기'}),
+    'crayonwizard': ('주문 외우기', {'t': 'attackAll', 'v': 70, 'say': '낙서 대폭발'}),
+}
+
+def charge_blurb(e, warn, nxt):
+    s = f'「{warn}」 로 힘을 모으면 다음 턴 「{nxt["say"]}」 — 모으는 턴 · 쏟는 턴에 격파하면 끊깁니다.'
+    b = e.get('blurb', '')
+    e['blurb'] = b.replace(' 희귀종:', ' ' + s + ' 희귀종:', 1) if ' 희귀종:' in b else (b + ' ' + s).strip()
+
+if ADD_CHARGE:
+    for k, (warn, nxt) in list(ELITE_CHARGE.items()) + list(MOB_CHARGE.items()):
+        e = E[k]
+        e['intents'].append(charge(warn, nxt))
+        if 'phase' in e: e['phase']['intents'].append(charge(warn, nxt))   # 판이 바뀌어도 같은 큰 수
+        charge_blurb(e, warn, nxt)
+
+for k, e in E.items():
+    boss_body = bool(e.get('boss'))
+    elite = k.endswith('_elite')
+    e['pick'] = 'shuffle'
+    lists = [e['intents']] + [e[f]['intents'] for f in ('phase', 'phase2') if f in e]
+    for lst in lists:
+        if boss_body: lst[:] = [uncharge(i) if i.get('t') == 'charge' else i for i in lst]
+        else:
+            for i in lst:   # 남은 힘 모으기 — 모으는 턴 · 쏟는 턴 모두 격파로 끊긴다
+                if i.get('t') == 'charge': i['brk'] = True; i['next']['brk'] = True
+        top = max((threat(i) for i in lst if i.get('t') != 'charge'), default=0)
+        tops = [i for i in lst if i.get('t') != 'charge' and threat(i) == top and top > 0]
+        for i in lst:
+            t = i.get('t')
+            if t == 'summon': w = W_SUMMON
+            elif t == 'charge': w = W_CHARGE_ELITE if elite else W_CHARGE_MOB
+            elif len(tops) == 1 and i is tops[0]: w = W_TOP
+            else: w = W_BASE
+            i['w'] = w
+
 # ═══════════════════════ 밸런스(시뮬로 맞춤 — 졸개가 빠진 보스 · 몬스터 정리 뒤 완주율을 리워크 전 근처로) ═══════════════════════
 import math
+# 2026-10-07 평소 수 무작위 · 고학년 강화 · 엘리트/일반 힘 모으기 뒤 보스 몸 HP 1.25 → 1.2(숙련 · 역할 30.9% → 32.0%, _measure/적_리워크.md §8).
 BAL = {'mob_hp': float(os.environ.get('FOE_MOB_HP', 1.1)), 'mob_dmg': float(os.environ.get('FOE_MOB_DMG', 1.155)),
-       'boss_hp': float(os.environ.get('FOE_BOSS_HP', 1.25)), 'boss_dmg': float(os.environ.get('FOE_BOSS_DMG', 1.155))}
+       'boss_hp': float(os.environ.get('FOE_BOSS_HP', 1.2)), 'boss_dmg': float(os.environ.get('FOE_BOSS_DMG', 1.155))}
 HIT = {'attack', 'back', 'multi', 'attackAll'}
 def r5(x, step): return int(round(x / step) * step)
 def scale(e, hp, dmg):

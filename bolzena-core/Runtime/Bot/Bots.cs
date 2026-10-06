@@ -148,16 +148,7 @@ namespace Bolzena.Core
             return Math.Max(0, Num.Round(d * Math.Max(0.1, m)));
         }
 
-        static Unit PickT(List<Unit> live, bool fromBack)
-        {
-            if (live.Count == 0) return null;
-            foreach (var r in fromBack ? R.ROWS.Reverse() : R.ROWS)
-            {
-                var inRow = live.Where(u => u.Row == r).ToList();
-                if (inRow.Count > 0) return inRow.Aggregate((a, b) => fromBack ? (b.Idx < a.Idx ? b : a) : (b.Idx > a.Idx ? b : a));
-            }
-            return live[0];
-        }
+        static Unit PickT(List<Unit> live, bool fromBack) => Battle.PickInOrder(live, fromBack);
 
         /// <summary>이번 적의 차례에 파티가 잃을 HP + 다음 턴에 쏟을 힘 · 방해.</summary>
         public (int hp, int shield, double later, double misc) Incoming(Battle s)

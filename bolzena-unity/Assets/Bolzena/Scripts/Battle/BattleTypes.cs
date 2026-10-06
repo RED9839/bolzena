@@ -100,7 +100,8 @@ namespace Bolzena.Battle
         public UnityEngine.Color Tint;
         public int Atk, Def, Crit;       // 바탕(장비 포함)
         public int AtkNow, DefNow, CritNow;
-        public string Role, Nature, Row, Blurb;
+        public string Role, Nature, Blurb;
+        public int Slot;                 // 편성 순서(0 = 자리 1 — 적의 공격을 받는 모습). 사도 열은 없다
         public int Ult, UltMax;          // 게이지(파티 공용) · 이 사도 고학년 값
         public bool Dead;
         public List<string> Passives = new List<string>();   // 고유 효과에 안 모인 패시브 「이름 — 글」(CardText.Traits 의 패시브 칸)
@@ -130,6 +131,9 @@ namespace Bolzena.Battle
         public string IntentText, IntentSay;
         public string UltName, UltHero;  // 보스 클론 고학년 — 예고(charge) · 사용(ult) 중이면 그 고학년 이름 · 사도 id(의도 칸에 얼굴 · 이름)
         public bool UltNow;              // 이번 차례에 쓴다(ult) — 아니면 예고(다음 턴)
+        public string ChargeName;        // 엘리트 · 일반의 힘 모으기 — 모으는 턴 · 쏟는 턴이면 쏟을 수 이름(의도 칸 아래 · 주황). 보스 고학년은 UltName 쪽
+        public bool IntentLater;         // IntentValue 가 다음 턴 피해(힘 모으기 · 고학년 예고 — b.ChargeHit). 이번 적 차례에 받을 피해 합에는 넣지 않는다
+        public bool ChargeNow;           // 이번 차례에 쏟는다(모은 힘) — 아니면 모으는 중(다음 차례)
         public int RushNeed, RushCnt;    // 즉시 행동 — 카드 RushNeed 장이면 당겨서 한다(0 이면 안 당겨짐)
         public bool RushedTurn;
         public string Nature, Blurb;
@@ -188,6 +192,7 @@ namespace Bolzena.Battle
         Victory,
         Defeat,
         Revive,         // Target(적) 되살아남 — core revive(재 속 부활 · 가사에서 일어섬) · HpAfter 체력
+        FoeCharge,      // 엘리트 · 일반 적 힘 모으기 — Actor(적) · Text warn(모으기 — core foeChargeWarn) · cut(끊김 — 격파로 모은 수를 놓침) · Say 쏟을 수 이름 · Anim 모으기 이름 · Value 다음 턴 피해(warn)
     }
 
     public class BattleEvent

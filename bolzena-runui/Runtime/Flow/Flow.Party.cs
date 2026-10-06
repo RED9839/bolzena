@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Bolzena.RunUI
 {
-    // 파티 편성 · 사도 도감 — 웹판 js/party-screen.js. 위에 세 줄(후열 · 중열 · 전열) 칸, 아래에 135명 그리드(필터),
+    // 파티 편성 · 사도 도감 — 웹판 js/party-screen.js. 위에 세 자리(편성 순서 1 · 2 · 3) 칸, 아래에 135명 그리드(필터),
     // 오른쪽에 이번 층(마을 · 보스 · 나오는 적)과 고른 사도의 정보. 도감은 같은 그리드에 교주 카드 · 장비 탭이 붙는다.
     // 코어 데이터에 있는 사도만 데려갈 수 있다(나머지는 「준비 중」 — 도감으로만).
     public partial class Flow
@@ -15,16 +15,13 @@ namespace Bolzena.RunUI
         class PartyState
         {
             public string Village;
-            public string[] Slots = new string[3];       // 0 후열 · 1 중열 · 2 전열 — 사도 key(표)
+            public string[] Slots = new string[3];       // 편성 순서(자리 1 · 2 · 3) — 사도 key(표). 사도 열은 없다
             public string Nature, Role;
             public bool PlayableOnly;
             public string Focus;
             public string Tab = "사도";
             public bool Dex;
         }
-
-        static readonly string[] RowKey = { "back", "mid", "front" };
-        static readonly string[] RowKo = { "후열", "중열", "전열" };
 
         public void Party(string village)
         {
@@ -169,10 +166,8 @@ namespace Bolzena.RunUI
                 var go = Btn.Make(root, count < 3 ? $"사도 {3 - count}명 더" : "이 파티로 출발", BtnStyle.PillGold, () =>
                 {
                     var party = st.Slots.Select(k => Roster.ByKey(k).CoreId).ToList();
-                    var rows = Enumerable.Range(0, 3).ToDictionary(i => party[i], i => RowKey[i]);
                     RunPort.ClearSave();
                     P.NewRun(party, st.Village, DateTime.Now.Ticks & 0x7fffffff);
-                    foreach (var kv in rows) P.S.Rows[kv.Key] = kv.Value;
                     MapStep();
                 }, Theme.FsXl - 2, "go");
                 go.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, Theme.Gutter, side, Theme.C(78, 64));
@@ -209,7 +204,7 @@ namespace Bolzena.RunUI
             }, 0, "slot" + i);
             var rt = b.GetComponent<RectTransform>();
             if (h == null) b.Bg.sprite = Theme.GlassDim;
-            var lab = Ui.Title(rt, RowKo[i], Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center);
+            var lab = Ui.Title(rt, $"자리 {i + 1}", Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center);
             lab.rectTransform.Band(1, 34, 0, 0, -10);
             if (h == null)
             {
@@ -245,12 +240,6 @@ namespace Bolzena.RunUI
             x.rectTransform.At(1, 1, -14, -14, 22, 22);
             var ri = Theme.Icon("역할_" + h.role);
             if (ri != null) { var r = Ui.Img(rt, ri, Color.white, "role"); r.rectTransform.At(0, 1, 12, -12, 30, 30); r.preserveAspect = true; }
-            var own = P.Data.Hero(h.CoreId)?.Row ?? h.row;
-            if (own != RowKey[i])
-            {
-                var warn = Ui.Text(rt, $"본래 {(own == "front" ? "전열" : own == "mid" ? "중열" : "후열")}", Theme.FsCap, Theme.Gold, TextAlignmentOptions.TopRight);
-                warn.rectTransform.At(1, 1, -44, -14, 120, 20);
-            }
         }
 
         void GridHero(RectTransform content, PartyState st, HeroInfo h, RectTransform root, Action back, int idx)
@@ -265,9 +254,8 @@ namespace Bolzena.RunUI
                     if (at >= 0) st.Slots[at] = null;
                     else
                     {
-                        // 본래 줄의 빈 칸 → 아무 빈 칸
-                        int want = Array.IndexOf(RowKey, P.Data.Hero(h.CoreId)?.Row ?? h.row);
-                        int slot = want >= 0 && st.Slots[want] == null ? want : Array.IndexOf(st.Slots, null);
+                        // 앞쪽 빈 칸
+                        int slot = Array.IndexOf(st.Slots, null);
                         if (slot >= 0) st.Slots[slot] = h.key;
                         else Toast.Show("세 칸이 다 찼습니다 — 위 칸을 눌러 빼세요");
                     }
@@ -374,7 +362,7 @@ namespace Bolzena.RunUI
             nm.enableAutoSizing = true; nm.fontSizeMin = 18; nm.fontSizeMax = Theme.FsXl;
             nm.textWrappingMode = TextWrappingModes.NoWrap;
             string stars = new string('★', Mathf.Clamp(h.star, 1, 3));
-            var sub = Ui.Text(top, $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(h.nature))}>{h.nature}</color> · {h.race} · {h.role} · {h.RowKo}  <color={Theme.GoldTag}>{stars}</color>", Theme.FsSm, Theme.Sub);
+            var sub = Ui.Text(top, $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(h.nature))}>{h.nature}</color> · {h.race} · {h.role}  <color={Theme.GoldTag}>{stars}</color>", Theme.FsSm, Theme.Sub);
             sub.rectTransform.At(0, 1, fz + 20, -48, 330, 26);
             sub.textWrappingMode = TextWrappingModes.NoWrap;
             var blurb = Ui.Text(box.transform, h.blurb ?? "", Theme.FsSm - 1, Theme.Sub, TextAlignmentOptions.TopLeft);

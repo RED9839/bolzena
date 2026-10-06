@@ -128,7 +128,6 @@ namespace Bolzena.Core
                     case "status": if (St(c.Id == R.RHYTHM ? Pool : owner, c.Id) < c.N) return false; break;
                     case "foes": if (AliveEnemies().Count < c.N) return false; break;
                     case "foesMax": if (AliveEnemies().Count > c.N) return false; break;
-                    case "row": if (owner.Row != c.Row) return false; break;
                     case "playedMax": if (PlayedThisTurn > c.N) return false; break;
                     case "playedMin": if (PlayedThisTurn < c.N) return false; break;
                     case "ownNone":

@@ -10,15 +10,16 @@ namespace Bolzena.UI
     // 화면 UI — 카제나 전투 화면의 배치 · 밀도를 따른다(그림 · 아이콘 · 글은 우리 것, 색 · 글자 단계는 판 화면 톤.md).
     // 판 · 상자를 거의 없애고 화면 대부분을 싸움터에 쓴다. 무리마다 화면 모서리 · 가장자리에 붙는다(21:9 · 16:10 에서도), 폰은 1.25배.
     //   위 왼쪽: 가는 파티 HP 막대(숫자 얹기 · 예고 피해 ▼) → 사도 초상 띠 셋(비스듬한 조각 · 옆에 키워드 수) → 파티 상태 칩(작게)
-    //   위 오른쪽: 배속 · 메뉴(≡ — 일시정지 · 설정 · 화면) 두 개만, 얇은 구분선
-    //   왼쪽 가운데: 턴 칩 · 웨이브 → 뽑을 더미(아이콘 + 수)       오른쪽 가운데: 무덤(버린 더미) · 소멸(아이콘 + 수)
+    //   위 오른쪽: 자동 전투(알약) · 배속(1× · 2× 알약) · 메뉴(≡ — 일시정지 · 설정 · 화면), 얇은 구분선
+    //   왼쪽 가운데: 뽑을 더미(아이콘 + 수)       오른쪽 가운데: 무덤(버린 더미 — 아이콘 + 수)
+    //   (턴 칩 · 웨이브 · 소멸 더미 표시 · 게이지 머리 아이콘 · 「/ 최대」 는 2026-10-07 사용자 요청으로 걷음 — 턴 · 웨이브는 로그 · 스냅샷에만, 소멸 더미는 무덤 창의 탭으로 본다)
     //   왼쪽 아래: 고학년 게이지(큰 % + 세로 칸) 옆에 고학년 띠 셋(비스듬한 초상 · 값 · 쓸 수 있으면 반짝이)
     //   아래 가운데: 손패 밑 큰 AP 숫자(빛나는 마름모) · 손패 수 「05/10」        오른쪽 아래: 둥근 ✓ 턴 종료(이중 원 · 빛)
     //   싸움터: 사도 머리 위 고유 효과(키워드) 작은 표시
     public class PartyHud : MonoBehaviour
     {
         SpriteRenderer hpFill, hpLag, hpGain, hpDue, dueTick, shieldIcon, endBtn, endGlow, speedBg, menuBg, apGem, apGlow;
-        TextMeshPro hpText, shieldText, apText, handText, deckText, discText, goneText, turnText, waveText, speedText, pvText, gaugeText;
+        TextMeshPro hpText, shieldText, apText, handText, deckText, discText, speedText, pvText, gaugeText;
         Ring endRing;
         ChipRow chips;
         /// <summary>파티 버프 줄(강화 칩 포함).</summary>
@@ -26,11 +27,10 @@ namespace Bolzena.UI
         Group TL, TR, ML, MR, BL, BR, BC;
         public System.Action<int> OnPile;           // 0 뽑을 · 1 버린 · 2 사라진
         public System.Action OnSpeed, OnPause, OnParty, OnAuto;
-        SpriteRenderer autoKnob, autoTrack, autoIcon, clockRing;
+        SpriteRenderer autoKnob, autoTrack, autoIcon, speedIcon;
         public System.Action<int> OnHero;           // 왼쪽 위 초상을 누름 — 사도 정보
         public BattleSnapshot Snap;                 // 툴팁이 읽는 지금 모습
         SpriteRenderer gaugeFill, gaugeLead, gaugeBg;
-        TextMeshPro gaugeMaxText;
         readonly List<(int need, SpriteRenderer line, TextMeshPro num)> ticks = new List<(int, SpriteRenderer, TextMeshPro)>();
         readonly List<Portrait> portraits = new List<Portrait>();
         public readonly List<UltButton> Ults = new List<UltButton>();
@@ -41,17 +41,20 @@ namespace Bolzena.UI
         // 자리(16:9 기준 좌표 — 무리마다 모서리를 따라 옮겨진다)
         const float BarX0 = -7.72f, BarW = 4.9f, BarY = 4.2f, BarH = 0.13f;
         const float StripY = 3.78f, StripW = 1.5f, StripDx = 1.62f;
-        static readonly Vector3 TurnAt = new Vector3(-7.42f, 0.62f, 0), DeckAt = new Vector3(-7.45f, -0.5f, 0);
-        static readonly Vector3 DiscAt = new Vector3(7.45f, -0.5f, 0), GoneAt = new Vector3(7.45f, 0.42f, 0);
-        // 고학년 — 왼쪽 열: 「고학년」 · 큰 %(실제 값) · 「/ 최대」 → 세로 막대(부드러운 채움 + 사도마다 필요치 눈금). 오른쪽: 사도 띠 셋
-        static readonly Vector3 GaugeAt = new Vector3(-7.42f, -1.86f, 0);
+        static readonly Vector3 DeckAt = new Vector3(-7.45f, -0.5f, 0);
+        static readonly Vector3 DiscAt = new Vector3(7.45f, -0.5f, 0);
+        // 고학년 — 왼쪽 열: 큰 %(실제 값) → 세로 막대(부드러운 채움 + 사도마다 필요치 눈금). 오른쪽: 사도 띠 셋
+        //   (머리 아이콘 · 「/ 최대」 를 걷은 뒤 % 를 막대 바로 위로 내렸다 — 옛 자리 -1.86)
+        static readonly Vector3 GaugeAt = new Vector3(-7.42f, -2.04f, 0);
         const float GBarX = -7.3f, GBarTop = -2.32f, GBarBot = -4.16f, GBarW = 0.2f;
         const float UltX = -5.86f, UltY0 = -2.62f, UltDy = 0.74f;
         static readonly Vector3 ApAt = new Vector3(0, -3.92f, 0), HandAt = new Vector3(0, -4.34f, 0);
         static readonly Vector3 EndAt = new Vector3(7.02f, -3.58f, 0);
         const float EndD = 1.22f;
-        static readonly Vector3 AutoAt = new Vector3(6.72f, 4.05f, 0), MenuAt = new Vector3(7.6f, 4.05f, 0);
-        static readonly Vector3 SpeedAt = new Vector3(7.45f, -1.55f, 0);     // 오른쪽 가운데 아래 — 원형 시계 단추(배속)
+        // 위 오른쪽 줄 — 자동 전투 · 배속 · 메뉴(2026-10-07 사용자: 배속을 옛 자동 전투 자리로, 자동 전투는 그 왼쪽)
+        static readonly Vector3 AutoAt = new Vector3(5.74f, 4.05f, 0), MenuAt = new Vector3(7.6f, 4.05f, 0);
+        static readonly Vector3 SpeedAt = new Vector3(6.72f, 4.05f, 0);      // 자동 전투와 같은 알약(시계 + 1× · 2×)
+        const float PillW = 0.86f, PillH = 0.4f;
 
         public Vector3 EndPos => endBtn.transform.position;
         public Vector3 SpeedPos => speedBg.transform.position;
@@ -142,39 +145,29 @@ namespace Bolzena.UI
             }
             chips = ChipRow.Create(tl, new Vector3(BarX0, 3.4f, 0), O + 3, 0.24f);
 
-            // ── 위 오른쪽 — 배속 · 메뉴(≡), 사이에 얇은 선 ──
+            // ── 위 오른쪽 — 자동 전투 · 배속 · 메뉴(≡), 배속과 메뉴 사이에 얇은 선 ──
+            // 배속 — 자동 전투와 같은 알약 트랙: 왼쪽 시계 아이콘 + 오른쪽 지금 배속(1× · 2×). 누를 때마다 1× ↔ 2×, 2× 면 금빛(자동 켬과 같은 빛깔)
+            speedBg = Make.Sliced("speed", tr, Res.UI("bar_fill_9s"), SpeedAt, new Vector2(PillW, PillH), O + 1, new Color(0.08f, 0.1f, 0.2f, 0.85f));
+            speedIcon = Make.Box("speedi", tr, Res.UI("ic_clock"), SpeedAt + new Vector3(-0.2f, 0, 0), new Vector2(0.26f, 0.26f), O + 2, new Color(0.95f, 0.93f, 0.88f));
+            speedText = Txt("speedt", tr, "1×", SpeedAt + new Vector3(0.14f, -0.01f, 0), Tone.Sm, O + 2, Tone.Ink, TextAlignmentOptions.Center, 0.24f);
+            { var sb = speedBg.gameObject.AddComponent<Button>(); sb.Size = new Vector2(PillW + 0.04f, PillH + 0.06f); sb.OnClick = () => OnSpeed?.Invoke(); TipZone.Add(speedBg, sb.Size, () => "전투 배속 1× · 2× — 단축키 Tab", 2); }
             // 자동 전투 토글 — 알약 트랙 + 손잡이(켜면 금빛, 손잡이 위 자동 아이콘)
-            autoTrack = Make.Sliced("autotrack", tr, Res.UI("bar_fill_9s"), AutoAt, new Vector2(0.86f, 0.4f), O + 1, new Color(0.08f, 0.1f, 0.2f, 0.85f));
+            autoTrack = Make.Sliced("autotrack", tr, Res.UI("bar_fill_9s"), AutoAt, new Vector2(PillW, PillH), O + 1, new Color(0.08f, 0.1f, 0.2f, 0.85f));
             autoKnob = Make.Box("autoknob", tr, Res.UI("circle"), AutoAt + new Vector3(-0.22f, 0, 0), new Vector2(0.36f, 0.36f), O + 2, new Color(0.85f, 0.87f, 0.95f));
             autoIcon = Make.Box("autoi", tr, Res.UI("ic_auto"), AutoAt + new Vector3(-0.22f, 0, 0), new Vector2(0.24f, 0.24f), O + 3, new Color(0.1f, 0.12f, 0.2f));
             { var ab = autoTrack.gameObject.AddComponent<Button>(); ab.Size = new Vector2(0.9f, 0.46f); ab.OnClick = () => OnAuto?.Invoke(); TipZone.Add(autoTrack, ab.Size, () => "자동 전투 — 카드 · 고학년을 저절로 냅니다 · 단축키 Q", 2); }
-            Make.Box("sep", tr, Res.UI("white"), (AutoAt + MenuAt) / 2 + new Vector3(0.1f, 0, 0), new Vector2(0.015f, 0.36f), O + 1, new Color(1, 1, 1, 0.3f));
+            Make.Box("sep", tr, Res.UI("white"), (SpeedAt + MenuAt) / 2 + new Vector3(0.1f, 0, 0), new Vector2(0.015f, 0.36f), O + 1, new Color(1, 1, 1, 0.3f));
             menuBg = IconBtn("menu", tr, MenuAt, "ic_menu", () => OnPause?.Invoke(), "메뉴 — 일시정지 · 설정 · 화면 · Esc");
 
-            // ── 왼쪽 가운데 — 턴 칩 · 웨이브 · 뽑을 더미 ──
-            Make.Sliced("turnbg", ml, Res.UI("cell_9s"), TurnAt, new Vector2(0.66f, 0.6f), O, new Color(1, 1, 1, 0.85f));
-            Txt("turnl", ml, "TURN", TurnAt + new Vector3(0, 0.16f, 0), 0.11f, O + 1, Tone.Sub, TextAlignmentOptions.Center, 0.2f);
-            turnText = Txt("turn", ml, "", TurnAt + new Vector3(0, -0.07f, 0), Tone.Lg, O + 1, Tone.Ink, TextAlignmentOptions.Center, 0.2f);
-            waveText = Txt("wave", ml, "", TurnAt + new Vector3(0, -0.46f, 0), 0.13f, O + 1, Tone.Sub, TextAlignmentOptions.Center, 0.26f);
-            TipZone.Add(turnText, new Vector2(0.7f, 0.9f), () => Snap == null ? null : Tip.Head($"{Snap.Turn}턴") + Tip.Dim($"  웨이브 {Snap.Wave} / {Snap.WaveCount}"), 2, new Vector2(0, -0.1f));
+            // ── 왼쪽 가운데 — 뽑을 더미 ──
             deckText = PileButton(ml, "deck", DeckAt, 0, "ic_pile_up", false, "뽑을 더미 — 다음에 뽑을 카드들(차례는 감춤). 누르면 봅니다 · 단축키 A");
 
-            // ── 오른쪽 가운데 — 무덤(버린 더미) · 소멸 ──
-            // 배속 — 원형 시계 단추(누를 때마다 1× ↔ 2×, 2× 면 금빛 고리)
-            speedBg = IconBtn("speed", mr, SpeedAt, "ic_clock", () => OnSpeed?.Invoke(), "전투 배속 1× · 2× — 단축키 Tab");
-            clockRing = Make.Box("clockring", mr, Res.UI("btn_round"), SpeedAt, new Vector2(0.62f, 0.62f), O + 1, new Color(1, 1, 1, 0.35f));
-            speedText = Txt("speedt", mr, "1×", SpeedAt + new Vector3(-0.42f, -0.02f, 0), Tone.Sm, O + 2, Tone.Sub, TextAlignmentOptions.Right, 0.24f);
+            // ── 오른쪽 가운데 — 무덤(버린 더미) ──
             discText = PileButton(mr, "disc", DiscAt, 1, "ic_pile_down", true, "무덤 — 낸 카드 · 버린 카드. 덱이 바닥나면 섞여 돌아옵니다. 누르면 봅니다 · 단축키 S");
-            goneText = PileButton(mr, "gone", GoneAt, 2, "ic_skull", true, "소멸 — 사라진 카드. 이 전투에서 다시 안 나옵니다.", 0.3f);
 
             // ── 왼쪽 아래 — 고학년 게이지(큰 % + 세로 칸) · 고학년 띠 셋 ──
             Make.Box("fadeBL", bl, Res.UI("hud_fade"), new Vector3(-6.4f, -3.0f, 0), new Vector2(3.6f, 3.4f), O - 6, new Color(1, 1, 1, 0.55f));
-            // 공용 게이지 머리 — 원작 공용 고학년 아이콘(사도 하나에 묶이지 않는 자리), 없으면 글
-            var ulIc = Res.Sprite("Art/ultimate_icon_common3");
-            if (ulIc != null) Make.Box("glbl", bl, ulIc, GaugeAt + new Vector3(0, 0.36f, 0), new Vector2(0.34f, 0.34f), O + 3);
-            else Txt("glbl", bl, "고학년", GaugeAt + new Vector3(0, 0.3f, 0), Tone.Cap, O + 3, Tone.Sub, TextAlignmentOptions.Center, 0.24f);
             gaugeText = Txt("gval", bl, "", GaugeAt, 0.4f, O + 3, Tone.Gold, TextAlignmentOptions.Center, 0.22f);
-            gaugeMaxText = Txt("gmax", bl, "", GaugeAt + new Vector3(0, -0.3f, 0), Tone.Cap, O + 3, Tone.Dim, TextAlignmentOptions.Center, 0.24f);
             // 세로 막대 — 바탕 · 부드러운 채움(아래부터) · 채움 끝 빛
             float gH = GBarTop - GBarBot, gMid = (GBarTop + GBarBot) / 2;
             gaugeBg = Make.Sliced("gbg", bl, Res.UI("bar_bg_9s"), new Vector3(GBarX, gMid, 0), new Vector2(GBarW + 0.06f, gH + 0.06f), O + 1, new Color(0.06f, 0.08f, 0.16f, 0.92f));
@@ -190,8 +183,8 @@ namespace Bolzena.UI
                 var nt = Txt("tickv" + n, bl, n.ToString(), new Vector3(GBarX - 0.2f, y, 0), 0.115f, O + 4, Tone.Sub, TextAlignmentOptions.Right, 0.3f);
                 ticks.Add((n, ln, nt));
             }
-            var gz = Make.Node("gzone", bl, new Vector3(GaugeAt.x, (GaugeAt.y + 0.4f + GBarBot) / 2, 0));
-            TipZone.Add(gz, new Vector2(0.9f, GaugeAt.y + 0.5f - GBarBot), () => Tip.Head("고학년 게이지") +
+            var gz = Make.Node("gzone", bl, new Vector3(GaugeAt.x, (GaugeAt.y + 0.25f + GBarBot) / 2, 0));
+            TipZone.Add(gz, new Vector2(0.9f, GaugeAt.y + 0.3f - GBarBot), () => Tip.Head("고학년 게이지") +
                 $"  {gauge}% / {gaugeMax}%\n파티가 함께 쓰는 게이지 — 카드에 쓴 AP 1 마다 +10%. 막대의 눈금은 사도마다 고학년에 드는 값, 그 선을 넘으면 그 사도 띠가 반짝입니다.", 2);
             for (int i = 0; i < s.Heroes.Count; i++)
                 Ults.Add(UltButton.Create(bl, s.Heroes[i], i, new Vector3(UltX, UltY0 - i * UltDy, 0)));
@@ -258,7 +251,7 @@ namespace Bolzena.UI
             return new Rect(t.position.x - StripW * k / 2, t.position.y - 0.25f * k, StripW * k, 0.5f * k);
         }
 
-        public Vector3 PilePos(int which) => which == 0 ? ML.At(DeckAt) : which == 1 ? MR.At(DiscAt) : MR.At(GoneAt);
+        public Vector3 PilePos(int which) => which == 0 ? ML.At(DeckAt) : MR.At(DiscAt);   // 소멸(2) 표시는 걷었다 — 무덤 자리
 
         // 화면 가장자리에 붙이기 — 무리마다 모서리로, 폰은 1.25배. 손패는 왼쪽 고학년 띠 · 오른쪽 턴 종료 사이
         void Anchor()
@@ -324,15 +317,16 @@ namespace Bolzena.UI
         {
             deckText.text = draw.ToString();
             discText.text = disc.ToString();
-            goneText.text = gone.ToString();
-            goneText.color = gone > 0 ? Tone.Ink : Tone.Dim;
         }
 
         public void SetSpeed(float v)
         {
-            speedText.text = v > 1 ? "2×" : "1×";
-            speedText.color = v > 1 ? Tone.Gold : Tone.Sub;
-            clockRing.color = v > 1 ? new Color(1f, 0.85f, 0.5f, 1f) : new Color(1, 1, 1, 0.35f);
+            bool fast = v > 1;
+            speedText.text = fast ? "2×" : "1×";
+            speedText.color = fast ? new Color(0.1f, 0.12f, 0.2f) : Tone.Ink;   // 금빛 트랙 위에서는 짙게(자동 켬 손잡이 아이콘과 같은 짝)
+            speedText.outlineWidth = fast ? 0f : 0.24f;
+            speedIcon.color = fast ? new Color(0.1f, 0.12f, 0.2f) : new Color(0.95f, 0.93f, 0.88f);
+            speedBg.color = fast ? new Color(0.85f, 0.66f, 0.28f, 0.95f) : new Color(0.08f, 0.1f, 0.2f, 0.85f);
         }
 
         public void SetAuto(bool on)
@@ -351,7 +345,7 @@ namespace Bolzena.UI
             due = 0;
             if (!s.Over)
                 foreach (var e in s.Enemies)
-                    if (!e.Dead && !e.Broken && !e.Sealed && (e.Intent == IntentKind.Attack || e.Intent == IntentKind.Heavy)) due += e.IntentValue * Mathf.Max(1, e.IntentHits);
+                    if (!e.Dead && !e.Broken && !e.Sealed && !e.IntentLater && (e.Intent == IntentKind.Attack || e.Intent == IntentKind.Heavy)) due += e.IntentValue * Mathf.Max(1, e.IntentHits);
             chips.Set(s.PartyChips);
             gauge = s.Gauge;
             gaugeMax = Mathf.Max(1, s.GaugeMax);
@@ -379,11 +373,7 @@ namespace Bolzena.UI
             }
         }
 
-        public void SetTurn(int turn, int wave, int waves)
-        {
-            turnText.text = turn.ToString();
-            waveText.text = $"WAVE {wave}/{waves}";
-        }
+        public void SetTurn(int turn, int wave, int waves) { }   // 턴 · 웨이브 표시는 걷었다(2026-10-07) — 부르는 곳은 그대로 둔다
 
         public bool OverEnd(Vector2 p) => Vector2.Distance(p, endBtn.transform.position) < (EndD / 2 + 0.04f) * Tone.K;
 
@@ -441,7 +431,6 @@ namespace Bolzena.UI
             // 고학년 게이지 — 큰 %(실제 값) · 부드러운 세로 채움 · 필요치 눈금
             gaugeShown = Mathf.MoveTowards(gaugeShown, gauge, Time.unscaledDeltaTime * Mathf.Max(120f, Mathf.Abs(gauge - gaugeShown) * 4f));
             gaugeText.text = Mathf.RoundToInt(gaugeShown) + "<size=45%>%</size>";
-            gaugeMaxText.text = "/ " + gaugeMax + "%";
             {
                 float gH = GBarTop - GBarBot, gf = Mathf.Clamp01(gaugeShown / gaugeMax), fh = gH * gf;
                 bool any = false;

@@ -15,11 +15,16 @@ namespace Bolzena.RunUI
     public partial class Flow
     {
         const string DefaultLobbyHero = "에르핀";
+        /// <summary>로비 스탠딩 상한(화면 높이 몫) — 2026-10-07 사용자: 예전 93% 는 「에르핀이 너무 크다」 · 넓은 화면에서 다리가 잘렸다 → 85%(기준 키 사도의 몸 = 화면 높이의 79%).</summary>
+        const float LobbyCap = 0.85f;
+
+        /// <summary>점검용(데모) — 저장(PlayerPrefs)을 건드리지 않고 로비 메인 사도를 바꿔 세운다.</summary>
+        public static string DemoLobbyHero;
 
         /// <summary>저장된 메인 사도 — 없거나 스탠딩 스파인이 없으면 에르핀.</summary>
         public static HeroInfo LobbyHeroInfo()
         {
-            var h = Roster.ByKey(Settings.LobbyHero);
+            var h = Roster.ByKey(DemoLobbyHero ?? Settings.LobbyHero);
             if (h == null || h.art == null || SpineUi.Data("st_" + h.art) == null) h = Roster.ByKey(DefaultLobbyHero);
             return h;
         }
@@ -39,15 +44,15 @@ namespace Bolzena.RunUI
             float aw = Mathf.Min(w, hgt * 1.1f);
             var area = Ui.Rect("stand", host);
             area.anchorMin = area.anchorMax = area.pivot = Vector2.zero;
-            area.sizeDelta = new Vector2(aw, hgt); area.anchoredPosition = new Vector2(40 + (w - aw) / 2, -Stage.Size.y * 0.012f);
-            var sg = h != null ? SpineUi.Standing(area, h.art, aw, hgt * 0.97f, StandMode.Full, 0, 0) : null;
+            area.sizeDelta = new Vector2(aw, hgt); area.anchoredPosition = new Vector2(40 + (w - aw) / 2, Stage.Size.y * 0.03f);   // 발이 화면 아래 끝에서 3% 위(2026-10-07 「에르핀 다리가 잘려」 — 예전 −1.2% 는 넓은 화면에서 발이 잘렸다)
+            var sg = h != null ? SpineUi.Standing(area, h.art, aw, hgt * 0.86f, StandMode.Full, 0, 0, "lobby") : null;   // 떠 있는 사도는 얼굴을 기준 얼굴 높이에(standing_center_fix.json float · _faceRef)
             if (sg != null)
             {
                 if (Array.IndexOf(Environment.GetCommandLineArgs(), "-testbig") >= 0) sg.rectTransform.localScale *= 2.2f;   // 점검: 배율이 어긋난 빌드 흉내(웹 「너무 큼」)
-                // 마지막 울타리 — 그려진 크기가 화면 높이의 93% 를 넘거나 칸 폭을 넘으면 발을 두고 줄인다(빌드 · 배율이 달라도). 레이아웃이 자리 잡은 뒤 한 번 더
-                SpineUi.ClampInto(sg, area, Stage.Root, 0.93f);
+                // 마지막 울타리 — 그려진 크기가 화면 높이의 LobbyCap(85%) 를 넘거나 칸 폭을 넘으면 발을 두고 줄인다(빌드 · 배율이 달라도). 레이아웃이 자리 잡은 뒤 한 번 더
+                SpineUi.ClampInto(sg, area, Stage.Root, LobbyCap, StandingFit.Floats(h.art));
                 var sg0 = sg;
-                Tw.After(0.1f, () => { if (sg0 && area) SpineUi.ClampInto(sg0, area, Stage.Root, 0.93f); });
+                Tw.After(0.1f, () => { if (sg0 && area) SpineUi.ClampInto(sg0, area, Stage.Root, LobbyCap, StandingFit.Floats(h.art)); });
                 return sg;
             }
             var full = h != null ? CardArt.Standing(h.art) : null;

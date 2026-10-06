@@ -36,14 +36,15 @@ namespace Bolzena.Core
             if (!e.Phased && e.Step == 0 && d.Open != null) it = d.Open;
             else if (d.Pick == "shuffle")
             {
-                // 같은 종류를 세 번 잇지 않는다
+                // 같은 종류를 세 번 잇지 않는다 · 힘 모으기는 CHARGE_GAP 동안 다시 안 고른다 · 꽉 찬 소환은 안 고른다
                 string a = e.Hist.Count >= 2 ? e.Hist[e.Hist.Count - 2] : null, b = e.Hist.Count >= 1 ? e.Hist[e.Hist.Count - 1] : null;
                 var src = ok.Count > 0 ? ok : list;
-                var pool = src.Where(x => !(a != null && a == b && x.T == a)).ToList();
+                var pool = src.Where(x => !(a != null && a == b && x.T == a) && ShuffleOk(e, x)).ToList();
+                if (pool.Count == 0) pool = src.Where(x => !(a != null && a == b && x.T == a)).ToList();
                 if (pool.Count == 0) pool = src;
-                double total = pool.Sum(x => x.WOr1);
+                double total = pool.Sum(x => ShuffleW(e, x));
                 double r = Rng.Next() * total;
-                it = pool.FirstOrDefault(x => (r -= x.WOr1) < 0) ?? pool[pool.Count - 1];
+                it = pool.FirstOrDefault(x => (r -= ShuffleW(e, x)) < 0) ?? pool[pool.Count - 1];
             }
             else
             {
@@ -55,6 +56,53 @@ namespace Bolzena.Core
             e.Intent = it;
             e.Hist.Add(it.T);
             e.Step++;
+            if (it.T == "charge" && it.Next != null && it.Next.T != "ult")
+                Cue("foeChargeWarn", e, new Cue { Name = it.Next.Say, Say = it.Say, V = ChargeHit(e) ?? 0, T = it.Next.T });
+        }
+
+        // ── 무작위(shuffle) 고르기 ─────────────────────────────────────
+        /// <summary>힘 모으기(charge)를 고른 뒤 이만큼의 고르기 동안은 다시 안 고른다(모은 수를 쏟는 턴은 고르기가 아니다 — 힘 모으기 → 쏟기 → 둘 → 다시 모으기 가 가장 빠르다).</summary>
+        public const int CHARGE_GAP = 2;
+        /// <summary>회복 수 — 적 모두가 이 비율 위면 무게를 HEAL_IDLE 배로(다친 동료가 없을 때 회복만 하다 턴을 버리지 않게).</summary>
+        public const double HEAL_NEED = 0.75, HEAL_IDLE = 0.25;
+
+        /// <summary>무작위로 고를 수 있나 — 힘 모으기 간격 · 소환 상한(같은 적 max · 자리 MAX_FOES).</summary>
+        bool ShuffleOk(Unit e, Intent x)
+        {
+            if (x.T == "charge")
+            {
+                for (int k = 1; k <= CHARGE_GAP && k <= e.Hist.Count; k++) if (e.Hist[e.Hist.Count - k] == "charge") return false;
+                return true;
+            }
+            if (x.T == "summon")
+            {
+                var alive = AliveEnemies();
+                if (alive.Count >= MAX_FOES) return false;
+                if (x.Max > 0 && alive.Count(u => u.Key == x.Id) >= x.Max) return false;
+            }
+            return true;
+        }
+
+        /// <summary>무작위 무게 — 데이터 w(기본 1)에 형편을 곱한다. 회복은 다친 동료가 있을 때, 강인도 회복 수는 강인도가 반 아래일 때 더 자주.</summary>
+        double ShuffleW(Unit e, Intent x)
+        {
+            double w = x.WOr1;
+            if (x.T == "heal" && !Enemies.Any(p => p.Dead && p.Feign) && AliveEnemies().All(p => p.Hp >= p.MaxHp * HEAL_NEED)) w *= HEAL_IDLE;
+            if ((x.Tough > 0 || x.T == "brace") && e.ToughMax > 0)
+            {
+                if (e.Tough < e.ToughMax * 0.5) w *= 2;
+                else if (e.Tough >= e.ToughMax) w *= 0.5;
+            }
+            return w;
+        }
+
+        /// <summary>힘 모으기(charge) 중인 적의 다음 턴 피해 — 머리 위 「공격 예고 중」 칸에 크게 보일 값(층 배율 · 약화 · 사기, multi 는 합). 고학년 예고도 같다. 예고가 아니거나 치지 않는 수면 null.</summary>
+        public int? ChargeHit(Unit e)
+        {
+            var n = e?.Intent?.T == "charge" ? e.Intent.Next : null;
+            if (n == null) return null;
+            if (n.T == "ult") return UltHitOf(e, n);
+            return IsHit(n.T) ? Dealt(e, AllX(n)) * (n.T == "multi" ? Math.Max(1, n.N) : 1) : (int?)null;
         }
 
         // ── 보스 클론의 고학년(BossUlt) ────────────────────────────────
@@ -103,6 +151,8 @@ namespace Bolzena.Core
             var use = e.Intent.T == "ult" ? e.Intent : e.Intent.Next;
             Say($"{e.Name}: {why} — 고학년 「{use.Say}」 이(가) 끊겼다");
             Cue("foeUltCut", e, new Cue { Hero = use.Id, Name = use.Say, Label = why, T = e.Intent.T });
+            // 끊는 보상 — 모은 힘이 되튀어 무방비(취약). 면역이면 막힌다
+            if (BossUlt.CUT_VULN > 0 && AddSt(e, "취약", BossUlt.CUT_VULN)) { StatusCue(e, "취약"); Say($"{e.Name}: 고학년이 끊겨 무방비 — 취약 +{BossUlt.CUT_VULN}"); }
         }
 
         bool IntentOk(Unit e, Intent it)
@@ -474,17 +524,14 @@ namespace Bolzena.Core
             if (!e.Dead) Cue("foeUltEnd", e, new Cue { Hero = it.Id, Name = it.Say });
         }
 
-        /// <summary>맞는 자리(연출) — 피해는 늘 파티 몸으로 간다. 앞줄부터(관통은 뒷줄부터), 같은 열이면 파티 순서가 뒤인 사도.</summary>
-        Unit PickTarget(bool fromBack)
+        /// <summary>맞는 모습을 보일 사도(연출 · 성격 상성) — 피해는 늘 파티 몸으로 간다. 사도에게 열은 없다: 편성 순서 맨 앞 사도, 관통은 맨 뒤 사도.</summary>
+        Unit PickTarget(bool fromBack) => PickInOrder(AliveParty().ToList(), fromBack);
+
+        /// <summary>편성 순서로 맞을 사도 — 앞(Idx 가 작은)부터, 관통은 뒤부터. 봇(Bots.PickT)도 같은 셈.</summary>
+        public static Unit PickInOrder(List<Unit> live, bool fromBack)
         {
-            var live = AliveParty().ToList(); if (live.Count == 0) return null;
-            var order = fromBack ? R.ROWS.Reverse().ToArray() : R.ROWS;
-            foreach (var r in order)
-            {
-                var inRow = live.Where(u => u.Row == r).ToList();
-                if (inRow.Count > 0) return inRow.Aggregate((a, b) => fromBack ? (b.Idx < a.Idx ? b : a) : (b.Idx > a.Idx ? b : a));
-            }
-            return live[0];
+            if (live.Count == 0) return null;
+            return live.Aggregate((a, b) => fromBack ? (b.Idx > a.Idx ? b : a) : (b.Idx < a.Idx ? b : a));
         }
 
         /// <summary>적이 치는 값 — 층 배율 · 약화(-25%) · 사기(겹마다 +20%).</summary>

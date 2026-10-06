@@ -28,6 +28,8 @@ namespace Bolzena.RunUI
         Color baseColor;
         /// <summary>못 누르는 까닭 — 누르면 짧게 알린다.</summary>
         public string Why;
+        /// <summary>올리거나 눌러도 크기를 바꾸지 않는다(밝아짐 · 테두리만) — 곁의 판과 붙어 있는 큰 칸.</summary>
+        public bool NoScale;
 
         public bool Interactable
         {
@@ -108,7 +110,7 @@ namespace Bolzena.RunUI
                 held += Time.unscaledDeltaTime;
                 if (held >= 0.45f) { holdFired = true; down = false; Sfx.Click(); OnHold(); }
             }
-            target = !on ? 1 : down ? 0.94f : hover ? 1.035f : 1;
+            target = !on || NoScale ? 1 : down ? 0.94f : hover ? 1.035f : 1;
             if (Mathf.Abs(scale - target) < 0.0005f && !hover && !down)
             {
                 if (scale != 1) { scale = 1; transform.localScale = Vector3.one; }

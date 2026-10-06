@@ -20,6 +20,8 @@ namespace Bolzena.RunUI
         public static void Apply()
         {
             AudioListener.volume = Master;
+            // 소리 점검(헤드리스 하네스가 이 줄을 읽는다) — 배포판은 시험 음소거(TestMute)가 꺼져 있어야 한다
+            Debug.Log($"[Audio] 전체 {Master:0.00} · 효과음 {SfxVol:0.00} · 목소리 {Voice:0.00} · AudioListener.volume {AudioListener.volume:0.00} · pause {AudioListener.pause} · 시험 음소거 {(TestMute.On ? "켬" : "꺼짐")}");
         }
     }
 }

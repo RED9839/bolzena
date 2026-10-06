@@ -134,6 +134,26 @@ def main():
         na = sum(ex.map(audio, ajobs, chunksize=16))
     print("고학년 소리", na, "새로 ·", len(ajobs), "개")
 
+    # 1-c) 판 화면 효과음(runui Kit/Sfx — Resources/RunArt/Sfx/<키>) — 없으면 로비 · 마을 · 지도 · 상점이 통째로 조용했다(2026-10-06 「소리 안 난다」).
+    #   고른 원작 파일은 옛 웹판 js/data/sfx-map.js 의 화면 소리와 같다
+    RUN_SFX = {
+        "click": "sfx_common_buttontouch",          # 단추 누름(웹판 ui.click)
+        "step": "sfx_selectstage",                  # 지도 칸으로 이동(map.step)
+        "coin": "sfx_battlecoinupdate",             # 골드 오감(coin)
+        "equip": "sfx_ingame_artifactequip",        # 장비 끼움(card.강화)
+        "heal": "hero/asana/asana_powerattck_heal", # 휴식 회복(heal)
+        "win": "sfx_victory",                       # 전투 승리(victory)
+        "lose": "sfx_stage_fail",                   # 패배(defeat)
+        "reveal": "sfx_ingame_getitemreward",       # 카드 · 신탁 받기(reward.card)
+        "reveal_open": "sfx_common_opencontents",   # 신탁 펼침(event.open)
+        "reveal_hover": "sfx_deck_changeskillinfo", # 신탁 칸 올림(card.hover)
+        "reveal_reborn": "sfx_card_levelup",        # 신탁 붙음(camp.train)
+    }
+    run_dst = os.path.join(PROJ, "Assets", "Resources", "RunArt", "Sfx")
+    rjobs = [(f"{SRC}/sfx/{v}.ogg", f"{run_dst}/{k}.wav") for k, v in RUN_SFX.items() if os.path.exists(f"{SRC}/sfx/{v}.ogg")]
+    nr = sum(audio(j) for j in rjobs)
+    print("판 화면 효과음", nr, "새로 ·", len(rjobs), "개")
+
     # 2-b) 원작 적 정지 아이콘(monster/icon_*.png → Resources/Art/Monster) — 스킨이 없는 적의 안전판 · 적 도감
     m = 0
     for f in sorted(os.listdir(f"{SRC}/monster")):

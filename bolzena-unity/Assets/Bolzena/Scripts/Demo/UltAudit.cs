@@ -306,6 +306,10 @@ namespace Bolzena.Demo
             int useAt = int.TryParse(Arg("-ultaudit-useult"), out var ua) ? ua : -1;   // 그 내 턴에 사도 0 의 고학년을 쓴다(보스 끊기 — 기절)
             for (int i = 0; i < turns && !d.Over; i++)
             {
+                // -ultaudit-break charge|spend — 힘 모으는(쏟을) 적이 보이는 첫 내 턴에 그 적 강인도를 거의 0 으로 하고 고학년을 써 격파 → 「끊김」을 본다
+                string brk = Arg("-ultaudit-break");
+                bool breakNow = brk != null && useAt < 0 && d.Battle.CanUlt(0, out _) && (d.Battle as CoreBattle) != null && (d.Battle as CoreBattle).AuditNearBreak(brk == "spend");
+                if (breakNow) { useAt = i + 1; d.RefreshAll(); cap.Still($"foe_{hid}_b{n++:000}"); }
                 if (i + 1 == useAt && d.Battle.CanUlt(0, out _))
                 {
                     d.RequestUlt(0);

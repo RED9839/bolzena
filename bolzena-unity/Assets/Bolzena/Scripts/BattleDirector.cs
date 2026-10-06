@@ -88,6 +88,9 @@ namespace Bolzena
             }
             StartCoroutine(Main());
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-layoutshot") >= 0) StartCoroutine(LayoutShot());
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-cardartsheet") >= 0) Demo.CardArtSheet.Attach(this);
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-cardpicsheet") >= 0) Demo.CardPicSheet.Attach(this);   // 원작 그림 카드 전후 시트(그림 자리 — CardArt.Place)
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-cardtextshot") >= 0) Demo.CardTextShot.Attach(this);   // 카드 글 가독성 점검(대표 카드 확대 + 낱말 판)   // 카드 그림 시트(135명 대표 카드 — 손패 · 확대 모습)
         }
 
         // -layoutshot <이름> — 첫 입력 대기에서 화면을 한 장 찍고(<-captures>/<이름>_<가로>x<세로>.png) 적 자리 겹침을 적은 뒤 끝낸다(배치 점검)
@@ -912,6 +915,9 @@ namespace Bolzena
                     break;
                 case EventKind.FoeUlt:
                     yield return FoeUltFx(e);
+                    break;
+                case EventKind.FoeCharge:
+                    yield return FoeChargeFx(e);
                     break;
                 case EventKind.Form:
                     yield return FormFx(e);

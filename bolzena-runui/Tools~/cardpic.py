@@ -17,7 +17,14 @@ FACE_Y = 0.35   # 얼굴이 창 위에서 몇 할 자리에 오나(아래 4할�
 # 성격 색(Theme.NatureCard — 투명 그림(싸우는 SD · 물건) 뒤 바탕)
 NATURE = {"순수": (0x4C, 0xB8, 0x3A), "광기": (0xE0, 0x48, 0x48), "냉정": (0x18, 0xC2, 0xE6),
           "우울": (0x8A, 0x5C, 0xE6), "활발": (0xE6, 0xC2, 0x1A), "공명": (0xF0, 0xA0, 0x70)}
-FLAT = ("story", "cg", "schedule")   # 장면 그림 — 자른다. 그 밖(btn · aside · present)은 투명 — 바탕 위에 통째로
+FLAT = ("story", "cg", "schedule")   # 장면 그림 — 자른다(창을 덮는다 · cover). 그 밖(btn · aside · present)은 투명 — 사물 · SD
+# 사물 · SD(투명 그림)는 2026-10-07 「카드 이미지가 너무 붕 뜬 것」 — 창 한 장으로 굽지 않고 따로 둔다(화면이 자리를 잡는다):
+#   RunArt/CardObj/<이름>.png = 알파 경계로 잘라 낸 그림 + 발밑 그림자(긴 변 OBJ_MAX 까지 줄임 · 4의 배수 판)
+#   RunArt/CardObj/_meta.json = {이름: [내용 x, y(위), 너비, 높이(판 px), 판 너비, 판 높이, 원본 내용 너비, 원본 내용 높이, 성격 번호]}
+#   RunArt/CardPic/_back_<성격 번호>.png = 성격 색 바탕(그라데이션 + 둥근 빛 · 그림 없음)
+#   자리 규칙은 runui CardArt.Place(판 W.Card · 전투 CardView 같은 함수) — 위 글 · 칩 아래 ~ 효과 판 장식 선 위 칸을 넉넉히 채우고 아래를 장식 선에 붙인다.
+OBJ_MAX = 320
+NATURES = ["순수", "광기", "냉정", "우울", "활발", "공명", ""]   # 바탕 번호(마지막 = 금빛 중립)
 
 
 def load():
@@ -48,7 +55,7 @@ def _crop(im, c):
     return im.crop((round(left), round(top), round(left + cw), round(top + ch))).resize((OUT_W, OUT_H), Image.LANCZOS)
 
 
-def _backdrop(nature):
+def _backdrop(nature, glow_box=(0.08, 0.14, 0.92, 0.66)):
     nc = NATURE.get(nature, (0xD9, 0xA4, 0x41))
     top = tuple(round(0x16 * 0.45 + v * 0.55) for v in nc)
     bot = (0x0A, 0x0F, 0x1C)
@@ -62,7 +69,8 @@ def _backdrop(nature):
     light = tuple(min(255, round(v * 0.6 + 255 * 0.4)) for v in nc)
     core = Image.new("L", (OUT_W, OUT_H), 0)
     from PIL import ImageDraw
-    ImageDraw.Draw(core).ellipse((OUT_W * 0.08, OUT_H * 0.14, OUT_W * 0.92, OUT_H * 0.66), fill=150)
+    gx0, gy0, gx1, gy1 = glow_box
+    ImageDraw.Draw(core).ellipse((OUT_W * gx0, OUT_H * gy0, OUT_W * gx1, OUT_H * gy1), fill=150)
     core = core.filter(ImageFilter.GaussianBlur(48))
     glow.paste(Image.new("RGBA", (OUT_W, OUT_H), light + (255,)), (0, 0), core)
     return Image.alpha_composite(bg, glow)
@@ -84,6 +92,58 @@ def _place(im, cat, nature):
     out = Image.alpha_composite(out, sh.filter(ImageFilter.GaussianBlur(10)))
     out.alpha_composite(im, (x, y))
     return out.convert("RGB")
+
+
+def nature_index(n):
+    return NATURES.index(n) if n in NATURES else len(NATURES) - 1
+
+
+def is_obj(p):
+    return bool(p.get("file")) and os.path.basename(p["file"]).split("__")[0] not in FLAT
+
+
+def bake_back(idx, dst):
+    """성격 바탕 한 장(128×180 — 부드러워 늘려도 된다). 둥근 빛은 창 위에서 2할 ~ 7할(사물이 서는 칸) 가운데."""
+    n = NATURES[idx]
+    big = _backdrop(n if n else None, (0.04, 0.2, 0.96, 0.72))
+    out = big.convert("RGB").resize((128, 180), Image.LANCZOS)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    out.save(dst, optimize=True)
+
+
+def bake_obj(p, dst):
+    """사물 · SD 그림 — 알파 경계로 자르고 발밑 그림자를 붙인다. 돌려주는 값 = _meta.json 한 줄."""
+    src = os.path.join(SRC, *p["file"].split("/")) + ".png"
+    if not os.path.exists(src):
+        return None
+    im = Image.open(src).convert("RGBA")
+    bb = im.getchannel("A").point(lambda a: 255 if a > 16 else 0).getbbox() or (0, 0) + im.size
+    im = im.crop(bb)
+    sw, sh = im.size
+    k = min(1.0, OBJ_MAX / max(sw, sh))
+    if k < 1:
+        im = im.resize((max(1, round(sw * k)), max(1, round(sh * k))), Image.LANCZOS)
+    w, h = im.size
+    # 판: 옆 · 아래로 그림자 자리. 4의 배수(크런치 · 웹 DXT)
+    px, pt, pb = round(w * 0.06) + 2, 2, round(h * 0.07) + 4
+    W, H = w + 2 * px, h + pt + pb
+    W, H = (W + 3) // 4 * 4, (H + 3) // 4 * 4
+    out = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    from PIL import ImageDraw
+    sh_ = Image.new("L", (W, H), 0)
+    cx, by = px + w / 2, pt + h
+    ImageDraw.Draw(sh_).ellipse((cx - w * 0.40, by - h * 0.045, cx + w * 0.40, by + h * 0.035), fill=150)
+    sh_ = sh_.filter(ImageFilter.GaussianBlur(max(2, h * 0.025)))
+    out.paste(Image.new("RGBA", (W, H), (0, 0, 0, 255)), (0, 0), sh_)
+    # 그림 자체의 흐린 그림자(옛 굽기와 같은 결 — 아래로 조금)
+    a = im.getchannel("A").point(lambda v: v * 0.45)
+    drop = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    drop.paste(Image.new("RGBA", im.size, (0, 0, 0, 255)), (px, pt + max(1, round(h * 0.02))), a)
+    out = Image.alpha_composite(out, drop.filter(ImageFilter.GaussianBlur(max(1.5, h * 0.015))))
+    out.alpha_composite(im, (px, pt))
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    out.save(dst, optimize=True)
+    return [px, pt, w, h, W, H, sw, sh, nature_index(p.get("nature"))]
 
 
 def bake(p, dst):

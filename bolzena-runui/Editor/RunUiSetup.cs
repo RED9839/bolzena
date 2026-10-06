@@ -194,11 +194,11 @@ namespace Bolzena.RunUI.EditorTools
             ti.textureCompression = TextureImporterCompression.CompressedHQ;
             if (p.Contains("/Sprites/")) ti.textureCompression = TextureImporterCompression.Uncompressed;
             ti.maxTextureSize = 2048;
-            if (p.Contains("/RunArt/Standing/") || p.Contains("/RunArt/CardPic/"))
+            if (p.Contains("/RunArt/Standing/") || p.Contains("/RunArt/CardPic/") || p.Contains("/RunArt/CardObj/"))
             {
                 // 사도 스탠딩 135장 — 목록 · 카드에서는 작게(밉맵 · 트라이리니어로 지글거리지 않게), 상세에서는 크게.
                 // 크런치 압축으로 빌드가 크게 붓지 않게 한다(그림 결이 부드러워 품질 차이가 잘 안 보인다)
-                // 카드 원작 그림(CardPic — 364×512, 고유 · 생성 카드)도 같은 설정
+                // 카드 원작 그림(CardPic — 364×512, 고유 · 생성 카드 · CardObj — 알파 경계로 자른 사물 · SD)도 같은 설정
                 ti.mipmapEnabled = true;
                 ti.mipmapFilter = TextureImporterMipFilter.KaiserFilter;
                 ti.filterMode = FilterMode.Trilinear;

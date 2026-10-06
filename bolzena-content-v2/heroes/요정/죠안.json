@@ -5,7 +5,6 @@
       "name": "죠안",
       "nature": "우울",
       "race": "요정",
-      "row": "mid",
       "role": "서포터",
       "star": 3,
       "hp": 720,
@@ -55,34 +54,45 @@
           }
         ]
       },
+      "keywords": [
+        {
+          "name": "형상",
+          "desc": "꿈속 계시를 받던 사제가 걸어온 모습 — 꿈결 → 심판 → 축복 차례로 순환",
+          "carrier": "self",
+          "cap": 3,
+          "wrap": true,
+          "stages": [
+            "꿈결",
+            "심판",
+            "축복"
+          ]
+        }
+      ],
       "passives": [
         {
-          "name": "서 있는 자리의 교리",
+          "name": "형상의 교리",
           "when": {
-            "on": "play"
+            "on": "fightStart"
           },
-          "conds": [
-            {
-              "c": "row",
-              "row": "front"
-            }
-          ],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "형상",
+              "v": 1
             }
           ]
         },
         {
-          "name": "서 있는 자리의 교리",
+          "name": "형상의 교리",
           "when": {
             "on": "play"
           },
           "conds": [
             {
-              "c": "row",
-              "row": "mid"
+              "c": "stack",
+              "id": "형상",
+              "n": 1,
+              "max": 1
             }
           ],
           "limit": {
@@ -97,14 +107,16 @@
           ]
         },
         {
-          "name": "서 있는 자리의 교리",
+          "name": "형상의 교리",
           "when": {
             "on": "play"
           },
           "conds": [
             {
-              "c": "row",
-              "row": "back"
+              "c": "stack",
+              "id": "형상",
+              "n": 2,
+              "max": 2
             }
           ],
           "limit": {
@@ -116,6 +128,26 @@
               "k": "status",
               "id": "사기",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "형상의 교리",
+          "when": {
+            "on": "play"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "형상",
+              "n": 3,
+              "max": 3
+            }
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
             }
           ]
         }
@@ -148,7 +180,7 @@
         {
           "id": "죠안_꿈결",
           "name": "꿈결 형상",
-          "desc": "꿈속 계시를 받던 때의 모습 — 어느 열에 서 있든 세 자리의 교리를 한꺼번에 행해 파티를 받침",
+          "desc": "꿈속 계시를 받던 때의 모습 — 어느 형상이든 세 교리를 한꺼번에 행해 파티를 받침",
           "turns": 2,
           "cards": {
             "죠안_s1": "죠안_f1"
@@ -250,15 +282,11 @@
     },
     {
       "id": "죠안_u1",
-      "name": "순례의 걸음",
+      "name": "계시의 기도",
       "hero": "죠안",
       "unique": true,
       "cost": 0,
       "type": "스킬",
-      "choices": [
-        "앞으로",
-        "뒤로"
-      ],
       "fx": [
         {
           "k": "stack",
@@ -266,20 +294,9 @@
           "v": 1
         },
         {
-          "k": "ifChoice",
-          "n": 1
-        },
-        {
-          "k": "moveRow",
-          "id": "front"
-        },
-        {
-          "k": "ifChoice",
-          "n": 2
-        },
-        {
-          "k": "moveRow",
-          "id": "back"
+          "k": "stack",
+          "id": "형상",
+          "v": 1
         }
       ],
       "oracles": [
@@ -292,25 +309,14 @@
               "v": 3
             },
             {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "moveRow",
-              "id": "front"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "moveRow",
-              "id": "back"
+              "k": "stack",
+              "id": "형상",
+              "v": 1
             }
           ]
         },
         {
-          "name": "발 빠른 순례",
+          "name": "발 빠른 기도",
           "tags": [
             "신속"
           ],
@@ -321,25 +327,14 @@
               "v": 1
             },
             {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "moveRow",
-              "id": "front"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "moveRow",
-              "id": "back"
+              "k": "stack",
+              "id": "형상",
+              "v": 1
             }
           ]
         },
         {
-          "name": "앞서 걷는 순례",
+          "name": "앞서는 기도",
           "tags": [
             "주도"
           ],
@@ -350,25 +345,14 @@
               "v": 2
             },
             {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "moveRow",
-              "id": "front"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "moveRow",
-              "id": "back"
+              "k": "stack",
+              "id": "형상",
+              "v": 1
             }
           ]
         },
         {
-          "name": "순례 일지",
+          "name": "기도 일지",
           "tags": [
             "보존"
           ],
@@ -379,25 +363,14 @@
               "v": 2
             },
             {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "moveRow",
-              "id": "front"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "moveRow",
-              "id": "back"
+              "k": "stack",
+              "id": "형상",
+              "v": 1
             }
           ]
         },
         {
-          "name": "새벽 순례",
+          "name": "새벽 기도",
           "tags": [
             "개전"
           ],
@@ -408,31 +381,20 @@
               "v": 2
             },
             {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "moveRow",
-              "id": "front"
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "moveRow",
-              "id": "back"
+              "k": "stack",
+              "id": "형상",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "성지의 이정표",
+          "name": "꿈길의 이정표",
           "kind": "draw"
         },
         {
-          "name": "순례자의 지팡이",
+          "name": "사제의 지팡이",
           "kind": "defUp"
         },
         {

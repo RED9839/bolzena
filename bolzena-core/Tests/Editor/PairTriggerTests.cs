@@ -177,7 +177,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("아군이 키워드 2개 이상을 소모하면", t.WhenText(new When { On = "spend", Who = "any", N = 2 }));
             Assert.AreEqual("아군의 연계 카드가 저절로 나가면", t.WhenText(new When { On = "link", Who = "any" }));
             Assert.AreEqual("사도마다 고유 효과 +1", t.Fx(new List<Fx> { new Fx { K = "feed", V = 1 } }));
-            Assert.AreEqual("파티 HP가 50% 이하이면: 드로우 1", t.Fx(new List<Fx> { new Fx { K = "ifHp", Pct = 0.5 }, new Fx { K = "draw", V = 1 } }));
+            Assert.AreEqual("파티 HP가 50% 이하이면 → 드로우 1", t.Fx(new List<Fx> { new Fx { K = "ifHp", Pct = 0.5 }, new Fx { K = "draw", V = 1 } }));
             Assert.AreEqual("졸개 2 부르기 (적이 3명 이상일 때)", new CardText(K.Data(enemies: "[{id:'m', name:'졸개', hp:1, intents:[{t:'jam', v:1}]}]")).Intent(new Intent { T = "summon", Id = "m", N = 2, If = new IntentIf { Allies = 3 } }));
         }
     }

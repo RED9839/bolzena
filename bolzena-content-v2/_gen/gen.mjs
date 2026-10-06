@@ -405,20 +405,23 @@ H.push({ id: '카렌', adj: ['화제의', '가벼운', '떡상한', '예약된',
     { name: '근본 생식 챌린지', noun: '챌린지', cost: 1, type: '스킬', fx: [K('구독자', 3), DR(1)] },
   ] });
 
-// 20 죠안 — 서 있는 자리의 교리(태세형)
-const DOC = '서 있는 자리의 교리';
+// 20 죠안 — 형상의 교리(태세형 · 꿈결 → 심판 → 축복 순환). 옛 「서 있는 자리의 교리」(열 조건 · moveRow)는 사도 열을 걷어 내며 바꿈(2026-10-06)
+const DOC = '형상의 교리';
+const FORM = n => ({ conds: [{ c: 'stack', id: '형상', n, max: n }] });
 H.push({ id: '죠안', adj: ['경건한', '가벼운', '목도한', '간직한', '교리의'],
-  keyword: { name: '목도', desc: '교주 곁에서 보고 들은 것 — 자리를 옮길 때마다 쌓인다', carrier: 'self', cap: 3 },
+  keyword: { name: '목도', desc: '교주 곁에서 보고 들은 것', carrier: 'self', cap: 3 },
+  keywords: [{ name: '형상', desc: '꿈속 계시를 받던 사제가 걸어온 모습 — 꿈결 → 심판 → 축복 차례로 순환', carrier: 'self', cap: 3, wrap: true, stages: ['꿈결', '심판', '축복'] }],
   passives: [
-    P(DOC, { on: 'play' }, [SH(0.4)], { conds: [{ c: 'row', row: 'front' }] }),
-    P(DOC, { on: 'play' }, [DR(1)], { conds: [{ c: 'row', row: 'mid' }], limit: T1 }),
-    P(DOC, { on: 'play' }, [ST('사기', 1)], { conds: [{ c: 'row', row: 'back' }], limit: { per: 'fight', n: 3 } }),
+    P(DOC, { on: 'fightStart' }, [K('형상', 1)]),
+    P(DOC, { on: 'play' }, [DR(1)], { ...FORM(1), limit: T1 }),
+    P(DOC, { on: 'play' }, [ST('사기', 1)], { ...FORM(2), limit: { per: 'fight', n: 3 } }),
+    P(DOC, { on: 'play' }, [SH(0.4)], FORM(3)),
   ],
   ult: { fx: [DD(1.5, 'allEnemies'), SH(3.0), K('목도', 2)] },
   syn: () => K('목도', 1),
   uniques: [
-    { name: '순례의 걸음', noun: '걸음', cost: 0, type: '스킬', choices: ['앞으로', '뒤로'], fx: [K('목도', 1), CH(1), { k: 'moveRow', id: 'front' }, CH(2), { k: 'moveRow', id: 'back' }],
-      o3: { tags: ['보존'], fx: [K('목도', 2), CH(1), { k: 'moveRow', id: 'front' }, CH(2), { k: 'moveRow', id: 'back' }] } },
+    { name: '계시의 기도', noun: '기도', cost: 0, type: '스킬', fx: [K('목도', 1), K('형상', 1)],
+      o3: { tags: ['보존'], fx: [K('목도', 2), K('형상', 1)] } },
     { name: '교리를 행하고', noun: '교리', cost: 3, type: '스킬', fx: [ST('사기', 2), ST('피해 감소', 3), PS('목도'), SH(1.0)] },
     { name: '무에서 빵을', noun: '빵', cost: 2, type: '스킬', fx: [HE(4.2), DR(2), K('목도', 1)] },
     { name: '사슬 심판', noun: '사슬', cost: 2, type: '공격', fx: [DD(1.5, 'allEnemies'), ST('약화', 1, 'allEnemies')] },
@@ -488,7 +491,7 @@ for (const h of H) {
   });
   for (const t of h.tokens || []) cards.push({ ...t, hero: h.id, token: true });
   const hero = {
-    id: h.id, name: d.ko, nature: d.nature, race: d.race, row: d.row, role: d.role, star: d.star,
+    id: h.id, name: d.ko, nature: d.nature, race: d.race, role: d.role, star: d.star,
     hp: d.hp, atk: d.atk, def: d.def, crit: d.crit, blurb: d.blurb,
     keyword: h.keyword, ...(h.keywords ? { keywords: h.keywords } : {}),
     passives: h.passives,

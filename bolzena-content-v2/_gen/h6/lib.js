@@ -57,7 +57,7 @@ function hero(h) {
   });
   for (const t of h.tokens || []) cards.push({ hero: id, token: true, ...t, id: t.id });
   const H = {
-    id, name: h.name, nature: h.nature, race: '용족', row: h.row, role: h.role, star: h.star,
+    id, name: h.name, nature: h.nature, race: '용족', role: h.role, star: h.star,
     hp: h.hp, atk: h.atk, def: h.def, crit: h.crit, blurb: h.blurb,
     keyword: h.keyword,
   };

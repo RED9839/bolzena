@@ -49,10 +49,15 @@ namespace Bolzena.View
             trauma = Mathf.Max(0, trauma - dt * 1.9f);
             roll = Mathf.Lerp(roll, 0, 1 - Mathf.Exp(-dt * 6f));
 
-            // 펀치는 용수철처럼 0 으로 돌아온다(살짝 넘친다)
-            float acc = -punch * 900f - punchVel * 38f;
-            punchVel += acc * dt;
-            punch += punchVel * dt;
+            // 펀치는 용수철처럼 0 으로 돌아온다(살짝 넘친다). 1/120초 조각으로 나눠 센다 — 한 프레임이 길면(≥ 67ms: 3440×1440 캡처 · 느린 PC)
+            //   한 번에 적분하면 용수철이 발산해 싸움터가 뒤집히고 끝없이 커졌다(2026-10-07)
+            for (float left = Mathf.Min(dt, 0.25f); left > 1e-5f; left -= 1f / 120f)
+            {
+                float h = Mathf.Min(left, 1f / 120f);
+                float acc = -punch * 900f - punchVel * 38f;
+                punchVel += acc * h;
+                punch += punchVel * h;
+            }
 
             float z = Zoom * (1 + punch);
             // 펀치 중심이 화면에서 그 자리에 머물도록 중심을 보정한다

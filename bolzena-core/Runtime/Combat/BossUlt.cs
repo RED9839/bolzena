@@ -21,27 +21,32 @@ namespace Bolzena.Core
         public const int FIRST = 2, EVERY = 4;
         /// <summary>층(1 · 2)마다 고학년 한 번의 기준 피해(원값 — 층 피해 배율은 전투가 따로 곱한다). 전체 공격이면 FOE_ALL_X 로 나눠 적는다.</summary>
         /// 2026-10-06 시뮬(9000판, 같은 씨앗) — 300 · 360 이면 완주 20.8% → 15.4%(-5.4%p), × 0.75 면 -1.9%p, × 0.65 면 -0.1%p → 210 · 250.
-        public static readonly int[] RAW = { 0, 210, 250 };
-        /// <summary>피해 없는 고학년(지원형)에 붙이는 피해 비율.</summary>
-        public const double SUPPORT_HIT = 0.6;
-        /// <summary>층마다 방어(실드 → 보스 방어) · 회복(치유 → 적 회복).</summary>
-        public static readonly int[] BLOCK = { 0, 100, 140 }, HEAL = { 0, 120, 160 };
+        /// 2026-10-07 사용자 「고학년이 너무 약한 감」 — 평소 수는 무작위 · 예고는 고학년만으로 바꾸며 300 · 360 으로 올렸다(난이도는 보스 몸 HP · 평소 피해로 맞춘다).
+        public static readonly int[] RAW = { 0, 300, 360 };
+        /// <summary>피해 없는 고학년(지원형)에 붙이는 피해 비율(2026-10-07 0.6 → 0.85).</summary>
+        public const double SUPPORT_HIT = 0.85;
+        /// <summary>층마다 방어(실드 → 보스 방어) · 회복(치유 → 적 회복). 2026-10-07 100 · 140 / 120 · 160 → 160 · 220 / 180 · 240.</summary>
+        public static readonly int[] BLOCK = { 0, 160, 220 }, HEAL = { 0, 180, 240 };
+        /// <summary>끊는 보상 — 예고 · 사용 턴에 격파 · 기절로 끊으면 그 보스에 취약(겹).</summary>
+        public const int CUT_VULN = 2;
         /// <summary>피해 비율 기준(135명 고학년 피해 비율 합의 가운데 값).</summary>
         public const double T_REF = 1.8;
         public const int MULTI_MAX = 5;
 
-        /// <summary>파티에 거는 디버프 — 사도 고학년이 적에게 거는 것 → 파티에(값 상한).</summary>
+        /// <summary>파티에 거는 디버프에 더하는 겹(2026-10-07 — 원작 값 + 1, 상한까지).</summary>
+        public const int DEBUFF_PLUS = 1;
+        /// <summary>파티에 거는 디버프 — 사도 고학년이 적에게 거는 것 → 파티에(값 + DEBUFF_PLUS, 상한).</summary>
         static readonly Dictionary<string, (string id, int cap)> DEBUFF = new()
         {
-            ["약화"] = ("약화", 2), ["취약"] = ("취약", 2), ["고통"] = ("고통", 3), ["충격"] = ("충격", 2), ["손상"] = ("손상", 2),
-            ["균열"] = ("균열", 3), ["잔불"] = ("고통", 2), ["그을림"] = ("고통", 2), ["미끄러움"] = ("미끄러움", 2),
+            ["약화"] = ("약화", 3), ["취약"] = ("취약", 3), ["고통"] = ("고통", 4), ["충격"] = ("충격", 3), ["손상"] = ("손상", 3),
+            ["균열"] = ("균열", 4), ["잔불"] = ("고통", 3), ["그을림"] = ("고통", 3), ["미끄러움"] = ("미끄러움", 2),
         };
         /// <summary>둔화 · 기절(적의 차례를 늦추는 것) → 파티의 다음 턴 AP -1.</summary>
         static readonly HashSet<string> TO_JAM = new() { "둔화", R.STUN, "행동 둔화" };
-        /// <summary>적 쪽 버프 — 사도 고학년이 파티에 거는 것 → 적 전체에(값 상한). 없는 것은 피해 감소 1.</summary>
+        /// <summary>적 쪽 버프 — 사도 고학년이 파티에 거는 것 → 적 전체에(값 상한). 없는 것은 피해 감소 2.</summary>
         static readonly Dictionary<string, (string id, int cap)> BUFF = new()
         {
-            ["사기"] = ("사기", 1), ["불굴"] = ("불굴", 2), ["결의"] = ("결의", 2), ["피해 감소"] = ("피해 감소", 2), ["면역"] = ("면역", 1),
+            ["사기"] = ("사기", 2), ["불굴"] = ("불굴", 3), ["결의"] = ("결의", 3), ["피해 감소"] = ("피해 감소", 3), ["면역"] = ("면역", 1),
         };
 
         /// <summary>손보정 — 자동 변환이 어색한 사도. Mul 피해 배율 · Hit 피해 꼴 강제(attackAll · attack · multi) · Add 덧붙일 수 · Drop 뺄 수 종류 · Note 까닭.</summary>
@@ -62,8 +67,8 @@ namespace Bolzena.Core
         public static readonly Dictionary<string, Fix> FIX = new()
         {
             // 치유가 몸통인 고학년 — 기본 적 회복(층 HEAL)만으론 원작 느낌이 안 산다. 크게 한 번 더 회복
-            ["카렌"] = new Fix { Add = new List<Intent> { new Intent { T = "heal", V = 150 } }, Note = "손보정: 방송 회복이 몸통 — 적 회복 한 번 더(150)" },
-            ["큐이"] = new Fix { Add = new List<Intent> { new Intent { T = "heal", V = 150 } }, Note = "손보정: 오이 회복이 몸통 — 적 회복 한 번 더(150)" },
+            ["카렌"] = new Fix { Add = new List<Intent> { new Intent { T = "heal", V = 200 } }, Note = "손보정: 방송 회복이 몸통 — 적 회복 한 번 더(200)" },
+            ["큐이"] = new Fix { Add = new List<Intent> { new Intent { T = "heal", V = 200 } }, Note = "손보정: 오이 회복이 몸통 — 적 회복 한 번 더(200)" },
             // 고유 효과 겹마다 치는 고학년 — 비율만 세면 겹(4) 몫이 빠진다
             ["쥬비"] = new Fix { Mul = 1.2, Note = "손보정: 「벌」 겹마다 피해 — 겹 4 몫으로 피해 × 1.2" },
             ["칸타"] = new Fix { Mul = 1.1, Note = "손보정: 「쇠팽이」 겹마다 전체 피해 — 피해 × 1.1" },
@@ -135,13 +140,13 @@ namespace Bolzena.Core
                             if (bad)
                             {
                                 if (TO_JAM.Contains(id)) { jam = 1; break; }
-                                if (DEBUFF.TryGetValue(id, out var m)) debuff[m.id] = Math.Max(debuff.TryGetValue(m.id, out var o) ? o : 0, Math.Min(m.cap, v));
+                                if (DEBUFF.TryGetValue(id, out var m)) debuff[m.id] = Math.Max(debuff.TryGetValue(m.id, out var o) ? o : 0, Math.Min(m.cap, v + DEBUFF_PLUS));
                                 else Drop($"{id}(파티에 걸 꼴 없음)");
                             }
                             else
                             {
                                 if (BUFF.TryGetValue(id, out var m)) buff[m.id] = Math.Max(buff.TryGetValue(m.id, out var o) ? o : 0, Math.Min(m.cap, v));
-                                else buff["피해 감소"] = Math.Max(buff.TryGetValue("피해 감소", out var o) ? o : 0, 1);
+                                else buff["피해 감소"] = Math.Max(buff.TryGetValue("피해 감소", out var o) ? o : 0, 2);
                             }
                             break;
                         }
@@ -175,7 +180,7 @@ namespace Bolzena.Core
             hit.Say = u.Name;
             rec.Raw = hit.T == "attackAll" ? Num.Round(hit.V * R.FOE_ALL_X) : hit.T == "multi" ? hit.V * hit.N : hit.V;
             if (hitAt >= 0) subs[hitAt] = hit; else subs.Insert(0, hit);
-            if (support) rec.Note = rec.Note ?? "피해 없는 고학년 — 기준의 60% 전체 공격을 붙였다";
+            if (support) rec.Note = rec.Note ?? $"피해 없는 고학년 — 기준의 {SUPPORT_HIT * 100:0}% 전체 공격을 붙였다";
 
             foreach (var kv in debuff) subs.Add(Db(kv.Key, kv.Value));
             if (jam > 0) subs.Add(new Intent { T = "jam", V = 1 });
@@ -205,7 +210,8 @@ namespace Bolzena.Core
             var tx = new CardText(d);
             var sb = new System.Text.StringBuilder();
             sb.Append("# 보스 클론 고학년 변환표\n\n");
-            sb.Append($"엔진 `Runtime/Combat/BossUlt.cs` 가 만든다(`bz bossult --out …`). 보스 클론이 {FIRST}턴째에 예고 → 다음 턴 사용, 그 뒤 {EVERY}턴마다. 예고 · 사용 턴에 격파(기절)하면 끊긴다.\n");
+            sb.Append($"엔진 `Runtime/Combat/BossUlt.cs` 가 만든다(`bz bossult --out …`). 보스 클론이 {FIRST}턴째에 예고 → 다음 턴 사용, 그 뒤 {EVERY}턴마다. 예고 · 사용 턴에 격파(기절)하면 끊기고, 끊긴 보스는 취약 {CUT_VULN}.\n");
+            sb.Append($"파티에 거는 디버프는 원작 값 + {DEBUFF_PLUS}(상한까지) · 피해 없는 고학년은 기준의 {SUPPORT_HIT * 100:0}% 전체 공격 · 방어 {BLOCK[1]} · {BLOCK[2]} · 회복 {HEAL[1]} · {HEAL[2]}(1층 · 2층).\n");
             sb.Append($"층은 사도 성급으로 잡았다(1~2성 → 1층 · 3성 → 2층). 예고 피해는 원값(층 피해 배율 · 상태 빼고) — 1층 기준 {RAW[1]} · 2층 기준 {RAW[2]}, 전체 공격은 화면에 × {R.FOE_ALL_X} 한 값.\n");
             sb.Append($"손보정 {FIX.Count}명(표에 ✎).\n\n");
             sb.Append("| 사도 | 층 | 고학년 | 원래 효과 | 보스 효과 | 예고 피해 | 뺀 것 · 메모 |\n|---|---|---|---|---|---|---|\n");

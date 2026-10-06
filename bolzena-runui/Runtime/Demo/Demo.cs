@@ -38,8 +38,9 @@ namespace Bolzena.RunUI
             if (Has("-phone")) tail = "_phone";
             Directory.CreateDirectory(dir);
             Debug.Log($"[Demo] captures → {dir} ({Screen.width}×{Screen.height})");
-            RunPort.ClearSave();
-            PlayerPrefs.DeleteKey("bz.calm");
+            bool keepPrefs = Has("-demo-settings");   // 설정 창 캡처는 저장 · 설정을 건드리지 않는다
+            bool arca = Has("-demo-arca");   // 소개 캡처 — 저장 · 설정을 지우지 않는다(-save 로 따로 둔 저장만 쓴다)
+            if (!keepPrefs && !arca) { RunPort.ClearSave(); PlayerPrefs.DeleteKey("bz.calm"); }
             // 감시 — 예외가 나거나 시간이 넘으면 오류 코드로 스스로 꺼진다(먹통으로 남지 않게)
             Application.logMessageReceived += (msg, stack, type) =>
             {
@@ -51,7 +52,7 @@ namespace Bolzena.RunUI
             StartCoroutine(AutoOwner());
             if (Has("-demo-loop")) { limit = float.TryParse(Arg("-demo-timeout"), out var ll) ? ll : 3600f; }
             StartCoroutine(Watchdog(limit));
-            StartCoroutine(Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
+            StartCoroutine(arca ? Arca_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
         }
 
         // 이벤트(-demo-events) — 꼴이 다른 이벤트 여섯(선택지 적음 · 많음 · 카드 고르기 · 신탁 · 전투 · 도박/판정)의 처음 화면 · 고른 뒤 결과를 찍고,
@@ -67,7 +68,7 @@ namespace Bolzena.RunUI
             yield return Wait(1.4f);
             yield return Press("go");
             yield return Screen_("party", 0.8f);
-            yield return Press("party.auto", 0.6f);
+            yield return PickParty(0.6f);
             yield return Press("party.go");
             yield return Screen_("map", 1.0f);
             f.P.S.Gold = Mathf.Max(f.P.S.Gold, 300);
@@ -482,7 +483,7 @@ namespace Bolzena.RunUI
             yield return Wait(1.4f);
             yield return Press("go");
             yield return Screen_("party", 0.8f);
-            yield return Press("party.auto", 0.8f);
+            yield return PickParty(0.8f);
             yield return Wait(0.6f);
             yield return Shot("party_foes");
             string Slots() => string.Join(",", f.Stage.ScreenLayer.GetComponentsInChildren<TMPro.TextMeshProUGUI>().Where(t => t.transform.parent != null && t.transform.parent.name == "plate").Select(t => t.text));
@@ -517,7 +518,7 @@ namespace Bolzena.RunUI
             yield return Wait(1.4f);
             yield return Press("go");
             yield return Screen_("party", 0.8f);
-            yield return Press("party.auto", 0.6f);
+            yield return PickParty(0.6f);
             yield return Press("party.go");
             yield return Screen_("map", 1.0f);
             var run = f.P.Run; var S = f.P.S; var d = f.P.Data;
@@ -922,26 +923,24 @@ namespace Bolzena.RunUI
             yield return Press(FirstHot("dexequip:"), 1.0f);
             yield return Shot("dex_equip_detail");
             yield return Press("zoom.close", 0.5f);
-            // 적 도감 — 전체 · 마을 하나 + 보스 · 상세
+            // 적 도감 — 몬스터 탭(성격 모습마다 한 장) · 상세 + 보스 클론 탭(사도 하나하나) · 클론 상세(자세한 점검은 -demo-foedex)
             yield return Press("tab:적", 1.0f);
             yield return Shot("dex_foes");
             yield return Press(FirstHot("dexfoe:"), 1.0f);
             yield return Shot("dex_foe_detail");
             yield return Press("zoom.close", 0.5f);
-            yield return Press("filter:보스", 0.8f);
+            yield return Press("foetab:보스 클론", 0.8f);
             yield return Shot("dex_foes_boss");
             yield return Press(FirstHot("dexfoe:"), 1.0f);
             yield return Shot("dex_foe_boss_detail");
             yield return Press("zoom.close", 0.5f);
-            yield return Press("filter:소환물", 0.8f);
-            yield return Press(FirstHot("dexfoe:"), 1.0f);
-            yield return Shot("dex_foe_summon_detail");
-            yield return Press("zoom.close", 0.5f);
+            yield return Press("foetab:몬스터", 0.8f);
             yield return Press("tab:사도", 1.0f);
             yield return Shot("dex_back_heroes");
-            if (tail == "") { StandingSheet(); yield return Wait(1.2f); yield return Shot("standing_sheet"); Destroy(sheet); }
+            // 정지 스탠딩 135장 · 스파인 12명을 한 프레임에 싣는 점검 시트 — 웹은 힙(2GB)을 넘기므로 PC 에서만
+            if (tail == "" && Application.platform != RuntimePlatform.WebGLPlayer) { StandingSheet(); yield return Wait(1.2f); yield return Shot("standing_sheet"); Destroy(sheet); }
             // 스탠딩 스파인 맞춤(standing_fit.json) — 같은 몸 키 px 로 전신 · 상반신을 나란히(바닥선 · 몸 크기 비 확인)
-            LiveSheet(); yield return Wait(1.5f); yield return Shot("standing_live"); Destroy(sheet);
+            if (Application.platform != RuntimePlatform.WebGLPlayer) { LiveSheet(); yield return Wait(1.5f); yield return Shot("standing_live"); Destroy(sheet); }
 
             // 판 하나 — 지도 · 덱 보기 · 카드 크게 · 싸움 · 보상(신탁 카드)
             f.Lobby();
@@ -951,7 +950,7 @@ namespace Bolzena.RunUI
             yield return Wait(1.4f);
             yield return Press("go");
             yield return Screen_("party", 0.8f);
-            yield return Press("party.auto", 0.6f);
+            yield return PickParty(0.6f);
             yield return Press("party.go");
             yield return Screen_("map", 1.4f);
             yield return Press("deck", 1.2f);
@@ -1076,7 +1075,7 @@ namespace Bolzena.RunUI
             foreach (var h in Roster.All.OrderBy(x => x.art, StringComparer.Ordinal))
             {
                 float x = 10 + (i % cols) * cw, y = -6 - (i / cols) * (ch + 12);
-                var sp = CardArt.Upper(h.art, 0.7f, 0.56f);
+                var sp = CardArt.Card(h.art);
                 var im = Ui.Img(layer, sp ?? h.Icon, sp != null ? Color.white : Color.white.A(0.5f), h.key);
                 im.rectTransform.At(0, 1, x + 1, y, cw - 2, ch);
                 var t = Ui.Text(layer, h.ko, 10, sp != null ? Theme.Ink : Theme.Bad, TMPro.TextAlignmentOptions.Top);
@@ -1173,7 +1172,7 @@ namespace Bolzena.RunUI
                 knee.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic = true;
                 SpineUi.Standing(knee.rectTransform, a, cw - 10, kneeH, StandMode.Knee, tall);
                 y -= kneeH + 6;
-                var card = Ui.Img(layer, CardArt.Upper(a, 0.71f, 0.56f), Color.white, "card " + a); card.rectTransform.At(0, 1, x + 8, y, cw - 16, cardH);
+                var card = Ui.Img(layer, CardArt.Card(a), Color.white, "card " + a); card.rectTransform.At(0, 1, x + 8, y, cw - 16, cardH);
                 y -= cardH + 6;
                 var face = Ui.Img(layer, Theme.S("circle"), Theme.NavyCell, "face " + a); face.rectTransform.At(0, 1, x + (cw - faceS) / 2, y, faceS, faceS);
                 face.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic = true;
@@ -1244,6 +1243,14 @@ namespace Bolzena.RunUI
 
         Btn Hot(string key) => f.Stage.Hot.TryGetValue(key, out var b) && b != null ? b : null;
 
+        /// <summary>편성 — 자리 1 칸을 눌러 사도 목록을 열고, 고를 수 있는 사도 셋을 차례로 넣고 닫는다(추천 편성은 없앴다 — 사용자 2026-10-06).</summary>
+        IEnumerator PickParty(float after = 0.6f)
+        {
+            yield return Press("slot0", 0.6f);
+            foreach (var k in Roster.All.Where(h => h.Playable).Take(3).Select(h => h.key).ToList()) yield return Press("hero:" + k, 0.25f);
+            yield return Press("list.done", after);
+        }
+
         IEnumerator Press(string key, float after = 0.5f)
         {
             var b = Hot(key);
@@ -1253,7 +1260,7 @@ namespace Bolzena.RunUI
             yield return Wait(after);
         }
 
-        // 짧은 판(-demo-quick) — 새 규칙이 판 처음부터 싸움까지 이어지는지만: 로비 → 마을 공개(판 속성 · 두 보스) → 편성(추천) → 판 열기
+        // 짧은 판(-demo-quick) — 새 규칙이 판 처음부터 싸움까지 이어지는지만: 로비 → 마을 공개(판 속성 · 두 보스) → 편성(사도 셋) → 판 열기
         //   (미리 보인 판 속성 · 보스 줄 = 실제 판의 것인지 대 본다) → 지도 → 싸움 둘(전투 화면이 붙으면 그쪽 봇) → 지도로 돌아오면 끝
         IEnumerator Quick()
         {
@@ -1268,7 +1275,7 @@ namespace Bolzena.RunUI
             var bossShown = f.FoeBosses?.Select(l => string.Join(",", l)).ToList();
             yield return Press("go");
             yield return Screen_("party", 1.0f);
-            yield return Press("party.auto", 0.6f);
+            yield return PickParty(0.6f);
             yield return Shot("quick_party");
             yield return Press("party.go");
             yield return Screen_("map", 1.4f);
@@ -1311,7 +1318,7 @@ namespace Bolzena.RunUI
         public static int LoopFights { get; private set; }
 
         // 연속 싸움(-demo-loop N, 기본 30) — 전투에 들고 나기를 거듭해 무엇이 쌓이는지 잰다(전투 쪽 EnterLeak 이 돌아올 때마다 센다).
-        //   로비 → 마을 → 편성(추천) → 지도에서 싸움 칸을 먼저 고른다(없으면 엘리트 · 보스 · 그 밖). 판이 끝나면 로비에서 새 판.
+        //   로비 → 마을 → 편성(사도 셋) → 지도에서 싸움 칸을 먼저 고른다(없으면 엘리트 · 보스 · 그 밖). 판이 끝나면 로비에서 새 판.
         IEnumerator Loop()
         {
             Looping = true;
@@ -1327,7 +1334,7 @@ namespace Bolzena.RunUI
                 yield return Wait(2.5f);
                 yield return Press("go");
                 yield return Screen_("party", 0.8f);
-                yield return Press("party.auto", 0.5f);
+                yield return PickParty(0.5f);
                 yield return Press("party.go");
                 for (int step = 0; step < 60 && LoopFights < want; step++)
                 {
@@ -1428,7 +1435,9 @@ namespace Bolzena.RunUI
             yield return Screen_("lobby", 1f);
             yield return Press("settings", 0.8f);
             yield return Shot("settings");
-            if (!Has("-no-display-try"))
+            yield return Press("settings.tab1", 0.6f);   // 해상도는 「화면」 탭에 있다
+            yield return Shot("settings_screen");
+            if (!Has("-no-display-try") && !DisplayOptions.Web)
             {
                 // 해상도 바꿔 보기 → 「이 화면으로 둘까요?」 → 되돌리기(데모는 창 크기를 남기지 않는다)
                 int pick = DisplayOptions.PresetIndex == 1 ? 2 : 1;

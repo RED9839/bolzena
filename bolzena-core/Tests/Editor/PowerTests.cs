@@ -89,7 +89,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("매일 다짐", chip.Id); Assert.AreEqual(1, chip.Stacks); Assert.AreEqual("party", chip.Layer); Assert.AreEqual("a", chip.Sources[0].Hero);
             var pv = b.PowersOf().Single();
             Assert.AreEqual("a", pv.Hero); Assert.AreEqual("pw_t", pv.Card); Assert.AreEqual(1, pv.Stacks);
-            StringAssert.Contains("매 턴 시작 시 결의 1", pv.Text);
+            StringAssert.Contains("매 턴 시작 시 → 결의 1", pv.Text);
             Assert.AreEqual(0, b.PowersOf("b").Count);
         }
 
@@ -114,8 +114,8 @@ namespace Bolzena.Core.Tests
         {
             var d = D();
             var tx = new CardText(d);
-            Assert.AreEqual("드로우 1. 이 전투 동안 매 턴 시작 시 결의 1", tx.Card(d.Card("pw_t")));
-            Assert.AreEqual("이 전투 동안 공격 카드를 낼 때마다 고학년 게이지 +5% (턴당 1회)", tx.Card(d.Card("pw_p")));
+            Assert.AreEqual("드로우 1\n이 전투 동안 매 턴 시작 시 → 결의 1", tx.Card(d.Card("pw_t")));
+            Assert.AreEqual("이 전투 동안 자신의 공격 카드를 낼 때마다 → 고학년 게이지 +5% (턴당 1회)", tx.Card(d.Card("pw_p")));
             Assert.AreEqual("이 전투 동안 공격력 +10%", tx.Card(d.Card("pw_a")));
             Assert.IsTrue(new CardText(d).Chips(d.View("pw_t")).Contains("결의"), "칩에 규칙 속 상태도");
         }

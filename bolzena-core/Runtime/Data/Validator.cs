@@ -20,7 +20,7 @@ namespace Bolzena.Core
         static readonly HashSet<string> WHEN_ON = new() { "fightStart", "turnStart", "turnEnd", "play", "guard", "break", "kill", "hurt", "lowHp", "rush", "ult", "debuff", "overheal", "stackReach", "stackGone", "stackOver", "reserveGone", "switch", "rhythm", "always",
             "discard", "pay", "exhaust", "huntDown", "blocked", "spend", "link", "crit", "make",
             "drawn", "shuffle", "extra", "hit", "shieldBreak", "foeShieldBreak", "foeGuard", "foeAct", "foeActBefore", "endure", "unwound" };
-        static readonly HashSet<string> CONDS = new() { "stack", "hp", "hpMin", "status", "foes", "foesMax", "row", "playedMin", "playedMax", "ownNone", "apLeft", "gauge", "guarded", "rushed", "hurtLast", "killedLast", "firstTurn", "targetBroken",
+        static readonly HashSet<string> CONDS = new() { "stack", "hp", "hpMin", "status", "foes", "foesMax", "playedMin", "playedMax", "ownNone", "apLeft", "gauge", "guarded", "rushed", "hurtLast", "killedLast", "firstTurn", "targetBroken",
             "repeat", "held", "spent", "balanced", "debuffs", "paid", "wounded", "onlyMe", "ally", "inDebt", "heldCards", "idleLast", "typeNew" };
         static readonly HashSet<string> INTENTS = new() { "attack", "back", "attackAll", "multi", "charge", "block", "guard", "heal", "buff", "debuff", "jam", "addCard", "summon",
             "count", "cardDebuff", "handCost", "reshuffle", "autoPlay", "shift", "brace" };
@@ -137,7 +137,6 @@ namespace Bolzena.Core
                         if (f.K == FxK.Pull && f.To != null && f.To != "hand" && f.To != "top") E($"{w}: to 는 hand · top");
                         if (f.At != null && f.At != "top" && f.At != "bottom" && f.At != "random") E($"{w}: at 은 top · bottom · random");
                         effects++; break;
-                    case FxK.MoveRow: if (Array.IndexOf(R.ROWS, f.Id) < 0) E($"{w}: id 는 front · mid · back"); effects++; break;
                     case FxK.GrowRun: if (f.Id != null && f.Id != "atk" && f.Id != "def" && f.Id != "crit") E($"{w}: id 는 atk · def · crit"); if (f.V == 0) E($"{w}: v 가 없다"); effects++; break;
                     case FxK.Stack: case FxK.Spend:
                         if (f.Id == null || !keywords.Contains(f.Id)) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」");
@@ -249,7 +248,7 @@ namespace Bolzena.Core
             if (string.IsNullOrEmpty(h.Name)) E($"{at}: name 이 없다");
             if (Array.IndexOf(R.ROLES, h.Role) < 0) E($"{at}: role 은 탱커 · 서포터 · 딜러");
             if (h.Nature != null && Array.IndexOf(R.NATURES, h.Nature) < 0) E($"{at}: 모르는 성격 {h.Nature}");
-            if (Array.IndexOf(R.ROWS, h.Row) < 0) E($"{at}: row 는 front · mid · back");
+            if (h.HadRow) W($"{at}: row 는 이제 쓰지 않는다(사도 열은 없다 — 맞는 모습은 편성 순서) — 지워라");
             if (h.Hp <= 0 || h.Atk <= 0) E($"{at}: hp · atk 가 없다");
             foreach (var id in h.Starter) { var c = d.Card(id); if (c == null) E($"{at}: 없는 시작 카드 {id}"); else if (c.Hero != h.Id) E($"{at}: 시작 카드 {id} 의 주인이 다르다"); }
             if (h.Starter.Count == 0) W($"{at}: 시작 카드가 없다");
@@ -262,6 +261,7 @@ namespace Bolzena.Core
                 else if (!Used(h, k.Name)) W($"{at}: 고유 효과 「{k.Name}」 이 어디에도 안 쓰인다(카드 · 패시브 · 고학년 · 규칙의 stack · spend · ifStack · perStack · payWith …)");
                 if (!CARRIERS.Contains(k.Carrier)) E($"{at}: 키워드 carrier 는 self · enemy · ally · hero");
                 if (k.Wrap && k.Cap == null) E($"{at}: wrap(순환)은 cap 이 있어야 한다");
+                if (k.Stages != null && (k.Cap == null || k.Stages.Count != k.Cap || k.Stages.Any(string.IsNullOrWhiteSpace))) E($"{at}: 「{k.Name}」 stages(단계 이름)는 cap 과 개수가 같아야 한다");
                 if (k.Weakens && k.Carrier != "enemy") E($"{at}: weakens 는 적에게 거는 표식(carrier enemy)에만");
                 if (k.Guard && k.Carrier != "self" && k.Carrier != "hero") E($"{at}: guard(소환물)는 carrier self · hero 에만");
                 if (k.Cut > 0 && (!k.Guard || k.Cut > 1)) E($"{at}: cut 은 guard 와 같이(0~1)");

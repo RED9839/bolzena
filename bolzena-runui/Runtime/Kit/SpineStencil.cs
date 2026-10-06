@@ -11,7 +11,10 @@ namespace Bolzena.RunUI
     // SkeletonData 는 SkeletonDataAsset 이 붙들고 있어 한 번 고치면 전투 · 판 화면이 함께 쓴다.
     public static class SpineStencil
     {
-        static readonly HashSet<SkeletonData> done = new HashSet<SkeletonData>();
+        // 고친 SkeletonData 표시 — 약한 참조(ConditionalWeakTable). 예전엔 HashSet 이 한 번 고친 SkeletonData 를 모두 붙들어
+        //   스탠딩 · 전투 스파인 데이터가 화면을 떠나도 영영 풀리지 않았다(2026-10-06 웹 OOM — 도감 사도 목록 → 상세)
+        static readonly System.Runtime.CompilerServices.ConditionalWeakTable<SkeletonData, object> done = new System.Runtime.CompilerServices.ConditionalWeakTable<SkeletonData, object>();
+        static readonly object mark = new object();
 
         public static SkeletonDataAsset Fix(SkeletonDataAsset a)
         {
@@ -21,8 +24,8 @@ namespace Bolzena.RunUI
 
         public static void Fix(SkeletonData d)
         {
-            if (d == null || done.Contains(d)) return;
-            done.Add(d);
+            if (d == null || done.TryGetValue(d, out _)) return;
+            done.Add(d, mark);
             var skin = d.DefaultSkin;
             if (skin == null) return;
             foreach (var pair in new[] { ("MaskStart", "MaskEnd"), ("MaskStartNext", "MaskEndNext") })

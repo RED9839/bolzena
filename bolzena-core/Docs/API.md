@@ -63,7 +63,7 @@ List<string> Chips(CardView c)                                 // 그 카드 글
 Battle b = Battle.Start(GameData data, BattleSetup setup, List<Cue> cues = null, Action<Cue> onCue = null);
 
 class BattleSetup {
-  List<string> Party; Dictionary<string,string> Rows; List<string> Deck; List<string> Enemies;
+  List<string> Party /* 편성 순서 — 맨 앞이 맞는 모습 */; List<string> Deck; List<string> Enemies;
   int? PartyHp, PartyMaxHp; long Seed; bool NoNature;
   Dictionary<string,Stats> Gear; Dictionary<string,List<PassiveRule>> GearRules;
   Dictionary<string,int> Flash; Dictionary<string,string> Shin; Dictionary<string,Glow> Glow;
@@ -123,6 +123,7 @@ double b.StatMod(Unit u, string stat)   // "atk" · "def" · "crit" · "dealt" �
 int    b.AtkNow(Unit u), b.DefNow(Unit u)
 int?   b.IntentHit(Unit e)              // 머리 위 피해 숫자(층 배율 · 약화 · 사기 반영). 치는 수가 아니면 null. 보스 고학년(T "ult")이면 안의 치는 수 합
 int?   b.UltHit(Unit e)                 // 보스 클론 고학년 피해 — 예고 턴(charge → Next "ult")에도 다음 턴 피해를 준다. 고학년이 아니면 null
+int?   b.ChargeHit(Unit e)              // 힘 모으기(charge) 중인 적의 다음 턴 피해(합 — 층 배율 · 약화 · 사기) — 엘리트 · 일반의 힘 모으기와 고학년 예고 모두. 예고 칸을 크게 보일 때. 예고가 아니면 null(2026-10-07)
 int    b.RushOf(Unit e)                 // 즉시 행동까지 장수(0 = 안 당겨짐). 남은 장수 = RushOf(e) - e.RushCnt
 int?   b.ActionCount(Unit e)            // 행동 카운트 — 이 적이 행동하기까지 남은 카드 수(둔화 · 급속 반영). 당겨지지 않는 수 · 이미 행동했으면 null
 List<StatusView> b.StatusViews(Unit u)  // 상태 칩 + 건 쪽 — 적이면 그 적, b.Pool 이면 파티 층, 사도면 개인 층(구속) + 그 사도 고유 효과
@@ -215,6 +216,7 @@ List<PowerRt>   b.Powers                            // 저장되는 상태 — {
 | `formOff` | **변신이 풀렸다** | Hero · Id · Name · Label(까닭 — time 지속이 다함 · until 풀리는 계기 · card 효과 formEnd · switch 다른 변신) |
 | `powerOn` | **강화가 켜졌다**(같은 강화를 또 내면 겹이 늘었다) | Hero · Id(강화 id) · Name(카드 이름) · CardId(카드 — 그림) · V(겹) |
 | `foeUltWarn` | **보스 클론이 고학년을 예고**(내 턴 시작 — 그 적의 수가 charge, Next 가 ult) | Hero(사도 키) · Name(고학년 이름) · V(다음 턴 피해 — `b.UltHit`) · T(치는 꼴 attackAll · attack · multi) |
+| `foeChargeWarn` | **엘리트 · 일반 적이 힘을 모은다**(그 적의 수가 charge, Next 가 ult 가 아닌 것 — 수를 세울 때) | Name(쏟을 수 이름) · Say(모으기 이름) · V(다음 턴 피해 — `b.ChargeHit`, 치지 않는 수면 0) · T(쏟을 수 꼴 attack · back · multi · attackAll) |
 | `foeUlt` | **보스 고학년 시작**(적의 차례 — 바로 뒤에 `act` T "ult") | Hero · Name · V(피해 합) |
 | `foeUltHit` | 보스 고학년의 치는 수 하나(바로 뒤에 그 수의 `hurt` · `status` …) | Hero · Name · V(몇 번째, 0부터) · T(attackAll · attack · multi) |
 | `foeUltEnd` | 보스 고학년 끝 | Hero · Name |
@@ -243,7 +245,7 @@ string Run.NatureBySeed(GameData d, string village, long seed)  // 속성을 안
 List<List<string>> Run.PickBosses(GameData d, string village, string nature, long seed)   // 층마다 보스 줄 — 클론 자리를 그 성격 사도의 클론으로
 List<(int floor,int idx,string id)> Run.CloneSlots(d, village) · List<string> Run.CloneCandidates(d, village, nature, int floor = -1)   // floor 를 주면 그 층 성급만
 bool Run.StarFits(int floor, int star)   // 보스 성급 — 1층(floor 0) 1~2성 · 2층 3성. 그 층 성급 사도가 없으면 그 층만 다른 성급(PickBosses)
-Run    Run.New(GameData d, List<string> party, long seed, string village = null, Dictionary<string,string> rows = null, string enemyNature = null)
+Run    Run.New(GameData d, List<string> party, long seed, string village = null, string enemyNature = null)   // party 순서 = 편성 순서(자리 1 · 2 · 3 — 맨 앞이 적의 공격에 맞는 모습, 관통은 맨 뒤). 사도 열(옛 rows)은 없다
 string run.EnemyNature   // 판의 적 속성 = run.S.EnemyNature(저장 · 이어하기에 남는다) — 이 판 모든 적의 성격(두 보스 클론도 그 성격 사도). 약점 성격 = R.WeakTo(run.EnemyNature). null = 옛 저장
 List<List<string>> run.Bosses   // 층마다 보스 줄(적 id) = run.S.Bosses(새 판에 정함 · 저장에 남는다). 옛 저장이면 마을 데이터
 List<string> run.BossHeroes     // 층마다 보스 클론의 사도 키 — 판 시작 화면(마을 · 속성과 함께)이 그 사도 그림 · 이름으로 미리 보인다
@@ -354,6 +356,8 @@ MetaSim.Run(data, rounds, seed, hpx, dmgx, threads) → MetaSim.Result;  MetaSim
 ---
 
 ## 바뀐 것
+
+- **v2.8(2026-10-07) — 평소 수는 무작위 · 예고 강화.** 덧붙이기만. `b.ChargeHit(e)` · 쪽지 `foeChargeWarn` · `Battle.CHARGE_GAP` · 고학년 끊김 뒤 보스 취약(`BossUlt.CUT_VULN`) · `BossUlt.DEBUFF_PLUS`. 고학년 기준 피해 1층 300 · 2층 360(옛 210 · 250).
 
 - **v2.7(2026-10-06) — 강인도 회복 규칙.** API 꼴은 그대로(덧붙이기만: 적의 수 `brace` — 글 `text.Intent` 가 「강인도 회복 v」). **규칙이 바뀐 것**: 강인도는 저절로 차지 않는다 — 격파되면 다음 내 턴 시작에 가득(전과 같음), 그 밖엔 회복 스킬(수 `brace` · 수에 붙은 `tough` · 패시브 `do: brace`)이 있는 적만. 판(phase)이 바뀌어도 안 찬다(옛: 다 참). 수의 `tough` 는 그 적 자신만(옛: guard 면 적 전체). `R.TOUGH.Boss` 10 → 7. tough 쪽지 `Up` 은 회복 스킬 · 격파에서 일어섬에서만 나온다. 글: `TIPS["강인도"]` · `TIPS["격파"]` 고침, 수의 덧글 「강인도 +1」 → 「강인도 회복 1」.
 

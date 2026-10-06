@@ -225,7 +225,7 @@ namespace Bolzena.Core
         public List<string> BossHeroes => Bosses.Select(l => l.Select(id => Data.Enemy(id)?.Clone).FirstOrDefault(x => x != null)).ToList();
 
         /// <summary>새 판 — 마을 · 적 속성 · 두 층 보스를 정한다. enemyNature 를 안 주거나 그 마을에서 못 고르는 속성이면 씨앗으로(NatureBySeed(d, village, seed)).</summary>
-        public static Run New(GameData data, List<string> party, long seed, string village = null, Dictionary<string, string> rows = null, string enemyNature = null)
+        public static Run New(GameData data, List<string> party, long seed, string village = null, string enemyNature = null)
         {
             int max = party.Sum(k => data.Hero(k)?.Hp ?? 0);
             string vil = village != null && data.Villages.ContainsKey(village) ? village : VillageBySeed(data, seed);
@@ -237,7 +237,6 @@ namespace Bolzena.Core
                 Village = vil,
                 EnemyNature = nat, Bosses = PickBosses(data, vil, nat, seed),
                 Party = party.ToList(),
-                Rows = rows != null ? new Dictionary<string, string>(rows) : party.ToDictionary(k => k, k => data.Hero(k)?.Row ?? "mid"),
                 PartyHp = max, PartyMaxHp = max, Gold = R.GOLD_START,
                 Deck = data.BuildDeck(party),
             };
@@ -298,7 +297,7 @@ namespace Bolzena.Core
             var sc = FoeScaleOf();
             var setup = new BattleSetup
             {
-                Party = S.Party.ToList(), Rows = S.Rows, Deck = S.Deck.ToList(), Enemies = CurrentEnemies().ToList(),
+                Party = S.Party.ToList(), Deck = S.Deck.ToList(), Enemies = CurrentEnemies().ToList(),
                 PartyHp = S.PartyHp, PartyMaxHp = S.PartyMaxHp, Gear = GearStats(), GearRules = GearRules(), Flash = S.Flash,
                 EnemyHp = sc.hp * hpx, EnemyDmg = sc.dmg * dmgx, Next = next, Shin = S.Shin, Gauge = S.Gauge,
                 Elite = S.EventFight != null ? S.EventFight.Elite : S.Elite || BossAsElite, EnemyNature = S.EnemyNature, Floor = S.Floor + 1,
@@ -780,7 +779,7 @@ namespace Bolzena.Core
         public Dictionary<string, object> Record(string stage) => new()
         {
             ["kind"] = "bolzena-record", ["v"] = 3, ["stage"] = stage, ["at"] = DateTime.UtcNow.ToString("o"), ["seed"] = S.Seed, ["village"] = S.Village,
-            ["party"] = S.Party.Select(k => new Dictionary<string, object> { ["key"] = k, ["name"] = Data.Hero(k)?.Name, ["row"] = S.Rows.TryGetValue(k, out var r) ? r : null,
+            ["party"] = S.Party.Select(k => new Dictionary<string, object> { ["key"] = k, ["name"] = Data.Hero(k)?.Name, ["slot"] = S.Party.IndexOf(k) + 1,
                 ["gear"] = GearOf(k).ToDictionary(kv => kv.Key, kv => Data.Equip(kv.Value)?.Name ?? kv.Value) }).ToList(),
             ["partyHp"] = S.PartyHp, ["partyMaxHp"] = S.PartyMaxHp, ["gold"] = S.Gold, ["gauge"] = S.Gauge, ["removals"] = S.Removals,
             ["deck"] = S.Deck.GroupBy(x => x).Select(g => new Dictionary<string, object> { ["id"] = g.Key, ["name"] = Data.Card(g.Key)?.Name, ["n"] = g.Count(),

@@ -24,7 +24,7 @@ for (const [key, s] of Object.entries(H)) {
   if (only && key !== only) continue;
   const d = design[key]; if (!d) throw new Error('design 없음 ' + key);
   const b = L.basics(key, d.role, d.start.map(c => c.ko).filter((v, i, a) => a.indexOf(v) === i));
-  const h = { id: key, name: d.ko, nature: d.nature, race: d.race, row: d.row, role: d.role, star: d.star,
+  const h = { id: key, name: d.ko, nature: d.nature, race: d.race, role: d.role, star: d.star,
     hp: d.hp, atk: d.atk, def: d.def, crit: d.crit, blurb: s.blurb, keyword: s.kw };
   if (s.kws) h.keywords = s.kws;
   h.passives = (s.passives || []).map(p => { const q = { name: p.name, when: p.when }; if (p.conds) q.conds = p.conds; if (p.limit) q.limit = p.limit; q.fx = p.fx; return q; });

@@ -124,7 +124,7 @@ namespace Bolzena.Core
         public const string IfChoice = "ifChoice", IfRandom = "ifRandom", IfHand = "ifHand", IfPile = "ifPile", IfNth = "ifNth", IfStreak = "ifStreak", IfAllHeroes = "ifAllHeroes",
             IfFoe = "ifFoe", IfCardSt = "ifCardSt", PerPlayed = "perPlayed", PerPile = "perPile", PerCardSt = "perCardSt", PerEvent = "perEvent",
             Later = "later", AfterCards = "afterCards", Trap = "trap", Confuse = "confuse", AutoPlay = "autoPlay", CastOther = "castOther",
-            Pull = "pull", ExileFrom = "exileFrom", Dispel = "dispel", MoveRow = "moveRow", GrowRun = "growRun";
+            Pull = "pull", ExileFrom = "exileFrom", Dispel = "dispel", GrowRun = "growRun";
         // v2 콘텐츠 요구(2026-10-05 넷째) — 배타 무작위 · 조건 · 다시 내기 · 비용 증감 · 태그 덧붙임 · 한 대 깎기 · 빚 탕감
         public const string Roll = "roll", IfRoll = "ifRoll", IfPrevSame = "ifPrevSame", IfInHand = "ifInHand", IfBond = "ifBond", IfLastMine = "ifLastMine",
             IfPulled = "ifPulled", IfShield = "ifShield", IfDebt = "ifDebt", IfTypeNew = "ifTypeNew",
@@ -157,7 +157,7 @@ namespace Bolzena.Core
             IfHp, PerApLeft, Feed,
             IfKill, IfBreak, IfWounded, PerTag, Drain, Extra, CardStatus, Transform,
             IfChoice, IfRandom, IfHand, IfPile, IfNth, IfStreak, IfAllHeroes, IfFoe, IfCardSt, PerPlayed, PerPile, PerCardSt, PerEvent,
-            Later, AfterCards, Trap, Confuse, AutoPlay, CastOther, Pull, ExileFrom, Dispel, MoveRow, GrowRun,
+            Later, AfterCards, Trap, Confuse, AutoPlay, CastOther, Pull, ExileFrom, Dispel, GrowRun,
             Roll, IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, Recast, CostMod, AddTag, CutHit, ClearDebt, HealMod,
             Form, FormEnd, Power, Cue,
         };
@@ -287,8 +287,10 @@ namespace Bolzena.Core
         public string Name;
         public string Nature;
         public string Race;
-        public string Row = "mid";
         public string Role;
+        /// <summary>옛 칸 「row」(전열 · 중열 · 후열 — 2026-10-06 걷어냄). 옛 데이터를 읽어도 깨지지 않게 받아서 버리고, 검사기가 주의로 알린다.</summary>
+        [Newtonsoft.Json.JsonProperty("row")] string RowOld { set => HadRow = value != null; }
+        [Newtonsoft.Json.JsonIgnore] public bool HadRow { get; private set; }
         /// <summary>옛 — 운영 방식(docs/19, 2026-10-05 틀 폐기). 엔진은 안 본다. 새 콘텐츠는 쓰지 않는다.</summary>
         public string Style;
         public int Star = 3;
@@ -386,6 +388,8 @@ namespace Bolzena.Core
         public bool EndClear;
         /// <summary>순환 — 최대(cap)를 넘으면 1 부터 다시(달 위상 · 단계 순환). cap 이 있어야 한다.</summary>
         public bool Wrap;
+        /// <summary>단계 이름(태세 · 형상) — 값 1 부터 차례로. 있으면 글이 「「형상」이 2면」 대신 「「형상」이 꿈결이면」 으로 쓴다. 개수는 cap 과 같아야 한다.</summary>
+        public List<string> Stages;
         /// <summary>소환물 — 겹이 있으면 적의 공격 한 대를 대신 받고 1 사라진다(파티는 그 대를 안 맞는다).</summary>
         public bool Guard;
         /// <summary>적에게 거는 표식 — 걸린 적을 치는 아군 카드는 약점 공격이 된다(친 카드 한 장에 1 준다).</summary>
@@ -497,7 +501,7 @@ namespace Bolzena.Core
 
     /// <summary>
     /// 조건. c: stack(id, n, not) · hp(pct 이하) · hpMin(pct 이상) · status(id, n — 파티 · 자신 상태) · foes(n 이상) · foesMax(n 이하) ·
-    /// playedMin · playedMax(n) · ownNone · apLeft(n) · gauge(n) · guarded(kind) · rushed · hurtLast · killedLast · firstTurn · targetBroken · row(row).
+    /// playedMin · playedMax(n) · ownNone · apLeft(n) · gauge(n) · guarded(kind) · rushed · hurtLast · killedLast · firstTurn · targetBroken.
     /// </summary>
     public sealed class Cond
     {
@@ -507,7 +511,6 @@ namespace Bolzena.Core
         public bool Not;
         public double Pct;
         public string Kind;
-        public string Row;
         /// <summary>stack — 위 끝(n 이상 max 이하). ownNone — 카드 종류(type).</summary>
         public int Max;
         public string Type;

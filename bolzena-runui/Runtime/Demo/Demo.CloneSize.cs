@@ -19,7 +19,7 @@ namespace Bolzena.RunUI
             yield return Shot("clone_village");
             yield return Press("go");
             yield return Screen_("party", 0.8f);
-            yield return Press("party.auto", 0.8f);
+            yield return PickParty(0.8f);
             yield return Wait(0.6f);
             yield return Shot("clone_party");
             // 보스 클론 칸 — 적 정의에 Clone 이 있는 것
@@ -41,7 +41,7 @@ namespace Bolzena.RunUI
                 }
                 yield return Press("zoom.close", 0.6f);
             }
-            // 지도 — 칸에 나오는 적 미리보기가 없다(2026-10-06 사용자: 모르고 들어가야 재미있다 — 보스 칸도 클론을 감춘다) · 화면의 글 어느 것도 잘리지 않는다
+            // 지도 — 일반 · 엘리트 칸에 나오는 적 미리보기가 없다(2026-10-06 사용자: 모르고 들어가야 재미있다) · 보스 칸만 그 층 보스 클론 얼굴(같은 날 정정 「보스 클론은 보여 줘」) · 화면의 글 어느 것도 잘리지 않는다
             yield return Press("party.go");
             yield return Screen_("map", 1.6f);
             var cut = f.Stage.ScreenLayer.GetComponentsInChildren<TMPro.TextMeshProUGUI>(false).Where(t => t.isActiveAndEnabled && t.text.Length > 0).Where(t => { t.ForceMeshUpdate(); return t.isTextTruncated; }).Select(t => t.text).ToList();
@@ -50,8 +50,15 @@ namespace Bolzena.RunUI
             int icons = mapAll.Count(t => t.name == "foes" || t.name.StartsWith("foe "));
             var foeNames = new System.Collections.Generic.HashSet<string>(f.P.Data.Enemies.Values.Select(e => e.Name).Where(x => !string.IsNullOrEmpty(x)));
             int named = f.Stage.ScreenLayer.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Count(t => foeNames.Contains(t.text));
-            Expect(icons == 0 && named == 0, $"지도 — 칸별 적 미리보기 없음 (적 그림 {icons} · 적 이름 글 {named})");
+            Expect(icons == 0 && named == 0, $"지도 — 일반 칸 적 미리보기 없음 (적 그림 {icons} · 적 이름 글 {named})");
+            var faces = mapAll.Where(t => t.name == "bossface").ToList();
+            var bossNodes = f.P.Map().Rows.SelectMany(r => r).Where(n => n.Type == "boss").Select(n => n.Id).ToList();
+            Expect(faces.Count == bossNodes.Count && faces.All(t => t.parent != null && bossNodes.Contains(t.parent.name)), $"지도 — 보스 칸만 클론 얼굴 ({faces.Count} / 보스 칸 {bossNodes.Count})");
+            Expect(f.Stage.ScreenLayer.GetComponentsInChildren<RectTransform>(true).Any(t => t.name == "hud.foenature") || f.Stage.Root.GetComponentsInChildren<RectTransform>(true).Any(t => t.name == "hud.foenature"), "지도 — 머리에 「이번 모험의 적 속성」");
             yield return Shot("clone_map");
+            // 지도 끝(보스 칸 — 클론 얼굴)까지 밀어 한 장 더
+            var msr = f.Stage.ScreenLayer.GetComponentInChildren<UnityEngine.UI.ScrollRect>();
+            if (msr != null) { msr.horizontalNormalizedPosition = 1f; yield return Wait(0.5f); yield return Shot("clone_map_boss"); }
             Debug.Log($"[Demo] 캔버스 {f.Stage.Size.x:0}x{f.Stage.Size.y:0} · 화면 {Screen.width}x{Screen.height} · Compact {Theme.Compact}");
             Debug.Log($"[Demo] 클론 크기 단언 실패 {fails}");
             Debug.Log("[Demo] 끝");

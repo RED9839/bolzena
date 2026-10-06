@@ -52,7 +52,7 @@ namespace Bolzena.Battle
             foreach (var x in heroes.Values) if (x.Art == art) { made[id] = x; return x; }
             var hd = Data?.Hero(id);
             string nature = hd?.Nature ?? info?.nature;
-            string row = hd?.Row ?? info?.row;
+            string row = info?.row;   // 원작 표의 서는 자리 — 규칙이 아니라 공격 모습(근접 돌진 · 타격 결)만 고른다(사도 열은 코어에 없다)
             h = new HeroLook
             {
                 Art = art,
@@ -290,7 +290,7 @@ namespace Bolzena.Battle
             }
             var art = Hero(heroId).Art;
             var pic = Bolzena.RunUI.CardArt.PicOf(cardId);
-            if (pic != null && Bolzena.RunUI.CardArt.Pic(pic) != null) return "pc:" + pic;
+            if (pic != null && Bolzena.RunUI.CardArt.HasPic(pic)) return "pc:" + pic;   // 장면 한 장 또는 사물(CardObj)
             if (!unique)
             {
                 var tok = Bolzena.RunUI.CardArt.IconOf(cardId);   // 생성 카드에 고른 원작 스킬 아이콘(시작 카드는 표에 없다)

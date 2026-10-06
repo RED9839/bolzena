@@ -36,7 +36,7 @@ namespace Bolzena.Core.Tests
             var hit = t.Single(x => x.T == "attackAll");
             Assert.AreEqual(Num.Round(BossUlt.RAW[1] / R.FOE_ALL_X), hit.V, "1층 기준 × 비율 1(1.8/1.8) ÷ 전체 공격 2");
             Assert.AreEqual(Num.Round(BossUlt.RAW[1] / R.FOE_ALL_X) * 2, p.Raw);
-            Assert.IsTrue(t.Any(x => x.T == "debuff" && x.Id == "약화" && x.V == 2), "적 디버프 → 파티 디버프");
+            Assert.IsTrue(t.Any(x => x.T == "debuff" && x.Id == "약화" && x.V == 2 + BossUlt.DEBUFF_PLUS), "적 디버프 → 파티 디버프(원작 값 + DEBUFF_PLUS)");
             Assert.IsTrue(t.Any(x => x.T == "buff" && x.Id == "사기" && x.V == 1 && x.All), "아군 버프 → 적 전체 버프");
             CollectionAssert.Contains(p.Dropped, "AP", "사도 자원은 뺀다");
             Assert.AreEqual(Num.Round(BossUlt.RAW[2] / R.FOE_ALL_X), BossUlt.Plan(D(), "z", 2).Use.Then.Single(x => x.T == "attackAll").V, "2층 기준");
@@ -104,7 +104,7 @@ namespace Bolzena.Core.Tests
             Assert.IsTrue(iu >= 0 && iu < ia && ia < ih && ih < ihurt && ihurt < ie, "foeUlt → act → foeUltHit → hurt → foeUltEnd: " + string.Join(",", ks));
             Assert.AreEqual("ult", cues[ia].T); Assert.AreEqual(Side.Enemy, cues[iu].Side);
             Assert.Less(b.Pool.Hp, hp0, "파티가 맞았다");
-            Assert.AreEqual(2, b.St(b.Pool, "약화"), "파티 약화 2");
+            Assert.AreEqual(2 + BossUlt.DEBUFF_PLUS, b.St(b.Pool, "약화"), "파티 약화 2 + DEBUFF_PLUS");
             Assert.AreEqual(1, b.St(e, "사기"), "보스 사기 1");
             Assert.AreEqual("attack", e.Intent.T, "넷째 턴 — 평소 수로 돌아온다");
             b.EndTurn(); b.EndTurn();
@@ -124,6 +124,7 @@ namespace Bolzena.Core.Tests
             var cut = cues.Single(c => c.K == "foeUltCut");
             Assert.AreEqual("격파", cut.Label); Assert.AreEqual("큰 일격", cut.Name);
             Assert.IsNull(e.Intent, "예고가 지워졌다");
+            Assert.AreEqual(BossUlt.CUT_VULN, b.St(e, "취약"), "끊는 보상 — 보스 취약");
             b.EndTurn();
             Assert.IsFalse(BossUlt.IsUlt(e.Intent), "다음 턴에 고학년을 쓰지 않는다");
             b.EndTurn();
