@@ -28,7 +28,12 @@ namespace Bolzena.RunUI
             var st = new PartyState { Village = village, PlayableOnly = false };
             var v = P.Village(village);
             Stage.SetBg(v.Floors[0].Bg != null && v.Floors[0].Bg.TryGetValue("fight", out var bg) ? bg : "stage3_2", 0.5f);
-            Stage.Show("party", root => BuildPartyLight(root, st));   // 밝은 판(Flow.Roster.cs)
+            Stage.Show("party", root =>
+            {
+                BuildPartyLight(root, st);
+                // 창 크기가 바뀌면 다시 세운다(큰 카드 셋 · 스탠딩이 Stage.Size 고정 단위). 사도 목록 · 상세 창이 열려 있으면 닫힌 뒤에
+                Stage.WhenResized(root, () => { if (Stage.ModalLayer.childCount > 0 || CardGain.IsOpen) return false; BuildPartyLight(root, st); return true; });
+            });   // 밝은 판(Flow.Roster.cs)
         }
 
         // 도감은 Flow.Dex.cs(사도 · 교주 카드 · 장비를 한 화면 틀에서). 아래 BuildParty 의 도감 갈래는 옛 화면 — 이제 쓰지 않는다.

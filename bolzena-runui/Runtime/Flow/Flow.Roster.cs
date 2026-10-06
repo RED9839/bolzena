@@ -561,6 +561,15 @@ namespace Bolzena.RunUI
             var d = h?.CoreId != null ? P.Data.Hero(h.CoreId) : null;
             void Close() { if (layer) Destroy(layer.gameObject); back?.Invoke(); }
             void Go(string k2, string t2) { if (layer) Destroy(layer.gameObject); HeroDetail(k2, keys, back, t2); }
+            // 창 크기가 바뀌면 같은 사도 · 탭으로 다시 세운다(스탠딩 · 칸 너비가 Stage.Size 고정 단위) — 겹친 창 순서는 그대로
+            Stage.WhenResized(layer, () =>
+            {
+                if (!layer) return;
+                int at = layer.GetSiblingIndex();
+                Go(key, tab);
+                var ml = Stage.ModalLayer;
+                if (ml.childCount > 0) ml.GetChild(ml.childCount - 1).SetSiblingIndex(Mathf.Min(at, ml.childCount - 1));
+            });
             RosterHead(layer, "상세 정보", Close);
             Stage.Hot["detail.close"] = Stage.Hot["back"];
 

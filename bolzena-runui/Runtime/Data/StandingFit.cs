@@ -231,12 +231,18 @@ namespace Bolzena.RunUI
             // 떠 있는 사도(손보정 float — 쥬비 · 벨라 · 아일라 · 다야 · 에르핀(왕도), 2026-10-07 사용자: 「공중에 뜬 만큼 다시 내려서 다른 사도와 얼굴 위치를 같게」):
             //   전신이면 얼굴(iconFaceY · cardFaceY · faceY · 얼굴 상자 가운데)이 바닥선에서 그 화면의 기준 얼굴 높이(standing_center_fix.json _faceRef — 보통 사도 평균, 원본 단위)에
             //   오게 발 자리를 옮긴다. 배율은 그대로 — 몸 아래(꼬리 · 연기 · 바위)가 바닥선 아래로 빠지면 그 부분은 잘린다. 기준이 없으면 float 값만큼 띄운다.
+            //   2026-10-07 뒤(사용자: 「벨라가 너무 크다 — 얼굴이 화면 가운데에 크게, 몸이 화면 아래로 크게 나간다」): 크기도 보통 사도와 같은 규칙으로 —
+            //   얼굴 기준 바닥선에서 그린 몸 위 끝(머리카락 · 왕관 · 이펙트 — 표 bounds 위 끝)까지가 칸(기준 키 사도의 몸 = 칸의 92%)을 넘으면 줄인다.
+            //   ClampInto(메시 전체 — 꼬리 · 연기까지 1300 단위)로 줄이면 얼굴이 6할로 작아지므로 위쪽만 잰다. 그다음 얼굴을 보통 사도의 얼굴 높이(기준 얼굴 높이 × 함께 쓰는 배율)에 둔다.
             if (NoLift) lift = null;
+            float liftFace = 0, liftRef = 0;
             if (lift != null && mode == StandMode.Full && f.Lift != 0)
             {
                 float face = f.IconFaceY != 0 ? f.IconFaceY : f.CardFaceY != 0 ? f.CardFaceY : f.FaceY != 0 ? f.FaceY : f.HasHead ? f.FaceBox.center.y : f.HeadY;
-                f.FootY = faceRef.TryGetValue(lift, out var fr) && fr > 0 ? face - fr : f.FootY - f.Lift;
+                bool hasRef = faceRef.TryGetValue(lift, out var fr) && fr > 0;
+                f.FootY = hasRef ? face - fr : f.FootY - f.Lift;
                 f.HairTop = Mathf.Max(f.HairTop, f.FootY + 1);
+                if (hasRef) { liftFace = face; liftRef = fr; f.HairTop = Mathf.Max(f.HairTop, f.Bounds.yMax); }
             }
             if (tallest <= 0) tallest = p95;
             float top = mode == StandMode.Full ? 0 : pad > 0 ? pad : slot.height * 0.06f;
@@ -248,7 +254,10 @@ namespace Bolzena.RunUI
             float reach = mode == StandMode.Full ? (f.HairTop - f.FootY) : f.Body / f.Scale;
             float room = mode == StandMode.Full ? avail : slot.yMax - top - floor;
             if (reach * k > room) k = room / Mathf.Max(1, reach);
+            // 떠 있는 사도: 얼굴은 보통 사도 얼굴 높이(liftRef × kc)에 고정 — 그 위(얼굴 → 위 끝)가 칸 위 끝을 넘지 않게
+            if (liftRef > 0) k = Mathf.Min(kc * f.Scale, Mathf.Max(0.0001f, room - liftRef * kc) / Mathf.Max(1, reach - liftRef));
             origin = new Vector2(slot.center.x - CropCenterX(f, mode) * k, floor - f.FootY * k);
+            if (liftRef > 0) origin.y = floor + liftRef * kc - liftFace * k;   // 떠 있는 사도 — 얼굴을 보통 사도 얼굴 높이에(줄였어도 얼굴 높이는 같게)
             // 얼굴 높이 손보정이 있는 사도(꿀벌 쥬비 — 얼굴이 몸 왼쪽 아래): 무릎께 · 상반신은 얼굴을 칸 가운데 위 1/3 에, 몸 전체가 칸 안에 들게
             if (f.FaceY != 0 && mode != StandMode.Full)
             {

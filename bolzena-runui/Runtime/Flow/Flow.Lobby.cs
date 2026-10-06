@@ -48,6 +48,13 @@ namespace Bolzena.RunUI
                 SkeletonGraphic sg = LobbyStanding(standHost, hero);
                 var tap = Ui.Img(stage, Theme.White, new Color(0, 0, 0, 0), "tap", true);
                 tap.rectTransform.At(0.5f, 0, 40, 0, Stage.Size.y * 0.52f, Stage.Size.y * 0.89f);
+                // 창 크기가 바뀌면(전체 화면 전환 · 창 늘이기) 스탠딩을 지금 캔버스 크기로 다시 세운다 — 칸 · 배율 · ClampInto 모두 Stage.Size 로 정하므로
+                Stage.WhenResized(standHost, () =>
+                {
+                    foreach (Transform c in standHost) Destroy(c.gameObject);
+                    sg = LobbyStanding(standHost, hero);
+                    if (tap) tap.rectTransform.At(0.5f, 0, 40, 0, Stage.Size.y * 0.52f, Stage.Size.y * 0.89f);
+                });
                 var tb = tap.gameObject.AddComponent<Btn>();
                 tb.Bg = null;
 
@@ -89,8 +96,9 @@ namespace Bolzena.RunUI
                     var old = sg;
                     sg = null;
                     if (old != null) Tw.Run(old.rectTransform, 0.22f, t => { if (old) old.color = new Color(1, 1, 1, 1 - t); }, Tw.Linear, 0, () => { if (old) Destroy(old.gameObject); });
-                    foreach (Transform c in standHost) if (c.name.StartsWith("still")) Destroy(c.gameObject);
-                    sg = LobbyStanding(standHost, hero);
+                    foreach (Transform c in standHost) if (c.name.StartsWith("still") || (c.name == "stand" && (old == null || !old.transform.IsChildOf(c)))) Destroy(c.gameObject);
+                    sg = LobbyStanding(standHost, hero);   // 칸은 지금 캔버스 크기(Stage.Size)로 새로 만든다
+                    if (tap) tap.rectTransform.At(0.5f, 0, 40, 0, Stage.Size.y * 0.52f, Stage.Size.y * 0.89f);
                     if (sg != null) { sg.color = new Color(1, 1, 1, 0); var ng = sg; Tw.Run(ng.rectTransform, 0.3f, t => { if (ng) ng.color = new Color(1, 1, 1, t); }, Tw.Linear, 0.12f); Tw.Rise(ng.rectTransform, 0.12f, 18, 0.35f); }
                     pt.text = $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}   <size=60%><color={Theme.SubTag}>누르면 반응합니다</color></size>";
                     if (bubble) Destroy(bubble.gameObject);

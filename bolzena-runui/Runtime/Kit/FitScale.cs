@@ -14,12 +14,15 @@ namespace Bolzena.RunUI
         public static float Fit(RectTransform panel, Vector2 canvas, float w, float h, float shareH, float shareW = 0.92f)
         {
             if (panel == null || panel.parent == null || canvas.y < 100) return 1;
-            float k = Mathf.Min(1f, canvas.y * shareH / Mathf.Max(1, h), canvas.x * shareW / Mathf.Max(1, w));
-            if (k >= 0.999f) return 1;
+            float K(Vector2 c) => Mathf.Min(1f, c.y * shareH / Mathf.Max(1, h), c.x * shareW / Mathf.Max(1, w));
+            float k = K(canvas);
+            // 받침은 늘 만든다 — 창 크기가 바뀌면(전체 화면 전환 등) 지금 캔버스로 배율만 다시 건다(2026-10-07)
             var fit = Ui.Rect("fit", panel.parent).Fill();
             fit.SetSiblingIndex(panel.GetSiblingIndex());
             fit.localScale = new Vector3(k, k, 1);
             panel.SetParent(fit, false);
+            var st = Stage.Main;
+            if (st != null) st.WhenResized(fit, () => { if (!fit) return; float k2 = K(st.Size); fit.localScale = new Vector3(k2, k2, 1); });
             return k;
         }
     }

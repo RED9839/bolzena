@@ -29,7 +29,68 @@ namespace Bolzena.RunUI
             var go = new GameObject("RunUI Stage");
             var st = go.AddComponent<Stage>();
             st.Build();
+            Main = st;
             return st;
+        }
+
+        /// <summary>지금 무대(하나) — 정적 도우미(FitScale)가 리사이즈 알림을 걸 때.</summary>
+        public static Stage Main { get; private set; }
+
+        // ── 창 크기 변화 뒤 다시 맞추기(2026-10-07 「전체 화면으로 바꾸니 에르핀이 화면을 꽉 채우고 지팡이가 잘린다」) ──
+        //   화면은 세울 때의 캔버스 크기(Stage.Size — 캔버스 단위)로 스탠딩 · 칸을 고정 단위로 놓는다. 창 비율이 바뀌면(4:3 창 → 21:9 전체 화면)
+        //   캔버스 높이 단위가 1200 → 900 처럼 바뀌어 그대로 둔 스탠딩이 1.33배로 커 보였다. 캔버스 크기가 바뀌고 0.2초 동안 그대로면(마지막 크기에서 한 번)
+        //   걸어 둔 다시 맞추기를 부른다. owner 가 사라지면 저절로 빠진다. 다시 맞추기가 false 를 돌려주면(창이 열려 있는 등 지금은 안 됨) 다음 프레임에 다시 묻는다.
+        //   -norefit: 끈다(전후 비교).
+        public static readonly bool NoRefit = Array.IndexOf(Environment.GetCommandLineArgs(), "-norefit") >= 0;
+        const float RefitDelay = 0.2f;
+        readonly List<(UnityEngine.Object owner, Func<bool> refit)> refits = new List<(UnityEngine.Object, Func<bool>)>();
+        readonly HashSet<Func<bool>> refitDue = new HashSet<Func<bool>>();
+        Vector2 canvasSeen;
+        float canvasChangedAt = -1;
+        /// <summary>캔버스 크기가 바뀐 횟수(디바운스 뒤 — 점검용).</summary>
+        public int Refits { get; private set; }
+
+        /// <summary>창 크기가 바뀐 뒤(마지막 크기에서 0.2초 뒤 한 번) refit 을 부른다 — owner(화면 · 칸)가 없어지면 빠진다. refit 이 false 면 다음 프레임에 다시.</summary>
+        public void WhenResized(UnityEngine.Object owner, Func<bool> refit)
+        {
+            if (owner == null || refit == null) return;
+            refits.Add((owner, refit));
+        }
+        public void WhenResized(UnityEngine.Object owner, Action refit) { if (refit != null) WhenResized(owner, () => { refit(); return true; }); }
+
+        void WatchCanvas()
+        {
+            if (Root == null) return;
+            var cs = Root.rect.size;
+            if (cs.x < 100 || cs.y < 100) return;
+            if (canvasSeen == Vector2.zero) { canvasSeen = cs; return; }
+            if (Mathf.Abs(cs.x - canvasSeen.x) > 0.5f || Mathf.Abs(cs.y - canvasSeen.y) > 0.5f)
+            {
+                canvasSeen = cs;
+                canvasChangedAt = Time.unscaledTime;
+            }
+            if (canvasChangedAt >= 0 && Time.unscaledTime - canvasChangedAt >= RefitDelay)
+            {
+                canvasChangedAt = -1;
+                Refits++;
+                refits.RemoveAll(r => r.owner == null);
+                Debug.Log($"[Stage] 캔버스 크기 바뀜 → {cs.x:0}×{cs.y:0}(화면 {Screen.width}×{Screen.height}) — 다시 맞추기 {(NoRefit ? "끔(-norefit)" : refits.Count + "곳")}");
+                if (NoRefit) return;
+                refits.RemoveAll(r => r.owner == null);
+                foreach (var r in refits) refitDue.Add(r.refit);
+            }
+            if (refitDue.Count == 0) return;
+            refits.RemoveAll(r => r.owner == null);
+            foreach (var r in refits.ToArray())
+            {
+                if (!refitDue.Contains(r.refit) || r.owner == null) continue;
+                bool done = true;
+                try { done = r.refit(); }
+                catch (Exception e) { Debug.LogException(e); }
+                if (done) refitDue.Remove(r.refit);
+            }
+            // 주인이 사라진 것은 버린다
+            refitDue.RemoveWhere(f => !refits.Exists(r => r.refit == f));
         }
 
         void Build()
@@ -80,6 +141,7 @@ namespace Bolzena.RunUI
             // 뒤로 키(Esc · 안드로이드 뒤로) — 맨 위 창을 닫는다. 잠긴 창(반드시 골라야 하는 것)이면 아무 일도 없다
             var kb = UnityEngine.InputSystem.Keyboard.current;
             if (kb != null && kb.escapeKey.wasPressedThisFrame) Back();
+            WatchCanvas();
             var now = new Vector2Int(Screen.width, Screen.height);
             if (now == lastScreen) return;
             lastScreen = now;

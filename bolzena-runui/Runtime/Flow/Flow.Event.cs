@@ -33,7 +33,12 @@ namespace Bolzena.RunUI
         {
             var f = P.Floor;
             Stage.SetBg(f.Bg != null && f.Bg.TryGetValue("event", out var bg) ? bg : "stage2_1", 0.4f);
-            Stage.Show("event", root => BuildEvent(root, -1), 1.2f);
+            Stage.Show("event", root =>
+            {
+                BuildEvent(root, -1);
+                // 창 크기가 바뀌면 지금 단계(대화 줄 · 선택 · 결과 — 상태는 필드에)로 다시 세운다. 고르기 창 · 카드 얻기 연출 중이면 끝난 뒤에
+                Stage.WhenResized(root, () => { if (Stage.ModalLayer.childCount > 0 || CardGain.IsOpen || Stage.Current != "event") return Stage.Current != "event"; BuildEvent(root, -1); return true; });
+            }, 1.2f);
         }
 
         void BuildEvent(RectTransform root, int picked)
