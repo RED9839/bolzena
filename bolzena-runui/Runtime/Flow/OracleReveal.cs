@@ -62,6 +62,12 @@ namespace Bolzena.RunUI
 
         public static void Show(Flow f, RevealOpts o) => f.StartCoroutine(Run(f, o));
 
+        // 연출 세기(2026-10-07 사용자 「신탁 연출이 너무 화려」) — 빛 · 섬광 세기 · 입자 수 · 지속을 예전의 대략 절반(K 0.5).
+        // 저사양 모드 · 움직임 줄이기면 더 약하게(K 0.3 — 고리 하나 · 빛살 안 돈다). 전투의 신탁 창(EpiphanyWindow)과 같은 몫.
+        static bool Calm => Settings.ReduceMotion || DisplayOptions.LowSpec;
+        static float K => Calm ? 0.3f : 0.5f;
+        static int N(int n) => Mathf.Max(1, Mathf.RoundToInt(n * K));
+
         static IEnumerator Run(Flow f, RevealOpts o)
         {
             var st = f.Stage;
@@ -84,7 +90,7 @@ namespace Bolzena.RunUI
             rays.color = new Color(1f, 0.82f, 0.4f, 0);
             float rs = Mathf.Max(size.x, size.y) * 1.5f;
             rays.rectTransform.At(0.5f, 0.5f, 0, cy, rs, rs);
-            rays.gameObject.AddComponent<Spin>().Speed = 6;
+            rays.gameObject.AddComponent<Spin>().Speed = Calm ? 0 : 3;
             var core = Ui.Img(root, Theme.S("soft"), new Color(1f, 0.85f, 0.45f, 0), "core");
             core.rectTransform.At(0.5f, 0.5f, 0, cy, cw * 3.2f, cw * 3.2f);
 
@@ -146,14 +152,14 @@ namespace Bolzena.RunUI
             yield return Lerp(root, 0.35f, t =>
             {
                 dim.color = dim.color.A(0.8f * t);
-                rays.color = rays.color.A(0.5f * t);
-                core.color = core.color.A(0.55f * t);
+                rays.color = rays.color.A(0.32f * K * t);   // 판 화면은 어두운 막 위라 빛살이 더 세 보여 전투 창보다 옅게
+                core.color = core.color.A(0.55f * K * t);
                 title.alpha = t; sub.alpha = t; subBg.color = subBg.color.A(t);
-                title.rectTransform.localScale = Vector3.one * Mathf.LerpUnclamped(2.2f, 1f, Tw.OutBack(t));
+                title.rectTransform.localScale = Vector3.one * (Calm ? 1f : Mathf.LerpUnclamped(1.35f, 1f, Tw.OutBack(t)));
                 if (baseCard) baseCard.parent.localScale = Vector3.one * Mathf.Lerp(0.8f, 1.15f, Tw.OutCubic(t));
             });
             if (!root) { Phase = null; yield break; }
-            Tw.Pulse(core, 0.35f, 0.6f, 2.2f);
+            Tw.Pulse(core, 0.35f * K, 0.6f * K, 2.2f);
             Sfx.Play("reveal", 0.5f);
 
             // 후보 — 가운데에서 겹쳐 나와 펼쳐진다
@@ -214,7 +220,7 @@ namespace Bolzena.RunUI
             if (close) close.transform.SetAsLastSibling();
             deckB.transform.SetAsLastSibling();
             var baseG = baseCard ? baseCard.parent.Group() : null;
-            Burst(root, new Vector2(0, cy), 26, 120, 420, new Color(1f, 0.85f, 0.4f), 0.5f, 0.9f);
+            Burst(root, new Vector2(0, cy), N(26), 90, 260, new Color(1f, 0.85f, 0.4f), 0.25f, 0.45f);
             yield return Lerp(root, 0.45f, t =>
             {
                 float k = Tw.OutBack(t);
@@ -270,29 +276,31 @@ namespace Bolzena.RunUI
                 }
             });
             if (!root) { Phase = null; yield break; }
-            yield return Lerp(root, 0.22f, t => { if (flash) flash.color = flash.color.A(t * t * t); });
+            float burnA = Calm ? 0.5f : 0.75f;   // 흰빛으로 다 덮지 않는다
+            yield return Lerp(root, 0.18f, t => { if (flash) flash.color = flash.color.A(burnA * t * t * t); });
 
             // 다시 태어남 — 흰빛이 걷히며 바뀐 모습으로 · 빛 고리 · 불티
             Phase = "reborn";
             for (int i = 0; i < holders.Count; i++) if (i != chosen && holders[i]) UnityEngine.Object.Destroy(holders[i].gameObject);
             Sfx.Play("reveal_reborn", 0.9f);
-            var sflash = Ui.Img(root, Theme.White, new Color(1f, 0.95f, 0.8f, 0.35f), "sflash"); sflash.rectTransform.Fill();
-            Tw.Run(sflash, 0.35f, t => { if (sflash) sflash.color = sflash.color.A(0.35f * (1 - t)); });
-            Ring(root, new Vector2(0, cy), cw * 0.6f, cw * 3.4f, 0.55f, new Color(1f, 0.85f, 0.5f, 1f));
-            Ring(root, new Vector2(0, cy), cw * 0.3f, cw * 2.4f, 0.45f, Color.white);
-            Burst(root, new Vector2(0, cy), 36, 300, 900, new Color(1f, 0.8f, 0.35f), 0.3f, 0.6f);
-            Burst(root, new Vector2(0, cy), 20, 80, 320, new Color(1f, 0.9f, 0.5f), 0.6f, 1.1f);
+            float fa = 0.35f * K;
+            var sflash = Ui.Img(root, Theme.White, new Color(1f, 0.95f, 0.8f, fa), "sflash"); sflash.rectTransform.Fill();
+            Tw.Run(sflash, 0.2f, t => { if (sflash) sflash.color = sflash.color.A(fa * (1 - t)); });
+            Ring(root, new Vector2(0, cy), cw * 0.6f, cw * 2.2f, 0.3f, new Color(1f, 0.85f, 0.5f, 0.5f + 0.5f * K));
+            if (!Calm) Ring(root, new Vector2(0, cy), cw * 0.3f, cw * 1.6f, 0.25f, new Color(1, 1, 1, 0.75f));
+            Burst(root, new Vector2(0, cy), N(36), 200, 520, new Color(1f, 0.8f, 0.35f), 0.15f, 0.3f);
+            Burst(root, new Vector2(0, cy), N(20), 60, 200, new Color(1f, 0.9f, 0.5f), 0.3f, 0.55f);
             var pk = o.Picks[chosen];
             var awake = Ui.Title(root, string.IsNullOrEmpty(pk.Label) ? o.Awake : $"{o.Awake} · {pk.Label}", compact ? 34 : 44, new Color(1f, 0.9f, 0.55f), TextAlignmentOptions.Center);
             awake.rectTransform.At(0.5f, 0.5f, 0, cy - ch * 1.3f / 2 - (compact ? 34 : 48), 1200, 60);
             awake.Outline(0.25f, new Color(0.3f, 0.12f, 0));
             yield return Lerp(root, 0.45f, t =>
             {
-                if (flash) flash.color = flash.color.A(1 - Tw.OutCubic(t));
-                if (ch0) ch0.localScale = Vector3.one * Mathf.Lerp(1.6f, 1.35f, Tw.OutCubic(t));
+                if (flash) flash.color = flash.color.A(burnA * (1 - Tw.OutCubic(t)));
+                if (ch0) ch0.localScale = Vector3.one * Mathf.Lerp(Calm ? 1.35f : 1.45f, 1.35f, Tw.OutCubic(t));
                 awake.alpha = t;
             });
-            yield return Wait(0.6f);
+            yield return Wait(0.4f);
             Phase = "leave";
             if (root)
             {

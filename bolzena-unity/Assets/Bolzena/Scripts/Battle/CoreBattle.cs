@@ -211,12 +211,34 @@ namespace Bolzena.Battle
             return g;
         }
 
+        /// <summary>
+        /// -glowbase(시험 캡처) — 같은 기본 카드 세 장 가운데 한 장에만 은총 빛(2026-10-07 제보: 같은 카드가 모두 빛났다).
+        /// 덱을 그 기본 카드 셋 + 다른 카드 둘로 줄여 첫 손에 다 들게 한다. 빛을 한 장에 거는 것은 엔진(Battle.LightOne)이 한다.
+        /// </summary>
+        static void GlowBase(GameData d, Fixture f, Dictionary<string, Glow> glow)
+        {
+            var dup = f.Deck.GroupBy(x => x).Where(g => g.Count() >= 2 && d.Card(g.Key) is CardDef c && c.Hero != null && !c.Unique && d.UniquesOf(c.Hero).Count > 0)
+                .Select(g => g.Key).FirstOrDefault();
+            if (dup == null) return;
+            var others = f.Deck.Where(x => x != dup).Distinct().Take(2).ToList();
+            f.Deck = new List<string> { dup, dup, dup }.Concat(others).ToList();
+            glow.Clear();
+            var hero = d.Card(dup).Hero;
+            glow[dup] = new Glow { Kind = "hero", Hero = hero, Options = new List<string> { d.UniquesOf(hero).First() } };
+            Debug.Log($"[Demo] -glowbase — 「{d.Card(dup).Name}」 세 장 가운데 한 장에 은총 빛");
+        }
+
         public IReadOnlyList<BattleEvent> Begin()
         {
             var evs = new List<BattleEvent>();
             wave = 0;
             if (preset != null) { b = preset; preset = null; shownIntent.Clear(); chargeSeen.Clear(); guard.Clear(); }   // 쪽지는 이미 cues 에
-            else b = StartWave(0, -1, 0, GlowFor(data, fx.Glow));
+            else
+            {
+                var glow = GlowFor(data, fx.Glow);
+                if (Array.IndexOf(Environment.GetCommandLineArgs(), "-glowbase") >= 0) GlowBase(data, fx, glow);
+                b = StartWave(0, -1, 0, glow);
+            }
             evs.Add(new BattleEvent { Kind = EventKind.WaveStart, Value = 1, Boss = b.Enemies.Any(e => e.Boss) });
             Translate(evs);
             After(evs);

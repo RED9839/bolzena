@@ -246,6 +246,7 @@ namespace Bolzena.Core
             if (opening.Count > 0) Draw = Draw.Where(id => !opening.Contains(id)).Concat(opening).ToList();
             MergePile(Draw, "draw");
             Glow = st.Glow != null ? st.Glow.ToDictionary(kv => kv.Key, kv => kv.Value.Copy()) : new();
+            LightOne();
 
             var nx = st.Next;
             if (nx != null)
@@ -277,6 +278,36 @@ namespace Bolzena.Core
             double t = e.Tough > 0 ? e.Tough : e.Boss ? R.TOUGH.Boss : elite ? R.TOUGH.Elite : R.TOUGH.Fight;
             if (elite && !e.Boss && t < R.TOUGH.Elite) t += R.TOUGH.EliteMinion;
             return Math.Max(e.Boss ? R.TOUGH.MinBoss : R.TOUGH.Min, t);
+        }
+
+        /// <summary>
+        /// 빛은 카드 한 장에만 — 같은 id 의 카드가 더미에 둘 이상이면 하나를 「id#n」(GameData.INST)으로 갈라 그 한 장에 빛을 단다.
+        /// 신탁 · 축복 · 카드 값은 갈라 낸 한 장도 그대로 이어 받는다. 이미 갈린 id(웨이브를 넘긴 빛 …)가 더미에 없으면 맨 id 한 장을 그 이름으로 바꾼다.
+        /// 판(Run.AfterFight · ClaimGlow)은 이 이름을 덱의 한 장으로 되돌려 받는다.
+        /// </summary>
+        void LightOne()
+        {
+            if (Glow.Count == 0) return;
+            var piles = new[] { Draw, Hand, Discard };
+            int Cnt(string id) => piles.Sum(p => p.Count(x => x == id));
+            foreach (var key in Glow.Keys.ToList())
+            {
+                int n = Cnt(key);
+                string from, to;
+                if (n > 1) { from = key; to = null; }
+                else if (n == 0 && GameData.IsInst(key) && Cnt(GameData.NoInst(key)) > 0) { from = GameData.NoInst(key); to = key; }
+                else continue;
+                if (to == null)
+                {
+                    for (int k = 1; ; k++) { to = GameData.WithInst(key, k); if (Cnt(to) == 0 && !Glow.ContainsKey(to)) break; }
+                    Glow[to] = Glow[key]; Glow.Remove(key);
+                }
+                var pile = piles.First(p => p.Contains(from));
+                pile[pile.LastIndexOf(from)] = to;
+                if (Flash.TryGetValue(from, out var f)) Flash[to] = f;
+                if (Shin.TryGetValue(from, out var sh)) Shin[to] = sh;
+                if (CardSt.TryGetValue(from, out var cs)) CardSt[to] = new Dictionary<string, int>(cs);
+            }
         }
 
         // ── 복사(봇 · 미리보기) ──────────────────────────────────────

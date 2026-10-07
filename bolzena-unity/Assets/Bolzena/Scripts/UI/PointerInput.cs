@@ -15,7 +15,9 @@ namespace Bolzena.UI
         static int frame = -1;
         static bool down, up, held, rightDown, longPress, longFired;
         static Vector2 pos, downPos;
-        static float downAt;
+        static float downAt, touchEndAt = -10f;
+        static bool touchPrev, echoHeld;
+        static Vector2 mousePrev;
         public static bool Touch { get; private set; }
         public static bool Moved { get; private set; }       // 누른 뒤 멀리 움직였나(끌기)
 
@@ -34,28 +36,43 @@ namespace Bolzena.UI
             }
             else
             {
+                // 터치 — 누른 동안과 뗀 그 프레임은 터치 자리로(2026-10-07: 뗀 프레임에 마우스 자리를 읽어 폰에서 카드가 안 나갔다 —
+                //   폰 브라우저의 Mouse 는 움직이지 않아 화면 구석 등 옛 자리라, 놓기 · 탭이 모두 엉뚱한 곳에 떨어졌다)
                 h = false;
                 var ts = Touchscreen.current;
-                if (ts != null && ts.primaryTouch.press.isPressed && cam != null)
+                bool tHeld = ts != null && ts.primaryTouch.press.isPressed;
+                var m = Mouse.current;
+                if (tHeld || touchPrev)
                 {
-                    var sp = ts.primaryTouch.position.ReadValue();
-                    pos = cam.ScreenToWorldPoint(new Vector3(sp.x, sp.y, 10));
-                    h = true;
-                    Touch = true;
-                }
-                else
-                {
-                    var m = Mouse.current;
-                    if (m != null && cam != null)
+                    if (ts != null && cam != null)
                     {
-                        var sp = m.position.ReadValue();
-                        var wp = (Vector2)cam.ScreenToWorldPoint(new Vector3(sp.x, sp.y, 10));
-                        if (m.leftButton.isPressed || m.rightButton.isPressed || (wp - pos).sqrMagnitude > 0.0004f) Touch = false;
-                        if (!Touch || prevHeld) pos = wp;
+                        var sp = ts.primaryTouch.position.ReadValue();
+                        pos = cam.ScreenToWorldPoint(new Vector3(sp.x, sp.y, 10));
+                    }
+                    h = tHeld;
+                    Touch = true;
+                    if (!tHeld) touchEndAt = Time.unscaledTime;
+                    if (m != null) mousePrev = m.position.ReadValue();   // 마우스 기준점을 지금으로 — 멈춰 있는 마우스가 「움직였다」로 읽히지 않게
+                }
+                else if (m != null && cam != null)
+                {
+                    // 마우스로 넘어가는 건 마우스가 정말 움직이거나 눌렸을 때만(전에는 마우스 자리 ≠ 손가락 자리면 넘어가 폰에서 늘 「마우스」가 됐다).
+                    //   터치를 뗀 직후 0.6초 안의 마우스 누름은 브라우저가 탭에 덧붙이는 흉내 마우스라 무시한다
+                    var sp = m.position.ReadValue();
+                    bool pressed = m.leftButton.isPressed || m.rightButton.isPressed;
+                    bool active = pressed || (sp - mousePrev).sqrMagnitude > 4f;
+                    mousePrev = sp;
+                    if (Touch && pressed && Time.unscaledTime - touchEndAt < 0.6f) echoHeld = true;   // 흉내 누름은 뗄 때까지 통째로 무시
+                    if (!pressed) echoHeld = false;
+                    if (active && !echoHeld && !(Touch && Time.unscaledTime - touchEndAt < 0.6f)) Touch = false;
+                    if (!Touch)
+                    {
+                        pos = cam.ScreenToWorldPoint(new Vector3(sp.x, sp.y, 10));
                         h = m.leftButton.isPressed;
                         r = m.rightButton.isPressed;
                     }
                 }
+                touchPrev = tHeld;
             }
             down = h && !prevHeld;
             up = !h && prevHeld;

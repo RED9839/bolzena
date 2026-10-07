@@ -48,7 +48,7 @@ List<string> Chips(CardView c)                                 // 그 카드 글
 
 카드 모습 `CardView.Choices`(두 갈래 이름 둘 — 있으면 화면이 낼 때 고르게 하고 `PlayOpts.Choice` 1 · 2 로).
 
-카드 id 꼬리: `xxx~` = 전투 중 만든 맨 카드(신탁 · 축복 없음), `xxx^` = 복제본(그림을 뒤집어 보인다). `GameData.BaseId(id)` 로 원래 id(그림 찾기).
+카드 id 꼬리: `xxx~` = 전투 중 만든 맨 카드(신탁 · 축복 없음), `xxx^` = 복제본(그림을 뒤집어 보인다), `xxx#n` = 같은 카드 여러 장 가운데 한 장(빛 · 신탁이 그 한 장에만). `GameData.BaseId(id)` 로 원래 id(그림 찾기).
 
 ---
 
@@ -356,6 +356,8 @@ MetaSim.Run(data, rounds, seed, hpx, dmgx, threads) → MetaSim.Result;  MetaSim
 ---
 
 ## 바뀐 것
+
+- **v2.9(2026-10-07) — 빛은 카드 한 장에만.** 덧붙이기만. 같은 id 의 카드가 더미에 여럿이면 `Battle.Start` 가 빛나는 한 장을 `id#n`(`GameData.INST`)으로 갈라 그 한 장에만 `b.Glow` 를 단다(신탁 · 축복 · 카드 값을 이어 받음). 화면은 손패 id 로 `b.GlowOf` · `b.MarkOf` 를 보면 그대로 한 장만 빛난다. `GameData.InstOf` · `IsInst` · `NoInst` · `WithInst` — `BaseId` · `OwnerOf` 는 `#n` 을 뗀다. 판: `run.AfterFight` · `run.ClaimGlow` 가 `#n` 을 덱의 한 장으로 받는다 — 신탁을 받은 한 장만 덱에 `#n` 으로 남고(나머지는 맨 카드), 안 쓴 은총 빛은 덱을 건드리지 않는다. 「강화 카드.」 신탁의 「덱에 한 장」은 `#n` 을 뗀 id 로 센다.
 
 - **v2.8(2026-10-07) — 평소 수는 무작위 · 예고 강화.** 덧붙이기만. `b.ChargeHit(e)` · 쪽지 `foeChargeWarn` · `Battle.CHARGE_GAP` · 고학년 끊김 뒤 보스 취약(`BossUlt.CUT_VULN`) · `BossUlt.DEBUFF_PLUS`. 고학년 기준 피해 1층 300 · 2층 360(옛 210 · 250).
 

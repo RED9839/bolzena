@@ -490,5 +490,112 @@ namespace Bolzena.Core.Tests
             string U(Unit u) => $"{u.Key}:{u.Hp}/{u.MaxHp}/{u.Block}/{u.Shield}/{u.Tough}/{u.Broken}/{u.Intent?.T}{u.Intent?.V}/{D(u.Status)}/{u.Mods.Count}";
             return $"{s.Turn}|{s.Ap}|{s.Gauge}|{s.Over}|{U(s.Pool)}|{string.Join(";", s.Party.Select(U))}|{string.Join(";", s.Enemies.Select(U))}|{string.Join(",", s.Hand)}|{string.Join(",", s.Draw)}|{string.Join(",", s.Discard)}|{string.Join(";", s.Stacks.OrderBy(k => k.Key).Select(k => k.Key + ":" + D(k.Value)))}|{s.Rng.State}";
         }
+    
+        // ── 빛은 카드 한 장에만(2026-10-07 사용자 제보 — 같은 기본 카드 여러 장이 모두 빛났다) ──
+        static (Run run, string basic, string nz) ThreeOfEach(long seed)
+        {
+            var run = New(seed);
+            run.Data.Cards["nz"] = new CardDef
+            {
+                Id = "nz", Name = "시험 교주 카드", Type = "공격", Cost = 1,
+                Oracles = Enumerable.Range(1, 5).Select(i => new OracleDef { Name = "시험 신탁 " + i }).ToList(),
+            };
+            var basic = run.S.Deck.First(id => run.Data.Card(id) is CardDef c && c.Hero == "rico" && !c.Unique);
+            var nz = GameData.WithOwner("nz", "rico");
+            run.S.Deck.RemoveAll(x => x == basic);
+            for (int i = 0; i < 3; i++) { run.S.Deck.Add(basic); run.S.Deck.Add(nz); }
+            run.S.Shin[basic] = "draw";   // 갈라 낸 한 장도 축복을 이어 받는다
+            run.S.ForceGlow = new Dictionary<string, Glow>
+            {
+                [basic] = new Glow { Kind = "hero", Hero = "rico", Options = new List<string> { "rico_u1" } },
+                [nz] = new Glow { Kind = "card", Picks = new List<GlowPick> { new GlowPick { N = 2 }, new GlowPick { N = 4, Shin = "power" } } },
+            };
+            run.EnterNode(run.Reachable()[0]);
+            return (run, basic, nz);
+        }
+
+        static List<string> All(Battle b) => b.Draw.Concat(b.Hand).Concat(b.Discard).ToList();
+
+        [Test] public void 같은_카드_세_장이면_빛은_한_장에만_서고_보이고_고른_뒤에도_한_장만_바뀐다()
+        {
+            var (run, basic, nz) = ThreeOfEach(7);
+            var (b, _) = run.OpenFight();
+            var all = All(b);
+            Assert.AreEqual(3, all.Count(x => GameData.NoInst(x) == basic));
+            Assert.AreEqual(3, all.Count(x => GameData.NoInst(x) == nz));
+            Assert.AreEqual(1, all.Count(x => GameData.NoInst(x) == basic && b.GlowOf(x) != null), "은총 빛은 기본 카드 한 장에만");
+            Assert.AreEqual(1, all.Count(x => GameData.NoInst(x) == nz && b.GlowOf(x) != null), "신탁 빛은 교주 카드 한 장에만");
+            var litB = all.Single(x => GameData.NoInst(x) == basic && b.GlowOf(x) != null);
+            var litN = all.Single(x => GameData.NoInst(x) == nz && b.GlowOf(x) != null);
+            Assert.AreNotEqual(basic, litB); Assert.AreEqual(basic, GameData.BaseId(litB));
+            Assert.AreEqual("rico", GameData.OwnerOf(litN)); Assert.AreEqual("nz", GameData.BaseId(litN));
+            Assert.AreEqual("draw", b.ShinOf(litB), "갈라 낸 한 장도 축복을 이어 받는다");
+            Assert.AreEqual(run.Data.Card(basic).Name, b.CardOf(litB).Name);
+
+            // 손에 여섯 장 — 빛은 둘, 표식(신탁)은 고른 한 장에만
+            K.Hand(b, all.Where(x => GameData.NoInst(x) == basic || GameData.NoInst(x) == nz).ToArray());
+            Assert.AreEqual(6, b.Hand.Count);
+            Assert.AreEqual(2, b.Hand.Count(x => b.GlowOf(x) != null), "손에서도 빛나는 카드는 둘");
+            Assert.AreEqual("card", b.ApplyEpiphany(litN, 1));
+            Assert.IsNotNull(b.MarkOf(litN).Oracle);
+            Assert.AreEqual(1, b.Hand.Count(x => b.MarkOf(x).Oracle != null), "신탁은 고른 한 장만 바뀐다");
+            Assert.AreEqual(0, b.Hand.Count(x => GameData.NoInst(x) == nz && b.GlowOf(x) != null));
+            Assert.AreEqual(1, b.Hand.Count(x => b.GlowOf(x) != null), "기본 카드 빛은 그대로 한 장");
+
+            // 전투 저장 · 불러오기에도 그대로
+            var b2 = Battle.Load(run.Data, b.Save());
+            Assert.AreEqual(1, b2.Hand.Count(x => b2.GlowOf(x) != null));
+            Assert.AreEqual(1, b2.Hand.Count(x => b2.MarkOf(x).Oracle != null));
+
+            // 판에 — 신탁은 덱의 한 장에만, 은총 빛(안 냄)은 덱을 건드리지 않는다
+            run.AfterFight(b);
+            Assert.AreEqual(3, run.S.Deck.Count(x => x == basic), "안 쓴 은총 빛 — 기본 카드는 그대로 세 장");
+            Assert.AreEqual(3, run.S.Deck.Count(x => GameData.NoInst(x) == nz));
+            Assert.AreEqual(1, run.S.Deck.Count(x => GameData.NoInst(x) == nz && run.MarkOf(x).Oracle != null), "판에서도 한 장만 신탁");
+            Assert.AreEqual(4, run.S.Flash[litN]); Assert.AreEqual("power", run.S.Shin[litN]);
+            Assert.IsFalse(run.S.Flash.ContainsKey(nz), "나머지 두 장은 맨 카드");
+            Assert.AreEqual(2, run.S.Deck.Count(x => x == nz));
+
+            // 남은 은총(안 낸 빛)을 끝난 뒤 받는다
+            Assert.IsNull(run.ClaimGlow(litB, b.Glow[litB], 0));
+            CollectionAssert.Contains(run.S.Deck, "rico_u1");
+            Assert.AreEqual(3, run.S.Deck.Count(x => x == basic));
+
+            // 판 저장 · 불러오기, 신탁 받은 한 장의 복제(복제본은 그 모습 그대로)
+            var r2 = Run.Load(run.Data, run.Save());
+            Assert.AreEqual(1, r2.S.Deck.Count(x => GameData.NoInst(x) == nz && r2.MarkOf(x).Oracle != null));
+            var cp = run.AddCopy(litN);
+            Assert.AreEqual(nz + "^", cp);
+            Assert.AreEqual(4, run.S.Flash[cp]);
+            Assert.IsFalse(run.FlashOk(cp, 1), "복제본은 신탁 불가");
+            CollectionAssert.DoesNotContain(run.FlashTargets(), litN, "신탁 받은 한 장은 다시 후보가 아니다");
+            CollectionAssert.Contains(run.FlashTargets(), nz, "맨 두 장은 아직 후보");
+        }
+
+        [Test] public void 안_낸_신탁_빛을_끝난_뒤_받아도_한_장만_바뀐다()
+        {
+            var (run, basic, nz) = ThreeOfEach(11);
+            var (b, _) = run.OpenFight();
+            var litN = All(b).Single(x => GameData.NoInst(x) == nz && b.GlowOf(x) != null);
+            run.AfterFight(b);
+            Assert.AreEqual(3, run.S.Deck.Count(x => x == nz), "전투가 끝나도 덱은 그대로");
+            Assert.IsNull(run.ClaimGlow(litN, b.Glow[litN], 0));
+            Assert.AreEqual(1, run.S.Deck.Count(x => GameData.NoInst(x) == nz && run.S.Flash.ContainsKey(x)));
+            Assert.AreEqual(2, run.S.Deck.Count(x => x == nz));
+            Assert.AreEqual(2, run.S.Flash[run.S.Deck.Single(x => GameData.IsInst(x))]);
+        }
+
+        [Test] public void 한_장_번호_id_는_정의_주인_꼬리를_지킨다()
+        {
+            Assert.AreEqual("a#2", GameData.WithInst("a", 2));
+            Assert.AreEqual("n_x@rico#1", GameData.WithInst("n_x@rico", 1));
+            Assert.AreEqual("n_x", GameData.BaseId("n_x@rico#1"));
+            Assert.AreEqual("rico", GameData.OwnerOf("n_x@rico#1"));
+            Assert.AreEqual("n_x@rico", GameData.NoInst("n_x@rico#1"));
+            Assert.AreEqual("n_x@sion#1", GameData.WithOwner("n_x@rico#1", "sion"));
+            Assert.AreEqual("a", GameData.BaseId("a#3~"));
+            Assert.AreEqual("a~", GameData.NoInst("a#3~"));
+            Assert.IsFalse(GameData.IsInst("a")); Assert.IsTrue(GameData.IsInst("a#1"));
+        }
     }
 }

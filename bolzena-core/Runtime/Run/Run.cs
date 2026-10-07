@@ -316,16 +316,28 @@ namespace Bolzena.Core
             if (!mind)
             {
                 foreach (var id in b.GainedCards) if (!S.Deck.Contains(id) && PowerWhy(id) == null) GainCard(id);
-                foreach (var (cardId, n, shin) in b.GainedFlash) { if (GameData.IsCopy(cardId)) continue; S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
+                foreach (var (cid, n, shin) in b.GainedFlash) { if (GameData.IsCopy(cid)) continue; var cardId = OwnInst(cid); S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
             }
-            // 제거 태그 — 덱에서 완전히 뺀다
-            foreach (var id in b.Removed) { int i = S.Deck.IndexOf(id); if (i >= 0) { S.Deck.RemoveAt(i); if (!S.Deck.Contains(id)) ForgetCard(id); } }
+            // 제거 태그 — 덱에서 완전히 뺀다(전투가 갈라 낸 한 장 「#n」이면 덱의 맨 id 한 장)
+            foreach (var id0 in b.Removed)
+            {
+                var id = S.Deck.Contains(id0) || !GameData.IsInst(id0) ? id0 : GameData.NoInst(id0);
+                int i = S.Deck.IndexOf(id); if (i >= 0) { S.Deck.RemoveAt(i); if (!S.Deck.Contains(id)) ForgetCard(id); }
+            }
             // 판 단위 성장 · 카드 값(카드 인스턴스 카운터 — 엔진 상태 말고 데이터가 지은 이름)
             foreach (var kv in b.GrowthGain) S.Growth[kv.Key] = (S.Growth.TryGetValue(kv.Key, out var g0) ? g0 : new Stats()) + kv.Value;
+            var vals = new Dictionary<string, Dictionary<string, int>>();
             foreach (var kv in b.CardSt)
             {
                 var keep = kv.Value.Where(x => !R.IsCardSt(x.Key) && x.Key != "비용" && !b.BattleVals.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
-                if (keep.Count > 0 && S.Deck.Contains(kv.Key)) S.CardVals[kv.Key] = keep; else S.CardVals.Remove(kv.Key);
+                // 전투가 갈라 낸 한 장(「#n」 — 빛)은 덱에 그 이름이 없으면 맨 id 의 값에 합친다(큰 쪽)
+                var key = S.Deck.Contains(kv.Key) || !GameData.IsInst(kv.Key) ? kv.Key : GameData.NoInst(kv.Key);
+                if (!vals.TryGetValue(key, out var acc)) vals[key] = acc = new Dictionary<string, int>();
+                foreach (var x in keep) acc[x.Key] = acc.TryGetValue(x.Key, out var v0) ? Math.Max(v0, x.Value) : x.Value;
+            }
+            foreach (var kv in vals)
+            {
+                if (kv.Value.Count > 0 && S.Deck.Contains(kv.Key)) S.CardVals[kv.Key] = kv.Value; else S.CardVals.Remove(kv.Key);
             }
             // 봉인된 금기 — 보스를 처치하면 금기 카드로 바뀐다
             if (b.Over == "win" && IsBoss && S.EventFight == null)
@@ -450,6 +462,7 @@ namespace Bolzena.Core
             }
             var p = g.Picks[choice];
             if (!FlashOk(cardId, p.N)) return "강화 카드가 되는 신탁은 덱에 한 장일 때만 붙습니다";
+            cardId = OwnInst(cardId);
             S.Flash[cardId] = p.N;
             if (p.Shin != null) S.Shin[cardId] = p.Shin;
             return null;
@@ -483,7 +496,25 @@ namespace Bolzena.Core
             var c = Data.Card(cardId);
             if (c == null || n < 1 || n > c.Oracles.Count || GameData.IsCopy(cardId)) return false;   // 복제본은 복제할 때 모습에 묶인다
             if (!Data.View(cardId, n).IsPower || Data.View(cardId).IsPower) return true;
-            return S.Deck.Count(x => x == cardId) <= 1;
+            var k = GameData.NoInst(cardId);
+            return S.Deck.Count(x => GameData.NoInst(x) == k) <= 1;
+        }
+
+        /// <summary>
+        /// 전투가 갈라 낸 한 장(「id#n」 — Battle.LightOne)을 덱의 한 장으로 — 신탁이 그 한 장에만 붙게.
+        /// 덱에 그 이름이 이미 있으면 그대로, 맨 id 가 한 장뿐이면 맨 id, 여럿이면 그 가운데 한 장을 그 이름으로 바꾼다(신탁 · 축복 · 카드 값을 이어 받는다).
+        /// </summary>
+        string OwnInst(string id)
+        {
+            if (id == null || S.Deck.Contains(id) || !GameData.IsInst(id)) return id;
+            var b = GameData.NoInst(id);
+            int i = S.Deck.LastIndexOf(b);
+            if (i < 0 || S.Deck.Count(x => x == b) == 1) return b;
+            S.Deck[i] = id;
+            if (S.Flash.TryGetValue(b, out var f)) S.Flash[id] = f; else S.Flash.Remove(id);
+            if (S.Shin.TryGetValue(b, out var sh)) S.Shin[id] = sh; else S.Shin.Remove(id);
+            if (S.CardVals.TryGetValue(b, out var cv)) S.CardVals[id] = new Dictionary<string, int>(cv); else S.CardVals.Remove(id);
+            return id;
         }
 
         /// <summary>신탁을 붙일 수 있는 카드 — 가진 고유 · 교주 카드 가운데 신탁 다섯이 있고 아직 안 붙은 것(복제본 · 금기 빼고).</summary>

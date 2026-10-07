@@ -42,7 +42,8 @@ namespace Bolzena.Core
                 int best = 0; double bv = double.MinValue;
                 if (g.Kind == "card")
                 {
-                    if (!run.S.Deck.Contains(kv.Key)) continue;
+                    var nk = GameData.NoInst(kv.Key);
+                    if (!run.S.Deck.Any(x => GameData.NoInst(x) == nk)) continue;
                     for (int i = 0; i < g.Picks.Count; i++) { double v = OracleScore(kv.Key, g.Picks[i].N, g.Picks[i].Shin); if (v > bv) { bv = v; best = i; } }
                 }
                 else for (int i = 0; i < g.Options.Count; i++) { double v = plan.Score(data.View(g.Options[i])); if (v > bv) { bv = v; best = i; } }

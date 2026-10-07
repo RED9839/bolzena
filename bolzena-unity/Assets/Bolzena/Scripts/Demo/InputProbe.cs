@@ -176,7 +176,7 @@ namespace Bolzena.Demo
         //   ① 꾹 누르기 → 확대 → 떼기(닫힘 · 안 냄)  ② 꾹 누르기 → 확대 → 끌어서 적 타격  ③ 짧게 누르기 = 고르기(다시 눌러 내려놓기)
         //   결과: [Hold] 로그 · Captures/probe/hold_<입력>_<장면>/NNNN.jpg
         Touchscreen touch;
-        bool touchMode;
+        bool touchMode, mouseStill;
         int holdFail;
 
         void Ptr(Vector2 screen, bool held, bool began = false)
@@ -185,8 +185,9 @@ namespace Bolzena.Demo
             var ph = began ? UnityEngine.InputSystem.TouchPhase.Began : held ? UnityEngine.InputSystem.TouchPhase.Moved : UnityEngine.InputSystem.TouchPhase.Ended;
             touch.MakeCurrent();
             InputSystem.QueueStateEvent(touch, new TouchState { touchId = 1, phase = ph, position = screen, pressure = held ? 1 : 0 });
-            // Windows 는 터치로 마우스 자리도 옮긴다 — 가상 마우스도 같은 자리에(단추는 안 누름)
-            InputSystem.QueueStateEvent(mouse, new MouseState { position = screen, buttons = 0 });
+            // Windows 는 터치로 마우스 자리도 옮긴다 — 가상 마우스도 같은 자리에(단추는 안 누름).
+            //   폰 브라우저(webtouch)는 마우스가 그대로 — 2026-10-07 뗀 프레임에 마우스 자리를 읽어 폰에서 카드가 안 나간 일을 잡는다
+            if (!mouseStill) InputSystem.QueueStateEvent(mouse, new MouseState { position = screen, buttons = 0 });
         }
 
         IEnumerator Burst(string tag, Func<bool> until)
@@ -228,9 +229,11 @@ namespace Bolzena.Demo
             touch = InputSystem.AddDevice<Touchscreen>("ProbeTouch");
             Debug.Log($"[Hold] 화면 {Screen.width}×{Screen.height} · 폰 {Tone.Compact}");
             yield return new WaitForSecondsRealtime(0.5f);
-            foreach (var mode in new[] { "mouse", "touch" })
+            foreach (var mode in new[] { "mouse", "touch", "webtouch" })
             {
-                touchMode = mode == "touch";
+                touchMode = mode != "mouse";
+                mouseStill = mode == "webtouch";
+                if (mouseStill) { InputSystem.QueueStateEvent(mouse, new MouseState { position = new Vector2(3, 3), buttons = 0 }); yield return Frames(3); }   // 마우스는 화면 구석에 멈춰 둔다
                 // ① 꾹 누르기 → 떼기
                 yield return WaitReady(d);
                 int i = PickCard(d);

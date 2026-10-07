@@ -161,7 +161,7 @@ namespace Bolzena.Core
         /// <summary>카드 정의 id — 꼬리(~ · ^)와 주인(@사도)을 뗀 것. 그림 찾기 · 「같은 카드」 비교.</summary>
         public static string BaseId(string id)
         {
-            var s = Untail(id);
+            var s = NoInstCore(Untail(id));
             int at = s?.IndexOf(OWNER) ?? -1;
             return at > 0 ? s.Substring(0, at) : s;
         }
@@ -185,7 +185,7 @@ namespace Bolzena.Core
         /// <summary>id 에 적힌 주인 사도(없으면 null).</summary>
         public static string OwnerOf(string id)
         {
-            var s = Untail(id);
+            var s = NoInstCore(Untail(id));
             int at = s?.IndexOf(OWNER) ?? -1;
             return at > 0 && at < s.Length - 1 ? s.Substring(at + 1) : null;
         }
@@ -194,7 +194,43 @@ namespace Bolzena.Core
         {
             if (id == null) return null;
             string tail = id.Substring(id.Length - TailLen(id));
-            return BaseId(id) + (heroKey != null ? OWNER + heroKey : "") + tail;
+            return BaseId(id) + (heroKey != null ? OWNER + heroKey : "") + InstOf(id) + tail;
+        }
+
+        /// <summary>
+        /// 같은 카드 여러 장 가운데 한 장 — 「카드[@사도]#n[꼬리]」. 신탁 · 은총의 빛은 카드 한 장에만 선다(2026-10-07 사용자 제보 —
+        /// 같은 기본 카드가 덱에 여럿이면 id 가 같아 모두 빛났다). 빛나는 한 장 · 신탁을 받은 한 장이 이 번호로 나머지와 갈린다.
+        /// 그림 · 정의 · 주인은 그대로(BaseId · OwnerOf 가 뗀다).
+        /// </summary>
+        public const string INST = "#";
+        static string NoInstCore(string core)
+        {
+            int k = core?.IndexOf(INST, StringComparison.Ordinal) ?? -1;
+            return k > 0 ? core.Substring(0, k) : core;
+        }
+        /// <summary>id 의 한 장 번호 꼬리(「#2」) — 없으면 "".</summary>
+        public static string InstOf(string id)
+        {
+            var core = Untail(id);
+            int k = core?.IndexOf(INST, StringComparison.Ordinal) ?? -1;
+            return k > 0 ? core.Substring(k) : "";
+        }
+        public static bool IsInst(string id) => InstOf(id).Length > 0;
+        /// <summary>한 장 번호만 뗀 id(주인 · 꼬리는 그대로) — 「같은 카드 여러 장」 비교.</summary>
+        public static string NoInst(string id)
+        {
+            if (id == null) return null;
+            var inst = InstOf(id);
+            if (inst.Length == 0) return id;
+            var core = Untail(id);
+            return core.Substring(0, core.Length - inst.Length) + id.Substring(core.Length);
+        }
+        /// <summary>한 장 번호 n 을 붙인 id(이미 있으면 바꾼다).</summary>
+        public static string WithInst(string id, int n)
+        {
+            var b = NoInst(id);
+            var core = Untail(b);
+            return core + INST + n + b.Substring(core.Length);
         }
         /// <summary>주인만 뗀 id(꼬리는 그대로) — 「덱에 한 장」(유일) 비교.</summary>
         public static string NoOwner(string id) => WithOwner(id, null);

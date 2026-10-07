@@ -12,6 +12,11 @@ namespace Bolzena.UI
     public static class EpiphanyWindow
     {
         const int O = 800;
+        // 연출 세기(2026-10-07 사용자 「신탁 연출이 너무 화려」) — 빛 · 섬광 세기 · 입자 수 · 지속을 예전의 대략 절반(K 0.5).
+        // 저사양 모드 · 움직임 줄이기면 더 약하게(K 0.3 — 고리 하나 · 빛살 안 돈다).
+        static bool Calm => Bolzena.RunUI.Settings.ReduceMotion || LowSpecFx.On;
+        static float K => Calm ? 0.3f : 0.5f;
+        static int N(int n) => Mathf.Max(1, Mathf.RoundToInt(n * K));
         public static System.Action<string> OnStage;
         /// <summary>지금 열린 창의 고를 카드들(닫혀 있으면 null) — 입력 재현(InputProbe)이 짚는다.</summary>
         public static List<CardView> Options { get; private set; }
@@ -27,9 +32,9 @@ namespace Bolzena.UI
             var dim = Make.Box("dim", root, Res.UI("white"), Vector3.zero, new Vector2(44, 16), O, new Color(0.03f, 0.02f, 0.06f, 0));
             var raysMat = Res.NewMat("Bolzena/Rays");
             raysMat.SetColor("_Color", new Color(1f, 0.82f, 0.4f, 1f));
-            raysMat.SetFloat("_Count", 22);
-            raysMat.SetFloat("_Spin", 0.05f);
-            raysMat.SetFloat("_Boost", 1.6f);
+            raysMat.SetFloat("_Count", 14);
+            raysMat.SetFloat("_Spin", Calm ? 0f : 0.025f);
+            raysMat.SetFloat("_Boost", 1.6f * K);
             raysMat.SetFloat("_Inner", 0.08f);
             raysMat.SetFloat("_Outer", 0.55f);
             var rays = Make.Quad("rays", root, new Vector3(0, 0.2f, 0), new Vector2(18, 18), raysMat, O + 1);
@@ -37,7 +42,7 @@ namespace Bolzena.UI
             var title = Make.Text("title", root, "신탁!", new Vector3(0, 3.55f, 0), 0.95f, O + 40, new Color(1f, 0.95f, 0.75f));
             title.colorGradient = new VertexGradient(Color.white, Color.white, new Color(1f, 0.78f, 0.3f), new Color(1f, 0.78f, 0.3f));
             Make.Outline(title, 0.2f, new Color(0.35f, 0.15f, 0));
-            Make.Glow(title, Color.white, 1.5f);
+            Make.Glow(title, Color.white, 1.5f * K + 0.3f);
             var sub = Make.Text("sub", root, "<color=#ffd76a>" + card.Info.Name + "</color>에 신탁 — 카드를 눌러 하나를 고르세요(←→ 엔터). 이번에는 비용 0",
                 new Vector3(0, 2.85f, 0), 0.24f, O + 40, new Color(1f, 0.92f, 0.8f));
             Make.Outline(sub, 0.25f, Color.black);
@@ -62,11 +67,11 @@ namespace Bolzena.UI
             yield return Clock.Tween(0.35f, t =>
             {
                 Make.Alpha(dim, 0.78f * t);
-                raysMat.SetFloat("_Alpha", 0.55f * t);
+                raysMat.SetFloat("_Alpha", 0.55f * K * t);
                 title.alpha = t; sub.alpha = t; Make.Alpha(subBg, t);
-                title.transform.localScale = Vector3.one * Mathf.LerpUnclamped(2.2f, 1f, Ease.OutBack(t, 2f));
+                title.transform.localScale = Vector3.one * (Calm ? 1f : Mathf.LerpUnclamped(1.35f, 1f, Ease.OutBack(t, 1.2f)));
             }, true);
-            Vfx.Glow(new Vector3(0, 0.1f, 0), 4.5f, new Color(1f, 0.85f, 0.45f, 0.9f), 0.5f, 3f, null, O + 30, root);
+            Vfx.Glow(new Vector3(0, 0.1f, 0), 3.2f, new Color(1f, 0.85f, 0.45f, 0.9f * K), 0.3f, 3f * K, null, O + 30, root);
             Sfx.Play("epiphany", 0.5f, 1.2f);
 
             // 세 갈래로 — 가운데 카드에서 겹쳐 나와 펼쳐진다
@@ -109,8 +114,8 @@ namespace Bolzena.UI
             Clock.Run(Clock.Tween(0.3f, t => card.SetAlpha(1 - t), true));
             Vfx.Burst(new Vector3(0, 0.1f, 0), new Vfx.BurstOpt
             {
-                Tex = "FX_UI_star_02", Count = 26, Speed = new Vector2(2f, 6f), Life = new Vector2(0.4f, 0.8f), Size = new Vector2(0.1f, 0.3f),
-                C0 = new Color(1f, 0.85f, 0.4f), C1 = Color.white, Drag = 2f, Order = O + 45, Boost = 3f, Parent = root, ShrinkTo = 0,
+                Tex = "FX_UI_star_02", Count = N(26), Speed = new Vector2(1.5f, 4f), Life = new Vector2(0.2f, 0.4f), Size = new Vector2(0.08f, 0.22f),
+                C0 = new Color(1f, 0.85f, 0.4f), C1 = Color.white, Drag = 2f, Order = O + 45, Boost = 3f * K, Parent = root, ShrinkTo = 0,
             });
             yield return Clock.WaitU(0.55f);
             OnStage?.Invoke("epiphany_window");
@@ -179,44 +184,44 @@ namespace Bolzena.UI
             yield return Clock.WaitU(0.3f);
 
             // 변신 — 흰빛으로 타오르다(겹친 원래 카드가 다시 보인다) 바뀐 모습으로
-            yield return Clock.Tween(0.22f, t => chosen.SetFlash(Ease.InCubic(t)), true);
+            yield return Clock.Tween(0.18f, t => chosen.SetFlash((Calm ? 0.5f : 0.75f) * Ease.InCubic(t)), true);
             OnStage?.Invoke("epiphany_burn");
             card.Info = options[choice];
             card.Refresh();
             card.SetAlpha(1);
-            card.SetFlash(1);
+            card.SetFlash(Calm ? 0.5f : 0.75f);
             card.transform.localPosition = new Vector3(0, 0.1f, 0);
             card.TargetPos = new Vector3(0, 0.1f, 0);
-            card.transform.localScale = Vector3.one * 1.6f;
+            card.transform.localScale = Vector3.one * (Calm ? 1.35f : 1.45f);
             card.TargetScale = 1.35f;
             card.SetOrder(O + 50);
             foreach (var c in opts) Object.Destroy(c.gameObject);
             Sfx.Play("epiphany", 0.9f);
-            Vfx.Flash(new Color(1f, 0.95f, 0.8f, 0.3f), 0.3f, 1f, O + 60);
-            Vfx.Ring(new Vector3(0, 0.1f, 0), 1f, 9f, 0.55f, new Color(1f, 0.85f, 0.5f, 1f), 3f, "FX_IN_Ring_ShockWave_01", O + 55, root, 1f, true);
-            Vfx.Ring(new Vector3(0, 0.1f, 0), 0.5f, 6f, 0.45f, new Color(1f, 1f, 1f, 1f), 2.5f, "FX_IN_RIng_Hit_wave_01", O + 55, root, 1f, true);
+            Vfx.Flash(new Color(1f, 0.95f, 0.8f, 0.3f * K), 0.18f, 1f, O + 60);
+            Vfx.Ring(new Vector3(0, 0.1f, 0), 1f, 5f, 0.3f, new Color(1f, 0.85f, 0.5f, 1f), 3f * K, "FX_IN_Ring_ShockWave_01", O + 55, root, 1f, true);
+            if (!Calm) Vfx.Ring(new Vector3(0, 0.1f, 0), 0.5f, 3.5f, 0.25f, new Color(1f, 1f, 1f, 1f), 2.5f * K, "FX_IN_RIng_Hit_wave_01", O + 55, root, 1f, true);
             Vfx.Burst(new Vector3(0, 0.1f, 0), new Vfx.BurstOpt
             {
-                Tex = "FX_IN_Spark", Count = 40, Speed = new Vector2(6f, 15f), Life = new Vector2(0.3f, 0.6f), Size = new Vector2(0.08f, 0.2f),
-                C0 = new Color(1f, 0.8f, 0.35f), C1 = Color.white, Stretch = true, StretchK = 0.04f, Drag = 3f, Order = O + 56, Boost = 4f, Parent = root,
+                Tex = "FX_IN_Spark", Count = N(40), Speed = new Vector2(4f, 9f), Life = new Vector2(0.15f, 0.3f), Size = new Vector2(0.06f, 0.16f),
+                C0 = new Color(1f, 0.8f, 0.35f), C1 = Color.white, Stretch = true, StretchK = 0.04f, Drag = 3f, Order = O + 56, Boost = 4f * K, Parent = root,
             });
             Vfx.Burst(new Vector3(0, 0.1f, 0), new Vfx.BurstOpt
             {
-                Tex = "FX_UI_star_02", Count = 24, Speed = new Vector2(1.5f, 5f), Life = new Vector2(0.6f, 1.1f), Size = new Vector2(0.12f, 0.32f),
-                C0 = new Color(1f, 0.9f, 0.5f), C1 = Color.white, Drag = 1.5f, Order = O + 56, Boost = 3f, Parent = root, ShrinkTo = 0, Spin = true,
+                Tex = "FX_UI_star_02", Count = N(24), Speed = new Vector2(1f, 3f), Life = new Vector2(0.3f, 0.55f), Size = new Vector2(0.1f, 0.24f),
+                C0 = new Color(1f, 0.9f, 0.5f), C1 = Color.white, Drag = 1.5f, Order = O + 56, Boost = 3f * K, Parent = root, ShrinkTo = 0, Spin = true,
             });
             var awake = Make.Text("awake", root, "신탁 · " + (options[choice].EpiphanyLabel ?? ""), new Vector3(0, -2.25f, 0), 0.5f, O + 61, new Color(1f, 0.9f, 0.55f));
             Make.Outline(awake, 0.25f, new Color(0.3f, 0.12f, 0));
-            Make.Glow(awake, new Color(1f, 0.9f, 0.6f), 1.4f);
-            yield return Clock.Tween(0.45f, t => card.SetFlash(1 - Ease.OutCubic(t)), true);
+            Make.Glow(awake, new Color(1f, 0.9f, 0.6f), 1.4f * K + 0.2f);
+            yield return Clock.Tween(0.3f, t => card.SetFlash((Calm ? 0.5f : 0.75f) * (1 - Ease.OutCubic(t))), true);
             OnStage?.Invoke("epiphany_reborn");
-            yield return Clock.WaitU(0.45f);
+            yield return Clock.WaitU(0.35f);
 
             // 닫기 — 카드는 그대로 남아 이어서 나간다
             yield return Clock.Tween(0.25f, t =>
             {
                 Make.Alpha(dim, 0.78f * (1 - t));
-                raysMat.SetFloat("_Alpha", 0.55f * (1 - t));
+                raysMat.SetFloat("_Alpha", 0.55f * K * (1 - t));
                 title.alpha = 1 - t; sub.alpha = 1 - t; awake.alpha = 1 - t; Make.Alpha(subBg, 1 - t);
             }, true);
             Object.Destroy(root.gameObject);

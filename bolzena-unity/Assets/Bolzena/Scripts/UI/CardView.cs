@@ -67,7 +67,7 @@ namespace Bolzena.UI
             raysMat.SetFloat("_Outer", 0.62f);
             rays = Make.Quad("rays", t, new Vector3(0, 0.1f, 0), new Vector2(5.4f, 5.4f), raysMat, 0);
             Make.Own(rays.gameObject, raysMat);       // 카드마다 새로 만든 재질 — 카드와 함께 지운다
-            epiGlow = Make.Box("epiglow", t, Res.UI("card_glow"), Vector3.zero, new Vector2(2.7f, 3.5f), 0, new Color(1f, 0.82f, 0.35f, 1f), Res.SpriteMat(true, 3.5f));
+            epiGlow = Make.Box("epiglow", t, Res.UI("card_glow"), Vector3.zero, new Vector2(2.55f, 3.3f), 0, new Color(1f, 0.82f, 0.35f, 1f), Res.SpriteMat(true, 1.8f));
             glow = Make.Box("glow", t, Res.UI("card_glow"), Vector3.zero, new Vector2(2.5f, 3.3f), 0, new Color(0.6f, 0.9f, 1f, 0f), Res.SpriteMat(true, 1.8f));
             rim = Make.Box("rim", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W, H), 0);
             body = Make.Box("body", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W - 0.07f, H - 0.07f), 0, new Color(0.06f, 0.08f, 0.16f));
@@ -232,7 +232,7 @@ namespace Bolzena.UI
             epiText.text = info.Epiphany ? "신탁" : !string.IsNullOrEmpty(info.EpiphanyLabel) ? info.EpiphanyLabel : "";
             PlaceMarks(info, decoY + 0.14f);
             bool epi = info.Epiphany;
-            rays.enabled = epi;
+            rays.enabled = false;   // 손패의 신탁 카드는 은은한 테두리 빛(epiGlow) · 금 테 · 「신탁」 띠만(2026-10-07 사용자 「신탁 연출이 너무 화려」 — 빛줄기 뺌)
             epiGlow.enabled = epi;
             ApplyVisibility();
         }
@@ -511,20 +511,21 @@ namespace Bolzena.UI
 
             if (Info.Epiphany)
             {
+                // 은은한 테두리 빛 — 천천히 옅게 숨 쉰다. 저사양 · 움직임 줄이기면 숨도 불티도 없이 더 옅게
+                bool calm = Bolzena.RunUI.Settings.ReduceMotion || LowSpecFx.On;
                 epiT += dt;
-                float pulse = 0.75f + 0.25f * Mathf.Sin(epiT * 4f);
+                float pulse = calm ? 0.45f : 0.5f + 0.12f * Mathf.Sin(epiT * 2.2f);
                 var ec = epiGlow.color; ec.a = pulse * alphaMul; epiGlow.color = ec;
-                raysMat.SetFloat("_Alpha", (0.75f + 0.25f * Mathf.Sin(epiT * 2.3f)) * alphaMul);
                 sparkT -= dt;
-                if (sparkT <= 0)
+                if (!calm && sparkT <= 0)
                 {
-                    sparkT = 0.09f;
+                    sparkT = 0.45f;
                     var edge = new Vector3(Random.Range(-W / 2, W / 2), Random.Range(-H / 2, H / 2), 0);
                     if (Random.value < 0.5f) edge.x = Mathf.Sign(edge.x) * W / 2; else edge.y = Mathf.Sign(edge.y) * H / 2;
                     Vfx.Burst(edge, new Vfx.BurstOpt
                     {
                         Tex = "FX_UI_star_02", Count = 1, Speed = new Vector2(0.3f, 0.9f), Angle = 90, Spread = 50, Life = new Vector2(0.6f, 1.0f),
-                        Size = new Vector2(0.14f, 0.3f), C0 = new Color(1f, 0.9f, 0.5f), C1 = Color.white, Order = order + 9, Boost = 3.5f, Parent = transform,
+                        Size = new Vector2(0.1f, 0.2f), C0 = new Color(1f, 0.9f, 0.5f), C1 = Color.white, Order = order + 9, Boost = 1.8f, Parent = transform,
                         ShrinkTo = 0f,
                     });
                 }

@@ -197,7 +197,7 @@ namespace Bolzena.UI
                     float half = CardView.W * sc / 2;
                     x = Mathf.Clamp(off * spacing, -HalfSpan - 0.1f + half, HalfSpan + 0.6f - half);
                 }
-                if (c.Info.Epiphany && i != up) y += 0.14f + 0.05f * Mathf.Sin(Clock.Now * 3f);   // 신탁 카드는 살짝 떠서 숨 쉰다
+                if (c.Info.Epiphany && i != up) y += 0.08f + (Bolzena.RunUI.Settings.ReduceMotion ? 0f : 0.02f * Mathf.Sin(Clock.Now * 2f));   // 신탁 카드는 살짝 떠서 숨 쉰다(2026-10-07 — 은은하게, 움직임 줄이기면 멈춤)
                 if (Hidden) y -= 4.5f;
                 c.TargetPos = new Vector3(x, y, 0);
                 c.TargetRot = rot;
