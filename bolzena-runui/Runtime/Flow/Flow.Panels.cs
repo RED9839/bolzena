@@ -116,7 +116,14 @@ namespace Bolzena.RunUI
             int curMode = DisplayOptions.ModeIndex, curPreset = DisplayOptions.PresetIndex;
             string ResLine() => "지금 " + DisplayOptions.Describe();
             string FullLine() => $"지금 {Screen.width}×{Screen.height} · 전체 화면은 Esc 로 나옵니다";
-            string FpsLine() => DisplayOptions.VSync ? "수직동기가 켜져 있어 쉽니다 · 끄면 고를 수 있습니다" : "초당 그리는 횟수입니다 · 낮추면 전기와 열이 줄어듭니다";
+            bool low = DisplayOptions.LowSpec;
+            const string LowWhy = "저사양 모드를 끄면 고를 수 있습니다";
+            string FpsLine() => low ? $"저사양 모드라 {DisplayOptions.LowSpecFps} 으로 그립니다"
+                              : DisplayOptions.VSync ? "수직동기가 켜져 있어 쉽니다 · 끄면 고를 수 있습니다" : "초당 그리는 횟수입니다 · 낮추면 전기와 열이 줄어듭니다";
+            string QualLine() => low ? $"저사양 모드라 {Mathf.RoundToInt(DisplayOptions.QualityScale * 100)}% 로 그립니다"
+                               : "전투 화면을 그리는 크기입니다 · 낮추면 가볍고 조금 흐려집니다";
+            var quals = new Btn[0];
+            TextMeshProUGUI qualDesc = null;
 
             if (DisplayOptions.Web)
                 fullDesc = SetToggle(c, "전체 화면", FullLine(), Screen.fullScreen, v => DisplayOptions.SetWebFullScreen(v), "disp.full");
@@ -139,23 +146,42 @@ namespace Bolzena.RunUI
                     var lk = Ui.Img(presets[i].transform, Theme.S("ic_lock"), Theme.Sub, "lock"); lk.rectTransform.At(1, 1, -6, -5, 14, 14); lk.preserveAspect = true;
                 }
             }
+            // 저사양 모드 — 켜면 아래 세부 항목(화질 · 프레임 · 수직동기 · 화면 효과)을 한 번에 정하고 잠근다(저장된 값은 그대로 — 끄면 돌아온다)
+            SetToggle(c, "저사양 모드", "화면 효과 끔 · 화질 75% · 프레임 30 · 이펙트 줄임을 한 번에 겁니다 · 폰 · 약한 PC 용", low,
+                v => { DisplayOptions.SetLowSpec(v); StartCoroutine(Rebuild()); }, "disp.low");
+            if (!desk)
+            {
+                // 웹 · 폰 — 해상도 칸이 없어 화질(렌더 배율)을 따로 고른다
+                var qc = SetRow(c, "화질", QualLine(), Theme.C(360, 360), 50, out qualDesc, out _);
+                quals = SetSegments(qc, Enumerable.Range(0, DisplayOptions.Qualities.Count).Select(DisplayOptions.QualityName).ToArray(),
+                    k => { DisplayOptions.SetQuality(k); Paint(); }, "disp.qual");
+            }
             var fc = SetRow(c, "프레임 제한", FpsLine(), Theme.C(500, 500), 50, out fpsDesc, out _);
             fps = SetSegments(fc, Enumerable.Range(0, DisplayOptions.FrameCaps.Count).Select(DisplayOptions.FrameCapName).ToArray(),
                 k => { DisplayOptions.SetFrameCap(k); Paint(); }, "disp.fps");
-            SetToggle(c, "수직동기", "모니터 주사율에 맞춰 찢김 없이 그립니다", DisplayOptions.VSync, v => { DisplayOptions.SetVSync(v); Paint(); }, "disp.vsync");
+            SetToggle(c, "수직동기", low ? "저사양 모드라 쉽니다" : "모니터 주사율에 맞춰 찢김 없이 그립니다", DisplayOptions.VSync && !low, v => { DisplayOptions.SetVSync(v); Paint(); }, "disp.vsync");
+            SetToggle(c, "화면 효과", low ? "저사양 모드라 꺼 둡니다" : "전투의 빛 번짐 · 타격 색 효과를 그립니다 · 끄면 폰 · 저사양 PC 에서 가벼워집니다", DisplayOptions.PostFxOn, v => DisplayOptions.SetPostFx(v), "disp.post");
+            if (low) foreach (var hk in new[] { "disp.vsync", "disp.post" }) Lock(hk);
             SetToggle(c, "글자 크게", "판 화면 글자를 키웁니다 · 다음 화면부터 바뀝니다", Settings.BigText, v => Settings.BigText = v, "set.big");
 
             void Paint()
             {
                 for (int i = 0; i < modes.Length; i++) SegOn(modes[i], i == curMode);
                 for (int i = 0; i < presets.Length; i++) SegOn(presets[i], i == curPreset);
-                bool vs = DisplayOptions.VSync;
+                bool vs = DisplayOptions.VSync && !low;
                 for (int i = 0; i < fps.Length; i++)
                 {
-                    SegOn(fps[i], !vs && i == DisplayOptions.FpsIndex);
-                    fps[i].Interactable = !vs;
-                    fps[i].Why = vs ? "수직동기를 끄면 고를 수 있습니다" : null;
+                    SegOn(fps[i], !vs && i == DisplayOptions.FpsIndexOn);
+                    fps[i].Interactable = !vs && !low;
+                    fps[i].Why = low ? LowWhy : vs ? "수직동기를 끄면 고를 수 있습니다" : null;
                 }
+                for (int i = 0; i < quals.Length; i++)
+                {
+                    SegOn(quals[i], Mathf.Abs(DisplayOptions.Qualities[i] - DisplayOptions.QualityScale) < 0.001f);
+                    quals[i].Interactable = !low;
+                    quals[i].Why = low ? LowWhy : null;
+                }
+                if (qualDesc) qualDesc.text = QualLine();
                 if (modeDesc) modeDesc.text = ModeLine(curMode);
                 if (resDesc) resDesc.text = ResLine();
                 if (fullDesc) fullDesc.text = FullLine();
@@ -176,6 +202,28 @@ namespace Bolzena.RunUI
                     if (!kept) { curMode = pm; curPreset = pp; }
                     Paint();
                 });
+            }
+
+            // 잠근 스위치 — 줄 전체를 옅게, 누르면 까닭을 알린다
+            void Lock(string hot)
+            {
+                if (!Stage.Hot.TryGetValue(hot, out var b) || b == null) return;
+                b.Interactable = false;
+                b.Why = LowWhy;
+                var row = b.transform.parent;
+                if (!row) return;
+                var cg = row.GetComponent<CanvasGroup>();
+                if (!cg) cg = row.gameObject.AddComponent<CanvasGroup>();
+                cg.alpha = 0.5f;
+            }
+
+            // 저사양 모드를 바꾸면 탭을 다시 그린다(잠금 · 설명 · 스위치 상태가 한꺼번에 바뀐다) — 누른 스위치가 제 동작을 끝낸 다음 프레임에
+            System.Collections.IEnumerator Rebuild()
+            {
+                yield return null;
+                if (!c || settingsTab != 1) yield break;
+                Gone(c);
+                ScreenTab(c);
             }
 
             Paint();

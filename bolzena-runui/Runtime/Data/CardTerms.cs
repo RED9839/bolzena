@@ -247,8 +247,8 @@ namespace Bolzena.RunUI
         /// 카드 글 · 낱말 판 글을 어절 단위로 꺾되, 끊으면 안 되는 덩이는 &lt;nobr&gt; 로 묶는다(2026-10-07 사용자 「『사기』 가 『사 / 기』 로 갈린다」).
         /// 줄바꿈 자체는 TMP 설정의 새 한글 규칙(어절 단위 — TMP Settings useModernHangulLineBreakingRules)이 하고, 여기서는 덩이만:
         ///   · 「…」 이름 · 밑줄 낱말(&lt;link&gt;) 안의 띄어쓰기는 끊지 않음(「첩보원 모드」 · 「방어 기반 피해」)
-        ///   · 수치 + 단위는 앞 낱말에 붙임(「공격력 120%」 · 「사기 1」 · 「「당」 +1」)
-        ///   · 한 글자 낱말은 뒤 낱말과(「→ 그 적에게」), 「더」 는 앞 낱말과(「피해 더」), 문단 끝 2글자 이하는 앞 낱말과(「피해」 가 홀로 남지 않게)
+        ///   · 수치 + 단위는 앞 낱말에 붙임(「피해 120%」 · 「사기 1」 · 「「당」 1」)
+        ///   · 한 글자 낱말은 뒤 낱말과(「그 적에게」), 「더」 는 앞 낱말과(「피해 90% 더」), 문단 끝 2글자 이하는 앞 낱말과(「피해」 가 홀로 남지 않게)
         ///   덩이가 너무 길어지지 않게(이름 · 낱말 안이 아니면) 12글자까지만 붙인다. Mark · 수치 색을 입힌 뒤 맨 나중에 부른다.
         /// </summary>
         public static string KeepWords(string rich)
@@ -303,10 +303,11 @@ namespace Bolzena.RunUI
             return sb.ToString();
         }
         /// <summary>
-        /// 카드 글 · 낱말 판 글의 최종 모습(2026-10-07 「조건 줄 배치가 들쭉날쭉」) — 화살표 규칙 + KeepWords.
-        ///   · 「조건 → 결과」 한 줄이 칸 폭(maxW)에 다 들어가면 한 줄 그대로
-        ///   · 안 들어가면 언제나 「조건」 / 「→ 결과」 로 나눈다(화살표는 늘 줄 맨 앞 — 화살표 뒤에서 꺾이지 않는다). 한 줄에 화살표가 여럿이면 화살표마다.
-        ///   「→ 결과」 줄이 또 넘치면 결과 안에서 어절 단위로 꺾인다(「→」 는 KeepWords 가 뒤 낱말과 묶는다).
+        /// 카드 글 · 낱말 판 글의 최종 모습 — 조건 줄 나눔 + KeepWords.
+        /// 2026-10-07 화살표 없앰(사용자 「카드 설명에 화살표랑 + 없애 줘」) — 엔진은 「조건 결과」 를 띄어쓰기 하나로 잇는다:
+        ///   · 「조건 결과」 한 줄이 칸 폭(maxW)에 다 들어가면 한 줄 그대로
+        ///   · 안 들어가면 언제나 「조건,」 / 「결과」 로 나눈다 — 조건 줄 끝의 쉼표가 「다음 줄로 이어짐」 표시(가운데 맞춤 칸이라 들여쓰기는 안 보임).
+        ///     조건이 어디서 끝나는지는 엔진이 지은 머리 목록(core CardText.HeadEnd)으로 찾는다. 결과 줄이 또 넘치면 결과 안에서 어절 단위로 꺾인다.
         /// lineWidth = 그 글 한 줄의 폭(꺾지 않고 잰 것) — 화면이 그릴 글자 크기로 잰다(LineWidth).
         /// </summary>
         public static string Fit(string rich, Func<string, float> lineWidth, float maxW)
@@ -315,9 +316,30 @@ namespace Bolzena.RunUI
             if (string.IsNullOrEmpty(rich) || OldWrap) return rich;
             var lines = rich.Split('\n');
             for (int i = 0; i < lines.Length; i++)
-                if (lines[i].Contains(" → ") && lineWidth(lines[i]) > maxW - 0.5f * 0.01f * maxW)
-                    lines[i] = lines[i].Replace(" → ", "\n→ ");
+            {
+                if (lineWidth(lines[i]) <= maxW - 0.5f * 0.01f * maxW) continue;
+                int at = CondBreak(lines[i]);
+                if (at > 0) lines[i] = lines[i].Substring(0, at) + ",\n" + lines[i].Substring(at + 1);
+            }
             return KeepWords(string.Join("\n", lines));
+        }
+
+        /// <summary>리치 글 한 줄에서 조건 머리 뒤 띄어쓰기의 자리(태그 밖) — 없으면 -1.</summary>
+        static int CondBreak(string rich)
+        {
+            var plain = new StringBuilder(rich.Length);
+            var map = new List<int>(rich.Length);
+            bool tag = false, sprite = false;
+            for (int k = 0; k < rich.Length; k++)
+            {
+                char c = rich[k];
+                if (tag) { if (c == '>') tag = false; continue; }
+                if (c == '<') { tag = true; sprite = string.CompareOrdinal(rich, k, "<sprite", 0, 7) == 0; continue; }
+                if (sprite) { sprite = false; if (c == ' ') continue; }   // 카드 아이콘(Mark 의 CardGlyph) 뒤 띄어쓰기는 엔진 글에 없다
+                plain.Append(c); map.Add(k);
+            }
+            int p = CardText.HeadEnd(plain.ToString());
+            return p >= 0 && p < map.Count && rich[map[p]] == ' ' ? map[p] : -1;
         }
 
         /// <summary>글 한 줄을 꺾지 않고 잰 폭 — t 의 글꼴 · 크기 size 로(자동 크기는 잠깐 끈다).</summary>
@@ -330,7 +352,7 @@ namespace Bolzena.RunUI
             return w;
         }
 
-        /// <summary>t 에 넣을 글 — 화살표 규칙을 t 의 지금 크기 · 폭으로(Fit).</summary>
+        /// <summary>t 에 넣을 글 — 조건 줄 나눔을 t 의 지금 크기 · 폭으로(Fit).</summary>
         public static string FitFor(TMP_Text t, string rich, float maxW, float size) => Fit(rich, l => LineWidth(t, l, size), maxW);
 
         static string Plain(string w) { var o = new StringBuilder(); bool t = false; foreach (char c in w) { if (t) { if (c == '>') t = false; continue; } if (c == '<') { t = true; continue; } o.Append(c); } return o.ToString(); }

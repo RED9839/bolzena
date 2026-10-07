@@ -59,6 +59,7 @@ namespace Bolzena
             string key = "spine:" + folder;
             if (cache.TryGetValue(key, out var o)) { Touch(key, spineOrder, SpineKeep); return o as SkeletonDataAsset; }
             // 웹 빌드는 스파인을 번들로 받는다(WebBundles — SpineSource 가 번들 먼저, 없으면 Resources)
+            using var _h = Bolzena.RunUI.Hitch.Span("Res.Spine 읽기");
             var a = Bolzena.RunUI.SpineStencil.Fix(Bolzena.RunUI.SpineSource.Load(folder));   // 원작 스텐실 가리기(미로 거울 · 셰이디(역전)) → 스파인 클리핑
             if (a == null && Bolzena.RunUI.SpineSource.IsPending(folder)) { Debug.LogWarning("[Res] 스파인 아직 받는 중: " + folder); return null; }
             if (a == null) Debug.LogWarning("[Res] 스파인 없음: " + folder);

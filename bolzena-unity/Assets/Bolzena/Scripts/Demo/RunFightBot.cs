@@ -15,6 +15,7 @@ namespace Bolzena.Demo
         static int fightNo;
         BattleDirector d;
         string label;
+        static int playedAll;   // 판 전체에서 봇이 낸 카드 수(메모리 재기 표식)
         bool lose;
 
         public static void Attach(BattleDirector director)
@@ -141,7 +142,7 @@ namespace Bolzena.Demo
             yield return WaitInput();
             yield return Wait(0.3f);
             Snap("start");
-            int acts = 0;
+            int acts = 0, played = 0;   // played = 이 싸움에서 낸 카드(판 전체는 playedAll)
             while (!d.Over && acts++ < 200)
             {
                 yield return WaitInput();
@@ -168,6 +169,10 @@ namespace Bolzena.Demo
                     Vector3 to = info.Target == TargetKind.Enemy ? EnemyCenter(t) : info.Target == TargetKind.Ally ? d.Hand.AllyDrop(info) : new Vector3(0.3f, 0.6f, 0);
                     yield return d.Hand.DemoDrag(pick, to, 0.15f, 0.3f, 0.15f);
                     yield return WaitTurnDone();
+                    played++; playedAll++;
+                    // 메모리 재기(웹 하네스가 [Mem] 줄마다 힙을 적는다) — 이 싸움 첫 카드 · 판 전체에서 다섯 장째
+                    if (played == 1) Bolzena.RunUI.MemLog.Log($"{label}_card1");
+                    if (playedAll == 5) Bolzena.RunUI.MemLog.Log($"{label}_card5_total");
                     continue;
                 }
                 yield return Click(d.Hud.EndPos);

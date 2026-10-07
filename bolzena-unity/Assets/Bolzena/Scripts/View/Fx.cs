@@ -169,6 +169,7 @@ namespace Bolzena.View
 
         public static ParticleSystem Burst(Vector3 pos, BurstOpt o)
         {
+            int count = LowSpecFx.Count(o.Count);   // 저사양 모드면 절반(BurstOpt 는 되쓰일 수 있어 고치지 않는다)
             var go = new GameObject("burst");
             go.SetActive(false);
             go.transform.SetParent(o.Parent ? o.Parent : Field, false);
@@ -181,7 +182,7 @@ namespace Bolzena.View
             main.simulationSpace = ParticleSystemSimulationSpace.Local;
             main.scalingMode = ParticleSystemScalingMode.Hierarchy;
             main.startSpeed = 0;
-            main.maxParticles = Mathf.Max(1, o.Count);
+            main.maxParticles = Mathf.Max(1, count);
             main.gravityModifier = o.Gravity;
             main.stopAction = ParticleSystemStopAction.Destroy;
             var em = ps.emission; em.enabled = false;
@@ -218,7 +219,7 @@ namespace Bolzena.View
             r.sortingOrder = o.Order;
             go.SetActive(true);
             ps.Play();
-            for (int i = 0; i < o.Count; i++)
+            for (int i = 0; i < count; i++)
             {
                 float a = (o.Angle + Random.Range(-o.Spread / 2, o.Spread / 2)) * Mathf.Deg2Rad;
                 var dir = new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0);

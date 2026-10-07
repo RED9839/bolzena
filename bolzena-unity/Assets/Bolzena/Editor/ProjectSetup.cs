@@ -116,6 +116,15 @@ namespace Bolzena.EditorTools
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 var ti = AssetImporter.GetAtPath(path) as TextureImporter;
                 if (ti == null) continue;
+                // 스탠딩 스파인(st_*)은 BolzenaImport 가 일부러 PC 덮어쓰기를 끈다(크런치 DXT5) — 아래 BC7 검사에 늘 걸려
+                //   빌드마다 135장을 다시 가져왔다(데스크톱 3분 · 노트북 40분). 규칙 그대로면 건너뛴다
+                if (path.Contains("/Resources/Spine/st_"))
+                {
+                    if (!ti.GetPlatformTextureSettings("Standalone").overridden && ti.crunchedCompression) continue;
+                    ti.SaveAndReimport();
+                    n++;
+                    continue;
+                }
                 bool big = !path.Contains("/Resources/UI/");
                 var pc = ti.GetPlatformTextureSettings("Standalone");
                 if (big == pc.overridden && (!big || pc.format == TextureImporterFormat.BC7)) continue;
@@ -277,6 +286,7 @@ namespace Bolzena.EditorTools
             Scene();
             AssetDatabase.SaveAssets();
             Debug.Log("[Setup] 웹 준비 끝");
+            SwitchWebTextures(WebGLTextureSubtarget.DXT);
             WebTextureAudit.Run();   // 압축 안 된 채 남은 큰 그림 점검(WebImport)
             // 스파인(353 폴더)은 첫 로딩(.data)에서 빼 번들로(WebBundleBuild · 런타임 WebBundles). BOLZENA_WEB_BUNDLES=1 일 때만(기본은 예전처럼 전부 .data — WebBundleBuild.Enabled)
             bool ok;
@@ -288,7 +298,67 @@ namespace Bolzena.EditorTools
                 if (ok && bundles) ok = WebBundleBuild.Build(WebPath + "/Bundles");
             }
             finally { if (bundles) WebBundleBuild.Restore(); }
+            // 폰(ASTC) 판 — 같은 코드로 그림만 ASTC 인 .data 를 하나 더 만들어 WebBuild/Build 에 넣는다(index.html 이 기기에 맞게 고른다 — web_post.py).
+            //   번들 판은 번들 그림이 DXT 라 건너뛴다. BOLZENA_WEB_ASTC=0 이면 건너뛴다(데스크톱 판만).
+            if (ok && !bundles && System.Environment.GetEnvironmentVariable("BOLZENA_WEB_ASTC") != "0")
+            {
+                try
+                {
+                    SwitchWebTextures(WebGLTextureSubtarget.ASTC);
+                    WebTextureAudit.Run();
+                    ok = BuildWebPlayer(MobilePath, WebGLTextureSubtarget.ASTC);
+                    if (ok) ok = CopyMobileData();
+                }
+                finally { SwitchWebTextures(WebGLTextureSubtarget.DXT); }   // 다음 빌드 · 다른 일이 늘 DXT 결과에서 시작하게
+            }
             if (Application.isBatchMode) EditorApplication.Exit(ok ? 0 : 1);
+        }
+
+        // ── 폰(ASTC) 판 ──
+        //   유니티 문서 「Texture compression in Web」: 서브타깃만 바꿔 두 번 빌드하고, 폰 판의 .data 만 데스크톱 판 Build/ 에 옮긴다(wasm · framework 는 같다).
+        const string MobilePath = "WebBuildAstc";
+
+        /// <summary>웹 그림 서브타깃을 바꾸고, 아직 그 형식으로 안 가져온 그림(WebImport 가 다루는 것)을 골라 다시 가져온다.</summary>
+        public static void SwitchWebTextures(WebGLTextureSubtarget sub)
+        {
+            var t0 = System.DateTime.Now;
+            EditorUserBuildSettings.webGLBuildSubtarget = sub;
+            WebImport.RegisterSubtarget();
+            AssetDatabase.Refresh();
+            bool astc = sub == WebGLTextureSubtarget.ASTC;
+            var stale = new List<string>();
+            foreach (var g in AssetDatabase.FindAssets("t:Texture2D", WebTextureAudit.Roots))
+            {
+                var p = AssetDatabase.GUIDToAssetPath(g);
+                var k = WebImport.KindOf(WebImport.Original(p));
+                if (k == WebImport.Kind.None) continue;
+                var t = AssetDatabase.LoadAssetAtPath<Texture2D>(p);
+                if (t == null) continue;
+                var f = t.format.ToString();
+                Resources.UnloadAsset(t);
+                // 다른 판의 형식으로 남은 것만 — 압축 없이 남은 것(UI 의 2의 거듭제곱 아닌 밉맵 그림 · 글꼴)은 다시 가져와도 그대로라 건너뛴다
+                if (astc ? (f.StartsWith("DXT") || f.StartsWith("BC")) : f.StartsWith("ASTC")) stale.Add(p);
+            }
+            if (stale.Count > 0)
+            {
+                Debug.Log($"[Setup] 웹 그림 {sub} 로 다시 가져오기 {stale.Count}장 …");
+                AssetDatabase.StartAssetEditing();
+                try { foreach (var p in stale) AssetDatabase.ImportAsset(p, ImportAssetOptions.ForceUpdate); }
+                finally { AssetDatabase.StopAssetEditing(); }
+            }
+            Debug.Log($"[Setup] 웹 그림 서브타깃 {sub} — 다시 가져온 그림 {stale.Count}장 · {(System.DateTime.Now - t0).TotalSeconds:F0}s");
+        }
+
+        static bool CopyMobileData()
+        {
+            var src = Path.Combine(MobilePath, "Build");
+            var dst = Path.Combine(WebPath, "Build");
+            var files = Directory.GetFiles(src, MobilePath + ".data*");
+            if (files.Length != 1) { Debug.LogError("[Build] 폰 판 .data 를 못 찾았다: " + files.Length); return false; }
+            var to = Path.Combine(dst, Path.GetFileName(files[0]));
+            File.Copy(files[0], to, true);
+            Debug.Log($"[Build] 폰(ASTC) .data → {to} ({new FileInfo(to).Length / 1048576f:F1}MB)");
+            return true;
         }
 
         static void CoreDataPack()
@@ -321,7 +391,10 @@ namespace Bolzena.EditorTools
             PlayerSettings.WebGL.exceptionSupport = WebGLExceptionSupport.ExplicitlyThrownExceptionsOnly;
             PlayerSettings.WebGL.template = "APPLICATION:Minimal"; // index.html 은 web_post.py 가 다시 쓴다
             PlayerSettings.WebGL.initialMemorySize = 256;
-            PlayerSettings.WebGL.maximumMemorySize = 2048;
+            // 상한 1024MB(예전 2048) — iOS 사파리는 탭 메모리가 크면 강제로 닫고, 큰 상한은 예약부터 실패하기도 한다.
+            //   2026-10-07 헤드리스 폰 프로필(-demo-mem: 도감 · 상세 · 판 · 전투 카드 내기)로 잰 wasm 힙 최고치 443~531MB 에 두 배 가까운 여유
+            //   (측정: bolzena-unity-tmp/web_mobile/m_*/result.json). BOLZENA_WEB_MAXMEM 으로 바꿔 시험할 수 있다
+            PlayerSettings.WebGL.maximumMemorySize = int.TryParse(System.Environment.GetEnvironmentVariable("BOLZENA_WEB_MAXMEM"), out var mx) && mx >= 512 ? mx : 1024;
             PlayerSettings.WebGL.memoryGrowthMode = WebGLMemoryGrowthMode.Geometric;
             PlayerSettings.WebGL.powerPreference = WebGLPowerPreference.HighPerformance;
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.WebGL, false);
@@ -335,19 +408,20 @@ namespace Bolzena.EditorTools
             if (Application.isBatchMode) EditorApplication.Exit(ok ? 0 : 1);
         }
 
-        static bool BuildWebPlayer()
+        static bool BuildWebPlayer(string path = WebPath, WebGLTextureSubtarget sub = WebGLTextureSubtarget.DXT)
         {
-            if (Directory.Exists(WebPath)) Directory.Delete(WebPath, true);
+            if (Directory.Exists(path)) Directory.Delete(path, true);
             var opts = new BuildPlayerOptions
             {
                 scenes = new[] { RunScenePath, ScenePath },
-                locationPathName = WebPath,
+                locationPathName = path,
                 target = BuildTarget.WebGL,
+                subtarget = (int)sub,
                 options = BuildOptions.None,
             };
             var report = BuildPipeline.BuildPlayer(opts);
             var s = report.summary;
-            Debug.Log($"[Build] 웹 {s.result} — {s.totalSize / (1024 * 1024)}MB, {s.totalTime.TotalSeconds:F0}s, 오류 {s.totalErrors}");
+            Debug.Log($"[Build] 웹 {sub} {s.result} — {s.totalSize / (1024 * 1024)}MB, {s.totalTime.TotalSeconds:F0}s, 오류 {s.totalErrors}");
             return s.result == BuildResult.Succeeded;
         }
 

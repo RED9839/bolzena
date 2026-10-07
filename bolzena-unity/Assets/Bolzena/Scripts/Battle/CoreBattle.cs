@@ -739,6 +739,15 @@ namespace Bolzena.Battle
             foreach (var ct in cterms)
                 if (!ct.IsCard && ct.Hero && !info.Terms.Exists(x => x.Word == ct.Name))
                     info.Terms.Add(new Term(ct.Name, Fmt(ct.Body), ct.Kind != null && ct.Kind.StartsWith("변신") ? "form" : "kw"));
+            // 엔진 키워드 가운데 화면 낱말 표(Terms.Words)에 없는 것(「격파 상태」 · 「피해 기반 회복」 — 2026-10-07 카제나 키워드로 줄인 글) — 판 화면 W.Card 와 같은 판.
+            // 그 이름 속 짧은 낱말(「격파」)이 글의 다른 곳에 따로 안 나오면 짧은 판은 뺀다
+            foreach (var ct in cterms)
+                if (!ct.IsCard && !ct.Hero && !info.Terms.Exists(x => x.Word == ct.Name))
+                {
+                    string rest = (info.Text ?? "").Replace(ct.Name, "");
+                    info.Terms.RemoveAll(x => x.Kind == "kw" && x.Word.Length < ct.Name.Length && ct.Name.Contains(x.Word) && !rest.Contains(x.Word));
+                    info.Terms.Add(new Term(ct.Name, Fmt(ct.Body), ct.Bad ? "status" : "tag"));   // 「tag」 = 엔진 낱말 판 꼴(「kw」 면 CardZoom 이 고유 효과로 적는다)
+                }
             if (depth == 0)
                 foreach (var ct in cterms)
                     if (ct.IsCard)

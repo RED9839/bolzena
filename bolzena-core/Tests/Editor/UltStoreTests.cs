@@ -44,7 +44,7 @@ namespace Bolzena.Core.Tests
             var d = K.Data(heroes: "[" + HERO + "]", cards: CARDS);
             var tx = new CardText(d);
             var rules = d.Hero("s").AllKeywords.First(k => k.Name == "잠").Rules;
-            StringAssert.Contains("그 값 10당 「아픔」 +1", tx.Fx(rules[0].Fx));
+            StringAssert.Contains("그 값 10당 「아픔」 1", tx.Fx(rules[0].Fx));
             StringAssert.Contains("「아픔」 1당 5 고정 실드", tx.Fx(rules[1].Fx));
             StringAssert.Contains("「아픔」 1당 2 고정 피해", tx.Fx(rules[1].Fx));
         }

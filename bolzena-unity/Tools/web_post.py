@@ -3,7 +3,10 @@
 #      index.html 의 fetch 덧씌우기가 조각을 차례로 받아 한 줄기로 이어 유니티 로더에 넘긴다(로더 · 캐시는 원래대로).
 #   2) index.html — 화면 꽉 채운 캔버스 · 로딩 막대 · 비공식 표기 · 첫 클릭 안내.
 #   3) 크기 · 파일 수 점검(25MB 넘는 파일이 남으면 실패).
-import json, os, sys, time, glob
+#   폰(ASTC) 판: ProjectSetup 이 그림만 ASTC 인 .data(WebBuildAstc.data…)를 Build/ 에 함께 넣는다. index.html 이 브라우저가
+#   WEBGL_compressed_texture_astc 를 읽으면 그것을, 아니면 데스크톱(DXT) .data 를 받는다(주소에 ?tex=dxt · ?tex=astc 로 고정해 볼 수 있다).
+#   두 판의 wasm · framework 가 같아야 한다 — 아래에서 풀어서 비교한다(다르면 실패).
+import json, os, sys, time, glob, gzip
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "WebBuild")
 ROOT = os.path.normpath(ROOT)
@@ -30,6 +33,31 @@ def find(kind):
 
 
 files = {k: find(k) for k in ("data", "framework", "wasm")}
+
+# ── 폰(ASTC) .data ──
+MOBILE_NAME = "WebBuildAstc"
+mobile = sorted({f.split(".part")[0] for f in os.listdir(build) if f.startswith(MOBILE_NAME + ".data")})
+if len(mobile) > 1:
+    sys.exit("폰 .data 가 여럿이다: %r" % mobile)
+mobile = mobile[0] if mobile else None
+
+
+def unpacked(p):
+    b = open(p, "rb").read()
+    return gzip.decompress(b) if b[:2] == bytes([0x1F, 0x8B]) else b
+
+
+if mobile:
+    mb = os.path.join(ROOT, "..", MOBILE_NAME, "Build")
+    if os.path.isdir(mb):
+        for k in ("framework", "wasm"):
+            a = os.path.join(build, files[k])
+            c = [f for f in os.listdir(mb) if f.startswith(MOBILE_NAME + "." + k)]
+            if not os.path.exists(a) or len(c) != 1:
+                continue   # 이미 조각났거나(다시 돌림) 폰 판 폴더가 바뀌었다
+            if unpacked(a) != unpacked(os.path.join(mb, c[0])):
+                sys.exit("[web] 폰 판과 데스크톱 판의 %s 가 다르다 — 같은 코드로 다시 빌드할 것" % k)
+        print("[web] 폰(ASTC) 판 wasm · framework 가 데스크톱 판과 같다")
 
 # ── 1) 조각내기 ──
 split = {}
@@ -103,7 +131,7 @@ html = r"""<!doctype html>
   <div class="tag">트릭컬 리바이브 팬 덱빌딩 로그라이크</div>
   <div id="bar"><div id="fill"></div></div>
   <div id="status">불러오는 중…</div>
-  <div id="note">처음 한 번은 %(total_mb)sMB 를 내려받습니다(다음부터는 브라우저에 저장된 것을 씁니다).<br>
+  <div id="note">처음 한 번은 <span id="mb">%(total_mb)s</span>MB 를 내려받습니다(다음부터는 브라우저에 저장된 것을 씁니다).<br>
     PC 의 크롬 · 엣지 · 파이어폭스를 권합니다. 소리는 화면을 한 번 누른 뒤부터 납니다.</div>
   <div id="error"></div>
 </div>
@@ -133,9 +161,28 @@ for (const t of ["fullscreenchange", "webkitfullscreenchange"]) window.addEventL
   document.addEventListener("visibilitychange", () => { if (!document.hidden) wake(); });
   window.bzAudio = () => ({ contexts: all.map((c) => c.state), wakes: wakes });
 })();
+// 그림 압축 판 고르기 — ASTC 를 읽는 기기(폰 · 애플 실리콘)는 ASTC 판 .data, 아니면 DXT 판. 폰이 DXT 를 받으면 유니티가 그림마다 풀어 올려 메모리가 4~8배 든다
+const DATA = { dxt: { file: "%(data)s", mb: %(desk_mb)d }, astc: %(mobile)s };
+function texPick() {
+  const q = new URLSearchParams(location.search).get("tex");
+  if (q === "dxt" || (q === "astc" && DATA.astc)) return q;
+  if (!DATA.astc) return "dxt";
+  try {
+    const c = document.createElement("canvas");
+    const gl = c.getContext("webgl2") || c.getContext("webgl");
+    if (!gl) return "dxt";
+    const astc = !!gl.getExtension("WEBGL_compressed_texture_astc");
+    const lose = gl.getExtension("WEBGL_lose_context"); if (lose) lose.loseContext();
+    return astc ? "astc" : "dxt";
+  } catch (e) { return "dxt"; }
+}
+const TEX = texPick();
+window.bzTex = TEX;
+console.log("[web] 그림 판 " + TEX + " · " + DATA[TEX].file);
+document.getElementById("mb").textContent = DATA[TEX].mb;
 const realFetch = window.fetch.bind(window);
 let bigDone = 0, bigTotal = 0;
-for (const k in SPLIT) bigTotal += SPLIT[k].size;
+for (const k in SPLIT) if (!/\.data/.test(k) || k.endsWith(DATA[TEX].file)) bigTotal += SPLIT[k].size;   // 받을 .data 하나만
 window.fetch = function (input, init) {
   const url = typeof input === "string" ? input : input.url;
   for (const k in SPLIT) {
@@ -187,8 +234,11 @@ window.bzStatus = (p, msg) => {
 };
 window.bzReady = () => { bzBusy = false; status.style.color = ""; if (window.unityInstance) loadingEl.style.display = "none"; };
 const canvas = document.getElementById("unity-canvas");
+// 폰은 화면 배율을 2 까지만 — 3배 폰이면 픽셀이 9배라 GPU · 화면 버퍼 메모리가 가장 크게 든다(2배면 56%% 덜 그린다). 데스크톱은 그대로
+const MOBILE = /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+const DPR = () => Math.min(window.devicePixelRatio || 1, MOBILE ? 2 : 8);
 function fit() {
-  const r = window.devicePixelRatio || 1;
+  const r = DPR();
   canvas.width = Math.round(window.innerWidth * r);
   canvas.height = Math.round(window.innerHeight * r);
 }
@@ -197,7 +247,7 @@ window.addEventListener("resize", fit);
 
 const config = {
   arguments: [],
-  dataUrl: "Build/%(data)s",
+  dataUrl: "Build/" + DATA[TEX].file,
   frameworkUrl: "Build/%(framework)s",
   codeUrl: "Build/%(wasm)s",
   streamingAssetsUrl: "StreamingAssets",
@@ -206,7 +256,7 @@ const config = {
   productVersion: VERSION,
   autoSyncPersistentDataPath: true,   // 이어하기 저장(persistentDataPath)을 IndexedDB 에 바로 적는다
   matchWebGLToCanvasSize: true,
-  devicePixelRatio: window.devicePixelRatio || 1,
+  devicePixelRatio: DPR(),
   showBanner: (msg, type) => { if (type === "error") err.textContent += msg + "\n"; console.log("[unity " + type + "] " + msg); },
 };
 
@@ -231,7 +281,12 @@ document.body.appendChild(script);
 </html>
 """
 
-first = sum(os.path.getsize(os.path.join(build, f)) for f in os.listdir(build))
+first_all = sum(os.path.getsize(os.path.join(build, f)) for f in os.listdir(build))
+size_of = lambda base: sum(os.path.getsize(os.path.join(build, f)) for f in os.listdir(build) if f == base or f.startswith(base + ".part"))
+desk_data = size_of(files["data"])
+mob_data = size_of(mobile) if mobile else 0
+first = first_all - mob_data              # 데스크톱이 받는 양
+first_mob = first_all - desk_data          # 폰이 받는 양
 # 번들(스파인) — boot 은 첫 화면 전에, later 는 첫 화면 뒤에 받는다(WebBundles.cs)
 boot_b = later_b = 0
 man = os.path.join(ROOT, "Bundles", "manifest.json")
@@ -247,6 +302,8 @@ with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as o:
         "legal": LEGAL, "split": json.dumps(split, ensure_ascii=False), "version": version, "stamp": stamp, "mtime": mtime,
         "data": files["data"], "framework": files["framework"], "wasm": files["wasm"], "name": name,
         "total_mb": int(round((first + boot_b) / 1e6)),
+        "desk_mb": int(round((first + boot_b) / 1e6)),
+        "mobile": json.dumps({"file": mobile, "mb": int(round(first_mob / 1e6))}) if mobile else "null",
         "bundles": "true" if os.path.exists(man) else "false",
     })
 
@@ -273,7 +330,9 @@ for dp, dn, fn in os.walk(ROOT):
             over.append((p, s))
 
 print("[web] 조각낸 파일: " + ", ".join("%s → %d조각" % (k, len(v["parts"])) for k, v in split.items()))
-print("[web] 첫 로딩(Build/) %.1fMB · 전체 %.1fMB · 파일 %d개 · 가장 큰 파일 %s %.1fMB" % (first / 1e6, total / 1e6, count, largest[0], largest[1] / 1e6))
+if mobile:
+    print("[web] 폰(ASTC) 첫 로딩 %.1fMB(.data %.1fMB) · 데스크톱(DXT) .data %.1fMB" % (first_mob / 1e6, mob_data / 1e6, desk_data / 1e6))
+print("[web] 첫 로딩(Build/, 데스크톱) %.1fMB · 전체 %.1fMB · 파일 %d개 · 가장 큰 파일 %s %.1fMB" % (first / 1e6, total / 1e6, count, largest[0], largest[1] / 1e6))
 if boot_b or later_b:
     print("[web] 번들 — 첫 화면 전(boot) %.1fMB · 첫 화면 뒤(later) %.1fMB → 첫 화면까지 %.1fMB" % (boot_b / 1e6, later_b / 1e6, (first + boot_b) / 1e6))
 if over:

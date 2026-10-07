@@ -75,7 +75,8 @@ namespace Bolzena.RunUI
             _ => "모니터를 그 해상도로 바꿔 차지합니다 · 알트탭이 느립니다",
         };
 
-        const string KMode = "bz.disp.mode", KPreset = "bz.disp.preset", KFps = "bz.disp.fps", KVsync = "bz.disp.vsync";
+        const string KMode = "bz.disp.mode", KPreset = "bz.disp.preset", KFps = "bz.disp.fps", KVsync = "bz.disp.vsync", KPost = "bz.disp.post",
+                     KLow = "bz.disp.low", KQual = "bz.disp.qual";
 
         // ── 지금 값 ──
         /// <summary>지금 창 모드(실제 화면에서 읽는다 — 최대화 창은 전체화면으로 본다).</summary>
@@ -100,18 +101,80 @@ namespace Bolzena.RunUI
             }
         }
 
-        public static int FpsIndex => Mathf.Clamp(PlayerPrefs.GetInt(KFps, 1), 0, FrameCaps.Count - 1);
+        // 처음 값 — PC 60, 폰(웹 포함) 30: 판 · 카드 게임이라 30 이면 충분하고, 그리는 일 · 열이 반으로 준다
+        public static int FpsIndex => Mathf.Clamp(PlayerPrefs.GetInt(KFps, Application.isMobilePlatform ? 0 : 1), 0, FrameCaps.Count - 1);
         public static bool VSync => PlayerPrefs.GetInt(KVsync, 0) == 1;
 
-        /// <summary>지금 3D 렌더 배율(0.25~1) — 테두리 없는 창 모드에서 모니터보다 작은 해상도를 고르면 1 미만.</summary>
+        /// <summary>화면 효과 설정값(후처리 — 빛 번짐 · 타격 색 효과). 저사양에서 가장 무거운 단계라 폰(웹 포함)은 처음에 꺼 둔다.
+        /// 실제로 그리는지는 PostFxOn(저사양 모드면 꺼짐).</summary>
+        public static bool PostFx => PlayerPrefs.GetInt(KPost, Application.isMobilePlatform ? 0 : 1) == 1;
+
+        /// <summary>지금 화면 효과를 그리는가 — 저사양 모드가 켜져 있으면 설정값과 상관없이 끈다.</summary>
+        public static bool PostFxOn => PostFx && !LowSpec;
+
+        // ── 저사양 모드 — 한 번에: 화면 효과 끔 · 렌더 배율 75% · 프레임 30 · 이펙트 줄이기(입자 수 · 잔상 — LowSpecHook 을 다는 쪽이 건다).
+        //    켜져 있는 동안 세부 항목(화면 효과 · 화질 · 프레임 제한 · 수직동기)은 잠긴다(저장된 값은 그대로 — 끄면 돌아온다). 폰(웹 포함)은 처음에 켜 둔다.
+        /// <summary>저사양 모드인가.</summary>
+        public static bool LowSpec => PlayerPrefs.GetInt(KLow, Application.isMobilePlatform ? 1 : 0) == 1;
+        public const float LowSpecScale = 0.75f;
+        public const int LowSpecFps = 30;
+
+        /// <summary>저사양 모드를 실제로 거는 손(이펙트를 아는 쪽이 단다) — 부팅 때 · 바뀔 때마다 불린다.</summary>
+        public static Action<bool> LowSpecHook;
+
+        /// <summary>화질(3D 렌더 배율) 칸 — 웹 · 폰 설정 창의 「화질」(PC 는 해상도 칸이 같은 일을 한다).</summary>
+        public static readonly IReadOnlyList<float> Qualities = new[] { 0.5f, 0.75f, 1f };
+        public static string QualityName(int i) => Mathf.RoundToInt(Qualities[Mathf.Clamp(i, 0, Qualities.Count - 1)] * 100) + "%";
+        public static int QualityIndex => Mathf.Clamp(PlayerPrefs.GetInt(KQual, Qualities.Count - 1), 0, Qualities.Count - 1);
+
+        /// <summary>저사양 모드 — 바로 적용 · 저장.</summary>
+        public static void SetLowSpec(bool on)
+        {
+            PlayerPrefs.SetInt(KLow, on ? 1 : 0);
+            PlayerPrefs.Save();
+            ApplyFrames();
+            ApplyScale();
+            PostFxHook?.Invoke(PostFxOn);
+            LowSpecHook?.Invoke(on);
+            Debug.Log($"[Display] 저사양 모드 {(on ? "켬" : "끔")} — 렌더 배율 {RenderScale:F2} · 프레임 {Application.targetFrameRate} · 화면 효과 {(PostFxOn ? "켬" : "끔")}");
+            Changed?.Invoke();
+        }
+
+        /// <summary>화질 — 바로 적용 · 저장(저사양 모드면 저장만, 끄면 이 값으로).</summary>
+        public static void SetQuality(int i)
+        {
+            PlayerPrefs.SetInt(KQual, Mathf.Clamp(i, 0, Qualities.Count - 1));
+            PlayerPrefs.Save();
+            ApplyScale();
+            Changed?.Invoke();
+        }
+
+        /// <summary>지금 프레임 칸(저사양 모드면 30 칸).</summary>
+        public static int FpsIndexOn => LowSpec ? Mathf.Max(0, IndexOfCap(LowSpecFps)) : FpsIndex;
+        static int IndexOfCap(int cap) { for (int i = 0; i < FrameCaps.Count; i++) if (FrameCaps[i] == cap) return i; return -1; }
+
+        /// <summary>화면 효과를 실제로 켜고 끄는 손(후처리를 아는 쪽이 단다) — 바뀔 때마다 불린다.</summary>
+        public static Action<bool> PostFxHook;
+
+        /// <summary>지금 3D 렌더 배율(0.25~1) — 해상도 몫(테두리 없는 창 모드에서 모니터보다 작은 해상도) × 화질 · 저사양 모드 가운데 작은 값.</summary>
         public static float RenderScale { get; private set; } = 1f;
+        static float resScale = 1f;   // 해상도 몫만
+
+        /// <summary>화질 · 저사양 모드가 거는 배율 상한.</summary>
+        public static float QualityScale => LowSpec ? Mathf.Min(LowSpecScale, Qualities[QualityIndex]) : Qualities[QualityIndex];
 
         /// <summary>렌더 배율을 실제로 거는 손(URP 를 아는 쪽이 부팅 때 단다) — 배율이 바뀔 때마다 불린다.</summary>
         public static Action<float> RenderScaleHook;
 
         static void SetRenderScale(float k)
         {
-            RenderScale = Mathf.Clamp(k, 0.25f, 1f);
+            resScale = Mathf.Clamp(k, 0.25f, 1f);
+            ApplyScale();
+        }
+
+        static void ApplyScale()
+        {
+            RenderScale = Mathf.Clamp(Mathf.Min(resScale, QualityScale), 0.25f, 1f);
             RenderScaleHook?.Invoke(RenderScale);
         }
 
@@ -160,7 +223,7 @@ namespace Bolzena.RunUI
         }
 
         /// <summary>지금 화면 한 줄 — 「1920×1080 · 전체화면」.</summary>
-        public static string Describe() => Web ? $"{Screen.width}×{Screen.height} · {(Screen.fullScreen ? "전체 화면" : "브라우저 창")}"
+        public static string Describe() => Web ? $"{Screen.width}×{Screen.height} · {(Screen.fullScreen ? "전체 화면" : "브라우저 창")}" + (RenderScale < 0.999f ? $" · 전투 {Mathf.RoundToInt(RenderScale * 100)}%" : "")
                                                : $"{Screen.width}×{Screen.height} · {Modes[ModeIndex].Name}" + (RenderScale < 0.999f ? $" · 그리기 {Mathf.RoundToInt(Screen.height * RenderScale)}p" : "");
 
         // ── 웹(WebGL) — 창 모드 · 해상도는 브라우저가 정한다. 설정 창은 「전체 화면」 켜고 끄기만 보인다 ──
@@ -194,7 +257,7 @@ namespace Bolzena.RunUI
         {
             var before = new Snapshot
             {
-                W = Screen.width, H = Screen.height, Mode = Screen.fullScreenMode, Scale = RenderScale,
+                W = Screen.width, H = Screen.height, Mode = Screen.fullScreenMode, Scale = resScale,
                 HadSaved = PlayerPrefs.HasKey(KPreset), SavedMode = PlayerPrefs.GetInt(KMode, DefaultMode), SavedPreset = PlayerPrefs.GetInt(KPreset, DefaultPreset),
             };
             if (!SetScreen(modeIndex, presetIndex)) return false;
@@ -251,10 +314,21 @@ namespace Bolzena.RunUI
             Changed?.Invoke();
         }
 
+        /// <summary>화면 효과 — 바로 적용 · 저장.</summary>
+        public static void SetPostFx(bool on)
+        {
+            PlayerPrefs.SetInt(KPost, on ? 1 : 0);
+            PlayerPrefs.Save();
+            PostFxHook?.Invoke(PostFxOn);
+            Changed?.Invoke();
+        }
+
         /// <summary>부팅 때 한 번 — 저장된 창 모드 · 해상도(명령줄이 정했으면 건너뜀)와 프레임 · 수직동기를 적용한다.</summary>
         public static void LoadAndApply()
         {
             ApplyFrames();
+            ApplyScale();                    // 화질 · 저사양 모드(웹 · 폰은 이것만 — 해상도 몫은 늘 1)
+            LowSpecHook?.Invoke(LowSpec);
             // 점검용 — -display 모드,해상도(저장 안 함). 예: -display 1,1 = 테두리 없는 창 모드 · HD
             int tm = -1, tp = -1;
             var ta = Environment.GetCommandLineArgs();
@@ -279,6 +353,7 @@ namespace Bolzena.RunUI
 
         static void ApplyFrames()
         {
+            if (LowSpec) { QualitySettings.vSyncCount = 0; Application.targetFrameRate = LowSpecFps; return; }
             if (VSync) { QualitySettings.vSyncCount = 1; Application.targetFrameRate = -1; }
             else
             {

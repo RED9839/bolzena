@@ -1352,8 +1352,9 @@ namespace Bolzena
             while (t < dur + 0.04f)
             {
                 u.Ghost(c, 0.22f);
-                yield return Clock.Wait(0.045f);
-                t += 0.045f;
+                float step = LowSpecFx.GhostStep;   // 저사양 모드면 잔상 반
+                yield return Clock.Wait(step);
+                t += step;
             }
         }
 

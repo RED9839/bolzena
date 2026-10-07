@@ -72,7 +72,39 @@ namespace Bolzena
         void Start()
         {
             if (Demo.UltAudit.On) Demo.UltAudit.Prepare();      // 점검 차림을 전투를 만들기 전에
-            Build();
+            StartCoroutine(Boot());
+        }
+
+        /// <summary>전투 준비가 끝났다(로딩 화면을 걷고 등장 연출로 넘어갔다).</summary>
+        public bool Ready { get; private set; }
+
+        // 전투 열기(2026-10-07 「처음 모험에 진입하면 응답 없음 · 검은 화면」) — 무거운 일을 로딩 화면 아래에서 여러 프레임에 나눈다.
+        //   예전에는 Start 한 프레임에 장면 세우기 + 미리 불러 두기 + Shader.WarmupAllShaders 를 다 했다 — 웹(헤드리스 크롬 · RTX 4080)에서
+        //   그 한 프레임이 9.2초(그 가운데 셰이더 전부 데우기 8.8초 · 66 셰이더 406 조합)였다.
+        //   ① 스파인(사도 SD · 컷인 스탠딩 · 적)을 하나씩 읽어 파싱  ② 장면 세우기(이제 가볍다)  ③ 이펙트 · 소리 · 고학년 데우기를 사도마다
+        //   ④ 쓰는 셰이더 변형만 프레임 예산 안에서 나눠 데우기(ShaderWarm)  ⑤ 로딩 화면을 걷고 Main(등장 연출)
+        IEnumerator Boot()
+        {
+            if (!Bolzena.RunUI.LoadingScreen.Visible) Bolzena.RunUI.LoadingScreen.Show("전투 준비 중");   // 다리(BattleBridge.Enter)가 이미 띄웠으면 그대로
+            const float S0 = 0.15f, A = 0.4f, B = 0.65f, C = 0.95f;   // 진행 몫 — (다리: 정리 · 장면 읽기 ~S0) 스파인 ~A · 데우기 ~B · 셰이더 ~C · 마지막 그리기 ~1
+            Bolzena.RunUI.LoadingScreen.Progress(S0, "사도 · 적 그림 읽는 중");
+            var fight = BattleBridge.Fight;
+            if (fight != null && fight.Battle != null)
+            {
+                var keys = new List<string>();
+                foreach (var id in fight.Battle.Fx.Party) { var art = Look.Hero(id).Art; keys.Add(art); keys.Add("st_" + art); }
+                keys.AddRange(fight.Battle.SpineKeys());
+                keys = new List<string>(new HashSet<string>(keys));
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    try { using (Bolzena.RunUI.Hitch.Span("스파인 읽기 · 파싱")) { var d = Res.Spine(keys[i]); if (d != null) d.GetSkeletonData(true); } }
+                    catch (Exception ex) { Debug.LogWarning("[Preload] 스파인 미리 읽기 실패 " + keys[i] + " — " + ex.Message); }   // 미리 읽기는 못 해도 전투는 연다
+                    Bolzena.RunUI.LoadingScreen.Progress(S0 + (A - S0) * (i + 1) / keys.Count);
+                    yield return null;
+                }
+            }
+            using (Bolzena.RunUI.Hitch.Span("전투 Build")) Build();
+            if (Battle == null || Hand == null) yield break;   // -artaudit 등 Build 가 일찍 끝냄
             // 사람 실행 — 가짜 손가락은 늘 끈 채로 시작한다(데모 · 봇이 켠 채 남으면 진짜 마우스를 읽지 않는다)
             PointerInput.Simulated = false;
             PointerInput.SimHeld = PointerInput.SimRight = false;
@@ -86,6 +118,27 @@ namespace Bolzena
                 }
                 else Demo.DemoRunner.Attach(this);                              // 전투 시범(-battle)
             }
+            Bolzena.RunUI.LoadingScreen.Progress(A + 0.02f, "전투 화면 세우는 중");
+            yield return null;                                              // 세우기와 데우기를 다른 프레임에
+            var s = Battle.Snapshot;
+            var steps = PreloadSteps(s);
+            for (int i = 0; i < steps.Count; i++)
+            {
+                try { using (Bolzena.RunUI.Hitch.Span(steps[i].name)) steps[i].run(); }
+                catch (Exception ex) { Debug.LogWarning("[Preload] " + steps[i].name + " 실패 — " + ex.Message); }
+                Bolzena.RunUI.LoadingScreen.Progress(A + (B - A) * (i + 1) / steps.Count, steps[i].what);
+                yield return null;
+            }
+            // 쓰는 셰이더 변형만 — 한 프레임 예산(웹은 그리기 · 컴파일이 같은 스레드라 짧게)
+            Bolzena.RunUI.LoadingScreen.Progress(B, "셰이더 준비 중");
+            var mats = ShaderWarm.Pending();
+            yield return ShaderWarm.Run(mats, Application.platform == RuntimePlatform.WebGLPlayer ? 60 : 40, p => Bolzena.RunUI.LoadingScreen.Progress(B + (C - B) * p));
+            // 장면을 몇 프레임 그려 둔다(로딩 화면 아래) — 화면 효과 · 글꼴 · 막 세운 재질의 첫 그리기를 여기서
+            for (int i = 0; i < 3; i++) { Bolzena.RunUI.LoadingScreen.Progress(C + (1 - C) * (i + 1) / 3f, "거의 다 됐습니다"); yield return null; }
+            Debug.Log($"[Battle] 준비 끝 — 셰이더 변형 {mats.Count}개 데움(누적 {ShaderWarm.Warmed})");
+            Bolzena.RunUI.Hitch.Mark("전투 준비 끝(등장 연출)");
+            Bolzena.RunUI.LoadingScreen.Hide(0.2f);
+            Ready = true;
             StartCoroutine(Main());
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-layoutshot") >= 0) StartCoroutine(LayoutShot());
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-cardartsheet") >= 0) Demo.CardArtSheet.Attach(this);
@@ -152,6 +205,7 @@ namespace Bolzena
             // 정적 자리에 남은 이 전투의 손잡이를 놓는다 — 다음 장면을 여는 정리(UnloadUnusedAssets)가 지난 싸움의 감독 · 유닛 · 스파인을
             //   「아직 쓰는 것」 으로 보고 붙들지 않게(람다가 this · FieldRoot 를 쥐고 있었다)
             if (I == this) I = null;
+            if (!Ready) Bolzena.RunUI.LoadingScreen.Hide(0);   // 준비 도중 장면이 바뀌면 로딩 화면이 남지 않게
             CardView.HeroOf = null;
             BattleBridge.OnOverlay = null;
             Vfx.Field = Vfx.Screen = null;
@@ -221,7 +275,8 @@ namespace Bolzena
             for (int i = 0; i < s.Heroes.Count; i++)
             {
                 var h = s.Heroes[i];
-                var u = UnitView.Create(FieldRoot, "hero_" + h.Key, h.Key, "Normal", true, UnitScale, HeroPos[i], 40 + i * 2);
+                UnitView u;
+                using (Bolzena.RunUI.Hitch.Span("사도 유닛 세우기")) u = UnitView.Create(FieldRoot, "hero_" + h.Key, h.Key, "Normal", true, UnitScale, HeroPos[i], 40 + i * 2);
                 u.Ref = UnitRef.Party(i);
                 u.FxKey = h.Id;
                 Heroes.Add(u);
@@ -230,7 +285,7 @@ namespace Bolzena
             ResetHeroOrder();
 
             CardView.HeroOf = i => { var hs = Battle.Snapshot.Heroes; return i >= 0 && i < hs.Count ? hs[i] : null; };
-            Hand = HandView.Create(UiRoot);
+            using (Bolzena.RunUI.Hitch.Span("손패 세우기")) Hand = HandView.Create(UiRoot);
             Hand.EnemyAt = EnemyAt;
             Hand.EnemyNear = NearestEnemy;
             Hand.EnemyAim = i => FieldRoot.TransformPoint(Enemies[i].Center);
@@ -246,7 +301,7 @@ namespace Bolzena
                 return idx >= 0 && Battle.CanPlay(idx, out _);
             };
             Hand.WhyNot = i => Battle.CanPlay(i, out var why) ? null : why;
-            Hud = PartyHud.Create(UiRoot, s);
+            using (Bolzena.RunUI.Hitch.Span("HUD 세우기")) Hud = PartyHud.Create(UiRoot, s);
             Hud.SetAp(s.Ap, s.MaxAp);
             Hud.OnPile = OpenPile;
             Hud.OnSpeed = ToggleSpeed;
@@ -255,31 +310,35 @@ namespace Bolzena
             Hud.OnParty = () => OpenParty(1);
             Hud.OnAuto = () => { Auto = !Auto; Hud.SetAuto(Auto); Sfx.Play("ui_click", 0.5f); };
             Hud.SetSpeed(Clock.Speed);
-            Preload(s);
         }
 
-        // 미리 불러 두기 — 고학년 · 보스 등장에서 처음 쓰는 것(컷인 스탠딩 스파인 · 목소리 · 보스 스파인 · 셰이더)을 시작할 때
-        void Preload(BattleSnapshot s)
+        // 미리 불러 두기 — 고학년 · 보스 등장에서 처음 쓰는 것(이펙트 · 컷인 스탠딩 스파인 · 목소리 · 보스 스파인)을 시작할 때.
+        //   한 단계 = 한 프레임(Boot 가 사이사이 yield) — 사도 · 적 하나씩. 셰이더는 Boot 가 ShaderWarm 으로 따로(예전 WarmupAllShaders 대신)
+        List<(string name, string what, Action run)> PreloadSteps(BattleSnapshot s)
         {
+            var o = new List<(string, string, Action)>();
+            // 원작 이펙트 — 공용(맞음 · 회복 …)은 첫 사도와 함께, 그다음 사도마다 고학년 · 카드
+            foreach (var h in s.Heroes) { var id = h.Id; o.Add(("이펙트 데우기", "이펙트 준비 중", () => Bolzena.Fx.BolzenaFx.Prewarm(new[] { id }, sounds: false))); }
+            o.Add(("몸짓 · 소리 목록", "사도 준비 중", () => { foreach (var hv in Heroes) { hv.PrewarmTravel(); HeroClips(hv.name.Replace("hero_", "")); } }));   // 고학년 순간에 재지 않게(몸짓 이동 · 소리 목록)
+            o.Add(("고학년 데우기", "고학년 준비 중", () => PrewarmUlt(s)));
+            foreach (var h in s.Heroes) { var key = h.Key; o.Add(("소리 미리 읽기", "목소리 준비 중", () => { Sfx.Preload(key); foreach (Motion m in Enum.GetValues(typeof(Motion))) { HeroSfx(key, m, true); HeroSfx(key, m, false); } })); }
             var keys = new List<string>();
-            Bolzena.Fx.BolzenaFx.Prewarm(System.Linq.Enumerable.Select(s.Heroes, h => h.Id), sounds: false);
-            foreach (var hv in Heroes) { hv.PrewarmTravel(); HeroClips(hv.name.Replace("hero_", "")); }   // 고학년 순간에 재지 않게(몸짓 이동 · 소리 목록)   // 원작 이펙트 — 파티의 고학년 · 카드 · 맞음 · 공용
-            PrewarmUlt(s);
-            foreach (var h in s.Heroes) { keys.Add("st_" + h.Key); Sfx.Preload(h.Key); foreach (Motion m in Enum.GetValues(typeof(Motion))) { HeroSfx(h.Key, m, true); HeroSfx(h.Key, m, false); } }
+            foreach (var h in s.Heroes) keys.Add("st_" + h.Key);
             if (Battle is CoreBattle cb) keys.AddRange(cb.SpineKeys());
-            foreach (var k in keys)
-            {
-                var data = Res.Spine(k);
-                if (data == null) continue;
-                // 한 번 세워 그려 둔다 — 아틀라스 텍스처 · 재질이 GPU 에 올라가게
-                var sa = Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(data);
-                sa.transform.position = new Vector3(0, -40, 0);
-                sa.Update(0);
-                sa.LateUpdate();
-                Destroy(sa.gameObject, 0.5f);
-            }
-            Vfx.Preload();
-            Shader.WarmupAllShaders();
+            foreach (var k in new HashSet<string>(keys))
+                o.Add(("스파인 미리 세우기", "적 준비 중", () =>
+                {
+                    var data = Res.Spine(k);
+                    if (data == null) return;
+                    // 한 번 세워 그려 둔다 — 아틀라스 텍스처 · 재질이 GPU 에 올라가게(ShaderWarm 이 이 재질도 데운다)
+                    var sa = Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(data);
+                    sa.transform.position = new Vector3(0, -40, 0);
+                    sa.Update(0);
+                    sa.LateUpdate();
+                    Destroy(sa.gameObject, 0.5f);
+                }));
+            o.Add(("Vfx.Preload", "효과 준비 중", () => Vfx.Preload()));
+            return o;
         }
 
         // 고학년 첫 순간의 몫을 싸움 시작으로 — 2026-10-05 점검(-ultaudit -ultprobe): 프로세스 첫 고학년의 SD 시작 프레임이 40.7ms,
@@ -444,6 +503,7 @@ namespace Bolzena
                 Hand.Request = null;
                 Hand.Interactive = true;
                 WaitingInput = true;
+                Bolzena.RunUI.Hitch.FirstInput();
                 Hud.SetEndReady(!AnyPlayable());
                 float autoT = 0;
                 while (request == null && !Over)
@@ -1104,6 +1164,7 @@ namespace Bolzena
                 else if (bossI >= 0) { pos = k == 0 ? new Vector3(6.3f, -0.95f, 0) : k == 1 ? new Vector3(6.7f, -1.6f, 0) : new Vector3(1.5f + (k - 2) * 0.9f, -1.6f + (k % 2) * 0.5f, 0); k++; }
                 else pos = EnemySlot(n, i);
                 float sc = es.Boss ? UnitScale * 1.0f : UnitScale * 1.1f;
+                using var _h = Bolzena.RunUI.Hitch.Span("적 유닛 세우기");
                 var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, sc, pos, es.Boss ? 30 : 36 - i * 2, Look.EnemyIconAs(es.Id, es.Nature), es.Name, Look.IsStandIn(es.Id));
                 u.Ref = UnitRef.Enemy(i);
                 u.Mood = (es.Skin ?? "").Replace("Skin_", "").Replace("Joly", "Jolly");   // 판 성격 애니(Attack1_1_Cool …) — 오리카 오타 스킨도

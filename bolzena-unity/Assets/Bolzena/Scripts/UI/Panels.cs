@@ -236,14 +236,15 @@ namespace Bolzena.UI
             y -= 0.66f + 0.12f;
             }
 
-            bool vs = Bolzena.RunUI.DisplayOptions.VSync;
-            y = Label(T, y, "프레임 제한", "초당 그리는 횟수 — 낮추면 전기 · 열이 줄어듭니다");
+            bool low = Bolzena.RunUI.DisplayOptions.LowSpec;   // 저사양 모드 — 프레임 30 · 수직동기 쉼(판 화면 설정 창에서 바꾼다)
+            bool vs = Bolzena.RunUI.DisplayOptions.VSync && !low;
+            y = Label(T, y, "프레임 제한", low ? "저사양 모드라 30 으로 그립니다 · 판 화면 설정의 화면 탭에서 바꿉니다" : "초당 그리는 횟수 — 낮추면 전기 · 열이 줄어듭니다");
             int nf = Bolzena.RunUI.DisplayOptions.FrameCaps.Count;
             for (int i = 0; i < nf; i++)
             {
                 int k = i;
                 float cw = (rowW - gap * (nf - 1)) / nf;
-                Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.FrameCapName(i), null, !vs && i == Bolzena.RunUI.DisplayOptions.FpsIndex, !vs, vs ? "수직동기를 끄면 고를 수 있습니다" : null,
+                Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.FrameCapName(i), null, !vs && i == Bolzena.RunUI.DisplayOptions.FpsIndexOn, !vs && !low, low ? "저사양 모드를 끄면 고를 수 있습니다" : vs ? "수직동기를 끄면 고를 수 있습니다" : null,
                     () => Bolzena.RunUI.DisplayOptions.SetFrameCap(k), cw);
             }
             y -= 0.52f + 0.12f;
@@ -262,7 +263,7 @@ namespace Bolzena.UI
                 var b = row.gameObject.AddComponent<Button>();
                 b.Size = new Vector2(rowW, rh);
                 b.Highlight = hl;
-                b.OnClick = () => Bolzena.RunUI.DisplayOptions.SetVSync(!vs);
+                b.OnClick = () => { if (low) { Bolzena.RunUI.Toast.Show("저사양 모드를 끄면 고를 수 있습니다"); return; } Bolzena.RunUI.DisplayOptions.SetVSync(!vs); };
                 y -= rh;
             }
 

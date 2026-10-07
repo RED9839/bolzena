@@ -22,6 +22,18 @@ namespace Bolzena.RunUI
                     yield return Press("settings.tab" + t, 0.7f);
                     LogFit(t);
                     yield return Shot($"settings{(inRun ? "_run" : "")}_tab{t}");
+                    if (t == 1 && !inRun)
+                    {
+                        // 저사양 모드 — 한 번 뒤집어 잠금 · 풀림 모양을 찍고 되돌린다(값은 처음 그대로 남는다)
+                        bool was = DisplayOptions.LowSpec;
+                        yield return Press("disp.low", 0.8f);
+                        Expect(DisplayOptions.LowSpec != was, "저사양 모드 스위치가 값을 바꿈");
+                        Debug.Log($"[Settings] 저사양 {(DisplayOptions.LowSpec ? "켬" : "끔")} · 렌더 배율 {DisplayOptions.RenderScale:F2} · 프레임 {Application.targetFrameRate} · 화면 효과 {DisplayOptions.PostFxOn}");
+                        yield return Shot($"settings_tab1_low{(DisplayOptions.LowSpec ? "On" : "Off")}");
+                        yield return Press("disp.low", 0.8f);
+                        Expect(DisplayOptions.LowSpec == was, "저사양 모드가 처음 값으로 돌아옴");
+                        Debug.Log($"[Settings] 저사양 {(DisplayOptions.LowSpec ? "켬" : "끔")} · 렌더 배율 {DisplayOptions.RenderScale:F2} · 프레임 {Application.targetFrameRate} · 화면 효과 {DisplayOptions.PostFxOn}");
+                    }
                 }
                 yield return Press("settings.close", 0.6f);
             }

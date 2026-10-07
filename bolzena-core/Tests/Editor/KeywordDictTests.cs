@@ -575,7 +575,7 @@ namespace Bolzena.Core.Tests
             var tips = t.Tips();
             StringAssert.Contains("째깍째깍", tips["초침"]); StringAssert.Contains("20%p", tips["사기"]);
             CollectionAssert.AreEqual(new[] { "보존", "소멸", "사기", "초침", "처치" }, t.Chips(d.View("cc")));
-            Assert.AreEqual("보존. 소멸 2.\n사기 1, 「초침」 +1\n처치: AP +1", t.Card(d.Card("cc")));
+            Assert.AreEqual("보존. 소멸 2.\n사기 1, 「초침」 1\n처치: AP +1", t.Card(d.Card("cc")));
             StringAssert.Contains("뽑을 더미 맨 위", CardText.Tip("망각"));
         }
 

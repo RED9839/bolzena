@@ -366,6 +366,7 @@ namespace Bolzena.RunUI
         {
             var mat0 = SpineUi.StraightMat;
             if (mat0 == null || !SystemInfo.supportsRenderTextures) return null;
+            using var _h = Hitch.Span("스탠딩 굽기");
             _ = CanBakeNow;   // 프레임 셈 맞추기
             bakeInFrame++;
             SkeletonGraphic g = SpineUi.NewStanding(Host, art);

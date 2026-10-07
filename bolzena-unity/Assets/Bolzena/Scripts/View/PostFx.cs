@@ -23,6 +23,9 @@ namespace Bolzena.View
             var v = go.AddComponent<Volume>();
             v.isGlobal = true;
             v.priority = 10;
+            // 설정 창 「화면 효과」 — 끄면 이 볼륨을 통째로 끈다(펀치 Kick 은 그대로 불려도 그려지지 않는다)
+            v.enabled = Bolzena.RunUI.DisplayOptions.PostFxOn;   // 저사양 모드면 설정값과 상관없이 끔
+            Bolzena.RunUI.DisplayOptions.PostFxHook = on => { if (I != null) I.GetComponent<Volume>().enabled = on; };
             var p = ScriptableObject.CreateInstance<VolumeProfile>();
             v.sharedProfile = p;
             var me = go.AddComponent<PostFx>();

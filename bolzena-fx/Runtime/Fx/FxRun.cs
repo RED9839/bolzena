@@ -85,6 +85,8 @@ namespace Bolzena.Fx
         static readonly Stack<P> pool = new Stack<P>();       // 입자 되쓰기(가비지 없이)
         public static int Live;                       // 모든 무대의 입자 수
         public static int Cap = 1500;
+        // 입자 밀도(0~1) — 저사양 모드가 낮춘다(쓰는 쪽이 건다). 방출량 · 터뜨림 수에 곱한다(작은 수는 확률로 — 한 알짜리가 사라지지 않게 최소 1)
+        public static float Density = 1f;
         // 겹침 상한(화면 넓이 몇 장 — 큰 입자의 넓이 × 알파 합). 0 이면 끄기. ScreenArea 는 월드 넓이(카메라에서 잰다)
         public static float OverdrawBudget = 12f;
         public static int Culled;
@@ -436,7 +438,7 @@ namespace Bolzena.Fx
                 if (e.Rate > 0 && te <= EmitWindow(e))
                 {
                     busy = true;
-                    em.Acc += e.Rate * dt;
+                    em.Acc += e.Rate * Density * dt;
                     int n = Mathf.FloorToInt(em.Acc);
                     em.Acc -= n;
                     if (n > 0) Spawn(em, n);
@@ -445,7 +447,8 @@ namespace Bolzena.Fx
                 {
                     while (b.Left > 0 && te >= b.T)
                     {
-                        int n = Mathf.FloorToInt(b.N) + (UnityEngine.Random.value < b.N % 1 ? 1 : 0);
+                        float bn = b.N >= 1 ? Mathf.Max(1f, b.N * Density) : b.N;
+                        int n = Mathf.FloorToInt(bn) + (UnityEngine.Random.value < bn % 1 ? 1 : 0);
                         Spawn(em, n);
                         b.Left--; b.T += b.Iv;
                     }

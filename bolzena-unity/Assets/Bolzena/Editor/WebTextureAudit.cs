@@ -10,7 +10,7 @@ namespace Bolzena.EditorTools
     //   웹 빌드(ProjectSetup.SetupAndBuildWeb) 전에 저절로 돈다. 손으로: Unity.exe -batchmode -quit -buildTarget WebGL -executeMethod Bolzena.EditorTools.WebTextureAudit.Run
     public static class WebTextureAudit
     {
-        static readonly string[] Roots = { "Assets/Bolzena/Resources", "Assets/Resources", "Assets/BolzenaFxData/Src" };
+        internal static readonly string[] Roots = { "Assets/Bolzena/Resources", "Assets/Resources", "Assets/BolzenaFxData/Src" };
 
         static bool Packed(TextureFormat f) => f.ToString().StartsWith("DXT") || f.ToString().StartsWith("BC") || f.ToString().StartsWith("ETC") || f.ToString().StartsWith("ASTC");
 
@@ -33,6 +33,7 @@ namespace Bolzena.EditorTools
         {
             if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.WebGL)
                 Debug.LogWarning("[WebTex] 지금 대상이 WebGL 이 아니다(" + EditorUserBuildSettings.activeBuildTarget + ") — 보이는 형식은 그 대상의 것");
+            Debug.Log("[WebTex] 서브타깃 " + EditorUserBuildSettings.webGLBuildSubtarget);
             var stat = new Dictionary<string, Dictionary<string, (int n, long bytes)>>();
             var bad = new List<(string p, string f, int w, int h, int mips, long b)>();
             foreach (var g in AssetDatabase.FindAssets("t:Texture2D", Roots))
@@ -46,7 +47,7 @@ namespace Bolzena.EditorTools
                 if (!stat.TryGetValue(gr, out var d)) stat[gr] = d = new Dictionary<string, (int, long)>();
                 d.TryGetValue(key, out var v);
                 d[key] = (v.n + 1, v.bytes + b);
-                if (!Packed(t.format) && !gr.StartsWith("UI") && t.width * t.height >= 64 * 64) bad.Add((p, t.format.ToString(), t.width, t.height, t.mipmapCount, b));
+                if (!Packed(t.format) && !gr.StartsWith("UI(") && t.width * t.height >= 64 * 64) bad.Add((p, t.format.ToString(), t.width, t.height, t.mipmapCount, b));
                 Resources.UnloadAsset(t);
             }
             foreach (var kv in stat.OrderBy(x => x.Key))

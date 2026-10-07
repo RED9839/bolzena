@@ -52,6 +52,7 @@ namespace Bolzena.RunUI
         public void NewAdventure()
         {
             if (!P.Ready) { Toast.Show("콘텐츠 데이터가 없습니다 — 마을 · 사도 셋이 있어야 떠납니다"); return; }
+            Hitch.Mark("모험 시작");
             string village = P.RollVillage();
             FoeSeed = DateTime.Now.Ticks & 0x7fffffff;
             FoeNature = P.RollFoeNature(village);
@@ -61,8 +62,9 @@ namespace Bolzena.RunUI
 
         public void StartRun(System.Collections.Generic.List<string> party, string village)
         {
+            Hitch.Mark("판 열기(편성 끝)");
             RunPort.ClearSave();
-            P.NewRun(party, village, FoeNature != null ? FoeSeed : DateTime.Now.Ticks & 0x7fffffff, FoeNature);
+            using (Hitch.Span("판 열기 NewRun")) P.NewRun(party, village, FoeNature != null ? FoeSeed : DateTime.Now.Ticks & 0x7fffffff, FoeNature);
             MapStep();
         }
 

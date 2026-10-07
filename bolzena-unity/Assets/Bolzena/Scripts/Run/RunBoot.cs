@@ -17,6 +17,7 @@ namespace Bolzena
         {
             Demo.InputProbe.Install();     // -inputprobe(사람 입력 재현)
             Demo.EnterLeak.Install();      // -leakprobe · -demo-loop(전투 들고 나기 저울)
+            Hitch.Ensure();                // -hitch(구간별 멈춤 저울)
             if (Flow.Me != null) return;   // 전투에서 돌아왔다
             // 웹 빌드 — 스파인 번들(스탠딩)을 받은 뒤에 판 화면을 세운다(WebBundles). PC · 에디터는 곧바로
             if (Application.platform == RuntimePlatform.WebGLPlayer && !WebBundles.Active) { StartCoroutine(BootWeb()); return; }
@@ -59,7 +60,10 @@ namespace Bolzena
                 if (QualitySettings.GetRenderPipelineAssetAt(i) is UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset a)
                 {
                     a.renderScale = k;
-                    a.upscalingFilter = k < 0.999f ? UnityEngine.Rendering.Universal.UpscalingFilterSelection.FSR : UnityEngine.Rendering.Universal.UpscalingFilterSelection.Auto;
+                    // 웹(폰 · 저사양 모드 · 화질)은 선형으로 늘린다 — FSR 은 화면 한 장을 더 그리는 단계라 폰 GPU 에 짐이다
+                    a.upscalingFilter = k >= 0.999f ? UnityEngine.Rendering.Universal.UpscalingFilterSelection.Auto
+                                      : Application.platform == RuntimePlatform.WebGLPlayer ? UnityEngine.Rendering.Universal.UpscalingFilterSelection.Linear
+                                      : UnityEngine.Rendering.Universal.UpscalingFilterSelection.FSR;
                 }
             Debug.Log($"[Display] 렌더 배율 {k:F2}");
         }

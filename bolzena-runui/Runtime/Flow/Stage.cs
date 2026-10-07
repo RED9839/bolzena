@@ -231,7 +231,8 @@ namespace Bolzena.RunUI
             Ui.Clear(ModalLayer);
             Current = name;
             var root = Ui.Rect(name, ScreenLayer).Fill();
-            try { build(root); }
+            Hitch.Mark("화면 " + name + " 세우기");
+            try { using (Hitch.Span("화면 세우기 " + name)) build(root); }
             catch (Exception e) { Debug.LogException(e); Toast.Show("화면을 세우지 못했습니다 — " + e.Message); }
             yield return null;
             if (instant) SetFade(0);
@@ -239,6 +240,7 @@ namespace Bolzena.RunUI
             fade.raycastTarget = false;
             Busy = false;
             Debug.Log("[Stage] 화면 " + name);
+            Hitch.Mark("화면 " + name);
             float w = 0;
             while (w < shownAfter) { w += Time.unscaledDeltaTime; yield return null; }
             if (Current == name) Shown?.Invoke(name);

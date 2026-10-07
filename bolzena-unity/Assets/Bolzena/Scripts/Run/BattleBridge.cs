@@ -49,6 +49,7 @@ namespace Bolzena
             EndHold = Overlay;   // runui RewardOverlay 가 시작 때 Fighting 을 끄므로 판 자동 데모도 이 길로
             Debug.Log($"[Bridge] 싸움 열기 — {string.Join(", ", t.Foes)} (배경 {t.Bg ?? "-"}, 이벤트 {t.Event})");
             Demo.EnterLeak.MarkOpen();
+            Hitch.Mark("싸움 열기");
             Flow.Me.StartCoroutine(Enter());
         }
 
@@ -62,9 +63,13 @@ namespace Bolzena
         {
             var stage = Flow.Me.Stage;
             yield return stage.Blackout(BlackoutSec);
-            yield return null;                                   // 검은 화면이 한 번 그려진 뒤에
-            GC.Collect();
+            // 로딩 화면(2026-10-07) — 전투 쪽(BattleDirector.Boot)이 스파인 · 이펙트 · 셰이더를 여러 프레임에 나눠 준비하는 동안 덮고 진행을 보인다
+            LoadingScreen.Show("전투 준비 중");
+            LoadingScreen.Progress(0.03f, "정리하는 중");
+            yield return null;                                   // 로딩 화면이 한 번 그려진 뒤에
+            using (Hitch.Span("GC.Collect")) GC.Collect();
             yield return Resources.UnloadUnusedAssets();
+            LoadingScreen.Progress(0.08f, "전투 장면 읽는 중");
             yield return WebBundles.WaitAll();                   // 웹 — 전투 스파인 번들을 덜 받았으면 여기서 기다린다(로딩 화면)
             void Loaded(Scene s, LoadSceneMode m)
             {
@@ -75,7 +80,8 @@ namespace Bolzena
                 Flow.Me.Stage.ClearFade();
             }
             SceneManager.sceneLoaded += Loaded;
-            yield return SceneManager.LoadSceneAsync(BattleScene);
+            var op = SceneManager.LoadSceneAsync(BattleScene);
+            while (op != null && !op.isDone) { LoadingScreen.Progress(0.08f + 0.07f * op.progress); yield return null; }
         }
 
         // 끝 자세 위에 보상 — 결과를 넣고(Finish) 판 화면 캔버스를 켜 보상 줄을 띄운 뒤, 「떠나기」 가 눌리면 Run 장면으로(판은 Flow 가 이어 간다)

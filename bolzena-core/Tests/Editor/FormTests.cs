@@ -221,7 +221,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0, b.StackOf("r", "충"), "풀릴 때 방전(off spend all)");
             K.Hand(b, "qq"); K.Play(b, "qq");
             Assert.IsTrue(b.InForm("q")); Assert.AreEqual(0, b.StackOf("q", "쿵"), "consume — 닿은 겹을 다 쓴다");
-            StringAssert.Contains("최대가 되면 → 「최대」로 변신(1턴)", new CardText(d).Keyword(d.Hero("r").Keyword));
+            StringAssert.Contains("최대가 되면 「최대」로 변신(1턴)", new CardText(d).Keyword(d.Hero("r").Keyword));
             var errs = Validator.Check(d).Errors.Where(e => e.Contains("사도 r") || e.Contains("사도 q")).ToList();   // 바탕 시험 데이터(dummy 의 jam v0)는 빼고
             Assert.AreEqual(0, errs.Count, string.Join("\n", errs));
         }

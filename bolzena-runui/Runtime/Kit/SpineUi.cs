@@ -117,7 +117,7 @@ namespace Bolzena.RunUI
             SkeletonGraphic g;
             try
             {
-                g = SkeletonGraphic.NewSkeletonGraphicGameObject(data, parent, Mat);
+                using (Hitch.Span("스파인UI 세우기(파싱)")) g = SkeletonGraphic.NewSkeletonGraphicGameObject(data, parent, Mat);
             }
             catch (System.Exception e) { Debug.LogWarning("[RunUI] 스파인 실패 " + folder + ": " + e.Message); return null; }
             g.name = "spine " + folder + (skin != null ? " " + skin : "");
@@ -166,7 +166,7 @@ namespace Bolzena.RunUI
             var data = Data("st_" + art);
             if (data == null || Mat == null) return null;
             SkeletonGraphic g;
-            try { g = SkeletonGraphic.NewSkeletonGraphicGameObject(data, area, Mat); }
+            try { using (Hitch.Span("스탠딩 세우기(파싱)")) g = SkeletonGraphic.NewSkeletonGraphicGameObject(data, area, Mat); }
             catch (System.Exception e) { Debug.LogWarning("[RunUI] 스탠딩 실패 " + art + ": " + e.Message); return null; }
             g.name = "standing " + art;
             g.raycastTarget = false;

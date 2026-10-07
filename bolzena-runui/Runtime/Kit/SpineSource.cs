@@ -17,6 +17,7 @@ namespace Bolzena.RunUI
         public static SkeletonDataAsset Load(string folder)
         {
             if (string.IsNullOrEmpty(folder)) return null;
+            using var _h = Hitch.Span("스파인 자산 읽기");
             var a = Find?.Invoke(folder);
             if (a != null) return a;
             var all = Resources.LoadAll<SkeletonDataAsset>("Spine/" + folder);

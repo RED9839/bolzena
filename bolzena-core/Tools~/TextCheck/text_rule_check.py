@@ -20,7 +20,7 @@ def tok_fx(f, out):
     if k in ('ap', 'nextAp') and v: out.append(f'AP {"+" if v > 0 else ""}{num(v)}')
     if k == 'status' and f.get('id') == '기절': out.append('기절')
     elif k == 'status' and v and f.get('id'): out.append(f'{f["id"]} {num(v)}')
-    if k == 'stack' and v and f.get('id'): out.append(f'「{f["id"]}」 +{num(v)}')
+    if k == 'stack' and v and f.get('id'): out.append(f'「{f["id"]}」 {num(v)}')   # 2026-10-07 쌓는 수는 + 없이(「홀로그램」 2)
     if k == 'spend' and f.get('id'): out.append(('ALL', f['id']) if f.get('all') else f'「{f["id"]}」')
     if k in ('dealtMod', 'takenMod', 'atkMod', 'defMod') and v is not None: out.append(f'{round(v * 100)}%')
     if k == 'tough' and v: out.append(f'강인도 피해 {num(v)}')
