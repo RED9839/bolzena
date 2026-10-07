@@ -1,849 +1,841 @@
 {
- "heroes": [
-  {
-   "id": "블랑셰",
-   "name": "블랑셰",
-   "nature": "우울",
-   "role": "딜러",
-   "star": 3,
-   "hp": 650,
-   "atk": 125,
-   "def": 28,
-   "crit": 15,
-   "blurb": "감정 대신 머리의 장미가 빛나는 배우. 공격할 때마다 푸른 장미가, 약점을 찌를 때마다 붉은 장미가 피고, 두 빛깔이 다 피면 커튼콜이 올라옵니다.",
-   "keywords": [
+  "heroes": [
     {
-     "name": "붉은 장미",
-     "desc": "약점 공격으로 피는 장미",
-     "carrier": "self",
-     "cap": 2,
-     "rules": [
-      {
-       "name": "커튼콜",
-       "when": {
-        "on": "stackReach",
-        "id": "붉은 장미",
-        "n": 2
-       },
-       "conds": [
+      "id": "블랑셰",
+      "name": "블랑셰",
+      "nature": "우울",
+      "role": "딜러",
+      "star": 3,
+      "hp": 650,
+      "atk": 125,
+      "def": 28,
+      "crit": 15,
+      "blurb": "감정 대신 머리의 장미가 빛나는 배우. 공격할 때마다 푸른 장미가, 약점을 찌를 때마다 붉은 장미가 피고, 두 빛깔이 다 피면 커튼콜이 올라옵니다.",
+      "passives": [
         {
-         "c": "stack",
-         "id": "푸른 장미",
-         "n": 2
-        }
-       ],
-       "fx": [
-        {
-         "k": "spend",
-         "id": "붉은 장미",
-         "all": true
+          "name": "싱크로즈",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         },
         {
-         "k": "spend",
-         "id": "푸른 장미",
-         "all": true
-        },
-        {
-         "k": "make",
-         "id": "블랑셰_t1",
-         "v": 1
+          "name": "백만 송이 피어나",
+          "when": {
+            "on": "stackReach",
+            "id": "푸른 장미",
+            "n": 4
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "블랑셰_t1",
+              "v": 1
+            }
+          ]
         }
-       ]
+      ],
+      "ult": {
+        "name": "파랑새 정원",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "make",
+            "id": "블랑셰_t1",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "푸른 장미",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "블랑셰_s1",
+        "블랑셰_u3",
+        "블랑셰_s2",
+        "블랑셰_s3"
+      ],
+      "keyword": {
+        "name": "푸른 장미",
+        "desc": "기적을 바라며 피는 꽃",
+        "carrier": "enemy",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.06
+          }
+        ],
+        "rules": [
+          {
+            "name": "만개",
+            "when": {
+              "on": "stackReach",
+              "id": "푸른 장미",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "푸른 장미",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 1.3,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "tough",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          }
+        ]
       }
-     ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "블랑셰_s1",
+      "name": "장미 가시",
+      "hero": "블랑셰",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
     },
     {
-     "name": "푸른 장미",
-     "desc": "공격으로 피는 장미",
-     "carrier": "self",
-     "cap": 2,
-     "rules": [
-      {
-       "name": "커튼콜",
-       "when": {
-        "on": "stackReach",
-        "id": "푸른 장미",
-        "n": 2
-       },
-       "conds": [
+      "id": "블랑셰_s2",
+      "name": "가시 장미 다발",
+      "hero": "블랑셰",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
         {
-         "c": "stack",
-         "id": "붉은 장미",
-         "n": 2
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
         }
-       ],
-       "fx": [
-        {
-         "k": "spend",
-         "id": "붉은 장미",
-         "all": true
-        },
-        {
-         "k": "spend",
-         "id": "푸른 장미",
-         "all": true
-        },
-        {
-         "k": "make",
-         "id": "블랑셰_t1",
-         "v": 1
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "passives": [
+      ]
+    },
     {
-     "name": "두 빛깔 장미",
-     "when": {
-      "on": "play",
-      "type": "공격"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "푸른 장미",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "ult": {
-    "name": "파랑새 정원",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 1.2,
-      "target": "allEnemies"
-     },
-     {
-      "k": "make",
+      "id": "블랑셰_s3",
+      "name": "꽃잎 커튼",
+      "hero": "블랑셰",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
       "id": "블랑셰_t1",
-      "v": 1
-     },
-     {
-      "k": "stack",
-      "id": "붉은 장미",
-      "v": 1
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "블랑셰_s1",
-    "블랑셰_s1",
-    "블랑셰_s2",
-    "블랑셰_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "블랑셰_s1",
-   "name": "장미 가시",
-   "hero": "블랑셰",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "블랑셰_s2",
-   "name": "가시 장미 다발",
-   "hero": "블랑셰",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "블랑셰_s3",
-   "name": "꽃잎 커튼",
-   "hero": "블랑셰",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 1.5
-    }
-   ]
-  },
-  {
-   "id": "블랑셰_u1",
-   "name": "붉은 장미 가시",
-   "hero": "블랑셰",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "tags": [
-    "약점 공격"
-   ],
-   "signature": true,
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "붉은 장미",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "핏빛 장미",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.62,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "가시덤불",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.94,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "장미 한 송이",
-     "tags": [
-      "약점 공격"
-     ],
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "독 가시",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "열연",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "짙은 향기",
-     "kind": "power"
-    },
-    {
-     "name": "가벼운 줄기",
-     "kind": "cost"
-    },
-    {
-     "name": "약점 연기",
-     "kind": "weakSpot"
-    }
-   ]
-  },
-  {
-   "id": "블랑셰_u2",
-   "name": "장미 정원 산책",
-   "hero": "블랑셰",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "약점 공격"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.8,
-     "target": "allEnemies"
-    },
-    {
-     "k": "stack",
-     "id": "붉은 장미",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "만개한 정원",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.08,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "작은 화단",
-     "cost": 1,
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.64,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "가시 울타리",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "allEnemies"
-      },
-      {
-       "k": "shield",
-       "ratio": 1
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "꽃잎 폭풍",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "allEnemies",
-       "hits": 2
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "파랑새의 정원",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "푸른 장미",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "향기로운 바람",
-     "kind": "power"
-    },
-    {
-     "name": "산책로",
-     "kind": "cost"
-    },
-    {
-     "name": "서리 내린 장미",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "블랑셰_u3",
-   "name": "앙코르",
-   "hero": "블랑셰",
-   "unique": true,
-   "cost": 0,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "stack",
-     "id": "붉은 장미",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "푸른 장미",
-     "v": 1
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "기립 박수",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "푸른 장미",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "무대 인사",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "푸른 장미",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1.46
-      }
-     ]
-    },
-    {
-     "name": "한 번 더",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "푸른 장미",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "커튼 뒤에서",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "푸른 장미",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "리허설",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "푸른 장미",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "관객의 환호",
-     "kind": "draw"
-    },
-    {
-     "name": "조명 켜기",
-     "kind": "ap"
-    },
-    {
-     "name": "예고편",
-     "tags": [
-      "개전"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "블랑셰_u4",
-   "name": "무대 위의 배우",
-   "hero": "블랑셰",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "critMod",
-     "v": 0.1,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "status",
-     "id": "사기",
-     "v": 1
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+      "name": "커튼콜",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
         {
-         "k": "stack",
-         "id": "붉은 장미",
-         "v": 1
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
         }
-       ]
-      }
-     ]
+      ],
+      "blurb": "두 빛깔 장미가 다 핀 무대의 마지막 인사.",
+      "hero": "블랑셰",
+      "token": true
+    },
+    {
+      "id": "블랑셰_u1",
+      "name": "싱크로즈",
+      "hero": "블랑셰",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.42,
+          "target": "randomEnemy",
+          "hits": 3
+        }
+      ],
+      "oracles": [
+        {
+          "name": "기적의 꽃말",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "randomEnemy",
+              "hits": 3
+            }
+          ]
+        },
+        {
+          "name": "확정 치명",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "푸른 장미",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "장미 넝쿨",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "흩날리는 파랑새",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "무대 인사",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "randomEnemy",
+              "hits": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "푸른 가시",
+          "kind": "power"
+        },
+        {
+          "name": "파랑새의 눈",
+          "kind": "ap"
+        },
+        {
+          "name": "가벼운 줄기",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "블랑셰_u2",
+      "name": "장미 정원 산책",
+      "hero": "블랑셰",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "푸른 장미"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "푸른 장미",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "만개한 정원",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "푸른 장미"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "푸른 장미",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "정원 손질",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "푸른 장미"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "붉어진 장미",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "푸른 장미"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "푸른 장미",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "가시 줄기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.57,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "푸른 장미",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "시상식의 액트리스",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "푸른 장미"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "푸른 장미",
+              "all": true
+            },
+            {
+              "k": "make",
+              "id": "블랑셰_t1",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "장미 향",
+          "kind": "power"
+        },
+        {
+          "name": "새벽 산책",
+          "kind": "draw"
+        },
+        {
+          "name": "정원 지름길",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "블랑셰_u3",
+      "name": "앙코르",
+      "hero": "블랑셰",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "푸른 장미",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "커튼 뒤",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대본 읽기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "처음 연기한 대본",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "파랑새 돌보기",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "푸른 장미",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "표정 연습",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "푸른 꽃향기",
+          "kind": "draw"
+        },
+        {
+          "name": "후후",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "조명 아래",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "블랑셰_u4",
+      "name": "무대 위의 배우",
+      "hero": "블랑셰",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "critMod",
+          "v": 0.15,
+          "run": true
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "stackReach",
+                "id": "푸른 장미",
+                "n": 4
+              },
+              "fx": [
+                {
+                  "k": "draw",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "주연 배우",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 0.2,
+              "run": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "푸른 장미",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "성대모사",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 0.15,
+              "run": true
+            },
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "푸른 장미",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    },
+                    {
+                      "k": "ap",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "응원단 비주얼",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 0.15,
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "푸른 장미",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "배역 몰입",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 0.15,
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "hits": 2
+            }
+          ]
+        },
+        {
+          "name": "백만송이 푸른장미",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 0.15,
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "푸른 장미",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "검은 드레스",
+          "kind": "atkUp"
+        },
+        {
+          "name": "스포트라이트",
+          "kind": "ap"
+        },
+        {
+          "name": "파랑새 날개",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "주연 배우",
-     "fx": [
-      {
-       "k": "critMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "붉은 장미",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "단역",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "붉은 장미",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "명연기",
-     "fx": [
-      {
-       "k": "critMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "붉은 장미",
-           "v": 2
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "빛나는 장미",
-     "fx": [
-      {
-       "k": "critMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "붉은 장미",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "붉은 장미",
-           "v": 2
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "막이 오르면",
-     "tags": [
-      "개막"
-     ],
-     "fx": [
-      {
-       "k": "critMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "붉은 장미",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "무대 체질",
-     "kind": "atkUp"
-    },
-    {
-     "name": "의상",
-     "kind": "defUp"
-    },
-    {
-     "name": "짧은 독백",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "블랑셰_t1",
-   "name": "커튼콜",
-   "cost": 0,
-   "type": "공격",
-   "tags": [
-    "소멸"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "status",
-     "id": "사기",
-     "v": 1
-    }
-   ],
-   "blurb": "두 빛깔 장미가 다 핀 무대의 마지막 인사.",
-   "hero": "블랑셰",
-   "token": true
-  }
- ],
+  ],
   "equips": [
     {
       "id": "eq_blanchetbird",
@@ -880,20 +872,16 @@
       },
       "affinityEffect": [
         {
-          "name": "두 빛깔 커튼콜",
+          "name": "파랑새의 표식",
           "when": {
-            "on": "ult"
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "stack",
-              "id": "붉은 장미",
-              "v": 1
-            },
-            {
-              "k": "stack",
               "id": "푸른 장미",
-              "v": 1
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }

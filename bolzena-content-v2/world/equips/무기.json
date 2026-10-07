@@ -14,7 +14,6 @@
           "name": "한 번에 들어 올리기",
           "when": {
             "on": "play",
-            "type": "공격",
             "minCost": 2
           },
           "limit": {
@@ -23,6 +22,11 @@
           },
           "fx": [
             {
+              "k": "extra",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
               "k": "status",
               "id": "잔광",
               "v": 1
@@ -30,7 +34,7 @@
           ]
         }
       ],
-      "blurb": "느리지만 한 번 휘두르면 묵직합니다."
+      "blurb": "느리지만 한 번 휘두르면 묵직합니다. 무거운 카드일수록 힘이 실립니다."
     },
     {
       "id": "eq_furnace",
@@ -84,6 +88,24 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "벼랑 끝",
+          "when": {
+            "on": "always"
+          },
+          "conds": [
+            {
+              "c": "wounded"
+            }
+          ],
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "self"
+            }
+          ]
         }
       ],
       "blurb": "한 대 맞으면 붉게 빛납니다. 알고 보니 말라붙은 석류 주스."
@@ -115,9 +137,27 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "연타",
+          "when": {
+            "on": "extra",
+            "who": "any"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            }
+          ]
         }
       ],
-      "blurb": "한 놈 쓰러뜨릴 때마다 주먹이 빨라집니다(세 번까지)."
+      "blurb": "한 놈 쓰러뜨릴 때마다 주먹이 빨라집니다(세 번까지). 덤으로 날린 주먹도 가끔 묵직합니다."
     },
     {
       "id": "eq_sharpstaff",
@@ -132,18 +172,23 @@
         {
           "name": "지팡이 끝 칼날",
           "when": {
-            "on": "ult"
+            "on": "play",
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
+              "k": "extra",
+              "ratio": 0.45,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
-      "blurb": "지팡이와 검을 하나로 합친 물건."
+      "blurb": "지팡이와 검을 하나로 합친 물건. 주문을 외우는 틈에 칼날이 먼저 나갑니다."
     },
     {
       "id": "eq_mace",
@@ -185,22 +230,26 @@
       },
       "effect": [
         {
-          "name": "다섯째 찌르기",
+          "name": "망토 속 단검",
           "when": {
             "on": "play",
-            "type": "공격",
-            "every": 5
+            "maxCost": 0,
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
             {
               "k": "extra",
-              "ratio": 1.2,
+              "ratio": 0.6,
               "target": "oneEnemy"
             }
           ]
         }
       ],
-      "blurb": "괴도 놀이 소품. 다섯 번째엔 꼭 급소를 찌릅니다."
+      "blurb": "괴도 놀이 소품. 망토를 펄럭이는 틈에 단검이 먼저 나갑니다."
     },
     {
       "id": "eq_elfwand",
@@ -312,6 +361,7 @@
           "when": {
             "on": "play",
             "type": "공격",
+            "maxCost": 1,
             "every": 3
           },
           "fx": [
@@ -323,7 +373,7 @@
           ]
         }
       ],
-      "blurb": "칠 때마다 한 자루씩 곁따라 날아갑니다."
+      "blurb": "가볍게 칠 때마다 한 자루씩 곁따라 날아갑니다."
     },
     {
       "id": "eq_mistdagger",
@@ -331,9 +381,29 @@
       "grade": "고급",
       "slot": "무기",
       "stats": {
-        "crit": 7
+        "crit": 6
       },
-      "blurb": "안개처럼 흐릿한 날의 비수."
+      "effect": [
+        {
+          "name": "안개 속 한 수",
+          "when": {
+            "on": "discard",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blurb": "안개처럼 흐릿한 날의 비수. 손에서 흩어진 카드 뒤에서 날이 나옵니다."
     },
     {
       "id": "eq_oldarrow",
@@ -341,8 +411,26 @@
       "grade": "고급",
       "slot": "무기",
       "stats": {
-        "atk": 13
+        "atk": 11
       },
+      "effect": [
+        {
+          "name": "곧게 날기",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "maxCost": 1,
+            "every": 4
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
       "blurb": "오래됐지만 아직 곧게 납니다."
     },
     {
@@ -384,13 +472,10 @@
           "name": "쓰라림",
           "when": {
             "on": "play",
-            "type": "공격"
+            "type": "공격",
+            "every": 3
           },
           "fx": [
-            {
-              "k": "ifRandom",
-              "pct": 0.3
-            },
             {
               "k": "status",
               "id": "균열",
@@ -415,13 +500,10 @@
           "name": "찌릿",
           "when": {
             "on": "play",
-            "type": "공격"
+            "type": "공격",
+            "every": 4
           },
           "fx": [
-            {
-              "k": "ifRandom",
-              "pct": 0.25
-            },
             {
               "k": "status",
               "id": "충격",
@@ -446,13 +528,10 @@
           "name": "불화살",
           "when": {
             "on": "play",
-            "type": "공격"
+            "type": "공격",
+            "every": 3
           },
           "fx": [
-            {
-              "k": "ifRandom",
-              "pct": 0.3
-            },
             {
               "k": "status",
               "id": "그을림",

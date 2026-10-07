@@ -13,39 +13,32 @@
       "crit": 10,
       "blurb": "\"허접\"이라며 날 세우던 수인 양아치가 디아나의 뒤를 이어 진짜 영웅이 된 모습.",
       "keyword": {
-        "name": "영웅담",
-        "desc": "격파로 쌓는 무용담",
+        "name": "영웅심",
+        "desc": "영웅의 길에서 솟는 용기",
         "carrier": "self",
-        "cap": 2,
-        "per": [
-          {
-            "stat": "dealt",
-            "v": 0.2
-          }
-        ],
+        "cap": 3,
         "rules": [
           {
-            "name": "맹호 일섬",
+            "name": "험난한 영웅의 길",
             "when": {
               "on": "stackReach",
-              "id": "영웅담",
-              "n": 2
+              "id": "영웅심",
+              "n": 3
             },
             "fx": [
               {
                 "k": "spend",
-                "id": "영웅담",
+                "id": "영웅심",
                 "all": true
               },
               {
                 "k": "dmg",
-                "ratio": 0.6,
+                "ratio": 0.4,
                 "target": "allEnemies"
               },
               {
-                "k": "tough",
-                "v": 1,
-                "target": "allEnemies"
+                "k": "heal",
+                "ratio": 0.3
               }
             ]
           }
@@ -53,34 +46,28 @@
       },
       "passives": [
         {
-          "name": "영웅의 길",
+          "name": "무용담",
           "when": {
-            "on": "break"
+            "on": "break",
+            "mine": true
           },
           "fx": [
             {
-              "k": "gauge",
-              "v": 15
-            },
-            {
               "k": "stack",
-              "id": "영웅담",
+              "id": "영웅심",
               "v": 1
             }
           ]
         },
         {
-          "name": "각성한 영웅",
+          "name": "그 스승에 그 제자",
           "when": {
             "on": "ult"
           },
           "fx": [
             {
-              "k": "ap",
-              "v": 1
-            },
-            {
-              "k": "draw",
+              "k": "stack",
+              "id": "영웅심",
               "v": 1
             }
           ]
@@ -107,7 +94,7 @@
           },
           {
             "k": "dmg",
-            "ratio": 1.0,
+            "ratio": 1,
             "target": "oneEnemy"
           },
           {
@@ -121,14 +108,14 @@
           },
           {
             "k": "dmg",
-            "ratio": 3.0,
+            "ratio": 3,
             "target": "oneEnemy"
           }
         ]
       },
       "starter": [
         "티그_영웅_s1",
-        "티그_영웅_s1",
+        "티그_영웅_u2",
         "티그_영웅_s2",
         "티그_영웅_s3"
       ]
@@ -181,21 +168,19 @@
       "name": "사슴류 베기",
       "hero": "티그_영웅",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.1,
-          "target": "oneEnemy",
+          "ratio": 0.4,
+          "target": "allEnemies",
           "hits": 2
         },
         {
-          "k": "ifBreak"
-        },
-        {
-          "k": "gauge",
-          "v": 30
+          "k": "stack",
+          "id": "영웅심",
+          "v": 1
         }
       ],
       "oracles": [
@@ -204,35 +189,53 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy",
+              "ratio": 0.55,
+              "target": "allEnemies",
               "hits": 2
             },
             {
-              "k": "ifBreak"
-            },
-            {
-              "k": "gauge",
-              "v": 30
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
             }
           ]
         },
         {
           "name": "한 칼만",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy",
+              "ratio": 0.3,
+              "target": "allEnemies",
               "hits": 2
             },
             {
-              "k": "ifBreak"
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "삼단 베기",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies",
+              "hits": 3
             },
             {
-              "k": "gauge",
-              "v": 30
+              "k": "stack",
+              "id": "영웅심",
+              "v": 2
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -241,21 +244,23 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy",
+              "ratio": 0.45,
+              "target": "allEnemies",
               "hits": 2
             },
             {
               "k": "stack",
-              "id": "영웅담",
+              "id": "영웅심",
               "v": 1
             },
             {
-              "k": "ifBreak"
+              "k": "ifStack",
+              "id": "영웅심",
+              "n": 2
             },
             {
-              "k": "gauge",
-              "v": 30
+              "k": "heal",
+              "ratio": 1
             }
           ]
         },
@@ -263,36 +268,19 @@
           "name": "사슴 뿔 휘돌리기",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 0.82,
-              "target": "allEnemies",
+              "ratio": 0.9,
+              "target": "oneEnemy",
               "hits": 2
             },
             {
-              "k": "ifBreak"
-            },
-            {
-              "k": "gauge",
-              "v": 30
-            }
-          ]
-        },
-        {
-          "name": "삼단 베기",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifBreak"
-            },
-            {
-              "k": "gauge",
-              "v": 40
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
             }
           ]
         }
@@ -322,8 +310,13 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.1,
+          "ratio": 0.8,
           "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "영웅심",
+          "v": 1
         },
         {
           "k": "tough",
@@ -336,8 +329,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.04,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
             },
             {
               "k": "tough",
@@ -351,30 +349,16 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.55,
               "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "영웅담 한 줄",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
             },
             {
               "k": "stack",
-              "id": "영웅담",
+              "id": "영웅심",
+              "v": 1
+            },
+            {
+              "k": "tough",
               "v": 1
             }
           ]
@@ -384,16 +368,18 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.94,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
+              "k": "stack",
+              "id": "영웅심",
               "v": 1
             },
             {
-              "k": "gauge",
-              "v": 20
+              "k": "draw",
+              "v": 1,
+              "basic": true
             }
           ]
         },
@@ -402,16 +388,42 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.0,
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
+              "k": "stack",
+              "id": "영웅심",
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 1.0
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "영웅담 한 줄",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 2
             }
           ]
         }
@@ -427,7 +439,13 @@
         },
         {
           "name": "몸에 밴 동작",
-          "kind": "cost"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -444,17 +462,22 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.9,
+          "ratio": 1.8,
           "target": "oneEnemy"
         },
         {
-          "k": "ifFoe",
-          "id": "broken"
+          "k": "perStack",
+          "id": "영웅심"
         },
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 0.35,
           "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "영웅심",
+          "all": true
         }
       ],
       "oracles": [
@@ -466,17 +489,22 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 2.1,
               "target": "oneEnemy"
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
+              "k": "perStack",
+              "id": "영웅심"
             },
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.42,
               "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "영웅심",
+              "all": true
             }
           ]
         },
@@ -489,71 +517,22 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.28,
               "target": "oneEnemy"
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
+              "k": "perStack",
+              "id": "영웅심"
             },
             {
               "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "무용담의 검",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.9,
+              "ratio": 0.24,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "영웅담",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "영웅의 검무",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
+              "k": "spend",
+              "id": "영웅심",
+              "all": true
             }
           ]
         },
@@ -566,21 +545,85 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.0,
+              "ratio": 2.9,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
+              "k": "perStack",
+              "id": "영웅심"
             },
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 0.5,
               "target": "oneEnemy"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.8
+            }
+          ]
+        },
+        {
+          "name": "무용담의 검",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "영웅심"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "영웅의 검술",
+          "cost": 1,
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.19,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "영웅심",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -591,12 +634,12 @@
           "kind": "power"
         },
         {
-          "name": "흔들린 적을 노려",
-          "kind": "weakSpot"
+          "name": "이름값",
+          "kind": "ap"
         },
         {
-          "name": "이름값",
-          "kind": "draw"
+          "name": "흔들린 적을 노려",
+          "kind": "weakSpot"
         }
       ]
     },
@@ -606,32 +649,25 @@
       "hero": "티그_영웅",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "영웅심"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
           "k": "gauge",
-          "v": 30
-        },
-        {
-          "k": "status",
-          "id": "잔광",
-          "v": 2
-        },
-        {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "gauge",
-                  "v": 15
-                }
-              ]
-            }
-          ]
+          "v": 10
         }
       ],
       "oracles": [
@@ -639,75 +675,39 @@
           "name": "전해질 무용담",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "영웅심"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy"
+            },
+            {
               "k": "gauge",
-              "v": 30
-            },
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "gauge",
-                      "v": 35
-                    }
-                  ]
-                }
-              ]
+              "v": 10
             }
           ]
         },
         {
-          "name": "첫 무용담",
-          "cost": 0,
+          "name": "첫걸음",
+          "power": true,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy"
             },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "gauge",
-                      "v": 15
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "영웅의 이름",
-          "fx": [
             {
               "k": "gauge",
               "v": 30
             },
             {
-              "k": "stack",
-              "id": "영웅담",
-              "v": 4
-            },
-            {
               "k": "power",
               "rules": [
                 {
@@ -716,8 +716,9 @@
                   },
                   "fx": [
                     {
-                      "k": "gauge",
-                      "v": 45
+                      "k": "stack",
+                      "id": "영웅심",
+                      "v": 1
                     }
                   ]
                 }
@@ -730,70 +731,71 @@
           "fx": [
             {
               "k": "gauge",
-              "v": 50
+              "v": 30
             },
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1.04,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "gauge",
-                      "v": 25
-                    }
-                  ]
-                }
-              ]
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "광기의 영웅",
-          "tags": [
-            "축복"
-          ],
+          "name": "영웅의 이름",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "영웅심"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "영웅심",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "첫 무용담",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "영웅심"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            },
+            {
               "k": "gauge",
-              "v": 30
-            },
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "gauge",
-                      "v": 15
-                    }
-                  ]
-                }
-              ]
+              "v": 10
             }
           ]
         }
       ],
       "blesses": [
-        {
-          "name": "첫걸음",
-          "kind": "cost"
-        },
         {
           "name": "길잡이",
           "kind": "draw"
@@ -801,6 +803,16 @@
         {
           "name": "영웅의 기개",
           "kind": "atkUp"
+        },
+        {
+          "name": "친구의 목걸이",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            }
+          ]
         }
       ]
     }

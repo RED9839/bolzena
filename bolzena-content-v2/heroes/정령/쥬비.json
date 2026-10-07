@@ -1,766 +1,891 @@
 {
- "heroes": [
-  {
-   "id": "쥬비",
-   "name": "쥬비",
-   "nature": "활발",
-   "role": "딜러",
-   "star": 2,
-   "hp": 550,
-   "atk": 115,
-   "def": 27,
-   "crit": 10,
-   "blurb": "하나의 정신을 나눠 쓰는 꿀벌 군집. 턴마다 벌이 모여들어 쥬비의 공격을 따라 쏘고, 파티가 다치면 벌이 흩어집니다.",
-   "keyword": {
-    "name": "벌",
-    "desc": "따라다니며 쏘는 꿀벌 떼",
-    "carrier": "self",
-    "cap": 8,
-    "rules": [
-     {
-      "name": "꿀 도둑 처단",
-      "when": {
-       "on": "kill",
-       "mine": true
+  "heroes": [
+    {
+      "id": "쥬비",
+      "name": "쥬비",
+      "nature": "활발",
+      "role": "딜러",
+      "star": 2,
+      "hp": 550,
+      "atk": 115,
+      "def": 27,
+      "crit": 10,
+      "blurb": "하나의 정신을 나눠 쓰는 꿀벌 군집. 턴마다 벌이 모여들어 쥬비의 공격을 따라 쏘고, 파티가 다치면 벌이 흩어집니다.",
+      "keyword": {
+        "name": "벌",
+        "desc": "따라다니며 쏘는 꿀벌 떼",
+        "carrier": "self",
+        "cap": 8,
+        "rules": [
+          {
+            "name": "벌집 출발",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "벌",
+                "v": 3
+              }
+            ]
+          },
+          {
+            "name": "윙윙 집합",
+            "when": {
+              "on": "turnStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "벌",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "꿀 도둑 처단",
+            "when": {
+              "on": "kill",
+              "mine": true
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "벌",
+                "v": 2
+              }
+            ]
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "stack",
-        "id": "벌",
-        "v": 2
-       }
+      "passives": [
+        {
+          "name": "친구왔쮸비",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "벌떼 습격",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "행복했쮸비",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "stack",
+            "id": "벌",
+            "v": 4
+          },
+          {
+            "k": "perStack",
+            "id": "벌"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.2,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "쥬비_s1",
+        "쥬비_u2",
+        "쥬비_s2",
+        "쥬비_s3"
       ]
-     },
-     {
-      "name": "흩어지는 벌",
-      "when": {
-       "on": "hurt"
-      },
-      "limit": {
-       "per": "turn",
-       "n": 1
-      },
+    }
+  ],
+  "cards": [
+    {
+      "id": "쥬비_s1",
+      "name": "벌침",
+      "hero": "쥬비",
+      "cost": 1,
+      "type": "공격",
       "fx": [
-       {
-        "k": "spend",
-        "id": "벌",
-        "v": 1
-       }
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
       ]
-     },
-     {
-      "name": "벌집 출발",
-      "when": {
-       "on": "fightStart"
-      },
+    },
+    {
+      "id": "쥬비_s2",
+      "name": "대장 벌침",
+      "hero": "쥬비",
+      "cost": 2,
+      "type": "공격",
       "fx": [
-       {
-        "k": "stack",
-        "id": "벌",
-        "v": 2
-       }
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "윙윙 집합",
-     "when": {
-      "on": "turnStart"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 1
-      }
-     ]
     },
     {
-     "name": "벌떼 습격",
-     "when": {
-      "on": "play",
-      "type": "공격"
-     },
-     "fx": [
-      {
-       "k": "perStack",
-       "id": "벌"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "ult": {
-    "name": "행복했쮸비",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "stack",
-      "id": "벌",
-      "v": 4
-     },
-     {
-      "k": "perStack",
-      "id": "벌"
-     },
-     {
-      "k": "dmg",
-      "ratio": 0.2,
-      "target": "allEnemies"
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "쥬비_s1",
-    "쥬비_s1",
-    "쥬비_s2",
-    "쥬비_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "쥬비_s1",
-   "name": "벌침",
-   "hero": "쥬비",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "쥬비_s2",
-   "name": "대장 벌침",
-   "hero": "쥬비",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "쥬비_s3",
-   "name": "밀랍 벽",
-   "hero": "쥬비",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 1.5
-    }
-   ]
-  },
-  {
-   "id": "쥬비_u1",
-   "name": "벌침 연타",
-   "hero": "쥬비",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "signature": true,
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.35,
-     "target": "oneEnemy",
-     "hits": 3
-    },
-    {
-     "k": "stack",
-     "id": "벌",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "독침 연타",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.47,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "일벌의 침",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.35,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "가벼운 침",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "흩뿌린 침",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.36,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "꿀 도둑 표시",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.35,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "날카로운 침",
-     "kind": "power"
-    },
-    {
-     "name": "가벼운 날개",
-     "kind": "cost"
-    },
-    {
-     "name": "급소 찌르기",
-     "kind": "weakSpot"
-    }
-   ]
-  },
-  {
-   "id": "쥬비_u2",
-   "name": "여왕벌 호출",
-   "hero": "쥬비",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "stack",
-     "id": "벌",
-     "v": 3
-    },
-    {
-     "k": "status",
-     "id": "협공",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "대군단",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 4
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "정찰벌",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "밀랍 방패",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1.2
-      }
-     ]
-    },
-    {
-     "name": "합창 윙윙",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "벌집 깨우기",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 4
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "윙윙 소리",
-     "kind": "draw"
-    },
-    {
-     "name": "날갯짓",
-     "kind": "ap"
-    },
-    {
-     "name": "꿀 한 방울",
-     "kind": "heal"
-    }
-   ]
-  },
-  {
-   "id": "쥬비_u3",
-   "name": "벌떼 돌격",
-   "hero": "쥬비",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "perStack",
-     "id": "벌"
-    },
-    {
-     "k": "dmg",
-     "ratio": 0.25,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "spend",
-     "id": "벌",
-     "v": 3
-    }
-   ],
-   "oracles": [
-    {
-     "name": "벌떼 폭풍",
-     "fx": [
-      {
-       "k": "perStack",
-       "id": "벌"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.32,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "벌",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "작은 돌격",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "perStack",
-       "id": "벌"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "벌",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "벌떼 휘몰이",
-     "fx": [
-      {
-       "k": "perStack",
-       "id": "벌"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.19,
-       "target": "allEnemies"
-      },
-      {
-       "k": "spend",
-       "id": "벌",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "아끼는 벌",
-     "fx": [
-      {
-       "k": "perStack",
-       "id": "벌"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.31,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "벌",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "꿀 도둑은 안 잊어",
-     "fx": [
-      {
-       "k": "perStack",
-       "id": "벌"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.25,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "벌",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "성난 벌떼",
-     "kind": "power"
-    },
-    {
-     "name": "빠른 날개",
-     "kind": "cost"
-    },
-    {
-     "name": "벌침 독",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "쥬비_u4",
-   "name": "밀랍 둥지",
-   "hero": "쥬비",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "stack",
-     "id": "벌",
-     "v": 2
-    },
-    {
-     "k": "atkMod",
-     "v": 0.1,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+      "id": "쥬비_s3",
+      "name": "밀랍 벽",
+      "hero": "쥬비",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
         {
-         "k": "stack",
-         "id": "벌",
-         "v": 1
+          "k": "shield",
+          "ratio": 1.5
         }
-       ]
-      }
-     ]
+      ]
+    },
+    {
+      "id": "쥬비_u1",
+      "name": "친구 꿀벌",
+      "hero": "쥬비",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "벌",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "친구 꿀벌 떼",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "가장 약한 적부터",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.02,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 2
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "벌침 세례",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.79,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "꿀 재고 점검",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "벌",
+              "max": 4
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "벌떼 소환",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.51,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 4
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "독침",
+          "kind": "power"
+        },
+        {
+          "name": "따끔",
+          "kind": "frost"
+        },
+        {
+          "name": "날갯짓",
+          "kind": "ap"
+        }
+      ]
+    },
+    {
+      "id": "쥬비_u2",
+      "name": "대장 쥬비 호출",
+      "hero": "쥬비",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "벌",
+          "v": 2
+        },
+        {
+          "k": "atkMod",
+          "v": 0.1,
+          "run": true
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "벌",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "89호와 210호",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 4
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "행복했쮸비",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 2
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "벌",
+                      "max": 3
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.11,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "꿀 재고 확인",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 3
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "벌집 비상",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 4
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "귀여움 뽐내기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 4
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "꿀 한 숟갈",
+          "kind": "draw"
+        },
+        {
+          "name": "윙윙",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿀단지",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "쥬비_u3",
+      "name": "벌떼 돌격",
+      "hero": "쥬비",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "벌"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.09,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "벌",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "총공격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.11,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "벌",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "복수와 유혈",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "벌",
+              "all": true
+            },
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "일부만 출격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "벌",
+              "max": 4
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.14,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "벌",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "벌떼 포위",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.06,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "꿀 도둑 추격",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "벌",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "성난 벌떼",
+          "kind": "power"
+        },
+        {
+          "name": "벌집 쑤시기",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "가벼운 날개",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "쥬비_u4",
+      "name": "밀랍 둥지",
+      "hero": "쥬비",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "벌",
+          "v": 1
+        },
+        {
+          "k": "perStack",
+          "id": "벌"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "큰 벌집",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.27
+            }
+          ]
+        },
+        {
+          "name": "꽃밭 돌보기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.2
+            }
+          ]
+        },
+        {
+          "name": "꿀벌 경호대",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.53
+            },
+            {
+              "k": "spend",
+              "id": "벌",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "온난화 걱정",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "행복한 꿀벌",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "벌"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "꿀벌 군단",
+          "kind": "atkUp"
+        },
+        {
+          "name": "밀랍 벽",
+          "kind": "guard"
+        },
+        {
+          "name": "꿀 냄새",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "거대한 벌집",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 2
-      },
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "벌",
-           "v": 2
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "작은 벌집",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "벌",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "꿀 창고",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "벌",
-           "v": 2
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "여왕의 축복",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 2
-      },
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "벌",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "봄의 벌집",
-     "tags": [
-      "개막"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "벌",
-       "v": 4
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "벌",
-           "v": 2
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "꿀 먹은 힘",
-     "kind": "atkUp"
-    },
-    {
-     "name": "밀랍 갑옷",
-     "kind": "defUp"
-    },
-    {
-     "name": "가벼운 벌집",
-     "kind": "cost"
-    }
-   ]
-  }
- ]
+  ]
 }

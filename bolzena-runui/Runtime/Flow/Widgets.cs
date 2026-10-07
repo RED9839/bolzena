@@ -447,13 +447,18 @@ namespace Bolzena.RunUI
 
             // ── 아래 글 자리 재기(효과 글 길이만큼 어둠을 올린다) ──
             string full = v != null ? P.Text.Card(v) : "";
+            var mark = view == null ? f.P.Mark(id) : CardMark.Of(P.Data, id, 0, null);
+            bool blessOn = mark.Blessed && !BlessFx.Old && !string.IsNullOrEmpty(mark.BlessText);
+            string baseFull = v != null && v.Oracle != null ? P.Text.Card(v.Def) : null;
             bool hasTags = v != null && v.Tags != null && v.Tags.Count > 0;
             if (hasTags)
             {
                 var tagHead = string.Join(" ", v.Tags.Select(t => t + "."));
                 if (full.StartsWith(tagHead)) full = full.Substring(tagHead.Length).TrimStart();
                 else full = full.Replace(tagHead, "").Trim();
+                if (baseFull != null) { if (baseFull.StartsWith(tagHead)) baseFull = baseFull.Substring(tagHead.Length).TrimStart(); else baseFull = baseFull.Replace(tagHead, "").Trim(); }
             }
+            if (baseFull != null) full = OracleDiff.Mark(baseFull, full);   // 신탁으로 바뀐 부분 표시
             // 글 속 낱말(키워드 · 상태 · 사도 고유 효과 · 생성 카드) — 작은 카드(150 아래)는 글이 작아 누르기 어려우니 싣지 않는다
             List<CardTerms.Term> terms = null;
             if (v != null && !string.IsNullOrEmpty(full) && w >= 150)
@@ -465,6 +470,7 @@ namespace Bolzena.RunUI
             // 보이는 글 = 낱말 표시(Mark) + 낱말 단위 줄바꿈(KeepWords — TMP 옛 한글 규칙은 글자마다 꺾어 「그 / 적에게」 처럼 갈린다).
             //   높이도 이 글로 잰다(낱말로 꺾으면 줄이 조금 늘 수 있다)
             string shown = terms != null && terms.Count > 0 ? CardTerms.Mark(full, terms) : full;
+            shown = OracleDiff.ToTmp(shown);
             var desc = Ui.Text(rt, shown, 13.5f * k, Theme.Ink, TextAlignmentOptions.Bottom, false, "desc");
             desc.lineSpacing = -2;
             shown = CardTerms.FitFor(desc, shown, descW, 13.5f * k);   // 어절 · 덩이 · 화살표 규칙(조건 → 결과가 안 들어가면 「→ 결과」 를 다음 줄 맨 앞으로)
@@ -472,7 +478,8 @@ namespace Bolzena.RunUI
             if (terms != null && terms.Count > 0) CardTerms.Prepare(desc);
             float need = string.IsNullOrEmpty(full) ? 0 : desc.GetPreferredValues(shown, descW, 0).y;
             float descH = Mathf.Clamp(need + 2 * k, 20 * k, 112 * k);
-            float descB = 12 * k;
+            float blessH = blessOn ? 18 * k : 0;   // 축복 효과 전용 줄(본문 맨 아래) — 기본 효과 글 아래에 따로
+            float descB = 12 * k + blessH;
             float tagY = descB + descH + 3 * k;              // 태그 줄 아래 끝
             float decoY = tagY + (hasTags ? 20 * k : 2 * k) + 5 * k;
             // 그림 자리 — 위 = 종류 알약 아래(카드 위 54 + 여백), 아래 = 장식 선(그림 창 = 카드 안쪽 2k)
@@ -485,19 +492,20 @@ namespace Bolzena.RunUI
             {
                 // 효과 글 뒤 어둠 판 — 밝은 그림(흰 옷 따위) 위에서도 글이 읽히게(전투 CardView 의 descbg 와 같은 것)
                 var plate = Ui.Img(wr, Theme.Round, new Color(0.01f, 0.02f, 0.06f, 0.6f), "descbg"); plate.pixelsPerUnitMultiplier = 2.2f;
-                plate.rectTransform.At(0.5f, 0, 0, descB - 6 * k, w - 12 * k, descH + (hasTags ? 21 * k : 0) + 10 * k);
+                plate.rectTransform.At(0.5f, 0, 0, descB - 6 * k - blessH, w - 12 * k, descH + blessH + (hasTags ? 21 * k : 0) + 10 * k);
             }
             var band = Ui.Img(wr, Theme.White, tint, "band"); band.rectTransform.Column(0, 5 * k);
 
             // ── 테(성격 색) ──
-            var frame = Ui.Img(rt, Theme.S("frame", 24), tint, "frame"); frame.rectTransform.Fill();
+            var frame = Ui.Img(rt, Theme.S("frame", 24), tint, "frame"); frame.rectTransform.Fill(); frame.pixelsPerUnitMultiplier = 1.7f;   // 얇은 테(2026-10-08 사용자)
 
             // ── 위: 큰 비용 · 이름 · 종류 알약 ──
             var ct = Ui.Title(rt, v == null ? "?" : v.X ? "X" : status && v.Cost <= 0 ? "-" : v.Cost.ToString(), 44 * k, Color.white, TextAlignmentOptions.Center, "cost");
             ct.rectTransform.At(0, 1, 9 * k, -2 * k, 36 * k, 50 * k);
+            if (v != null && v.Oracle != null && v.Oracle.Cost.HasValue && v.Oracle.Cost.Value < v.Def.Cost) ct.color = new Color(0.6f, 1f, 0.45f);
             ct.Outline(0.24f);
             var nm = Ui.Title(rt, v?.Name ?? id, 19 * k, Color.white, TextAlignmentOptions.MidlineLeft, "name");
-            nm.rectTransform.At(0, 1, 47 * k, -8 * k, w - 47 * k - (v != null && v.Unique || owner != null ? 30 : 8) * k, 25 * k);
+            nm.rectTransform.At(0, 1, 47 * k, -8 * k, w - 47 * k - (v != null && v.Unique ? 30 : 8) * k, 25 * k);
             nm.textWrappingMode = TextWrappingModes.NoWrap;
             nm.enableAutoSizing = true; nm.fontSizeMin = 11 * k; nm.fontSizeMax = 19 * k;
             nm.Outline(0.26f);
@@ -514,7 +522,7 @@ namespace Bolzena.RunUI
                 var star = Ui.Img(rt, Theme.S("ic_spark"), Theme.Gold, "unique");
                 star.rectTransform.At(1, 1, -8 * k, -9 * k, 20 * k, 20 * k);
             }
-            else if (owner != null && !noFace)
+            else if (false && owner != null && !noFace)   // 얼굴 배지 없음(2026-10-08 사용자)
             {
                 // 교주 카드 주인 핀 — 오른쪽 위 작은 초상(테 = 주인 성격 색, 전투 CardView 의 핀과 같은 자리)
                 var pin = Face(rt, Roster.OfCore(owner), 26 * k, true, "ownerpin");
@@ -524,11 +532,7 @@ namespace Bolzena.RunUI
             }
 
             // ── 아래: 장식 선(가운데 마름모) · 태그 · 효과 글 ──
-            var deco = Ui.Img(rt, Theme.White, new Color(1f, 0.88f, 0.6f, 0.6f), "deco"); deco.rectTransform.At(0.5f, 0, 0, decoY, w * 0.56f, 1.4f * k);
-            var dot = Ui.Img(rt, Theme.White, new Color(1f, 0.9f, 0.65f), "decodot");
-            dot.rectTransform.anchorMin = dot.rectTransform.anchorMax = new Vector2(0.5f, 0); dot.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            dot.rectTransform.sizeDelta = new Vector2(6 * k, 6 * k); dot.rectTransform.anchoredPosition = new Vector2(0, decoY + 0.7f * k);
-            dot.rectTransform.localRotation = Quaternion.Euler(0, 0, 45);
+            DecoLine(rt, decoY, w, k, DecoMark.None);
             if (hasTags)
             {
                 var tg = Ui.Title(rt, "[ " + string.Join(" / ", v.Tags) + " ]", 13.5f * k, Theme.Gold, TextAlignmentOptions.Center, "tags");
@@ -550,20 +554,44 @@ namespace Bolzena.RunUI
             desc.enableAutoSizing = true; desc.fontSizeMin = 8.5f * k; desc.fontSizeMax = 13.5f * k;   // 칸에 맞으면 13.5 그대로 · 넘치거나 한 덩이가 칸보다 넓으면 줄인다(끊지 않음)
             desc.Outline(0.2f);
             // ── 표식(신탁 · 축복 · 복제, 2026-10-06) — 겹쳐도 읽히게 자리를 나눈다:
-            //   신탁 = 장식 선 바로 위 금빛 이름 띠 + 테 바깥 금빛 · 축복 = 그 위 겨우살이(초록) 띠(후광 아이콘 + 이름) · 복제 = 오른쪽 위 셋째 줄 겹친 카드 표(「복제 — 신탁 · 축복 불가」)
+            //   신탁 = 장식 선의 별 줄(DecoLine, 이름은 안 보임 — 2026-10-07) + 테 바깥 금빛 · 축복 = 그 위 겨우살이(초록) 띠(후광 아이콘 + 이름) · 복제 = 오른쪽 위 셋째 줄 겹친 카드 표(「복제 — 신탁 · 축복 불가」)
             //   view 를 준 미리보기(신탁 고르기 후보 따위)는 신탁만 view 에서 — 축복은 고르기 창이 따로 그린다
-            var mark = view == null ? f.P.Mark(id) : CardMark.Of(P.Data, id, 0, null);
             float chipY = decoY + 8 * k;
-            if (v != null && v.Oracle != null)
+            bool oraOn = v != null && v.Oracle != null && !name.StartsWith("oracle");   // 신탁 미리보기 후보는 받은 카드가 아니라 마크 없음
+            if (oraOn || mark.Blessed)
             {
-                var og = Ui.Img(rt, Theme.S("frame_thick", 24), Theme.Gold.A(0.95f), "oracleglow");
-                og.rectTransform.Fill(-3 * k, -3 * k, -3 * k, -3 * k);
-                og.transform.SetSiblingIndex(frame.transform.GetSiblingIndex());   // 성격 테 밑 — 성격 색은 그대로, 바깥으로 금빛이 번진다
-                MarkBand(rt, "ic_spark", v.Oracle.Name, new Color(0.35f, 0.25f, 0.05f, 0.95f), Theme.Gold, Theme.Gold, chipY, w, k, "oracle");
-                chipY += 25 * k;
+                var og = Ui.Img(rt, Theme.S("frame_thick", 24), (mark.Blessed ? new Color(0.72f, 0.58f, 1f) : Theme.Gold).A(0.95f), "oracleglow");
+                og.rectTransform.Fill(-3 * k, -3 * k, -3 * k, -3 * k); og.pixelsPerUnitMultiplier = 1.7f;
+                og.transform.SetSiblingIndex(frame.transform.GetSiblingIndex());   // 성격 테 밑 — 성격 색은 그대로, 바깥으로 빛이 번진다
             }
-            if (mark.Blessed)
-                MarkBand(rt, "ic_bless", mark.Bless, new Color(0.06f, 0.27f, 0.2f, 0.95f), new Color(0.75f, 1f, 0.82f), new Color(0.85f, 1f, 0.9f), chipY, w, k, "bless");
+            // 비용 아래 마크(카제나 번뜩임) — 신탁 = 금빛 원 + 별 · 축복까지 = 신탁 마크 대신 연보라 원 + 날개 · 없으면 없음
+            if (oraOn || mark.Blessed)
+            {
+                float ms = 28 * k;
+                var mc = Ui.Img(rt, Theme.S("circle"), mark.Blessed ? new Color(0.76f, 0.64f, 1f) : new Color(1f, 0.82f, 0.38f), "costmark");
+                mc.rectTransform.At(0, 1, 13 * k, -54 * k, ms, ms);
+                if (mark.Blessed)
+                {   // 연보라 마름모 + 흰 네 갈래 별 — 신탁(금빛 원)과 모양 · 색 모두 다르게
+                    mc.sprite = Theme.White; mc.rectTransform.localEulerAngles = new Vector3(0, 0, 45); mc.rectTransform.sizeDelta = new Vector2(ms * 0.74f, ms * 0.74f);
+                    var sp = Ui.Img(mc.rectTransform, Theme.S("ic_spark"), Color.white, "star"); sp.preserveAspect = true;
+                    sp.rectTransform.At(0.5f, 0.5f, 0, 0, ms * 0.62f, ms * 0.62f); sp.rectTransform.localEulerAngles = new Vector3(0, 0, -45);
+                }
+                else
+                {
+                    var st = Ui.Img(mc.rectTransform, Theme.S("ic_spark"), new Color(0.35f, 0.2f, 0.02f), "star"); st.preserveAspect = true;
+                    st.rectTransform.At(0.5f, 0.5f, 0, 0, 18 * k, 18 * k);
+                }
+            }
+            if (blessOn)
+            {
+                var bl = Ui.Text(rt, OracleDiff.Strip(mark.BlessText), 12f * k, new Color(0.88f, 0.8f, 1f), TextAlignmentOptions.MidlineLeft, false, "blessline");
+                bl.textWrappingMode = TextWrappingModes.NoWrap; bl.enableAutoSizing = true; bl.fontSizeMin = 8f * k; bl.fontSizeMax = 12f * k; bl.Outline(0.2f);
+                bl.rectTransform.At(0.5f, 0, 8 * k, 11 * k, w - 44 * k, 18 * k);
+                var bic = Ui.Img(rt, Theme.S("ic_bless"), new Color(0.85f, 0.76f, 1f), "blessic"); bic.preserveAspect = true;
+                bic.rectTransform.At(0, 0, 11 * k, 11 * k, 16 * k, 16 * k);
+            }
+            if (mark.Blessed && BlessFx.Old)
+                MarkBand(rt, "ic_bless", "축복", new Color(0.06f, 0.27f, 0.2f, 0.95f), new Color(0.75f, 1f, 0.82f), new Color(0.85f, 1f, 0.9f), chipY, w, k, "bless");
             if (mark.Copy)
             {
                 bool small = w < 150;
@@ -586,6 +614,51 @@ namespace Bolzena.RunUI
                 }
             }
             return rt;
+        }
+
+        /// <summary>축복 표식 — 장식 선(높이 y, 반너비 half) 양 끝의 금빛 날개 한 쌍.</summary>
+        public static void BlessWings(RectTransform rt, float y, float half, float k)
+        {
+            float ww = 30 * k, wh = ww * 0.75f;
+            for (int sgn = -1; sgn <= 1; sgn += 2)
+            {
+                var im = Ui.Img(rt, BlessFx.Wing, Color.white, sgn < 0 ? "blesswingl" : "blesswingr");
+                var r = im.rectTransform;
+                r.anchorMin = r.anchorMax = new Vector2(0.5f, 0);
+                r.pivot = new Vector2(0.08f, 0.3f);
+                r.sizeDelta = new Vector2(ww, wh);
+                r.anchoredPosition = new Vector2(sgn * (half + 1 * k), y - 2 * k);
+                r.localScale = new Vector3(sgn, 1, 1);
+            }
+        }
+
+        /// <summary>장식 선에 박는 표식 — 갈래를 더해 쓴다(축복 표식 따위는 여기에 값을 더해 DecoLine 에서 그린다).</summary>
+        [System.Flags] public enum DecoMark { None = 0, Oracle = 1 }
+
+        /// <summary>
+        /// 효과 글 위 장식 선(카드 폭 56%) — 보통은 가운데 마름모 하나. Oracle(받은 신탁)이면 마름모 대신 가운데 큰 별 + 양옆 작은 별 둘씩
+        /// (카제나 번뜩임 별 — 2026-10-07). 별은 선 가운데 ±0.17 w 안이라 선 양 끝(±0.28 w)은 다른 표식이 쓸 수 있다. 돌려줌: 선.
+        /// </summary>
+        public static RectTransform DecoLine(RectTransform rt, float y, float w, float k, DecoMark mark)
+        {
+            var deco = Ui.Img(rt, Theme.White, new Color(1f, 0.88f, 0.6f, 0.6f), "deco"); deco.rectTransform.At(0.5f, 0, 0, y, w * 0.56f, 1.4f * k);
+            if ((mark & DecoMark.Oracle) != 0)
+            {
+                float[] xs = { 0, -0.09f, 0.09f, -0.17f, 0.17f };
+                for (int i = 0; i < xs.Length; i++)
+                {
+                    float s = (i == 0 ? 20 : 11) * k;
+                    var st = Ui.Img(rt, Theme.S("ic_spark"), new Color(1f, 0.85f, 0.45f), "orastar" + i); st.preserveAspect = true;
+                    st.rectTransform.anchorMin = st.rectTransform.anchorMax = new Vector2(0.5f, 0); st.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+                    st.rectTransform.sizeDelta = new Vector2(s, s); st.rectTransform.anchoredPosition = new Vector2(xs[i] * w, y + 0.7f * k);
+                }
+                return deco.rectTransform;
+            }
+            var dot = Ui.Img(rt, Theme.White, new Color(1f, 0.9f, 0.65f), "decodot");
+            dot.rectTransform.anchorMin = dot.rectTransform.anchorMax = new Vector2(0.5f, 0); dot.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            dot.rectTransform.sizeDelta = new Vector2(6 * k, 6 * k); dot.rectTransform.anchoredPosition = new Vector2(0, y + 0.7f * k);
+            dot.rectTransform.localRotation = Quaternion.Euler(0, 0, 45);
+            return deco.rectTransform;
         }
 
         /// <summary>카드 아래 표식 띠 하나(신탁 · 축복) — 가운데, 이름 길이만큼(카드 폭 안).</summary>

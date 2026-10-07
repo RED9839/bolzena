@@ -20,7 +20,7 @@ namespace Bolzena.RunUI
         {
             var o = new List<RevealPick>();
             foreach (var x in opts)
-                o.Add(new RevealPick { CardId = cardId, View = d.View(cardId, x.N), Label = x.Name, BlessName = x.Blessed ? x.BlessName : null, BlessText = x.Blessed ? x.BlessText : null });
+                o.Add(new RevealPick { CardId = cardId, View = d.View(cardId, x.N), Label = "신탁 " + x.N, BlessName = x.Blessed ? x.BlessName : null, BlessText = x.Blessed ? x.BlessText : null });
             return o;
         }
     }
@@ -193,7 +193,7 @@ namespace Bolzena.RunUI
                     Tw.Pulse(gl, 0.45f, 0.85f, 1.6f);
                     var band = Ui.Img(h, Theme.S("pill_gold", 46), Color.white, "blessband");
                     band.rectTransform.At(0.5f, 0, 0, compact ? -30 : -36, cw * 1.05f, compact ? 26 : 30);
-                    var bt = Ui.Title(band.transform, "축복! · " + p.BlessName, compact ? 13 : 16, Theme.Brown, TextAlignmentOptions.Center);
+                    var bt = Ui.Title(band.transform, "축복!", compact ? 13 : 16, Theme.Brown, TextAlignmentOptions.Center);
                     bt.rectTransform.Fill(8, 0, 8, 0); bt.enableAutoSizing = true; bt.fontSizeMin = 9; bt.fontSizeMax = compact ? 13 : 16;
                     if (!string.IsNullOrEmpty(p.BlessText))
                     {
@@ -262,50 +262,20 @@ namespace Bolzena.RunUI
             ch0.SetAsLastSibling();
             if (labels[chosen]) labels[chosen].alpha = 0;
             var from = holders.ConvertAll(h => h ? h.anchoredPosition : Vector2.zero);
-            var flash = Ui.Img(ch0, Theme.White, new Color(1, 1, 1, 0), "flash");
-            flash.rectTransform.Fill();
-            yield return Lerp(root, 0.32f, t =>
+            // 고른 뒤 — 연출 없음(2026-10-08 사용자): 나머지는 빠르게 흐려지고, 고른 카드는 그 자리에서 곧바로 이어진다
+            yield return Lerp(root, 0.15f, t =>
             {
                 for (int i = 0; i < holders.Count; i++)
-                {
-                    if (!holders[i]) continue;
-                    if (i == chosen) { holders[i].anchoredPosition = Vector2.Lerp(from[i], new Vector2(0, cy), Tw.OutCubic(t)); holders[i].localScale = Vector3.one * Mathf.Lerp(1f, 1.3f, t); continue; }
-                    holders[i].anchoredPosition = from[i] + new Vector2(0, -420 * t * t);
-                    holders[i].localEulerAngles = new Vector3(0, 0, (i < chosen ? 25 : -25) * t);
-                    holders[i].Group().alpha = 1 - t;
-                }
+                    if (i != chosen && holders[i]) holders[i].Group().alpha = 1 - t;
             });
             if (!root) { Phase = null; yield break; }
-            float burnA = Calm ? 0.5f : 0.75f;   // 흰빛으로 다 덮지 않는다
-            yield return Lerp(root, 0.18f, t => { if (flash) flash.color = flash.color.A(burnA * t * t * t); });
-
-            // 다시 태어남 — 흰빛이 걷히며 바뀐 모습으로 · 빛 고리 · 불티
             Phase = "reborn";
             for (int i = 0; i < holders.Count; i++) if (i != chosen && holders[i]) UnityEngine.Object.Destroy(holders[i].gameObject);
-            Sfx.Play("reveal_reborn", 0.9f);
-            float fa = 0.35f * K;
-            var sflash = Ui.Img(root, Theme.White, new Color(1f, 0.95f, 0.8f, fa), "sflash"); sflash.rectTransform.Fill();
-            Tw.Run(sflash, 0.2f, t => { if (sflash) sflash.color = sflash.color.A(fa * (1 - t)); });
-            Ring(root, new Vector2(0, cy), cw * 0.6f, cw * 2.2f, 0.3f, new Color(1f, 0.85f, 0.5f, 0.5f + 0.5f * K));
-            if (!Calm) Ring(root, new Vector2(0, cy), cw * 0.3f, cw * 1.6f, 0.25f, new Color(1, 1, 1, 0.75f));
-            Burst(root, new Vector2(0, cy), N(36), 200, 520, new Color(1f, 0.8f, 0.35f), 0.15f, 0.3f);
-            Burst(root, new Vector2(0, cy), N(20), 60, 200, new Color(1f, 0.9f, 0.5f), 0.3f, 0.55f);
-            var pk = o.Picks[chosen];
-            var awake = Ui.Title(root, string.IsNullOrEmpty(pk.Label) ? o.Awake : $"{o.Awake} · {pk.Label}", compact ? 34 : 44, new Color(1f, 0.9f, 0.55f), TextAlignmentOptions.Center);
-            awake.rectTransform.At(0.5f, 0.5f, 0, cy - ch * 1.3f / 2 - (compact ? 34 : 48), 1200, 60);
-            awake.Outline(0.25f, new Color(0.3f, 0.12f, 0));
-            yield return Lerp(root, 0.45f, t =>
-            {
-                if (flash) flash.color = flash.color.A(burnA * (1 - Tw.OutCubic(t)));
-                if (ch0) ch0.localScale = Vector3.one * Mathf.Lerp(Calm ? 1.35f : 1.45f, 1.35f, Tw.OutCubic(t));
-                awake.alpha = t;
-            });
-            yield return Wait(0.4f);
             Phase = "leave";
             if (root)
             {
                 var g = root.Group();
-                yield return Lerp(root, 0.25f, t => { if (g) g.alpha = 1 - t; });
+                yield return Lerp(root, 0.2f, t => { if (g) g.alpha = 1 - t; });
                 if (root) UnityEngine.Object.Destroy(root.gameObject);
             }
             Phase = null;

@@ -23,7 +23,10 @@ namespace Bolzena.UI
         public bool Playable = true;
         public bool Hovered;
         public bool ShowDesc = true;          // 효과 글(손패는 올렸을 때만)
-        public bool ShowPin = true;           // 오른쪽 위 사도 얼굴(손패는 손 위의 핀이 맡는다)
+        public bool NoOracleMark;             // 신탁 고르기 창 — 신탁 별 마크 없음(축복 마크만)
+        SpriteRenderer markBg, blessLineIc; TextMeshPro blessLineTx;
+        public Color? CostTint;               // 비용 숫자 빛깔 덮기(신탁 축복 — 비용이 내려가면 초록)
+        public bool ShowPin = false;           // 오른쪽 위 사도 얼굴(손패는 손 위의 핀이 맡는다)
         public float SlotX;                   // 손 안의 제자리 x(끌어 겨눌 때 그 자리에 띄운다)
         SpriteRenderer rim, body, art, iconPlate, icon, descBg, glow, flash, epiGlow, band, shadeT, shadeB, typeIcon, deco, decoDot, pinRim, pin;
         SpriteMask artMask, pinMask;
@@ -34,13 +37,22 @@ namespace Bolzena.UI
         // 표식(2026-10-06 — 판 화면 W.Card 와 같은 자리): 신탁 = 장식 선 위 금빛 띠 + 테 바깥 금빛 · 축복 = 그 위 초록 띠(후광) · 복제 = 오른쪽 위 셋째 줄
         SpriteRenderer oraRim, epiBg, epiIcon, blessBg, blessIcon, copyBg, copyIcon;
         TextMeshPro blessText, copyText;
+        // 신탁 받은 카드 — 장식 선의 별 줄(가운데 큰 별 + 양옆 작은 별 둘씩 — 카제나 번뜩임 별, 2026-10-07 사용자 「이름 띠 말고 별 표시」).
+        //   이름 띠(epiBg · epiText)는 쓰지 않는다. 별은 선 가운데 ±0.2 W 안 — 선 양 끝(DecoHalf)은 다른 표식(축복 날개 따위)이 쓴다.
+        SpriteRenderer[] oraStars;
+        bool oracleMark;
+        /// <summary>장식 선 높이(카드 가운데 기준) · 반 너비 — 장식 선에 붙는 표식(신탁 별 · 축복 …)이 같이 쓴다.</summary>
+        public float DecoY { get; private set; }
+        public float DecoHalf => deco != null && deco.sprite != null ? deco.transform.localScale.x * deco.sprite.bounds.size.x / 2 : W * 0.275f;
+        SpriteRenderer blessWingL, blessWingR;   // 축복 표식 — 장식 선 양 끝 금빛 날개(2026-10-07 · 이름 띠 대신)
         int order;
         float epiT, sparkT;
         float dim = 1f, descA = 1f;
         float alphaMul = 1f;
         public const float W = 1.9f, H = 2.7f;
         // 그림 창 — 카드 전체(테 안쪽)
-        const float ArtW = W - 0.07f, ArtH = H - 0.07f;
+        public const float Bd = 0.03f;   // 테두리 두께(양쪽 합) — 2026-10-08 사용자 「너무 두껍다」 0.07 → 0.04
+        const float ArtW = W - Bd, ArtH = H - Bd;
         const float ArtY = 0f;
         const float IconS = 1.06f, IconY = 0.27f;   // 고유 카드 아이콘(가운데 · 살짝 위)
         /// <summary>카드 주인 사도(초상 핀 · 빛깔) — 감독이 단다.</summary>
@@ -70,13 +82,13 @@ namespace Bolzena.UI
             epiGlow = Make.Box("epiglow", t, Res.UI("card_glow"), Vector3.zero, new Vector2(2.55f, 3.3f), 0, new Color(1f, 0.82f, 0.35f, 1f), Res.SpriteMat(true, 1.8f));
             glow = Make.Box("glow", t, Res.UI("card_glow"), Vector3.zero, new Vector2(2.5f, 3.3f), 0, new Color(0.6f, 0.9f, 1f, 0f), Res.SpriteMat(true, 1.8f));
             rim = Make.Box("rim", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W, H), 0);
-            body = Make.Box("body", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W - 0.07f, H - 0.07f), 0, new Color(0.06f, 0.08f, 0.16f));
+            body = Make.Box("body", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W - Bd, H - Bd), 0, new Color(0.06f, 0.08f, 0.16f));
             // 그림 — 카드 대부분, 둥근 모서리로 오린다(마스크 범위는 SetOrder 가 이 카드 차례에 맞춘다)
             var mn = Make.Node("artmask", t);
             artMask = mn.gameObject.AddComponent<SpriteMask>();
             artMask.sprite = Res.UI("card_mask");
             artMask.isCustomRangeActive = true;
-            { var mb = artMask.sprite.bounds.size; mn.localScale = new Vector3((W - 0.07f) / mb.x, (H - 0.07f) / mb.y, 1); }
+            { var mb = artMask.sprite.bounds.size; mn.localScale = new Vector3((W - Bd) / mb.x, (H - Bd) / mb.y, 1); }
             art = Make.Sprite("art", t, null, Vector3.zero, 0);
             art.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
             iconPlate = Make.Box("iconplate", t, Res.UI("card_mask"), new Vector3(0, IconY, 0), new Vector2(IconS + 0.07f, IconS + 0.07f), 0);
@@ -85,10 +97,10 @@ namespace Bolzena.UI
             icon.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
             band = Make.Box("band", t, Res.UI("white"), new Vector3(-W / 2 + 0.07f, 0, 0), new Vector2(0.07f, H - 0.1f), 0);
             band.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            shadeT = Make.Box("shadeT", t, Res.UI("grad_v"), new Vector3(0, H / 2 - 0.5f, 0), new Vector2(W - 0.07f, 1.0f), 0, new Color(0.02f, 0.03f, 0.08f, 0.92f));
+            shadeT = Make.Box("shadeT", t, Res.UI("grad_v"), new Vector3(0, H / 2 - 0.5f, 0), new Vector2(W - Bd, 1.0f), 0, new Color(0.02f, 0.03f, 0.08f, 0.92f));
             shadeT.flipY = true;          // grad_v 는 아래가 짙다 — 위 그늘은 뒤집어 위가 짙게
             shadeT.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            shadeB = Make.Box("shadeB", t, Res.UI("grad_v"), new Vector3(0, -H / 2 + 0.85f, 0), new Vector2(W - 0.07f, 1.7f), 0, new Color(0.01f, 0.02f, 0.06f, 1f));   // 그림이 카드 전체라 글 밑을 더 짙게 · 높게
+            shadeB = Make.Box("shadeB", t, Res.UI("grad_v"), new Vector3(0, -H / 2 + 0.85f, 0), new Vector2(W - Bd, 1.7f), 0, new Color(0.01f, 0.02f, 0.06f, 1f));   // 그림이 카드 전체라 글 밑을 더 짙게 · 높게
             shadeB.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
             // 효과 글 뒤 어둠 판 — 그림이 카드 전체라 흰 옷 · 밝은 그림 위에서도 글이 읽히게(올렸을 때 짙게)
             descBg = Make.Box("descbg", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W - 0.14f, 0.6f), 0, new Color(0.01f, 0.02f, 0.06f, 0.78f));
@@ -120,6 +132,9 @@ namespace Bolzena.UI
             // 아래 — 장식 선 · 태그 줄 · 효과 글
             deco = Make.Box("deco", t, Res.UI("band_line"), Vector3.zero, new Vector2(W * 0.55f, 0.02f), 0, new Color(1f, 0.88f, 0.6f, 0.75f));
             decoDot = Make.Box("decod", t, Res.UI("diamond"), Vector3.zero, new Vector2(0.09f, 0.09f), 0, new Color(1f, 0.9f, 0.65f));
+            oraStars = new SpriteRenderer[5];
+            for (int i = 0; i < 5; i++)
+                oraStars[i] = Make.Box("orastar" + i, t, Bolzena.RunUI.Theme.S("ic_spark"), Vector3.zero, i == 0 ? new Vector2(0.19f, 0.19f) : new Vector2(0.1f, 0.1f), 0, new Color(1f, 0.85f, 0.45f));
             tagText = Tone.Text("tags", t, "", new Vector3(0, -H / 2 + 0.88f, 0), 0.14f, 0, Tone.Gold, TextAlignmentOptions.Center, true, W - 0.2f);
             Make.Outline(tagText, 0.2f, Tone.Outline);
             descText = Tone.Text("desc", t, "", Vector3.zero, 0.155f, 0, Tone.Ink, TextAlignmentOptions.Center, true, W - 0.24f);
@@ -133,17 +148,24 @@ namespace Bolzena.UI
             epiText = Make.Text("epi", t, "", new Vector3(0, -0.05f, 0), 0.14f, 0, new Color(1f, 0.88f, 0.55f));
             Make.Outline(epiText, 0.3f, Tone.Outline);
             // 표식 — 신탁 띠 · 축복 띠 · 복제 표(Refresh 가 켜고 자리를 잡는다)
-            oraRim = Make.Box("orarim", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W + 0.09f, H + 0.09f), 0, new Color(1f, 0.82f, 0.4f, 0.95f));
+            oraRim = Make.Box("orarim", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W + 0.05f, H + 0.05f), 0, new Color(1f, 0.82f, 0.4f, 0.95f));
             epiBg = Make.Sliced("epibg", t, Res.UI("bar_fill_9s"), Vector3.zero, new Vector2(1f, 0.22f), 0, new Color(0.35f, 0.25f, 0.05f, 0.95f));
             epiIcon = Make.Box("epiic", t, Bolzena.RunUI.Theme.S("ic_spark"), Vector3.zero, new Vector2(0.14f, 0.14f), 0, new Color(1f, 0.82f, 0.48f));
             blessBg = Make.Sliced("blessbg", t, Res.UI("bar_fill_9s"), Vector3.zero, new Vector2(1f, 0.22f), 0, new Color(0.06f, 0.27f, 0.2f, 0.95f));
             blessIcon = Make.Box("blessic", t, Bolzena.RunUI.Theme.S("ic_bless"), Vector3.zero, new Vector2(0.15f, 0.15f), 0, new Color(0.75f, 1f, 0.82f));
             blessText = Make.Text("bless", t, "", Vector3.zero, 0.13f, 0, new Color(0.85f, 1f, 0.9f));
             Make.Outline(blessText, 0.3f, Tone.Outline);
+            blessWingR = Make.Sprite("blesswingr", t, Bolzena.RunUI.BlessFx.Wing, Vector3.zero, 0);
+            blessWingL = Make.Sprite("blesswingl", t, Bolzena.RunUI.BlessFx.Wing, Vector3.zero, 0);
+            blessWingL.flipX = true;
             copyBg = Make.Sliced("copybg", t, Res.UI("bar_fill_9s"), Vector3.zero, new Vector2(1f, 0.2f), 0, new Color(0.04f, 0.05f, 0.1f, 0.88f));
             copyIcon = Make.Box("copyic", t, Bolzena.RunUI.Theme.S("ic_copy"), Vector3.zero, new Vector2(0.14f, 0.14f), 0, new Color(0.78f, 0.86f, 1f));
             copyText = Make.Text("copy", t, "", Vector3.zero, 0.105f, 0, new Color(0.85f, 0.9f, 1f));
             Make.Outline(copyText, 0.3f, Tone.Outline);
+            markBg = Make.Box("markbg", t, Res.UI("circle"), Vector3.zero, new Vector2(0.4f, 0.4f), 0, new Color(1f, 0.82f, 0.38f));
+            blessLineIc = Make.Box("blesslineic", t, Bolzena.RunUI.Theme.S("ic_bless"), Vector3.zero, new Vector2(0.15f, 0.15f), 0, new Color(0.85f, 0.76f, 1f));
+            blessLineTx = Tone.Text("blessline", t, "", Vector3.zero, 0.125f, 0, new Color(0.88f, 0.8f, 1f), TextAlignmentOptions.Center, true, W - 0.5f);
+            Make.Outline(blessLineTx, 0.25f, Tone.Outline);
             flash = Make.Box("flash", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W, H), 0, new Color(1, 1, 1, 0), Res.SpriteMat(true, 2f));
             Refresh();
             SetOrder(500);
@@ -199,13 +221,18 @@ namespace Bolzena.UI
                 descText.enableAutoSizing = auto; descText.fontSize = fs;
             }
             float descH = Mathf.Clamp(needH + 0.02f, baseH, baseH + 0.16f), extra = descH - baseH;
-            tagText.transform.localPosition = new Vector3(0, -H / 2 + 0.88f + extra, 0);
-            float decoY = -H / 2 + (tags.Length > 0 ? 1.06f : 0.9f) + extra;
+            bool hasBL = !string.IsNullOrEmpty(info.MarkBless) && !string.IsNullOrEmpty(info.MarkBlessText) && !Bolzena.RunUI.BlessFx.Old;
+            float blessH = hasBL ? 0.2f : 0;   // 축복 효과 전용 줄(본문 맨 아래) — 기본 효과 글은 그대로 두고 그 아래에 덧붙인다
+            tagText.transform.localPosition = new Vector3(0, -H / 2 + 0.88f + extra + blessH, 0);
+            float decoY = -H / 2 + (tags.Length > 0 ? 1.06f : 0.9f) + extra + blessH;
             PlaceArt(decoY);   // 그림 자리 — 장식 선에 붙인다
             deco.transform.localPosition = new Vector3(0, decoY, 0);
             decoDot.transform.localPosition = new Vector3(0, decoY, 0);
+            DecoY = decoY;
+            oracleMark = !info.Epiphany && !string.IsNullOrEmpty(info.EpiphanyLabel);   // 받은 신탁 — 이름 대신 별 줄
+            PlaceOracleStars();
             epiText.transform.localPosition = new Vector3(0, decoY + 0.14f, 0);   // 신탁 이름표 — 장식 선 바로 위(그림 · 아이콘 가운데를 가리지 않게)
-            descText.transform.localPosition = new Vector3(0, -H / 2 + (tags.Length > 0 ? 0.38f : 0.44f) + extra / 2, 0);
+            descText.transform.localPosition = new Vector3(0, -H / 2 + (tags.Length > 0 ? 0.38f : 0.44f) + extra / 2 + blessH, 0);
             descText.rectTransform.sizeDelta = new Vector2(descW, descH);
             // 화살표 규칙은 그릴 크기로 다시 — 자동 크기가 고른 크기에서 한 줄에 드는지 재고, 바뀌면 다시 고른다(두세 번이면 멈춘다)
             if (!string.IsNullOrEmpty(rawDesc))
@@ -224,24 +251,79 @@ namespace Bolzena.UI
             // 어둠 판 — 글 줄 수만큼(태그 줄까지 덮는다)
             descText.ForceMeshUpdate();
             float th = string.IsNullOrEmpty(descText.text) ? 0 : Mathf.Min(descText.rectTransform.sizeDelta.y, descText.GetRenderedValues(true).y);
-            float bgTop = tags.Length > 0 ? -H / 2 + 0.98f + extra : descText.transform.localPosition.y + th / 2 + 0.06f;
-            float bgBot = descText.transform.localPosition.y - th / 2 - 0.08f;
-            descBg.enabled = th > 0;
+            float bgTop = tags.Length > 0 ? -H / 2 + 0.98f + extra + blessH : descText.transform.localPosition.y + th / 2 + 0.06f;
+            float bgBot = descText.transform.localPosition.y - th / 2 - 0.08f - blessH;
+            descBg.enabled = th > 0 || hasBL;
+            blessLineTx.enabled = blessLineIc.enabled = hasBL;
+            if (hasBL)
+            {
+                blessLineTx.text = Tone.StripDiff(info.MarkBlessText);
+                blessLineTx.rectTransform.sizeDelta = new Vector2(W - 0.52f, blessH);
+                float ly = bgBot + 0.04f + blessH / 2 + 0.02f;
+                blessLineTx.transform.localPosition = new Vector3(0.1f, ly, 0);
+                blessLineIc.transform.localPosition = new Vector3(-W / 2 + 0.2f, ly, 0);
+                Make.Fit(blessLineIc, new Vector2(0.15f, 0.15f));
+            }
+            CostTint = info.CostDown ? new Color(0.6f, 1f, 0.45f) : (Color?)null;
             descBg.transform.localPosition = new Vector3(0, (bgTop + bgBot) / 2, 0);
             Make.Fit(descBg, new Vector2(W - 0.14f, Mathf.Max(0.2f, bgTop - bgBot)));
-            epiText.text = info.Epiphany ? "신탁" : !string.IsNullOrEmpty(info.EpiphanyLabel) ? info.EpiphanyLabel : "";
+            // 빛나는 카드(신탁 · 은총 대기)는 띠 글 없이 빛만(2026-10-07 사용자) — 받은 신탁의 이름 띠는 그대로
+            epiText.text = "";   // 받은 신탁의 이름 띠도 뺀다(2026-10-07 사용자 — 장식 선의 별 줄 · 금 테로)
             PlaceMarks(info, decoY + 0.14f);
+            PlaceCostMark(info);
             bool epi = info.Epiphany;
-            rays.enabled = false;   // 손패의 신탁 카드는 은은한 테두리 빛(epiGlow) · 금 테 · 「신탁」 띠만(2026-10-07 사용자 「신탁 연출이 너무 화려」 — 빛줄기 뺌)
-            epiGlow.enabled = epi;
+            bool bl0 = !string.IsNullOrEmpty(info.MarkBless);
+            rays.enabled = false;   // 손패의 신탁 카드는 은은한 테두리 빛(epiGlow) · 금 테만(띠 글은 뺌)(2026-10-07 사용자 「신탁 연출이 너무 화려」 — 빛줄기 뺌)
+            bool blessGlow = !epi && bl0 && !Bolzena.RunUI.BlessFx.Old;   // 축복 받은 카드 — 연보라 은은한 빛(신탁만 받은 카드의 금빛과 구분)
+            epiGlow.enabled = epi || blessGlow;
+            epiGlow.color = blessGlow ? new Color(0.7f, 0.56f, 1f, 1f) : new Color(1f, 0.82f, 0.35f, 1f);
             ApplyVisibility();
+        }
+
+        /// <summary>신탁 별 줄 — 장식 선 가운데 큰 별(마름모 자리), 양옆 ±0.09 · ±0.17 W 에 작은 별. 받은 신탁이 없으면 끄고 마름모를 켠다.</summary>
+        // 비용 바로 아래 마크(카제나 번뜩임) — 신탁 받은 카드 = 금빛 별 · 축복까지 받은 카드 = 신탁 마크 대신 연보라 날개 문장 · 없으면 없음
+        void PlaceCostMark(CardInfo info)
+        {
+            bool bless = !string.IsNullOrEmpty(info.MarkBless) && !Bolzena.RunUI.BlessFx.Old;
+            bool ora = oracleMark && !bless && !NoOracleMark;
+            var at = new Vector3(-W / 2 + 0.29f, H / 2 - 0.1f - 0.27f - 0.43f, 0);
+            decoDot.enabled = true;
+            for (int i = 0; i < oraStars.Length; i++) oraStars[i].enabled = i == 0 && ora;
+            oraStars[0].transform.localPosition = at; Make.Fit(oraStars[0], new Vector2(0.26f, 0.26f)); oraStars[0].color = new Color(0.35f, 0.2f, 0.02f);
+            markBg.enabled = ora || bless;
+            markBg.transform.localPosition = at;
+            markBg.transform.localScale = Vector3.one; Make.Fit(markBg, new Vector2(0.4f, 0.4f));
+            markBg.color = bless ? new Color(0.76f, 0.64f, 1f) : new Color(1f, 0.82f, 0.38f);
+            blessWingL.enabled = false; blessWingR.enabled = bless;
+            markBg.sprite = bless ? Res.UI("diamond") : Res.UI("circle");   // 축복 = 연보라 마름모 · 신탁 = 금빛 원
+            Make.Fit(markBg, bless ? new Vector2(0.5f, 0.5f) : new Vector2(0.4f, 0.4f));
+            if (bless)
+            {   // 마름모 안의 흰 네 갈래 별(✦)
+                blessWingR.sprite = Bolzena.RunUI.Theme.S("ic_spark"); blessWingR.flipX = false;
+                blessWingR.transform.localEulerAngles = Vector3.zero; blessWingR.transform.localScale = Vector3.one;
+                Make.Fit(blessWingR, new Vector2(0.24f, 0.24f));
+                blessWingR.transform.localPosition = at;
+                blessWingR.color = new Color(1f, 1f, 1f, blessWingR.color.a);
+            }
+        }
+
+        void PlaceOracleStars()
+        {
+            decoDot.enabled = !oracleMark;
+            float[] xs = { 0, -0.09f * W, 0.09f * W, -0.17f * W, 0.17f * W };
+            for (int i = 0; i < oraStars.Length; i++)
+            {
+                oraStars[i].enabled = oracleMark;
+                oraStars[i].transform.localPosition = new Vector3(xs[i], DecoY, 0);
+                Make.Fit(oraStars[i], i == 0 ? new Vector2(0.19f, 0.19f) : new Vector2(0.1f, 0.1f));
+            }
         }
 
         // 표식 자리 — 신탁 띠(장식 선 바로 위, 아이콘 + 이름) · 그 위 축복 띠 · 오른쪽 위 셋째 줄 복제 표. 셋이 겹쳐도 읽히게 따로 선다.
         void PlaceMarks(CardInfo info, float y)
         {
             bool ora = !string.IsNullOrEmpty(epiText.text);
-            oraRim.enabled = ora && !info.Epiphany;   // 빛나는 카드는 제 빛(epiGlow · 빛줄기)이 있다
+            oraRim.enabled = oracleMark;   // 받은 신탁 — 테 바깥 금빛(빛나는 카드는 제 빛 epiGlow 가 있다)
             epiBg.enabled = epiIcon.enabled = ora;
             if (ora)
             {
@@ -255,8 +337,21 @@ namespace Bolzena.UI
                 y += 0.25f;
             }
             bool bl = !string.IsNullOrEmpty(info.MarkBless);
-            blessBg.enabled = blessIcon.enabled = blessText.enabled = bl;
-            if (bl)
+            // 축복 — 이름 띠 대신 장식 선 양 끝 금빛 날개(이름 · 효과는 키워드 상자에서). 띠는 -oldbless 점검에서만
+            bool oldBand = bl && Bolzena.RunUI.BlessFx.Old;
+            blessWingL.enabled = blessWingR.enabled = bl && !oldBand;
+            if (bl && !oldBand)
+            {
+                float dy = y - 0.14f;   // 장식 선 높이(PlaceMarks 는 그 0.14 위에서 받는다)
+                float half = deco.sprite != null ? deco.transform.localScale.x * deco.sprite.bounds.size.x / 2 : W * 0.275f;
+                float ws = 0.3f / Bolzena.RunUI.BlessFx.Wing.bounds.size.x;   // 날개 너비 0.3
+                blessWingR.transform.localScale = new Vector3(ws, ws, 1);
+                blessWingL.transform.localScale = new Vector3(ws, ws, 1);
+                blessWingR.transform.localPosition = new Vector3(half + 0.01f, dy - 0.02f, 0);
+                blessWingL.transform.localPosition = new Vector3(-half - 0.01f, dy - 0.02f, 0);
+            }
+            blessBg.enabled = blessIcon.enabled = blessText.enabled = oldBand;
+            if (oldBand)
             {
                 blessText.text = info.MarkBless;
                 blessText.ForceMeshUpdate();
@@ -361,6 +456,7 @@ namespace Bolzena.UI
         {
             bool pinOn = ShowPin && pin.sprite != null;
             if (pin.enabled != pinOn) pin.enabled = pinRim.enabled = pinOn;
+            nameText.rectTransform.sizeDelta = new Vector2(pinOn ? W - 0.58f : W - 0.34f, 0.3f);   // 얼굴 배지가 없으면 이름을 오른쪽 끝까지
         }
 
         public static Color TypeColor(CardInfo info) =>
@@ -431,6 +527,7 @@ namespace Bolzena.UI
             pinMask.frontSortingOrder = o + 8;
             deco.sortingOrder = o + 7;
             decoDot.sortingOrder = o + 7;
+            foreach (var st in oraStars) st.sortingOrder = o + 9;
             tagText.sortingOrder = o + 7;
             descText.sortingOrder = o + 7;
             epiText.sortingOrder = o + 7;
@@ -438,6 +535,8 @@ namespace Bolzena.UI
             epiBg.sortingOrder = blessBg.sortingOrder = copyBg.sortingOrder = o + 6;
             epiIcon.sortingOrder = blessIcon.sortingOrder = copyIcon.sortingOrder = o + 7;
             blessText.sortingOrder = copyText.sortingOrder = o + 7;
+            blessWingL.sortingOrder = blessWingR.sortingOrder = o + 9;
+            markBg.sortingOrder = o + 8; blessLineIc.sortingOrder = o + 8; blessLineTx.sortingOrder = o + 8;
             flash.sortingOrder = o + 9;
         }
 
@@ -499,16 +598,24 @@ namespace Bolzena.UI
             blessText.alpha = copyText.alpha = a;
             Make.Alpha(oraRim, 0.95f * a); Make.Alpha(epiBg, 0.95f * a); Make.Alpha(blessBg, 0.95f * a); Make.Alpha(copyBg, 0.88f * a);
             Make.Alpha(epiIcon, a); Make.Alpha(blessIcon, a); Make.Alpha(copyIcon, a);
-            costText.color = Playable ? new Color(1, 1, 1, a) : new Color(1f, 0.6f, 0.6f, a);
+            Make.Alpha(blessWingL, a); Make.Alpha(blessWingR, a); Make.Alpha(markBg, a); Make.Alpha(blessLineIc, descA * a); blessLineTx.alpha = descA * a;
+            costText.color = CostTint.HasValue ? new Color(CostTint.Value.r, CostTint.Value.g, CostTint.Value.b, a) : Playable ? new Color(1, 1, 1, a) : new Color(1f, 0.6f, 0.6f, a);
             tagText.alpha = descText.alpha = descA * a;
             Make.Alpha(deco, 0.75f * descA * a);
             Make.Alpha(decoDot, descA * a);
+            foreach (var st in oraStars) Make.Alpha(st, Mathf.Max(descA, 0.85f) * a);   // 별은 효과 글을 접은 손패에서도 보이게
             Make.Alpha(descBg, 0.78f * descA * a);
 
             var gc = glow.color;
             gc.a = Mathf.MoveTowards(gc.a, Hovered && Playable ? 0.9f : 0f, dt * 6f);
             glow.color = gc;
 
+            if (!Info.Epiphany && epiGlow.enabled)
+            {
+                epiT += dt;
+                bool calm0 = Bolzena.RunUI.Settings.ReduceMotion || LowSpecFx.On;
+                var bc0 = epiGlow.color; bc0.a = (calm0 ? 0.4f : 0.45f + 0.1f * Mathf.Sin(epiT * 2f)) * alphaMul; epiGlow.color = bc0;
+            }
             if (Info.Epiphany)
             {
                 // 은은한 테두리 빛 — 천천히 옅게 숨 쉰다. 저사양 · 움직임 줄이기면 숨도 불티도 없이 더 옅게

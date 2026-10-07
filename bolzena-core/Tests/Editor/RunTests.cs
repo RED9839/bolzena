@@ -417,7 +417,11 @@ namespace Bolzena.Core.Tests
             var c1 = run.Data.Event("C1");
             Assert.AreEqual(3, run.OptionsOf(c1).Count, "선택지 둘 + 떠나기");
             run.Data.Add(null, null, null, null, "[{\"id\":\"H1\",\"name\":\"사도 선택지\",\"options\":[{\"label\":\"리코타만\",\"hero\":[\"rico\"],\"out\":[{\"k\":\"gold\",\"v\":1}]},{\"label\":\"없는 사도만\",\"hero\":[\"nobody\"],\"out\":[]}]}]", null);
-            CollectionAssert.AreEqual(new[] { "리코타만", "떠나기" }, run.OptionsOf(run.Data.Event("H1")).Select(o => o.Label));
+            // 조건이 안 맞는 사도 선택지는 잠긴 칸으로 보인다(2026-10-07) — 조건 글이 잠금 까닭
+            var h1 = run.OptionsOf(run.Data.Event("H1"));
+            CollectionAssert.AreEqual(new[] { "리코타만", "없는 사도만", "떠나기" }, h1.Select(o => o.Label));
+            Assert.IsNull(run.LockOf(h1[0]));
+            StringAssert.Contains("파티에 있어야", run.LockOf(h1[1]));
             run.S.Gold = 10;
             Assert.IsNotNull(run.LockOf(c1.Options[0]));
             run.S.Gold = 500;

@@ -14,53 +14,39 @@
       "blurb": "소설 속 주인공이 현실로 걸어 나온 유령 소녀. 쌓이는 존재감이 실드를 두껍게 하고 파티 모두의 공격까지 끌어올리며, 존재가 또렷해지면 쓰러질 한 대를 버텨 내 자신을 증명합니다.",
       "keyword": {
         "name": "존속",
-        "desc": "위기일수록 또렷한 존재감",
+        "desc": "벨라가 나눠 준 작은 불꽃",
         "carrier": "self",
         "cap": 5,
         "per": [
           {
-            "stat": "guard",
-            "v": 0.1
-          },
-          {
             "stat": "dealt",
-            "v": 0.06,
+            "v": 0.02,
             "who": "allies"
           }
         ],
         "rules": [
           {
-            "name": "존재의 증명",
+            "name": "존재의 불꽃",
             "when": {
               "on": "stackReach",
               "id": "존속",
-              "n": 3
-            },
-            "limit": {
-              "per": "fight",
-              "n": 1
+              "n": 5
             },
             "fx": [
               {
-                "k": "status",
-                "id": "끈기",
-                "v": 1
-              }
-            ]
-          },
-          {
-            "name": "넘치는 존재감",
-            "when": {
-              "on": "stackOver",
-              "id": "존속"
-            },
-            "fx": [
-              {
-                "k": "perEvent"
+                "k": "spend",
+                "id": "존속",
+                "all": true
               },
               {
-                "k": "shield",
-                "ratio": 0.4
+                "k": "dmg",
+                "ratio": 0.45,
+                "base": "def",
+                "target": "allEnemies"
+              },
+              {
+                "k": "heal",
+                "ratio": 0.6
               }
             ]
           }
@@ -68,21 +54,38 @@
       },
       "passives": [
         {
-          "name": "앳된 존재감",
+          "name": "다시금 타오르는 존재",
           "when": {
-            "on": "turnEnd"
+            "on": "hurt",
+            "guarded": true
           },
-          "conds": [
-            {
-              "c": "hp",
-              "pct": 0.5
-            }
-          ],
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
           "fx": [
             {
               "k": "stack",
               "id": "존속",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "영속",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.4
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 2.4
             }
           ]
         }
@@ -112,7 +115,7 @@
         "벨라_s1",
         "벨라_s1",
         "벨라_s2",
-        "벨라_s2"
+        "벨라_u1"
       ]
     }
   ],
@@ -150,114 +153,151 @@
       "hero": "벨라",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "fx": [
         {
-          "k": "shield",
-          "ratio": 1.4
+          "k": "dmg",
+          "ratio": 0.3,
+          "base": "def",
+          "target": "allEnemies"
         },
         {
           "k": "stack",
           "id": "존속",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "또렷한 경계",
+          "name": "불꽃길",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 2.0
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "흐린 경계",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "여기 있어",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.4
+              "k": "dmg",
+              "ratio": 0.46,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "존속",
               "v": 2
-            }
-          ]
-        },
-        {
-          "name": "희미한 손짓",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.4
             },
             {
               "k": "status",
               "id": "피해 감소",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
             }
           ]
         },
         {
-          "name": "머무는 경계",
-          "tags": [
-            "보존"
-          ],
+          "name": "존재의 증명",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.7
+              "k": "dmg",
+              "ratio": 0.33,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "존속",
-              "v": 1
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 0.48
+            }
+          ]
+        },
+        {
+          "name": "도발의 불꽃",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "불꽃 다 태우기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "존속",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "질문 폭격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "짙은 윤곽",
-          "kind": "guard"
+          "name": "오드아이",
+          "kind": "power"
         },
         {
-          "name": "한 걸음 앞",
+          "name": "존재감 표출",
           "kind": "draw"
         },
         {
-          "name": "존재감",
+          "name": "작은 불씨",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
+              "k": "stack",
+              "id": "존속",
               "v": 1
             }
           ]
@@ -274,65 +314,29 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.6
+          "ratio": 2.09
+        },
+        {
+          "k": "perStack",
+          "id": "존속"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.19
         },
         {
           "k": "status",
           "id": "실드 유지",
           "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "존속",
-          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "찬란한 실드",
+          "name": "또렷한 존재감",
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.4
-            },
-            {
-              "k": "status",
-              "id": "실드 유지",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "얇은 실드",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "status",
-              "id": "실드 유지",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "존재 증명",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.8
+              "ratio": 2.57
             },
             {
               "k": "perStack",
@@ -340,75 +344,132 @@
             },
             {
               "k": "shield",
-              "ratio": 0.5
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꺼지지 않는 막",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.1
-            },
-            {
-              "k": "status",
-              "id": "실드 보존",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "처음부터 여기",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.0
+              "ratio": 0.25
             },
             {
               "k": "status",
               "id": "실드 유지",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 존재감",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.14
             },
             {
-              "k": "stack",
-              "id": "존속",
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.14
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "불꽃 장막",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.92
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.49
+            },
+            {
+              "k": "spend",
+              "id": "존속",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "잊히지 않는 존재",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.24
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.22
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "존속",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "위기의 존재감",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.96
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.27
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.98
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "겹겹이 막",
+          "name": "단단한 랜턴",
           "kind": "guard"
         },
         {
-          "name": "서두른 막",
-          "kind": "cost"
+          "name": "다크넷 지식",
+          "kind": "draw"
         },
         {
-          "name": "단단한 의지",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            }
-          ]
+          "name": "촛대",
+          "kind": "cost"
         }
       ]
     },
@@ -422,95 +483,128 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 1.4
+          "ratio": 0.57
         },
         {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 1
+          "k": "perStack",
+          "id": "존속"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.24
+        },
+        {
+          "k": "spend",
+          "id": "존속",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "정성 챙김",
+          "name": "정성 어린 챙김",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.8
+              "ratio": 0.71
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "대충 챙김",
-          "cost": 0,
-          "fx": [
+              "k": "perStack",
+              "id": "존속"
+            },
             {
               "k": "heal",
-              "ratio": 0.6
+              "ratio": 0.28
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "처음 해 보는 간호",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.4
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "stack",
+              "k": "spend",
               "id": "존속",
-              "v": 1
+              "all": true
             }
           ]
         },
         {
-          "name": "서툰 붕대",
+          "name": "나눠 준 불꽃",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.0
+              "ratio": 0.57
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
             },
             {
               "k": "shield",
-              "ratio": 1.0
+              "ratio": 0.33
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "spend",
+              "id": "존속",
+              "all": true
             }
           ]
         },
         {
-          "name": "챙겨 둔 간식",
-          "tags": [
-            "보존"
-          ],
+          "name": "조금만 챙김",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.7
+              "ratio": 0.7
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.27
+            }
+          ]
+        },
+        {
+          "name": "해파리 친구 부르기",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.57
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.21
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "해파리 친구",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.57
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.24
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.86
             }
           ]
         }
@@ -521,15 +615,15 @@
           "kind": "heal"
         },
         {
-          "name": "허둥지둥",
-          "kind": "draw"
+          "name": "서툰 손길",
+          "kind": "ap"
         },
         {
-          "name": "미안해",
+          "name": "불씨 나눔",
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "stack",
+              "id": "존속",
               "v": 1
             }
           ]
@@ -546,9 +640,9 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
-          "target": "oneEnemy",
-          "base": "def"
+          "ratio": 0.52,
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
           "k": "perStack",
@@ -556,9 +650,14 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.12,
-          "target": "oneEnemy",
-          "base": "def"
+          "ratio": 0.11,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "존속",
+          "v": 1
         }
       ],
       "oracles": [
@@ -567,9 +666,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.66,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -577,52 +676,9 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.14,
-              "target": "oneEnemy",
-              "base": "def"
-            }
-          ]
-        },
-        {
-          "name": "작은 불씨",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "perStack",
-              "id": "존속"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.08,
-              "target": "oneEnemy",
-              "base": "def"
-            }
-          ]
-        },
-        {
-          "name": "존재의 불꽃",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "perStack",
-              "id": "존속"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.12,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.13,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -632,13 +688,13 @@
           ]
         },
         {
-          "name": "도깨비불 무리",
+          "name": "구미호 도깨비불",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
-              "target": "allEnemies",
-              "base": "def"
+              "ratio": 0.43,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "perStack",
@@ -647,22 +703,80 @@
             {
               "k": "dmg",
               "ratio": 0.09,
-              "target": "allEnemies",
-              "base": "def"
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
             }
           ]
         },
         {
-          "name": "도깨비 장난",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "랜턴으로 빼앗기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.76,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "교주 저금통",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "존속"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "존속",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "불꽃 휘두르기",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -671,24 +785,52 @@
             {
               "k": "dmg",
               "ratio": 0.13,
-              "target": "oneEnemy",
-              "base": "def"
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "존속",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "큰 불꽃",
+          "name": "도깨비불 강화",
           "kind": "power"
         },
         {
-          "name": "흔들리는 불",
+          "name": "불꽃 냄새",
           "kind": "frost"
         },
         {
-          "name": "불씨 나누기",
-          "kind": "draw"
+          "name": "히힛",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
         }
       ]
     }

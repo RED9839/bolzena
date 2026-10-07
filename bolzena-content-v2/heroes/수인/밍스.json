@@ -14,9 +14,16 @@
       "blurb": "촌장을 수백 번 졸라 교사가 된 늑대 수인.",
       "keyword": {
         "name": "졸업 미룸",
-        "desc": "제자가 공격하면 쌓이는 수업",
+        "desc": "제자를 붙잡아 두는 핑계",
         "carrier": "self",
         "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1,
+            "who": "allies"
+          }
+        ],
         "rules": [
           {
             "name": "졸업은 아직",
@@ -24,6 +31,10 @@
               "on": "stackReach",
               "id": "졸업 미룸",
               "n": 3
+            },
+            "limit": {
+              "per": "fight",
+              "n": 2
             },
             "fx": [
               {
@@ -34,55 +45,42 @@
               {
                 "k": "status",
                 "id": "사기",
-                "v": 2
-              }
-            ]
-          },
-          {
-            "name": "개학",
-            "when": {
-              "on": "fightStart"
-            },
-            "fx": [
-              {
-                "k": "stack",
-                "id": "제자",
-                "v": 1,
-                "target": "otherAllies"
+                "v": 1
               }
             ]
           }
         ]
       },
-      "keywords": [
-        {
-          "name": "제자",
-          "desc": "밍스 반 학생 표시",
-          "carrier": "hero",
-          "cap": 1
-        }
-      ],
       "passives": [
         {
           "name": "시범 수업",
           "when": {
             "on": "play",
             "type": "공격",
-            "marked": "제자"
+            "who": "other"
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 1
           },
           "fx": [
             {
               "k": "stack",
               "id": "졸업 미룸",
               "v": 1
-            },
+            }
+          ]
+        },
+        {
+          "name": "개학",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
             {
-              "k": "extra",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
             }
           ]
         }
@@ -109,7 +107,7 @@
       },
       "starter": [
         "밍스_s1",
-        "밍스_s1",
+        "밍스_u4",
         "밍스_s2",
         "밍스_s3"
       ]
@@ -162,12 +160,12 @@
       "name": "캬오오~",
       "hero": "밍스",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 0.75,
           "target": "allEnemies"
         },
         {
@@ -188,7 +186,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 0.97,
               "target": "allEnemies"
             },
             {
@@ -206,11 +204,11 @@
         },
         {
           "name": "캬오",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.5,
               "target": "allEnemies"
             },
             {
@@ -218,47 +216,6 @@
               "id": "약화",
               "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "쉬는 시간 끝!",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "꾸중 한 마디",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2
             },
             {
               "k": "stack",
@@ -269,21 +226,69 @@
         },
         {
           "name": "교실 울림",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.0,
+              "ratio": 1.6,
               "target": "allEnemies"
             },
             {
               "k": "status",
-              "id": "사기",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
+            }
+          ]
+        },
+        {
+          "name": "꾸중 한 마디",
+          "fx": [
+            {
+              "k": "discard",
               "v": 1
             },
             {
-              "k": "stack",
+              "k": "dmg",
+              "ratio": 1.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "쉬는 시간 끝!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
               "id": "졸업 미룸",
-              "v": 1
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies"
             }
           ]
         }
@@ -299,7 +304,13 @@
         },
         {
           "name": "선생님의 위엄",
-          "kind": "atkUp"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -313,13 +324,22 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 0.8,
           "target": "oneEnemy"
         },
         {
-          "k": "stack",
-          "id": "졸업 미룸",
-          "v": 1
+          "k": "perStack",
+          "id": "졸업 미룸"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "basic": true
         }
       ],
       "oracles": [
@@ -328,13 +348,22 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
+              "k": "perStack",
+              "id": "졸업 미룸"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
             }
           ]
         },
@@ -344,28 +373,83 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.55,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
+              "k": "perStack",
+              "id": "졸업 미룸"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
             }
           ]
         },
         {
-          "name": "한 번 더 시범",
+          "name": "매일 같은 수업",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.0,
+              "ratio": 0.84,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "draw",
+              "v": 1,
+              "basic": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "졸업 미룸"
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.21,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "졸업장 수여",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "졸업 미룸"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
               "id": "졸업 미룸",
-              "v": 2
+              "all": true
             }
           ]
         },
@@ -374,31 +458,18 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "모범 답안",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 1.03,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "졸업 미룸",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
             }
           ]
         }
@@ -409,77 +480,113 @@
           "kind": "power"
         },
         {
-          "name": "약점 짚어 주기",
-          "kind": "weakSpot"
-        },
-        {
           "name": "교과서 펼치기",
           "kind": "draw"
+        },
+        {
+          "name": "출석부",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
         }
       ]
     },
     {
       "id": "밍스_u3",
-      "name": "졸업장은 서랍 속에",
+      "name": "졸업 시험",
       "hero": "밍스",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "fx": [
         {
-          "k": "stack",
-          "id": "졸업 미룸",
-          "v": 2
+          "k": "perStack",
+          "id": "졸업 미룸"
         },
         {
-          "k": "status",
-          "id": "협공",
+          "k": "dmg",
+          "ratio": 0.45,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "졸업 미룸",
+          "all": true
+        },
+        {
+          "k": "draw",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "서랍 깊숙이",
+          "name": "깐깐한 졸업 시험",
           "fx": [
             {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 2
+              "k": "perStack",
+              "id": "졸업 미룸"
             },
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "졸업 미룸",
+              "all": true
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "졸업장 한 장",
+          "name": "쪽지 시험",
           "cost": 0,
           "fx": [
             {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
+              "k": "perStack",
+              "id": "졸업 미룸"
             },
             {
-              "k": "status",
-              "id": "협공",
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "졸업 미룸",
+              "all": true
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "유급 통지",
+          "name": "졸업식",
+          "cost": 2,
           "fx": [
             {
-              "k": "stack",
+              "k": "perStack",
+              "id": "졸업 미룸"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
               "id": "졸업 미룸",
-              "v": 3
+              "all": true
             },
             {
               "k": "status",
@@ -489,52 +596,62 @@
           ]
         },
         {
-          "name": "무서운 담임",
+          "name": "졸업은 또 미룸",
           "fx": [
             {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 2
+              "k": "perStack",
+              "id": "졸업 미룸"
             },
             {
-              "k": "status",
-              "id": "협공",
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
             }
           ]
         },
         {
           "name": "졸업 앨범",
-          "tags": [
-            "개전"
-          ],
           "fx": [
             {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 3
+              "k": "perStack",
+              "id": "졸업 미룸"
             },
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "졸업 미룸",
+              "all": true
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "열쇠 숨기기",
-          "kind": "cost"
+          "name": "졸업장",
+          "kind": "power"
         },
         {
-          "name": "출석부",
+          "name": "열쇠 숨기기",
           "kind": "draw"
         },
         {
@@ -550,6 +667,9 @@
       "unique": true,
       "cost": 1,
       "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
         {
           "k": "status",
@@ -577,98 +697,9 @@
       "oracles": [
         {
           "name": "모범생 칭찬",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "졸업 미룸",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "쉬는 시간",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "졸업 미룸",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "제자 지정",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "제자",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "졸업 미룸",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "시범 수업",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "status",
@@ -695,10 +726,73 @@
           ]
         },
         {
-          "name": "졸업 사진",
+          "name": "쉬는 시간",
+          "cost": 0,
           "tags": [
-            "축복"
+            "개전"
           ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "조회 시간",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "basic": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "숙제 검사",
           "fx": [
             {
               "k": "status",
@@ -708,7 +802,42 @@
             {
               "k": "stack",
               "id": "졸업 미룸",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "자습 과제",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             },
             {
               "k": "power",
@@ -732,15 +861,15 @@
       ],
       "blesses": [
         {
-          "name": "조회 시간",
-          "kind": "ap"
+          "name": "캔 사료 상자",
+          "kind": "atkUp"
         },
         {
-          "name": "자습 과제",
+          "name": "숲속 별채",
           "kind": "draw"
         },
         {
-          "name": "숙제 검사",
+          "name": "사료 선물",
           "fx": [
             {
               "k": "stack",

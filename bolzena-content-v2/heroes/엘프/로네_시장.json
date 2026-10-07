@@ -19,7 +19,7 @@
         "cap": 3,
         "rules": [
           {
-            "name": "사랑받는 시장",
+            "name": "시청 앞 축포",
             "when": {
               "on": "stackReach",
               "id": "지지율",
@@ -36,11 +36,6 @@
                 "ratio": 0.4,
                 "hits": 3,
                 "target": "allEnemies"
-              },
-              {
-                "k": "status",
-                "id": "사기",
-                "v": 1
               }
             ]
           }
@@ -50,12 +45,24 @@
         {
           "name": "돈까스 배달",
           "when": {
-            "on": "play",
-            "type": "스킬"
+            "on": "play"
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "바삭한 꿈",
+          "when": {
+            "on": "fightStart"
           },
           "fx": [
             {
@@ -85,7 +92,7 @@
       },
       "starter": [
         "로네_시장_s1",
-        "로네_시장_s1",
+        "로네_시장_u3",
         "로네_시장_s2",
         "로네_시장_s3"
       ]
@@ -144,7 +151,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.6
+          "ratio": 0.5
         },
         {
           "k": "stack",
@@ -160,126 +167,166 @@
       "name": "돈까스 시장, 로네!",
       "hero": "로네_시장",
       "unique": true,
-      "signature": true,
       "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.2,
           "hits": 4,
-          "target": "randomEnemy"
+          "target": "allEnemies"
         },
         {
-          "k": "stack",
-          "id": "지지율",
-          "v": 1
+          "k": "perTag",
+          "id": "로네_시장_t1"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "allEnemies"
+        },
+        {
+          "k": "exileFrom",
+          "from": "hand",
+          "all": true,
+          "tag": "로네_시장_t1"
         }
       ],
       "oracles": [
         {
-          "name": "당선 확률 3%",
+          "name": "특대 배달",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.39,
+              "ratio": 0.25,
               "hits": 4,
-              "target": "randomEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "지지율",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "돈까스 특별시 선포",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
+              "k": "perTag",
+              "id": "로네_시장_t1"
+            },
             {
               "k": "dmg",
               "ratio": 0.36,
-              "hits": 4,
-              "target": "randomEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "지지율",
-              "v": 1
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "로네_시장_t1"
             }
           ]
         },
         {
-          "name": "바삭한 꿈을 꾸었습니다",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "hits": 4,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "지지율",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "곱빼기 주문",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.36,
-              "hits": 4,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "지지율",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복지 예산 집행",
+          "name": "시민 대축제",
           "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.72,
+              "ratio": 0.36,
               "hits": 4,
-              "target": "randomEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "지지율",
+              "k": "perTag",
+              "id": "로네_시장_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "도시락 배달 드론",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "배달 경로 검색",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "hits": 4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "로네_시장_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "급한 배달",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "hits": 4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "로네_시장_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "당선 확률 3%",
+          "name": "바삭한 튀김옷",
           "kind": "power"
         },
         {
-          "name": "복지 예산 집행",
-          "kind": "ap"
+          "name": "배달 앱",
+          "kind": "draw"
         },
         {
-          "name": "지지자들의 응원",
+          "name": "덤 도시락",
           "fx": [
             {
-              "k": "stack",
-              "id": "지지율",
+              "k": "make",
+              "id": "로네_시장_t1",
               "v": 1
             }
           ]
@@ -297,60 +344,42 @@
         {
           "k": "make",
           "id": "로네_시장_t1",
-          "v": 1
+          "v": 2
         },
         {
           "k": "draw",
           "v": 1
-        },
-        {
-          "k": "shield",
-          "ratio": 1
         }
       ],
       "oracles": [
         {
-          "name": "예약 주문",
+          "name": "곱빼기 주문",
           "fx": [
             {
               "k": "make",
               "id": "로네_시장_t1",
-              "v": 1
+              "v": 3
             },
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.73
             }
           ]
         },
         {
-          "name": "단체 주문",
+          "name": "단골 할인",
           "cost": 0,
           "fx": [
             {
               "k": "make",
               "id": "로네_시장_t1",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "로네표 리더십",
-          "tags": [
-            "보존"
-          ],
+          "name": "정기 배달",
+          "power": true,
           "fx": [
             {
               "k": "make",
@@ -362,66 +391,77 @@
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 1.45
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "로네_시장_t1",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "배달 드론 증편",
+          "name": "시장실 회식",
           "fx": [
             {
               "k": "make",
               "id": "로네_시장_t1",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "지지율",
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.6
+              "k": "heal",
+              "ratio": 1.23
             }
           ]
         },
         {
-          "name": "심야 식당",
-          "tags": [
-            "신속"
-          ],
+          "name": "도시락 몰아 받기",
           "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
             {
               "k": "make",
               "id": "로네_시장_t1",
-              "v": 1
+              "v": 3
             },
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.32
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "곱빼기 주문",
-          "kind": "guard"
+          "name": "뜨거운 소스",
+          "kind": "defUp"
         },
         {
-          "name": "심야 식당",
-          "kind": "draw"
+          "name": "시장 할인",
+          "kind": "cost"
         },
         {
-          "name": "사과는 돈까스로",
+          "name": "도시락 하나 더",
           "fx": [
             {
-              "k": "stack",
-              "id": "지지율",
+              "k": "make",
+              "id": "로네_시장_t1",
               "v": 1
             }
           ]
@@ -435,30 +475,31 @@
       "unique": true,
       "cost": 1,
       "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
         {
-          "k": "atkMod",
-          "v": 0.1,
-          "run": true,
-          "target": "self"
+          "k": "stack",
+          "id": "지지율",
+          "v": 1
         },
         {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "play",
-                "type": "스킬"
+                "on": "exhaust"
               },
               "limit": {
                 "per": "turn",
-                "n": 1
+                "n": 3
               },
               "fx": [
                 {
-                  "k": "stack",
-                  "id": "지지율",
-                  "v": 1
+                  "k": "dmg",
+                  "ratio": 0.35,
+                  "target": "randomEnemy"
                 }
               ]
             }
@@ -467,158 +508,12 @@
       ],
       "oracles": [
         {
-          "name": "점심시간 카운트다운",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "스킬"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지지율",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "평생 소원",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "스킬"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지지율",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "지지자들의 응원",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "스킬"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지지율",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "돈까스 정식 상상",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "stack",
-              "id": "지지율",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "스킬"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지지율",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "그림자 속의 시장",
+          "name": "돈까스 생각뿐",
           "tags": [
-            "신속"
+            "개전"
           ],
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
               "k": "stack",
               "id": "지지율",
               "v": 1
@@ -628,18 +523,169 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "스킬"
+                    "on": "exhaust"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 1
+                    "n": 3
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "지지율",
+                      "k": "dmg",
+                      "ratio": 0.54,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "한 입 생각",
+          "cost": 0,
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.35,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "도시락 공장",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.3,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "로네_시장_t1",
                       "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "지지자 명단",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.35,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "퇴근길 돈까스",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.4,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
@@ -650,15 +696,15 @@
       ],
       "blesses": [
         {
-          "name": "복지 예산 집행",
+          "name": "돈까스 상징 마크",
           "kind": "atkUp"
         },
         {
-          "name": "지지자들의 응원",
-          "kind": "draw"
+          "name": "공약 이행",
+          "kind": "cost"
         },
         {
-          "name": "당선 확률 3%",
+          "name": "지지자 함성",
           "fx": [
             {
               "k": "stack",
@@ -678,172 +724,179 @@
       "type": "공격",
       "fx": [
         {
-          "k": "status",
-          "id": "잔불",
-          "v": 1,
+          "k": "dmg",
+          "ratio": 2,
           "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "지지율"
         },
         {
           "k": "dmg",
-          "ratio": 2.4,
+          "ratio": 0.5,
           "target": "oneEnemy"
         },
         {
-          "k": "ifKill"
-        },
-        {
-          "k": "make",
-          "id": "로네_시장_t1",
-          "v": 1
+          "k": "spend",
+          "id": "지지율",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "먼저 경고했습니다",
+          "name": "말이 짧아짐",
           "fx": [
             {
-              "k": "status",
-              "id": "잔불",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 2.5,
               "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지지율"
             },
             {
               "k": "dmg",
-              "ratio": 3.12,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "로네_시장_t1",
-              "v": 1
+              "k": "spend",
+              "id": "지지율",
+              "all": true
             }
           ]
         },
         {
-          "name": "시장 직권 처분",
+          "name": "참을 인 세 번",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지지율"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "지지율",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "도시락 투척",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "로네_시장_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "로네_시장_t1"
+            }
+          ]
+        },
+        {
+          "name": "돈까스 모독 금지령",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지지율"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "지지율",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "시장직을 걸고",
           "tags": [
-            "보존"
+            "소멸"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "잔불",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 4,
               "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "지지율"
             },
             {
               "k": "dmg",
-              "ratio": 2.88,
+              "ratio": 0.8,
               "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
             },
             {
               "k": "make",
               "id": "로네_시장_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "공기 커틀릿 엄벌",
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔불",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 3.48,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "로네_시장_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "사과는 돈까스로",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔불",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.88,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "로네_시장_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "상관을 셋이나",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔불",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 4.32,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "로네_시장_t1",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "심야 식당",
-          "kind": "power"
+          "name": "공기 커틀릿",
+          "kind": "weakSpot"
         },
         {
-          "name": "사과는 돈까스로",
+          "name": "빠른 배달",
           "kind": "ap"
         },
         {
-          "name": "곱빼기 주문",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "지지율",
-              "v": 1
-            }
-          ]
+          "name": "짧아진 말투",
+          "kind": "power"
         }
       ]
     }

@@ -16,22 +16,27 @@
         "name": "표정",
         "desc": "약 올려서 모은 화난 표정",
         "carrier": "self",
-        "cap": 3,
+        "cap": 5,
         "rules": [
           {
-            "name": "표정 관리 실패",
+            "name": "업로드",
             "when": {
-              "on": "stackOver",
-              "id": "표정"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
+              "on": "stackReach",
+              "id": "표정",
+              "n": 5
             },
             "fx": [
               {
-                "k": "status",
-                "id": "반격",
+                "k": "spend",
+                "id": "표정",
+                "all": true
+              },
+              {
+                "k": "shield",
+                "ratio": 2
+              },
+              {
+                "k": "draw",
                 "v": 1
               }
             ]
@@ -40,7 +45,7 @@
       },
       "passives": [
         {
-          "name": "약 올리기",
+          "name": "방금 그 표정 좋았어",
           "when": {
             "on": "debuff"
           },
@@ -57,19 +62,19 @@
           ]
         },
         {
-          "name": "도발 전문 엘튜버",
+          "name": "세 번째 도발",
           "when": {
-            "on": "hurt",
-            "guarded": true
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "play",
+            "every": 3
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "표정",
+              "k": "heal",
+              "ratio": 0.4
+            },
+            {
+              "k": "status",
+              "id": "반격",
               "v": 1
             }
           ]
@@ -103,7 +108,7 @@
         "셀리네_s1",
         "셀리네_s1",
         "셀리네_s2",
-        "셀리네_s2"
+        "셀리네_u1"
       ]
     }
   ],
@@ -136,132 +141,123 @@
       ]
     },
     {
+      "hero": "셀리네",
+      "token": true,
+      "id": "셀리네_selfie",
+      "name": "셀카",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "evolve": {
+        "n": 3,
+        "into": "셀리네_viral"
+      },
+      "fx": [
+        {
+          "k": "stack",
+          "id": "표정",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.35
+        }
+      ],
+      "blurb": "화난 얼굴 옆에서 브이. 구독자용 비하인드 컷."
+    },
+    {
+      "hero": "셀리네",
+      "token": true,
+      "id": "셀리네_viral",
+      "name": "조회수 폭발 셀카",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "stack",
+          "id": "표정",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "세 장을 이어 붙였더니 알고리즘이 반응했습니다."
+    },
+    {
       "id": "셀리네_u1",
       "name": "온 마음을 다해",
       "hero": "셀리네",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
-          "target": "allEnemies",
-          "base": "def"
-        },
-        {
-          "k": "ifStack",
-          "id": "표정",
-          "n": 2
+          "ratio": 0.33,
+          "base": "def",
+          "target": "allEnemies"
         },
         {
           "k": "status",
-          "id": "기절",
+          "id": "약화",
           "v": 1,
-          "target": "randomEnemy"
+          "target": "allEnemies"
         },
         {
-          "k": "spend",
+          "k": "stack",
           "id": "표정",
-          "v": 2
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "하트 에너지 충전",
+          "name": "하트 에너지",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "표정",
-              "n": 2
+              "ratio": 0.46,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "status",
-              "id": "기절",
+              "id": "약화",
               "v": 1,
-              "target": "randomEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "표정",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "가벼운 하트",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "표정",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "표정",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "팬서비스",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "표정",
-              "n": 1
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "표정",
               "v": 1
             }
           ]
         },
         {
-          "name": "모아 둔 표정",
+          "name": "하트 폭발",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies",
-              "base": "def"
+              "ratio": 0.76,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "표정",
-              "n": 3
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "status",
@@ -272,45 +268,106 @@
           ]
         },
         {
-          "name": "하트 원샷",
+          "name": "한 명만 노려",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "표정",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
+              "ratio": 1.13,
+              "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "표정",
-              "v": 2
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "후훗",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "관객 몰이",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "debuff"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.62
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "진한 하트",
+          "name": "사근사근",
           "kind": "power"
         },
         {
-          "name": "약 오르지?",
+          "name": "토끼 펀치",
           "kind": "frost"
         },
         {
-          "name": "생방송",
-          "kind": "draw"
+          "name": "구독 버튼",
+          "fx": [
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -319,121 +376,117 @@
       "name": "인증샷",
       "hero": "셀리네",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.0
+          "ratio": 1.21
         },
         {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 2
+          "k": "stack",
+          "id": "표정",
+          "v": 1
         },
         {
-          "k": "status",
-          "id": "반격",
+          "k": "make",
+          "id": "셀리네_selfie",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "단체 인증샷",
+          "name": "화난 표정 인증샷",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.8
+              "ratio": 1.88
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "k": "stack",
+              "id": "표정",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "반격",
+              "k": "make",
+              "id": "셀리네_selfie",
               "v": 1
             }
           ]
         },
         {
-          "name": "셀카 한 장",
-          "cost": 1,
+          "name": "연속 촬영",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 0.99
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "무한 일회용 카메라",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.09
+            },
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self"
+            }
+          ]
+        },
+        {
+          "name": "셀카 각도",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.98
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "표정",
+              "n": 4
             },
             {
               "k": "status",
               "id": "피해 감소",
               "v": 1
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
             }
           ]
         },
         {
-          "name": "라이브 방송",
+          "name": "채널 No.5",
+          "cost": 2,
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.0
+              "ratio": 3.07
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 2
             },
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "흑역사 박제",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.4
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "저장한 사진",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.6
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "반격",
               "v": 1
             }
           ]
@@ -441,19 +494,19 @@
       ],
       "blesses": [
         {
-          "name": "보정 필터",
+          "name": "포즈",
           "kind": "guard"
         },
         {
-          "name": "연사",
-          "kind": "cost"
+          "name": "플래시",
+          "kind": "draw"
         },
         {
-          "name": "조회수 폭발",
+          "name": "필터",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
+              "k": "stack",
+              "id": "표정",
               "v": 1
             }
           ]
@@ -465,14 +518,14 @@
       "name": "화난 얼굴 갤러리",
       "hero": "셀리네",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
-          "target": "oneEnemy",
-          "base": "def"
+          "ratio": 0.5,
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
           "k": "perStack",
@@ -480,9 +533,9 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.4,
-          "target": "oneEnemy",
-          "base": "def"
+          "ratio": 0.2,
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
           "k": "spend",
@@ -492,13 +545,13 @@
       ],
       "oracles": [
         {
-          "name": "특별 전시",
+          "name": "명예의 전당",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.61,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -506,9 +559,9 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.24,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
@@ -518,14 +571,13 @@
           ]
         },
         {
-          "name": "작은 액자",
-          "cost": 1,
+          "name": "갤러리 공개",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.38,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "perStack",
@@ -533,9 +585,9 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.15,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "spend",
@@ -545,96 +597,116 @@
           ]
         },
         {
-          "name": "갤러리 개관",
+          "name": "셀카 전시회",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.46,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "표정"
+              "k": "perTag",
+              "id": "셀리네_selfie"
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.35,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "표정",
-              "v": 2
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "셀리네_selfie"
             }
           ]
         },
         {
-          "name": "순회 전시",
+          "name": "구독자 0부터",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "perStack",
-              "id": "표정"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "spend",
-              "id": "표정",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "혹평",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "perStack",
-              "id": "표정"
-            },
             {
               "k": "dmg",
               "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "spend",
+              "k": "perStack",
+              "id": "표정"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
               "id": "표정",
-              "v": 1
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "셀럽 복귀",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "표정"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "표정",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.44,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "명작 한 점",
+          "name": "액자",
           "kind": "power"
         },
         {
-          "name": "관람객 반응",
-          "kind": "draw"
+          "name": "약 올리기",
+          "kind": "frost"
         },
         {
-          "name": "액자 모서리",
-          "kind": "frost"
+          "name": "조회수",
+          "kind": "ap"
         }
       ]
     },
@@ -644,133 +716,226 @@
       "hero": "셀리네",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "강화",
       "fx": [
         {
           "k": "status",
-          "id": "약화",
+          "id": "결의",
           "v": 1
         },
         {
-          "k": "status",
-          "id": "반격",
-          "v": 2
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "표정",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "얄미운 반말",
+          "name": "나긋한 반말",
           "fx": [
             {
               "k": "status",
-              "id": "약화",
+              "id": "결의",
               "v": 1
             },
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "표정",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.33
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "체스의 검은 말",
+          "fx": [
+            {
               "k": "status",
-              "id": "반격",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "표정",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "표정",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "뒷일 생각 안 함",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "표정",
               "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "표정",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.33
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "반말 한마디",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "찡긋 반말",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "반말 폭격",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "반말로 인사",
+          "name": "판 짜기",
           "tags": [
             "개전"
           ],
           "fx": [
             {
               "k": "status",
-              "id": "약화",
+              "id": "결의",
               "v": 1
             },
             {
-              "k": "status",
-              "id": "반격",
+              "k": "stack",
+              "id": "표정",
               "v": 2
             },
             {
-              "k": "shield",
-              "ratio": 0.6
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "표정",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "무미호 장난",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "표정",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "툭 던진 말",
-          "kind": "cost"
+          "name": "기부 챌린지",
+          "kind": "defUp"
         },
         {
-          "name": "말대꾸",
-          "kind": "draw"
-        },
-        {
-          "name": "윙크",
+          "name": "셀럽 미소",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 0.4
             }
           ]
+        },
+        {
+          "name": "아하하",
+          "kind": "cost"
         }
       ]
     }

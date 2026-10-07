@@ -32,6 +32,10 @@ namespace Bolzena.Core
         public int Uniques, Basics;
         /// <summary>상점에서 뺀 횟수.</summary>
         public int Removals;
+        /// <summary>판이 끝날 때 서 있던 연속 이벤트 깃발.</summary>
+        public List<string> Flags = new();
+        /// <summary>깃발이 선 채로 줄기 뒤 이벤트를 만난 횟수.</summary>
+        public int FlagReads;
         public Dictionary<string, (int n, int turns, int win)> Kinds = new();
         /// <summary>강인도 통계 — 카드가 강인도를 깎은 횟수 · 그 가운데 약점 · 격파 수. 싸움 종류(fight · elite · boss …)마다 격파 수.</summary>
         public int ToughHits, ToughWeakHits, Breaks;
@@ -50,6 +54,8 @@ namespace Bolzena.Core
         readonly GameData data;
         readonly Bots bots;
         const int K = R.SCALE;
+        /// <summary>장비 효과 한 싸움 값어치 → 장비 점수(옛 장비 효과 평균 값어치 0.93 이 옛 고정값 4 와 같게) · 한 효과의 위 끝.</summary>
+        public const double GEAR_EFF = 4.3, GEAR_EFF_CAP = 12;
         public RunBot(GameData data) { this.data = data; bots = new Bots(data); }
         /// <summary>숙련 봇의 판 짜기 눈(판마다 새로) — 초보 봇이면 null.</summary>
         DeckPlan plan;
@@ -92,8 +98,9 @@ namespace Bolzena.Core
             var e = data.Equip(id); var s = run.StatsOf(id, k); var role = data.Hero(k)?.Role;
             double atkW = role == "딜러" ? 3 : role == "서포터" ? 1.8 : 1.4;
             double v = (s.Hp * 0.3 + s.Atk * atkW + s.Def * (role == "탱커" ? 2.2 : role == "서포터" ? 2 : 1)) / K + s.Crit * 0.25;
-            if (e.Effect.Count > 0) v += 4;
-            if (e.Affinity == k && e.AffinityEffect.Count > 0) v += 5;
+            // 효과 몫 — 한 싸움 값어치(CardValue.GearWorth, 1코 카드 ≈ 1.5) × GEAR_EFF. 옛 「효과가 있으면 +4 · 애착 +5」 를 효과 크기로(2026-10-07)
+            if (e.Effect.Count > 0) v += Math.Min(GEAR_EFF_CAP, Math.Max(1, GEAR_EFF * CardValue.GearWorth(e.Effect)));
+            if (e.Affinity == k && e.AffinityEffect.Count > 0) v += Math.Min(GEAR_EFF_CAP, Math.Max(2, GEAR_EFF * CardValue.GearWorth(e.AffinityEffect)));
             if (plan != null) v += 1.5 * plan.GearHits(e);   // 숙련 — 파티 축에 맞는 효과
             return v;
         }
@@ -354,6 +361,7 @@ namespace Bolzena.Core
             if (E.Id == null && E.Choices.Count > 0)
                 run.PickEvent(P.SmartOut ? E.Choices.OrderByDescending(id => run.OptionsOf(data.Event(id)).Max(o => OptValue(run, o))).First() : E.Choices[0]);
             var ev = data.Event(run.S.Event.Id);
+            if (ev != null && run.FlagHit(ev)) outr.FlagReads++;
             if (ev == null) { run.LeaveEvent(); return true; }
             var opts = run.OptionsOf(ev);
             int idx = 0;
@@ -412,6 +420,7 @@ namespace Bolzena.Core
             o.Uniques = run.S.Deck.Count(id => run.Data.Card(id)?.Unique == true);
             o.Basics = run.S.Deck.Count(run.IsBasic);
             o.Removals = run.S.Removals;
+            o.Flags = run.S.Flags.ToList();
             return o;
         }
     }

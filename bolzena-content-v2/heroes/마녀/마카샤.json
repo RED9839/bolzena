@@ -13,27 +13,65 @@
       "crit": 5,
       "blurb": "수다쟁이 책략관 마녀. 흘린 말 속에 적의 결말이 이미 적혀 있고, 맞아떨어진 예언은 다음 결말의 재료가 됩니다.",
       "keyword": {
-        "name": "예언",
-        "desc": "모아 두었다 꺼내 쓰는 예언",
-        "carrier": "self",
-        "cap": 5
+        "name": "운명의 시계",
+        "desc": "세 칸 뒤에 결말이 오는 시곗바늘",
+        "carrier": "enemy",
+        "cap": 3,
+        "decay": 1,
+        "rules": [
+          {
+            "name": "적혀 있던 결말",
+            "when": {
+              "on": "stackGone",
+              "id": "운명의 시계"
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 1.6,
+                "base": "def",
+                "target": "oneEnemy"
+              },
+              {
+                "k": "status",
+                "id": "취약",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
-          "name": "수다 속 결말",
+          "name": "예언 떠벌리기",
           "when": {
-            "on": "stackReach",
-            "id": "예언",
-            "n": 3
+            "on": "play",
+            "type": "공격"
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
-              "k": "draw",
+              "k": "spend",
+              "id": "운명의 시계",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "이미 본 결말",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "allEnemies"
             }
           ]
         }
@@ -56,7 +94,7 @@
           },
           {
             "k": "stack",
-            "id": "예언",
+            "id": "운명의 시계",
             "v": 2
           }
         ]
@@ -65,7 +103,7 @@
         "마카샤_s1",
         "마카샤_s1",
         "마카샤_s2",
-        "마카샤_s2"
+        "마카샤_u1"
       ]
     }
   ],
@@ -100,72 +138,36 @@
     },
     {
       "id": "마카샤_u1",
-      "name": "운명의 시계",
+      "name": "언젠가 일어날 일",
       "hero": "마카샤",
       "unique": true,
       "cost": 1,
       "type": "스킬",
-      "signature": true,
       "fx": [
         {
-          "k": "afterCards",
-          "n": 3,
-          "then": [
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "예언",
-              "v": 1
-            }
-          ]
+          "k": "stack",
+          "id": "운명의 시계",
+          "v": 3,
+          "target": "oneEnemy"
         },
         {
           "k": "draw",
           "v": 1
         }
       ],
-      "blurb": "시곗바늘 세 칸 뒤에 결말이 옵니다",
       "oracles": [
         {
           "name": "또렷한 예언",
           "fx": [
             {
-              "k": "afterCards",
-              "n": 3,
-              "then": [
-                {
-                  "k": "dmg",
-                  "ratio": 1.8,
-                  "target": "allEnemies",
-                  "base": "def"
-                },
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -174,59 +176,48 @@
           "cost": 0,
           "fx": [
             {
-              "k": "afterCards",
-              "n": 2,
-              "then": [
-                {
-                  "k": "dmg",
-                  "ratio": 0.8,
-                  "target": "allEnemies",
-                  "base": "def"
-                },
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "겹예언",
-          "fx": [
-            {
-              "k": "afterCards",
-              "n": 3,
-              "then": [
-                {
-                  "k": "dmg",
-                  "ratio": 1.25,
-                  "target": "allEnemies",
-                  "base": "def"
-                },
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 2,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 2
-                }
-              ]
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다음 날의 쪽지",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "운명의 시계",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -234,66 +225,33 @@
           "name": "예언과 처방",
           "fx": [
             {
-              "k": "afterCards",
-              "n": 3,
-              "then": [
-                {
-                  "k": "dmg",
-                  "ratio": 1.45,
-                  "target": "allEnemies",
-                  "base": "def"
-                },
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 1.15
+              "k": "pull",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "이미 본 결말",
-          "tags": [
-            "개전"
-          ],
+          "name": "겹예언",
           "fx": [
             {
-              "k": "afterCards",
-              "n": 3,
-              "then": [
-                {
-                  "k": "dmg",
-                  "ratio": 1.65,
-                  "target": "allEnemies",
-                  "base": "def"
-                },
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -304,21 +262,21 @@
       ],
       "blesses": [
         {
-          "name": "수정 구슬",
-          "kind": "draw"
-        },
-        {
-          "name": "예지몽",
+          "name": "브로치 우물거리기",
           "tags": [
-            "개전"
+            "보존"
           ]
         },
         {
-          "name": "덤으로 한마디",
+          "name": "절굿공이",
+          "kind": "draw"
+        },
+        {
+          "name": "이-히힛",
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
+              "k": "stack",
+              "id": "운명의 시계",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -336,77 +294,132 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
-          "target": "oneEnemy",
-          "base": "def"
+          "ratio": 0.55,
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
           "k": "perStack",
-          "id": "예언"
+          "id": "운명의 시계"
         },
         {
           "k": "dmg",
           "ratio": 0.3,
-          "target": "allEnemies",
-          "base": "def"
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
           "k": "spend",
-          "id": "예언",
+          "id": "운명의 시계",
           "all": true
         }
       ],
-      "blurb": "「그러니까 말했잖아~」",
       "oracles": [
         {
           "name": "결말 낭독",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "예언"
+              "id": "운명의 시계"
             },
             {
               "k": "dmg",
               "ratio": 0.4,
-              "target": "allEnemies",
-              "base": "def"
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
-              "id": "예언",
+              "id": "운명의 시계",
               "all": true
             }
           ]
         },
         {
-          "name": "짧은 결말",
-          "cost": 0,
+          "name": "그러니까 말했잖아~",
+          "tags": [
+            "약점 공격"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.55,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "예언"
+              "id": "운명의 시계"
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
-              "target": "allEnemies",
-              "base": "def"
+              "ratio": 0.33,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
-              "id": "예언",
+              "id": "운명의 시계",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "마녀 탐정 바바",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "운명의 시계"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "정해진 결말 비틀기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "운명의 시계",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "운명의 시계",
               "all": true
             }
           ]
@@ -416,98 +429,40 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.74,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "예언"
+              "id": "운명의 시계"
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "spend",
-              "id": "예언",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "비극의 결말",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "perStack",
-              "id": "예언"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "spend",
-              "id": "예언",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "책략관의 각본",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "perStack",
-              "id": "예언"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "spend",
-              "id": "예언",
-              "all": true
+              "ratio": 0.32,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "명대사",
+          "name": "뱀잡이 대장",
           "kind": "power"
         },
         {
-          "name": "복선",
-          "kind": "weakSpot"
+          "name": "지팡이 내려치기",
+          "kind": "ap"
         },
         {
-          "name": "에필로그",
+          "name": "예언 쪽지",
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -515,85 +470,42 @@
     },
     {
       "id": "마카샤_u3",
-      "name": "수다 한 바가지",
+      "name": "생각이 줄줄",
       "hero": "마카샤",
       "unique": true,
       "cost": 0,
-      "type": "스킬",
+      "type": "공격",
       "fx": [
         {
-          "k": "afterCards",
-          "n": 2,
-          "then": [
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "예언",
-              "v": 1
-            }
-          ]
+          "k": "dmg",
+          "ratio": 0.35,
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
-          "k": "heal",
-          "ratio": 0.7
+          "k": "spend",
+          "id": "운명의 시계",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
         }
       ],
-      "blurb": "흘린 말 속에 힌트가 섞여 있습니다",
       "oracles": [
         {
           "name": "수다 두 바가지",
           "fx": [
             {
-              "k": "afterCards",
-              "n": 2,
-              "then": [
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 2
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.49,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "heal",
-              "ratio": 0.8
-            }
-          ]
-        },
-        {
-          "name": "귓속말",
-          "fx": [
-            {
-              "k": "afterCards",
-              "n": 2,
-              "then": [
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "k": "heal",
-              "ratio": 0.7
+              "k": "spend",
+              "id": "운명의 시계",
+              "v": 2
             },
             {
               "k": "draw",
@@ -602,107 +514,121 @@
           ]
         },
         {
-          "name": "잔소리",
+          "name": "귓속말",
           "fx": [
             {
-              "k": "afterCards",
-              "n": 2,
-              "then": [
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "status",
-                  "id": "약화",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.49,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "heal",
-              "ratio": 0.7
+              "k": "spend",
+              "id": "운명의 시계",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "약초 수다",
+          "name": "딴생각 흘리기",
+          "power": true,
           "fx": [
             {
-              "k": "afterCards",
-              "n": 2,
-              "then": [
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.75,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "heal",
-              "ratio": 1.2
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "spend",
+                      "id": "운명의 시계",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "수다 비축",
-          "tags": [
-            "보존"
-          ],
+          "name": "말 끊기 싫음",
           "fx": [
             {
-              "k": "afterCards",
-              "n": 2,
-              "then": [
-                {
-                  "k": "status",
-                  "id": "취약",
-                  "v": 1,
-                  "target": "allEnemies"
-                },
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.35,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "heal",
-              "ratio": 0.8
+              "k": "spend",
+              "id": "운명의 시계",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "수다 폭주",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.12,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "운명의 시계",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "약초 향",
-          "kind": "heal"
+          "name": "긴긴-팔다리",
+          "kind": "draw"
         },
         {
-          "name": "말주머니",
-          "tags": [
-            "보존"
+          "name": "미숫가루 한 잔",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.3
+            }
           ]
         },
         {
-          "name": "입담",
-          "kind": "draw"
+          "name": "노을 보며 멍",
+          "kind": "weakSpot"
         }
       ]
     },
@@ -712,120 +638,72 @@
       "hero": "마카샤",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
-          "k": "status",
-          "id": "사기",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "예언",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "perStack",
+          "id": "운명의 시계"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "base": "def",
+          "target": "oneEnemy"
         }
       ],
-      "blurb": "모든 수가 다 보이는 탁상",
       "oracles": [
         {
           "name": "완벽한 책략",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.75,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "예언",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "운명의 시계"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "작은 탁상",
+          "name": "발자국 남기기",
           "cost": 0,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "예언",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "책략과 약초",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "perStack",
+              "id": "운명의 시계"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "예언",
-                      "v": 2
-                    },
-                    {
-                      "k": "heal",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "수 읽기",
+          "power": true,
           "fx": [
             {
               "k": "status",
@@ -833,21 +711,25 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
-            },
-            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "stackGone",
+                    "id": "운명의 시계"
                   },
                   "fx": [
                     {
+                      "k": "status",
+                      "id": "취약",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    },
+                    {
                       "k": "stack",
-                      "id": "예언",
-                      "v": 1
+                      "id": "운명의 시계",
+                      "v": 2,
+                      "target": "topEnemy"
                     }
                   ]
                 }
@@ -857,57 +739,63 @@
         },
         {
           "name": "미리 펼친 지도",
-          "tags": [
-            "개전"
-          ],
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
               "k": "stack",
-              "id": "예언",
-              "v": 2
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "allEnemies"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "예언",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "이-히힛 결말",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "운명의 시계"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "운명의 시계",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "책략가",
-          "kind": "defUp"
+          "name": "궁극의 절구통",
+          "kind": "frost"
         },
         {
-          "name": "먼저 펼친 판",
-          "tags": [
-            "개전"
-          ]
+          "name": "쓴 커피",
+          "kind": "ap"
         },
         {
-          "name": "찻잔",
+          "name": "바바의 발자국",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.5
+              "k": "status",
+              "id": "사기",
+              "v": 1
             }
           ]
         }

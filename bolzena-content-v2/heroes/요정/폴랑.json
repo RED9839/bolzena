@@ -1,713 +1,866 @@
 {
- "heroes": [
-  {
-   "id": "폴랑",
-   "name": "폴랑",
-   "nature": "광기",
-   "race": "요정",
-   "role": "서포터",
-   "star": 3,
-   "hp": 580,
-   "atk": 86,
-   "def": 58,
-   "crit": 5,
-   "blurb": "요정 왕국 에르피엔의 경비대장으로, 네르와 함께 왕국의 양날개로 꼽힙니다. 한때 롤렛의 이간질에 넘어가 반란을 일으켰지만 지금은 에르핀에게 광적으로 충성합니다. 「셋이서 120도로 둘러싸 패기」라는 전통 전술을 신봉합니다.",
-   "keyword": {
-    "name": "포위",
-    "desc": "셋이 함께 둘러싸는 포위",
-    "carrier": "enemy",
-    "cap": 3,
-    "endClear": true,
-    "rules": [
-     {
-      "name": "포위 완성",
-      "when": {
-       "on": "stackReach",
-       "id": "포위",
-       "n": 3
+  "heroes": [
+    {
+      "id": "폴랑",
+      "name": "폴랑",
+      "nature": "광기",
+      "race": "요정",
+      "role": "서포터",
+      "star": 3,
+      "hp": 580,
+      "atk": 86,
+      "def": 58,
+      "crit": 5,
+      "blurb": "요정 왕국 에르피엔의 경비대장으로, 네르와 함께 왕국의 양날개로 꼽힙니다. 한때 롤렛의 이간질에 넘어가 반란을 일으켰지만 지금은 에르핀에게 광적으로 충성합니다. 「셋이서 120도로 둘러싸 패기」라는 전통 전술을 신봉합니다.",
+      "keyword": {
+        "name": "머스킷 장전",
+        "desc": "셋째 발에 맞춰 재는 장전",
+        "carrier": "self",
+        "cap": 3,
+        "rules": [
+          {
+            "name": "일제 사격",
+            "when": {
+              "on": "stackReach",
+              "id": "머스킷 장전",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "머스킷 장전",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.45,
+                "target": "allEnemies"
+              },
+              {
+                "k": "heal",
+                "ratio": 0.4
+              }
+            ]
+          }
+        ]
       },
-      "limit": {
-       "per": "turn",
-       "n": 1
+      "passives": [
+        {
+          "name": "120도 포위",
+          "when": {
+            "on": "play",
+            "who": "any",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "에르피엔 진군깃발",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "로얄 스트레이트",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "heal",
+            "ratio": 1.8
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "status",
-        "id": "취약",
-        "v": 1
-       },
-       {
-        "k": "status",
-        "id": "둔화",
-        "v": 1
-       },
-       {
-        "k": "draw",
-        "v": 1
-       }
+      "starter": [
+        "폴랑_s1",
+        "폴랑_s1",
+        "폴랑_s2",
+        "폴랑_u3"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "120도 포위",
-     "when": {
-      "on": "hit",
-      "who": "any"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "로얄 스트레이트",
-    "cost": 150,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 1.2,
-      "target": "allEnemies"
-     },
-     {
-      "k": "heal",
-      "ratio": 1.8
-     },
-     {
-      "k": "status",
-      "id": "기절",
-      "v": 1
-     }
-    ]
-   },
-   "starter": [
-    "폴랑_s1",
-    "폴랑_s1",
-    "폴랑_s2",
-    "폴랑_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "폴랑_s1",
-   "name": "머스킷 사격",
-   "hero": "폴랑",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "폴랑_s1",
+      "name": "머스킷 사격",
+      "hero": "폴랑",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "폴랑_s2",
+      "name": "야전 붕대",
+      "hero": "폴랑",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "폴랑_u1",
+      "name": "요정 왕국에 경례",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.9
+        },
+        {
+          "k": "dealtMod",
+          "v": 0.2,
+          "target": "allAllies"
+        },
+        {
+          "k": "stack",
+          "id": "머스킷 장전",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘찬 경례",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.15
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.25,
+              "target": "allAllies"
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "제식 동작",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.9
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "왕국 전체 경례",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.48
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "후열 경례",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.24
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "여왕 체육 수업",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.19
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "경비대 제복",
+          "kind": "heal"
+        },
+        {
+          "name": "진법",
+          "kind": "draw"
+        },
+        {
+          "name": "여왕 바라기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "폴랑_u2",
+      "name": "일제 사격",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "머스킷 장전"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "머스킷 장전",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "탄도 계산",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "머스킷 장전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "머스킷 장전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "견제 사격",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "머스킷 장전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "머스킷 장전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "저격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "머스킷 장전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "매일 사격 훈련",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "머스킷 장전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "제 미숙함부터",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "머스킷 장전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.67
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "머스킷",
+          "kind": "power"
+        },
+        {
+          "name": "화약 냄새",
+          "kind": "ap"
+        },
+        {
+          "name": "탄약 보급",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "폴랑_u3",
+      "name": "120도 삼각 편대",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "머스킷 장전",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "머스킷 장전",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "완벽한 편대",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "편대 합류",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "병법",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "제식 훈련",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "basic": true
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "셋이 둘러싸기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "부하들의 신뢰",
+          "kind": "cost"
+        },
+        {
+          "name": "둘러싸기",
+          "kind": "draw"
+        },
+        {
+          "name": "대장님",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "폴랑_u4",
+      "name": "경비대장 폴랑입니다",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 0.5
+        },
+        {
+          "k": "perStack",
+          "id": "머스킷 장전"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.15
+        }
+      ],
+      "oracles": [
+        {
+          "name": "경비대 총출동",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.5
+            },
+            {
+              "k": "perStack",
+              "id": "머스킷 장전"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.15
+            }
+          ]
+        },
+        {
+          "name": "양익",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "머스킷 장전",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "피해 감소",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "물러서지 않는 대장",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.6
+            }
+          ]
+        },
+        {
+          "name": "나도 소녀랍니다",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "경례 한 번",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "perStack",
+              "id": "머스킷 장전"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.35
+            },
+            {
+              "k": "spend",
+              "id": "머스킷 장전",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "진군깃발",
+          "kind": "atkUp"
+        },
+        {
+          "name": "에르피엔 수호",
+          "kind": "defUp"
+        },
+        {
+          "name": "폴랑 버스터",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "폴랑_s2",
-   "name": "야전 붕대",
-   "hero": "폴랑",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 2.1
-    }
-   ]
-  },
-  {
-   "id": "폴랑_u1",
-   "name": "120도 삼각 편대",
-   "hero": "폴랑",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "연계"
-   ],
-   "fx": [
-    {
-     "k": "stack",
-     "id": "포위",
-     "v": 2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "status",
-     "id": "피해 감소",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "완벽한 편대",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "두 명 편대",
-     "cost": 0,
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "전면 포위",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 3,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "방패 편대",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.5
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "협공 편대",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "전령",
-     "kind": "draw"
-    },
-    {
-     "name": "구령 한 마디",
-     "kind": "ap"
-    },
-    {
-     "name": "신속 전개",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "폴랑_u2",
-   "name": "일제 사격",
-   "hero": "폴랑",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "allEnemies",
-     "base": "def"
-    },
-    {
-     "k": "stack",
-     "id": "포위",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "status",
-     "id": "약화",
-     "v": 1,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "전열 일제 사격",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.3,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "두 발 사격",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.65,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "조준 사격",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.2,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "십자 포화",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.2,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "연속 일제 사격",
-     "cost": 3,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.9,
-       "target": "allEnemies",
-       "hits": 2,
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "화약 증량",
-     "kind": "power"
-    },
-    {
-     "name": "탄환 세례",
-     "kind": "frost"
-    },
-    {
-     "name": "포위망 조준",
-     "kind": "weakSpot"
-    }
-   ]
-  },
-  {
-   "id": "폴랑_u3",
-   "name": "요정 왕국에 경례",
-   "hero": "폴랑",
-   "unique": true,
-   "cost": 3,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "status",
-     "id": "사기",
-     "v": 1
-    },
-    {
-     "k": "heal",
-     "ratio": 3
-    },
-    {
-     "k": "status",
-     "id": "협공",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "충성의 경례",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 2
-      },
-      {
-       "k": "heal",
-       "ratio": 3.5
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "짧은 경례",
-     "cost": 2,
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.6
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "왕국 수호 선서",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 3.7
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "사열식",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 3.0
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "경례 후 돌격",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 2
-      },
-      {
-       "k": "heal",
-       "ratio": 2.0
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "왕국의 가호",
-     "kind": "heal"
-    },
-    {
-     "name": "힘찬 구령",
-     "kind": "ap"
-    },
-    {
-     "name": "반듯한 자세",
-     "kind": "defUp"
-    }
-   ]
-  },
-  {
-   "id": "폴랑_u4",
-   "name": "경비대장 폴랑입니다",
-   "hero": "폴랑",
-   "unique": true,
-   "cost": 2,
-   "type": "스킬",
-   "tags": [
-    "개전"
-   ],
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    },
-    {
-     "k": "status",
-     "id": "협공",
-     "v": 1
-    },
-    {
-     "k": "ap",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "경비대 총출동",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.0
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 2
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "야간 순찰",
-     "cost": 1,
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.2
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "경비대장의 지휘",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.6
-      },
-      {
-       "k": "status",
-       "id": "협공",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "경계 태세",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.4
-      },
-      {
-       "k": "stack",
-       "id": "포위",
-       "v": 3,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "경비대장의 각오",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.6
-      },
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "철통 경비",
-     "kind": "guard"
-    },
-    {
-     "name": "순찰 보고",
-     "kind": "draw"
-    },
-    {
-     "name": "경비대장 직권",
-     "kind": "atkUp"
-    }
-   ]
-  }
- ]
+  ]
 }

@@ -21,7 +21,7 @@ namespace Bolzena.UI
 
         public static Modal Show(Transform parent, BattleSnapshot s, int tab)
         {
-            var m = Modal.Create(parent, "pile", new Vector2(60, 30), Vector3.zero, false, 0.965f);
+            var m = Modal.Create(parent, "pile", new Vector2(60, 30), Vector3.zero, false, 0.99f);
             m.Panel.enabled = false;
             var ui = m.gameObject.AddComponent<PileUi>();
             ui.Init(m, s, tab);
@@ -32,7 +32,7 @@ namespace Bolzena.UI
         {
             var sb = new StringBuilder();
             sb.Append(Tip.Head(c.Name)).Append("  ").Append(Tip.Dim($"{c.HeroName} · {c.TypeName} · 비용 {c.Cost}"));
-            sb.Append('\n').Append(c.Text);
+            sb.Append('\n').Append(Tone.StripDiff(c.Text));
             if (c.Terms.Count > 0) sb.Append("\n\n").Append(Tip.Terms(c.Terms));
             return sb.ToString();
         }
@@ -127,7 +127,7 @@ namespace Bolzena.UI
                 for (int i = 0; i < cards.Count; i++)
                 {
                     int r = i / cols, c = i % cols;
-                    var cv = CardView.Create(parent, cards[i]);
+                    var cv = CardView.Create(parent, cards[i]); cv.ShowPin = false;
                     cv.TargetPos = new Vector3(x0 + cw / 2 + c * (cw + gap), y - ch / 2 - r * (ch + gap), 0);
                     cv.TargetScale = cw / CardView.W; cv.TargetRot = 0; cv.Snap();
                     cv.SetOrder(order + 10 + n * 12);
@@ -249,7 +249,7 @@ namespace Bolzena.UI
         // 누른 카드 — 크게 띄우고 키워드 판(다시 누르면 · 다른 곳을 누르면 닫는다)
         void Taps()
         {
-            if (!PointerInput.Tap) return;
+            if (detailOpen || !PointerInput.Tap) return;
             if (CardZoom.Shown) { CardZoom.Hide(); return; }
             var p = PointerInput.Pos;
             CardView hit = null;
@@ -260,11 +260,34 @@ namespace Bolzena.UI
                 if (Mathf.Abs(l.x) < CardView.W / 2 && Mathf.Abs(l.y) < CardView.H / 2) { hit = c; break; }
             }
             if (hit == null) return;
+            // 판 화면(Flow)이 살아 있으면 카드 상세 페이지(신탁 미리보기 포함)를 연다 — 닫으면 이 창으로 돌아온다(2026-10-08 사용자)
+            var flow = Bolzena.RunUI.Flow.Me;
+            if (flow != null && !detailOpen && !string.IsNullOrEmpty(hit.Info.Id))
+            {
+                StartCoroutine(Detail(flow, Bolzena.Core.GameData.BaseId(hit.Info.Id)));
+                Emit?.Invoke("pile_detail");
+                return;
+            }
             float s = Mathf.Min(2.0f, (Tone.HalfH * 2 * 0.62f) / CardView.H);
             CardZoom.Show(m.transform.parent, hit.Info, new Vector3(-1.6f * Tone.K, 0, 0), s);
             Emit?.Invoke("pile_zoom");
         }
         public static System.Action<string> Emit;
+        bool detailOpen;
+        System.Collections.IEnumerator Detail(Bolzena.RunUI.Flow flow, string id)
+        {
+            detailOpen = true;
+            var canvas = flow.Stage.Canvas;
+            bool was = canvas.enabled;
+            canvas.enabled = true;
+            flow.CardZoom(id);
+            yield return null; yield return null;
+            var layer = flow.Stage.ModalLayer;
+            while (layer != null && layer.childCount > 0) yield return null;
+            canvas.enabled = was;
+            yield return null;
+            detailOpen = false;
+        }
 
         void Update()
         {

@@ -52,7 +52,7 @@ namespace Bolzena.RunUI
             StartCoroutine(AutoOwner());
             if (Has("-demo-loop")) { limit = float.TryParse(Arg("-demo-timeout"), out var ll) ? ll : 3600f; }
             StartCoroutine(Watchdog(limit));
-            StartCoroutine(arca ? Arca_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-resize") ? Resize_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
+            StartCoroutine(arca ? Arca_() : Has("-demo-bless") ? Bless_() : Has("-demo-oraclepeek") ? OraclePeek_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listperf") ? ListPerf_() : Has("-demo-snapdiff") ? SnapDiff_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-resize") ? Resize_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
         }
 
         // 이벤트(-demo-events) — 꼴이 다른 이벤트 여섯(선택지 적음 · 많음 · 카드 고르기 · 신탁 · 전투 · 도박/판정)의 처음 화면 · 고른 뒤 결과를 찍고,
@@ -189,6 +189,7 @@ namespace Bolzena.RunUI
             Expect(fitBad == 0 && fitSeen > 0, $"결과 칸 — 받은 것이 칸 밖으로 잘린 것 {fitBad} (본 결과 칸 {fitSeen} · 스크롤 {fitScroll})");
             Expect(alignBad == 0 && fitSeen > 0, $"결과 칸 — 글 왼쪽 끝 = 칸 왼쪽 + {Flow.EvTextInset} · 칸 왼쪽 = 선택지 왼쪽 (어긋남 {alignBad})");
             _ = firstFitDone;
+            yield return EvLock_();   // 잠긴 칸 · 연속 이벤트 깃발(Demo.EvLock.cs)
 
             // 대화창 흐름 — 서술 · 대사 줄(이름표) → 선택 → 결과 줄 → 받은 것 · 떠나기(2026-10-06 사용자: 비주얼 노벨식)
             f.DialogAuto = false;
@@ -290,7 +291,7 @@ namespace Bolzena.RunUI
 
             // 이벤트 은총 — 실제 화면으로: 선택지 → 결과 → 사도 고르기 창 → 그 사도의 남은 고유 카드 → 가운데 띄우기
             {
-                bool Plain(Core.EventOption o) => o.Hero == null && o.Fight == null && o.Gamble == null && o.Judge == null;
+                bool Plain(Core.EventOption o) => o.Hero == null && o.Race == null && o.When == null && o.Flag == null && o.NoFlag == null && o.Fight == null && o.Gamble == null && o.Judge == null;   // 조건 칸(잠금으로 보임)은 빼고
                 var gev = evs.FirstOrDefault(e => e.Options.Any(o => Plain(o) && Out(o, "unique") && !Out(o, "remove", "dupe", "flash")));
                 if (gev == null) Expect(false, "은총: unique 를 주는 이벤트가 없다");
                 else
@@ -1573,7 +1574,17 @@ namespace Bolzena.RunUI
             for (int i = 0; i < 4 && Hot("reward.glow") != null; i++)
             {
                 yield return Shot("reward_glow");
-                yield return Press("reward.glow", 0.9f);
+                yield return Press("reward.glow", 0.3f);
+                if (CardGain.IsOpen)
+                {   // 은총 — 고르기 없이 「은총!」 으로 크게 보인 뒤 저절로 덱으로(누르지 않는다)
+                    yield return Until(() => CardGain.Phase == "show", 3);
+                    yield return Shot("reward_grace_show");
+                    yield return Until(() => !CardGain.IsOpen && f.Stage.ModalLayer.childCount == 0, 6);
+                    Expect(!CardGain.IsOpen, "보상 은총 — 누르지 않아도 덱으로 들어간다");
+                    yield return Wait(0.5f);
+                    continue;
+                }
+                yield return Wait(0.6f);
                 yield return Until(() => OracleReveal.Phase == "choose", 5); yield return Wait(0.3f);
                 yield return Shot("reward_glow_pick");
                 yield return Press("glow.opt0", 0.1f);

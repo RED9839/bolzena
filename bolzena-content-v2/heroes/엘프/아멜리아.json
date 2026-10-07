@@ -41,22 +41,6 @@
       },
       "passives": [
         {
-          "name": "업무 대행",
-          "when": {
-            "on": "play",
-            "type": "스킬"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
-          "fx": [
-            {
-              "k": "castOther"
-            }
-          ]
-        },
-        {
           "name": "서류 접수",
           "when": {
             "on": "play",
@@ -64,13 +48,32 @@
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 3
           },
           "fx": [
             {
               "k": "stack",
               "id": "결재 서류",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "초고속 썬더 레이저",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -121,7 +124,7 @@
         "아멜리아_s1",
         "아멜리아_s1",
         "아멜리아_s2",
-        "아멜리아_s2"
+        "아멜리아_u3"
       ]
     }
   ],
@@ -159,140 +162,139 @@
       "name": "새틀라이트 전술폭격",
       "hero": "아멜리아",
       "unique": true,
-      "signature": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.85,
           "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "결재 서류"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.3,
+          "k": "status",
+          "id": "충격",
+          "v": 1,
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "좌표 확인 완료",
+          "name": "Mk.2 폭격",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.78,
+              "ratio": 1.06,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "결재 서류"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.39,
+              "k": "status",
+              "id": "충격",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
           "name": "새틀라이트 오버히트",
-          "tags": [
-            "보존"
-          ],
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.72,
+              "ratio": 0.35,
+              "hits": 4,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "결재 서류"
+              "k": "status",
+              "id": "충격",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "결재된 폭격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "결재 서류",
+              "n": 2
             },
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.56,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "지원 요청의 건",
+          "name": "좌표 요청",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.87,
+              "ratio": 0.75,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "결재 서류"
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.44,
-              "target": "allEnemies"
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "과부하 전류",
-          "tags": [
-            "신속"
-          ],
+          "name": "서류 1장당 폭격",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "target": "allEnemies"
-            },
             {
               "k": "perStack",
               "id": "결재 서류"
             },
             {
               "k": "dmg",
-              "ratio": 0.36,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "결재 등급: 그냥",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.08,
+              "ratio": 0.35,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "결재 서류"
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.54,
-              "target": "allEnemies"
+              "k": "spend",
+              "id": "결재 서류",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "밀린 결재",
+          "name": "레이저 출력",
           "kind": "power"
         },
         {
-          "name": "휴가지에서도 일함",
+          "name": "엘레나 사진",
           "kind": "ap"
         },
         {
-          "name": "감시 보고서",
+          "name": "결재 도장",
           "fx": [
             {
               "k": "stack",
@@ -308,135 +310,162 @@
       "name": "감봉 통보",
       "hero": "아멜리아",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.2,
+          "ratio": 0.6,
           "target": "oneEnemy"
         },
         {
-          "k": "ifStack",
+          "k": "perStack",
+          "id": "결재 서류"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
           "id": "결재 서류",
-          "n": 2
-        },
-        {
-          "k": "status",
-          "id": "약화",
-          "v": 2,
-          "target": "oneEnemy"
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "사전 통보",
+          "name": "일괄 감봉",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.86,
+              "ratio": 0.8,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
+              "k": "perStack",
+              "id": "결재 서류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
               "id": "결재 서류",
-              "n": 2
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "구두 경고",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "결재 서류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "결재 서류",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "감전된 직원",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.14,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "충격"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.83,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "전원 감봉",
-          "tags": [
-            "보존"
-          ],
+          "name": "상시 감봉 제도",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.64,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "결재 서류",
-              "n": 2
+              "k": "perStack",
+              "id": "결재 서류"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.3,
               "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "결재 서류",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "남은 예산 이월",
+          "name": "징계 위원회",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 3.19,
-              "target": "oneEnemy"
+              "k": "discard",
+              "v": 1
             },
-            {
-              "k": "ifStack",
-              "id": "결재 서류",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "부서 전체 징계",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
             {
               "k": "dmg",
-              "ratio": 2.64,
+              "ratio": 0.8,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "결재 서류",
-              "n": 2
+              "k": "perStack",
+              "id": "결재 서류"
             },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "입 모양 읽기",
-          "cost": 3,
-          "fx": [
             {
               "k": "dmg",
-              "ratio": 3.96,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "결재 서류",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
+              "ratio": 0.38,
               "target": "oneEnemy"
             }
           ]
@@ -444,22 +473,16 @@
       ],
       "blesses": [
         {
-          "name": "시장님 일정 관리",
-          "kind": "power"
+          "name": "찌릿한 서명",
+          "kind": "weakSpot"
         },
         {
-          "name": "좌표 확인 완료",
-          "kind": "ap"
+          "name": "야근 금지",
+          "kind": "draw"
         },
         {
-          "name": "결재 등급: 그냥",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "결재 서류",
-              "v": 1
-            }
-          ]
+          "name": "감봉 서식",
+          "kind": "frost"
         }
       ]
     },
@@ -468,82 +491,75 @@
       "name": "모나티엄 행정 대행",
       "hero": "아멜리아",
       "unique": true,
-      "cost": 1,
+      "cost": 0,
       "type": "스킬",
-      "tags": [
-        "연계"
-      ],
       "fx": [
         {
-          "k": "draw",
-          "v": 1
+          "k": "stack",
+          "id": "결재 서류",
+          "v": 2
         },
         {
-          "k": "castOther"
+          "k": "draw",
+          "v": 1,
+          "who": "other"
         }
       ],
       "oracles": [
         {
-          "name": "밀린 결재",
-          "cost": 0,
-          "tags": [
-            "연계"
-          ],
+          "name": "일괄 처리",
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 3
             },
             {
-              "k": "castOther"
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "지원 요청 접수",
-          "tags": [
-            "연계",
-            "보존"
-          ],
+          "name": "상시 대행",
+          "power": true,
           "fx": [
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "castOther"
-            }
-          ]
-        },
-        {
-          "name": "시장님 일정 관리",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "castOther"
-            },
             {
               "k": "stack",
               "id": "결재 서류",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "결재 서류",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "감시 보고서",
-          "tags": [
-            "연계",
-            "신속"
-          ],
+          "name": "업무 대행",
           "fx": [
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "결재 서류",
               "v": 2
             },
             {
@@ -552,32 +568,57 @@
           ]
         },
         {
-          "name": "휴가지에서도 일함",
+          "name": "결재 우선순위",
           "tags": [
-            "연계"
+            "보존"
           ],
           "fx": [
             {
-              "k": "draw",
-              "v": 2
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 3
             },
             {
-              "k": "castOther"
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "시장님 일정 우선",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "휴가지에서도 일함",
-          "kind": "guard"
+          "name": "관리자 직함",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "감시 보고서",
-          "kind": "draw"
+          "name": "일기 작성",
+          "kind": "ap"
         },
         {
-          "name": "밀린 결재",
+          "name": "복지 탄원서 반려",
           "fx": [
             {
               "k": "stack",
@@ -594,114 +635,231 @@
       "hero": "아멜리아",
       "unique": true,
       "cost": 1,
-      "type": "공격",
+      "type": "강화",
       "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.8,
-          "target": "allEnemies"
-        },
         {
           "k": "stack",
           "id": "결재 서류",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "play",
+                "who": "other",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "충격",
+                  "v": 1,
+                  "target": "oneEnemy"
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "녹화 중",
+          "name": "64대 증설",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.04,
-              "target": "allEnemies"
-            },
             {
               "k": "stack",
               "id": "결재 서류",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "충격",
+                      "v": 2,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "전 채널 출력",
-          "tags": [
-            "보존"
-          ],
+          "name": "몰래카메라",
+          "cost": 0,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.96,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "결재 서류",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "충격",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "교주에게만 너그럽게",
+          "name": "녹화본 판독",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.16,
+              "k": "status",
+              "id": "충격",
+              "v": 1,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "결재 서류",
+              "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "충격",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "브로마이드 수호",
-          "tags": [
-            "신속"
-          ],
+          "name": "녹화본 열람",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.96,
-              "target": "allEnemies"
-            },
             {
               "k": "stack",
               "id": "결재 서류",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "충격",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "왕자님의 은총",
-          "cost": 2,
+          "name": "야근 감시",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.92,
-              "target": "allEnemies"
+              "k": "payHpPct",
+              "v": 0.05
             },
             {
               "k": "stack",
               "id": "결재 서류",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "충격",
+                      "v": 2,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "좌표 확인 완료",
-          "kind": "power"
+          "name": "부동산 카메라",
+          "kind": "cost"
         },
         {
-          "name": "결재 등급: 그냥",
-          "kind": "ap"
+          "name": "채널 고정",
+          "kind": "defUp"
         },
         {
-          "name": "시장님 일정 관리",
+          "name": "서류 더미",
           "fx": [
             {
               "k": "stack",
@@ -727,8 +885,11 @@
           "name": "찌릿한 화면",
           "when": {
             "on": "play",
-            "type": "스킬",
-            "every": 2
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
           "fx": [
             {
@@ -736,6 +897,20 @@
               "id": "충격",
               "v": 1,
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "화면 켜기",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -749,18 +924,13 @@
         {
           "name": "결재함 동기화",
           "when": {
-            "on": "play",
-            "who": "other"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "stack",
               "id": "결재 서류",
-              "v": 1
+              "v": 2
             }
           ]
         }

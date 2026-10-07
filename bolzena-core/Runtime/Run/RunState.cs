@@ -54,6 +54,8 @@ namespace Bolzena.Core
         public EventState Event;
         public List<string> EventsSeen = new();
         public HashSet<string> EventDone = new();
+        /// <summary>연속 이벤트 깃발 — 이벤트 결과 `flag` 가 세우고, 뒤 이벤트의 선택지(flag · noFlag) · 뽑기(needFlag)가 읽는다. 판 저장에 남는다.</summary>
+        public HashSet<string> Flags = new();
         public NextFight NextFight;
         public bool Scout, RewardFlash, NoShin;
         public string ShopGift;

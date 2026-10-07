@@ -14,29 +14,54 @@
       "blurb": "남의 흠만 쏙쏙 찾아 험하게 늘어지는 결점의 유령. 베루가 친 적에게는 「흠」 이 남고, 흠 붙은 적을 치는 아군 공격은 한 장마다 약점으로 꽂힙니다.",
       "keyword": {
         "name": "흠",
-        "desc": "아군 공격이 꽂히는 결점",
+        "desc": "베루가 짚어 낸 적의 결점",
         "carrier": "enemy",
-        "cap": 3,
+        "cap": 4,
         "weakens": true,
         "per": [
           {
             "stat": "taken",
-            "v": 0.1
+            "v": 0.08
           }
         ]
       },
       "passives": [
         {
-          "name": "흠 하나 물고",
+          "name": "흠잡기",
           "when": {
             "on": "play",
             "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
               "id": "흠",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "등 뒤에서 짚기",
+          "when": {
+            "on": "play",
+            "who": "other",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -63,7 +88,7 @@
       },
       "starter": [
         "베루_s1",
-        "베루_s1",
+        "베루_u1",
         "베루_s3",
         "베루_s2"
       ]
@@ -116,116 +141,164 @@
       "name": "도끼 날아가요~",
       "hero": "베루",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
-          "target": "allEnemies"
+          "ratio": 0.48,
+          "target": "oneEnemy",
+          "hits": 3
         },
         {
           "k": "stack",
           "id": "흠",
           "v": 1,
-          "target": "allEnemies"
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "도끼 회오리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "도끼 하나",
-          "cost": 1,
+          "name": "도끼 셋 명중",
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.6,
-              "target": "allEnemies"
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "stack",
               "id": "흠",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "흠집 내기",
+          "name": "이히히 도끼",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
-              "target": "allEnemies"
+              "ratio": 0.41,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "stack",
               "id": "흠",
-              "v": 2,
-              "target": "allEnemies"
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "정수리 도끼",
+          "name": "흩어지는 도끼",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
+              "ratio": 0.59,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "익살스러운 표정",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "ifStack",
               "id": "흠",
-              "v": 2
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "도끼 두 자루",
+          "name": "베-",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "target": "allEnemies",
-              "hits": 2
+              "ratio": 0.44,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "stack",
               "id": "흠",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "흠",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "무거운 도끼",
+          "name": "날 선 도끼",
           "kind": "power"
         },
         {
-          "name": "흠 찾기",
+          "name": "허점 발견",
           "kind": "weakSpot"
         },
         {
-          "name": "도끼 줍기",
-          "kind": "draw"
+          "name": "이히히",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -234,18 +307,27 @@
       "name": "흠 하나 물고",
       "hero": "베루",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.6,
+          "ratio": 1,
           "target": "oneEnemy"
         },
         {
-          "k": "stack",
+          "k": "perStack",
+          "id": "흠"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.38,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
           "id": "흠",
-          "v": 2
+          "all": true
         }
       ],
       "oracles": [
@@ -254,43 +336,53 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.15,
+              "ratio": 1.19,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "perStack",
+              "id": "흠"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
               "id": "흠",
-              "v": 2
+              "all": true
             }
           ]
         },
         {
-          "name": "앙 물기",
-          "cost": 1,
+          "name": "계속 물고",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.65,
+              "ratio": 1.21,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "흠",
-              "v": 2
+              "k": "perStack",
+              "id": "흠"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "흠 잡아 뜯기",
+          "name": "먼저 지적",
+          "tags": [
+            "약점 공격"
+          ],
           "fx": [
             {
-              "k": "stack",
-              "id": "흠",
-              "v": 2
-            },
-            {
               "k": "dmg",
-              "ratio": 2.0,
+              "ratio": 1.06,
               "target": "oneEnemy"
             },
             {
@@ -301,61 +393,104 @@
               "k": "dmg",
               "ratio": 0.4,
               "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "흠",
+              "all": true
             }
           ]
         },
         {
-          "name": "끝까지 물기",
+          "name": "끈질긴 기억",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.9,
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "흠",
-              "v": 2
+              "k": "perStack",
+              "id": "흠"
             },
             {
-              "k": "status",
-              "id": "취약",
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "흠",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "PC방의 기억",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.09,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "흠"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "벼르던 흠",
-          "tags": [
-            "약점 공격",
-            "주도"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "험한 말",
+          "name": "끈질긴 이빨",
           "kind": "power"
         },
         {
-          "name": "트집",
-          "kind": "frost"
+          "name": "결점 노트",
+          "kind": "draw"
         },
         {
-          "name": "다음 흠",
-          "kind": "draw"
+          "name": "들통난 흠",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -364,144 +499,147 @@
       "name": "친구 계약서",
       "hero": "베루",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "stack",
           "id": "흠",
-          "v": 2
+          "v": 2,
+          "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "취약",
-          "v": 1
+          "v": 1,
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "잔광",
+          "k": "draw",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "3년 계약",
+          "name": "3년짜리 계약",
           "fx": [
             {
               "k": "stack",
               "id": "흠",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "하루 계약",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "단체 계약",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 1,
-              "target": "allEnemies"
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "위약금",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "잔광",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "평생 계약",
-          "cost": 3,
+          "name": "계약서 던지기",
           "fx": [
             {
               "k": "stack",
               "id": "흠",
-              "v": 3
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "도장 찍기 전에",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
               "v": 2
+            }
+          ]
+        },
+        {
+          "name": "친구 놀이",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "잔광",
-              "v": 2
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "집문서 담보",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "깨알 같은 약관",
+          "name": "깨알 조항",
           "kind": "draw"
+        },
+        {
+          "name": "서명 강요",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         },
         {
           "name": "빠른 도장",
           "kind": "cost"
-        },
-        {
-          "name": "친구 하자",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
         }
       ]
     },
@@ -511,31 +649,53 @@
       "hero": "베루",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "fx": [
         {
-          "k": "stack",
+          "k": "dmg",
+          "ratio": 0.38,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
           "id": "흠",
-          "v": 1
+          "each": true
         },
         {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 1
-        },
-        {
-          "k": "draw",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.22,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "든든한 등",
+          "name": "메죵 등에 착",
           "fx": [
             {
-              "k": "stack",
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
               "id": "흠",
-              "v": 2
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "외강내유",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
             },
             {
               "k": "status",
@@ -543,103 +703,137 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "흠",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "흠",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "쏙 숨기",
+          "name": "걱정한 게 아니라구",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "등 뒤에서 베-",
           "cost": 0,
           "fx": [
             {
-              "k": "stack",
-              "id": "흠",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "perStack",
+              "id": "흠",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "등 뒤에서 째려보기",
+          "name": "놀릴 거리 모음",
           "fx": [
             {
-              "k": "stack",
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
               "id": "흠",
-              "v": 1
+              "each": true
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "메죵을 방패로",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "늘 숨는 자리",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "쪼르르",
-          "kind": "cost"
+          "name": "메죵의 그림자",
+          "kind": "defUp"
         },
         {
-          "name": "힐끔",
-          "kind": "draw"
-        },
-        {
-          "name": "울먹",
+          "name": "울음 참기",
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "작은 등",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }

@@ -22,9 +22,26 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "눌린 자국",
+          "when": {
+            "on": "shieldBreak"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
         }
       ],
-      "blurb": "무엇이든 말랑하게 받아 내는 조끼."
+      "blurb": "무엇이든 말랑하게 받아 내는 조끼. 눌린 자리는 더 단단해집니다."
     },
     {
       "id": "eq_growpotion",
@@ -44,12 +61,25 @@
             {
               "k": "status",
               "id": "초재생",
-              "v": 2
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "큰 주먹",
+          "when": {
+            "on": "always"
+          },
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.1,
+              "target": "self"
             }
           ]
         }
       ],
-      "blurb": "마시면 몸이 커집니다. 커진 몸은 금방 아뭅니다."
+      "blurb": "마시면 몸이 커집니다. 커진 몸은 금방 아물고 주먹도 커집니다."
     },
     {
       "id": "eq_goblinhat",
@@ -95,7 +125,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.25
+              "ratio": 0.3
             }
           ]
         }
@@ -120,6 +150,11 @@
             {
               "k": "shield",
               "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 1
             }
           ]
         }
@@ -132,9 +167,28 @@
       "grade": "희귀",
       "slot": "방어구",
       "stats": {
-        "def": 14
+        "def": 12
       },
-      "blurb": "단단한 비늘을 엮은 갑옷."
+      "effect": [
+        {
+          "name": "비늘 세우기",
+          "when": {
+            "on": "blocked"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "단단한 비늘을 엮은 갑옷. 다 막아 내면 비늘이 곤두섭니다."
     },
     {
       "id": "eq_balloon",
@@ -270,18 +324,22 @@
         {
           "name": "질긴 가죽",
           "when": {
-            "on": "fightStart"
+            "on": "turnEnd"
           },
+          "conds": [
+            {
+              "c": "wounded"
+            }
+          ],
           "fx": [
             {
-              "k": "healMod",
-              "v": 0.2,
-              "run": true
+              "k": "heal",
+              "ratio": 0.4
             }
           ]
         }
       ],
-      "blurb": "상처가 덧나지 않게 감싸 주는 가죽."
+      "blurb": "상처가 덧나지 않게 감싸 주는 가죽. 많이 다쳤을 때 더 단단히 조입니다."
     },
     {
       "id": "eq_leafrobe",
@@ -299,9 +357,28 @@
       "grade": "일반",
       "slot": "방어구",
       "stats": {
-        "def": 6
+        "def": 5
       },
-      "blurb": "택배 상자를 겹겹이 댄 갑옷."
+      "effect": [
+        {
+          "name": "한 겹 더",
+          "when": {
+            "on": "guard",
+            "kind": "shield"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.3
+            }
+          ]
+        }
+      ],
+      "blurb": "택배 상자를 겹겹이 댄 갑옷. 막을 치면 상자가 한 겹 더 받쳐 줍니다."
     },
     {
       "id": "eq_wraprobe",

@@ -13,8 +13,8 @@
       "crit": 5,
       "blurb": "「정숙해주세요오」 도서관 사서 마녀. 가장 바쁜 동료에게 오늘 안에 돌려받을 책을 빌려 주고, 도장이 차면 버린 더미에서 그 손에 맞는 책을 다시 찾아 줍니다.",
       "keyword": {
-        "name": "대출 도장",
-        "desc": "도서 대출 도장",
+        "name": "북카트",
+        "desc": "고서를 가득 실은 사서의 수레",
         "carrier": "self",
         "cap": 3,
         "rules": [
@@ -22,26 +22,25 @@
             "name": "서가 정리",
             "when": {
               "on": "stackReach",
-              "id": "대출 도장",
+              "id": "북카트",
               "n": 3
             },
             "fx": [
               {
-                "k": "pull",
-                "from": "discard",
-                "n": 1,
-                "who": "other"
+                "k": "spend",
+                "id": "북카트",
+                "all": true
+              },
+              {
+                "k": "make",
+                "id": "바리에_book",
+                "v": 2
               },
               {
                 "k": "stack",
                 "id": "빌린 책",
                 "v": 2,
                 "target": "strongestAlly"
-              },
-              {
-                "k": "spend",
-                "id": "대출 도장",
-                "all": true
               }
             ]
           }
@@ -58,7 +57,7 @@
           "per": [
             {
               "stat": "dealt",
-              "v": 0.1
+              "v": 0.15
             }
           ]
         }
@@ -67,14 +66,39 @@
         {
           "name": "북카트 순회",
           "when": {
-            "on": "play",
-            "every": 2
+            "on": "play"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
           },
           "fx": [
             {
               "k": "stack",
-              "id": "대출 도장",
+              "id": "북카트",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "당일 반납",
+          "when": {
+            "on": "stackGone",
+            "id": "빌린 책",
+            "decay": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
             }
           ]
         }
@@ -91,7 +115,7 @@
           },
           {
             "k": "shield",
-            "ratio": 2.0
+            "ratio": 2
           },
           {
             "k": "draw",
@@ -103,7 +127,7 @@
         "바리에_s1",
         "바리에_s1",
         "바리에_s2",
-        "바리에_s2"
+        "바리에_u1"
       ]
     }
   ],
@@ -137,13 +161,35 @@
       ]
     },
     {
+      "hero": "바리에",
+      "token": true,
+      "id": "바리에_book",
+      "name": "헌 책",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.4
+        }
+      ],
+      "blurb": "분리수거장에서 건진 고서. 펼치면 누군가의 비법이 적혀 있습니다"
+    },
+    {
       "id": "바리에_u1",
       "name": "도서 대출",
       "hero": "바리에",
       "unique": true,
       "cost": 0,
       "type": "스킬",
-      "signature": true,
       "fx": [
         {
           "k": "stack",
@@ -152,16 +198,11 @@
           "target": "oneAlly"
         },
         {
-          "k": "shield",
-          "ratio": 0.8
-        },
-        {
-          "k": "stack",
-          "id": "대출 도장",
-          "v": 1
+          "k": "draw",
+          "v": 1,
+          "who": "other"
         }
       ],
-      "blurb": "대출 기한은 오늘까지예요오",
       "oracles": [
         {
           "name": "두 권 대출",
@@ -173,18 +214,14 @@
               "target": "oneAlly"
             },
             {
-              "k": "shield",
-              "ratio": 0.8
-            },
-            {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "대출과 추천",
+          "name": "추천 도서",
           "fx": [
             {
               "k": "stack",
@@ -193,61 +230,50 @@
               "target": "oneAlly"
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 1
-            },
-            {
               "k": "draw",
-              "v": 1
+              "v": 2,
+              "who": "other",
+              "type": "공격"
             }
           ]
         },
         {
           "name": "연장 대출",
+          "power": true,
           "fx": [
             {
               "k": "stack",
               "id": "빌린 책",
-              "v": 2,
+              "v": 1,
               "target": "oneAlly"
             },
             {
-              "k": "shield",
-              "ratio": 0.8
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "조용한 대출",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "빌린 책",
-              "v": 2,
-              "target": "oneAlly"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.4
-            },
-            {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빌린 책",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "예약 도서",
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
               "k": "stack",
@@ -256,34 +282,48 @@
               "target": "oneAlly"
             },
             {
-              "k": "shield",
-              "ratio": 1.2
+              "k": "make",
+              "id": "바리에_book",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반납 독촉",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "basic": true
             },
             {
               "k": "stack",
-              "id": "대출 도장",
-              "v": 1
+              "id": "빌린 책",
+              "v": 3,
+              "target": "oneAlly"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "추천 도서",
-          "kind": "draw"
-        },
-        {
-          "name": "예약 선반",
+          "name": "책 모자",
           "tags": [
             "보존"
           ]
         },
         {
-          "name": "책갈피",
+          "name": "대출 카드",
+          "kind": "draw"
+        },
+        {
+          "name": "헌 책 한 권",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "make",
+              "id": "바리에_book",
+              "v": 1
             }
           ]
         }
@@ -291,7 +331,154 @@
     },
     {
       "id": "바리에_u2",
-      "name": "잉크 폭탄",
+      "name": "책을 정리해주세요오",
+      "hero": "바리에",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.6
+        },
+        {
+          "k": "stack",
+          "id": "북카트",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "빌린 책",
+          "v": 1,
+          "target": "strongestAlly"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "고서 카트",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.1
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 1,
+              "target": "strongestAlly"
+            }
+          ]
+        },
+        {
+          "name": "책 한 칸",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.75
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 1,
+              "target": "strongestAlly"
+            }
+          ]
+        },
+        {
+          "name": "분리수거장의 헌 책",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "북카트 들이받기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "바리에_book",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "정숙 경고",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 2.35
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "제자리에",
+          "kind": "guard"
+        },
+        {
+          "name": "단것부터",
+          "kind": "draw"
+        },
+        {
+          "name": "정숙 표지판",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바리에_u3",
+      "name": "연체자 독촉",
       "hero": "바리에",
       "unique": true,
       "cost": 1,
@@ -299,175 +486,50 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.85,
-          "target": "oneEnemy",
-          "base": "def"
-        },
-        {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
+          "ratio": 0.72,
+          "base": "def",
           "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "북카트"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "북카트",
+          "all": true
         }
       ],
-      "blurb": "도서관에서 떠드는 자에게",
       "oracles": [
         {
-          "name": "먹물 폭탄",
+          "name": "몽둥이 독촉",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.89,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "잉크 한 방울",
-          "cost": 0,
-          "fx": [
+              "k": "perStack",
+              "id": "북카트"
+            },
             {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "잉크 범벅",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "지워지지 않는 잉크",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.34,
+              "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "대출 연체 고지서",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "진한 잉크",
-          "kind": "power"
-        },
-        {
-          "name": "번지는 잉크",
-          "kind": "frost"
-        },
-        {
-          "name": "만년필",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "바리에_u3",
-      "name": "정숙해주세요오",
-      "hero": "바리에",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
-          "target": "allEnemies"
-        },
-        {
-          "k": "heal",
-          "ratio": 0.9
-        },
-        {
-          "k": "stack",
-          "id": "대출 도장",
-          "v": 1
-        }
-      ],
-      "blurb": "사서의 한마디에 열람실이 얼어붙습니다",
-      "oracles": [
-        {
-          "name": "엄중 경고",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.9
-            },
-            {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 1
+              "k": "spend",
+              "id": "북카트",
+              "all": true
             }
           ]
         },
@@ -476,78 +538,100 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "heal",
-              "ratio": 0.6
+              "k": "perStack",
+              "id": "북카트"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "북카트",
+              "all": true
             }
           ]
         },
         {
-          "name": "열람실 휴식",
+          "name": "연체 고지서",
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.83,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "heal",
-              "ratio": 1.4
+              "k": "perStack",
+              "id": "북카트"
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.35,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "퇴실 조치",
+          "name": "잉크 폭탄",
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.85,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "북카트"
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.34,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1
             }
           ]
         },
         {
-          "name": "정숙 표지판",
-          "tags": [
-            "보존"
-          ],
+          "name": "헌 책 압수",
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.43,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "heal",
-              "ratio": 1.1
+              "k": "perStack",
+              "id": "북카트"
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
+              "k": "dmg",
+              "ratio": 0.16,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "바리에_book",
               "v": 1
             }
           ]
@@ -555,24 +639,22 @@
       ],
       "blesses": [
         {
-          "name": "고요",
-          "kind": "heal"
+          "name": "고서 카트 들이받기",
+          "kind": "power"
         },
         {
-          "name": "눈빛",
+          "name": "연체료",
+          "kind": "ap"
+        },
+        {
+          "name": "정숙해주세요오",
           "fx": [
             {
               "k": "status",
-              "id": "둔화",
+              "id": "약화",
               "v": 1,
               "target": "oneEnemy"
             }
-          ]
-        },
-        {
-          "name": "표지판",
-          "tags": [
-            "보존"
           ]
         }
       ]
@@ -583,120 +665,82 @@
       "hero": "바리에",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "결의",
-          "v": 1
+          "k": "shield",
+          "ratio": 0.7
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "대출 도장",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "perTag",
+          "id": "바리에_book"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.35
+        },
+        {
+          "k": "stack",
+          "id": "빌린 책",
+          "v": 1,
+          "target": "strongestAlly"
         }
       ],
-      "blurb": "모든 책은 제자리에",
       "oracles": [
         {
           "name": "대청소",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "k": "shield",
+              "ratio": 0.9
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "대출 도장",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "책 한 칸",
-          "cost": 0,
-          "fx": [
+              "k": "perTag",
+              "id": "바리에_book"
+            },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "대출 도장",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "shield",
+              "ratio": 0.45
+            },
+            {
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 1,
+              "target": "strongestAlly"
             }
           ]
         },
         {
           "name": "분류 번호",
+          "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.5
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "perTag",
+              "id": "바리에_book"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "대출 도장",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "shield",
+              "ratio": 0.25
+            },
+            {
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 1,
+              "target": "strongestAlly"
             }
           ]
         },
         {
           "name": "신착 도서",
+          "power": true,
           "fx": [
             {
               "k": "status",
-              "id": "결의",
+              "id": "사기",
               "v": 1
             },
             {
@@ -709,19 +753,9 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "대출 도장",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "shuffle"
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 2
+                      "id": "빌린 책",
+                      "v": 1,
+                      "target": "strongestAlly"
                     }
                   ]
                 }
@@ -731,56 +765,60 @@
         },
         {
           "name": "개관 준비",
-          "tags": [
-            "개전"
-          ],
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "make",
+              "id": "바리에_book",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "벨리타가 인정한 학위",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.23
             },
             {
-              "k": "stack",
-              "id": "대출 도장",
-              "v": 2
+              "k": "perTag",
+              "id": "바리에_book"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "대출 도장",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "shield",
+              "ratio": 0.64
+            },
+            {
+              "k": "spend",
+              "id": "북카트",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "꼼꼼함",
-          "kind": "defUp"
+          "name": "셰럼 몰래",
+          "kind": "guard"
         },
         {
-          "name": "개관",
+          "name": "만년 막내",
           "tags": [
             "개전"
           ]
         },
         {
-          "name": "반납함",
+          "name": "헌 책 사랑",
           "fx": [
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "북카트",
               "v": 1
             }
           ]

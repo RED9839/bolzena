@@ -35,7 +35,7 @@ namespace Bolzena.UI
             shownId = key;
             root = Make.Node("CardZoom", parent);
             card = CardView.Create(root, info);
-            card.ShowDesc = true; card.ShowPin = true; card.Playable = true;
+            card.ShowDesc = true; card.ShowPin = false; card.Playable = true;   // 확대 카드는 오른쪽 위 얼굴 배지 없이(2026-10-08 사용자)
             card.TargetScale = s; card.TargetRot = 0; card.TargetPos = Vector3.zero;
             card.Snap();
             card.SetOrder(O);

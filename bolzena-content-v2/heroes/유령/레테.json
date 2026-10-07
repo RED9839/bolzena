@@ -14,22 +14,16 @@
       "blurb": "레이저 포인터로 싫은 기억을 지우는 망각의 유령. 카드를 낼 때마다 적의 버프를 번쩍 지워 그만큼 실드로 바꾸고, 지운 기억이 쌓이면 파티의 아픔까지 털어 냅니다. 포인터를 몇 번 휘두르면 레이저가 연달아 꽂힙니다.",
       "keyword": {
         "name": "지운 기억",
-        "desc": "잊어서 털어 내는 아픈 기억",
+        "desc": "레이저로 잠깐 지워 둔 아팠던 기억",
         "carrier": "self",
-        "cap": 5,
-        "per": [
-          {
-            "stat": "guard",
-            "v": 0.06
-          }
-        ],
+        "cap": 4,
         "rules": [
           {
-            "name": "말끔한 망각",
+            "name": "으히히 리셋",
             "when": {
               "on": "stackReach",
               "id": "지운 기억",
-              "n": 5
+              "n": 4
             },
             "fx": [
               {
@@ -39,7 +33,12 @@
               },
               {
                 "k": "heal",
-                "ratio": 1.2
+                "ratio": 0.55
+              },
+              {
+                "k": "status",
+                "id": "피해 감소",
+                "v": 1
               }
             ]
           }
@@ -47,23 +46,15 @@
       },
       "passives": [
         {
-          "name": "번쩍 리셋",
+          "name": "아팠던 기억",
           "when": {
-            "on": "play"
+            "on": "hurt"
           },
           "limit": {
             "per": "turn",
             "n": 2
           },
           "fx": [
-            {
-              "k": "dispel",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.25
-            },
             {
               "k": "stack",
               "id": "지운 기억",
@@ -113,7 +104,7 @@
         "레테_s1",
         "레테_s1",
         "레테_s2",
-        "레테_s2"
+        "레테_u3"
       ]
     }
   ],
@@ -150,21 +141,25 @@
       "name": "뉴럴 링크 스따트",
       "hero": "레테",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.6
+          "ratio": 1
+        },
+        {
+          "k": "perStack",
+          "id": "지운 기억"
         },
         {
           "k": "heal",
-          "ratio": 0.8
+          "ratio": 0.3
         },
         {
-          "k": "stack",
+          "k": "spend",
           "id": "지운 기억",
-          "v": 2
+          "all": true
         }
       ],
       "oracles": [
@@ -173,99 +168,118 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.2
+              "ratio": 1.25
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
             },
             {
               "k": "heal",
-              "ratio": 1.1
+              "ratio": 0.38
             },
             {
-              "k": "stack",
+              "k": "spend",
               "id": "지운 기억",
-              "v": 3
+              "all": true
             }
           ]
         },
         {
           "name": "간이 접속",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.0
+              "ratio": 0.7
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
             },
             {
               "k": "heal",
-              "ratio": 0.5
+              "ratio": 0.3
+            },
+            {
+              "k": "spend",
+              "id": "지운 기억",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "기억 소거",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "n": 1,
+              "basic": true
             },
             {
               "k": "stack",
               "id": "지운 기억",
               "v": 2
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.35
             }
           ]
         },
         {
-          "name": "기억 정리",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.4
-            },
-            {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "지운 기억",
-              "n": 4
-            },
-            {
-              "k": "status",
-              "id": "면역",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "병동 전체 리셋",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.0
-            },
-            {
-              "k": "cleanse",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "면역",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "풀 리부트",
-          "cost": 3,
+          "name": "잊지 않을게",
           "tags": [
-            "개전"
+            "보존"
           ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.8
+              "ratio": 1.04
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
             },
             {
               "k": "heal",
-              "ratio": 1.5
+              "ratio": 0.31
+            }
+          ]
+        },
+        {
+          "name": "흑역사 차단",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
             },
             {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지운 기억",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -301,106 +315,144 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.35,
-          "hits": 4,
-          "target": "oneEnemy"
+          "ratio": 0.28,
+          "target": "oneEnemy",
+          "hits": 4
         },
         {
-          "k": "dispel",
+          "k": "stack",
+          "id": "지운 기억",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "포인터 난타",
+          "name": "빨간 점 고정",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.36,
               "target": "oneEnemy",
               "hits": 4
             },
             {
-              "k": "dispel",
+              "k": "stack",
+              "id": "지운 기억",
               "v": 1
             }
           ]
         },
         {
-          "name": "톡톡 짚기",
-          "cost": 0,
+          "name": "레이저 파티",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "randomEnemy",
+              "hits": 6
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기억 지우개",
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.25,
               "target": "oneEnemy",
-              "hits": 3
+              "hits": 4
             },
             {
-              "k": "dispel",
-              "v": 1
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "지운 기억",
+              "all": true
             }
           ]
         },
         {
-          "name": "지워 버리기",
+          "name": "포인터 장전",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.26,
               "target": "oneEnemy",
               "hits": 4
-            },
-            {
-              "k": "dispel",
-              "v": 1
             },
             {
               "k": "stack",
               "id": "지운 기억",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지운 기억",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "빙 둘러 짚기",
+          "name": "누구야아아?",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.27,
-              "target": "allEnemies",
+              "ratio": 0.28,
+              "target": "oneEnemy",
               "hits": 4
             },
             {
-              "k": "dispel",
+              "k": "stack",
+              "id": "지운 기억",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "포인터 5연타",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.54,
-              "target": "oneEnemy",
-              "hits": 5
             },
             {
-              "k": "dispel",
-              "v": 2
+              "k": "ifStack",
+              "id": "지운 기억",
+              "n": 3
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "강한 출력",
+          "name": "매일 연습한 폼",
           "kind": "power"
         },
         {
@@ -418,144 +470,122 @@
       "name": "눈앞의 레이저",
       "hero": "레테",
       "unique": true,
-      "cost": 2,
-      "type": "공격",
+      "cost": 0,
+      "type": "스킬",
       "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.6,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "지운 기억"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.3
-        },
         {
           "k": "status",
           "id": "약화",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "지운 기억",
+          "v": 1
+        },
+        {
+          "k": "draw",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "초점 레이저",
+          "name": "빨간 점을 봐",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.35
-            },
             {
               "k": "status",
               "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "레이저 한 줄기",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
+              "v": 2,
               "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.25
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "기억째 지우기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.3
             },
             {
               "k": "stack",
               "id": "지운 기억",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "눈부신 섬광",
+          "name": "번쩍",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.3
-            },
             {
               "k": "status",
               "id": "약화",
               "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "최대 출력",
-          "cost": 3,
+          "name": "환자복 주머니",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 2.8,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
             },
             {
-              "k": "perStack",
-              "id": "지운 기억"
+              "k": "draw",
+              "v": 2,
+              "who": "self"
+            }
+          ]
+        },
+        {
+          "name": "헛기억",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "n": 1,
+              "basic": true
             },
             {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
             },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "으히히",
+          "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 2
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 3
             }
           ]
         }
@@ -563,15 +593,28 @@
       "blesses": [
         {
           "name": "렌즈 닦기",
-          "kind": "power"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "주운 포인터",
+          "kind": "draw"
         },
         {
           "name": "눈앞이 하얘짐",
-          "kind": "frost"
-        },
-        {
-          "name": "반사판",
-          "kind": "guard"
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -580,8 +623,8 @@
       "name": "병상 곁",
       "hero": "레테",
       "unique": true,
-      "cost": 2,
-      "type": "강화",
+      "cost": 1,
+      "type": "스킬",
       "fx": [
         {
           "k": "status",
@@ -589,44 +632,45 @@
           "v": 1
         },
         {
-          "k": "status",
-          "id": "결정화",
-          "v": 1
+          "k": "perStack",
+          "id": "지운 기억"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "지운 기억",
-                  "v": 1
-                },
-                {
-                  "k": "shield",
-                  "ratio": 0.3
-                }
-              ]
-            }
-          ]
+          "k": "shield",
+          "ratio": 0.35
         }
       ],
       "oracles": [
         {
-          "name": "밤샘 간호",
+          "name": "정성 간호",
           "fx": [
             {
               "k": "status",
               "id": "불굴",
-              "v": 2
+              "v": 1
             },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.51
+            }
+          ]
+        },
+        {
+          "name": "밤샘 간호",
+          "power": true,
+          "fx": [
             {
               "k": "status",
               "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "불굴",
               "v": 1
             },
             {
@@ -649,50 +693,53 @@
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "name": "헤일리 곁에서",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.62
+            }
+          ]
+        },
+        {
+          "name": "남겨 둔 기억",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "spend",
+              "id": "지운 기억",
+              "all": true
             }
           ]
         },
         {
           "name": "잠깐 들르기",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지운 기억",
-                      "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "지키는 자리",
-          "tags": [
-            "보존"
-          ],
+          "cost": 0,
           "fx": [
             {
               "k": "status",
@@ -700,120 +747,29 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
+              "k": "perStack",
+              "id": "지운 기억"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지운 기억",
-                      "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "아픈 기억은 두고",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "면역",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지운 기억",
-                      "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "새벽 회진",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지운 기억",
-                      "v": 2
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
+              "k": "shield",
+              "ratio": 0.3
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "밤새 켜 둔 등",
-          "kind": "defUp"
+          "name": "링거 거치대",
+          "kind": "heal"
         },
         {
-          "name": "급한 호출",
-          "kind": "cost"
+          "name": "환자복",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "조용한 자장가",
+          "name": "쓴 약",
           "fx": [
             {
               "k": "cleanse",

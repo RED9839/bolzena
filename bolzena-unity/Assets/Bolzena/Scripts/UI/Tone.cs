@@ -103,20 +103,38 @@ namespace Bolzena.UI
 
         // ── 카드 효과 글 — 수치(숫자 · % · ×N)만 하늘색으로(태그 밖에서만). 「낱말」 금빛은 규칙 쪽 서식 그대로 ──
         static readonly System.Text.RegularExpressions.Regex num = new System.Text.RegularExpressions.Regex(@"(?<![#\w])([+\-]?\d+(?:\.\d+)?%?(?:\s?×\s?\d+)?)");
+        /// <summary>신탁으로 바뀐 부분 표시(\u0001 … \u0002) — 연두. 안쪽의 다른 색(수치 · 「낱말」)은 연두가 이긴다.</summary>
+        public const char DiffOn = '\u0001', DiffOff = '\u0002';
+        public const string ChangedTag = "#9BE564";
+        public static string StripDiff(string s) => string.IsNullOrEmpty(s) ? s : s.Replace(DiffOn.ToString(), "").Replace(DiffOff.ToString(), "");
         public static string CardText(string rich)
         {
             if (string.IsNullOrEmpty(rich)) return "";
             var sb = new System.Text.StringBuilder(rich.Length + 64);
-            int i = 0;
+            int i = 0; bool green = false; int skipClose = 0;
             while (i < rich.Length)
             {
                 int lt = rich.IndexOf('<', i);
                 string plain = lt < 0 ? rich.Substring(i) : rich.Substring(i, lt - i);
-                sb.Append(num.Replace(plain, "<color=" + SkyTag + ">$1</color>"));
+                // 평문 조각 안의 표시 문자로 나눠 처리
+                int p = 0;
+                while (p < plain.Length)
+                {
+                    int m = plain.IndexOfAny(new[] { DiffOn, DiffOff }, p);
+                    string seg = m < 0 ? plain.Substring(p) : plain.Substring(p, m - p);
+                    sb.Append(green ? seg : num.Replace(seg, "<color=" + SkyTag + ">$1</color>"));
+                    if (m < 0) break;
+                    if (plain[m] == DiffOn && !green) { green = true; skipClose = 0; sb.Append("<color=" + ChangedTag + ">"); }
+                    else if (plain[m] == DiffOff && green) { green = false; sb.Append("</color>"); }
+                    p = m + 1;
+                }
                 if (lt < 0) break;
                 int gt = rich.IndexOf('>', lt);
                 if (gt < 0) { sb.Append(rich.Substring(lt)); break; }
-                sb.Append(rich, lt, gt - lt + 1);
+                string tag = rich.Substring(lt, gt - lt + 1);
+                if (green && tag.StartsWith("<color=")) skipClose++;
+                else if (green && tag == "</color>" && skipClose > 0) skipClose--;
+                else sb.Append(tag);
                 i = gt + 1;
             }
             return sb.ToString();

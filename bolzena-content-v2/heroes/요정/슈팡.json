@@ -1,706 +1,902 @@
 {
- "heroes": [
-  {
-   "id": "슈팡",
-   "name": "슈팡",
-   "nature": "활발",
-   "race": "요정",
-   "role": "서포터",
-   "star": 3,
-   "hp": 630,
-   "atk": 75,
-   "def": 58,
-   "crit": 5,
-   "blurb": "과로 끝에 애마 슈파볼트에 엘프가 심어 둔 고장장치를 알아채고 복수극을 벌인 뒤 프리랜서가 된 과속 배달부. 소포는 던지고, 흘리고, 가끔 쌍손가락 욕도 곁들입니다. 그래도 달리고 싶습니다.",
-   "keyword": {
-    "name": "배송",
-    "desc": "신속 카드로 쌓는 배달",
-    "carrier": "self",
-    "cap": 3,
-    "endClear": true,
-    "rules": [
-     {
-      "name": "소포 투척",
-      "when": {
-       "on": "stackReach",
-       "id": "배송",
-       "n": 3
+  "heroes": [
+    {
+      "id": "슈팡",
+      "name": "슈팡",
+      "nature": "활발",
+      "race": "요정",
+      "role": "서포터",
+      "star": 3,
+      "hp": 630,
+      "atk": 75,
+      "def": 58,
+      "crit": 5,
+      "blurb": "과로 끝에 애마 슈파볼트에 엘프가 심어 둔 고장장치를 알아채고 복수극을 벌인 뒤 프리랜서가 된 과속 배달부. 소포는 던지고, 흘리고, 가끔 쌍손가락 욕도 곁들입니다. 그래도 달리고 싶습니다.",
+      "keyword": {
+        "name": "배달 속도",
+        "desc": "슈파볼트를 모는 속도광의 속도",
+        "carrier": "self",
+        "cap": 4,
+        "rules": [
+          {
+            "name": "슈파볼트 질주",
+            "when": {
+              "on": "stackReach",
+              "id": "배달 속도",
+              "n": 4
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "배달 속도",
+                "all": true
+              },
+              {
+                "k": "heal",
+                "ratio": 1
+              },
+              {
+                "k": "ap",
+                "v": 1
+              }
+            ]
+          }
+        ]
       },
-      "limit": {
-       "per": "turn",
-       "n": 2
+      "passives": [
+        {
+          "name": "과속 배달",
+          "when": {
+            "on": "play",
+            "who": "any",
+            "tag": "신속"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "배달의 요정",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 30
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "슈팡 배송",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "heal",
+            "ratio": 2.5
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          },
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "heal",
-        "ratio": 1.0
-       },
-       {
-        "k": "dmg",
-        "ratio": 0.8,
-        "target": "randomEnemy"
-       },
-       {
-        "k": "spend",
-        "id": "배송",
-        "all": true
-       }
+      "starter": [
+        "슈팡_s1",
+        "슈팡_s1",
+        "슈팡_s2",
+        "슈팡_u1"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "과속 배달",
-     "when": {
-      "on": "play",
-      "who": "any",
-      "tag": "신속"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "슈팡 배송",
-    "cost": 250,
-    "fx": [
-     {
-      "k": "heal",
-      "ratio": 2.5
-     },
-     {
-      "k": "status",
-      "id": "피해 감소",
-      "v": 2
-     },
-     {
-      "k": "dmg",
-      "ratio": 1.0,
-      "target": "allEnemies"
-     },
-     {
-      "k": "status",
-      "id": "약화",
-      "v": 1,
-      "target": "allEnemies"
-     }
-    ]
-   },
-   "starter": [
-    "슈팡_s1",
-    "슈팡_s1",
-    "슈팡_s2",
-    "슈팡_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "슈팡_s1",
-   "name": "소포 투척",
-   "hero": "슈팡",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "슈팡_s1",
+      "name": "소포 투척",
+      "hero": "슈팡",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "슈팡_s2",
+      "name": "구급 소포",
+      "hero": "슈팡",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "슈팡_parcel",
+      "name": "택배 상자",
+      "hero": "슈팡",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "신속",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.37,
+          "target": "randomEnemy"
+        }
+      ]
+    },
+    {
+      "id": "슈팡_u1",
+      "name": "무책임 배달부",
+      "hero": "슈팡",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.83
+        },
+        {
+          "k": "stack",
+          "id": "배달 속도",
+          "v": 1
+        },
+        {
+          "k": "make",
+          "id": "슈팡_parcel",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "왕복 두 번",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.59
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "몰아서 배달",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 2
+            },
+            {
+              "k": "spend",
+              "id": "배달 속도",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "문 늦게 여는 집",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.02
+            },
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 1
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.46
+            }
+          ]
+        },
+        {
+          "name": "배송 동선",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.23
+            },
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "tag": "신속"
+            }
+          ]
+        },
+        {
+          "name": "특급 배송 계약",
+          "tags": [
+            "신속"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.74
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "슈팡_parcel",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "3시간 수면",
+          "kind": "heal"
+        },
+        {
+          "name": "상사 계급장",
+          "kind": "ap"
+        },
+        {
+          "name": "속도위반 딱지",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈팡_u2",
+      "name": "슈팡은⋯ 달리고 싶다!",
+      "hero": "슈팡",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "배달 속도",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "질주 본능",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "새 지역",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "tag": "신속"
+            }
+          ]
+        },
+        {
+          "name": "일 없이도 달리기",
+          "tags": [
+            "신속"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "배달 속도",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "⋯슈팡",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "정령산 정상",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "로켓엔진",
+          "kind": "ap"
+        },
+        {
+          "name": "정비",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "바람 맞기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈팡_u3",
+      "name": "케이크 위 코너링",
+      "hero": "슈팡",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.37,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "배달 속도"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.14,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "배달 속도",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "드리프트",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "배달 속도"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "배달 속도",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "엘리아스 횡단",
+          "cost": 2,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "배달 속도"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "배달 속도",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "택배 쏟기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "슈팡_parcel"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "슈팡_parcel"
+            }
+          ]
+        },
+        {
+          "name": "코너링 연습",
+          "tags": [
+            "신속"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "배달 속도"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "tag": "신속"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "배달 속도",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "경찰 추격전",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "배달 속도"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "슈파볼트",
+          "kind": "power"
+        },
+        {
+          "name": "미끄러운 크림",
+          "kind": "cost"
+        },
+        {
+          "name": "택배 한 상자",
+          "fx": [
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈팡_u4",
+      "name": "손가락 인사",
+      "hero": "슈팡",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 2
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.37,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "배달 속도"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.14,
+          "target": "randomEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "양손 인사",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "배달 속도"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "출발 인사",
+          "tags": [
+            "신속",
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "배달 속도",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.57,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "앙탈",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "휙",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "tag": "신속"
+            }
+          ]
+        },
+        {
+          "name": "배달 완료",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "배달 속도"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "배달 속도",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "경적",
+          "kind": "frost"
+        },
+        {
+          "name": "헬멧",
+          "kind": "draw"
+        },
+        {
+          "name": "거침없는 반말",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.28
+            }
+          ]
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "슈팡_s2",
-   "name": "구급 소포",
-   "hero": "슈팡",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 2.1
-    }
-   ]
-  },
-  {
-   "id": "슈팡_u1",
-   "name": "무책임 배달부",
-   "hero": "슈팡",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "신속"
-   ],
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 1.8
-    },
-    {
-     "k": "status",
-     "id": "행동 둔화",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "배송",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "대충 배달",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 2.5
-      },
-      {
-       "k": "status",
-       "id": "행동 둔화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "현관 앞 투척",
-     "cost": 0,
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.1
-      },
-      {
-       "k": "status",
-       "id": "행동 둔화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "배송 두 건",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.8
-      },
-      {
-       "k": "status",
-       "id": "행동 둔화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "뽁뽁이 포장",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.2
-      },
-      {
-       "k": "status",
-       "id": "행동 둔화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "두고 감",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 2.3
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "따끈한 소포",
-     "kind": "heal"
-    },
-    {
-     "name": "영수증",
-     "kind": "draw"
-    },
-    {
-     "name": "급배송 수당",
-     "kind": "ap"
-    }
-   ]
-  },
-  {
-   "id": "슈팡_u2",
-   "name": "슈팡은⋯ 달리고 싶다!",
-   "hero": "슈팡",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "신속"
-   ],
-   "fx": [
-    {
-     "k": "draw",
-     "v": 2
-    },
-    {
-     "k": "stack",
-     "id": "배송",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "전력 질주",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "제자리 뛰기",
-     "cost": 0,
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "배송 러시",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "바람 가르기",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "회피",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "지름길",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "nextCheaper",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "급가속",
-     "kind": "ap"
-    },
-    {
-     "name": "바람 냄새",
-     "kind": "draw"
-    },
-    {
-     "name": "짐 하나 더",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "슈팡_u3",
-   "name": "케이크 위 코너링",
-   "hero": "슈팡",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "신속"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.2,
-     "target": "allEnemies",
-     "base": "def"
-    },
-    {
-     "k": "stack",
-     "id": "배송",
-     "v": 2
-    }
-   ],
-   "oracles": [
-    {
-     "name": "드리프트",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.5,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "살짝 코너링",
-     "cost": 1,
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.9,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "배송 코스 질주",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.3,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "케이크에 처박기",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "크림 범벅",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.45,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "풀 스로틀",
-     "kind": "power"
-    },
-    {
-     "name": "미끄러운 크림",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "인코스 파고들기",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "슈팡_u4",
-   "name": "손가락 인사",
-   "hero": "슈팡",
-   "unique": true,
-   "cost": 0,
-   "type": "스킬",
-   "tags": [
-    "신속"
-   ],
-   "fx": [
-    {
-     "k": "status",
-     "id": "약화",
-     "v": 2
-    },
-    {
-     "k": "stack",
-     "id": "배송",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "양손 인사",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "인사하고 튀기",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "배송 완료 인사",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "모두에게 인사",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "도발 인사",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "배송",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "뻔뻔함",
-     "kind": "defUp"
-    },
-    {
-     "name": "윙크",
-     "kind": "draw"
-    },
-    {
-     "name": "메롱",
-     "fx": [
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      }
-     ]
-    }
-   ]
-  }
- ]
+  ]
 }

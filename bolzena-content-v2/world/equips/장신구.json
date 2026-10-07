@@ -26,7 +26,7 @@
           ]
         }
       ],
-      "blurb": "「맑음」 이라 적힌 카드. 그런데 왜 번개가 치는 걸까."
+      "blurb": "「맑음」 이라 적힌 카드. 그런데 왜 번개가 치는 걸까요."
     },
     {
       "id": "eq_eldainlamp",
@@ -45,13 +45,31 @@
           "fx": [
             {
               "k": "healMod",
-              "v": 0.6,
+              "v": 0.4,
               "run": true
+            }
+          ]
+        },
+        {
+          "name": "남는 불빛",
+          "when": {
+            "on": "overheal",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1,
+              "ofEvent": 0.5
             }
           ]
         }
       ],
-      "blurb": "엘다인의 숲을 비추던 램프. 곁에 있으면 상처가 빨리 아뭅니다."
+      "blurb": "엘다인의 숲을 비추던 램프. 넘치는 온기는 막이 되어 남습니다."
     },
     {
       "id": "eq_lifegem",
@@ -104,9 +122,28 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "그림자 찌르기",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "maxCost": 0
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "extra",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
-      "blurb": "다섯 번 베면 한 번 숨는 법이 적힌 비급."
+      "blurb": "다섯 번 베면 한 번 숨는 법이 적힌 비급. 가벼운 손일수록 그림자가 짙습니다."
     },
     {
       "id": "eq_toyscope",
@@ -156,8 +193,8 @@
             "kind": "shield"
           },
           "limit": {
-            "per": "turn",
-            "n": 1
+            "per": "fight",
+            "n": 3
           },
           "fx": [
             {
@@ -210,19 +247,22 @@
         {
           "name": "차오르는 기원",
           "when": {
-            "on": "play",
-            "type": "공격",
-            "every": 2
+            "on": "spend",
+            "who": "any"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 2
           },
           "fx": [
             {
-              "k": "gauge",
-              "v": 10
+              "k": "draw",
+              "v": 1
             }
           ]
         }
       ],
-      "blurb": "칠 때마다 성배에 기운이 고입니다."
+      "blurb": "모아 둔 힘을 쏟을 때마다 성배에 기운이 고여 다음 손이 보입니다."
     },
     {
       "id": "eq_jadebook",
@@ -235,19 +275,20 @@
       },
       "effect": [
         {
-          "name": "다음 장",
+          "name": "펼쳐 둔 장",
           "when": {
-            "on": "ult"
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "draw",
-              "v": 2
+              "v": 1,
+              "unique": true
             }
           ]
         }
       ],
-      "blurb": "큰 주문을 끝내면 다음 장이 저절로 넘어갑니다."
+      "blurb": "전투 전에 가장 자신 있는 주문이 적힌 장을 펼쳐 둡니다."
     },
     {
       "id": "eq_goldcrown",
@@ -368,9 +409,12 @@
         {
           "name": "펑",
           "when": {
-            "on": "play",
-            "type": "공격",
-            "every": 5
+            "on": "exhaust",
+            "who": "any"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 1
           },
           "fx": [
             {
@@ -385,7 +429,7 @@
           ]
         }
       ],
-      "blurb": "오래 굽다 보면 터집니다. 막 같은 건 소용없습니다."
+      "blurb": "오래 굽다 보면 터집니다. 다 쓴 카드가 사라질 때마다 펑 — 막 같은 건 소용없습니다."
     },
     {
       "id": "eq_luckydice",
@@ -451,10 +495,29 @@
       "grade": "고급",
       "slot": "장신구",
       "stats": {
-        "hp": 89,
-        "def": 11
+        "hp": 74,
+        "def": 9
       },
-      "blurb": "단단한 다이아를 박은 팔찌."
+      "effect": [
+        {
+          "name": "깨지지 않는 돌",
+          "when": {
+            "on": "shieldBreak"
+          },
+          "limit": {
+            "per": "fight",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "단단한 다이아를 박은 팔찌. 막이 깨져도 팔찌는 남습니다."
     },
     {
       "id": "eq_greedring",
@@ -468,18 +531,14 @@
         {
           "name": "더 아프게",
           "when": {
-            "on": "debuff"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "status",
-              "id": "고통",
+              "id": "고통 각인",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             }
           ]
         }
@@ -498,8 +557,7 @@
         {
           "name": "우러러보기",
           "when": {
-            "on": "kill",
-            "mine": true
+            "on": "kill"
           },
           "limit": {
             "per": "turn",
@@ -507,13 +565,13 @@
           },
           "fx": [
             {
-              "k": "gauge",
-              "v": 15
+              "k": "heal",
+              "ratio": 0.4
             }
           ]
         }
       ],
-      "blurb": "멋진 장면을 넣어 둘 액자."
+      "blurb": "멋진 장면을 넣어 둘 액자. 한 놈 쓰러질 때마다 기운이 납니다."
     },
     {
       "id": "eq_cutletpin",
@@ -521,10 +579,25 @@
       "grade": "고급",
       "slot": "장신구",
       "stats": {
-        "hp": 170,
-        "def": 10
+        "hp": 147,
+        "def": 8
       },
-      "blurb": "보기만 해도 배고파지는 머리핀."
+      "effect": [
+        {
+          "name": "배꼽시계",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "보기만 해도 배고파지는 머리핀. 다음 끼니 생각에 손이 빨라집니다."
     },
     {
       "id": "eq_thimble",
@@ -558,9 +631,9 @@
           },
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "k": "extra",
+              "ratio": 0.3,
+              "target": "oneEnemy"
             }
           ]
         }

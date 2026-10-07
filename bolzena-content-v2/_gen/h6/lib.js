@@ -1,5 +1,6 @@
 // H6 용족 사도 생성기 — 짧은 꼴로 쓰고 JSON 으로 펼친다
 const fs = require('fs');
+const REWORKED = JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')); // 리워크한 사도는 _gen/rework/rework.mjs 가 쓴다 — 여기서 덮어쓰지 않는다
 const path = require('path');
 const OUT = 'C:/projects/bolzena-content-v2/heroes/용족';
 
@@ -68,7 +69,7 @@ function hero(h) {
   const out = { heroes: [H], cards };
   if (h.equips) out.equips = h.equips;
   fs.mkdirSync(OUT, { recursive: true });
-  fs.writeFileSync(path.join(OUT, `${id}.json`), JSON.stringify(out, null, 2) + '\n', 'utf8');
+  if (REWORKED.includes(id)) console.log('건너뜀(리워크)', id); else fs.writeFileSync(path.join(OUT, `${id}.json`), JSON.stringify(out, null, 2) + '\n', 'utf8');
   return out;
 }
 

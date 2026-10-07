@@ -1,807 +1,840 @@
 {
- "heroes": [
-  {
-   "id": "샤샤",
-   "name": "샤샤",
-   "nature": "우울",
-   "race": "요정",
-   "role": "딜러",
-   "star": 3,
-   "hp": 630,
-   "atk": 135,
-   "def": 28,
-   "crit": 10,
-   "blurb": "말을 더듬고 늘 사과하는 소심한 요정. 그런데 불 끄는 것만큼은 자신 있습니다. 물의 정령이 만든, 자의식 있고 난폭한 「텀블러」를 들고 다니며, 사과하면서 건물을 부숩니다.",
-   "keyword": {
-    "name": "수압",
-    "desc": "텀블러에 차오르는 물",
-    "carrier": "self",
-    "cap": 3
-   },
-   "passives": [
+  "heroes": [
     {
-     "name": "멋대로 텀블러",
-     "when": {
-      "on": "turnEnd"
-     },
-     "fx": [
-      {
-       "k": "autoPlay",
-       "n": 1,
-       "id": "탄환"
+      "id": "샤샤",
+      "name": "샤샤",
+      "nature": "우울",
+      "race": "요정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 630,
+      "atk": 135,
+      "def": 28,
+      "crit": 10,
+      "blurb": "말을 더듬고 늘 사과하는 소심한 요정. 그런데 불 끄는 것만큼은 자신 있습니다. 물의 정령이 만든, 자의식 있고 난폭한 「텀블러」를 들고 다니며, 사과하면서 건물을 부숩니다.",
+      "keyword": {
+        "name": "텀블러 수압",
+        "desc": "제멋대로 차오르는 텀블러 물",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.12
+          }
+        ],
+        "rules": [
+          {
+            "name": "거대 물방울",
+            "when": {
+              "on": "stackReach",
+              "id": "텀블러 수압",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "텀블러 수압",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.8,
+                "target": "allEnemies"
+              },
+              {
+                "k": "status",
+                "id": "둔화",
+                "v": 1,
+                "target": "allEnemies"
+              }
+            ]
+          }
+        ]
       },
-      {
-       "k": "shield",
-       "ratio": 0.5
+      "passives": [
+        {
+          "name": "대용량 텀블러",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대용량 텀블러",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "물대포 폭격!!",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.5,
+            "target": "oneEnemy",
+            "hits": 6
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "텀블러 수압",
+            "v": 2
+          }
+        ]
       },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 1
-      }
-     ]
+      "starter": [
+        "샤샤_s1",
+        "샤샤_u1",
+        "샤샤_s2",
+        "샤샤_s3"
+      ]
     }
-   ],
-   "ult": {
-    "name": "물대포 폭격!!",
-    "cost": 150,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 0.5,
-      "target": "oneEnemy",
-      "hits": 6
-     },
-     {
-      "k": "status",
-      "id": "둔화",
-      "v": 1
-     },
-     {
-      "k": "stack",
-      "id": "수압",
-      "v": 2
-     }
-    ]
-   },
-   "starter": [
-    "샤샤_s1",
-    "샤샤_s1",
-    "샤샤_s2",
-    "샤샤_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "샤샤_s1",
-   "name": "물방울 탄",
-   "hero": "샤샤",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "샤샤_s1",
+      "name": "물방울 탄",
+      "hero": "샤샤",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "샤샤_s2",
+      "name": "왕물방울 탄",
+      "hero": "샤샤",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "샤샤_s3",
+      "name": "텀블러 방패",
+      "hero": "샤샤",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "샤샤_u1",
+      "name": "텀블러 투척!",
+      "hero": "샤샤",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "allEnemies",
+          "hits": 2
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "텀블러 수압",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "텀블러 내리꽂기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "텀블러 비우기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.57,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "텀블러 수압",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "텀블러 맡기기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꼭 필요할 때",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "텀블러 수압",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "잡일 대행",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "basic": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "정령산 호수 물",
+          "kind": "power"
+        },
+        {
+          "name": "개구리 튀어나옴",
+          "kind": "draw"
+        },
+        {
+          "name": "텀블러 채우기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "샤샤_u2",
+      "name": "물줄기 발사",
+      "hero": "샤샤",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "perStack",
+          "id": "텀블러 수압"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "텀블러 수압",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "고압 물줄기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "텀블러 수압",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "졸졸 물줄기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "텀블러 수압",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "수압 유지",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "물대포 쓸기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.53,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "텀블러 수압",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "텀블러 훈련",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "텀블러 수압",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "쫄딱 젖음",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "차원문 물길",
+          "kind": "ap"
+        },
+        {
+          "name": "물 한 모금",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "샤샤_u3",
+      "name": "물방울 연사",
+      "hero": "샤샤",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "텀블러 수압",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "큰 물방울",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "연사 또 연사",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "흩뿌리는 물방울",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "물 길어 오기",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "180도 달라진 샤샤",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "말 더듬기",
+          "kind": "frost"
+        },
+        {
+          "name": "뽀송한 중심가",
+          "kind": "cost"
+        },
+        {
+          "name": "물방울 탄창",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "텀블러 수압",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "샤샤_u4",
+      "name": "불 하나는 잘 꺼요",
+      "hero": "샤샤",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "cleanse",
+          "v": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "텀블러 수압"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.12,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "특별 소방 대장",
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "물 면역 샤샤",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "출동 대기",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "텀블러 수압",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "장난 신고엔 물대포",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "텀블러 수압",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "잡일 대행 접수",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "텀블러 수압"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "우비",
+          "kind": "defUp"
+        },
+        {
+          "name": "소방 직함",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "장화",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "샤샤_s2",
-   "name": "왕물방울 탄",
-   "hero": "샤샤",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "샤샤_s3",
-   "name": "텀블러 방패",
-   "hero": "샤샤",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "샤샤_u1",
-   "name": "텀블러 투척!",
-   "hero": "샤샤",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "탄환"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.5,
-     "target": "allEnemies",
-     "hits": 2
-    },
-    {
-     "k": "status",
-     "id": "약화",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "stack",
-     "id": "수압",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "힘껏 투척",
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.65,
-       "target": "allEnemies",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "텀블러 굴리기",
-     "cost": 1,
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "allEnemies",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "물 가득 텀블러",
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.55,
-       "target": "allEnemies",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "정면 투척",
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.15,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "물보라 막",
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "allEnemies",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "묵직한 텀블러",
-     "kind": "power"
-    },
-    {
-     "name": "차가운 물세례",
-     "kind": "frost"
-    },
-    {
-     "name": "텀블러 리필",
-     "kind": "draw"
-    }
-   ]
-  },
-  {
-   "id": "샤샤_u2",
-   "name": "물줄기 발사",
-   "hero": "샤샤",
-   "unique": true,
-   "cost": 3,
-   "type": "공격",
-   "tags": [
-    "탄환"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.6,
-     "target": "oneEnemy",
-     "hits": 5
-    },
-    {
-     "k": "perStack",
-     "id": "수압"
-    },
-    {
-     "k": "dmg",
-     "ratio": 0.3,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "spend",
-     "id": "수압",
-     "all": true
-    }
-   ],
-   "oracles": [
-    {
-     "name": "고압 물줄기",
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.75,
-       "target": "oneEnemy",
-       "hits": 5
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "가는 물줄기",
-     "cost": 2,
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy",
-       "hits": 5
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "수압 해방",
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "hits": 5
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.55,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "물줄기 쓸기",
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.45,
-       "target": "allEnemies",
-       "hits": 5
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.25,
-       "target": "allEnemies"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "텀블러 대방류",
-     "cost": 4,
-     "tags": [
-      "탄환"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.0,
-       "target": "oneEnemy",
-       "hits": 5
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "꽉 조인 뚜껑",
-     "kind": "power"
-    },
-    {
-     "name": "조준 물줄기",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "텀블러 기울이기",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "샤샤_u3",
-   "name": "물방울 연사",
-   "hero": "샤샤",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "tags": [
-    "탄환",
-    "분쇄"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.5,
-     "target": "oneEnemy",
-     "hits": 2
-    },
-    {
-     "k": "perStack",
-     "id": "수압"
-    },
-    {
-     "k": "dmg",
-     "ratio": 0.2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "spend",
-     "id": "수압",
-     "all": true
-    }
-   ],
-   "oracles": [
-    {
-     "name": "연발 사격",
-     "tags": [
-      "탄환",
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.25,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "한 방울",
-     "cost": 0,
-     "tags": [
-      "탄환",
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.15,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "수압 몰아 쏘기",
-     "tags": [
-      "탄환",
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "사방 물총",
-     "tags": [
-      "탄환",
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.4,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.2,
-       "target": "randomEnemy"
-      },
-      {
-       "k": "spend",
-       "id": "수압",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "압력 유지",
-     "tags": [
-      "탄환",
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "perStack",
-       "id": "수압"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "굵은 물방울",
-     "kind": "power"
-    },
-    {
-     "name": "틈새 물총",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "얼음물",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "샤샤_u4",
-   "name": "불 하나는 잘 꺼요",
-   "hero": "샤샤",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "cleanse",
-     "v": 1
-    },
-    {
-     "k": "shield",
-     "ratio": 2
-    },
-    {
-     "k": "stack",
-     "id": "수압",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "잘 끄는 편임",
-     "fx": [
-      {
-       "k": "cleanse",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 2.6
-      },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "물 한 컵",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "cleanse",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1.2
-      },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "물 채우기",
-     "fx": [
-      {
-       "k": "cleanse",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 2.0
-      },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "응급 처치",
-     "fx": [
-      {
-       "k": "cleanse",
-       "v": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.8
-      },
-      {
-       "k": "shield",
-       "ratio": 1.8
-      }
-     ]
-    },
-    {
-     "name": "불씨 털기",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "cleanse",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 2.2
-      },
-      {
-       "k": "stack",
-       "id": "수압",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "두꺼운 물막",
-     "kind": "guard"
-    },
-    {
-     "name": "물기 털기",
-     "kind": "draw"
-    },
-    {
-     "name": "소방 근성",
-     "kind": "defUp"
-    }
-   ]
-  }
- ]
+  ]
 }

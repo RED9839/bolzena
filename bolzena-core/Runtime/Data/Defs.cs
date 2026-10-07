@@ -594,6 +594,8 @@ namespace Bolzena.Core
         public bool Keep;
         /// <summary>0 이 되면 기절(비행).</summary>
         public bool StunAtZero;
+        /// <summary>자기가 치는 수(공격 · 관통 · 연타 · 전체)를 한 뒤 0 으로 — 모았다가 한 방에 쏟는 「급소 노림」(2026-10-07).</summary>
+        public bool ClearOnAttack;
         public string Desc;
     }
 
@@ -733,6 +735,10 @@ namespace Bolzena.Core
         public string Scene;
         /// <summary>드문 이벤트 — 굴릴 때마다 이 확률로만 후보에 든다.</summary>
         public double Rare;
+        /// <summary>연속 이벤트 — 이 깃발(앞 이벤트 결과 `flag`)이 서 있어야 뽑힌다.</summary>
+        public string NeedFlag;
+        /// <summary>줄기 뒤 이벤트 — 이 이벤트가 읽는 깃발(needFlag · 선택지 flag)이 서 있으면 뽑힐 무게 × 이 값. 0 이하 = 기본(R.EVENT_FLAG_WEIGHT = 3).</summary>
+        public double FlagWeight;
         public List<EventOption> Options = new();
         public string Leave;
         public List<Outcome> LeaveOut = new();
@@ -748,6 +754,17 @@ namespace Bolzena.Core
         public string Race;
         /// <summary>"hp30" — 파티 HP 30% 이하일 때만.</summary>
         public string When;
+        /// <summary>연속 이벤트 — 이 깃발이 서 있어야 보인다(앞 이벤트 결과 `{ "k": "flag", "id" }`).</summary>
+        public string Flag;
+        /// <summary>이 깃발이 서 있으면 안 보인다.</summary>
+        public string NoFlag;
+        /// <summary>
+        /// 조건(hero · race · when · flag · noFlag)이 안 맞을 때 — null(기본): hero · race · when 은 잠긴 칸으로 보이고(조건 글과 함께), flag · noFlag 는 숨긴다.
+        /// true = 깃발 조건도 잠금으로 보인다 · false = 사도 조건도 숨긴다.
+        /// </summary>
+        public bool? ShowLocked;
+        /// <summary>잠긴 칸에 보일 조건 글(없으면 엔진이 짓는다 — 「루포 · 티그 가운데 한 명이 있어야 합니다」).</summary>
+        public string LockText;
         public List<Gamble> Gamble;
         /// <summary>gamble 의 결과를 골라서 받는다.</summary>
         public bool Choose;
@@ -777,7 +794,7 @@ namespace Bolzena.Core
 
     /// <summary>
     /// 이벤트 결과 한 조각. k: none · gold(v) · hp(v 비율) · maxHp(v) · remove(n) · dupe(n) · unique · neutral(grade?) · equip(grade, slot?) ·
-    /// flash(all · swap) · shin(v 확률) · noShin · shinNow · shinPick(n, kind?) · curse(id) · gift(id) · scout · shopGift(grade) · rewardFlash ·
+    /// flash(all · swap) · shin(v 확률) · noShin · shinNow · shinPick(n, kind?) · curse(id) · gift(id) · flag(id — 연속 이벤트 깃발) · scout · shopGift(grade) · rewardFlash ·
     /// next(ap · gauge · hand · weak · hpCut · rush · foeVuln · quiet · buff).
     /// </summary>
     public sealed class Outcome

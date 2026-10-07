@@ -439,9 +439,12 @@ namespace Bolzena.RunUI
             var shown = list.ToList();
             var shownKeys = shown.Select(x => x.key).ToList();
             bool anim = !ls.Drawn;
-            int idx = 0;
-            foreach (var h in shown) ListCard(content, h, st, ls, target, k, idx++, anim, Rebuild, shownKeys);
-            ls.Drawn = true;
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            // 칸 자리(빈 RectTransform — 이름 「hero <키>」 는 검색이 읽는다)를 먼저 다 놓고, 카드는 보이는 줄부터 — 보이는 줄 + 한 줄은 지금,
+            //   나머지는 다음 프레임들에 FillPerFrame 장씩(2026-10-07 「사도 목록이 무겁다」 — 135칸을 한 프레임에 다 세우면 웹에서 100ms 넘게 멈췄다.
+            //   편성 목록은 누를 때마다 다시 그린다). 격자 자리 · 스크롤 높이는 처음부터 그대로라 스크롤 되돌리기 · 검색이 그대로 된다
+            var cells = new RectTransform[shown.Count];
+            for (int i = 0; i < shown.Count; i++) cells[i] = Ui.Rect("hero " + shown[i].key, content);
             // 스크롤 자리 — 다시 그려도 보던 자리 그대로(첫 누름이 엉뚱한 칸에 가지 않게)
             if (ls.ScrollY > 0)
             {
@@ -450,6 +453,24 @@ namespace Bolzena.RunUI
                 content.anchoredPosition = new Vector2(content.anchoredPosition.x, Mathf.Min(ls.ScrollY, maxY));
                 sr.StopMovement();
             }
+            {
+                var vp = (RectTransform)sr.viewport;
+                float cellW = grid.cellSize.x + grid.spacing.x, cellH = grid.cellSize.y + grid.spacing.y;
+                int cols = Mathf.Max(1, Mathf.FloorToInt((vp.rect.width - grid.padding.horizontal + grid.spacing.x) / cellW));
+                float y0 = Mathf.Max(0, content.anchoredPosition.y) - grid.padding.top;
+                int r0 = Mathf.Max(0, Mathf.FloorToInt(y0 / cellH)), r1 = Mathf.Max(r0 + 1, Mathf.CeilToInt((y0 + Mathf.Max(vp.rect.height, cellH * 3)) / cellH));
+                int Dist(int i) { int r = i / cols; return r < r0 ? (r0 - r) * 2 + 1 : r > r1 ? (r - r1) * 2 : 0; }
+                var later = new List<int>();
+                for (int i = 0; i < shown.Count; i++)
+                {
+                    if (Dist(i) == 0) ListCard(cells[i], shown[i], st, ls, target, k, i, anim, Rebuild, shownKeys);
+                    else later.Add(i);
+                }
+                later.Sort((a, b) => Dist(a) != Dist(b) ? Dist(a).CompareTo(Dist(b)) : a.CompareTo(b));
+                if (later.Count > 0) StartCoroutine(FillCards(content, later.Select(i => (Action)(() => { if (cells[i]) ListCard(cells[i], shown[i], st, ls, target, k, i, false, Rebuild, shownKeys); })).ToList()));
+            }
+            if (Demo.Active) Debug.Log($"[ListPerf] 사도 목록 칸 {shown.Count} 만들기 {sw.Elapsed.TotalMilliseconds:F0}ms");
+            ls.Drawn = true;
             sr.onValueChanged.AddListener(_ => { if (content) ls.ScrollY = content.anchoredPosition.y; });
 
             // 아래 — 남색 띠 · 가는 금 선 · 고른 사도 · 「완료」 · 「상세 정보」 · 「편성」
@@ -501,6 +522,19 @@ namespace Bolzena.RunUI
             else Toast.Show("세 칸이 다 찼습니다 — 넣은 사도를 눌러 빼세요");
         }
 
+        /// <summary>목록 카드 나머지를 프레임마다 FillPerFrame 장씩(HeroList — 보이는 줄은 이미 세웠다). 목록이 닫히면(content 없음) 멈춘다.</summary>
+        const int FillPerFrame = 12;
+        System.Collections.IEnumerator FillCards(RectTransform content, List<Action> jobs)
+        {
+            int i = 0;
+            while (i < jobs.Count)
+            {
+                yield return null;
+                if (!content) yield break;
+                for (int n = 0; n < FillPerFrame && i < jobs.Count; n++) jobs[i++]();
+            }
+        }
+
         void ListCard(RectTransform content, HeroInfo h, PartyState st, ListState ls, int target, float k, int idx, bool anim, Action rebuild, List<string> shownKeys)
         {
             bool dex = st == null;
@@ -518,6 +552,7 @@ namespace Bolzena.RunUI
             }, 0, "hero " + h.key);
             b.Bg.sprite = Theme.Round; b.SetColor(locked ? Theme.NavyCell : Color.Lerp(Theme.NavyWell, nc, 0.32f));
             var rt = b.GetComponent<RectTransform>();
+            rt.Fill();   // 격자 칸 자리(HeroList 가 먼저 놓은 빈 칸)를 채운다
             var glow = Ui.Img(rt, Theme.S("fade_top"), (locked ? Theme.Dim : nc).A(0.45f), "glow"); glow.rectTransform.Fill(2, 2, 2, 2);
             var mask = Ui.Img(rt, Theme.Round, Color.white, "mask"); mask.rectTransform.Fill(2, 2, 2, 2); mask.gameObject.AddComponent<Mask>().showMaskGraphic = false;
             // 스탠딩 상반신(없으면 초상)
@@ -738,6 +773,8 @@ namespace Bolzena.RunUI
             var content = Ui.Scroll(left, out var sr);
             ScrollBar(left, sr);
             Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(4, 14, 0, 10), true, false);
+            // 카드 상세의 이전 · 다음 — 시작 카드 → 고유 카드 순 그대로
+            var allCards = CardOrder.Sort(d.Starter, P.Data, new[] { d.Id }).Concat(CardOrder.Sort(P.Data.UniquesOf(d.Id), P.Data, new[] { d.Id })).ToList();
             void Row(string title, string sub, List<string> ids)
             {
                 var s = W.Section(content, title, sub, 40);
@@ -749,13 +786,13 @@ namespace Bolzena.RunUI
                 {
                     var id = sorted[i];
                     var c = W.Card(holder, this, id, cw); c.At(0, 1, (i % cols) * (cw + 12), -(i / cols) * (ch + 12), cw, ch);
-                    var b = c.gameObject.AddComponent<Btn>(); b.OnClick = () => CardZoom(id);
+                    var b = c.gameObject.AddComponent<Btn>(); int at = allCards.IndexOf(id); b.OnClick = () => CardZoom(id, allCards, at);
                     Stage.Hot["detail.card" + title + i] = b;
                     Tw.Pop(c, 0.03f * i, 0.85f, 0.3f);
                 }
             }
             Row("시작 카드", $"{d.Starter.Count}장 · 모험을 시작할 때 덱에", d.Starter);
-            Row("고유 카드", "은총으로 얻습니다 · 신탁 · 축복", P.Data.UniquesOf(d.Id));
+            Row("고유 카드", "은총으로 얻습니다 · 신탁이 나올 수 있습니다", P.Data.UniquesOf(d.Id));
 
             // 오른쪽 — 고학년 → 고유 효과 → 패시브(2026-10 사용자: 「고유 효과 탭을 없애고 카드 목록 옆에, 자세히 없이 다 보이게」)
             var side = Ui.Rect("side", stage); side.anchorMin = new Vector2(0, 0); side.anchorMax = new Vector2(0, 1); side.pivot = new Vector2(0, 0.5f);

@@ -58,6 +58,9 @@ namespace Bolzena.RunUI
 
         public static bool Has(string art) { Load(); return art != null && table.ContainsKey(art); }
 
+        /// <summary>표에 있는 그림 키 전부(미리 굽기 — 에디터 SnapPrebake).</summary>
+        public static List<string> Arts { get { Load(); return new List<string>(table.Keys); } }
+
         /// <summary>떠 있는 사도인가(손보정 float · -nolift 아님) — 상세 · 로비 전신이 얼굴을 기준 얼굴 높이에 맞추고 ClampInto 로 줄이지 않는다.</summary>
         public static bool Floats(string art) => !NoLift && TryGet(art, out var f) && f.Lift != 0;
 

@@ -13,27 +13,14 @@
       "crit": 10,
       "blurb": "루드와 티격태격하는 사파이어의 용족, 자칭 2인자. 동료가 공격할 때마다 기록을 세어 두었다가 제 공격으로 그 기록을 깨면, 하늘을 가르는 기세에 적들이 한꺼번에 굼떠집니다.",
       "keyword": {
-        "name": "2인자 쟁탈전",
-        "desc": "아군 공격을 세는 기록",
+        "name": "2인자의 단검",
+        "desc": "루드보다 하나 더 챙긴 단검",
         "carrier": "self",
-        "cap": 3,
-        "rules": [
+        "cap": 5,
+        "per": [
           {
-            "name": "청금이라 부르지 마",
-            "when": {
-              "on": "stackOver",
-              "id": "2인자 쟁탈전"
-            },
-            "fx": [
-              {
-                "k": "perEvent"
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.4,
-                "target": "randomEnemy"
-              }
-            ]
+            "stat": "dealt",
+            "v": 0.12
           }
         ]
       },
@@ -42,53 +29,39 @@
           "name": "넘버 투",
           "when": {
             "on": "play",
-            "who": "other",
-            "type": "공격"
+            "who": "any",
+            "nth": 2
           },
-          "limit": {
-            "per": "turn",
-            "n": 2
-          },
-          "fx": [
-            {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "기록 경신",
-          "when": {
-            "on": "play",
-            "type": "공격"
-          },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "2인자 쟁탈전",
-              "n": 2
-            }
-          ],
           "limit": {
             "per": "turn",
             "n": 1
           },
           "fx": [
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "청금이라 부르지 마",
+          "when": {
+            "on": "stackOver",
+            "id": "2인자의 단검"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "perEvent"
             },
             {
-              "k": "nextCheaper",
-              "v": 1
-            },
-            {
-              "k": "spend",
-              "id": "2인자 쟁탈전",
-              "all": true
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "randomEnemy"
             }
           ]
         }
@@ -105,7 +78,7 @@
           },
           {
             "k": "stack",
-            "id": "2인자 쟁탈전",
+            "id": "2인자의 단검",
             "v": 2
           },
           {
@@ -120,7 +93,7 @@
         "실피르_s1",
         "실피르_s1",
         "실피르_s2",
-        "실피르_s2"
+        "실피르_u2"
       ]
     }
   ],
@@ -154,158 +127,176 @@
     },
     {
       "id": "실피르_u1",
-      "name": "창공의 지배자",
+      "name": "단검 세례",
       "hero": "실피르",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
-      "tags": [
-        "신속"
-      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
-          "target": "randomEnemy",
-          "hits": 4
+          "ratio": 1.24,
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "둔화",
-          "v": 1,
-          "target": "allEnemies"
+          "k": "perStack",
+          "id": "2인자의 단검"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.31,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "2인자의 단검",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "날갯짓",
-          "cost": 1,
+          "name": "킹갓zi존 단검비",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "2인자의 단검",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "정정당당",
           "tags": [
-            "신속"
+            "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 1.37,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "2인자의 단검",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "몇 자루는 아껴 두기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "2인자의 단검",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.39,
               "target": "randomEnemy",
               "hits": 3
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "창공 제패",
-          "tags": [
-            "신속"
-          ],
+          "name": "2인자의 집념",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "randomEnemy",
-              "hits": 5
+              "k": "perStack",
+              "id": "2인자의 단검"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "호수 바람",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "randomEnemy",
-              "hits": 4
+              "ratio": 0.82,
+              "target": "randomEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "spend",
+              "id": "2인자의 단검",
+              "all": true
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "한 끗 차 비행",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "randomEnemy",
-              "hits": 4
+              "k": "ifKill"
             },
             {
               "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "2인자의 단검",
+              "v": 2
             }
           ]
         },
         {
-          "name": "웨스트 블루 제독",
-          "tags": [
-            "신속"
-          ],
+          "name": "단검 줍기",
           "fx": [
             {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "randomEnemy",
-              "hits": 4
+              "ratio": 0.73,
+              "target": "randomEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "spend",
+              "id": "2인자의 단검",
+              "all": true
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "pull",
+              "from": "discard",
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "사파이어 비늘",
+          "name": "사파이어 날",
           "kind": "power"
         },
         {
-          "name": "가벼운 날개",
-          "kind": "cost"
+          "name": "호수 잠수",
+          "kind": "ap"
         },
         {
-          "name": "호숫물",
-          "kind": "draw"
+          "name": "나이아의 응원",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -319,8 +310,8 @@
       "fx": [
         {
           "k": "stack",
-          "id": "2인자 쟁탈전",
-          "v": 2
+          "id": "2인자의 단검",
+          "v": 3
         },
         {
           "k": "draw",
@@ -329,50 +320,47 @@
       ],
       "oracles": [
         {
-          "name": "자칭 2인자",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
           "name": "진짜 2인자",
           "fx": [
             {
               "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 3
+              "id": "2인자의 단검",
+              "v": 4
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "청금이라 부르지 마",
+          "name": "질투의 일격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "루드보다 먼저",
           "fx": [
             {
               "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 2
+              "id": "2인자의 단검",
+              "v": 3
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "v": 2,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
@@ -381,7 +369,31 @@
           "fx": [
             {
               "k": "stack",
-              "id": "2인자 쟁탈전",
+              "id": "2인자의 단검",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "노력 끝의 보상",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
               "v": 2
             },
             {
@@ -389,197 +401,21 @@
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 1.2
-            }
-          ]
-        },
-        {
-          "name": "정정당당",
-          "cost": 0,
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "도전장",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "요란한 선언",
-          "kind": "draw"
-        },
-        {
-          "name": "비늘 방패",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.8
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "실피르_u3",
-      "name": "사파이어 단검",
-      "hero": "실피르",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "tags": [
-        "약점 공격"
-      ],
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.8,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "2인자 쟁탈전"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.25,
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "단검 한 자루",
-          "cost": 0,
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "2인자 쟁탈전"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "엑박스칼리버",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "2인자 쟁탈전"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "청금석 빛",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "2인자 쟁탈전"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "영롱한 날",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "2인자 쟁탈전"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "다이아몬드를 향해",
-          "cost": 2,
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "2인자 쟁탈전"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자의 단검",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -587,15 +423,206 @@
       "blesses": [
         {
           "name": "반짝이는 것",
-          "kind": "power"
+          "kind": "guard"
         },
         {
-          "name": "빠른 손",
+          "name": "쇼핑 봉투",
+          "kind": "cost"
+        },
+        {
+          "name": "웨스트 블루 제독님",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "실피르_u3",
+      "name": "창공의 지배자",
+      "hero": "실피르",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.93,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "2인자의 단검",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "창공의 패자",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.16,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "급강하",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "청금이라 부르지 마!",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "2인자의 단검",
+              "n": 4
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "깃털 단검",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.98,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "2인자의 단검",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "바람의 지배자",
+          "tags": [
+            "신속"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.19,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자의 단검",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "푸른 날개",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "바람 가르기",
           "kind": "draw"
         },
         {
-          "name": "빨간 건 싫어",
-          "kind": "weakSpot"
+          "name": "비늘 깃",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -605,7 +632,7 @@
       "hero": "실피르",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
           "k": "status",
@@ -613,66 +640,76 @@
           "v": 1
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "2인자 쟁탈전",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "dmg",
+          "ratio": 0.78,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "2인자의 단검"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.39,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "다짐",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "2인자 쟁탈전",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "보석의 자존심",
+          "name": "2인자의 품격",
           "fx": [
             {
               "k": "status",
               "id": "사기",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.01,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "영원한 라이벌",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.85,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "2인자 쟁탈전",
+                      "id": "2인자의 단검",
                       "v": 1
                     }
                   ]
@@ -682,122 +719,91 @@
           ]
         },
         {
-          "name": "나이아의 호수",
+          "name": "악우의 응원",
           "fx": [
             {
               "k": "status",
               "id": "사기",
               "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.97,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "전교 1등 목표",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "2인자의 단검",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "셀프 칭찬",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.69,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "2인자 쟁탈전",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "3연패 설욕",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "2인자 쟁탈전",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "사파이어의 용족",
-          "cost": 0,
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "2인자 쟁탈전",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "교복",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.8
-            }
-          ]
+          "name": "사파이어 광택",
+          "kind": "atkUp"
         },
         {
-          "name": "제독 모자",
+          "name": "도전장",
           "tags": [
             "개전"
           ]
         },
         {
-          "name": "보석함",
+          "name": "풋풋한 학창 시절",
           "fx": [
             {
-              "k": "stack",
-              "id": "2인자 쟁탈전",
+              "k": "draw",
               "v": 1
             }
           ]

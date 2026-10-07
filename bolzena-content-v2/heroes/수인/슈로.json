@@ -21,11 +21,11 @@
         "per": [
           {
             "stat": "taken",
-            "v": -0.05
+            "v": -0.06
           },
           {
             "stat": "dealt",
-            "v": 0.05
+            "v": 0.06
           }
         ],
         "rules": [
@@ -43,61 +43,48 @@
             ],
             "fx": [
               {
+                "k": "perStack",
+                "id": "검의 영역"
+              },
+              {
                 "k": "dmg",
                 "ratio": 0.2,
-                "target": "randomEnemy",
                 "base": "def",
-                "hits": 4
+                "target": "randomEnemy"
               }
             ]
           }
         ]
       },
-      "keywords": [
-        {
-          "name": "결투",
-          "desc": "한 적과 맞붙는 결투",
-          "carrier": "enemy",
-          "cap": 1,
-          "hunt": true
-        }
-      ],
       "passives": [
         {
-          "name": "통성명 뒤엔 결투",
+          "name": "물러났다 전진",
           "when": {
-            "on": "blocked"
+            "on": "hurt",
+            "guarded": true
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
-              "k": "ifStack",
-              "id": "결투"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "draw",
+              "k": "stack",
+              "id": "검의 영역",
               "v": 1
             }
           ]
         },
         {
-          "name": "좋은 승부였어",
+          "name": "검으로 사귄 친구",
           "when": {
-            "on": "huntDown",
-            "id": "결투"
+            "on": "fightStart"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
             }
           ]
         }
@@ -135,7 +122,7 @@
         "슈로_s1",
         "슈로_s1",
         "슈로_s2",
-        "슈로_s2"
+        "슈로_u4"
       ]
     }
   ],
@@ -172,7 +159,7 @@
       "name": "검 조율",
       "hero": "슈로",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
@@ -181,13 +168,11 @@
           "v": 2
         },
         {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 1
+          "k": "shield",
+          "ratio": 0.8
         },
         {
-          "k": "status",
-          "id": "협공",
+          "k": "draw",
           "v": 1
         }
       ],
@@ -201,76 +186,37 @@
               "v": 3
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.8
             },
             {
-              "k": "status",
-              "id": "협공",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
           "name": "칼끝 맞추기",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "stack",
               "id": "검의 영역",
               "v": 1
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "결투 신청",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "검의 영역",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "결투",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "버티는 자세",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "검의 영역",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
             },
             {
               "k": "shield",
-              "ratio": 2.0
+              "ratio": 0.5
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
           "name": "세 자루 조율",
-          "cost": 3,
+          "cost": 2,
           "fx": [
             {
               "k": "stack",
@@ -278,14 +224,69 @@
               "v": 3
             },
             {
-              "k": "status",
-              "id": "협공",
-              "v": 2
+              "k": "shield",
+              "ratio": 2
             },
             {
               "k": "status",
-              "id": "피해 감소",
+              "id": "협공",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "매일의 조율",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.5
+                    },
+                    {
+                      "k": "stack",
+                      "id": "검의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "맞춤 조언",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.05
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
             }
           ]
         }
@@ -297,11 +298,17 @@
         },
         {
           "name": "익숙한 손놀림",
-          "kind": "cost"
+          "kind": "draw"
         },
         {
-          "name": "유리비늘 갑옷",
-          "kind": "defUp"
+          "name": "한 뼘 넓은 둘레",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -315,17 +322,16 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
+          "ratio": 0.7,
           "target": "oneEnemy"
         },
         {
-          "k": "stack",
-          "id": "결투",
-          "v": 1
+          "k": "perStack",
+          "id": "검의 영역"
         },
         {
           "k": "shield",
-          "ratio": 1
+          "ratio": 0.4
         }
       ],
       "oracles": [
@@ -334,17 +340,16 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.85,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "결투",
-              "v": 1
+              "k": "perStack",
+              "id": "검의 영역"
             },
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 0.5
             }
           ]
         },
@@ -354,79 +359,97 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.45,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "결투",
-              "v": 1
+              "k": "perStack",
+              "id": "검의 영역"
             },
             {
               "k": "shield",
-              "ratio": 0.5
+              "ratio": 0.25
             }
           ]
         },
         {
-          "name": "검을 겨누고",
+          "name": "칼을 맞대면 친구",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "검의 영역",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.6
+            }
+          ]
+        },
+        {
+          "name": "결투 신청서",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.0,
+              "ratio": 0.8,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
-              "id": "결투",
+              "id": "검의 영역",
               "v": 1
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "검의 영역"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "수인의 예법",
-          "tags": [
-            "개전"
-          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "결투",
+              "k": "discard",
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 1.4
-            }
-          ]
-        },
-        {
-          "name": "격식 갖춘 결투",
-          "cost": 2,
-          "fx": [
-            {
               "k": "dmg",
-              "ratio": 1.8,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "결투",
-              "v": 1
+              "k": "perStack",
+              "id": "검의 영역"
             },
             {
               "k": "shield",
-              "ratio": 2.6
+              "ratio": 0.64
             }
           ]
         }
@@ -451,22 +474,29 @@
       "name": "장검 · 단도 · 한손검",
       "hero": "슈로",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.3,
           "target": "oneEnemy",
           "hits": 3
         },
         {
-          "k": "ifStack",
-          "id": "결투"
+          "k": "perStack",
+          "id": "검의 영역"
         },
         {
-          "k": "tough",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.25,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "검의 영역",
+          "all": true
         }
       ],
       "oracles": [
@@ -475,37 +505,99 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.36,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "ifStack",
-              "id": "결투"
+              "k": "perStack",
+              "id": "검의 영역"
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "검의 영역",
+              "all": true
             }
           ]
         },
         {
           "name": "단도만",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.3,
               "target": "oneEnemy",
               "hits": 2
             },
             {
-              "k": "ifStack",
-              "id": "결투"
+              "k": "perStack",
+              "id": "검의 영역"
             },
             {
-              "k": "tough",
+              "k": "dmg",
+              "ratio": 0.15,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "검의 영역",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "한 자루 더",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "perStack",
+              "id": "검의 영역"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "검의 영역",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "지키는 영역",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "perStack",
+              "id": "검의 영역"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "base": "def",
+              "target": "allEnemies"
             }
           ]
         },
@@ -513,62 +605,25 @@
           "name": "결투의 검",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
-              "id": "결투"
-            },
-            {
-              "k": "tough",
-              "v": 1
+              "k": "perStack",
+              "id": "검의 영역"
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "세 방향 베기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies",
-              "hits": 3
+              "ratio": 0.41,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "결투"
+              "k": "spend",
+              "id": "검의 영역",
+              "all": true
             },
             {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "한 자루 더",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy",
-              "hits": 4
-            },
-            {
-              "k": "ifStack",
-              "id": "결투"
-            },
-            {
-              "k": "tough",
-              "v": 2
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
             }
           ]
         }
@@ -584,7 +639,7 @@
         },
         {
           "name": "검 바꿔 쥐기",
-          "kind": "cost"
+          "kind": "ap"
         }
       ]
     },
@@ -595,6 +650,9 @@
       "unique": true,
       "cost": 1,
       "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
         {
           "k": "status",
@@ -606,16 +664,12 @@
           "rules": [
             {
               "when": {
-                "on": "blocked"
-              },
-              "limit": {
-                "per": "turn",
-                "n": 1
+                "on": "turnStart"
               },
               "fx": [
                 {
-                  "k": "status",
-                  "id": "반격",
+                  "k": "stack",
+                  "id": "검의 영역",
                   "v": 1
                 }
               ]
@@ -625,7 +679,10 @@
       ],
       "oracles": [
         {
-          "name": "검사의 예",
+          "name": "활짝 핀 투구꽃",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "status",
@@ -637,16 +694,12 @@
               "rules": [
                 {
                   "when": {
-                    "on": "blocked"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "반격",
+                      "k": "stack",
+                      "id": "검의 영역",
                       "v": 2
                     }
                   ]
@@ -658,32 +711,9 @@
         {
           "name": "가지 하나",
           "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "blocked"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "반격",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "통성명",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "status",
@@ -691,61 +721,16 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "결투",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "blocked"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "반격",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "맞댄 칼날",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "blocked"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "반격",
+                      "k": "stack",
+                      "id": "검의 영역",
                       "v": 1
                     }
                   ]
@@ -757,7 +742,43 @@
         {
           "name": "꽃 피는 결투장",
           "tags": [
-            "축복"
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "맞댄 칼날",
+          "tags": [
+            "개전"
           ],
           "fx": [
             {
@@ -766,13 +787,24 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.6
             },
             {
               "k": "power",
               "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검의 영역",
+                      "v": 1
+                    }
+                  ]
+                },
                 {
                   "when": {
                     "on": "blocked"
@@ -785,6 +817,38 @@
                     {
                       "k": "status",
                       "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "우리를 기억해",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검의 영역",
                       "v": 1
                     }
                   ]
@@ -804,11 +868,11 @@
           "kind": "draw"
         },
         {
-          "name": "되받는 꽃잎",
+          "name": "꽃잎 둘레",
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
+              "k": "stack",
+              "id": "검의 영역",
               "v": 1
             }
           ]

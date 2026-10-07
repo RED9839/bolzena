@@ -19,10 +19,10 @@ namespace Bolzena.Core
 
         int KitCount(FxCtx ctx, string id)
         {
-            if (id.StartsWith(PLAYED_PER)) { var tg = id.Substring(PLAYED_PER.Length); return tg.Length == 0 ? PlayTags.Count : PlayTags.Count(t => t.Contains(tg)); }
-            if (id.StartsWith(PILE_PER)) return PileOf(id.Substring(PILE_PER.Length)).Count;
-            if (id.StartsWith(CARDST_PER)) return CardStOf(ctx.CardId, id.Substring(CARDST_PER.Length));
-            if (id.StartsWith(EVENT_PER)) return ctx.EventV / Math.Max(1, int.Parse(id.Substring(EVENT_PER.Length)));
+            if (id.StartsWith(PLAYED_PER, StringComparison.Ordinal)) { var tg = id.Substring(PLAYED_PER.Length); return tg.Length == 0 ? PlayTags.Count : PlayTags.Count(t => t.Contains(tg)); }
+            if (id.StartsWith(PILE_PER, StringComparison.Ordinal)) return PileOf(id.Substring(PILE_PER.Length)).Count;
+            if (id.StartsWith(CARDST_PER, StringComparison.Ordinal)) return CardStOf(ctx.CardId, id.Substring(CARDST_PER.Length));
+            if (id.StartsWith(EVENT_PER, StringComparison.Ordinal)) return ctx.EventV / Math.Max(1, int.Parse(id.Substring(EVENT_PER.Length)));
             return -1;
         }
 
@@ -136,7 +136,7 @@ namespace Bolzena.Core
                         }
                         var src = PileOf(f.From ?? "discard");
                         int burned = 0;
-                        for (int k = 0; k < f.NOr1 && src.Count > 0; k++)
+                        for (int k = 0; k < (f.All ? int.MaxValue : f.NOr1) && src.Count > 0; k++)   // all — 맞는 카드 전부(2026-10-07)
                         {
                             var okIdx = Enumerable.Range(0, src.Count).Where(i => FxMatch(f, src[i], owner)).ToList();
                             if (okIdx.Count == 0) break;

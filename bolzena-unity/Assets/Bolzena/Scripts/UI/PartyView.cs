@@ -171,7 +171,7 @@ namespace Bolzena.UI
             float tx = x + 0.56f * k, tw = right - tx - 0.06f;
             T("cn", R, $"<color=#{ColorUtility.ToHtmlStringRGB(Color.Lerp(Color.white, kc, 0.55f))}>{c.Id}</color>" + (c.Turns > 0 ? $"  <size=80%><color={Tone.SubTag}>{c.Turns}턴</color></size>" : ""),
                 new Vector3(tx, top - 0.12f * k, 0), Tone.Body * k, Tone.Ink);
-            var d = T("cd", R, Strip(c.Text, c.Id), new Vector3(tx, top - 0.3f * k, 0), Tone.Sm * k, Tone.Sub, TextAlignmentOptions.TopLeft, true, tw);
+            var d = T("cd", R, Strip(Tone.StripDiff(c.Text), c.Id), new Vector3(tx, top - 0.3f * k, 0), Tone.Sm * k, Tone.Sub, TextAlignmentOptions.TopLeft, true, tw);
             d.textWrappingMode = TextWrappingModes.Normal; d.maxVisibleLines = 2; d.overflowMode = TextOverflowModes.Ellipsis;
             d.rectTransform.sizeDelta = new Vector2(tw, 0.6f * k);
             d.ForceMeshUpdate();

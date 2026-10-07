@@ -1,798 +1,843 @@
 {
- "heroes": [
-  {
-   "id": "에슈르_마도",
-   "name": "에슈르(마도)",
-   "nature": "활발",
-   "race": "요정",
-   "role": "딜러",
-   "star": 3,
-   "hp": 700,
-   "atk": 135,
-   "def": 28,
-   "crit": 10,
-   "blurb": "정령 예속 주문을 쓰려다 기절한 사이, 다른 세계에서 마법의 정점을 찍은 대신 친구를 모두 잃은 「대-에슈르」를 보고 돌아온 빵집 요정. 이제 마법사로서의 자신을 증명하려 합니다. 큰 주문을 외우면 거울 속 대-에슈르가 나타나 한동안 함께 마법을 쏩니다.",
-   "keyword": {
-    "name": "노트",
-    "desc": "소멸할 때 적는 연구 노트",
-    "carrier": "self",
-    "cap": 5,
-    "per": [
-     {
-      "stat": "dealt",
-      "v": 0.12
-     }
-    ],
-    "rules": [
-     {
-      "name": "증명 완료",
-      "when": {
-       "on": "stackReach",
-       "id": "노트",
-       "n": 3
+  "heroes": [
+    {
+      "id": "에슈르_마도",
+      "name": "에슈르(마도)",
+      "nature": "활발",
+      "race": "요정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 700,
+      "atk": 135,
+      "def": 28,
+      "crit": 10,
+      "blurb": "정령 예속 주문을 쓰려다 기절한 사이, 다른 세계에서 마법의 정점을 찍은 대신 친구를 모두 잃은 「대-에슈르」를 보고 돌아온 빵집 요정. 이제 마법사로서의 자신을 증명하려 합니다. 큰 주문을 외우면 거울 속 대-에슈르가 나타나 한동안 함께 마법을 쏩니다.",
+      "keyword": {
+        "name": "마력 증폭",
+        "desc": "마도술로 끌어올린 마력",
+        "carrier": "self",
+        "cap": 3,
+        "decay": 1,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.2
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "pull",
-        "from": "gone",
-        "to": "top",
-        "n": 1
-       }
+      "passives": [
+        {
+          "name": "연구 노트",
+          "when": {
+            "on": "exhaust"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "노력의 결실",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "마도학자의 길",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "cue",
+            "id": "eshur_mirror_summon"
+          },
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "마력 증폭",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "거울 형상",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "에슈르_마도_s1",
+        "에슈르_마도_u3",
+        "에슈르_마도_s2",
+        "에슈르_마도_s3"
+      ],
+      "keywords": [
+        {
+          "name": "거울 형상",
+          "desc": "함께 마법을 쏘는 거울 속 대-에슈르",
+          "carrier": "self",
+          "cap": 3,
+          "rules": [
+            {
+              "name": "함께 쏘기",
+              "when": {
+                "on": "play",
+                "type": "공격"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "거울 형상",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "eshur_mirror_shot"
+                },
+                {
+                  "k": "extra",
+                  "ratio": 0.6
+                },
+                {
+                  "k": "spend",
+                  "id": "거울 형상",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "연구 노트",
-     "when": {
-      "on": "exhaust"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "마도학자의 길",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "cue",
-      "id": "eshur_mirror_summon"
-     },
-     {
-      "k": "dmg",
-      "ratio": 1.0,
-      "target": "allEnemies"
-     },
-     {
-      "k": "stack",
-      "id": "노트",
-      "v": 2
-     },
-     {
-      "k": "stack",
-      "id": "거울 형상",
-      "v": 3
-     }
-    ]
-   },
-   "starter": [
-    "에슈르_마도_s1",
-    "에슈르_마도_s1",
-    "에슈르_마도_s2",
-    "에슈르_마도_s3"
-   ],
-   "keywords": [
+  ],
+  "cards": [
     {
-     "name": "거울 형상",
-     "desc": "함께 마법을 쏘는 거울 속 대-에슈르",
-     "carrier": "self",
-     "cap": 3,
-     "rules": [
-      {
-       "name": "함께 쏘기",
-       "when": {
-        "on": "play",
-        "type": "공격"
-       },
-       "conds": [
+      "id": "에슈르_마도_s1",
+      "name": "마력 구체",
+      "hero": "에슈르_마도",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "c": "stack",
-         "id": "거울 형상",
-         "n": 1
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         }
-       ],
-       "fx": [
+      ]
+    },
+    {
+      "id": "에슈르_마도_s2",
+      "name": "왕마력 구체",
+      "hero": "에슈르_마도",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
         {
-         "k": "cue",
-         "id": "eshur_mirror_shot"
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "에슈르_마도_s3",
+      "name": "로브 두르기",
+      "hero": "에슈르_마도",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "에슈르_마도_u1",
+      "name": "억까의 시간은 끝",
+      "hero": "에슈르_마도",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
         },
         {
-         "k": "extra",
-         "ratio": 0.6
+          "k": "stack",
+          "id": "마력 증폭",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "억까 종료 선언",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 2
+            }
+          ]
         },
         {
-         "k": "spend",
-         "id": "거울 형상",
-         "v": 1
-        }
-       ]
-      }
-     ]
-    }
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "에슈르_마도_s1",
-   "name": "마력 구체",
-   "hero": "에슈르_마도",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_마도_s2",
-   "name": "왕마력 구체",
-   "hero": "에슈르_마도",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_마도_s3",
-   "name": "로브 두르기",
-   "hero": "에슈르_마도",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "에슈르_마도_u1",
-   "name": "빵타지아",
-   "hero": "에슈르_마도",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "소멸 2"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.5,
-     "target": "allEnemies"
-    },
-    {
-     "k": "status",
-     "id": "취약",
-     "v": 1,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "빵타지아 대폭발",
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.9,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "미니 빵타지아",
-     "cost": 1,
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.05,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "연구 성과 발표",
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.6,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "단일 표적 실험",
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "선제 시연",
-     "tags": [
-      "소멸 2",
-      "주도"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.7,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "부푼 반죽",
-     "kind": "power"
-    },
-    {
-     "name": "취약점 표기",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "여백 메모",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "에슈르_마도_u2",
-   "name": "마력 레이저",
-   "hero": "에슈르_마도",
-   "unique": true,
-   "cost": 3,
-   "type": "공격",
-   "tags": [
-    "소멸"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 4.4,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "출력 최대",
-     "tags": [
-      "소멸"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 5.4,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "휴대용 레이저",
-     "cost": 2,
-     "tags": [
-      "소멸"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.65,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "관통 레이저",
-     "tags": [
-      "소멸"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.3,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "노트 연동 사격",
-     "tags": [
-      "소멸"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 4.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "perStack",
-       "id": "노트"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "붕괴 광선",
-     "tags": [
-      "소멸",
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 4.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "렌즈 연마",
-     "kind": "power"
-    },
-    {
-     "name": "초점 맞추기",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "달군 궤적",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_마도_u3",
-   "name": "억까의 시간은 끝",
-   "hero": "에슈르_마도",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "소멸 2"
-   ],
-   "fx": [
-    {
-     "k": "draw",
-     "v": 2
-    },
-    {
-     "k": "stack",
-     "id": "노트",
-     "v": 1
-    },
-    {
-     "k": "status",
-     "id": "잔광",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "반격 개시",
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "짧은 반격",
-     "cost": 0,
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "억까 일지",
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "억까 처리반",
-     "tags": [
-      "소멸 2"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "긴급 탈출",
-     "tags": [
-      "소멸 2",
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "분노 충전",
-     "kind": "ap"
-    },
-    {
-     "name": "다음 장 넘기기",
-     "kind": "draw"
-    },
-    {
-     "name": "오기",
-     "kind": "atkUp"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_마도_u4",
-   "name": "연구 집중",
-   "hero": "에슈르_마도",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.1,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+          "name": "억까 보관",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            }
+          ]
+        },
         {
-         "k": "stack",
-         "id": "노트",
-         "v": 1
+          "name": "연구 자료",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "증명할 기회",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "밤샘 연구",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "마력 증폭",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ],
+      "blesses": [
+        {
+          "name": "노트 정리",
+          "kind": "draw"
+        },
+        {
+          "name": "평가 뒤집기",
+          "tags": [
+            "신속"
+          ]
+        },
+        {
+          "name": "잔소리 차단",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에슈르_마도_u2",
+      "name": "마력 레이저",
+      "hero": "에슈르_마도",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "마력 증폭"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "마력 증폭",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "극대 마력 레이저",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 증폭"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마력 증폭",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "시험 발사",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 증폭"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마력 증폭",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "광역 레이저",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.22,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "모든 걸 건 증명",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 4.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 증폭"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 2
+            }
+          ]
+        },
+        {
+          "name": "억까는 끝",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 증폭"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "마력 증폭",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "빛나는 노트",
+          "kind": "power"
+        },
+        {
+          "name": "세계수 연구",
+          "kind": "ap"
+        },
+        {
+          "name": "증폭 회로",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에슈르_마도_u3",
+      "name": "빵타지아",
+      "hero": "에슈르_마도",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "마력 증폭",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "화려한 마도술",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "한 점 빵타지아",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "증명 완료",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "마력 증폭",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "연구 실습",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.92,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "마법 빵 후보",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.92,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "새 복장",
+          "kind": "frost"
+        },
+        {
+          "name": "빵 뽕",
+          "kind": "cost"
+        },
+        {
+          "name": "밤샘 연구",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에슈르_마도_u4",
+      "name": "연구 집중",
+      "hero": "에슈르_마도",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "마력 증폭"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "깊은 연구 집중",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 증폭"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "연구실 불 켜기",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "마력 증폭",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "대마법 연구 노트",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "마법의 빵 비밀 공식",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 증폭"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "증명 끝",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 증폭"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마력 증폭",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "공격 속도",
+          "kind": "atkUp"
+        },
+        {
+          "name": "대-에슈르의 조언",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "빵 한 입",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.3
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "증폭된 연구",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "노트",
-           "v": 2
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "쪽지 연구",
-     "cost": 0,
-     "tags": [],
-     "fx": [
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "노트",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "기록된 연구",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "노트",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "덮어 둔 연구",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "노트",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "마도의 연구",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "노트",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "노트",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "요약 정리",
-     "kind": "cost"
-    },
-    {
-     "name": "참고 자료",
-     "kind": "draw"
-    },
-    {
-     "name": "연구 몰입",
-     "kind": "atkUp"
-    }
-   ]
-  }
- ]
+  ]
 }

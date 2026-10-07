@@ -13,71 +13,35 @@
       "crit": 5,
       "blurb": "은의 용족 행세를 하는 수은의 용족 귀족. 실드를 든 채 재채기를 참아 두었다가, 누가 막을 깨면 그 적에게 수은을 뿜습니다.",
       "keyword": {
-        "name": "수은 재채기",
-        "desc": "실드가 깨지면 되쏘는 수은",
-        "carrier": "self",
-        "cap": 3,
+        "name": "수은 중독",
+        "desc": "스며드는 은빛 독",
+        "carrier": "enemy",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dot",
+            "ratio": 0.25
+          }
+        ],
         "rules": [
           {
-            "name": "수은 재채기",
+            "name": "녹아내린 갑옷",
             "when": {
-              "on": "shieldBreak"
-            },
-            "conds": [
-              {
-                "c": "stack",
-                "id": "수은 재채기",
-                "n": 1
-              }
-            ],
-            "limit": {
-              "per": "turn",
-              "n": 2
+              "on": "stackReach",
+              "id": "수은 중독",
+              "n": 4
             },
             "fx": [
-              {
-                "k": "perEvent",
-                "per": 100
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.3,
-                "target": "oneEnemy",
-                "base": "def"
-              }
-            ]
-          },
-          {
-            "name": "수은 재채기",
-            "when": {
-              "on": "shieldBreak"
-            },
-            "conds": [
-              {
-                "c": "stack",
-                "id": "수은 재채기",
-                "n": 1
-              }
-            ],
-            "limit": {
-              "per": "turn",
-              "n": 2
-            },
-            "fx": [
-              {
-                "k": "status",
-                "id": "고통",
-                "v": 3
-              },
-              {
-                "k": "status",
-                "id": "손상",
-                "v": 1
-              },
               {
                 "k": "spend",
-                "id": "수은 재채기",
-                "v": 1
+                "id": "수은 중독",
+                "all": true
+              },
+              {
+                "k": "status",
+                "id": "취약",
+                "v": 2,
+                "target": "oneEnemy"
               }
             ]
           }
@@ -85,21 +49,20 @@
       },
       "passives": [
         {
-          "name": "수은 실드",
+          "name": "수은 장막",
           "when": {
-            "on": "turnEnd"
+            "on": "shieldBreak"
           },
-          "conds": [
-            {
-              "c": "guarded",
-              "kind": "shield"
-            }
-          ],
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
           "fx": [
             {
               "k": "stack",
-              "id": "수은 재채기",
-              "v": 1
+              "id": "수은 중독",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -112,7 +75,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 4
+              "ratio": 3
             },
             {
               "k": "status",
@@ -148,7 +111,7 @@
         "비비_s1",
         "비비_s1",
         "비비_s2",
-        "비비_s2"
+        "비비_u1"
       ]
     }
   ],
@@ -190,123 +153,127 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2
+          "ratio": 1.63
         },
         {
           "k": "stack",
-          "id": "수은 재채기",
-          "v": 1
+          "id": "수은 중독",
+          "v": 1,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "먼저 맞이하는 숙녀",
+          "name": "오호호",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "명예로운 비비",
           "tags": [
-            "개전"
+            "보존"
           ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.2
+              "ratio": 1.75
             },
             {
               "k": "stack",
-              "id": "수은 재채기",
-              "v": 1
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "잠긴 기억의 상자",
-          "cost": 2,
+          "name": "귀족의 품격",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 3.8
+              "k": "dmg",
+              "ratio": 0.63,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
-              "id": "수은 재채기",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "id": "수은 중독",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "실드가 터지면",
+          "name": "궁지의 사와요",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2
+              "ratio": 1.63
             },
             {
               "k": "stack",
-              "id": "수은 재채기",
-              "v": 1
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "ifWounded"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.25
             }
           ]
         },
         {
-          "name": "수은 증기",
+          "name": "쇠사슬로 잠긴 상자",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.2
+              "ratio": 1.5
             },
             {
               "k": "stack",
-              "id": "수은 재채기",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "실비아를 위해",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "수은 재채기",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "면역",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "오호호호",
+          "name": "보석 목걸이",
           "kind": "guard"
         },
         {
-          "name": "비비아나 아르겐툼",
-          "tags": [
-            "보존"
-          ]
+          "name": "세탁의 용족",
+          "kind": "draw"
         },
         {
-          "name": "은의 용족 행세",
+          "name": "은 위장",
           "fx": [
             {
-              "k": "status",
-              "id": "손상",
-              "v": 1
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -322,137 +289,149 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
-          "target": "randomEnemy",
-          "hits": 3,
-          "base": "def"
+          "ratio": 0.44,
+          "base": "def",
+          "target": "allEnemies"
         },
         {
-          "k": "status",
-          "id": "고통",
-          "v": 2,
+          "k": "stack",
+          "id": "수은 중독",
+          "v": 1,
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "참는 중이와요",
+          "name": "대형 재채기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
-              "target": "randomEnemy",
-              "hits": 3,
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
+              "ratio": 0.56,
+              "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "수은 재채기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "연쇄 재채기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "randomEnemy",
-              "hits": 6,
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "비말 차단",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "randomEnemy",
-              "hits": 3,
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
+              "id": "수은 중독",
               "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "공기 중 수은",
+          "name": "연쇄 재채기",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "target": "allEnemies",
-              "base": "def"
+              "ratio": 0.94,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 2,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "정면 재채기",
+          "name": "먼지 알레르기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.44,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "고통",
-              "v": 4
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "알레르기 체질",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수은 중독",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "콜록콜록",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "base": "def",
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "더러운 건 질색이와요",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "만성 몸살",
+          "name": "에취",
           "kind": "power"
         },
         {
-          "name": "예고 없는 재채기",
-          "tags": [
-            "개전"
+          "name": "수은 안개",
+          "kind": "ap"
+        },
+        {
+          "name": "손수건",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
           ]
         }
       ]
@@ -462,7 +441,7 @@
       "name": "은빛 창 네 자루",
       "hero": "비비",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "tags": [
         "분쇄"
@@ -470,147 +449,205 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
-          "target": "oneEnemy",
+          "ratio": 0.5,
           "base": "def",
-          "hits": 4
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "손상",
-          "v": 2
+          "k": "perStack",
+          "id": "수은 중독"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.19,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "수은 중독",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "창 두 자루만",
-          "cost": 1,
+          "name": "퀵실버 창",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
+              "ratio": 0.63,
               "base": "def",
-              "hits": 3
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "손상",
-              "v": 1
+              "k": "perStack",
+              "id": "수은 중독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "수은 중독",
+              "all": true
             }
           ]
         },
         {
-          "name": "은빛 창 세례",
+          "name": "창 한 자루",
+          "cost": 0,
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy",
+              "ratio": 0.38,
               "base": "def",
-              "hits": 4
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "손상",
-              "v": 2
+              "k": "perStack",
+              "id": "수은 중독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "수은 중독",
+              "all": true
             }
           ]
         },
         {
-          "name": "자매들을 위한 창",
+          "name": "녹아내리는 갑옷",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
+              "ratio": 0.69,
               "base": "def",
-              "hits": 4
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "수은 중독",
+              "n": 3
             },
             {
               "k": "status",
-              "id": "손상",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 1.5
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "수은 묻은 창끝",
+          "name": "사와요체 창술",
+          "tags": [
+            "분쇄"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "수은 중독",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.41,
+                      "base": "def",
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "창 회수",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
-              "base": "def",
-              "hits": 4
+              "k": "perStack",
+              "id": "수은 중독"
             },
-            {
-              "k": "status",
-              "id": "손상",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 4
-            }
-          ]
-        },
-        {
-          "name": "한 점에 꽂기",
-          "tags": [
-            "분쇄",
-            "약점 공격"
-          ],
-          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy",
+              "ratio": 0.63,
               "base": "def",
-              "hits": 4
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "손상",
-              "v": 2
+              "k": "spend",
+              "id": "수은 중독",
+              "all": true
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "품격 있는 흡혈",
-          "fx": [
-            {
-              "k": "drain",
-              "ratio": 0.3
-            }
-          ]
+          "name": "은빛 창날",
+          "kind": "weakSpot"
         },
         {
-          "name": "등 뒤의 꼬리 창",
+          "name": "창 자루 밀기",
           "kind": "cost"
         },
         {
-          "name": "삼킨 은",
-          "kind": "power"
+          "name": "창끝 독",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -620,7 +657,7 @@
       "hero": "비비",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
           "k": "status",
@@ -628,157 +665,54 @@
           "v": 1
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "수은 재채기",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "dmg",
+          "ratio": 0.31,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "수은 중독",
+          "each": true
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.15,
+          "base": "def",
+          "target": "allEnemies"
         }
       ],
       "oracles": [
-        {
-          "name": "취미 생활",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "수은 재채기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수은 재채기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "우로스 강림 계획",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수은 재채기",
-                      "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.5
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "명예로운 비비",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수은 재채기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
         {
           "name": "뿌리 깊이",
           "fx": [
             {
               "k": "status",
               "id": "결의",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수은 재채기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.42,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "독을 먹였더니 기운이",
+          "name": "우로스 강림 계획",
+          "power": true,
           "fx": [
             {
               "k": "status",
@@ -786,52 +720,126 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.55,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "stackReach",
+                    "id": "수은 중독",
+                    "n": 4
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "수은 재채기",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 0.62,
+                      "base": "def",
+                      "target": "allEnemies"
                     }
                   ]
                 }
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
+        },
         {
-          "name": "은세공 목걸이",
+          "name": "엄마라고 부른 날",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 2,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "엄마라 부른 나무",
+          "name": "수은 범람",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "작은 복수",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "세계수의 원한",
+          "kind": "defUp"
+        },
+        {
+          "name": "수은 양동이",
           "tags": [
             "개전"
           ]
         },
         {
-          "name": "자매들의 세상",
+          "name": "은빛 독",
           "fx": [
             {
               "k": "status",
-              "id": "면역",
+              "id": "피해 감소",
               "v": 1
             }
           ]

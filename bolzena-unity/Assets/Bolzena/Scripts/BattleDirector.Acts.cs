@@ -1586,7 +1586,10 @@ namespace Bolzena
                     if (e.Target.Index < EnemyHuds.Count && EnemyHuds[e.Target.Index] != null) EnemyHuds[e.Target.Index].SetTough(e.FAfter, !e.Up);
                     break;
                 case EventKind.Break:
+                    Hud.ApGain(e.Value);   // 격파 AP +1 — 수가 끝나야 숫자가 맞춰지니 그 순간 「+1」 로
                     yield return BreakFx(e.Target.Index);
+                    // 격파하며 처치(core LethalKill — 쪽지 강인도 → 격파 → 죽음) — 빈 강인도 칸과 「격파!」 를 잠깐 보이고 쓰러진다
+                    if (e.Target.Index < Battle.Snapshot.Enemies.Count && Battle.Snapshot.Enemies[e.Target.Index].Dead) yield return Clock.Wait(0.3f);
                     break;
                 case EventKind.Death:
                     StartCoroutine(DeathFx(e.Target.Index, e.Boss));
@@ -1618,6 +1621,7 @@ namespace Bolzena
                     Hud.SetAp(e.Value, s.MaxAp);
                     break;
                 case EventKind.Draw:
+                    if (e.Text != null && e.Text.StartsWith("grace")) { yield return GraceIn(e); break; }   // 은총으로 얻은 카드
                     yield return Deal(new List<CardInfo> { e.Card });
                     break;
                 case EventKind.Intent:

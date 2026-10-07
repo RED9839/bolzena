@@ -14,26 +14,52 @@
       "blurb": "악덕 CEO 행세가 번번이 남 좋은 일로 끝나는 회장님. 적을 쓰러뜨리고 넘친 피해가 파티를 회복시키고, 그 선행이 장부에 쌓입니다.",
       "keyword": {
         "name": "선행 장부",
-        "desc": "처치로 적는 장부",
+        "desc": "본의 아니게 쌓인 선행 기록",
         "carrier": "self",
-        "cap": 5
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ],
+        "rules": [
+          {
+            "name": "기부천사 아이시아",
+            "when": {
+              "on": "stackReach",
+              "id": "선행 장부",
+              "n": 5
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "선행 장부",
+                "all": true
+              },
+              {
+                "k": "heal",
+                "ratio": 0.9
+              },
+              {
+                "k": "shield",
+                "ratio": 1
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
           "name": "의도치 않은 선행",
           "when": {
-            "on": "kill",
-            "mine": true
+            "on": "play"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
           },
           "fx": [
-            {
-              "k": "perEvent",
-              "per": 20
-            },
-            {
-              "k": "heal",
-              "ratio": 0.4
-            },
             {
               "k": "stack",
               "id": "선행 장부",
@@ -42,21 +68,20 @@
           ]
         },
         {
-          "name": "기부천사",
+          "name": "냉혹한 경영",
           "when": {
             "on": "kill",
             "mine": true
           },
-          "conds": [
-            {
-              "c": "hpMin",
-              "pct": 0.95
-            }
-          ],
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.6
+              "k": "stack",
+              "id": "선행 장부",
+              "v": 2
             }
           ]
         }
@@ -85,7 +110,7 @@
       },
       "starter": [
         "아이시아_s1",
-        "아이시아_s1",
+        "아이시아_u2",
         "아이시아_s2",
         "아이시아_s3"
       ]
@@ -134,21 +159,17 @@
       ]
     },
     {
-      "id": "아이시아_u1",
-      "name": "신제품 시연",
-      "hero": "아이시아",
-      "unique": true,
-      "signature": true,
-      "cost": 2,
+      "id": "아이시아_fridge",
+      "name": "신상 냉장고",
+      "cost": 0,
       "type": "공격",
       "tags": [
-        "약점 공격"
+        "소멸"
       ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.25,
-          "hits": 4,
+          "ratio": 0.35,
           "target": "allEnemies"
         },
         {
@@ -157,32 +178,49 @@
           "v": 1
         }
       ],
+      "hero": "아이시아",
+      "token": true
+    },
+    {
+      "id": "아이시아_u1",
+      "name": "신제품 시연",
+      "hero": "아이시아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "hits": 4,
+          "target": "allEnemies"
+        },
+        {
+          "k": "make",
+          "id": "아이시아_fridge",
+          "v": 1
+        }
+      ],
       "oracles": [
         {
-          "name": "주주 설명회",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "대형 냉장고",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.33,
+              "ratio": 0.26,
               "hits": 4,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "선행 장부",
+              "k": "make",
+              "id": "아이시아_fridge",
               "v": 1
             }
           ]
         },
         {
-          "name": "대형 냉장고 출시",
-          "tags": [
-            "약점 공격",
-            "보존"
-          ],
+          "name": "아이스박스 폭발",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
@@ -191,87 +229,102 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 1
+              "k": "make",
+              "id": "아이시아_fridge",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "기부천사 아이시아",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "재고 처리",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.24,
               "hits": 4,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "미공개 신제품",
-          "tags": [
-            "약점 공격",
-            "신속"
-          ],
-          "fx": [
+              "k": "perTag",
+              "id": "아이시아_fridge"
+            },
             {
               "k": "dmg",
               "ratio": 0.3,
-              "hits": 4,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 1
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "아이시아_fridge"
             }
           ]
         },
         {
-          "name": "132차 기업전쟁",
-          "cost": 3,
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "신제품 카탈로그",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.18,
               "hits": 4,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "선행 장부",
+              "k": "make",
+              "id": "아이시아_fridge",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "반품 처리",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "hits": 4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "아이시아_fridge",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "주주 설명회",
+          "name": "액체 질소",
           "kind": "power"
         },
         {
-          "name": "퇴직 선물",
-          "kind": "ap"
+          "name": "우주식량",
+          "kind": "draw"
         },
         {
-          "name": "해고 대신 휴가",
+          "name": "신상 하나 더",
           "fx": [
             {
-              "k": "stack",
-              "id": "선행 장부",
+              "k": "make",
+              "id": "아이시아_fridge",
               "v": 1
             }
           ]
@@ -283,22 +336,16 @@
       "name": "내가 누군지 몰라?",
       "hero": "아이시아",
       "unique": true,
-      "cost": 1,
+      "cost": 0,
       "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "취약",
-          "v": 1,
-          "target": "oneEnemy"
+          "k": "stack",
+          "id": "선행 장부",
+          "v": 2
         },
         {
           "k": "draw",
-          "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "선행 장부",
           "v": 1
         }
       ],
@@ -307,106 +354,102 @@
           "name": "회장님 등장",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "선행 장부",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "주주 총회",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "선행 장부",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "선행 장부",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "전 계열사 동원",
-          "cost": 0,
+          "name": "인사 기록 검색",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
+              "k": "stack",
+              "id": "선행 장부",
+              "v": 2
+            },
+            {
+              "k": "draw",
               "v": 1,
-              "target": "oneEnemy"
+              "who": "self",
+              "type": "공격"
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "선행 장부",
               "v": 1
             }
           ]
         },
         {
-          "name": "유급 휴가",
-          "tags": [
-            "보존"
-          ],
+          "name": "신제품 발표",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "아이시아_fridge",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "선행 장부",
+              "n": 3
             },
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 2
             }
           ]
         },
         {
-          "name": "한정판 신제품",
-          "tags": [
-            "신속"
-          ],
+          "name": "갑질 회의",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
+              "k": "discard",
               "v": 1
             },
             {
               "k": "stack",
               "id": "선행 장부",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "어린이 취급 금지",
-          "fx": [
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 3
             },
             {
               "k": "draw",
               "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 1
             }
           ]
         }
@@ -414,14 +457,21 @@
       "blesses": [
         {
           "name": "유급 휴가",
-          "kind": "guard"
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "133차 선전포고",
-          "kind": "draw"
+          "name": "법무팀 방패",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
         },
         {
-          "name": "얼음광선 악수",
+          "name": "장부 한 줄",
           "fx": [
             {
               "k": "stack",
@@ -437,12 +487,12 @@
       "name": "해고야!",
       "hero": "아이시아",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2,
+          "ratio": 0.8,
           "target": "oneEnemy"
         },
         {
@@ -451,7 +501,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.2,
           "target": "oneEnemy"
         },
         {
@@ -462,11 +512,11 @@
       ],
       "oracles": [
         {
-          "name": "아침 인사",
+          "name": "즉시 해고",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.6,
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
@@ -475,25 +525,114 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.26,
               "target": "oneEnemy"
             },
             {
               "k": "spend",
               "id": "선행 장부",
               "all": true
+            }
+          ]
+        },
+        {
+          "name": "구두 해고",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "선행 장부"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "선행 장부",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "냉동 창고행",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "아이시아_fridge"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "아이시아_fridge"
+            }
+          ]
+        },
+        {
+          "name": "상시 구조 조정",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "선행 장부"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "선행 장부",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.8,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "전원 해고",
           "tags": [
-            "보존"
+            "소멸"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 1.8,
               "target": "oneEnemy"
             },
             {
@@ -502,111 +641,28 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.4,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "선행 장부",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "해고 대신 휴가",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "선행 장부"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.51,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "선행 장부",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "퇴직 선물",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "선행 장부"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.42,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "선행 장부",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "얼음광선 악수",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "선행 장부"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.63,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "선행 장부",
-              "all": true
+              "k": "draw",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "퇴직 선물",
-          "kind": "power"
+          "name": "해고 통지서",
+          "kind": "weakSpot"
         },
         {
-          "name": "해고 대신 휴가",
+          "name": "퇴직금 정산",
           "kind": "ap"
         },
         {
-          "name": "주주 설명회",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 1
-            }
-          ]
+          "name": "찬바람",
+          "kind": "frost"
         }
       ]
     },
@@ -616,108 +672,85 @@
       "hero": "아이시아",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
-          "k": "atkMod",
-          "v": 0.1,
-          "run": true,
-          "target": "self"
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "perStack",
+          "id": "선행 장부"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "선행 장부",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "133차 선전포고",
+          "name": "131전 끝의 승리",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "선행 장부"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "선행 장부",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "업계 1위 탈환",
+          "name": "승리 선언",
           "cost": 0,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "선행 장부",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "선행 장부"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.14,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "승리한 아이시아",
-          "tags": [
-            "보존"
-          ],
+          "name": "멜론 혐오",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "oneEnemy"
             },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "선행 장부",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "정복 계획서",
+          "power": true,
+          "fx": [
             {
               "k": "stack",
               "id": "선행 장부",
@@ -728,13 +761,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "turnEnd"
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "선행 장부",
-                      "v": 1
+                      "k": "perStack",
+                      "id": "선행 장부"
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.16,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
@@ -743,84 +780,41 @@
           ]
         },
         {
-          "name": "신제품 독점 공개",
+          "name": "정복 자금 탕진",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "선행 장부"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "선행 장부",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "멜론은 인정 못 해",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "선행 장부",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
+              "k": "spend",
+              "id": "선행 장부",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "133차 선전포고",
+          "name": "프로스트 노바",
           "kind": "atkUp"
         },
         {
-          "name": "얼음광선 악수",
-          "kind": "draw"
+          "name": "경영 효율화",
+          "kind": "cost"
         },
         {
-          "name": "유급 휴가",
+          "name": "선행 기록",
           "fx": [
             {
               "k": "stack",

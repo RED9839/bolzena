@@ -13,33 +13,37 @@
       "crit": 5,
       "blurb": "볼-요가 전도사. 가장 센 동료를 붙잡고 「밀착 감시」 로 볼-요가를 시키면 그 동료가 더 세게 치고, 동료가 칠 때마다 아사나는 명상에 들어 파티를 지킵니다.",
       "keyword": {
-        "name": "명상",
-        "desc": "다음 공격에 힘을 싣는 명상 자세",
+        "name": "마력 호흡",
+        "desc": "들숨 넷, 날숨 넷 — 심마체의 호흡",
         "carrier": "self",
-        "cap": 1,
-        "consumeAll": true,
+        "cap": 3,
         "per": [
           {
-            "stat": "taken",
-            "v": -0.05
-          },
-          {
             "stat": "dealt",
-            "v": 0.6
+            "v": 0.08,
+            "who": "allies"
           }
         ],
         "rules": [
           {
-            "name": "깊은 호흡",
+            "name": "세 번째 분출",
             "when": {
-              "on": "stackOver",
-              "id": "명상"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 2
+              "on": "stackReach",
+              "id": "마력 호흡",
+              "n": 3
             },
             "fx": [
+              {
+                "k": "spend",
+                "id": "마력 호흡",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.8,
+                "base": "def",
+                "target": "oneEnemy"
+              },
               {
                 "k": "shield",
                 "ratio": 0.5
@@ -48,53 +52,43 @@
           }
         ]
       },
-      "keywords": [
-        {
-          "name": "밀착 감시",
-          "desc": "아사나가 붙어 자세를 잡아 주는 동료",
-          "carrier": "hero",
-          "cap": 2,
-          "hunt": true,
-          "decay": 1,
-          "per": [
-            {
-              "stat": "dealt",
-              "v": 0.15
-            }
-          ]
-        }
-      ],
       "passives": [
         {
-          "name": "24시간 밀착 감시",
+          "name": "심마체",
           "when": {
-            "on": "fightStart"
+            "on": "play"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
-              "id": "밀착 감시",
-              "v": 2,
-              "target": "strongestAlly"
+              "id": "마력 호흡",
+              "v": 1
             }
           ]
         },
         {
-          "name": "같이 해요, 볼-요가",
+          "name": "건강한 몸에 건강한 정신",
           "when": {
-            "on": "play",
-            "type": "공격",
-            "marked": "밀착 감시"
+            "on": "turnStart"
           },
+          "conds": [
+            {
+              "c": "hp",
+              "pct": 0.5
+            }
+          ],
           "limit": {
-            "per": "turn",
+            "per": "fight",
             "n": 1
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
+              "k": "heal",
+              "ratio": 1
             }
           ]
         }
@@ -116,7 +110,7 @@
           },
           {
             "k": "stack",
-            "id": "명상",
+            "id": "마력 호흡",
             "v": 1
           }
         ]
@@ -125,7 +119,7 @@
         "아사나_s1",
         "아사나_s1",
         "아사나_s2",
-        "아사나_s2"
+        "아사나_u1"
       ]
     }
   ],
@@ -164,437 +158,18 @@
       "hero": "아사나",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
-      "signature": true,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.6
+          "ratio": 0.7
         },
         {
           "k": "stack",
-          "id": "밀착 감시",
-          "v": 1,
-          "target": "oneAlly"
-        },
-        {
-          "k": "stack",
-          "id": "명상",
-          "v": 1
-        }
-      ],
-      "blurb": "숨 들이쉬고… 볼을 부풀리고… 내쉬고",
-      "oracles": [
-        {
-          "name": "깊은 호흡",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.15
-            },
-            {
-              "k": "stack",
-              "id": "밀착 감시",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가벼운 스트레칭",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.2
-            },
-            {
-              "k": "stack",
-              "id": "밀착 감시",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "단체 요가",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "밀착 감시",
-              "v": 2,
-              "target": "oneAlly"
-            }
-          ]
-        },
-        {
-          "name": "명상 음악",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.0
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "밀착 감시",
-              "v": 2,
-              "target": "oneAlly"
-            }
-          ]
-        },
-        {
-          "name": "요가 매트",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.1
-            },
-            {
-              "k": "stack",
-              "id": "밀착 감시",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "고요한 마음",
-          "kind": "guard"
-        },
-        {
-          "name": "요가 블록",
-          "kind": "heal"
-        },
-        {
-          "name": "매트 깔기",
-          "tags": [
-            "개전"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "아사나_u2",
-      "name": "고요한 일격",
-      "hero": "아사나",
-      "unique": true,
-      "cost": 2,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.2,
-          "target": "oneEnemy",
-          "base": "def"
-        },
-        {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
-          "target": "oneEnemy"
-        }
-      ],
-      "blurb": "명상을 깨는 단 한 번의 동작",
-      "oracles": [
-        {
-          "name": "천천히, 깊게",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.55,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "짧은 동작",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "균형의 일격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "전신 동작",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "기다린 일격",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.55,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "단전의 힘",
-          "kind": "power"
-        },
-        {
-          "name": "흐름",
-          "kind": "frost"
-        },
-        {
-          "name": "간결한 동작",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "아사나_u3",
-      "name": "호흡 고르기",
-      "hero": "아사나",
-      "unique": true,
-      "cost": 0,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 1
-        },
-        {
-          "k": "draw",
-          "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "명상",
-          "v": 1
-        }
-      ],
-      "blurb": "들숨 넷, 날숨 넷",
-      "oracles": [
-        {
-          "name": "긴 호흡",
-          "fx": [
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "복식 호흡",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "맑은 정신",
-          "fx": [
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "명상 준비",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "잠깐 쉬기",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "명상",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "평온",
-          "kind": "draw"
-        },
-        {
-          "name": "따뜻한 차",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.4
-            }
-          ]
-        },
-        {
-          "name": "조용한 방",
-          "tags": [
-            "보존"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "아사나_u4",
-      "name": "볼-요가 전도",
-      "hero": "아사나",
-      "unique": true,
-      "cost": 1,
-      "type": "강화",
-      "fx": [
-        {
-          "k": "status",
-          "id": "사기",
+          "id": "마력 호흡",
           "v": 1
         },
         {
@@ -607,13 +182,7 @@
               "fx": [
                 {
                   "k": "stack",
-                  "id": "밀착 감시",
-                  "v": 1,
-                  "target": "strongestAlly"
-                },
-                {
-                  "k": "stack",
-                  "id": "명상",
+                  "id": "마력 호흡",
                   "v": 1
                 }
               ]
@@ -621,125 +190,52 @@
           ]
         }
       ],
-      "blurb": "함께하면 모두가 말랑해집니다",
       "oracles": [
         {
-          "name": "요가 교실",
+          "name": "깊은 들숨",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.9
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀착 감시",
-                      "v": 1,
-                      "target": "strongestAlly"
-                    },
-                    {
-                      "k": "stack",
-                      "id": "명상",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "혼자 요가",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀착 감시",
-                      "v": 1,
-                      "target": "strongestAlly"
-                    },
-                    {
-                      "k": "stack",
-                      "id": "명상",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "평정심",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 1.0
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀착 감시",
-                      "v": 1,
-                      "target": "strongestAlly"
-                    },
-                    {
-                      "k": "stack",
-                      "id": "명상",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "굳건한 자세",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
+              "k": "stack",
+              "id": "마력 호흡",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "마력 호흡",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "요가 매트",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 2
             },
             {
               "k": "power",
@@ -751,18 +247,8 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "밀착 감시",
-                      "v": 1,
-                      "target": "strongestAlly"
-                    },
-                    {
-                      "k": "stack",
-                      "id": "명상",
+                      "id": "마력 호흡",
                       "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.5
                     }
                   ]
                 }
@@ -772,18 +258,14 @@
         },
         {
           "name": "아침 요가",
+          "cost": 0,
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
               "k": "stack",
-              "id": "명상",
+              "id": "마력 호흡",
               "v": 1
             },
             {
@@ -796,13 +278,72 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "밀착 감시",
-                      "v": 1,
-                      "target": "strongestAlly"
-                    },
+                      "id": "마력 호흡",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "단체 요가",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
                     {
                       "k": "stack",
-                      "id": "명상",
+                      "id": "마력 호흡",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "붙잡고 시키기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "마력 호흡",
                       "v": 1
                     }
                   ]
@@ -814,23 +355,504 @@
       ],
       "blesses": [
         {
-          "name": "유연함",
+          "name": "엘튜브 방송",
           "kind": "defUp"
         },
         {
-          "name": "새벽 수련",
-          "tags": [
-            "개전"
-          ]
+          "name": "스트레칭",
+          "kind": "cost"
         },
         {
-          "name": "요가 볼",
+          "name": "호흡 교정",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아사나_u2",
+      "name": "마력 분출",
+      "hero": "아사나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.5
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "마력 호흡",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "강한 분출",
           "fx": [
             {
               "k": "shield",
               "ratio": 0.6
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
             }
           ]
+        },
+        {
+          "name": "가벼운 분출",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "마력 탐지",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "세 번째 분출",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "마력 호흡",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "과호흡",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마력 호흡",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "마력 집중",
+          "kind": "power"
+        },
+        {
+          "name": "들숨",
+          "kind": "draw"
+        },
+        {
+          "name": "불가능 없는 몸",
+          "kind": "frost"
+        }
+      ]
+    },
+    {
+      "id": "아사나_u3",
+      "name": "고요한 일격",
+      "hero": "아사나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "마력 호흡"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "마력 호흡",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "천천히, 깊게",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마력 호흡",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "균형의 일격",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마력 호흡",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "명상 자세",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "마력 호흡",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.6
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.35,
+                      "base": "def",
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "기다린 일격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.57,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "긴 날숨",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.38
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.52
+            },
+            {
+              "k": "spend",
+              "id": "마력 호흡",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "명상을 깨는 동작",
+          "kind": "power"
+        },
+        {
+          "name": "맑은 정신",
+          "kind": "ap"
+        },
+        {
+          "name": "허리 삐끗",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아사나_u4",
+      "name": "24시간 밀착 감시",
+      "hero": "아사나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.8
+        },
+        {
+          "k": "perStack",
+          "id": "마력 호흡"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.3
+        }
+      ],
+      "oracles": [
+        {
+          "name": "요가 교실",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "혼자 요가",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.6
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.24
+            }
+          ]
+        },
+        {
+          "name": "평정심",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "마력 호흡",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.45
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "굳건한 자세",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "심마체 이론",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.2
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.5
+            },
+            {
+              "k": "spend",
+              "id": "마력 호흡",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "건강 잔소리",
+          "kind": "heal"
+        },
+        {
+          "name": "불주사 협박",
+          "kind": "draw"
+        },
+        {
+          "name": "요가복",
+          "kind": "guard"
         }
       ]
     }

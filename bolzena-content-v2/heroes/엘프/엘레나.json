@@ -13,14 +13,14 @@
       "crit": 10,
       "blurb": "모든 발명품에 자폭 기능을 다는 괴짜 시장. 스킬을 낼 때마다 드론이 뜨고, 턴 끝마다 드론이 쏘고, 공격할 때 한 기씩 날려 버립니다.",
       "keyword": {
-        "name": "드론",
-        "desc": "스킬로 띄우는 드론",
+        "name": "냥이 드론",
+        "desc": "자폭 기능이 달린 고양이 드론",
         "carrier": "self",
         "cap": 3,
         "per": [
           {
             "stat": "dot",
-            "ratio": 0.3
+            "ratio": 0.6
           }
         ]
       },
@@ -28,47 +28,29 @@
         {
           "name": "드론 출격",
           "when": {
-            "on": "play",
-            "type": "스킬"
+            "on": "play"
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 3
           },
           "fx": [
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 1
             }
           ]
         },
         {
-          "name": "쓸데없는 자폭 기능",
+          "name": "엘프의 자존심",
           "when": {
-            "on": "play",
-            "type": "공격"
-          },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "드론",
-              "n": 1
-            }
-          ],
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "드론",
+              "k": "stack",
+              "id": "냥이 드론",
               "v": 1
             }
           ]
@@ -86,14 +68,14 @@
           },
           {
             "k": "stack",
-            "id": "드론",
+            "id": "냥이 드론",
             "v": 2
           }
         ]
       },
       "starter": [
         "엘레나_s1",
-        "엘레나_s1",
+        "엘레나_u2",
         "엘레나_s2",
         "엘레나_s3"
       ]
@@ -146,136 +128,110 @@
       "name": "전술 드론 MK-2",
       "hero": "엘레나",
       "unique": true,
-      "signature": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.1,
-          "target": "allEnemies"
-        },
-        {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
+          "ratio": 0.9,
           "target": "allEnemies"
         },
         {
           "k": "stack",
-          "id": "드론",
+          "id": "냥이 드론",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "MK-1 시제품",
+          "name": "펄스파 증폭",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.43,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 1.07,
               "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 1
             }
           ]
         },
         {
-          "name": "MK-3 양산형",
-          "tags": [
-            "보존"
-          ],
+          "name": "코드 기능 개선",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.32,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 1.46,
               "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
+              "v": 2
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "맑은 눈의 엘레나",
+          "name": "드론 편대",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 0.78,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "냥이 드론"
             },
             {
-              "k": "stack",
-              "id": "드론",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "편대 비행",
-          "tags": [
-            "신속"
-          ],
+          "name": "아멜리아 호출",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.32,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.78,
               "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "감전 펄스",
-          "cost": 3,
+          "name": "과부하 펄스",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 2.18,
-              "target": "allEnemies"
+              "k": "discard",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 1.15,
               "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 1
             }
           ]
@@ -283,19 +239,19 @@
       ],
       "blesses": [
         {
-          "name": "감자 삼백만 개",
+          "name": "펄스 출력",
           "kind": "power"
         },
         {
-          "name": "편대 비행",
-          "kind": "ap"
+          "name": "커피 수혈",
+          "kind": "draw"
         },
         {
-          "name": "감전 펄스",
+          "name": "예비 드론",
           "fx": [
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 1
             }
           ]
@@ -308,126 +264,209 @@
       "hero": "엘레나",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "강화",
       "tags": [
-        "천상"
+        "개전"
       ],
       "fx": [
         {
           "k": "stack",
-          "id": "드론",
+          "id": "냥이 드론",
           "v": 1
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "냥이 드론",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "주머니 드론",
+          "name": "냥이 두 마리",
           "tags": [
-            "천상"
+            "개전"
           ],
           "fx": [
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "냥이 드론",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "드론 격납고 개방",
+          "name": "즉석 출격",
           "cost": 0,
           "tags": [
-            "천상"
+            "개전"
           ],
           "fx": [
             {
-              "k": "stack",
-              "id": "드론",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "냥이 드론",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "느긋한 주말의 집냥이",
+          "name": "출격 신호탄",
           "tags": [
-            "천상",
-            "보존"
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "냥이 드론",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "발명품 서랍",
+          "tags": [
+            "개전"
           ],
           "fx": [
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "냥이 드론",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "쉬는 날 출격",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "냥이 드론",
               "v": 2
             },
             {
               "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "감자 삼백만 개",
-          "tags": [
-            "천상",
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "드론",
-              "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "그란데에 물 한 샷",
-          "tags": [
-            "천상"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "드론",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "냥이 드론",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "자폭은 낭만",
-          "kind": "guard"
+          "name": "작업대 방패",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
         },
         {
-          "name": "주머니 드론",
-          "kind": "draw"
+          "name": "랩코트 주머니",
+          "kind": "cost"
         },
         {
-          "name": "1인 종신 시장",
+          "name": "드론 정비",
           "fx": [
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 1
             }
           ]
@@ -439,57 +478,155 @@
       "name": "쓸데없는 자폭 기능",
       "hero": "엘레나",
       "unique": true,
-      "cost": 3,
+      "cost": 1,
       "type": "공격",
       "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.2,
-          "target": "allEnemies"
-        },
-        {
-          "k": "perStack",
-          "id": "드론"
-        },
         {
           "k": "dmg",
           "ratio": 0.6,
           "target": "allEnemies"
         },
         {
+          "k": "perStack",
+          "id": "냥이 드론"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "allEnemies"
+        },
+        {
           "k": "spend",
-          "id": "드론",
+          "id": "냥이 드론",
           "all": true
         }
       ],
       "oracles": [
         {
-          "name": "소형 자폭 장치",
+          "name": "대형 자폭",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.56,
+              "ratio": 0.71,
               "target": "allEnemies"
             },
             {
               "k": "perStack",
-              "id": "드론"
+              "id": "냥이 드론"
             },
             {
               "k": "dmg",
-              "ratio": 0.78,
+              "ratio": 0.41,
               "target": "allEnemies"
             },
             {
               "k": "spend",
-              "id": "드론",
+              "id": "냥이 드론",
               "all": true
             }
           ]
         },
         {
-          "name": "연구동 두 채",
-          "cost": 2,
+          "name": "소형 자폭",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "냥이 드론"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "냥이 드론",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "자폭 취소",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "냥이 드론"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자폭 프로토콜",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "냥이 드론"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "냥이 드론",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "냥이 드론"
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.25,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "spend",
+                      "id": "냥이 드론",
+                      "all": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "연쇄 자폭",
+          "tags": [
+            "소멸"
+          ],
           "fx": [
             {
               "k": "dmg",
@@ -498,7 +635,7 @@
             },
             {
               "k": "perStack",
-              "id": "드론"
+              "id": "냥이 드론"
             },
             {
               "k": "dmg",
@@ -506,109 +643,24 @@
               "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "드론",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "차원문 탈출",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.44,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "드론"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "드론",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "버그는 버그로 덮기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.74,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "드론"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.87,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "드론",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "자폭은 낭만",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.44,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "드론"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "드론",
-              "all": true
+              "k": "draw",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "편대 비행",
-          "kind": "power"
+          "name": "버터 바른 토스트",
+          "kind": "weakSpot"
         },
         {
-          "name": "감전 펄스",
+          "name": "연구동 두 채",
           "kind": "ap"
         },
         {
-          "name": "감자 삼백만 개",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "드론",
-              "v": 1
-            }
-          ]
+          "name": "영구동력",
+          "kind": "frost"
         }
       ]
     },
@@ -622,140 +674,157 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 0.6,
           "target": "oneEnemy"
         },
         {
-          "k": "ifChain"
+          "k": "perStack",
+          "id": "냥이 드론"
         },
         {
-          "k": "status",
-          "id": "취약",
-          "v": 2,
+          "k": "dmg",
+          "ratio": 0.3,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "기술명은 즉석에서",
+          "name": "엘프의 긍지",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.56,
+              "ratio": 0.75,
               "target": "oneEnemy"
             },
             {
-              "k": "ifChain"
+              "k": "perStack",
+              "id": "냥이 드론"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.38,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "1인 종신 시장",
+          "name": "즉석 기술명",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.4,
               "target": "oneEnemy"
             },
             {
-              "k": "ifChain"
+              "k": "perStack",
+              "id": "냥이 드론"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.2,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "드론에게 지시",
+          "name": "60년 막내의 공구함",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.32,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifChain"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
+              "ratio": 0.9,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
             }
           ]
         },
         {
-          "name": "과충전 에너지 구체",
+          "name": "시장 연설",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.74,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
-              "k": "ifChain"
+              "k": "perStack",
+              "id": "냥이 드론"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.3,
               "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "냥이 드론",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "단추 개수 세금",
-          "tags": [
-            "신속"
-          ],
+          "name": "3초 이상은 못 참아",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.44,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
-              "k": "ifChain"
+              "k": "perStack",
+              "id": "냥이 드론"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "냥이 드론",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "주머니 드론",
-          "kind": "power"
+          "name": "기계마법 공학",
+          "kind": "atkUp"
         },
         {
-          "name": "1인 종신 시장",
-          "kind": "ap"
+          "name": "지름길",
+          "kind": "cost"
         },
         {
-          "name": "자폭은 낭만",
+          "name": "드론 한 대 더",
           "fx": [
             {
               "k": "stack",
-              "id": "드론",
+              "id": "냥이 드론",
               "v": 1
             }
           ]

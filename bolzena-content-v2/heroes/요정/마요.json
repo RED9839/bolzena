@@ -1,695 +1,881 @@
 {
- "heroes": [
-  {
-   "id": "마요",
-   "name": "마요",
-   "nature": "광기",
-   "race": "요정",
-   "role": "딜러",
-   "star": 2,
-   "hp": 500,
-   "atk": 125,
-   "def": 24,
-   "crit": 10,
-   "blurb": "움직이지 않는 것만 모으는 수집광 요정. 전당포를 운영하며 음침하게 흐흐 웃고, 교주를 최고의 수집품으로 점찍어 둔 채 경쟁자들을 견제합니다. 친구가 사라진 뒤로 「더는 움직이지 않는 것」만 모으게 됐고, 독침으로 움직임을 멈추게 하는 것도 수집의 일부. 말끝은 늘 음슴체임.",
-   "keyword": {
-    "name": "마취",
-    "desc": "독침으로 쌓는 마취",
-    "carrier": "enemy",
-    "cap": 3,
-    "per": [
-     {
-      "stat": "taken",
-      "v": 0.1
-     }
-    ],
-    "rules": [
-     {
-      "name": "완전 마취",
-      "when": {
-       "on": "stackReach",
-       "id": "마취",
-       "n": 3
+  "heroes": [
+    {
+      "id": "마요",
+      "name": "마요",
+      "nature": "광기",
+      "race": "요정",
+      "role": "딜러",
+      "star": 2,
+      "hp": 500,
+      "atk": 125,
+      "def": 24,
+      "crit": 10,
+      "blurb": "움직이지 않는 것만 모으는 수집광 요정. 전당포를 운영하며 음침하게 흐흐 웃고, 교주를 최고의 수집품으로 점찍어 둔 채 경쟁자들을 견제합니다. 친구가 사라진 뒤로 「더는 움직이지 않는 것」만 모으게 됐고, 독침으로 움직임을 멈추게 하는 것도 수집의 일부. 말끝은 늘 음슴체임.",
+      "keyword": {
+        "name": "마취독",
+        "desc": "수집품을 재우는 독침의 독",
+        "carrier": "enemy",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dot",
+            "ratio": 0.18
+          }
+        ],
+        "rules": [
+          {
+            "name": "움직이지 않는 수집품",
+            "when": {
+              "on": "stackReach",
+              "id": "마취독",
+              "n": 4
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "약화",
+                "v": 1
+              },
+              {
+                "k": "tough",
+                "v": 1
+              }
+            ]
+          }
+        ]
       },
-      "limit": {
-       "per": "turn",
-       "n": 1
+      "passives": [
+        {
+          "name": "마취 독침",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "전당포임",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "마요_trophy",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "그 수집품 내꺼임",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.5,
+            "target": "randomEnemy",
+            "hits": 8
+          },
+          {
+            "k": "stack",
+            "id": "마취독",
+            "v": 2,
+            "target": "allEnemies"
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "status",
-        "id": "둔화",
-        "v": 2
-       }
+      "starter": [
+        "마요_s1",
+        "마요_u1",
+        "마요_s2",
+        "마요_s3"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "움직이지 않는 수집품",
-     "when": {
-      "on": "hit"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "그 수집품 내꺼임",
-    "cost": 250,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 0.5,
-      "target": "randomEnemy",
-      "hits": 8
-     },
-     {
-      "k": "stack",
-      "id": "마취",
-      "v": 2,
-      "target": "allEnemies"
-     }
-    ]
-   },
-   "starter": [
-    "마요_s1",
-    "마요_s1",
-    "마요_s2",
-    "마요_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "마요_s1",
-   "name": "독침",
-   "hero": "마요",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "마요_s1",
+      "name": "독침",
+      "hero": "마요",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마요_s2",
+      "name": "맹독 대침",
+      "hero": "마요",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마요_s3",
+      "name": "진열장 뒤로",
+      "hero": "마요",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "마요_trophy",
+      "name": "박제 수집품",
+      "hero": "마요",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "마취독",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "마요_u1",
+      "name": "수집의 법칙임.",
+      "hero": "마요",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "stack",
+          "id": "마취독",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "수집가의 눈",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "진짜 보물",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "박제 이야기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "마취독",
+              "n": 3
+            },
+            {
+              "k": "make",
+              "id": "마요_trophy",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "특징으로 부르기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "수집품 점검",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "권총 코코",
+          "kind": "power"
+        },
+        {
+          "name": "자물쇠 따기",
+          "kind": "draw"
+        },
+        {
+          "name": "독침 장전",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마요_u2",
+      "name": "경쟁자 견제",
+      "hero": "마요",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.16,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "마취독"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.44,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "마취독",
+          "all": true,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정실 경쟁자 견제",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.51,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마취독",
+              "all": true,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 견제",
+          "cost": 0,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마취독",
+              "all": true,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "오래 지켜보기",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.53,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "밤에 30분",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마취독",
+              "all": true,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "마요_trophy",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "경매장 낙찰",
+          "tags": [
+            "분쇄"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "마요_trophy",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "경매장",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "무표정",
+          "kind": "cost"
+        },
+        {
+          "name": "진열장 한 칸",
+          "fx": [
+            {
+              "k": "make",
+              "id": "마요_trophy",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마요_u3",
+      "name": "마취 독침 세례",
+      "hero": "마요",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.36,
+          "target": "randomEnemy",
+          "hits": 4
+        },
+        {
+          "k": "stack",
+          "id": "마취독",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "독침 폭우",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "독침 대방출",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "randomEnemy",
+              "hits": 8
+            },
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "수집품 목록",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self"
+            }
+          ]
+        },
+        {
+          "name": "수집품 회수",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.01,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마취독",
+              "all": true,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "독 바르기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 3,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "마취 효과",
+          "kind": "frost"
+        },
+        {
+          "name": "잠옷 차림",
+          "kind": "ap"
+        },
+        {
+          "name": "바늘 연마",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마요_u4",
+      "name": "흐흐…",
+      "hero": "마요",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.73,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "마취독"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.26,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "흐흐흐…",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "이미 내꺼임",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "마취독",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "반항하는 수집품",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "마요_trophy",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "전당포 진열장",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "독 거두기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마취독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마취독",
+              "all": true,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "음침한 웃음",
+          "kind": "atkUp"
+        },
+        {
+          "name": "사진 한 장",
+          "kind": "draw"
+        },
+        {
+          "name": "하나뿐인 수집품",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마취독",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "마요_s2",
-   "name": "맹독 대침",
-   "hero": "마요",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "마요_s3",
-   "name": "진열장 뒤로",
-   "hero": "마요",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "마요_u1",
-   "name": "수집의 법칙임.",
-   "hero": "마요",
-   "unique": true,
-   "cost": 3,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.3,
-     "target": "oneEnemy",
-     "hits": 3
-    },
-    {
-     "k": "stack",
-     "id": "마취",
-     "v": 2,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "법칙 제1조",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.6,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "약식 법칙",
-     "cost": 2,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.1,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "표본 고정",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.3,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "perStack",
-       "id": "마취"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "싹쓸이 수집",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.15,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "전부 내꺼임.",
-     "cost": 4,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.9,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "희귀 표본",
-     "kind": "power"
-    },
-    {
-     "name": "감정사의 눈",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "따끔한 침",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "마요_u2",
-   "name": "경쟁자 견제",
-   "hero": "마요",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "분쇄"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "status",
-     "id": "취약",
-     "v": 2
-    }
-   ],
-   "oracles": [
-    {
-     "name": "확실한 견제",
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.7,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "발 걸기",
-     "cost": 1,
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "마취 견제",
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "경쟁자 전원 견제",
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.5,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "밑장 빼기",
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "뾰족한 신경전",
-     "kind": "power"
-    },
-    {
-     "name": "약점 수집",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "흘겨보기",
-     "kind": "draw"
-    }
-   ]
-  },
-  {
-   "id": "마요_u3",
-   "name": "마취 독침 세례",
-   "hero": "마요",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.6,
-     "target": "randomEnemy",
-     "hits": 5
-    },
-    {
-     "k": "stack",
-     "id": "마취",
-     "v": 1,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "독침 소나기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.75,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "몰래 한 발",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.4,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "마취 두 겹",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.65,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "한 놈 집중 사격",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "hits": 5
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "잠드는 독",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.65,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "진한 독",
-     "kind": "power"
-    },
-    {
-     "name": "저릿한 침",
-     "kind": "frost"
-    },
-    {
-     "name": "통째로 쏟기",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "마요_u4",
-   "name": "흐흐…",
-   "hero": "마요",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "stack",
-     "id": "마취",
-     "v": 2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "흐흐흐…",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.25,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "씨익",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "마취 진열",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "다 내꺼 될 거임",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "draw",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "숨긴 웃음",
-     "tags": [
-      "보존",
-      "주도"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "마취",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "음흉한 계산",
-     "kind": "ap"
-    },
-    {
-     "name": "진열장 열쇠",
-     "kind": "draw"
-    },
-    {
-     "name": "수집욕",
-     "kind": "atkUp"
-    }
-   ]
-  }
- ]
+  ]
 }

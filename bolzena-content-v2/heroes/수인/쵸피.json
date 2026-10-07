@@ -14,9 +14,9 @@
       "blurb": "사료스탕스의 티그를 동경해 최강의 전사를 꿈꾸며 매일 장작을 패는 꼬마 개 수인.",
       "keyword": {
         "name": "수련",
-        "desc": "격파로 쌓는 수련",
+        "desc": "하루도 거르지 않는 장작 패기",
         "carrier": "self",
-        "cap": 5,
+        "cap": 4,
         "per": [
           {
             "stat": "dealt",
@@ -29,7 +29,7 @@
             "when": {
               "on": "stackReach",
               "id": "수련",
-              "n": 5
+              "n": 4
             },
             "fx": [
               {
@@ -40,12 +40,12 @@
               {
                 "k": "growRun",
                 "id": "atk",
-                "v": 2
+                "v": 3
               },
               {
                 "k": "dmg",
-                "ratio": 1.5,
-                "target": "oneEnemy"
+                "ratio": 1.2,
+                "target": "allEnemies"
               }
             ]
           }
@@ -54,6 +54,19 @@
       "passives": [
         {
           "name": "하루도 거르지 않는 수련",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수련",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "강한 사람은 모두 스승",
           "when": {
             "on": "break",
             "mine": true
@@ -64,13 +77,13 @@
           },
           "fx": [
             {
-              "k": "growRun",
-              "id": "atk",
-              "v": 3
-            },
-            {
               "k": "stack",
               "id": "수련",
+              "v": 2
+            },
+            {
+              "k": "growRun",
+              "id": "atk",
               "v": 1
             }
           ]
@@ -98,7 +111,7 @@
       },
       "starter": [
         "쵸피_s1",
-        "쵸피_s1",
+        "쵸피_u4",
         "쵸피_s2",
         "쵸피_s3"
       ]
@@ -147,6 +160,29 @@
       ]
     },
     {
+      "hero": "쵸피",
+      "token": true,
+      "id": "쵸피_log",
+      "name": "쪼갠 장작",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "수련",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "오늘 몫의 장작입니다. 내일 몫도 팰 겁니다."
+    },
+    {
       "id": "쵸피_u1",
       "name": "퍄오오~",
       "hero": "쵸피",
@@ -156,11 +192,12 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.3,
-          "target": "oneEnemy"
+          "ratio": 1.15,
+          "target": "allEnemies"
         },
         {
-          "k": "tough",
+          "k": "stack",
+          "id": "수련",
           "v": 1
         }
       ],
@@ -170,11 +207,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
-              "target": "oneEnemy"
+              "ratio": 1.42,
+              "target": "allEnemies"
             },
             {
-              "k": "tough",
+              "k": "stack",
+              "id": "수련",
               "v": 1
             }
           ]
@@ -185,26 +223,8 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "수련의 기합",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
+              "ratio": 0.74,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -214,12 +234,18 @@
           ]
         },
         {
-          "name": "도끼 돌리기",
+          "name": "온몸 기합",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 2.16,
               "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "수련",
+              "v": 2
             },
             {
               "k": "tough",
@@ -229,17 +255,49 @@
           ]
         },
         {
-          "name": "온몸 기합",
-          "cost": 2,
+          "name": "매일 기합",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.5,
-              "target": "oneEnemy"
+              "ratio": 0.81,
+              "target": "allEnemies"
             },
             {
-              "k": "tough",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "쵸피_log",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "장작 기합",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "쵸피_log",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         }
@@ -251,11 +309,17 @@
         },
         {
           "name": "쩍 갈라진 틈",
-          "kind": "frost"
+          "kind": "weakSpot"
         },
         {
           "name": "기합 충전",
-          "kind": "atkUp"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수련",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -272,16 +336,22 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.55,
+          "ratio": 2.16,
           "target": "oneEnemy"
         },
         {
-          "k": "ifBreak"
+          "k": "perStack",
+          "id": "수련"
         },
         {
-          "k": "stack",
+          "k": "dmg",
+          "ratio": 0.27,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
           "id": "수련",
-          "v": 1
+          "all": true
         }
       ],
       "oracles": [
@@ -293,16 +363,22 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.05,
+              "ratio": 2.57,
               "target": "oneEnemy"
             },
             {
-              "k": "ifBreak"
+              "k": "perStack",
+              "id": "수련"
             },
             {
-              "k": "stack",
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
               "id": "수련",
-              "v": 1
+              "all": true
             }
           ]
         },
@@ -315,16 +391,22 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.75,
+              "ratio": 1.46,
               "target": "oneEnemy"
             },
             {
-              "k": "ifBreak"
+              "k": "perStack",
+              "id": "수련"
             },
             {
-              "k": "stack",
+              "k": "dmg",
+              "ratio": 0.21,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
               "id": "수련",
-              "v": 1
+              "all": true
             }
           ]
         },
@@ -336,42 +418,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.55,
+              "ratio": 2.3,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "수련",
-              "n": 3
+              "k": "perStack",
+              "id": "수련"
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.3,
               "target": "oneEnemy"
-            },
-            {
-              "k": "ifBreak"
-            },
-            {
-              "k": "stack",
-              "id": "수련",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "나무꾼 휘두르기",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifBreak"
             },
             {
               "k": "stack",
@@ -389,20 +446,50 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 4.0,
+              "ratio": 3.24,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "perStack",
+              "id": "수련"
             },
             {
-              "k": "ifBreak"
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "수련",
+              "k": "make",
+              "id": "쵸피_log",
               "v": 2
+            }
+          ]
+        },
+        {
+          "name": "나무꾼의 감",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수련"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -428,29 +515,21 @@
       "hero": "쵸피",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
-          "k": "status",
-          "id": "불굴",
-          "v": 1
+          "k": "dmg",
+          "ratio": 1.35,
+          "target": "oneEnemy"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "수련",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "perStack",
+          "id": "수련"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.24,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
@@ -458,84 +537,46 @@
           "name": "백 번 휘두르기",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.69,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수련",
-                      "v": 2
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "break",
-                    "mine": true
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수련",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "수련"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "목검 수련",
-          "cost": 0,
+          "name": "사부님 일과",
+          "power": true,
           "fx": [
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수련",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "장작 백 개",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.57,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "수련",
-              "v": 2
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -553,66 +594,61 @@
           "name": "사부님 흉내",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "perTag",
+              "id": "쵸피_log"
             },
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수련",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "수련 일지",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "수련",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "목검 수련",
+          "fx": [
+            {
+              "k": "discard",
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "수련",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 1.49,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수련"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "아침 수련",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수련"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -620,18 +656,18 @@
       "blesses": [
         {
           "name": "티그 님 흉내",
-          "kind": "atkUp"
+          "kind": "power"
         },
         {
           "name": "따라 하기",
-          "kind": "cost"
+          "kind": "draw"
         },
         {
-          "name": "아침 수련",
+          "name": "장작 한 짐",
           "fx": [
             {
-              "k": "stack",
-              "id": "수련",
+              "k": "make",
+              "id": "쵸피_log",
               "v": 1
             }
           ]
@@ -648,17 +684,18 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.5
-        },
-        {
-          "k": "status",
-          "id": "반격",
-          "v": 1
+          "ratio": 1.22
         },
         {
           "k": "stack",
           "id": "수련",
           "v": 1
+        },
+        {
+          "k": "transform",
+          "id": "쵸피_log",
+          "from": "쵸피_s1",
+          "n": 1
         }
       ],
       "oracles": [
@@ -667,17 +704,18 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.2
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "ratio": 1.77
             },
             {
               "k": "stack",
               "id": "수련",
               "v": 1
+            },
+            {
+              "k": "transform",
+              "id": "쵸피_log",
+              "from": "쵸피_s1",
+              "n": 1
             }
           ]
         },
@@ -687,12 +725,18 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 0.68
             },
             {
-              "k": "status",
-              "id": "반격",
+              "k": "stack",
+              "id": "수련",
               "v": 1
+            },
+            {
+              "k": "transform",
+              "id": "쵸피_log",
+              "from": "쵸피_s1",
+              "n": 1
             }
           ]
         },
@@ -700,59 +744,56 @@
           "name": "수련 겸 심부름",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.5
+              "k": "stack",
+              "id": "수련",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "수련",
+              "n": 3
             },
             {
               "k": "status",
               "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "수련",
               "v": 2
             }
           ]
         },
         {
-          "name": "되받아 찍기",
+          "name": "심부름 쪽지",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.0
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "ratio": 1.22
             },
             {
               "k": "stack",
               "id": "수련",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
             }
           ]
         },
         {
           "name": "장바구니 막기",
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 1.89
             },
             {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "stack",
+              "id": "수련",
+              "v": 3
             }
           ]
         }
@@ -763,8 +804,8 @@
           "kind": "guard"
         },
         {
-          "name": "심부름 쪽지",
-          "kind": "draw"
+          "name": "지는 건 싫어",
+          "kind": "defUp"
         },
         {
           "name": "한 걸음 수련",

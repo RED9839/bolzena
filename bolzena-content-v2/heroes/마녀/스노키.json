@@ -13,24 +13,33 @@
       "crit": 5,
       "blurb": "두유 유통 조직의 전 두목, 지금은 경호원 겸 오른팔. 동료가 주먹을 내밀 때마다 두유 한 병씩 건넵니다.",
       "keyword": {
-        "name": "두유",
-        "desc": "아군 공격에 맞춰 배달하는 두유",
+        "name": "밀두유",
+        "desc": "갈아 만든 콩물파의 비밀 상품",
         "carrier": "self",
         "cap": 3,
-        "endClear": true,
         "rules": [
           {
             "name": "세 병째",
             "when": {
               "on": "stackReach",
-              "id": "두유",
+              "id": "밀두유",
               "n": 3
             },
             "fx": [
               {
+                "k": "spend",
+                "id": "밀두유",
+                "all": true
+              },
+              {
+                "k": "shield",
+                "ratio": 0.6
+              },
+              {
                 "k": "status",
-                "id": "반격",
-                "v": 1
+                "id": "취약",
+                "v": 1,
+                "target": "allEnemies"
               }
             ]
           }
@@ -46,17 +55,35 @@
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 0.2
             },
             {
               "k": "stack",
-              "id": "두유",
+              "id": "밀두유",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "의리의 대명사",
+          "when": {
+            "on": "shieldBreak"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -88,7 +115,7 @@
         "스노키_s1",
         "스노키_s1",
         "스노키_s2",
-        "스노키_s2"
+        "스노키_u1"
       ]
     }
   ],
@@ -127,405 +154,19 @@
       "hero": "스노키",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
-      "signature": true,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
+        {
+          "k": "stack",
+          "id": "밀두유",
+          "v": 1
+        },
         {
           "k": "shield",
-          "ratio": 1.9
-        },
-        {
-          "k": "status",
-          "id": "반격",
-          "v": 1
-        }
-      ],
-      "blurb": "보스 앞에는 언제나 스노키가 섭니다",
-      "oracles": [
-        {
-          "name": "철통 경호",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.55
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "몸으로 막기",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.4
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "두목의 위엄",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.9
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "경호 교대",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.1
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "대기 중인 경호원",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.45
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "방탄 코트",
-          "kind": "guard"
-        },
-        {
-          "name": "선글라스",
-          "fx": [
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "무전기",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
-      "id": "스노키_u2",
-      "name": "두유 상자 던지기",
-      "hero": "스노키",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.75,
-          "target": "oneEnemy",
-          "base": "def"
-        },
-        {
-          "k": "stack",
-          "id": "두유",
-          "v": 1
-        }
-      ],
-      "blurb": "한 상자에 스물네 병. 맞으면 아픕니다",
-      "oracles": [
-        {
-          "name": "대형 상자",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "한 병 던지기",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "상자째 투척",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "냉장 두유",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "트럭째 배달",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "꽉 찬 상자",
-          "kind": "power"
-        },
-        {
-          "name": "차가운 두유",
-          "kind": "frost"
-        },
-        {
-          "name": "빠른 배달",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "스노키_u3",
-      "name": "오른팔의 신호",
-      "hero": "스노키",
-      "unique": true,
-      "cost": 0,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "status",
-          "id": "협공",
-          "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "두유",
-          "v": 1
-        }
-      ],
-      "blurb": "눈짓 한 번이면 조직이 움직입니다",
-      "oracles": [
-        {
-          "name": "합동 작전",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신호와 엄호",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.8
-            }
-          ]
-        },
-        {
-          "name": "작전 지시",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "두 병 건네기",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "잠복 신호",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "두유",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "수신호",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "비밀 암호",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "두유 한 병",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.5
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "스노키_u4",
-      "name": "불법 유통망",
-      "hero": "스노키",
-      "unique": true,
-      "cost": 1,
-      "type": "강화",
-      "fx": [
-        {
-          "k": "status",
-          "id": "결정화",
-          "v": 1
+          "ratio": 0.48
         },
         {
           "k": "power",
@@ -537,7 +178,7 @@
               "fx": [
                 {
                   "k": "stack",
-                  "id": "두유",
+                  "id": "밀두유",
                   "v": 1
                 }
               ]
@@ -545,131 +186,21 @@
           ]
         }
       ],
-      "blurb": "은퇴했어도 연락망은 살아 있습니다",
       "oracles": [
         {
-          "name": "전국 유통망",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "두유",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "동네 유통",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "두유",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "경호 계약",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "두유",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "유통 장부",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "두유",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "새벽 배송",
+          "name": "철통 경호",
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
+              "k": "stack",
+              "id": "밀두유",
               "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.64
             },
             {
               "k": "power",
@@ -681,7 +212,136 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "두유",
+                      "id": "밀두유",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "돈을 모시는 오른팔",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.72
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "대기 중인 경호원",
+          "cost": 0,
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "경호 교대",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "구역 순찰",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
                       "v": 1
                     }
                   ]
@@ -693,21 +353,487 @@
       ],
       "blesses": [
         {
-          "name": "전 두목",
+          "name": "부하 모집",
           "kind": "defUp"
         },
         {
-          "name": "새벽 출근",
-          "tags": [
-            "개전"
-          ]
+          "name": "문워크",
+          "kind": "cost"
         },
         {
-          "name": "비상 두유",
+          "name": "콩 한 줌",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스노키_u2",
+      "name": "불법 두유",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.96
+        },
+        {
+          "k": "stack",
+          "id": "밀두유",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "냉장 두유",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 1.25
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "한 병 건네기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.72
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "두유 영업",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "갈아 만든 콩물",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.49
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재고 처분",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "spend",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "두유 상자 방패",
+          "kind": "guard"
+        },
+        {
+          "name": "의리",
+          "kind": "draw"
+        },
+        {
+          "name": "미숫가루",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.24
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스노키_u3",
+      "name": "두유 상자 던지기",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.28,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "밀두유"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.12,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "밀두유",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대형 상자",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "밀두유"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "밀두유",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "날아 차기",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "밀두유"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "밀두유",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "스물네 병",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "밀두유",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.51,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "유통 장부",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "밀두유"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "상자째 투척",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "밀두유"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "발차기 각도",
+          "kind": "power"
+        },
+        {
+          "name": "콩 금단 현상",
+          "kind": "ap"
+        },
+        {
+          "name": "밀두유 한 상자",
+          "kind": "frost"
+        }
+      ]
+    },
+    {
+      "id": "스노키_u4",
+      "name": "불법 유통망",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.48,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "밀두유"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.24,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "전국 유통망",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "밀두유"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "동네 유통",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "밀두유"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "삼각회",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "every": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.8,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "경호 계약",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.45
+            },
+            {
+              "k": "perStack",
+              "id": "밀두유"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "새벽 배송",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.64,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "밀두유"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "밀두유",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "내 꿈은 빅보스",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "금테 장신구",
+          "kind": "draw"
+        },
+        {
+          "name": "두목 자리",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
             }
           ]
         }

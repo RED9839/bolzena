@@ -14,13 +14,13 @@
       "blurb": "영원살이 마녀 자매의 맏이이자 만년설의 현자. 공격마다 적에게 서리를 묻혀 파티의 칼이 깊이 박히게 하고, 눈보라로 적 전체를 쓸며, 넘친 서리는 그 자리에서 얼어 터집니다.",
       "keyword": {
         "name": "서리",
-        "desc": "맞을수록 깊이 박히는 눈꽃 서리",
+        "desc": "맞을수록 깊이 박히는 만년설의 눈꽃",
         "carrier": "enemy",
         "cap": 5,
         "per": [
           {
             "stat": "taken",
-            "v": 0.05
+            "v": 0.04
           },
           {
             "stat": "dealt",
@@ -28,6 +28,25 @@
           }
         ],
         "rules": [
+          {
+            "name": "눈꽃 개화",
+            "when": {
+              "on": "stackReach",
+              "id": "서리",
+              "n": 5
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 0.5,
+                "target": "allEnemies"
+              }
+            ]
+          },
           {
             "name": "얼어 터지는 서리",
             "when": {
@@ -53,7 +72,7 @@
       },
       "passives": [
         {
-          "name": "서리 탄환",
+          "name": "싸락나비",
           "when": {
             "on": "play",
             "type": "공격"
@@ -68,24 +87,24 @@
           ]
         },
         {
-          "name": "눈꽃 개화",
+          "name": "희망의 눈꽃",
           "when": {
-            "on": "break"
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "limit": {
+            "per": "fight",
+            "n": 1
           },
           "fx": [
             {
-              "k": "perStack",
-              "id": "서리"
+              "k": "cleanse",
+              "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "서리",
-              "all": true
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
             }
           ]
         }
@@ -114,7 +133,7 @@
       },
       "starter": [
         "아야_s1",
-        "아야_s1",
+        "아야_u3",
         "아야_s2",
         "아야_s3"
       ]
@@ -164,145 +183,131 @@
     },
     {
       "id": "아야_u1",
-      "name": "얼음 결정 탄",
+      "name": "싸락나비",
       "hero": "아야",
       "unique": true,
       "cost": 1,
       "type": "공격",
-      "signature": true,
-      "tags": [
-        "약점 공격"
-      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy"
+          "ratio": 0.33,
+          "target": "randomEnemy",
+          "hits": 3
         },
         {
           "k": "stack",
           "id": "서리",
           "v": 1,
-          "target": "oneEnemy"
+          "target": "allEnemies"
         }
       ],
-      "blurb": "맞은 자리부터 얼어붙는 탄환",
       "oracles": [
         {
-          "name": "단단한 결정",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "작은 결정",
-          "cost": 0,
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
           "name": "겹눈송이",
-          "tags": [
-            "약점 공격"
-          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
+              "ratio": 0.44,
+              "target": "randomEnemy",
+              "hits": 3
             },
             {
               "k": "stack",
               "id": "서리",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "작은 나비",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
-              "k": "status",
-              "id": "약화",
+              "k": "stack",
+              "id": "서리",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "나비 길잡이",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
           "name": "서리 꽃봉오리",
-          "tags": [
-            "약점 공격"
-          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
+              "ratio": 0.38,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "서리"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "눈보라 나비",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
               "k": "stack",
               "id": "서리",
               "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "맏이의 조준",
-          "tags": [
-            "약점 공격",
-            "주도"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "날 선 서리",
+          "name": "얼음 날개",
           "kind": "power"
         },
         {
-          "name": "얼어붙는 탄",
-          "kind": "frost"
+          "name": "냉차 한 모금",
+          "kind": "ap"
         },
         {
-          "name": "눈송이",
+          "name": "눈꽃 가루",
           "fx": [
             {
               "k": "stack",
@@ -316,71 +321,54 @@
     },
     {
       "id": "아야_u2",
-      "name": "눈보라 사격",
+      "name": "빙설화도 발도",
       "hero": "아야",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.45,
-          "target": "allEnemies",
-          "hits": 2
+          "ratio": 0.7,
+          "target": "oneEnemy"
         },
         {
-          "k": "stack",
+          "k": "perStack",
+          "id": "서리"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.26,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
           "id": "서리",
-          "v": 1,
-          "target": "allEnemies"
-        },
-        {
-          "k": "gauge",
-          "v": 15
+          "all": true
         }
       ],
-      "blurb": "눈보라 속에서도 과녁은 하나",
       "oracles": [
         {
-          "name": "한겨울 사격",
+          "name": "한겨울 발도",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies",
-              "hits": 2
+              "ratio": 0.87,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "서리"
             },
-            {
-              "k": "gauge",
-              "v": 15
-            }
-          ]
-        },
-        {
-          "name": "짧은 눈보라",
-          "cost": 1,
-          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
-              "target": "allEnemies",
-              "hits": 2
+              "ratio": 0.33,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "spend",
               "id": "서리",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "gauge",
-              "v": 10
+              "all": true
             }
           ]
         },
@@ -389,19 +377,50 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies",
-              "hits": 3
+              "ratio": 0.54,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "서리"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "서리",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "양산 발도",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "서리"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
             },
             {
               "k": "stack",
               "id": "서리",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "gauge",
-              "v": 15
+              "v": 3,
+              "target": "topEnemy"
             }
           ]
         },
@@ -410,59 +429,63 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies",
-              "hits": 2
+              "ratio": 0.87,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "서리"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "끝없는 겨울",
-          "cost": 3,
+          "tags": [
+            "분쇄",
+            "소멸"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies",
-              "hits": 3
+              "ratio": 1.65,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "서리",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "서리"
             },
             {
-              "k": "gauge",
-              "v": 25
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "세찬 바람",
-          "kind": "power"
-        },
-        {
-          "name": "빠른 장전",
-          "kind": "cost"
-        },
-        {
-          "name": "겨울 숨결",
+          "name": "빙설화도",
           "kind": "weakSpot"
+        },
+        {
+          "name": "맑은 칼날",
+          "kind": "draw"
+        },
+        {
+          "name": "눈사람",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -481,17 +504,10 @@
           "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
-          "target": "oneEnemy"
-        },
-        {
           "k": "draw",
           "v": 1
         }
       ],
-      "blurb": "먼저 얼려 두고, 그다음에 쏩니다",
       "oracles": [
         {
           "name": "깊은 동상",
@@ -503,56 +519,8 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
               "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "얼음 눈금",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "서릿발",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 2
             }
           ]
         },
@@ -562,77 +530,121 @@
             {
               "k": "stack",
               "id": "서리",
-              "v": 4,
-              "target": "allEnemies"
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "희망의 눈꽃",
-          "tags": [
-            "보존"
-          ],
+          "name": "첫눈",
+          "power": true,
           "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "얼음 눈금",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.69,
+              "target": "oneEnemy"
+            },
             {
               "k": "stack",
               "id": "서리",
               "v": 2,
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "눈 감고 조준",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
+              "k": "stack",
+              "id": "서리",
+              "v": 3,
               "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "차가운 손끝",
-          "kind": "draw"
-        },
-        {
-          "name": "하얀 숨",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "눈 덮인 길",
+          "name": "레몬차",
           "tags": [
             "보존"
           ]
+        },
+        {
+          "name": "하늘이 탁 트인 곳",
+          "kind": "draw"
+        },
+        {
+          "name": "눈꽃 한 송이",
+          "kind": "atkUp"
         }
       ]
     },
     {
       "id": "아야_u4",
-      "name": "영원살이 맏이",
+      "name": "만년설의 현자",
       "hero": "아야",
       "unique": true,
       "cost": 1,
       "type": "강화",
       "fx": [
         {
-          "k": "atkMod",
-          "v": 0.1,
-          "run": true,
-          "target": "self"
+          "k": "stack",
+          "id": "서리",
+          "v": 1,
+          "target": "allEnemies"
         },
         {
           "k": "power",
@@ -649,20 +661,33 @@
                   "target": "allEnemies"
                 }
               ]
+            },
+            {
+              "when": {
+                "on": "stackReach",
+                "id": "서리",
+                "n": 5
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.29,
+                  "target": "allEnemies"
+                }
+              ]
             }
           ]
         }
       ],
-      "blurb": "눈보라 속에서 희망을 찾아낸 맏이의 각오",
       "oracles": [
         {
-          "name": "맏이의 각오",
+          "name": "만개의 예감",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "power",
@@ -676,6 +701,20 @@
                       "k": "stack",
                       "id": "서리",
                       "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "서리",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.48,
                       "target": "allEnemies"
                     }
                   ]
@@ -689,67 +728,10 @@
           "cost": 0,
           "fx": [
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "서리",
-                      "v": 1,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "만개의 예감",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "서리",
-                      "v": 2,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "겨울 지킴이",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "power",
@@ -766,22 +748,33 @@
                       "target": "allEnemies"
                     }
                   ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "서리",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.3,
+                      "target": "allEnemies"
+                    }
+                  ]
                 }
               ]
             }
           ]
         },
         {
-          "name": "첫눈",
-          "tags": [
-            "개전"
-          ],
+          "name": "동생들 생각",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             },
             {
               "k": "stack",
@@ -801,6 +794,109 @@
                       "k": "stack",
                       "id": "서리",
                       "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "서리",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.39,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "희망의 눈꽃",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "서리",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.35,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "맏이의 각오",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "서리",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.39,
                       "target": "allEnemies"
                     }
                   ]
@@ -812,25 +908,18 @@
       ],
       "blesses": [
         {
-          "name": "단단한 마음",
+          "name": "새하얀 눈송이",
           "kind": "atkUp"
         },
         {
-          "name": "첫눈",
+          "name": "눈보라 권능",
           "tags": [
             "개전"
           ]
         },
         {
-          "name": "눈꽃 장식",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
+          "name": "겨울 지킴이",
+          "kind": "cost"
         }
       ]
     }

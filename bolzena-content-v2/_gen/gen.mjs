@@ -1,5 +1,6 @@
 // H1 — 요정 22명 생성기. node gen.mjs → C:\projects\bolzena-content-v2\heroes\요정\<사도키>.json
 import fs from 'fs';
+const REWORKED = JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')); // 리워크한 사도는 _gen/rework/rework.mjs 가 쓴다 — 여기서 덮어쓰지 않는다
 import path from 'path';
 const design = (await import('file:///C:/projects/볼제나/js/data/design.js')).default.heroes;
 const OUT = 'C:/projects/bolzena-content-v2/heroes/요정';
@@ -500,7 +501,7 @@ for (const h of H) {
   };
   const out = { heroes: [hero], cards };
   if (EQ[h.id]) out.equips = [EQ[h.id]];
-  fs.writeFileSync(path.join(OUT, `${h.id}.json`), JSON.stringify(out, null, 1));
+  if (REWORKED.includes(h.id)) console.log('건너뜀(리워크)', h.id); else fs.writeFileSync(path.join(OUT, `${h.id}.json`), JSON.stringify(out, null, 1));
   names.add(h.id);
 }
 console.log('썼다', names.size, [...names].join(' '));

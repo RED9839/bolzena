@@ -13,6 +13,8 @@ for (const slot of ['무기', '방어구', '장신구'])
   L.writeJson(`${ROOT}/world/equips/${slot}.json`, { equips: EQ.world.filter(e => e.slot === slot) });
 L.writeJson(`${ROOT}/world/neutral/교주카드.json`, { cards: NC.cards });
 
+// --world: 세계 장비 · 교주 카드 · _ref 만 쓰고 사도 파일(애착 장비)은 건드리지 않는다(2026-10-07 — 사도 담당이 애착 장비를 고치는 동안)
+const WORLD_ONLY = process.argv.includes('--world');
 // ── 사도 파일 — 최상위 "equips" 만 갈아 끼운다(다른 글자는 그대로) ──
 function walk(d, o = []) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walk(p, o); else if (f.endsWith('.json')) o.push(p); } return o; }
 // 최상위 키 "equips" 의 [키 시작, 값 끝) 범위와 그 앞 쉼표 위치
@@ -49,7 +51,7 @@ function findTopKey(t, key) {
   return null;
 }
 const indentJson = v => JSON.stringify(L.clean(v), null, 2).replace(/\n/g, '\n  ');
-const heroFiles = walk(`${ROOT}/heroes`);
+const heroFiles = WORLD_ONLY ? [] : walk(`${ROOT}/heroes`);
 const touched = [], removed = [];
 const owners = new Set(Object.keys(EQ.affinity));
 for (const f of heroFiles) {
@@ -77,7 +79,7 @@ for (const f of heroFiles) {
   touched.push(`${h.id}: ${want ? want.map(e => e.id).join(',') : '(애착 없음 — 지움)'}`);
   owners.delete(h.id);
 }
-if (owners.size) throw new Error('사도 파일을 못 찾은 애착 주인: ' + [...owners].join(','));
+if (owners.size && !WORLD_ONLY) throw new Error('사도 파일을 못 찾은 애착 주인: ' + [...owners].join(','));
 
 // ── 그림짝 · 칸 나눔 표 ──
 L.writeJson(`${ROOT}/_ref/그림짝.json`, {

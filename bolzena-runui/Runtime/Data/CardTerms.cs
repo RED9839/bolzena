@@ -395,7 +395,7 @@ namespace Bolzena.RunUI
             }
         }
 
-        static string CardGlyph => Icons != null ? "<sprite index=0 tint=1> " : "▣ ";
+        static string CardGlyph => "";   // 이름 앞 카드 아이콘은 쓰지 않는다(2026-10-08 — 작은 네모로 깨져 보인다 · 창마다 달랐다)
 
         /// <summary>Mark 한 글을 담을 TMP 에 아이콘 애셋을 건다(Mark 전에 · 뒤에 아무 때나).</summary>
         public static void Prepare(TMP_Text t)

@@ -56,6 +56,8 @@ namespace Bolzena.Core
             {
                 if (!c.Keep) SetStRaw(e, c.Name, Math.Min(c.Max, c.Start));
                 string mode = c.Mode ?? "now";
+                // 격파 · 기절로 쉬는 적은 지금 움직이지 못한다 — 「즉시」 수는 다음 차례로 미룬다(사용자 버그 2026-10-07: 격파된 불효자손이 심통으로 내리찍었다)
+                if (mode == "now" && e.Sealed) mode = "next";
                 Say($"{e.Name}: {c.Name} {after} — {(mode == "next" ? "다음 차례에" : mode == "replace" ? "수가 바뀐다" : "즉시")} 「{c.Act.Say ?? c.Name}」");
                 if (mode == "next") e.ForceNext = c.Act;
                 else if (mode == "replace") { e.Intent = c.Act; e.IntentFromCharge = false; StatusCue(e, "수 바뀜"); }
@@ -85,12 +87,15 @@ namespace Bolzena.Core
                         if (c.ClearTurnEnd && St(e, c.Name) > 0) { SetStRaw(e, c.Name, 0); Say($"{e.Name}: {c.Name} — 사라진다"); }
                         if (c.OnTurnEnd != 0) CounterAdd(e, c, c.OnTurnEnd);
                         break;
+                    case "attack":   // 자기가 치는 수를 한 뒤 — 모은 것을 쏟았다
+                        if (c.ClearOnAttack && St(e, c.Name) > 0) { SetStRaw(e, c.Name, 0); Say($"{e.Name}: {c.Name} — 쏟아 사라진다"); StatusCue(e, $"{c.Name} 0", true); }
+                        break;
                 }
             }
         }
 
         /// <summary>카드 종류 조건 — 「공격」 · 「!공격」(공격이 아닌 것).</summary>
-        static bool TypeOk(string want, string type) => want == null || (want.StartsWith("!") ? type != want.Substring(1) : type == want);
+        static bool TypeOk(string want, string type) => want == null || (want.StartsWith("!", StringComparison.Ordinal) ? type != want.Substring(1) : type == want);
 
         // ── 희귀종 ────────────────────────────────────────────────────
         bool HasRare(Unit e, string id, out RareDef r)
@@ -139,6 +144,7 @@ namespace Bolzena.Core
         /// <summary>적이 쓰러졌다 — 죽을 때 패시브(재 속 · 가사 · 그 밖의 수) · 그 적이 세운 Tied 적도 쓰러진다.</summary>
         void FoeDeath(Unit u)
         {
+            SeizeBack(u, "처치");   // 빼앗긴 카드는 쓰러뜨리면 돌아온다
             var d = Data.Enemy(u.Key);
             if (d != null && !(FoeQuiet > 0 && Turn <= FoeQuiet))
                 foreach (var p in FoePassList(d).Where(p => p.On == "death").ToList())
@@ -182,6 +188,7 @@ namespace Bolzena.Core
         {
             switch (it.T)
             {
+                case "seize": SeizeCards(e, it, say); return true;   // 손패 흡수(BattleSeize.cs)
                 case "count":
                     CounterAdd(e, CounterOf(e, it.Id), it.V);
                     Say($"{e.Name}: {say} ({it.Id} {(it.V >= 0 ? "+" : "")}{it.V})");

@@ -38,7 +38,7 @@ namespace Bolzena.Core
         }
         /// <summary>축복의 배율 꼴(power · cost · …) — 공용 축복이면 그 이름, 그 카드만의 축복이면 그 축복의 kind.</summary>
         public static string ShinKind(CardDef c, string shin) =>
-            shin == null ? null : shin.StartsWith("own") ? BlessOf(c, shin)?.Kind : shin;
+            shin == null ? null : shin.StartsWith("own", StringComparison.Ordinal) ? BlessOf(c, shin)?.Kind : shin;
         public string ShinOf(string id) => Shin.TryGetValue(id, out var s) ? s : null;
 
         bool BlessTag(string cardId, string tag)
@@ -47,7 +47,7 @@ namespace Bolzena.Core
             return b != null && b.Tags.Any(t => Tag.Parse(t).id == tag);
         }
         /// <summary>그 카드(손의 id)에 태그가 붙었나 — 카드 글의 태그 또는 고른 축복의 태그.</summary>
-        public bool HasTagB(string id, string tag) => (CardOf(id)?.HasTag(tag) ?? false) || BlessTag(id, tag) || KwTag(id, tag);
+        public bool HasTagB(string id, string tag) => (CardOf(id)?.HasTag(tag) ?? false) || BlessTag(id, tag) || KwTag(id, tag) || GameData.BaseId(id) == tag;   // 생성물 카드 id 도 갈래 태그로(perTag · 거르개 tag — 「케이크」 세기, 2026-10-07)
 
         HashSet<string> CardHitTags(string id, CardView c)
         {
@@ -195,7 +195,7 @@ namespace Bolzena.Core
                 FreeOnce.Add(cardId);
                 GainedFlash.Add((cardId, o.N, o.Shin));
                 var od = Data.Card(cardId).Oracles[o.N - 1];
-                Say($"신탁! 「{Data.Card(cardId).Name}」 → {od.Name}{(o.Shin != null ? " · 축복" : "")}");
+                Say($"신탁! 「{Data.Card(cardId).Name}」 → 신탁 {o.N}{(o.Shin != null ? " · 축복" : "")}");
             }
             else
             {
@@ -509,8 +509,9 @@ namespace Bolzena.Core
                 var after = (random ? runs.First(r => r.idx == e.Idx).b : runs[0].b).Enemies[e.Idx];
                 int hp = e.Hp - Math.Max(0, after.Hp);
                 int guard = Math.Max(0, e.Block - after.Block + e.Shield - after.Shield);
-                double tough = e.Broken || after.Dead ? 0 : Math.Max(0, e.Tough - after.Tough);
-                bool brk = !e.Broken && after.Broken && !after.Dead;
+                // 처치 일격도 강인도를 깎는다(LethalKill) — 쓰러뜨리며 격파하면 Kill · Brk 둘 다
+                double tough = e.Broken ? 0 : Math.Max(0, e.Tough - after.Tough);
+                bool brk = !e.Broken && after.Broken;
                 if (hp <= 0 && guard <= 0 && !after.Dead && tough <= 0) return null;
                 return new PreviewFoe { Hp = hp, Guard = guard, Kill = after.Dead, Max = random, Tough = tough, Brk = brk };
             }).ToList();

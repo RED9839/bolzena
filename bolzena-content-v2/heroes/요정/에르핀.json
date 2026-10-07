@@ -1,692 +1,820 @@
 {
- "heroes": [
-  {
-   "id": "에르핀",
-   "name": "에르핀",
-   "nature": "순수",
-   "race": "요정",
-   "role": "딜러",
-   "star": 3,
-   "hp": 550,
-   "atk": 155,
-   "def": 25,
-   "crit": 10,
-   "blurb": "요정 왕국 에르피엔의 먹보 여왕. 세계수가 씌운 왕관의 저주로 머리는 나빠지고 식욕은 폭발해 하루 12끼에 무전취식을 일삼고, 국정은 네르와 컨닝 페이퍼에 맡깁니다. 그래도 산을 뽑아 던지는 괴력과 순한 본심으로 결정적 순간엔 모든 종족을 한데 묶는 트러블메이커.",
-   "keyword": {
-    "name": "외상",
-    "desc": "큰 카드로 지는 밥값",
-    "carrier": "self",
-    "cap": 2
-   },
-   "passives": [
+  "heroes": [
     {
-     "name": "무전취식",
-     "when": {
-      "on": "kill",
-      "mine": true
-     },
-     "limit": {
-      "per": "turn",
-      "n": 1
-     },
-     "fx": [
-      {
-       "k": "make",
-       "id": "에르핀_cake",
-       "v": 1
+      "id": "에르핀",
+      "name": "에르핀",
+      "nature": "순수",
+      "race": "요정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 550,
+      "atk": 155,
+      "def": 25,
+      "crit": 10,
+      "blurb": "요정 왕국 에르피엔의 먹보 여왕. 세계수가 씌운 왕관의 저주로 머리는 나빠지고 식욕은 폭발해 하루 12끼에 무전취식을 일삼고, 국정은 네르와 컨닝 페이퍼에 맡깁니다. 그래도 산을 뽑아 던지는 괴력과 순한 본심으로 결정적 순간엔 모든 종족을 한데 묶는 트러블메이커.",
+      "keyword": {
+        "name": "배부름",
+        "desc": "케이크로 채운 여왕의 배",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.05
+          }
+        ]
       },
-      {
-       "k": "ifStack",
-       "id": "외상",
-       "n": 1
+      "passives": [
+        {
+          "name": "달달한 게 최고야!",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "무전취식",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "돌겨어어어!!! 억⋯?",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 3
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          }
+        ]
       },
-      {
-       "k": "spend",
-       "id": "외상",
-       "all": true
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "큰 주문",
-     "when": {
-      "on": "play",
-      "minCost": 2
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "외상",
-       "v": 1
-      }
-     ]
+      "starter": [
+        "에르핀_s1",
+        "에르핀_u2",
+        "에르핀_s2",
+        "에르핀_s3"
+      ]
     }
-   ],
-   "ult": {
-    "name": "돌겨어어어!!! 억⋯?",
-    "cost": 250,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 2,
-      "target": "allEnemies"
-     },
-     {
-      "k": "status",
-      "id": "피해 감소",
-      "v": 3
-     },
-     {
-      "k": "status",
-      "id": "약화",
-      "v": 2,
-      "target": "allEnemies"
-     }
-    ]
-   },
-   "starter": [
-    "에르핀_s1",
-    "에르핀_s1",
-    "에르핀_s2",
-    "에르핀_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "에르핀_s1",
-   "name": "마력탄",
-   "hero": "에르핀",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "에르핀_s1",
+      "name": "마력탄",
+      "hero": "에르핀",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "에르핀_s2",
+      "name": "특대 마력탄",
+      "hero": "에르핀",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "에르핀_s3",
+      "name": "도끼도 튕기는 몸",
+      "hero": "에르핀",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "에르핀_cake",
+      "name": "케이크",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.4
+        },
+        {
+          "k": "stack",
+          "id": "배부름",
+          "v": 1
+        }
+      ],
+      "hero": "에르핀",
+      "token": true
+    },
+    {
+      "id": "에르핀_u1",
+      "name": "마력탄 폭주",
+      "hero": "에르핀",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "target": "randomEnemy",
+          "hits": 3
+        },
+        {
+          "k": "perTag",
+          "id": "에르핀_cake"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "exileFrom",
+          "from": "hand",
+          "all": true,
+          "tag": "에르핀_cake"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "마력 대방출",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "perTag",
+              "id": "에르핀_cake"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "에르핀_cake"
+            }
+          ]
+        },
+        {
+          "name": "그건 아까잖아",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "배부름"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "백성들이여!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "에르핀_cake"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "에르핀_cake"
+            }
+          ]
+        },
+        {
+          "name": "사교 적성",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perTag",
+              "id": "에르핀_cake"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "와구와구 발사!!",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perTag",
+              "id": "에르핀_cake"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.62,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "아이스크림 케이크",
+          "kind": "power"
+        },
+        {
+          "name": "숨 쉬고 먹고 자고",
+          "kind": "draw"
+        },
+        {
+          "name": "쫀득한 초코 층",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_u2",
+      "name": "무한의 케이크",
+      "hero": "에르핀",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "에르핀_cake",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "열두 끼 정식",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "한 입만",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "친구 몰래 한 조각",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "에르핀_cake",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "먹어도 먹어도 다시",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "친구 몫까지",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "당 충전",
+          "kind": "ap"
+        },
+        {
+          "name": "포크 하나 더",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "배고파서 서두름",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "에르핀_u3",
+      "name": "순수 케이크 공격!!!",
+      "hero": "에르핀",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.85,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "make",
+          "id": "에르핀_cake",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진심 전력!!!",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "케이크 폭탄!!!",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.79,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "크림 방패",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.72
+            }
+          ]
+        },
+        {
+          "name": "케이크 하나 더!",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "혼자 다 먹기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "설탕 듬뿍",
+          "kind": "power"
+        },
+        {
+          "name": "휘핑크림",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "한 조각 더",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "에르핀_u4",
+      "name": "맨주먹 결계 부수기",
+      "hero": "에르핀",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.8,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "배부름"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "배부름",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진심 펀치",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "배부름"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "결계째 박살",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "배부름"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "배부름",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "밥값은 했어",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.96,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "배부름"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "한 방 올인",
+          "tags": [
+            "분쇄",
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 4.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "배부름"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "에르핀_cake"
+            }
+          ]
+        },
+        {
+          "name": "결계 툭툭",
+          "cost": 1,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "배부름"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "배부름",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "주먹에 마력",
+          "kind": "power"
+        },
+        {
+          "name": "금 간 결계",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "밥 먹고 힘내기",
+          "kind": "ap"
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "에르핀_s2",
-   "name": "특대 마력탄",
-   "hero": "에르핀",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "에르핀_s3",
-   "name": "도끼도 튕기는 몸",
-   "hero": "에르핀",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "에르핀_u1",
-   "name": "맨주먹 결계 부수기",
-   "hero": "에르핀",
-   "unique": true,
-   "cost": 3,
-   "type": "공격",
-   "debt": true,
-   "tags": [
-    "분쇄"
-   ],
-   "fx": [
-    {
-     "k": "strip"
-    },
-    {
-     "k": "dmg",
-     "ratio": 3.6,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "진심 펀치",
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "strip"
-      },
-      {
-       "k": "dmg",
-       "ratio": 4.4,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "결계 툭툭",
-     "cost": 2,
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "strip"
-      },
-      {
-       "k": "dmg",
-       "ratio": 3.0,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "밥값은 했어",
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "strip"
-      },
-      {
-       "k": "dmg",
-       "ratio": 4.0,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "결계째 박살",
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "strip"
-      },
-      {
-       "k": "dmg",
-       "ratio": 2.7,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "한 방 올인",
-     "tags": [
-      "분쇄",
-      "소멸"
-     ],
-     "fx": [
-      {
-       "k": "strip"
-      },
-      {
-       "k": "dmg",
-       "ratio": 7.5,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "주먹에 마력",
-     "kind": "power"
-    },
-    {
-     "name": "금 간 결계",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "밥 먹고 힘내기",
-     "kind": "ap"
-    }
-   ]
-  },
-  {
-   "id": "에르핀_u2",
-   "name": "마력탄 폭주",
-   "hero": "에르핀",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "debt": true,
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.6,
-     "target": "randomEnemy",
-     "hits": 5
-    },
-    {
-     "k": "ifKill"
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "마력 대방출",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.72,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "마력탄 난사",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.42,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "외상 탕감",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.65,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "과녁 하나",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.65,
-       "target": "oneEnemy",
-       "hits": 5
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "눈먼 마력",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "과충전",
-     "kind": "power"
-    },
-    {
-     "name": "흔들리는 표적",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "참지 못함",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "에르핀_u3",
-   "name": "순수 케이크 공격!!!",
-   "hero": "에르핀",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "debt": true,
-   "tags": [
-    "연계"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.8,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "status",
-     "id": "피해 감소",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "진심 전력!!!",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.15,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "한 입만",
-     "cost": 0,
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.45,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "케이크 하나 더!",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "make",
-       "id": "에르핀_cake",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "케이크 폭탄!!!",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "크림 방패",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 0.8
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "설탕 듬뿍",
-     "kind": "power"
-    },
-    {
-     "name": "휘핑크림",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "한 조각 더",
-     "kind": "draw"
-    }
-   ]
-  },
-  {
-   "id": "에르핀_u4",
-   "name": "무한의 케이크",
-   "hero": "에르핀",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "make",
-     "id": "에르핀_cake",
-     "v": 1
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "두 판 굽기",
-     "fx": [
-      {
-       "k": "make",
-       "id": "에르핀_cake",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "부스러기",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "make",
-       "id": "에르핀_cake",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "외상으로 한 판",
-     "fx": [
-      {
-       "k": "make",
-       "id": "에르핀_cake",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "외상",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "나눠 먹는 케이크",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.0
-      },
-      {
-       "k": "make",
-       "id": "에르핀_cake",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "비상 케이크",
-     "tags": [
-      "보존",
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "make",
-       "id": "에르핀_cake",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "당 충전",
-     "kind": "ap"
-    },
-    {
-     "name": "포크 하나 더",
-     "kind": "draw"
-    },
-    {
-     "name": "배고파서 서두름",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "에르핀_cake",
-   "name": "케이크",
-   "cost": 0,
-   "type": "스킬",
-   "tags": [
-    "소멸"
-   ],
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 0.6
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "hero": "에르핀",
-   "token": true
-  }
- ],
- "equips": [
+  ],
+  "equips": [
     {
       "id": "eq_erpinstaff",
       "name": "에르핀의 지팡이",
@@ -721,21 +849,15 @@
       },
       "affinityEffect": [
         {
-          "name": "외상 장부 펼치기",
+          "name": "간식 꺼내기",
           "when": {
-            "on": "turnStart"
+            "on": "fightStart"
           },
-          "conds": [
-            {
-              "c": "hpMin",
-              "pct": 0.99
-            }
-          ],
           "fx": [
             {
-              "k": "stack",
-              "id": "외상",
-              "v": 1
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
             }
           ]
         }

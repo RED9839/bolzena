@@ -13,34 +13,21 @@
       "crit": 5,
       "blurb": "마법 소녀로 변신한 다야. 변신이 부끄러워 누구보다 빨리 끝내고 싶습니다. 파티가 바쁘게 카드를 낼수록 반짝이는 빛이 상처를 아물게 하고, 마무리 빔이 손에 들어옵니다.",
       "keyword": {
-        "name": "얼른 끝내자",
-        "desc": "턴 첫 카드로 켜는 마음",
+        "name": "퓨어☆영역",
+        "desc": "발밑에 펼친 반짝이는 마법진",
         "carrier": "self",
-        "cap": 1,
-        "endClear": true,
-        "rules": [
+        "cap": 3,
+        "endDecay": 1,
+        "per": [
           {
-            "name": "서두르는 마음",
-            "when": {
-              "on": "stackOver",
-              "id": "얼른 끝내자"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "draw",
-                "v": 1
-              }
-            ]
+            "stat": "hot",
+            "ratio": 0.25
           }
         ]
       },
       "passives": [
         {
-          "name": "퓨어☆피니시",
+          "name": "퓨어☆포즈",
           "when": {
             "on": "play",
             "who": "any",
@@ -52,22 +39,30 @@
           },
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.8
-            },
-            {
-              "k": "make",
-              "id": "다야_퓨어샤인_finish",
+              "k": "stack",
+              "id": "퓨어☆영역",
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "얼른 끝내자",
-              "n": 1
+              "k": "heal",
+              "ratio": 0.3
+            }
+          ]
+        },
+        {
+          "name": "마법 소녀는 편지 쓰는 중",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.5
             },
             {
-              "k": "make",
-              "id": "다야_퓨어샤인_finish",
+              "k": "status",
+              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -103,7 +98,7 @@
         "다야_퓨어샤인_s1",
         "다야_퓨어샤인_s1",
         "다야_퓨어샤인_s2",
-        "다야_퓨어샤인_s2"
+        "다야_퓨어샤인_u4"
       ]
     }
   ],
@@ -136,6 +131,25 @@
       ]
     },
     {
+      "hero": "다야_퓨어샤인",
+      "token": true,
+      "id": "다야_퓨어샤인_finish",
+      "name": "샤이닝 피니시",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.34,
+          "target": "oneEnemy",
+          "hits": 4
+        }
+      ]
+    },
+    {
       "id": "다야_퓨어샤인_u1",
       "name": "매지컬☆샤인",
       "hero": "다야_퓨어샤인",
@@ -145,142 +159,134 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.2
-        },
-        {
-          "k": "heal",
-          "ratio": 1.0
-        },
-        {
-          "k": "ifNth",
-          "n": 1
+          "ratio": 1.7
         },
         {
           "k": "stack",
-          "id": "얼른 끝내자",
-          "v": 1
+          "id": "퓨어☆영역",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "변신 완료",
-          "cost": 0,
+          "name": "매지컬☆샤인 MAX",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.7
+              "ratio": 2.3
             },
             {
-              "k": "heal",
-              "ratio": 0.6
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "서둘러 끝내자",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.84
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 2
             },
             {
               "k": "ifNth",
               "n": 1
             },
             {
-              "k": "stack",
-              "id": "얼른 끝내자",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "풀 파워 변신",
+          "name": "반짝 반창고",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
               "k": "heal",
-              "ratio": 1.3
-            },
-            {
-              "k": "ifNth",
-              "n": 1
+              "ratio": 2.69
             },
             {
               "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "매지컬☆포즈",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.0
-            },
-            {
-              "k": "heal",
-              "ratio": 1.0
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "포즈 한 번 더",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.4
-            },
-            {
-              "k": "heal",
-              "ratio": 1.0
-            },
-            {
-              "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
+              "id": "퓨어☆영역",
+              "v": 2
             }
           ]
         },
         {
           "name": "나의 아름다운 장미꽃에게",
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.5
-            },
-            {
-              "k": "heal",
-              "ratio": 1.2
-            },
-            {
-              "k": "ifNth",
-              "n": 1
+              "ratio": 1.53
             },
             {
               "k": "stack",
-              "id": "얼른 끝내자",
+              "id": "퓨어☆영역",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "매지컬☆변신",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.89
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.75
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "변신 주문 단축",
-          "kind": "cost"
-        },
-        {
-          "name": "반짝이 가루",
+          "name": "매지컬☆스태프",
           "kind": "guard"
         },
         {
-          "name": "지상 주민의 응원",
+          "name": "별빛 리본",
           "kind": "draw"
+        },
+        {
+          "name": "하트 스티커",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -294,16 +300,12 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 1.02,
           "target": "oneEnemy"
         },
         {
-          "k": "ifNth",
-          "n": 1
-        },
-        {
           "k": "stack",
-          "id": "얼른 끝내자",
+          "id": "퓨어☆영역",
           "v": 1
         }
       ],
@@ -313,51 +315,42 @@
           "fx": [
             {
               "k": "dmg",
+              "ratio": 1.36,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "에너지 파동",
+          "fx": [
+            {
+              "k": "dmg",
               "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "얼른 끝내자!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.11,
               "target": "oneEnemy"
             },
             {
-              "k": "ifNth",
-              "n": 1
-            },
-            {
               "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "매지컬☆버스트",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifNth",
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "지원 사격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
+              "id": "퓨어☆영역",
               "v": 1
             },
             {
@@ -366,236 +359,255 @@
             },
             {
               "k": "stack",
-              "id": "얼른 끝내자",
+              "id": "퓨어☆영역",
               "v": 1
             }
           ]
         },
         {
-          "name": "마무리 포즈",
+          "name": "샤이닝 피니시",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "ifNth",
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "부끄럽느니라!",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 0.85,
               "target": "oneEnemy"
             },
             {
               "k": "make",
               "id": "다야_퓨어샤인_finish",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "영역 해방",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
             },
             {
-              "k": "ifNth",
-              "n": 1
+              "k": "perStack",
+              "id": "퓨어☆영역"
             },
             {
-              "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "별빛 충전",
+          "name": "반짝 별",
           "kind": "power"
         },
         {
-          "name": "반짝",
-          "kind": "draw"
+          "name": "매지컬☆윙크",
+          "kind": "ap"
         },
         {
-          "name": "용족의 위엄",
-          "kind": "frost"
+          "name": "한 번 더 변신",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
         }
       ]
     },
     {
       "id": "다야_퓨어샤인_u3",
-      "name": "교주의 편지",
+      "name": "스타☆샤인",
       "hero": "다야_퓨어샤인",
       "unique": true,
-      "cost": 0,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "draw",
-          "v": 1
+          "k": "shield",
+          "ratio": 1.02
         },
         {
-          "k": "ifNth",
-          "n": 1
+          "k": "perStack",
+          "id": "퓨어☆영역"
         },
         {
-          "k": "stack",
-          "id": "얼른 끝내자",
-          "v": 1
+          "k": "shield",
+          "ratio": 0.77
+        },
+        {
+          "k": "spend",
+          "id": "퓨어☆영역",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "장문의 편지",
+          "name": "스타☆샤인 MAX",
           "fx": [
             {
-              "k": "draw",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.36
             },
             {
-              "k": "ifNth",
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "칭찬을 기다리겠느니라",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "퓨어☆영역"
             },
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 0.85
             },
             {
-              "k": "ifNth",
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
             }
           ]
         },
         {
-          "name": "빨개진 얼굴",
-          "tags": [
-            "소멸"
-          ],
+          "name": "편지 한 장 더",
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.91
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "perStack",
+              "id": "퓨어☆영역"
             },
             {
-              "k": "ifNth",
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.64
             }
           ]
         },
         {
-          "name": "편지 쓰는 마법 소녀",
-          "tags": [
-            "보존"
-          ],
+          "name": "기다림 끝의 답장",
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "heal",
+              "ratio": 1.39
             },
             {
-              "k": "ifNth",
-              "n": 1
+              "k": "perStack",
+              "id": "퓨어☆영역"
             },
             {
-              "k": "stack",
-              "id": "얼른 끝내자",
-              "v": 1
+              "k": "heal",
+              "ratio": 1.1
+            },
+            {
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
             }
           ]
         },
         {
-          "name": "기다림 끝에 도착한 답장",
+          "name": "영원한 팬레터",
+          "power": true,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "퓨어☆영역"
             },
             {
-              "k": "make",
-              "id": "다야_퓨어샤인_finish",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.94
+            },
+            {
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "퓨어☆영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "팬레터 답장",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "퓨어☆영역"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.02
+            },
+            {
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "우표",
-          "kind": "draw"
+          "name": "하트 편지지",
+          "kind": "heal"
         },
         {
-          "name": "편지지 향기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "답장",
+          "name": "우체통",
           "tags": [
             "보존"
           ]
+        },
+        {
+          "name": "답장 기다림",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
         }
-      ],
-      "blurb": "교주에게 칭찬받고 싶어 쓰는 편지. 답장은 언제 오려나."
+      ]
     },
     {
       "id": "다야_퓨어샤인_u4",
       "name": "매지컬☆샤인 영역",
       "hero": "다야_퓨어샤인",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
-        },
         {
           "k": "status",
           "id": "결의",
@@ -611,7 +623,7 @@
               "fx": [
                 {
                   "k": "stack",
-                  "id": "얼른 끝내자",
+                  "id": "퓨어☆영역",
                   "v": 1
                 }
               ]
@@ -621,8 +633,10 @@
       ],
       "oracles": [
         {
-          "name": "작은 영역",
-          "cost": 1,
+          "name": "반짝 영역 확장",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "status",
@@ -639,7 +653,7 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "얼른 끝내자",
+                      "id": "퓨어☆영역",
                       "v": 2
                     }
                   ]
@@ -649,17 +663,19 @@
           ]
         },
         {
-          "name": "반짝반짝 결계",
+          "name": "반짝이 가루",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "status",
               "id": "결의",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.02
             },
             {
               "k": "power",
@@ -671,71 +687,7 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "얼른 끝내자",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "일 초 만에 끝내겠느니라",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "make",
-              "id": "다야_퓨어샤인_finish",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "얼른 끝내자",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "스타☆샤인",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "얼른 끝내자",
+                      "id": "퓨어☆영역",
                       "v": 1
                     }
                   ]
@@ -745,16 +697,18 @@
           ]
         },
         {
-          "name": "부끄러운 영역",
-          "cost": 1,
+          "name": "위기의 마법 소녀",
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "shield",
+              "ratio": 2.04
+            },
+            {
+              "k": "heal",
+              "ratio": 0.68
             },
             {
               "k": "power",
@@ -766,7 +720,84 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "얼른 끝내자",
+                      "id": "퓨어☆영역",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "응원 편지",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "퓨어☆영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "늦은 등장",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "퓨어☆영역",
                       "v": 1
                     }
                   ]
@@ -778,48 +809,21 @@
       ],
       "blesses": [
         {
-          "name": "따스한 빛",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
-            }
-          ]
+          "name": "마법진",
+          "kind": "defUp"
         },
         {
-          "name": "영역 확장",
-          "tags": [
-            "개전"
-          ]
+          "name": "공연 준비",
+          "kind": "cost"
         },
         {
-          "name": "응원봉",
+          "name": "반짝 왕관",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.4
             }
           ]
-        }
-      ]
-    },
-    {
-      "hero": "다야_퓨어샤인",
-      "token": true,
-      "id": "다야_퓨어샤인_finish",
-      "name": "샤이닝 피니시",
-      "cost": 0,
-      "type": "공격",
-      "tags": [
-        "증발"
-      ],
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.3,
-          "target": "oneEnemy",
-          "hits": 5
         }
       ]
     }

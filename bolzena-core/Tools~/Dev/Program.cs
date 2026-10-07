@@ -240,6 +240,9 @@ static class Program
                     Console.WriteLine($"→ {Path.GetFullPath(outp)} · {rows.Sum(r => r.N)}판 · {(DateTime.Now - t0).TotalSeconds:0}초");
                     return 0;
                 }
+            case "bench":
+                // bench [판 20] [--seed 0] [--rep 3] [--records 파일] · bench --sim 바퀴 [--threads 8] · bench --textdump 파일 — 엔진 성능(Bench.cs)
+                return Bench.Run(data, rest);
             case "bossult":
                 {
                     // bossult [--out 파일.md] — 보스 클론 고학년 변환표(사도마다 원래 효과 · 보스 효과 · 예고 피해)

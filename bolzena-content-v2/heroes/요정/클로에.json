@@ -1,723 +1,879 @@
 {
- "heroes": [
-  {
-   "id": "클로에",
-   "name": "클로에",
-   "nature": "광기",
-   "race": "요정",
-   "role": "탱커",
-   "star": 3,
-   "hp": 990,
-   "atk": 112,
-   "def": 75,
-   "crit": 5,
-   "blurb": "자기 권능을 통째로 곰인형 세바스티안에게 맡겨둔 영원살이 재단사. 엘다인 중 셈이 가장 밝지만 \"아?\" 소리와 함께 성질머리가 먼저 나가는, 건치 미소의 「클황」.",
-   "keyword": {
-    "name": "바늘땀",
-    "desc": "스킬로 꿰매는 바늘땀",
-    "carrier": "self",
-    "cap": 2,
-    "rules": [
-     {
-      "name": "세바스티안 바느질",
-      "when": {
-       "on": "stackReach",
-       "id": "바늘땀",
-       "n": 2
-      },
-      "fx": [
-       {
-        "k": "spend",
-        "id": "바늘땀",
-        "all": true
-       },
-       {
-        "k": "make",
-        "id": "클로에_cloth",
-        "v": 1
-       }
-      ]
-     }
-    ]
-   },
-   "passives": [
+  "heroes": [
     {
-     "name": "재단사의 손",
-     "when": {
-      "on": "play",
-      "type": "스킬"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "ult": {
-    "name": "쁘띠 세바스티안",
-    "cost": 300,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 0.6,
-      "target": "randomEnemy",
-      "hits": 7
-     },
-     {
-      "k": "status",
-      "id": "둔화",
-      "v": 1,
-      "target": "allEnemies"
-     },
-     {
-      "k": "make",
-      "id": "클로에_cloth",
-      "v": 2
-     }
-    ]
-   },
-   "starter": [
-    "클로에_s1",
-    "클로에_s1",
-    "클로에_s2",
-    "클로에_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "클로에_s1",
-   "name": "세바스티안 앞발",
-   "hero": "클로에",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "클로에_s2",
-   "name": "원단 두르기",
-   "hero": "클로에",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "클로에_u1",
-   "name": "메리 고 라운드",
-   "hero": "클로에",
-   "unique": true,
-   "cost": 2,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 3.2
-    },
-    {
-     "k": "status",
-     "id": "반격",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "바늘땀",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "멈추지 않는 목마",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 4.1
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "꼬마 목마",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.0
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "감침질 회전",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.4
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "가시 돋친 목마",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.0
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "한밤의 놀이공원",
-     "cost": 3,
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 5.0
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "솜 충전",
-     "kind": "guard"
-    },
-    {
-     "name": "세바스티안 꼭 안기",
-     "kind": "defUp"
-    },
-    {
-     "name": "회전 관성",
-     "kind": "draw"
-    }
-   ]
-  },
-  {
-   "id": "클로에_u2",
-   "name": "세바스티안 연타",
-   "hero": "클로에",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.9,
-     "target": "oneEnemy",
-     "hits": 3
-    }
-   ],
-   "oracles": [
-    {
-     "name": "분노의 세바스티안",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.1,
-       "target": "oneEnemy",
-       "hits": 3
-      }
-     ]
-    },
-    {
-     "name": "앞발 툭툭",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.63,
-       "target": "oneEnemy",
-       "hits": 3
-      }
-     ]
-    },
-    {
-     "name": "꿰매는 연타",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.95,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "세바스티안 난동",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "allEnemies",
-       "hits": 3
-      }
-     ]
-    },
-    {
-     "name": "솜뭉치 방패",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.85,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "shield",
-       "ratio": 1.5
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "발톱 세우기",
-     "kind": "power"
-    },
-    {
-     "name": "틈새 앞발",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "물어뜯기",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "클로에_u3",
-   "name": "건치 스마일",
-   "hero": "클로에",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    },
-    {
-     "k": "status",
-     "id": "피해 감소",
-     "v": 2
-    }
-   ],
-   "oracles": [
-    {
-     "name": "반짝 건치",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.6
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "살짝 미소",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1.3
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "바늘땀 미소",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.0
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "섬뜩한 미소",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.0
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "굳어 버린 미소",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.2
-      },
-      {
-       "k": "status",
-       "id": "실드 유지",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "치아 미백",
-     "kind": "guard"
-    },
-    {
-     "name": "미소 연습",
-     "kind": "draw"
-    },
-    {
-     "name": "근거 없는 자신감",
-     "kind": "defUp"
-    }
-   ]
-  },
-  {
-   "id": "클로에_u4",
-   "name": "의지를 넘긴 날",
-   "hero": "클로에",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "defMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
-        {
-         "k": "stack",
-         "id": "바늘땀",
-         "v": 1
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "oracles": [
-    {
-     "name": "촘촘한 의지",
-     "tags": [],
-     "fx": [
-      {
-       "k": "defMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
+      "id": "클로에",
+      "name": "클로에",
+      "nature": "광기",
+      "race": "요정",
+      "role": "탱커",
+      "star": 3,
+      "hp": 990,
+      "atk": 112,
+      "def": 75,
+      "crit": 5,
+      "blurb": "자기 권능을 통째로 곰인형 세바스티안에게 맡겨둔 영원살이 재단사. 엘다인 중 셈이 가장 밝지만 \"아?\" 소리와 함께 성질머리가 먼저 나가는, 건치 미소의 「클황」.",
+      "keyword": {
+        "name": "바늘땀",
+        "desc": "인형을 짓는 재단사의 바늘땀",
+        "carrier": "self",
+        "cap": 2,
+        "rules": [
           {
-           "k": "stack",
-           "id": "바늘땀",
-           "v": 2
+            "name": "세바스티안 바느질",
+            "when": {
+              "on": "stackReach",
+              "id": "바늘땀",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "바늘땀",
+                "all": true
+              },
+              {
+                "k": "make",
+                "id": "클로에_cloth",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "재단사의 손",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재단사의 손",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재단사의 손",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "셀러브리티 클로에",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "클로에_sebas",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "쁘띠 세바스티안",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.6,
+            "target": "randomEnemy",
+            "hits": 7
           },
           {
-           "k": "shield",
-           "ratio": 0.3
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "실 한 가닥",
-     "cost": 0,
-     "tags": [],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
+            "k": "status",
+            "id": "둔화",
+            "v": 1,
+            "target": "allEnemies"
+          },
           {
-           "k": "stack",
-           "id": "바늘땀",
-           "v": 1
+            "k": "make",
+            "id": "클로에_cloth",
+            "v": 2
           }
-         ]
-        }
-       ]
-      }
-     ]
-    },
+        ]
+      },
+      "starter": [
+        "클로에_s1",
+        "클로에_s1",
+        "클로에_s2",
+        "클로에_u2"
+      ]
+    }
+  ],
+  "cards": [
     {
-     "name": "한 땀의 의지",
-     "tags": [],
-     "fx": [
-      {
-       "k": "defMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
+      "id": "클로에_s1",
+      "name": "세바스티안 앞발",
+      "hero": "클로에",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "바늘땀",
-           "v": 1
-          }
-         ]
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         }
-       ]
-      }
-     ]
+      ]
     },
     {
-     "name": "접어 둔 의지",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "defMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
+      "id": "클로에_s2",
+      "name": "원단 두르기",
+      "hero": "클로에",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "바늘땀",
-           "v": 1
-          }
-         ]
+          "k": "shield",
+          "ratio": 2
         }
-       ]
-      }
-     ]
+      ]
     },
     {
-     "name": "세바스티안의 축복",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "defMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "바늘땀",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
+      "id": "클로에_cloth",
+      "name": "천 조각",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "결속"
+      ],
+      "bondCard": "클로에_sebas",
+      "fx": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "바늘땀",
-           "v": 1
-          }
-         ]
+          "k": "shield",
+          "ratio": 0.52
         }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "서두른 바느질",
-     "kind": "cost"
+      ],
+      "hero": "클로에",
+      "token": true
     },
     {
-     "name": "단단한 매듭",
-     "kind": "defUp"
+      "id": "클로에_sebas",
+      "name": "세바스티안",
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "allEnemies",
+          "base": "def"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.7
+        }
+      ],
+      "hero": "클로에",
+      "token": true
     },
     {
-     "name": "바늘 상자",
-     "kind": "draw"
-    }
-   ]
-  },
-  {
-   "id": "클로에_cloth",
-   "name": "천 조각",
-   "cost": 0,
-   "type": "스킬",
-   "tags": [
-    "결속"
-   ],
-   "bondCard": "클로에_sebas",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 0.6
-    }
-   ],
-   "hero": "클로에",
-   "token": true
-  },
-  {
-   "id": "클로에_sebas",
-   "name": "세바스티안",
-   "cost": 0,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.8,
-     "target": "allEnemies",
-     "base": "def"
+      "id": "클로에_u1",
+      "name": "세바스티안 연타",
+      "hero": "클로에",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.22,
+          "base": "def",
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "stack",
+          "id": "바늘땀",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "인형의 의지",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "휘두르는 앞발",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "base": "def",
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "마지막 큰 한 방",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "바늘땀",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "천 조각 휘두르기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "세바스티안 훈련",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.36,
+                      "base": "def",
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "곰 앞발",
+          "kind": "power"
+        },
+        {
+          "name": "넉백",
+          "kind": "frost"
+        },
+        {
+          "name": "실밥",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            }
+          ]
+        }
+      ]
     },
     {
-     "k": "shield",
-     "ratio": 0.8
+      "id": "클로에_u2",
+      "name": "메리 고 라운드",
+      "hero": "클로에",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.87
+        },
+        {
+          "k": "stack",
+          "id": "바늘땀",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "회전목마",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.27
+            },
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "실밥 뜯기",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.49
+            },
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "세바스티안에 올라타기",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.78
+            },
+            {
+              "k": "make",
+              "id": "클로에_sebas",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흔들리지 않는 의지",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.09
+            },
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 2
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "재단소 단골",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.87
+            },
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "콩깍지",
+          "kind": "guard"
+        },
+        {
+          "name": "첫 손님 무료",
+          "kind": "cost"
+        },
+        {
+          "name": "별 문양",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "클로에_u3",
+      "name": "건치 스마일",
+      "hero": "클로에",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.78
+        },
+        {
+          "k": "perTag",
+          "id": "클로에_cloth"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.26
+        }
+      ],
+      "oracles": [
+        {
+          "name": "반짝이는 이",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.04
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            }
+          ]
+        },
+        {
+          "name": "살짝 미소",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.61
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.22
+            }
+          ]
+        },
+        {
+          "name": "포커페이스",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.78
+            },
+            {
+              "k": "make",
+              "id": "클로에_cloth",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "클로버 문양",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.17
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.34
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "흠 있는 인형 뜯기",
+          "fx": [
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "클로에_cloth"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "다이아몬드",
+          "kind": "guard"
+        },
+        {
+          "name": "물음표",
+          "kind": "draw"
+        },
+        {
+          "name": "새 천 한 필",
+          "fx": [
+            {
+              "k": "make",
+              "id": "클로에_cloth",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "클로에_u4",
+      "name": "의지를 넘긴 날",
+      "hero": "클로에",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "바늘땀",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "넘겨준 모든 힘",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "바늘땀",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "오래전 황무지",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.44
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "바늘땀",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "동생들을 지키라며",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "바늘땀",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.26
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "shield",
+              "ratio": 0.35
+            }
+          ]
+        },
+        {
+          "name": "자매의 의지",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "바늘땀",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "작은 의지",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "make",
+              "id": "클로에_cloth",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "바늘땀",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "머리 위의 세바스티안",
+          "kind": "defUp"
+        },
+        {
+          "name": "런웨이 오프닝",
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "재단 도구",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.35
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "hero": "클로에",
-   "token": true
-  }
- ]
+  ]
 }

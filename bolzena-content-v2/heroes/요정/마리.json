@@ -1,748 +1,795 @@
 {
- "heroes": [
-  {
-   "id": "마리",
-   "name": "마리",
-   "nature": "활발",
-   "race": "요정",
-   "role": "딜러",
-   "star": 2,
-   "hp": 590,
-   "atk": 125,
-   "def": 27,
-   "crit": 10,
-   "blurb": "왕국 하나쯤 날려 버릴 폭탄도 만드는 천재 폭파 전문가이자, 과거엔 「황금손」이라 불린 좀도둑. 이제는 도둑이 아닌 모험가로 인정받고 싶은데, 도무지 존재감이 없습니다.",
-   "keyword": {
-    "name": "폭탄",
-    "desc": "스킬로 터뜨리는 폭탄",
-    "carrier": "enemy",
-    "cap": 5,
-    "rules": [
-     {
-      "name": "가득 찬 폭탄",
-      "when": {
-       "on": "stackReach",
-       "id": "폭탄",
-       "n": 5
+  "heroes": [
+    {
+      "id": "마리",
+      "name": "마리",
+      "nature": "활발",
+      "race": "요정",
+      "role": "딜러",
+      "star": 2,
+      "hp": 590,
+      "atk": 125,
+      "def": 27,
+      "crit": 10,
+      "blurb": "왕국 하나쯤 날려 버릴 폭탄도 만드는 천재 폭파 전문가이자, 과거엔 「황금손」이라 불린 좀도둑. 이제는 도둑이 아닌 모험가로 인정받고 싶은데, 도무지 존재감이 없습니다.",
+      "keyword": {
+        "name": "폭파 실험",
+        "desc": "폭발에 들뜨는 탐험가의 눈",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.15
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "tough",
-        "v": 2
-       },
-       {
-        "k": "status",
-        "id": "잔불",
-        "v": 1,
-        "target": "oneEnemy"
-       },
-       {
-        "k": "spend",
-        "id": "폭탄",
-        "all": true,
-        "target": "oneEnemy"
-       }
+      "passives": [
+        {
+          "name": "강화 폭탄",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "황금손 마리",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "발파 합니다!",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.8,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "폭파 실험",
+            "v": 2
+          },
+          {
+            "k": "status",
+            "id": "잔불",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "마리_s1",
+        "마리_u3",
+        "마리_s2",
+        "마리_s3"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "폭탄 설치",
-     "when": {
-      "on": "hit"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "기폭 스위치",
-     "when": {
-      "on": "play",
-      "type": "스킬"
-     },
-     "limit": {
-      "per": "turn",
-      "n": 1
-     },
-     "fx": [
-      {
-       "k": "perStack",
-       "id": "폭탄",
-       "each": true
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "allEnemies",
-       "fixed": true
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "발파 합니다!",
-    "cost": 300,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 1.8,
-      "target": "allEnemies"
-     },
-     {
-      "k": "stack",
-      "id": "폭탄",
-      "v": 2,
-      "target": "allEnemies"
-     },
-     {
-      "k": "status",
-      "id": "잔불",
-      "v": 1,
-      "target": "allEnemies"
-     }
-    ]
-   },
-   "starter": [
-    "마리_s1",
-    "마리_s1",
-    "마리_s2",
-    "마리_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "마리_s1",
-   "name": "폭죽 던지기",
-   "hero": "마리",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "마리_s1",
+      "name": "폭죽 던지기",
+      "hero": "마리",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마리_s2",
+      "name": "왕폭죽 던지기",
+      "hero": "마리",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마리_s3",
+      "name": "방폭 헬멧",
+      "hero": "마리",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "마리_bomb",
+      "name": "특제 폭탄",
+      "hero": "마리",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "폭파 실험",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "마리_u1",
+      "name": "폭탄 배달 왔어용~",
+      "hero": "마리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "target": "allEnemies"
+        },
+        {
+          "k": "make",
+          "id": "마리_bomb",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "특급 배달",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "폭탄 공장",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "마리_bomb",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "배달 사고",
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반물질 중성자 폭탄",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "폭파 실험",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "왕국 하나쯤",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "화약 듬뿍",
+          "kind": "power"
+        },
+        {
+          "name": "날개 펄럭",
+          "kind": "atkUp"
+        },
+        {
+          "name": "정령 호수 지뢰",
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_u2",
+      "name": "기폭 스위치",
+      "hero": "마리",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "폭파 실험"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "폭파 실험",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "고폭 기폭",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "폭파 실험",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "손 안 대고 기폭",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "연쇄 기폭",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "마리_bomb"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "마리_bomb"
+            }
+          ]
+        },
+        {
+          "name": "한 놈만 기폭",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "폭파 실험",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "실험 일지",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "폭파 실험",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "빨간 버튼",
+          "kind": "ap"
+        },
+        {
+          "name": "원격 장치",
+          "kind": "cost"
+        },
+        {
+          "name": "반짝이는 유물",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_u3",
+      "name": "황금손의 추억",
+      "hero": "마리",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "make",
+          "id": "마리_bomb",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "황금손 전성기",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "금고 털이",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "좀도둑 버릇",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "지도 그리기",
+          "tags": [
+            "신속"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "마리_bomb",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "가출 통로",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "슬쩍",
+          "kind": "draw"
+        },
+        {
+          "name": "날쌘 손",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "주머니 속 폭탄",
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_u4",
+      "name": "저도 여기 있어요!",
+      "hero": "마리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.85,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "폭파 실험",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진짜 여기 있어요!",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.19,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "혼자서도 있어요",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.91,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "존재감 폭발",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.89,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "에르핀의 첫 친구",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "같이 가요",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "큰 날개",
+          "kind": "power"
+        },
+        {
+          "name": "지붕 조심",
+          "kind": "frost"
+        },
+        {
+          "name": "설탕 뿌리기",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.3
+            }
+          ]
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "마리_s2",
-   "name": "왕폭죽 던지기",
-   "hero": "마리",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "마리_s3",
-   "name": "방폭 헬멧",
-   "hero": "마리",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "마리_u1",
-   "name": "폭탄 배달 왔어용~",
-   "hero": "마리",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.6,
-     "target": "allEnemies"
-    },
-    {
-     "k": "stack",
-     "id": "폭탄",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "status",
-     "id": "잔불",
-     "v": 1,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "특급 배달",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.0,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "소포 배달",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "두 개씩 배달",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.7,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "한 집 몰아 배달",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "깜짝 선물 상자",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.8,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 2,
-       "target": "allEnemies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "화약 듬뿍",
-     "kind": "power"
-    },
-    {
-     "name": "파편 세례",
-     "kind": "frost"
-    },
-    {
-     "name": "빠른 배송",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "마리_u2",
-   "name": "기폭 스위치",
-   "hero": "마리",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "status",
-     "id": "취약",
-     "v": 1
-    },
-    {
-     "k": "draw",
-     "v": 1
-    },
-    {
-     "k": "status",
-     "id": "잔불",
-     "v": 1,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "두 번 딸깍",
-     "fx": [
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "딸깍",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "폭탄 장전",
-     "fx": [
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "연쇄 기폭",
-     "fx": [
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "원격 기폭",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "잔불",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "스위치 연타",
-     "kind": "ap"
-    },
-    {
-     "name": "도화선 정리",
-     "kind": "draw"
-    },
-    {
-     "name": "심지 하나 더",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "마리_u3",
-   "name": "황금손의 추억",
-   "hero": "마리",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "신속"
-   ],
-   "fx": [
-    {
-     "k": "draw",
-     "v": 2
-    },
-    {
-     "k": "stack",
-     "id": "폭탄",
-     "v": 1,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "황금기의 손맛",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "손가락 풀기",
-     "cost": 0,
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "추억의 폭죽 두 개",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "황금손 손재주",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "nextCheaper",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "첫 무대의 추억",
-     "tags": [
-      "신속",
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "황금 동전",
-     "kind": "ap"
-    },
-    {
-     "name": "손때 묻은 장갑",
-     "kind": "draw"
-    },
-    {
-     "name": "덤 폭죽",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "마리_u4",
-   "name": "저도 여기 있어요!",
-   "hero": "마리",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "tags": [
-    "연계"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.3,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "폭탄",
-     "v": 1,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "여기요 여기!",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.75,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "빼꼼",
-     "cost": 0,
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "폭탄 두 개 들고",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "존재감 폭발",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "잊지 말아 줘요",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "폭탄",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "목소리 키우기",
-     "kind": "power"
-    },
-    {
-     "name": "빈틈 끼어들기",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "손 번쩍",
-     "kind": "draw"
-    }
-   ]
-  }
- ]
+  ]
 }

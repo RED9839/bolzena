@@ -1,5 +1,6 @@
 // H5 — 유령 17명 생성기. node gen.mjs → C:\projects\bolzena-content-v2\heroes\유령\<사도키>.json
 import fs from 'fs';
+const REWORKED = JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')); // 리워크한 사도는 _gen/rework/rework.mjs 가 쓴다 — 여기서 덮어쓰지 않는다
 import path from 'path';
 import { pathToFileURL } from 'url';
 
@@ -646,6 +647,7 @@ H['베루'] = {
 fs.mkdirSync(OUT, { recursive: true });
 for (const [key, spec] of Object.entries(H)) {
   if (!design[key] || design[key].race !== '유령') throw new Error('not ghost ' + key);
+  if (REWORKED.includes(key)) { console.log('건너뜀(리워크)', key); continue; }
   fs.writeFileSync(path.join(OUT, key + '.json'), JSON.stringify(hero(key, spec), null, 2) + '\n');
 }
 console.log('wrote', Object.keys(H).length);

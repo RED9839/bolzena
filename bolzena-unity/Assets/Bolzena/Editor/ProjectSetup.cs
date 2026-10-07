@@ -43,6 +43,7 @@ namespace Bolzena.EditorTools
             AssetDatabase.Refresh();
             Recompress();
             SpineMaterials();
+            SnapPrebake();
             AlwaysIncludedShaders();
             Player();
             Scene();
@@ -54,6 +55,15 @@ namespace Bolzena.EditorTools
         {
             Setup();
             Build();
+        }
+
+        // 사도 정지 그림 미리 굽기(runui SnapPrebake — 2026-10-07 「사도 목록이 무겁다」): 목록 카드 · 얼굴 칸 · 카드 그림을 Assets/Resources/RunArt/Snap 에 PNG 로
+        //   (원작 파생 — git 밖). 바뀐 사도만 다시 굽는다. 스파인 · 재질 준비 뒤에. BOLZENA_SNAP=0 이면 건너뛴다(실행 중에 굽는 예전 길).
+        static void SnapPrebake()
+        {
+            if (System.Environment.GetEnvironmentVariable("BOLZENA_SNAP") == "0") { Debug.Log("[Setup] 정지 그림 미리 굽기 건너뜀(BOLZENA_SNAP=0)"); return; }
+            try { Bolzena.RunUI.EditorTools.SnapPrebake.Run(System.Environment.GetEnvironmentVariable("BOLZENA_SNAP") == "force"); }
+            catch (System.Exception e) { Debug.LogWarning("[Setup] 정지 그림 미리 굽기 실패 — 실행 중에 굽는다: " + e); }
         }
 
         // 코어 데이터 — 콘텐츠 폴더(C:\projects\bolzena-content — 사도 135 · 마을 · 이벤트 · 장비, 폴더째 재귀)를 StreamingAssets/CoreData 로
@@ -280,6 +290,7 @@ namespace Bolzena.EditorTools
             AssetDatabase.Refresh();
             Recompress();
             SpineMaterials();
+            SnapPrebake();
             AlwaysIncludedShaders();
             Player();
             WebPlayer();

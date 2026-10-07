@@ -1,4 +1,5 @@
 import fs from 'fs';
+const REWORKED = JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')); // 리워크한 사도는 _gen/rework/rework.mjs 가 쓴다 — 여기서 덮어쓰지 않는다
 export const P='C:/projects/bolzena-content-v2/heroes/수인/';
 const COND = new Set(['ifBroken','ifTune','ifChain','ifStack','perStack','ifKill','ifBreak','ifWounded','perTag','ifChoice','ifRandom','ifHand','ifPile','ifNth','ifStreak','ifAllHeroes','ifFoe','ifCardSt','perPlayed','perPile','perCardSt','perEvent','when','ifHp']);
 const effects = (fx) => fx.filter((f) => !COND.has(f.k)).length;
@@ -25,7 +26,7 @@ export function oracles(card, theme) {
   return o.map((x) => { const y = { name: x.name }; if (x.cost !== undefined) y.cost = x.cost; if (x.tags && x.tags.length) y.tags = x.tags; y.fx = x.fx; return y; });
 }
 export function load(k){return JSON.parse(fs.readFileSync(P+k+'.json','utf8'));}
-export function save(k,j){fs.writeFileSync(P+k+'.json',JSON.stringify(j,null,2)+'\n');}
+export function save(k,j){if(REWORKED.includes(k)){console.log('건너뜀(리워크)',k);return;}fs.writeFileSync(P+k+'.json',JSON.stringify(j,null,2)+'\n');}
 // 고유 카드 바꾸기 — fx(·cost·tags) 를 바꾸고 신탁을 다시 짓는다(테마 = 셋째 축복 · 셋째 신탁 이름 앞말)
 export function setCard(j, id, patch) {
   const c = j.cards.find((x) => x.id === id); if (!c) throw new Error('no card '+id);

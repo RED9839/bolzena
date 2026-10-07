@@ -713,7 +713,7 @@ namespace Bolzena.View
                 if (icon != null) Make.Box("i", chip, IconSprite(icon), new Vector3(size * 0.55f, 0, 0), new Vector2(size * 0.9f, size * 0.9f), order + 1);
                 t.rectTransform.pivot = new Vector2(0, 0.5f);
                 t.transform.localPosition = new Vector3(iconW + size * 0.15f, -0.005f, 0);
-                var text = c.Text;
+                var text = Tone.StripDiff(c.Text);
                 var id = c.Id;
                 if (flash.Contains(c.Id))
                 {

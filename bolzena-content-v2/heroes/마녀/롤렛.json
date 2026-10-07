@@ -13,32 +13,34 @@
       "crit": 10,
       "blurb": "판을 슬쩍 굴리는 트릭스터 마녀. 흘려 보낸 카드는 다음 마술봉을 세게 만들고, 사라진 비둘기는 동료의 어깨 위에서 되살아나 고학년을 앞당깁니다.",
       "keyword": {
-        "name": "바꿔치기",
-        "desc": "버린 카드로 준비하는 트릭",
+        "name": "갈채",
+        "desc": "봉봉한 트릭에 쏟아지는 박수",
         "carrier": "self",
-        "cap": 1,
-        "consumeAll": true,
+        "cap": 5,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.6
+            "v": 0.1
           }
         ],
         "rules": [
           {
-            "name": "어깨 위의 비둘기",
+            "name": "피날레",
             "when": {
-              "on": "stackOver",
-              "id": "바꿔치기"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 2
+              "on": "stackReach",
+              "id": "갈채",
+              "n": 5
             },
             "fx": [
               {
-                "k": "gauge",
-                "v": 10
+                "k": "spend",
+                "id": "갈채",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 1.2,
+                "target": "allEnemies"
               }
             ]
           }
@@ -50,10 +52,32 @@
           "when": {
             "on": "discard"
           },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
           "fx": [
             {
               "k": "stack",
-              "id": "바꿔치기",
+              "id": "갈채",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "관객의 환호",
+          "when": {
+            "on": "play",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈채",
               "v": 1
             }
           ]
@@ -82,14 +106,14 @@
           },
           {
             "k": "stack",
-            "id": "바꿔치기",
+            "id": "갈채",
             "v": 1
           }
         ]
       },
       "starter": [
         "롤렛_s1",
-        "롤렛_s1",
+        "롤렛_u1",
         "롤렛_s2",
         "롤렛_s3"
       ]
@@ -138,13 +162,40 @@
       ]
     },
     {
+      "hero": "롤렛",
+      "token": true,
+      "id": "롤렛_dove",
+      "name": "하얀 비둘기",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "when",
+          "on": "discard"
+        },
+        {
+          "k": "stack",
+          "id": "갈채",
+          "v": 2
+        }
+      ],
+      "blurb": "모자에서 나와 관객 머리 위를 한 바퀴. 사라질 때 박수가 더 큽니다"
+    },
+    {
       "id": "롤렛_u1",
       "name": "비둘기 부활 마술",
       "hero": "롤렛",
       "unique": true,
       "cost": 0,
       "type": "스킬",
-      "signature": true,
       "fx": [
         {
           "k": "discard",
@@ -153,16 +204,27 @@
         {
           "k": "draw",
           "v": 2
-        },
-        {
-          "k": "gauge",
-          "v": 15
         }
       ],
-      "blurb": "사라진 비둘기는 언제나 엉뚱한 데서 돌아옵니다",
       "oracles": [
         {
           "name": "비둘기 떼",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "박수 유도",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "discard",
@@ -171,10 +233,56 @@
             {
               "k": "draw",
               "v": 3
+            }
+          ]
+        },
+        {
+          "name": "다시 부활",
+          "power": true,
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
             },
             {
-              "k": "gauge",
-              "v": 15
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "갈채",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "두 번 접은 카드",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self"
+            },
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 1
             }
           ]
         },
@@ -186,89 +294,28 @@
               "v": 1
             },
             {
-              "k": "draw",
+              "k": "make",
+              "id": "롤렛_dove",
               "v": 2
-            },
-            {
-              "k": "gauge",
-              "v": 30
-            }
-          ]
-        },
-        {
-          "name": "두 번 접은 카드",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 3
-            },
-            {
-              "k": "gauge",
-              "v": 20
-            }
-          ]
-        },
-        {
-          "name": "박수 유도",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "다시 부활",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "gauge",
-              "v": 20
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "하얀 비둘기",
+          "name": "모나미",
+          "kind": "atkUp"
+        },
+        {
+          "name": "소매 속 카드",
           "kind": "draw"
         },
         {
-          "name": "비밀 주머니",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "갈채",
+          "name": "비둘기 모자",
           "fx": [
             {
-              "k": "status",
-              "id": "공명",
+              "k": "make",
+              "id": "롤렛_dove",
               "v": 1
             }
           ]
@@ -277,88 +324,130 @@
     },
     {
       "id": "롤렛_u2",
-      "name": "마술봉 난타",
+      "name": "갈채를 먹는 엔터테이너",
       "hero": "롤렛",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy",
-          "hits": 3
+          "ratio": 0.9,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "갈채",
+          "v": 1
+        },
+        {
+          "k": "when",
+          "on": "discard"
+        },
+        {
+          "k": "stack",
+          "id": "갈채",
+          "v": 2
         }
       ],
-      "blurb": "관객이 숨을 고르기 전에 끝냅니다",
       "oracles": [
         {
-          "name": "앙코르 난타",
+          "name": "앙코르 무대",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 1.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 2
             }
           ]
         },
         {
-          "name": "짧은 난타",
-          "cost": 1,
+          "name": "울랄라",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.7,
-              "target": "oneEnemy",
-              "hits": 3
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 2
             }
           ]
         },
         {
-          "name": "눈속임 난타",
+          "name": "호기심 상자",
           "fx": [
             {
               "k": "dmg",
               "ratio": 1.1,
-              "target": "oneEnemy",
-              "hits": 3
+              "target": "allEnemies"
             },
             {
-              "k": "discard",
+              "k": "stack",
+              "id": "갈채",
               "v": 1
             },
             {
               "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "비둘기 쇼",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "롤렛_dove",
               "v": 1
             }
           ]
         },
         {
-          "name": "피날레",
+          "name": "앙코르 강요",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 1.6,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "흩뿌리는 난타",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "randomEnemy",
-              "hits": 6
+              "k": "spend",
+              "id": "갈채",
+              "v": 2
             }
           ]
         }
@@ -369,12 +458,18 @@
           "kind": "power"
         },
         {
-          "name": "빠른 손",
-          "kind": "cost"
+          "name": "봉봉하게",
+          "kind": "ap"
         },
         {
-          "name": "관객 호응",
-          "kind": "ap"
+          "name": "박수 부대",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -388,45 +483,46 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.1,
+          "ratio": 0.8,
           "target": "oneEnemy"
         },
         {
-          "k": "when",
-          "on": "discard"
+          "k": "perStack",
+          "id": "갈채"
         },
         {
           "k": "dmg",
-          "ratio": 0.9,
-          "target": "randomEnemy"
+          "ratio": 0.35,
+          "target": "oneEnemy"
         },
         {
-          "k": "gauge",
-          "v": 20
+          "k": "spend",
+          "id": "갈채",
+          "all": true
         }
       ],
-      "blurb": "버린 줄 알았던 카드가 날아와 꽂힙니다",
       "oracles": [
         {
           "name": "날 선 트릭 카드",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "when",
-              "on": "discard"
+              "k": "perStack",
+              "id": "갈채"
             },
             {
               "k": "dmg",
-              "ratio": 1.2,
-              "target": "randomEnemy"
+              "ratio": 0.42,
+              "target": "oneEnemy"
             },
             {
-              "k": "gauge",
-              "v": 20
+              "k": "spend",
+              "id": "갈채",
+              "all": true
             }
           ]
         },
@@ -436,67 +532,22 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.5,
               "target": "oneEnemy"
             },
             {
-              "k": "when",
-              "on": "discard"
+              "k": "perStack",
+              "id": "갈채"
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "gauge",
-              "v": 15
-            }
-          ]
-        },
-        {
-          "name": "비장의 카드",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.25,
+              "ratio": 0.25,
               "target": "oneEnemy"
             },
             {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "gauge",
-              "v": 20
-            }
-          ]
-        },
-        {
-          "name": "카드 부채",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "gauge",
-              "v": 20
+              "k": "spend",
+              "id": "갈채",
+              "all": true
             }
           ]
         },
@@ -505,38 +556,85 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.35,
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "갈채",
+              "v": 1
             },
             {
               "k": "when",
               "on": "discard"
             },
             {
-              "k": "gauge",
-              "v": 40
+              "k": "stack",
+              "id": "갈채",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "카드 부채",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "롤렛_dove"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "롤렛_dove"
+            }
+          ]
+        },
+        {
+          "name": "비장의 카드",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "갈채"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "금박 카드",
+          "name": "트럼프 한 벌",
           "kind": "power"
         },
         {
-          "name": "마킹 카드",
-          "kind": "weakSpot"
+          "name": "숨긴 카드",
+          "kind": "cost"
         },
         {
-          "name": "트릭 손목",
-          "kind": "draw"
+          "name": "파흐돈",
+          "kind": "weakSpot"
         }
       ]
     },
@@ -546,57 +644,40 @@
       "hero": "롤렛",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
-          "k": "status",
-          "id": "공명",
-          "v": 2
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "바꿔치기",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "perStack",
+          "id": "갈채"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.22,
+          "target": "randomEnemy"
         }
       ],
-      "blurb": "박수가 클수록 트릭은 대담해집니다",
       "oracles": [
         {
           "name": "기립 박수",
           "fx": [
             {
-              "k": "status",
-              "id": "공명",
-              "v": 4
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "바꿔치기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "갈채"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "randomEnemy"
             }
           ]
         },
@@ -605,95 +686,46 @@
           "cost": 0,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "바꿔치기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "갈채"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "randomEnemy"
             }
           ]
         },
         {
           "name": "환호성",
+          "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "공명",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "stack",
+              "id": "갈채",
+              "v": 3
             },
             {
               "k": "power",
               "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "바꿔치기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "앙코르 요청",
-          "fx": [
-            {
-              "k": "status",
-              "id": "공명",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "바꿔치기",
-                      "v": 1
-                    }
-                  ]
-                },
                 {
                   "when": {
                     "on": "discard"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 1
+                    "n": 3
                   },
                   "fx": [
                     {
-                      "k": "draw",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 0.5,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
@@ -702,57 +734,64 @@
           ]
         },
         {
-          "name": "개막 박수",
-          "tags": [
-            "개전"
-          ],
+          "name": "비둘기 커튼콜",
           "fx": [
             {
-              "k": "status",
-              "id": "공명",
-              "v": 3
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "바꿔치기",
-              "v": 1
+              "k": "perTag",
+              "id": "롤렛_dove"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "바꿔치기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "마지막 박수",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "갈채"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "갈채",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "무대 매너",
-          "kind": "atkUp"
+          "name": "최고의 엔터테인먼트",
+          "kind": "weakSpot"
         },
         {
-          "name": "커튼 오픈",
-          "tags": [
-            "개전"
-          ]
+          "name": "지팡이 돌리기",
+          "kind": "draw"
         },
         {
-          "name": "휘파람",
+          "name": "앙코르",
           "fx": [
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "갈채",
               "v": 1
             }
           ]

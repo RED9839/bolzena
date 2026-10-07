@@ -151,6 +151,7 @@ function basics(key, role, names) {
 
 function write(dir, key, obj) {
   fs.mkdirSync(dir, { recursive: true });
+  if (JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')).includes(key)) { console.log('건너뜀(리워크)', key); return; }   // 리워크한 사도는 _gen/rework 가 쓴다
   fs.writeFileSync(path.join(dir, key + '.json'), JSON.stringify(obj, null, 2) + '\n', 'utf8');
 }
 

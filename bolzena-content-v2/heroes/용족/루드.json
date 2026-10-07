@@ -13,75 +13,32 @@
       "crit": 5,
       "blurb": "근육으로 다 해결하는 루비의 용족 헬창. 쉬지 않고 자기 카드만 잇달아 내면 세트가 쌓여 실드가 두꺼워지고 숨도 돌리며, 세트가 넘치면 기합 소리가 적 전체를 때립니다. 다른 사람이 끼어들면 세트가 끊깁니다.",
       "keyword": {
-        "name": "한 세트 더",
-        "desc": "자기 카드를 이어 내는 세트",
+        "name": "렙",
+        "desc": "쉬지 않고 세는 반복 횟수",
         "carrier": "self",
         "cap": 4,
-        "wipe": true,
-        "endClear": true,
         "rules": [
           {
-            "name": "2세트",
+            "name": "포즈",
             "when": {
               "on": "stackReach",
-              "id": "한 세트 더",
-              "n": 2
-            },
-            "fx": [
-              {
-                "k": "shield",
-                "ratio": 0.3
-              }
-            ]
-          },
-          {
-            "name": "3세트",
-            "when": {
-              "on": "stackReach",
-              "id": "한 세트 더",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "heal",
-                "ratio": 0.6
-              }
-            ]
-          },
-          {
-            "name": "4세트",
-            "when": {
-              "on": "stackReach",
-              "id": "한 세트 더",
+              "id": "렙",
               "n": 4
             },
             "fx": [
               {
-                "k": "shield",
-                "ratio": 0.9
+                "k": "spend",
+                "id": "렙",
+                "all": true
               },
               {
                 "k": "status",
-                "id": "결의",
-                "v": 1
-              }
-            ]
-          },
-          {
-            "name": "오버 트레이닝",
-            "when": {
-              "on": "stackOver",
-              "id": "한 세트 더"
-            },
-            "fx": [
-              {
-                "k": "perEvent"
+                "id": "피해 감소",
+                "v": 2
               },
               {
-                "k": "dmg",
-                "ratio": 0.3,
-                "target": "allEnemies",
-                "base": "def"
+                "k": "heal",
+                "ratio": 0.5
               }
             ]
           }
@@ -96,8 +53,21 @@
           "fx": [
             {
               "k": "stack",
-              "id": "한 세트 더",
+              "id": "렙",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "크로스핏 선발대",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 2
             }
           ]
         }
@@ -120,7 +90,7 @@
           },
           {
             "k": "stack",
-            "id": "한 세트 더",
+            "id": "렙",
             "v": 3
           },
           {
@@ -135,7 +105,7 @@
         "루드_s1",
         "루드_s1",
         "루드_s2",
-        "루드_s2"
+        "루드_u2"
       ]
     }
   ],
@@ -177,9 +147,9 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.4,
-          "target": "allEnemies",
-          "base": "def"
+          "ratio": 0.5,
+          "base": "def",
+          "target": "allEnemies"
         },
         {
           "k": "status",
@@ -188,79 +158,20 @@
           "target": "allEnemies"
         },
         {
-          "k": "heal",
-          "ratio": 0.5
+          "k": "stack",
+          "id": "렙",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "가벼운 세트",
-          "cost": 0,
+          "name": "쩌렁쩌렁 기합",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.25,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.68,
+              "base": "def",
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "무한 세트",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "기합 소리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.5
-            }
-          ]
-        },
-        {
-          "name": "루드 짐 개장",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies",
-              "base": "def"
             },
             {
               "k": "status",
@@ -270,22 +181,19 @@
             },
             {
               "k": "stack",
-              "id": "한 세트 더",
+              "id": "렙",
               "v": 1
             }
           ]
         },
         {
-          "name": "다야 님을 위하여",
-          "tags": [
-            "보존"
-          ],
+          "name": "세트 한가운데",
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.45,
-              "target": "allEnemies",
-              "base": "def"
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "status",
@@ -294,8 +202,100 @@
               "target": "allEnemies"
             },
             {
-              "k": "heal",
-              "ratio": 0.55
+              "k": "ifStack",
+              "id": "렙",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "루드 짐 개장",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "렙",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.52,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "마지막 세트",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "단체 PT",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "렙"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -306,15 +306,15 @@
           "kind": "power"
         },
         {
-          "name": "헬씨 레드",
-          "kind": "guard"
+          "name": "소음 공해",
+          "kind": "ap"
         },
         {
-          "name": "소음 공해",
+          "name": "구령 맞추기",
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
+              "k": "stack",
+              "id": "렙",
               "v": 1
             }
           ]
@@ -330,72 +330,113 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "shield",
-          "ratio": 0.7
+          "k": "stack",
+          "id": "렙",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "한 스쿱",
+          "name": "곱빼기 스쿱",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.9
-            }
-          ]
-        },
-        {
-          "name": "벌크업",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.7
+              "k": "stack",
+              "id": "렙",
+              "v": 2
             },
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "식물에게도 프로틴",
-          "fx": [
-            {
               "k": "shield",
-              "ratio": 0.7
-            },
-            {
-              "k": "heal",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "유산소는 적",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.7
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "ratio": 0.52
             }
           ]
         },
         {
           "name": "루드의 운동 교본",
-          "cost": 1,
+          "power": true,
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.8
+              "k": "draw",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "결의",
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "렙",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "기본기 다지기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "basic": true
+            }
+          ]
+        },
+        {
+          "name": "쉐이커에 담아 두기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "아침 공복 한 잔",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 2
             }
           ]
         }
@@ -403,66 +444,94 @@
       "blesses": [
         {
           "name": "쉐이커",
-          "kind": "guard"
-        },
-        {
-          "name": "탄수화물 금지",
           "kind": "draw"
         },
         {
-          "name": "단백질 바",
+          "name": "탄수화물 금지",
           "tags": [
             "보존"
           ]
+        },
+        {
+          "name": "단백질 바",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
         }
-      ],
-      "blurb": "식물에게도 프로틴을."
+      ]
     },
     {
       "id": "루드_u3",
       "name": "다야 님을 지켜라",
       "hero": "루드",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.6
+          "ratio": 1.4
         },
         {
-          "k": "status",
-          "id": "불굴",
-          "v": 1
+          "k": "perStack",
+          "id": "렙"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.35
         }
       ],
       "oracles": [
         {
-          "name": "한발 앞으로",
-          "cost": 1,
+          "name": "근육 방패",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.7
+              "ratio": 1.66
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "perStack",
+              "id": "렙"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.42
             }
           ]
         },
         {
           "name": "용족 2인자의 의무",
+          "cost": 2,
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.4
+              "ratio": 2.2
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "stack",
+              "id": "렙",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "쏟아붓는 펌핑",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "렙"
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "spend",
+              "id": "렙",
+              "all": true
             }
           ]
         },
@@ -471,48 +540,52 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.6
+              "ratio": 1.43
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "perStack",
+              "id": "렙"
             },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "근육 방패",
-          "fx": [
             {
               "k": "shield",
-              "ratio": 2.6
+              "ratio": 0.36
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 2
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.43
             }
           ]
         },
         {
           "name": "근손실 방지",
-          "tags": [
-            "보존"
-          ],
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.1
+              "ratio": 1.22
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "렙"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.31
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -523,16 +596,6 @@
           "kind": "guard"
         },
         {
-          "name": "루비 이두근",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
-        },
-        {
           "name": "패배는 인정",
           "fx": [
             {
@@ -541,6 +604,10 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "루비 이두근",
+          "kind": "cost"
         }
       ]
     },
@@ -554,62 +621,77 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
-          "target": "oneEnemy",
-          "base": "def"
-        },
-        {
-          "k": "ifStack",
-          "id": "한 세트 더",
-          "n": 2
-        },
-        {
-          "k": "tough",
-          "v": 1,
+          "ratio": 0.7,
+          "base": "def",
           "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "렙"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "렙",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "잽",
-          "cost": 0,
+          "name": "마지막 한 개",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "한 세트 더",
-              "n": 2
-            },
-            {
-              "k": "tough",
-              "v": 1,
+              "ratio": 0.91,
+              "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "렙"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "렙",
+              "all": true
             }
           ]
         },
         {
           "name": "재도전",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "한 세트 더",
-              "n": 2
-            },
-            {
-              "k": "tough",
-              "v": 1,
+              "ratio": 1.4,
+              "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "렙"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 4
             }
           ]
         },
@@ -618,62 +700,78 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "한 세트 더",
-              "n": 1
-            },
-            {
-              "k": "tough",
-              "v": 1,
+              "ratio": 0.83,
+              "base": "def",
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "마지막 한 개",
-          "fx": [
+            },
+            {
+              "k": "perStack",
+              "id": "렙"
+            },
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "한 세트 더",
-              "n": 2
-            },
-            {
-              "k": "tough",
-              "v": 2,
+              "ratio": 0.24,
+              "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.71
             }
           ]
         },
         {
           "name": "악우의 주먹",
-          "cost": 2,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "렙"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "렙",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "날개는 장식",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.5,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "한 세트 더",
-              "n": 2
+              "k": "perStack",
+              "id": "렙"
             },
             {
-              "k": "tough",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "렙",
+              "all": true
             }
           ]
         }
@@ -688,11 +786,12 @@
           "kind": "frost"
         },
         {
-          "name": "날개는 장식",
+          "name": "근육 기억",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.6
+              "k": "stack",
+              "id": "렙",
+              "v": 1
             }
           ]
         }
@@ -710,15 +809,20 @@
       },
       "effect": [
         {
-          "name": "회복도 운동",
+          "name": "쉬는 것도 운동",
           "when": {
-            "on": "fightStart"
+            "on": "turnEnd"
           },
+          "conds": [
+            {
+              "c": "playedMin",
+              "n": 3
+            }
+          ],
           "fx": [
             {
-              "k": "healMod",
-              "v": 0.4,
-              "run": true
+              "k": "shield",
+              "ratio": 0.8
             }
           ]
         }
@@ -730,10 +834,10 @@
       },
       "affinityEffect": [
         {
-          "name": "세트 끝 스트레칭",
+          "name": "포즈 뒤 스트레칭",
           "when": {
             "on": "stackReach",
-            "id": "한 세트 더",
+            "id": "렙",
             "n": 4
           },
           "fx": [

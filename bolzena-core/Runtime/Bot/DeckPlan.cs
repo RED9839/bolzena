@@ -33,7 +33,19 @@ namespace Bolzena.Core
                 Gives.UnionWith(HeroGives(d, h));
                 Hears.UnionWith(HeroHears(d, h));
             }
+            // 증폭 짝 — 파티가 바탕을 내면 그 증폭(고통 각인 · 결의 …)도 「듣는다」(2026-10-07)
+            foreach (var (amp, bas) in AMP) if (Gives.Contains(bas)) Hears.Add(amp);
         }
+
+        /// <summary>
+        /// 증폭 짝(증폭 상태, 바탕) — 증폭 상태는 바탕이 있을 때만 값을 낸다: 고통 각인(고통이 붙을 때 더) · 결의 · 실드 유지 · 실드 보존(실드) ·
+        /// 잔불 · 잔광(격파) · 탄성(추가 공격) · 공명(버리기). 바탕을 내는 파티는 그 증폭을 내는 카드 · 장비와 맞물린다.
+        /// </summary>
+        public static readonly (string amp, string bas)[] AMP =
+        {
+            ("st:고통 각인", "st:고통"), ("st:결의", "ev:guard"), ("st:실드 유지", "ev:guard"), ("st:실드 보존", "ev:guard"),
+            ("st:잔불", "ev:break"), ("st:잔광", "ev:break"), ("st:탄성", "ev:extra"), ("st:공명", "ev:discard"),
+        };
 
         // ── 사도의 축 ──────────────────────────────────────────────────
         /// <summary>사도가 내는 것 — MetaSim.Gives + 고유 효과 겹을 쌓는 카드 · 패시브(「kw:이름」).</summary>
@@ -47,6 +59,7 @@ namespace Bolzena.Core
             }
             foreach (var r in h.Passives) o.UnionWith(FxGives(r.Fx));
             if (h.Ult != null) o.UnionWith(FxGives(h.Ult.Fx));
+            if (d.Cards.Values.Any(c => c.Hero == h.Id && !c.Token && c.Cost == 0)) o.Add("ev:cost0");   // 비용 0 카드를 낸다
             return o;
         }
 
@@ -127,7 +140,9 @@ namespace Bolzena.Core
                             case "break": o.Add("ev:break"); break;
                             case "guard": o.Add("ev:guard"); break;
                             case "overheal": o.Add("ev:heal"); break;
+                            case "shieldBreak": case "blocked": o.Add("ev:guard"); break;
                         }
+                        if (r.When?.On == "play" && r.When.MaxCost == 0) o.Add("ev:cost0");
                         foreach (var c in r.Conds) if (c.C == "stack" && c.Id != null) o.Add("kw:" + c.Id); else if (c.C == "status" && c.Id != null) o.Add("st:" + c.Id);
                     }
             }
@@ -166,7 +181,9 @@ namespace Bolzena.Core
         }
 
         /// <summary>덱 장수에 따른 「새 카드를 받을 만한가」 문턱 — 얇을수록 낮다.</summary>
-        public static double TakeBar(int deck) => 1.05 + THICK_STEP * Math.Max(0, deck - THICK);
+        public static double TakeBar(int deck) => TAKE_BASE + THICK_STEP * Math.Max(0, deck - THICK);
+        /// <summary>새 카드를 받는 바닥 문턱(2026-10-07 — 옛 1.05: 교주 카드가 고유 카드 덤 0.25 없이 넘기 어려웠다).</summary>
+        public const double TAKE_BASE = 0.98;
 
         /// <summary>장비 효과가 파티 축에 맞는 가짓수(효과의 상태 · 일 · 계기).</summary>
         public int GearHits(EquipDef e)

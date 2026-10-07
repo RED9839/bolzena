@@ -14,6 +14,9 @@ namespace Bolzena.RunUI
     //   얻은 카드는 CardGain(GainCards) 연출로 가운데에 크게 보인 뒤 덱으로.
     public partial class Flow
     {
+        /// <summary>은총으로 얻은 카드를 가운데에 크게 보여 주는 시간(초) — 그 뒤 저절로 덱으로(누르면 바로). 전투 은총(손패로)과 같은 몫.</summary>
+        public const float GraceHold = 0.9f;
+
         void GracePick(RectTransform root, Pending p)
         {
             var party = P.S.Party.Take(3).ToList();
@@ -28,7 +31,8 @@ namespace Bolzena.RunUI
                 var why = P.Resolve(key);
                 if (why != null) { Toast.Show(why); return; }
                 close();
-                GainCards(NewCards(cs), () => { P.Save("event"); BuildEvent(root, -1); });
+                // 은총 — 고르는 것은 사도까지. 얻은 카드는 「은총!」 으로 크게 0.9초 보인 뒤 저절로 덱으로(누르면 바로 · 2026-10-07 사용자)
+                GainCards(NewCards(cs), () => { P.Save("event"); BuildEvent(root, -1); }, "은총!", key != null ? $"{Roster.OfCore(key).ko}의 고유 카드 — 덱에 넣습니다" : null, GraceHold);
             }
 
             float footH = Theme.C(64, 54), gap = 16;

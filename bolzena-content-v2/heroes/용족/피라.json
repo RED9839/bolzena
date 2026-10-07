@@ -13,59 +13,46 @@
       "crit": 5,
       "blurb": "위조 금화를 끊고 진짜 화금석을 찾는 황철석의 용족 연금술사. 스킬을 쓸 때마다 제 명함과 경품을 금으로 도금하고, 동료의 손에 든 첫 공격 카드에도 금칠을 해 줍니다. 벗겨진 가루는 모아 두었다가 한꺼번에 터뜨립니다.",
       "keyword": {
-        "name": "도금 연금술",
-        "desc": "도금이 벗겨진 가루",
+        "name": "부유함",
+        "desc": "번쩍이는 금 부스러기",
         "carrier": "self",
         "cap": 5,
-        "rules": [
+        "per": [
           {
-            "name": "벗겨진 도금",
-            "when": {
-              "on": "exhaust"
-            },
-            "fx": [
-              {
-                "k": "stack",
-                "id": "도금 연금술",
-                "v": 1
-              }
-            ]
+            "stat": "dealt",
+            "v": 0.1,
+            "who": "allies"
           }
         ]
       },
       "passives": [
         {
-          "name": "도금",
+          "name": "수금",
           "when": {
-            "on": "play",
-            "type": "스킬"
+            "on": "debuff"
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 3
           },
           "fx": [
             {
-              "k": "transform",
-              "id": "피라_g1",
-              "from": "피라_s1",
-              "n": 1
-            },
+              "k": "stack",
+              "id": "부유함",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "햇살 아래에서",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
             {
-              "k": "transform",
-              "id": "피라_g2",
-              "from": "피라_s2",
-              "n": 1
-            },
-            {
-              "k": "cardStatus",
-              "id": "탐구심",
-              "v": 1,
-              "to": "hand",
-              "n": 1,
-              "who": "other",
-              "basic": true,
-              "type": "공격"
+              "k": "stack",
+              "id": "부유함",
+              "v": 2
             }
           ]
         }
@@ -82,7 +69,7 @@
           },
           {
             "k": "perStack",
-            "id": "도금 연금술"
+            "id": "부유함"
           },
           {
             "k": "dmg",
@@ -92,7 +79,7 @@
           },
           {
             "k": "spend",
-            "id": "도금 연금술",
+            "id": "부유함",
             "all": true
           }
         ]
@@ -101,7 +88,7 @@
         "피라_s1",
         "피라_s1",
         "피라_s2",
-        "피라_s2"
+        "피라_u1"
       ]
     }
   ],
@@ -134,6 +121,41 @@
       ]
     },
     {
+      "hero": "피라",
+      "token": true,
+      "id": "피라_g1",
+      "name": "도금 명함",
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 3.33,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "hero": "피라",
+      "token": true,
+      "id": "피라_g2",
+      "name": "도금 경품",
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 5
+        }
+      ]
+    },
+    {
       "id": "피라_u1",
       "name": "연금술 실험",
       "hero": "피라",
@@ -143,138 +165,149 @@
       "fx": [
         {
           "k": "status",
-          "id": "협공",
+          "id": "취약",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "부유함",
           "v": 1
         },
         {
           "k": "draw",
           "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "도금 연금술",
-          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "플라스크 하나",
+          "name": "화금석 근사치",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "부유함",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "도금",
+          "fx": [
+            {
+              "k": "transform",
+              "id": "피라_g1",
+              "from": "피라_s1",
+              "n": 1
+            },
+            {
+              "k": "transform",
+              "id": "피라_g2",
+              "from": "피라_s2",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "부유함",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "불꽃 튕기기",
           "cost": 0,
           "fx": [
             {
               "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
-              "id": "도금 연금술",
+              "id": "부유함",
               "v": 1
             }
           ]
         },
         {
-          "name": "대실험",
+          "name": "남의 수작",
           "fx": [
             {
               "k": "status",
-              "id": "협공",
-              "v": 1
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "부유함",
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "도금 연금술",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "화금석 반응",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "when",
+              "on": "draw"
             },
             {
               "k": "stack",
-              "id": "도금 연금술",
+              "id": "부유함",
               "v": 2
             }
           ]
         },
         {
-          "name": "폭발 주의",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "도금 연금술",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "진짜 금?",
+          "name": "금서고 출입",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "status",
-              "id": "협공",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
-              "id": "도금 연금술",
+              "id": "부유함",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "정제",
+          "name": "연금 솥",
+          "kind": "guard"
+        },
+        {
+          "name": "불꽃 손가락",
+          "kind": "cost"
+        },
+        {
+          "name": "황철석 가루",
           "fx": [
             {
               "k": "stack",
-              "id": "도금 연금술",
+              "id": "부유함",
               "v": 1
             }
           ]
-        },
-        {
-          "name": "실험 노트",
-          "kind": "draw"
-        },
-        {
-          "name": "보호 장갑",
-          "kind": "guard"
         }
       ]
     },
@@ -283,167 +316,133 @@
       "name": "수금 시간이다!",
       "hero": "피라",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy"
+          "ratio": 1.02,
+          "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "도금 연금술"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.35,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "도금 연금술",
-          "all": true
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "소액 수금",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "도금 연금술"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "도금 연금술",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "채권 추심",
+          "name": "추심",
           "fx": [
             {
               "k": "dmg",
               "ratio": 1.3,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "도금 연금술"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "도금 연금술",
-              "all": true
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "복리 이자",
+          "name": "조각상 박살",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
+              "ratio": 2.13,
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "도금 연금술"
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "도금 연금술",
-              "all": true
+              "k": "stack",
+              "id": "부유함",
+              "v": 1
             }
           ]
         },
         {
-          "name": "담보 잡기",
+          "name": "1대1 수금",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "도금 연금술"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 1.83,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "다조!",
+          "name": "이자까지",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.02,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "도금 연금술"
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "부유함",
+              "n": 3
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.74,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "장부 정리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.08,
               "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "도금 연금술",
-              "all": true
+              "k": "stack",
+              "id": "부유함",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "금니",
+          "name": "황금 망치",
           "kind": "power"
         },
         {
-          "name": "장부 정리",
-          "kind": "weakSpot"
+          "name": "독촉장",
+          "kind": "draw"
         },
         {
-          "name": "야로!",
+          "name": "이자",
           "fx": [
             {
               "k": "stack",
-              "id": "도금 연금술",
+              "id": "부유함",
               "v": 1
             }
           ]
@@ -460,123 +459,178 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.56,
           "target": "randomEnemy",
           "hits": 3
         },
         {
-          "k": "stack",
-          "id": "도금 연금술",
-          "v": 1
+          "k": "perStack",
+          "id": "부유함"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.46,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "부유함",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "동전 튕기기",
-          "cost": 0,
+          "name": "금화 폭탄",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.7,
               "target": "randomEnemy",
               "hits": 3
             },
             {
-              "k": "stack",
-              "id": "도금 연금술",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "금화 소나기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "randomEnemy",
-              "hits": 4
+              "k": "perStack",
+              "id": "부유함"
             },
             {
-              "k": "stack",
-              "id": "도금 연금술",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.56,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "부유함",
+              "all": true
             }
           ]
         },
         {
-          "name": "번쩍번쩍",
+          "name": "피버☆금화",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.74,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "perStack",
+              "id": "부유함"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "부유함",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "가짜도 반짝",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.02,
               "target": "randomEnemy",
               "hits": 3
             },
             {
-              "k": "stack",
-              "id": "도금 연금술",
-              "v": 1
+              "k": "ifStack",
+              "id": "부유함",
+              "n": 3
             },
             {
               "k": "status",
-              "id": "약화",
+              "id": "취약",
               "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "위폐 공장",
+          "name": "뒷골목 사채",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.72,
               "target": "randomEnemy",
               "hits": 3
             },
             {
               "k": "stack",
-              "id": "도금 연금술",
-              "v": 2
+              "id": "부유함",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "debuff"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.72,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "황철석 가루",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "금화 회수",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "randomEnemy",
-              "hits": 3
+              "k": "perStack",
+              "id": "부유함"
             },
             {
-              "k": "stack",
-              "id": "도금 연금술",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.96,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "부유함",
+              "all": true
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "진짜 같은",
-          "kind": "power"
+          "name": "번쩍 금박",
+          "kind": "weakSpot"
         },
         {
-          "name": "돈 냄새",
-          "kind": "draw"
+          "name": "댄스 크루 스파클",
+          "kind": "ap"
         },
         {
-          "name": "고래!",
+          "name": "껌 좀 씹어본",
           "fx": [
             {
-              "k": "stack",
-              "id": "도금 연금술",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
@@ -589,7 +643,7 @@
       "hero": "피라",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
           "k": "status",
@@ -597,49 +651,23 @@
           "v": 1
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "도금 연금술",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "perStack",
+          "id": "부유함"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.46,
+          "target": "randomEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "연구 노트",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "도금 연금술",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "골디를 넘어",
+          "name": "수십 년의 연구",
           "fx": [
             {
               "k": "status",
@@ -647,30 +675,24 @@
               "v": 1
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "결의",
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "도금 연금술",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "부유함"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.66,
+              "target": "randomEnemy"
             }
           ]
         },
         {
-          "name": "과거 청산",
+          "name": "진짜 금",
+          "power": true,
           "fx": [
             {
               "k": "status",
@@ -692,8 +714,13 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "도금 연금술",
+                      "id": "부유함",
                       "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.69,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
@@ -702,7 +729,7 @@
           ]
         },
         {
-          "name": "황금 비율",
+          "name": "반짝반짝 우리 사이",
           "fx": [
             {
               "k": "status",
@@ -710,52 +737,63 @@
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "도금 연금술",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "부유함",
+              "v": 2
             }
           ]
         },
         {
-          "name": "뒷골목 연금술",
-          "cost": 0,
-          "tags": [
-            "개전"
-          ],
+          "name": "싸구려 플라스크",
           "fx": [
             {
-              "k": "stack",
-              "id": "도금 연금술",
-              "v": 2
+              "k": "status",
+              "id": "사기",
+              "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "도금 연금술",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "부유함"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.03,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "부유함",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "실험 일지",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "부유함"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -763,58 +801,20 @@
       "blesses": [
         {
           "name": "화금석",
+          "kind": "atkUp"
+        },
+        {
+          "name": "첫 실험",
+          "kind": "draw"
+        },
+        {
+          "name": "블링블링 우정 목걸이",
           "fx": [
             {
-              "k": "stack",
-              "id": "도금 연금술",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.3
             }
           ]
-        },
-        {
-          "name": "연구실",
-          "tags": [
-            "개전"
-          ]
-        },
-        {
-          "name": "투자 유치",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
-      "hero": "피라",
-      "token": true,
-      "id": "피라_g1",
-      "name": "도금 명함",
-      "cost": 1,
-      "type": "공격",
-      "tags": [
-        "소멸"
-      ],
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.8,
-          "target": "oneEnemy"
-        }
-      ]
-    },
-    {
-      "hero": "피라",
-      "token": true,
-      "id": "피라_g2",
-      "name": "도금 경품",
-      "cost": 1,
-      "type": "스킬",
-      "tags": [
-        "소멸"
-      ],
-      "fx": [
-        {
-          "k": "shield",
-          "ratio": 2.7
         }
       ]
     }

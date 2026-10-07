@@ -14,9 +14,11 @@
       "blurb": "닌자 만화에 푹 빠진 다람쥐 수인.",
       "keyword": {
         "name": "분신",
-        "desc": "따라 치고 대신 맞는 분신",
+        "desc": "따라 던지고 대신 맞는 람쥐 분신",
         "carrier": "self",
-        "cap": 3
+        "cap": 2,
+        "guard": true,
+        "cut": 0.3
       },
       "passives": [
         {
@@ -25,48 +27,31 @@
             "on": "play",
             "type": "공격"
           },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "분신"
-            }
-          ],
-          "fx": [
-            {
-              "k": "spend",
-              "id": "분신",
-              "v": 1
-            },
-            {
-              "k": "extra",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "통나무 바꿔치기",
-          "when": {
-            "on": "hurt"
-          },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "분신"
-            }
-          ],
           "limit": {
             "per": "turn",
             "n": 1
           },
           "fx": [
             {
-              "k": "spend",
-              "id": "분신",
-              "v": 1
+              "k": "perStack",
+              "id": "분신"
             },
             {
-              "k": "status",
-              "id": "회피",
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "통나무 바꿔치기",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
               "v": 1
             }
           ]
@@ -97,7 +82,7 @@
       },
       "starter": [
         "모모_s1",
-        "모모_s1",
+        "모모_u3",
         "모모_s2",
         "모모_s3"
       ]
@@ -146,28 +131,57 @@
       ]
     },
     {
+      "hero": "모모",
+      "token": true,
+      "id": "모모_shuriken",
+      "name": "번개 수리검",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "충격",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "blurb": "람쥐썬더를 머금은 작은 수리검입니다."
+    },
+    {
       "id": "모모_u1",
       "name": "두배로 안아준닷",
       "hero": "모모",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy",
-          "hits": 2
+          "k": "perStack",
+          "id": "분신"
         },
         {
-          "k": "ifStack",
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
           "id": "분신",
-          "n": 2
+          "all": true
         },
         {
-          "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy"
+          "k": "status",
+          "id": "충격",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
@@ -175,105 +189,115 @@
           "name": "세배로 안아준닷",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy",
-              "hits": 2
+              "k": "perStack",
+              "id": "분신"
             },
             {
-              "k": "ifStack",
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
               "id": "분신",
-              "n": 2
+              "all": true
             },
             {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
           "name": "살짝 안아준닷",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy",
-              "hits": 2
+              "k": "perStack",
+              "id": "분신"
             },
             {
-              "k": "ifStack",
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
               "id": "분신",
-              "n": 2
+              "all": true
             },
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "분신도 안아준닷",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "분신",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "모두 안아준닷",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies",
-              "hits": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "분신",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
+              "k": "status",
+              "id": "충격",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
           "name": "찌릿 포옹",
+          "cost": 2,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy",
-              "hits": 2
+              "k": "perStack",
+              "id": "분신"
             },
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "분신",
+              "all": true
+            },
+            {
+              "k": "perTag",
+              "id": "모모_shuriken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "다시 안아준닷",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "분신"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "분신",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "꽃꿀 포옹",
+          "fx": [
             {
               "k": "status",
               "id": "충격",
-              "v": 1
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "ifStack",
@@ -281,9 +305,18 @@
               "n": 2
             },
             {
+              "k": "perStack",
+              "id": "분신"
+            },
+            {
               "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy"
+              "ratio": 0.37,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "분신",
+              "all": true
             }
           ]
         }
@@ -299,7 +332,13 @@
         },
         {
           "name": "신난 람쥐",
-          "kind": "atkUp"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -313,12 +352,19 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
-          "target": "oneEnemy"
+          "ratio": 0.5,
+          "target": "oneEnemy",
+          "hits": 2
         },
         {
           "k": "status",
           "id": "충격",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "분신",
           "v": 1
         }
       ],
@@ -328,13 +374,20 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
+              "ratio": 0.64,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "status",
               "id": "충격",
-              "v": 2
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
             }
           ]
         },
@@ -344,28 +397,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
+              "ratio": 0.32,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "status",
               "id": "충격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "분신 수리검",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
+              "v": 1,
               "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "충격",
-              "v": 1
             },
             {
               "k": "stack",
@@ -376,35 +416,79 @@
         },
         {
           "name": "번개 흩뿌리기",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.5,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 2,
               "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "모모_shuriken",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "번개로 콩 볶기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "status",
               "id": "충격",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 2
             }
           ]
         },
         {
-          "name": "번개 같은 손",
-          "tags": [
-            "신속"
-          ],
+          "name": "람쥐썬더",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy"
+              "ratio": 0.45,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
-              "k": "status",
-              "id": "충격",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "모모_shuriken",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -420,7 +504,7 @@
         },
         {
           "name": "손목 스냅",
-          "kind": "cost"
+          "kind": "draw"
         }
       ]
     },
@@ -435,11 +519,15 @@
         {
           "k": "stack",
           "id": "분신",
-          "v": 2
+          "v": 1
         },
         {
-          "k": "status",
-          "id": "회피",
+          "k": "make",
+          "id": "모모_shuriken",
+          "v": 1
+        },
+        {
+          "k": "draw",
           "v": 1
         }
       ],
@@ -450,11 +538,15 @@
             {
               "k": "stack",
               "id": "분신",
-              "v": 3
+              "v": 2
             },
             {
-              "k": "status",
-              "id": "회피",
+              "k": "make",
+              "id": "모모_shuriken",
+              "v": 1
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
@@ -469,27 +561,8 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "그림자 분신",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "draw",
+              "k": "make",
+              "id": "모모_shuriken",
               "v": 1
             }
           ]
@@ -500,41 +573,56 @@
             {
               "k": "stack",
               "id": "분신",
-              "v": 2
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
             },
             {
               "k": "status",
               "id": "회피",
               "v": 1
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
             }
           ]
         },
         {
           "name": "통나무 진법",
-          "tags": [
-            "보존"
-          ],
           "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "모모_shuriken",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "그림자 수련",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
             {
               "k": "stack",
               "id": "분신",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "make",
+              "id": "모모_shuriken",
+              "v": 2
             }
           ]
         }
@@ -542,18 +630,18 @@
       "blesses": [
         {
           "name": "손가락 인",
-          "kind": "cost"
+          "kind": "draw"
         },
         {
           "name": "두루마리",
-          "kind": "draw"
+          "kind": "ap"
         },
         {
           "name": "통나무 하나 더",
           "fx": [
             {
-              "k": "status",
-              "id": "회피",
+              "k": "stack",
+              "id": "분신",
               "v": 1
             }
           ]
@@ -566,40 +654,62 @@
       "hero": "모모",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perTag",
+          "id": "모모_shuriken"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
         {
           "k": "stack",
           "id": "분신",
           "v": 1
-        },
-        {
-          "k": "status",
-          "id": "회피",
-          "v": 1
-        },
-        {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "분신",
-                  "v": 1
-                }
-              ]
-            }
-          ]
         }
       ],
       "oracles": [
         {
           "name": "그림자 분신술",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "모모_shuriken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "카게의 비전",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
             {
               "k": "stack",
               "id": "분신",
@@ -616,11 +726,59 @@
                     {
                       "k": "stack",
                       "id": "분신",
-                      "v": 3
+                      "v": 1
                     }
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "name": "수리검 비",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "모모_shuriken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "닌자 두루마리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.67,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "모모_shuriken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
             }
           ]
         },
@@ -629,119 +787,23 @@
           "cost": 0,
           "fx": [
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "분신",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "통나무 대기",
-          "fx": [
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "모모_shuriken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            },
             {
               "k": "stack",
               "id": "분신",
               "v": 1
-            },
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "분신",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "닌자 두루마리",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "분신",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "카게의 비전",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "분신",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         }
@@ -749,18 +811,18 @@
       "blesses": [
         {
           "name": "닌자 호흡",
-          "kind": "ap"
+          "kind": "atkUp"
         },
         {
           "name": "비전서 한 장",
           "kind": "draw"
         },
         {
-          "name": "그림자 하나",
+          "name": "수리검 한 자루",
           "fx": [
             {
-              "k": "stack",
-              "id": "분신",
+              "k": "make",
+              "id": "모모_shuriken",
               "v": 1
             }
           ]

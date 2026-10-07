@@ -13,17 +13,17 @@
       "crit": 10,
       "blurb": "사료스탕스의 먹보 곰.",
       "keyword": {
-        "name": "한 입",
-        "desc": "처치하고 먹는 한 입",
+        "name": "포만감",
+        "desc": "꿀 절인 생선으로 채운 배",
         "carrier": "self",
-        "cap": 2,
+        "cap": 3,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.5
+            "v": 0.15
           }
         ],
-        "consumeAll": true
+        "consume": 1
       },
       "passives": [
         {
@@ -31,15 +31,37 @@
           "when": {
             "on": "kill"
           },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
           "fx": [
             {
               "k": "stack",
-              "id": "한 입",
+              "id": "포만감",
               "v": 1
             },
             {
               "k": "heal",
               "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "나를 따르라 곰",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 1
             }
           ]
         }
@@ -63,7 +85,7 @@
       },
       "starter": [
         "베니_s1",
-        "베니_s1",
+        "베니_u1",
         "베니_s2",
         "베니_s3"
       ]
@@ -112,6 +134,29 @@
       ]
     },
     {
+      "hero": "베니",
+      "token": true,
+      "id": "베니_fish",
+      "name": "꿀 절인 생선",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.3
+        },
+        {
+          "k": "stack",
+          "id": "포만감",
+          "v": 1
+        }
+      ],
+      "blurb": "배고픈 곰이 아껴 두는 비상식량입니다."
+    },
+    {
       "id": "베니_u1",
       "name": "생선 꿀~꺽!",
       "hero": "베니",
@@ -121,15 +166,16 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 1.2
+          "ratio": 0.6
         },
         {
           "k": "stack",
-          "id": "한 입",
+          "id": "포만감",
           "v": 1
         },
         {
-          "k": "draw",
+          "k": "make",
+          "id": "베니_fish",
           "v": 1
         }
       ],
@@ -139,16 +185,17 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.2
+              "ratio": 0.8
             },
             {
               "k": "stack",
-              "id": "한 입",
-              "v": 2
+              "id": "포만감",
+              "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
             }
           ]
         },
@@ -157,13 +204,37 @@
           "cost": 0,
           "fx": [
             {
+              "k": "heal",
+              "ratio": 0.4
+            },
+            {
               "k": "stack",
-              "id": "한 입",
+              "id": "포만감",
               "v": 1
             },
             {
-              "k": "draw",
+              "k": "make",
+              "id": "베니_fish",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "배 터지게 먹기",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.41
+            },
+            {
+              "k": "stack",
+              "id": "포만감",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
             }
           ]
         },
@@ -172,34 +243,17 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.0
+              "ratio": 0.6
             },
             {
-              "k": "status",
-              "id": "사기",
+              "k": "make",
+              "id": "베니_fish",
               "v": 1
             },
             {
               "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "배 터지게 먹기",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 2.2
-            },
-            {
-              "k": "stack",
-              "id": "한 입",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "v": 2,
+              "who": "other"
             }
           ]
         },
@@ -210,17 +264,18 @@
           ],
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.2
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
+            },
+            {
+              "k": "when",
+              "on": "draw"
             },
             {
               "k": "stack",
-              "id": "한 입",
+              "id": "포만감",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
             }
           ]
         }
@@ -239,7 +294,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "한 입",
+              "id": "포만감",
               "v": 1
             }
           ]
@@ -256,7 +311,17 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "포만감",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
           "target": "oneEnemy"
         }
       ],
@@ -266,7 +331,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "포만감",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
               "target": "oneEnemy"
             }
           ]
@@ -277,37 +352,18 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "밥심 공사",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.0,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
               "k": "ifStack",
-              "id": "한 입"
+              "id": "포만감",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.3,
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "철거 현장",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "allEnemies"
             }
           ]
         },
@@ -317,11 +373,63 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "포만감",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
               "target": "oneEnemy"
             },
             {
               "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "빈속 공사",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "포만감",
+              "n": 1,
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "공사장 새참",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
               "v": 1
             }
           ]
@@ -334,11 +442,16 @@
         },
         {
           "name": "망치 자국",
-          "kind": "frost"
+          "kind": "weakSpot"
         },
         {
           "name": "현장 체력",
-          "kind": "atkUp"
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
         }
       ]
     },
@@ -348,29 +461,21 @@
       "hero": "베니",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
-          "k": "status",
-          "id": "불굴",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "한 입",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "perTag",
+          "id": "베니_fish"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
@@ -378,68 +483,29 @@
           "name": "곱빼기",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "한 입",
-                      "v": 2
-                    },
-                    {
-                      "k": "heal",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "간식 한 알",
-          "cost": 0,
+          "name": "뽀너스 정기 배송",
+          "power": true,
           "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "한 입",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "배부른 낮잠",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
             {
               "k": "stack",
-              "id": "한 입",
-              "v": 2
+              "id": "포만감",
+              "v": 1
             },
             {
               "k": "power",
@@ -450,13 +516,36 @@
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "한 입",
+                      "k": "make",
+                      "id": "베니_fish",
                       "v": 1
                     }
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "name": "생선 한입에",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.89,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -464,61 +553,42 @@
           "name": "든든한 밥심",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 2
+              "k": "perStack",
+              "id": "포만감"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "한 입",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.84
             }
           ]
         },
         {
           "name": "사료 축제",
-          "tags": [
-            "축복"
-          ],
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "한 입",
-              "v": 1
+              "k": "perTag",
+              "id": "베니_fish"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "한 입",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -526,18 +596,18 @@
       "blesses": [
         {
           "name": "뽀너스 쿠폰",
-          "kind": "cost"
+          "kind": "power"
         },
         {
           "name": "두툼한 뱃살",
-          "kind": "defUp"
+          "kind": "weakSpot"
         },
         {
-          "name": "덤 사료",
+          "name": "생선 한 마리 더",
           "fx": [
             {
-              "k": "stack",
-              "id": "한 입",
+              "k": "make",
+              "id": "베니_fish",
               "v": 1
             }
           ]
@@ -554,15 +624,27 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.4,
+          "ratio": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "포만감",
+          "n": 1,
+          "not": true
+        },
+        {
+          "k": "dmg",
+          "ratio": 1,
           "target": "oneEnemy"
         },
         {
           "k": "ifKill"
         },
         {
-          "k": "ap",
-          "v": 1
+          "k": "stack",
+          "id": "포만감",
+          "v": 2
         }
       ],
       "oracles": [
@@ -571,15 +653,27 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.9,
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "포만감",
+              "n": 1,
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
               "k": "ifKill"
             },
             {
-              "k": "ap",
-              "v": 1
+              "k": "stack",
+              "id": "포만감",
+              "v": 2
             }
           ]
         },
@@ -589,15 +683,83 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "포만감",
+              "n": 1,
+              "not": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.62,
               "target": "oneEnemy"
             },
             {
               "k": "ifKill"
             },
             {
-              "k": "ap",
-              "v": 1
+              "k": "stack",
+              "id": "포만감",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "굶주린 도끼",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "포만감",
+              "all": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "곰의 사냥 본능",
+          "cost": 1,
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "베니_fish",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -606,63 +768,25 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.0,
+              "ratio": 2.34,
               "target": "oneEnemy"
             },
             {
               "k": "ifStack",
-              "id": "한 입"
+              "id": "포만감",
+              "n": 1,
+              "not": true
             },
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.17,
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
-            },
-            {
-              "k": "ap",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "휘두르는 도끼",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "ap",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "만찬의 도끼",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "ap",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -677,8 +801,13 @@
           "kind": "weakSpot"
         },
         {
-          "name": "포만감",
-          "kind": "defUp"
+          "name": "나눠 먹는 생선",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
         }
       ]
     }

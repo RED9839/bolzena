@@ -265,6 +265,21 @@ namespace Bolzena.Core.Tests
             StringAssert.Contains("all(다섯 중 고르기)은 없앴다", string.Join("\n", bad.Errors));
         }
 
+        [Test] public void 축복_붙은_카드가_쓰고_버려져도_축복이_남는다()
+        {
+            var d = K.Sample();
+            var run = Run.New(d, new List<string> { "rico", "carrot", "sion" }, 1); run.S.Deck.Add("rico_u1");
+            var (b, _) = run.OpenFight();
+            b.Hand.Clear(); b.Hand.Add("rico_u1");
+            b.Glow["rico_u1"] = new Glow { Kind = "card", Picks = new List<GlowPick> { new GlowPick { N = 2, Shin = "power" }, new GlowPick { N = 4 }, new GlowPick { N = 5 } } };
+            b.ApplyEpiphany("rico_u1", 0);
+            Assert.AreEqual("power", b.ShinOf("rico_u1"), "고르는 순간 인스턴스에 축복이 붙는다");
+            Assert.IsTrue(b.MarkOf("rico_u1").Blessed);
+            b.Hand.Remove("rico_u1"); b.Discard.Add("rico_u1");   // 쓰고 버려진 모습
+            Assert.IsTrue(b.MarkOf("rico_u1").Blessed, "버린 더미에서도 축복 표식");
+            Assert.AreEqual(2, b.Flash["rico_u1"]);
+        }
+
         [Test] public void 검사기와_글()
         {
             var d = D("[{id:'bad', name:'잘못', hero:'a', cost:0, type:'스킬', fx:[{k:'ifRoll', n:1}, {k:'gauge', v:1}, {k:'cardStatus', id:'독', v:-1}]}, {id:'ok', name:'좋음', hero:'a', cost:0, type:'스킬', fx:[{k:'costMod', v:-1, who:'self', type:'공격', turns:2}, {k:'cutHit', v:0.3}]}]");

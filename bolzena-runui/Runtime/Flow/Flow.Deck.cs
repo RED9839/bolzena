@@ -76,7 +76,9 @@ namespace Bolzena.RunUI
             float cw = Mathf.Clamp((cardsW - gap * (cols - 1)) / cols, 150, 232), ch = cw * 1.4f;
             float headH = headW * 1.42f;
             int gi = 0, ci = 0;
-            foreach (var g in CardOrder.Groups(P.S.Deck, P.Data, P.S.Party))
+            var groups = CardOrder.Groups(P.S.Deck, P.Data, P.S.Party).ToList();
+            var order = groups.SelectMany(g => g.Ids).ToList();   // 카드 상세의 이전 · 다음
+            foreach (var g in groups)
             {
                 int rows = Mathf.CeilToInt(g.Ids.Count / (float)cols);
                 float gh = Mathf.Max(headH, rows * (ch + gap) - gap);
@@ -98,7 +100,8 @@ namespace Bolzena.RunUI
                     var c = W.Card(holder, this, id, cw);
                     c.At(0, 1, (i % cols) * (cw + gap), -(i / cols) * (ch + gap), cw, ch);
                     var b = c.gameObject.AddComponent<Btn>();
-                    b.OnClick = () => CardZoom(id);
+                    int at = ci;
+                    b.OnClick = () => CardZoom(id, order, at);
                     Stage.Hot["deck.card" + ci] = b;
                     if (ci < 24) Tw.Pop(c, 0.02f * ci, 0.9f, 0.25f);
                     ci++;
@@ -148,75 +151,7 @@ namespace Bolzena.RunUI
             return rt;
         }
 
-        /// <summary>카드 크게 — 왼쪽 카드 한 장, 오른쪽 신탁(이름만 — 번호는 보이지 않는다) · 겨우살이의 축복.</summary>
-        public void CardZoom(string id)
-        {
-            var v = P.View(id);
-            var def = P.Data.Card(id);
-            var (body, close, _) = Stage.ModalBox("cardzoom", 1180, Theme.C(700, 690), v?.Name ?? id, def?.Blurb ?? (v?.Def.Hero != null ? Roster.OfCore(v.Def.Hero).ko + "의 카드" : v?.Owner != null ? $"교주 카드 · {Roster.OfCore(v.Owner).ko} 덱" : "교주 카드"));
-            float cw = Theme.C(330, 300);
-            var card = W.Card(body, this, id, cw, "zoom"); card.At(0, 0.5f, 10, 0, cw, cw * 1.4f);
-            var right = Ui.Rect("right", body).Fill(cw + 40, 0, 6, 0);
-            var content = Ui.Scroll(right, out _);
-            Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(4, 10, 4, 10), true, false);
-            void Line(string text, float size, Color c)
-            {
-                var t = Ui.Text(content, text, size, c, TextAlignmentOptions.TopLeft);
-                t.textWrappingMode = TextWrappingModes.Normal;
-                var fit = t.gameObject.AddComponent<ContentSizeFitter>(); fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            }
-            // 이 카드의 낱말 — 키워드 · 상태 · 고유 효과 · 생성 카드 판을 세로로(카드 글의 밑줄 낱말과 같은 판)
-            var terms = v != null ? CardTerms.Of(P.Data, P.Text, v, P.Text.Card(v)) : new List<CardTerms.Term>();
-            if (terms.Count > 0)
-            {
-                W.Section(content, "낱말", "카드 글의 색 낱말 — 키워드 · 상태 · 고유 효과 · 변신 · 만들어지는 카드", 36);
-                float bw = Mathf.Min(1180, Stage.Size.x - 32) - 40 - cw - 40 - 6 - 14;
-                int ti = 0;
-                foreach (var t0 in terms)
-                {
-                    var t = t0;
-                    if (t.IsCard)
-                    {
-                        var cv = P.View(t.CardId);
-                        t = new CardTerms.Term { Name = t0.Name, CardId = t0.CardId, Rel = t0.Rel, Kind = t0.Rel != null ? "카드 · " + t0.Rel : "만들어지는 카드",
-                            Body = cv != null ? $"<color={Theme.SubTag}>{W.TypeLabel(cv.Type)} · 비용 {(cv.X ? "X" : cv.Cost.ToString())}</color>  {P.Text.Card(cv)}" : null };
-                    }
-                    var holder = Ui.Rect("term" + ti, content);
-                    var bx = TermPop.Box(holder, t, bw);   // 수치가 다 든 글 하나(「자세히」 없음) — 오른쪽 칸이 스크롤된다
-                    holder.Pref(-1, bx.sizeDelta.y);
-                    ti++;
-                }
-            }
-            // 이 카드에 얹힌 것 — 받은 신탁 · 축복(효과 글) · 복제(카드의 표식과 같은 색)
-            var mark = P.Mark(id);
-            if (mark.Any)
-            {
-                W.Section(content, "이 카드에 얹힌 것", mark.Copy ? "복제할 때 모습 그대로 묶였습니다" : null, 36);
-                if (mark.Oracle != null) Line($"<color={Theme.GoldTag}>신탁 「{mark.Oracle}」</color>", Theme.FsBody, Theme.Ink);
-                if (mark.Blessed) Line($"<color=#BFFFD1>축복 「{mark.Bless}」</color>  <size=90%>{mark.BlessText}</size>", Theme.FsBody, Theme.Ink);
-                if (mark.Copy) Line($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color>  <size=90%><color={Theme.SubTag}>원본이 나중에 받는 신탁 · 축복은 따라오지 않습니다</color></size>", Theme.FsBody, Theme.Ink);
-            }
-            if (def != null && def.Oracles.Count > 0)
-            {
-                W.Section(content, "신탁", "카드를 내면 빛나고 · 보상에서 하나를 얹습니다", 36);
-                for (int i = 0; i < def.Oracles.Count; i++)
-                {
-                    var o = def.Oracles[i];
-                    bool cur = v?.Oracle == o;
-                    Line($"<color={(cur ? Theme.GoodTag : Theme.GoldTag)}>{o.Name}</color>{(cur ? "  <size=80%>(얹은 것)</size>" : "")}\n<size=90%>{P.Text.Oracle(def, o)}</size>", Theme.FsBody, Theme.Ink);
-                }
-            }
-            if (def != null && def.Hero != null)
-            {
-                W.Section(content, "겨우살이의 축복", def.Blesses.Count > 0 ? "이 카드만의 축복" : "공용 축복에서", 36);
-                if (def.Blesses.Count > 0)
-                    foreach (var b in def.Blesses) Line($"<color={Theme.GoldTag}>{b.Name}</color>{(b.Name == mark.Bless ? $"  <size=80%><color={Theme.GoodTag}>(얹은 것)</color></size>" : "")}  <size=90%>{P.Text.Bless(b)}</size>", Theme.FsBody, Theme.Ink);
-                else Line($"<color={Theme.SubTag}>이 카드만의 축복은 없습니다 — 축복을 받으면 공용 축복 가운데 하나가 붙습니다.</color>", Theme.FsSm, Theme.Sub);
-            }
-            if (def == null || (def.Oracles.Count == 0 && def.Hero == null))
-                Line($"<color={Theme.SubTag}>신탁 · 축복이 없는 카드입니다.</color>", Theme.FsBody, Theme.Sub);
-            Stage.Hot["zoom.close"] = Stage.Hot["modal.x"];
-        }
+        // 카드 크게(CardZoom) — Flow.CardDetail.cs(카제나 「카드 상세」 배치 · 신탁 미리보기)
 
         /// <summary>사도별 카드 묶음(작은 머리표 + 격자) — 카드 제거 · 이벤트 카드 고르기. 같은 카드도 한 장마다 한 칸(×N 으로 묶지 않는다 — 신탁 · 축복 · 복제 표식이 칸마다 보이게, 2026-10-06 사용자).</summary>
         /// <summary>격자 한 줄 칸 수 — 폭 avail 에 최대 폭 cwMax 카드가 몇 장 드나(min~max). 덱 보기 · 고르기 목록이 같이 쓴다.</summary>
@@ -245,6 +180,8 @@ namespace Bolzena.RunUI
                     var c = W.Card(holder, this, id, cw);
                     c.At(0, 1, (j % cols) * (cw + gap), -(j / cols) * (ch + gap), cw, ch);
                     each(c, id, i);
+                    var cb = c.GetComponent<Btn>();   // 고르기 칸 — 꾹 누르면 카드 상세(누름은 고르기 그대로)
+                    if (cb != null && cb.OnHold == null) { var cid = id; cb.OnHold = () => CardZoom(cid); }
                     if (i < 30) Tw.Pop(c, 0.02f * i, 0.85f, 0.3f);
                     i++;
                 }
@@ -272,7 +209,7 @@ namespace Bolzena.RunUI
                     var rt2 = Ui.Title(rib.transform, "축복!", Theme.FsMd, Theme.Brown, TextAlignmentOptions.Center); rt2.rectTransform.Fill();
                     var glow = Ui.Img(holder, Theme.S("soft"), Theme.Gold.A(0.45f), "glow"); glow.rectTransform.At(0.5f, 1, 0, 30, cw * 1.5f, cw * 1.9f); glow.transform.SetAsFirstSibling();
                     Tw.Pulse(glow, 0.25f, 0.55f, 1.6f);
-                    var bt = Ui.Text(holder, $"<color={Theme.GoldTag}>{o.BlessName}</color>  {o.BlessText}", Theme.FsCap, Theme.Ink, TextAlignmentOptions.Top);
+                    var bt = Ui.Text(holder, $"{o.BlessText}", Theme.FsCap, Theme.Ink, TextAlignmentOptions.Top);
                     bt.rectTransform.At(0.5f, 0, 0, 0, cw + 20, 48); bt.enableAutoSizing = true; bt.fontSizeMin = 10; bt.fontSizeMax = Theme.FsCap;
                 }
                 var b = face.gameObject.AddComponent<Btn>();

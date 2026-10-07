@@ -13,14 +13,34 @@
       "crit": 10,
       "blurb": "곰인형 속 AI 글러브와 함께하는 해커. 공격할 때마다 콤보가 이어지며 고학년 게이지가 차고, 고학년 한 번이면 적의 다음 행동을 통째로 해킹합니다.",
       "keyword": {
-        "name": "콤보",
-        "desc": "공격으로 이어 가는 콤보",
-        "carrier": "self",
-        "cap": 5,
-        "per": [
+        "name": "개인정보",
+        "desc": "해킹으로 긁어모은 적의 신상",
+        "carrier": "enemy",
+        "cap": 3,
+        "rules": [
           {
-            "stat": "dealt",
-            "v": 0.08
+            "name": "신상 털기",
+            "when": {
+              "on": "stackReach",
+              "id": "개인정보",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "개인정보",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.45,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "tough",
+                "v": 1
+              }
+            ]
           }
         ]
       },
@@ -29,35 +49,36 @@
           "name": "글러브 해킹",
           "when": {
             "on": "play",
-            "type": "공격"
+            "type": "공격",
+            "minCost": 1
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
           "fx": [
             {
-              "k": "gauge",
-              "v": 8
-            },
-            {
               "k": "stack",
-              "id": "콤보",
-              "v": 1
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "콤보 끊김",
+          "name": "천재 해커의 등장",
           "when": {
-            "on": "turnEnd"
+            "on": "spend",
+            "id": "개인정보"
           },
-          "conds": [
-            {
-              "c": "ownNone"
-            }
-          ],
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
           "fx": [
             {
-              "k": "spend",
-              "id": "콤보",
-              "all": true
+              "k": "gauge",
+              "v": 5
             }
           ]
         }
@@ -80,8 +101,9 @@
           },
           {
             "k": "stack",
-            "id": "콤보",
-            "v": 2
+            "id": "개인정보",
+            "v": 2,
+            "target": "oneEnemy"
           },
           {
             "k": "draw",
@@ -91,7 +113,7 @@
       },
       "starter": [
         "리스티_s1",
-        "리스티_s1",
+        "리스티_u2",
         "리스티_s2",
         "리스티_s3"
       ]
@@ -140,148 +162,198 @@
       ]
     },
     {
+      "id": "리스티_can",
+      "name": "빈 캔",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "oneEnemy"
+        }
+      ],
+      "hero": "리스티",
+      "token": true
+    },
+    {
       "id": "리스티_u1",
       "name": "테크노맨시",
       "hero": "리스티",
       "unique": true,
-      "signature": true,
-      "cost": 3,
+      "cost": 2,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
-          "hits": 3,
-          "target": "randomEnemy"
+          "ratio": 0.45,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "perStack",
+          "id": "개인정보"
         },
         {
           "k": "dmg",
-          "ratio": 1.6,
+          "ratio": 0.4,
           "target": "oneEnemy"
         },
         {
-          "k": "stack",
-          "id": "콤보",
-          "v": 1
+          "k": "spend",
+          "id": "개인정보",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "빌드 완성",
+          "name": "마지막 타격 강화",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.91,
-              "hits": 3,
-              "target": "randomEnemy"
+              "ratio": 0.62,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "개인정보"
             },
             {
               "k": "dmg",
-              "ratio": 2.08,
+              "ratio": 0.55,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "콤보",
-              "v": 1
+              "k": "spend",
+              "id": "개인정보",
+              "all": true
             }
           ]
         },
         {
-          "name": "리스티의 슈퍼 세이브",
-          "cost": 2,
+          "name": "라이트 해킹",
+          "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "hits": 3,
-              "target": "randomEnemy"
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "개인정보"
             },
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 0.35,
               "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "콤보",
-              "v": 1
             }
           ]
         },
         {
-          "name": "완벽한 팀",
+          "name": "캔 던지기 해킹",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perTag",
+              "id": "리스티_can"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "리스티_can"
+            }
+          ]
+        },
+        {
+          "name": "상주 해킹 프로그램",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "개인정보"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "개인정보",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.35,
+                      "target": "oneEnemy",
+                      "hits": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "서버 다운",
           "tags": [
-            "보존"
+            "소멸"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.84,
-              "hits": 3,
-              "target": "randomEnemy"
+              "ratio": 1.15,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "개인정보"
             },
             {
               "k": "dmg",
-              "ratio": 1.92,
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "콤보",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "무한 콤보",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.01,
-              "hits": 3,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.32,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "콤보",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "마지막 입력",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.84,
-              "hits": 3,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.92,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "콤보",
-              "v": 1
+              "k": "spend",
+              "id": "개인정보",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "빌드 완성",
+          "name": "복셀 블록",
           "kind": "power"
         },
         {
@@ -289,12 +361,13 @@
           "kind": "ap"
         },
         {
-          "name": "말동무 AI",
+          "name": "로그 수집",
           "fx": [
             {
               "k": "stack",
-              "id": "콤보",
-              "v": 1
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -305,138 +378,150 @@
       "name": "훗, 못 깨는 게임은 없지",
       "hero": "리스티",
       "unique": true,
-      "cost": 2,
+      "cost": 0,
       "type": "스킬",
       "fx": [
         {
           "k": "stack",
-          "id": "콤보",
-          "v": 2
+          "id": "개인정보",
+          "v": 1,
+          "target": "oneEnemy"
         },
         {
           "k": "draw",
-          "v": 2
-        },
-        {
-          "k": "ap",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "스피드런",
-          "cost": 1,
+          "name": "공략 완료",
           "fx": [
             {
               "k": "stack",
-              "id": "콤보",
-              "v": 2
+              "id": "개인정보",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "ap",
               "v": 1
             }
           ]
         },
         {
-          "name": "밤샘 레이드",
-          "tags": [
-            "보존"
-          ],
+          "name": "무한 콤보",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "개인정보",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "공략집 검색",
           "fx": [
             {
               "k": "stack",
-              "id": "콤보",
-              "v": 3
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             },
             {
-              "k": "ap",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "팀원 캐리",
-          "tags": [
-            "신속"
-          ],
+          "name": "버그 악용",
           "fx": [
             {
               "k": "stack",
-              "id": "콤보",
-              "v": 3
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 2
+              "k": "ifStack",
+              "id": "개인정보",
+              "n": 2
             },
             {
-              "k": "ap",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "최적화 루트",
+          "name": "밤샘 게임",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "stack",
-              "id": "콤보",
-              "v": 4
+              "id": "개인정보",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 2
-            },
-            {
-              "k": "ap",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "팀 큐",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "콤보",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 3
-            },
-            {
-              "k": "ap",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "최적화 루트",
-          "kind": "guard"
+          "name": "세이브 파일",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "양심 회로",
-          "kind": "draw"
+          "name": "골판지 왕관",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
         },
         {
-          "name": "무한 콤보",
+          "name": "다크넷 계정",
           "fx": [
             {
               "k": "stack",
-              "id": "콤보",
-              "v": 1
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -447,74 +532,30 @@
       "name": "다 마신 캔",
       "hero": "리스티",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2,
+          "ratio": 0.75,
           "target": "oneEnemy"
         },
         {
-          "k": "ifChain"
+          "k": "stack",
+          "id": "개인정보",
+          "v": 1,
+          "target": "oneEnemy"
         },
         {
-          "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy"
+          "k": "make",
+          "id": "리스티_can",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "캔 탑 쌓기",
+          "name": "독타 페퍼 캔",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifChain"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "한 박스째",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifChain"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "같이 던지기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifChain"
-            },
             {
               "k": "dmg",
               "ratio": 1.1,
@@ -522,67 +563,119 @@
             },
             {
               "k": "stack",
-              "id": "콤보",
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "리스티_can",
               "v": 1
             }
           ]
         },
         {
-          "name": "리필 완료",
-          "tags": [
-            "신속"
-          ],
+          "name": "찌그러뜨린 캔",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 0.55,
               "target": "oneEnemy"
             },
             {
-              "k": "ifChain"
+              "k": "stack",
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "리스티_can",
+              "v": 1
             }
           ]
         },
         {
-          "name": "독타 페퍼",
-          "cost": 3,
+          "name": "캔 탑 쌓기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.6,
+              "ratio": 0.78,
               "target": "oneEnemy"
             },
             {
-              "k": "ifChain"
+              "k": "perTag",
+              "id": "리스티_can"
             },
             {
               "k": "dmg",
-              "ratio": 1.8,
+              "ratio": 0.33,
               "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "리스티_can",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "냉장고 뒤지기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "리스티_can",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "분리수거",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "리스티_can",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "독타 페퍼",
-          "kind": "power"
+          "name": "찌그러진 캔",
+          "kind": "frost"
         },
         {
-          "name": "말동무 AI",
-          "kind": "ap"
+          "name": "한 캔 더",
+          "kind": "draw"
         },
         {
-          "name": "빌드 완성",
+          "name": "캔 하나 더",
           "fx": [
             {
-              "k": "stack",
-              "id": "콤보",
+              "k": "make",
+              "id": "리스티_can",
               "v": 1
             }
           ]
@@ -595,126 +688,212 @@
       "hero": "리스티",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
-      "tags": [
-        "연계"
-      ],
+      "type": "강화",
       "fx": [
         {
-          "k": "draw",
-          "v": 1
+          "k": "stack",
+          "id": "개인정보",
+          "v": 1,
+          "target": "oneEnemy"
         },
         {
-          "k": "gauge",
-          "v": 20
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "stackReach",
+                "id": "개인정보",
+                "n": 3
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.35,
+                  "target": "oneEnemy"
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "양심 회로",
-          "tags": [
-            "연계"
-          ],
+          "name": "글러브 풀가동",
           "fx": [
             {
-              "k": "draw",
-              "v": 2
+              "k": "stack",
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "gauge",
-              "v": 26
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "개인정보",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.75,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "분석 완료",
+          "name": "글러브 대기 모드",
           "cost": 0,
-          "tags": [
-            "연계"
-          ],
           "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "개인정보",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.45,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "양심의 목소리",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
             {
               "k": "draw",
               "v": 1
             },
             {
-              "k": "gauge",
-              "v": 20
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "개인정보",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.5,
+                      "target": "oneEnemy"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.5
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "곰인형 방패",
-          "tags": [
-            "연계",
-            "보존"
-          ],
+          "name": "현실 개변 장치",
           "fx": [
             {
-              "k": "draw",
-              "v": 2
+              "k": "stack",
+              "id": "개인정보",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "gauge",
-              "v": 24
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "개인정보",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.5,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "입력 보조",
-          "tags": [
-            "연계"
-          ],
+          "name": "곰인형 혹사",
           "fx": [
             {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "gauge",
-              "v": 20
+              "k": "payHpPct",
+              "v": 0.05
             },
             {
               "k": "stack",
-              "id": "콤보",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "말동무 AI",
-          "tags": [
-            "연계",
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
+              "id": "개인정보",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
-              "k": "gauge",
-              "v": 24
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "개인정보",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.7,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "양심 회로",
-          "kind": "guard"
+          "name": "말동무",
+          "kind": "atkUp"
         },
         {
-          "name": "무한 콤보",
-          "kind": "draw"
+          "name": "호숫가 집",
+          "kind": "cost"
         },
         {
-          "name": "최적화 루트",
+          "name": "방구석 바리케이드",
           "fx": [
             {
-              "k": "stack",
-              "id": "콤보",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.4
             }
           ]
         }
@@ -748,6 +927,18 @@
               "target": "oneEnemy"
             }
           ]
+        },
+        {
+          "name": "손에 붙은 패드",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
         }
       ],
       "affinity": "리스티",
@@ -763,8 +954,9 @@
           "fx": [
             {
               "k": "stack",
-              "id": "콤보",
-              "v": 2
+              "id": "개인정보",
+              "v": 1,
+              "target": "topEnemy"
             }
           ]
         }

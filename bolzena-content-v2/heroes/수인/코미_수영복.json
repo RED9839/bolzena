@@ -14,7 +14,7 @@
       "blurb": "여름에도 게으른 고양이 수인이지만 이번엔 돈 냄새를 맡았습니다.",
       "keyword": {
         "name": "주스 재고",
-        "desc": "스킬마다 파는 주스",
+        "desc": "수상한 재료로 만든 코미 주스",
         "carrier": "self",
         "cap": 4,
         "rules": [
@@ -43,56 +43,9 @@
                 "v": 1
               }
             ]
-          },
-          {
-            "name": "재고 떨이",
-            "when": {
-              "on": "stackOver",
-              "id": "주스 재고"
-            },
-            "fx": [
-              {
-                "k": "stack",
-                "id": "매출",
-                "v": 1
-              }
-            ],
-            "limit": {
-              "per": "turn",
-              "n": 1
-            }
           }
         ]
       },
-      "keywords": [
-        {
-          "name": "매출",
-          "desc": "주스를 팔아 모은 돈",
-          "carrier": "self",
-          "cap": 3,
-          "rules": [
-            {
-              "name": "장사 수완",
-              "when": {
-                "on": "stackReach",
-                "id": "매출",
-                "n": 3
-              },
-              "fx": [
-                {
-                  "k": "spend",
-                  "id": "매출",
-                  "all": true
-                },
-                {
-                  "k": "ap",
-                  "v": 1
-                }
-              ]
-            }
-          ]
-        }
-      ],
       "passives": [
         {
           "name": "조기 매진",
@@ -103,9 +56,14 @@
           "conds": [
             {
               "c": "stack",
-              "id": "주스 재고"
+              "id": "주스 재고",
+              "n": 1
             }
           ],
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
           "fx": [
             {
               "k": "spend",
@@ -114,11 +72,24 @@
             },
             {
               "k": "heal",
-              "ratio": 0.6
-            },
+              "ratio": 0.7
+            }
+          ]
+        },
+        {
+          "name": "장사 수완",
+          "when": {
+            "on": "stackOver",
+            "id": "주스 재고"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
             {
-              "k": "stack",
-              "id": "매출",
+              "k": "make",
+              "id": "코미_수영복_juice",
               "v": 1
             }
           ]
@@ -151,7 +122,7 @@
         "코미_수영복_s1",
         "코미_수영복_s1",
         "코미_수영복_s2",
-        "코미_수영복_s2"
+        "코미_수영복_u3"
       ]
     }
   ],
@@ -184,25 +155,43 @@
       ]
     },
     {
+      "hero": "코미_수영복",
+      "token": true,
+      "id": "코미_수영복_juice",
+      "name": "코미 주스",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.4
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "맛은 묻지 마세요. 효과는 확실합니다."
+    },
+    {
       "id": "코미_수영복_u1",
       "name": "물놀이 좋은거 아니야?",
       "hero": "코미_수영복",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "shield",
-          "ratio": 2
-        },
-        {
           "k": "heal",
-          "ratio": 1.4
+          "ratio": 1
         },
         {
-          "k": "stack",
-          "id": "주스 재고",
-          "v": 2
+          "k": "status",
+          "id": "사기",
+          "v": 1
         }
       ],
       "oracles": [
@@ -210,54 +199,47 @@
           "name": "풀장 개장",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 2.5
-            },
-            {
               "k": "heal",
-              "ratio": 1.8
+              "ratio": 1.62
             },
             {
-              "k": "stack",
-              "id": "주스 재고",
-              "v": 2
+              "k": "status",
+              "id": "사기",
+              "v": 1
             }
           ]
         },
         {
           "name": "튜브 띄우기",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.2
-            },
-            {
               "k": "heal",
-              "ratio": 1.0
+              "ratio": 0.5
             },
             {
-              "k": "stack",
-              "id": "주스 재고",
-              "v": 2
+              "k": "status",
+              "id": "사기",
+              "v": 1
             }
           ]
         },
         {
-          "name": "매점 대목",
+          "name": "워터파크 통째로",
+          "cost": 2,
           "fx": [
             {
-              "k": "shield",
-              "ratio": 2.4
+              "k": "heal",
+              "ratio": 1.8
             },
             {
-              "k": "stack",
-              "id": "주스 재고",
+              "k": "status",
+              "id": "사기",
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "매출",
+              "k": "make",
+              "id": "코미_수영복_juice",
               "v": 2
             }
           ]
@@ -266,45 +248,48 @@
           "name": "물보라 튀기기",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 2.0
+              "k": "heal",
+              "ratio": 0.9
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "주스 재고",
+              "n": 3
             },
             {
               "k": "heal",
-              "ratio": 1.4
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "allEnemies"
+              "ratio": 0.8
             }
           ]
         },
         {
-          "name": "워터파크 통째로",
-          "cost": 3,
+          "name": "매점 대목",
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.4
-            },
-            {
-              "k": "heal",
-              "ratio": 2.4
-            },
             {
               "k": "stack",
               "id": "주스 재고",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "코미_수영복_juice",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
             }
           ]
         }
       ],
       "blesses": [
-        {
-          "name": "튼튼한 튜브",
-          "kind": "guard"
-        },
         {
           "name": "시원한 물",
           "kind": "heal"
@@ -312,6 +297,15 @@
         {
           "name": "입장권 할인",
           "kind": "cost"
+        },
+        {
+          "name": "튼튼한 튜브",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            }
+          ]
         }
       ]
     },
@@ -320,22 +314,26 @@
       "name": "특제 코미 주스",
       "hero": "코미_수영복",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
+          "k": "perStack",
+          "id": "주스 재고"
+        },
+        {
           "k": "heal",
-          "ratio": 1.6
+          "ratio": 0.45
+        },
+        {
+          "k": "spend",
+          "id": "주스 재고",
+          "all": true
         },
         {
           "k": "status",
-          "id": "불굴",
-          "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "매출",
-          "v": 1
+          "id": "피해 감소",
+          "v": 2
         }
       ],
       "oracles": [
@@ -343,52 +341,91 @@
           "name": "진한 특제 주스",
           "fx": [
             {
+              "k": "perStack",
+              "id": "주스 재고"
+            },
+            {
               "k": "heal",
-              "ratio": 2.4
+              "ratio": 0.6
+            },
+            {
+              "k": "spend",
+              "id": "주스 재고",
+              "all": true
             },
             {
               "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "매출",
-              "v": 1
+              "id": "피해 감소",
+              "v": 2
             }
           ]
         },
         {
           "name": "맛보기 주스",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
+              "k": "perStack",
+              "id": "주스 재고"
+            },
+            {
               "k": "heal",
-              "ratio": 1.0
+              "ratio": 0.3
+            },
+            {
+              "k": "spend",
+              "id": "주스 재고",
+              "all": true
             },
             {
               "k": "status",
-              "id": "불굴",
+              "id": "피해 감소",
               "v": 1
             }
           ]
         },
         {
-          "name": "완판 주스",
+          "name": "원액 그대로",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.6
+              "ratio": 1.4
             },
             {
               "k": "status",
-              "id": "불굴",
-              "v": 1
+              "id": "피해 감소",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "주스 가판대",
+          "power": true,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "주스 재고"
             },
             {
-              "k": "stack",
-              "id": "매출",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "코미_수영복_juice",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -396,38 +433,21 @@
           "name": "에너지 주스",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.6
+              "k": "perStack",
+              "id": "주스 재고"
             },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "원액 그대로",
-          "cost": 3,
-          "fx": [
             {
               "k": "heal",
-              "ratio": 2.4
+              "ratio": 0.45
             },
             {
-              "k": "status",
-              "id": "불굴",
+              "k": "spend",
+              "id": "주스 재고",
+              "all": true
+            },
+            {
+              "k": "draw",
               "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "매출",
-              "v": 1
             }
           ]
         }
@@ -446,7 +466,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "매출",
+              "id": "주스 재고",
               "v": 1
             }
           ]
@@ -467,9 +487,8 @@
           "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "약화",
-          "v": 1
+          "k": "heal",
+          "ratio": 0.6
         },
         {
           "k": "stack",
@@ -483,13 +502,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.7
             },
             {
               "k": "stack",
@@ -504,54 +522,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.55,
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "주스 재고",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "투척 판매",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "주스 재고",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "매출",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "주스 폭탄",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "heal",
+              "ratio": 0.4
             },
             {
               "k": "stack",
@@ -566,18 +542,56 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
+              "ratio": 0.5,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "heal",
+              "ratio": 1
+            },
+            {
+              "k": "make",
+              "id": "코미_수영복_juice",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "주스 폭탄",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.98,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.79
+            }
+          ]
+        },
+        {
+          "name": "투척 판매",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.62
             },
             {
-              "k": "stack",
-              "id": "주스 재고",
-              "v": 2
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
             }
           ]
         }
@@ -593,7 +607,13 @@
         },
         {
           "name": "다음 병",
-          "kind": "draw"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -606,9 +626,9 @@
       "type": "강화",
       "fx": [
         {
-          "k": "status",
-          "id": "사기",
-          "v": 1
+          "k": "stack",
+          "id": "주스 재고",
+          "v": 2
         },
         {
           "k": "power",
@@ -624,9 +644,8 @@
               },
               "fx": [
                 {
-                  "k": "stack",
-                  "id": "매출",
-                  "v": 1
+                  "k": "heal",
+                  "ratio": 0.3
                 }
               ]
             }
@@ -637,75 +656,6 @@
         {
           "name": "완판 행진",
           "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "스킬"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "매출",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "한정 수량",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "스킬"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "매출",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "시원한 얼음",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "주스 재고",
@@ -725,9 +675,8 @@
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "매출",
-                      "v": 1
+                      "k": "heal",
+                      "ratio": 0.55
                     }
                   ]
                 }
@@ -736,16 +685,13 @@
           ]
         },
         {
-          "name": "단골 손님",
+          "name": "한정 수량",
+          "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 2
             },
             {
               "k": "power",
@@ -761,9 +707,8 @@
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "매출",
-                      "v": 1
+                      "k": "heal",
+                      "ratio": 0.3
                     }
                   ]
                 }
@@ -774,17 +719,80 @@
         {
           "name": "해변 대목",
           "tags": [
-            "축복"
+            "개전"
           ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "코미_수영복_juice",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "코사장 성공 신화",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "단골 확보",
           "fx": [
             {
               "k": "status",
               "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "매출",
               "v": 1
             },
             {
@@ -801,9 +809,8 @@
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "매출",
-                      "v": 1
+                      "k": "heal",
+                      "ratio": 0.3
                     }
                   ]
                 }
@@ -826,7 +833,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "매출",
+              "id": "주스 재고",
               "v": 1
             }
           ]

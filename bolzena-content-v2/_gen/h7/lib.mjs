@@ -1,5 +1,6 @@
 // H7 생성기 공용 부품 — 마녀 14 + 미스틱 2
 import fs from 'fs';
+const REWORKED = JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')); // 리워크한 사도는 _gen/rework/rework.mjs 가 쓴다 — 여기서 덮어쓰지 않는다
 import path from 'path';
 
 export const OUT = 'C:/projects/bolzena-content-v2/heroes/마녀';
@@ -71,6 +72,7 @@ export function hero(key, h) {
   H.ult = h.ult;
   H.starter = h.starter.map(id);
   fs.mkdirSync(OUT, { recursive: true });
+  if (REWORKED.includes(key)) { console.log('건너뜀(리워크)', key); return; }
   fs.writeFileSync(path.join(OUT, `${key}.json`), JSON.stringify({ heroes: [H], cards, ...(h.equips ? { equips: h.equips } : {}) }, null, 2) + '\n', 'utf8');
 }
 

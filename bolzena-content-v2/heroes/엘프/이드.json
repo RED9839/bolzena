@@ -13,16 +13,46 @@
       "crit": 5,
       "blurb": "세상 전부를 자기가 꾸는 꿈이라 여기는 영원살이. 손에 들어온 카드마다 꿈결이 번져 방패가 되고, 버려진 꿈은 다음 턴의 손패로 돌아옵니다.",
       "keyword": {
-        "name": "꿈결",
-        "desc": "카드가 뽑힐 때 번지는 꿈",
+        "name": "나타 경보",
+        "desc": "나타가 세는 꿈속의 충격",
         "carrier": "self",
-        "cap": 5
+        "cap": 5,
+        "rules": [
+          {
+            "name": "꿈의 파동",
+            "when": {
+              "on": "stackReach",
+              "id": "나타 경보",
+              "n": 5
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "나타 경보",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.4,
+                "base": "def",
+                "target": "allEnemies"
+              },
+              {
+                "k": "status",
+                "id": "약화",
+                "v": 1,
+                "target": "allEnemies"
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
           "name": "함께 꾸는 꿈",
           "when": {
-            "on": "drawn"
+            "on": "hurt",
+            "guarded": true
           },
           "limit": {
             "per": "turn",
@@ -30,29 +60,26 @@
           },
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.3
-            },
-            {
               "k": "stack",
-              "id": "꿈결",
+              "id": "나타 경보",
               "v": 1
             }
           ]
         },
         {
-          "name": "함께 꾸는 꿈",
+          "name": "깨지 않은 꿈",
           "when": {
-            "on": "discard"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "status",
-              "id": "다음 턴 드로우",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나타 경보",
               "v": 1
             }
           ]
@@ -85,7 +112,7 @@
         "이드_s1",
         "이드_s1",
         "이드_s2",
-        "이드_s2"
+        "이드_u2"
       ]
     }
   ],
@@ -120,165 +147,124 @@
     },
     {
       "id": "이드_u1",
-      "name": "흐릿한 경계",
+      "name": "나타에게 먼저",
       "hero": "이드",
       "unique": true,
-      "signature": true,
-      "cost": 3,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "shield",
-          "ratio": 4
+          "ratio": 1.4
         },
         {
-          "k": "perStack",
-          "id": "꿈결"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.5
-        },
-        {
-          "k": "spend",
-          "id": "꿈결",
-          "all": true
+          "k": "stack",
+          "id": "나타 경보",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "먼저 펼친 꿈",
+          "name": "전뇌 통신",
           "fx": [
             {
               "k": "shield",
-              "ratio": 5.2
+              "ratio": 1.8
             },
             {
-              "k": "perStack",
-              "id": "꿈결"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.65
-            },
-            {
-              "k": "spend",
-              "id": "꿈결",
-              "all": true
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
             }
           ]
         },
         {
-          "name": "세이빙",
-          "cost": 2,
+          "name": "나타의 대답",
+          "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 4
+              "ratio": 0.95
             },
             {
-              "k": "perStack",
-              "id": "꿈결"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.5
-            },
-            {
-              "k": "spend",
-              "id": "꿈결",
-              "all": true
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
             }
           ]
         },
         {
-          "name": "꿈이 덮치는 앞줄",
-          "tags": [
-            "보존"
-          ],
+          "name": "꿈 이야기",
           "fx": [
             {
               "k": "shield",
-              "ratio": 4.8
+              "ratio": 1.53
             },
             {
-              "k": "perStack",
-              "id": "꿈결"
+              "k": "ifStack",
+              "id": "나타 경보",
+              "n": 3
             },
             {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "spend",
-              "id": "꿈결",
-              "all": true
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "깊어지는 잠",
+          "name": "나타의 기록",
           "fx": [
             {
               "k": "shield",
-              "ratio": 5.8
+              "ratio": 1.25
             },
             {
-              "k": "perStack",
-              "id": "꿈결"
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 0.73
-            },
-            {
-              "k": "spend",
-              "id": "꿈결",
-              "all": true
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "LLEL-S",
-          "tags": [
-            "신속"
-          ],
+          "name": "리소스 정리",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 4.8
-            },
-            {
-              "k": "perStack",
-              "id": "꿈결"
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 1.8
             },
             {
-              "k": "spend",
-              "id": "꿈결",
-              "all": true
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "먼저 펼친 꿈",
+          "name": "생명유지장치",
           "kind": "guard"
         },
         {
-          "name": "전뇌 통신",
+          "name": "LLEL-S",
           "kind": "draw"
         },
         {
-          "name": "끝나지 않는 꿈",
+          "name": "먼저 건 말",
           "fx": [
             {
               "k": "stack",
-              "id": "꿈결",
+              "id": "나타 경보",
               "v": 1
             }
           ]
@@ -290,47 +276,27 @@
       "name": "전기로 지져 줘",
       "hero": "이드",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "status",
           "id": "반격",
-          "v": 2
-        },
-        {
-          "k": "shield",
-          "ratio": 3
+          "v": 1
         },
         {
           "k": "stack",
-          "id": "꿈결",
+          "id": "나타 경보",
+          "v": 1
+        },
+        {
+          "k": "draw",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "자장가 대신",
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 4.29
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 1
-            }
-          ]
-        },
-        {
           "name": "기절할 때까지",
-          "cost": 1,
           "fx": [
             {
               "k": "status",
@@ -338,320 +304,28 @@
               "v": 2
             },
             {
-              "k": "shield",
-              "ratio": 3
-            },
-            {
               "k": "stack",
-              "id": "꿈결",
+              "id": "나타 경보",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "감전 반사",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
             },
             {
-              "k": "shield",
-              "ratio": 3.96
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿈속의 전류",
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 4.35
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
           "name": "나타의 거부",
-          "tags": [
-            "신속"
-          ],
+          "power": true,
           "fx": [
             {
               "k": "status",
               "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 3.96
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
               "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "나타의 대답",
-          "kind": "guard"
-        },
-        {
-          "name": "깊어지는 잠",
-          "kind": "draw"
-        },
-        {
-          "name": "영원살이의 품",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "이드_u3",
-      "name": "나타에게 먼저",
-      "hero": "이드",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "shield",
-          "ratio": 2
-        },
-        {
-          "k": "draw",
-          "v": 1
-        },
-        {
-          "k": "when",
-          "on": "discard"
-        },
-        {
-          "k": "stack",
-          "id": "꿈결",
-          "v": 2
-        }
-      ],
-      "oracles": [
-        {
-          "name": "나타의 대답",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.6
             },
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "전뇌 통신",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "나타의 팔",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.4
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "꿈 이야기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.9
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "남는 리소스",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.4
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "전뇌 통신",
-          "kind": "guard"
-        },
-        {
-          "name": "끝나지 않는 꿈",
-          "kind": "draw"
-        },
-        {
-          "name": "먼저 펼친 꿈",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "꿈결",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "이드_u4",
-      "name": "착한 마음씨 이드",
-      "hero": "이드",
-      "unique": true,
-      "cost": 2,
-      "type": "강화",
-      "fx": [
-        {
-          "k": "defMod",
-          "v": 0.15,
-          "run": true,
-          "target": "self"
-        },
-        {
-          "k": "draw",
-          "v": 2
-        },
-        {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "꿈결",
-                  "v": 1
-                },
-                {
-                  "k": "shield",
-                  "ratio": 0.4
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "oracles": [
-        {
-          "name": "함께라면",
-          "fx": [
-            {
-              "k": "defMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
-              "v": 2
             },
             {
               "k": "power",
@@ -663,12 +337,331 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "꿈결",
-                      "v": 2
+                      "id": "나타 경보",
+                      "v": 1
                     },
                     {
                       "k": "shield",
-                      "ratio": 0.6
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "잠든 척",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "찌릿한 잠꼬대",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.78
+            }
+          ]
+        },
+        {
+          "name": "꿈속의 전류",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "감전 반사",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "겨울잠 직전",
+          "kind": "cost"
+        },
+        {
+          "name": "전뇌 신호",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "이드_u3",
+      "name": "흐릿한 경계",
+      "hero": "이드",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.1
+        },
+        {
+          "k": "status",
+          "id": "끈기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "세이빙",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.83
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "얕은 경계",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "꿈과 현실 사이",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "경보 연동 탐색",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "경보 소모 방벽",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.95
+            },
+            {
+              "k": "spend",
+              "id": "나타 경보",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "나타의 격벽",
+          "kind": "guard"
+        },
+        {
+          "name": "외롭지 않은 꿈",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "동료의 온기",
+          "kind": "defUp"
+        }
+      ]
+    },
+    {
+      "id": "이드_u4",
+      "name": "착한 마음씨 이드",
+      "hero": "이드",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.7
+        },
+        {
+          "k": "perStack",
+          "id": "나타 경보"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "함께라면",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.85
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.25
+            }
+          ]
+        },
+        {
+          "name": "겨울잠 이불",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.45
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.14
+            }
+          ]
+        },
+        {
+          "name": "언니 생각",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "눈 감은 방패",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "나타 경보",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1.2
                     }
                   ]
                 }
@@ -678,169 +671,40 @@
         },
         {
           "name": "이드 더 이터널 불릿",
-          "cost": 1,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "나타 경보"
             },
             {
-              "k": "defMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.35,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "꿈결",
-                      "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.4
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "영원살이의 품",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "defMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "status",
-              "id": "면역",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "꿈결",
-                      "v": 2
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.4
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "끝나지 않는 꿈",
-          "fx": [
-            {
-              "k": "defMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "꿈결",
-                      "v": 2
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.4
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "잠든 채 휘두르는 힘",
-          "fx": [
-            {
-              "k": "defMod",
-              "v": 0.25,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "꿈결",
-                      "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.4
-                    }
-                  ]
-                }
-              ]
+              "k": "spend",
+              "id": "나타 경보",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "깊어지는 잠",
-          "kind": "atkUp"
+          "name": "포근한 격벽",
+          "kind": "defUp"
         },
         {
-          "name": "영원살이의 품",
-          "kind": "draw"
+          "name": "잠결의 다짐",
+          "kind": "ap"
         },
         {
-          "name": "나타의 대답",
+          "name": "잠결 경보",
           "fx": [
             {
               "k": "stack",
-              "id": "꿈결",
+              "id": "나타 경보",
               "v": 1
             }
           ]

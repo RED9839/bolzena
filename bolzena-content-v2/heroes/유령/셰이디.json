@@ -14,12 +14,18 @@
       "blurb": "역대 최고의 장난을 평생 소원으로 삼은 유령 우두머리. 공격할 때마다 적에게 「장난」 을 걸고, 셋이 다 걸린 적은 정신을 못 차리고 한 대 크게 얻어맞습니다.",
       "keyword": {
         "name": "장난",
-        "desc": "적에게 겹치는 장난",
+        "desc": "셰이디가 미리 떠벌려 둔 장난",
         "carrier": "enemy",
         "cap": 3,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.06
+          }
+        ],
         "rules": [
           {
-            "name": "역대 최고의 장난",
+            "name": "자세 붕괴",
             "when": {
               "on": "stackReach",
               "id": "장난",
@@ -27,20 +33,18 @@
             },
             "fx": [
               {
-                "k": "status",
-                "id": "기절",
-                "v": 1,
-                "target": "oneEnemy"
-              },
-              {
-                "k": "dmg",
-                "ratio": 1.5,
-                "target": "oneEnemy"
-              },
-              {
                 "k": "spend",
                 "id": "장난",
                 "all": true
+              },
+              {
+                "k": "tough",
+                "v": 2
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.5,
+                "target": "oneEnemy"
               }
             ]
           }
@@ -61,16 +65,27 @@
             {
               "k": "stack",
               "id": "장난",
-              "v": 1
-            },
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "다음 장난 예고",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
             {
-              "k": "ifRandom",
-              "pct": 0.5
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -95,7 +110,7 @@
       },
       "starter": [
         "셰이디_s1",
-        "셰이디_s1",
+        "셰이디_u1",
         "셰이디_s3",
         "셰이디_s2"
       ]
@@ -148,140 +163,162 @@
       "name": "불 좀 꺼줄래?",
       "hero": "셰이디",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
-          "target": "allEnemies"
+          "ratio": 0.22,
+          "target": "oneEnemy",
+          "hits": 4
         },
         {
-          "k": "status",
-          "id": "둔화",
+          "k": "stack",
+          "id": "장난",
           "v": 1,
-          "target": "allEnemies"
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "정전 소동",
+          "name": "불 좀 꺼줄래? Max!",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "촛불 끄기",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "깜깜한 늪",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "ratio": 0.28,
+              "target": "oneEnemy",
+              "hits": 4
             },
             {
               "k": "stack",
               "id": "장난",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "어둠 속 술래",
+          "name": "차원 사슬낫",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
-              "target": "allEnemies"
+              "ratio": 0.22,
+              "target": "oneEnemy",
+              "hits": 4
             },
             {
-              "k": "status",
-              "id": "둔화",
+              "k": "stack",
+              "id": "장난",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.64,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "완전한 암흑",
-          "cost": 3,
+          "name": "가장 뒤의 적",
+          "tags": [
+            "약점 공격"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
-              "target": "allEnemies"
+              "ratio": 0.25,
+              "target": "oneEnemy",
+              "hits": 4
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "취약",
+              "k": "stack",
+              "id": "장난",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "불 끄기 장난",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "장난 예고장",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "장난",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "어둠 속 낫",
+          "name": "사슬낫 1호",
           "kind": "power"
         },
         {
-          "name": "깜짝이야",
-          "kind": "frost"
+          "name": "어둠 속",
+          "kind": "weakSpot"
         },
         {
-          "name": "발소리 죽이기",
+          "name": "히히",
           "fx": [
             {
               "k": "stack",
               "id": "장난",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             }
           ]
         }
@@ -297,149 +334,153 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.35,
-          "hits": 4,
+          "ratio": 0.56,
           "target": "oneEnemy"
         },
         {
-          "k": "ifRandom",
-          "pct": 0.5
+          "k": "perStack",
+          "id": "장난"
         },
         {
-          "k": "status",
-          "id": "약화",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.32,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "장난",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "1~4호 총출동",
+          "name": "사슬낫 1~4호",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "hits": 4
-            },
-            {
-              "k": "ifRandom",
-              "pct": 0.5
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.68,
               "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장난"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "장난",
+              "all": true
             }
           ]
         },
         {
-          "name": "두 자루만",
-          "cost": 0,
+          "name": "네 방향 사슬낫",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.42,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "장난",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "사슬 감기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.56,
               "target": "oneEnemy",
               "hits": 2
             },
             {
-              "k": "ifRandom",
-              "pct": 0.5
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "사슬로 칭칭",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy",
-              "hits": 4
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "stack",
               "id": "장난",
               "v": 1,
               "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "사방으로 휘두르기",
+          "name": "장난의 끝",
+          "tags": [
+            "소멸"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.28,
-              "target": "allEnemies",
-              "hits": 4
+              "ratio": 1.2,
+              "target": "oneEnemy"
             },
             {
-              "k": "ifRandom",
-              "pct": 0.5
+              "k": "perStack",
+              "id": "장난"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "장난",
+              "all": true
             }
           ]
         },
         {
-          "name": "몰래 한 자루 더",
+          "name": "다음 계획",
           "fx": [
             {
+              "k": "perStack",
+              "id": "장난"
+            },
+            {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy",
-              "hits": 5
-            },
-            {
-              "k": "ifRandom",
-              "pct": 0.5
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 0.48,
               "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "장난",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "잘 간 날",
+          "name": "사슬낫 4호",
           "kind": "power"
         },
         {
-          "name": "얽힌 사슬",
-          "kind": "weakSpot"
+          "name": "쓰라림",
+          "kind": "frost"
         },
         {
-          "name": "발목 걸기",
-          "fx": [
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
+          "name": "인동 딸기 향",
+          "kind": "draw"
         }
       ]
     },
@@ -448,18 +489,20 @@
       "name": "대롱대롱 매달기",
       "hero": "셰이디",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "stack",
           "id": "장난",
-          "v": 2
+          "v": 2,
+          "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "취약",
-          "v": 2
+          "v": 2,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
@@ -469,31 +512,13 @@
             {
               "k": "stack",
               "id": "장난",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
               "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "발끝만 매달기",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
               "target": "oneEnemy"
             }
           ]
@@ -505,18 +530,39 @@
               "k": "stack",
               "id": "장난",
               "v": 2,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
               "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "빙글빙글 돌리기",
+          "name": "한 달 미룬 날짜",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "계획 떠벌리기",
           "fx": [
             {
               "k": "stack",
@@ -531,19 +577,20 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "둔화",
+              "k": "draw",
               "v": 1,
-              "target": "allEnemies"
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "밤새 대롱대롱",
-          "tags": [
-            "개전"
-          ],
+          "name": "교주도 매달아 봄",
           "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
             {
               "k": "stack",
               "id": "장난",
@@ -553,7 +600,7 @@
             {
               "k": "status",
               "id": "취약",
-              "v": 2,
+              "v": 3,
               "target": "oneEnemy"
             }
           ]
@@ -561,22 +608,23 @@
       ],
       "blesses": [
         {
-          "name": "재빠른 매듭",
-          "kind": "cost"
+          "name": "튼튼한 사슬",
+          "kind": "draw"
         },
         {
-          "name": "깔깔깔",
+          "name": "나이 얘기 금지",
           "fx": [
             {
               "k": "status",
-              "id": "사기",
-              "v": 1
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "놀란 틈에",
-          "kind": "draw"
+          "name": "빠른 매듭",
+          "kind": "cost"
         }
       ]
     },
@@ -586,25 +634,84 @@
       "hero": "셰이디",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "fx": [
         {
-          "k": "draw",
-          "v": 2
+          "k": "dmg",
+          "ratio": 0.24,
+          "target": "oneEnemy",
+          "hits": 2
         },
         {
-          "k": "stack",
-          "id": "장난",
-          "v": 1
+          "k": "perDebuff"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.24,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "주머니 뒤집기",
+          "name": "깊은 차원 주머니",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perDebuff"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "주머니 뒤적",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
               "k": "draw",
-              "v": 3
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "장난",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "소악마의 대변인",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
             },
             {
               "k": "stack",
@@ -615,95 +722,64 @@
           ]
         },
         {
-          "name": "주머니 슬쩍",
+          "name": "괴물 끌고 오기",
           "cost": 0,
           "fx": [
             {
-              "k": "draw",
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perDebuff"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "주머니 털기",
+          "fx": [
+            {
+              "k": "discard",
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "장난",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perDebuff"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "장난감 쏟아내기",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "주머니 속 낫",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "extra",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "넣어 둔 주머니",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "다음 턴 드로우",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "깊은 주머니",
+          "name": "주머니 속 인형",
           "kind": "draw"
         },
         {
-          "name": "빠른 손",
-          "kind": "cost"
+          "name": "소악마의 삼지창",
+          "kind": "atkUp"
         },
         {
-          "name": "깜짝 선물",
+          "name": "차원 틈새",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
+              "k": "stack",
+              "id": "장난",
               "v": 1,
               "target": "oneEnemy"
             }

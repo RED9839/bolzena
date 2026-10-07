@@ -1,884 +1,980 @@
 {
- "heroes": [
-  {
-   "id": "칸타",
-   "name": "칸타",
-   "nature": "냉정",
-   "race": "요정",
-   "role": "딜러",
-   "star": 2,
-   "hp": 590,
-   "atk": 115,
-   "def": 27,
-   "crit": 10,
-   "blurb": "「최강 팽이 배틀러」를 자처하는 뒷골목 팽이 도박꾼. 삼각회(스노키·피라) 시절 네르에게 사기를 쳐 감옥까지 다녀왔고, 연회장을 팽이 하우스 「칸타피아」로 바꿀 야심을 품습니다. 소원은 무적의 팽이, 제일 싫은 건 애 취급. 지면 절규하며 무승부를 조릅니다.",
-   "keyword": {
-    "name": "판돈",
-    "desc": "다음 턴을 걸고 거는 판돈",
-    "carrier": "self",
-    "cap": 1,
-    "endClear": true,
-    "rules": [
-     {
-      "name": "올인",
-      "when": {
-       "on": "kill",
-       "mine": true
-      },
-      "conds": [
-       {
-        "c": "stack",
-        "id": "판돈",
-        "n": 1
-       }
-      ],
-      "fx": [
-       {
-        "k": "ap",
-        "v": 3
-       },
-       {
-        "k": "spend",
-        "id": "판돈",
-        "all": true
-       }
-      ]
-     },
-     {
-      "name": "올인",
-      "when": {
-       "on": "break",
-       "mine": true
-      },
-      "conds": [
-       {
-        "c": "stack",
-        "id": "판돈",
-        "n": 1
-       }
-      ],
-      "fx": [
-       {
-        "k": "ap",
-        "v": 3
-       },
-       {
-        "k": "spend",
-        "id": "판돈",
-        "all": true
-       }
-      ]
-     }
-    ]
-   },
-   "keywords": [
+  "heroes": [
     {
-     "name": "쇠팽이",
-     "desc": "판 위를 돌며 들이받는 팽이",
-     "carrier": "self",
-     "cap": 4,
-     "decay": 1,
-     "rules": [
-      {
-       "name": "튕겨 나간 팽이",
-       "when": {
-        "on": "stackOver",
-        "id": "쇠팽이"
-       },
-       "fx": [
-        {
-         "k": "perEvent"
-        },
-        {
-         "k": "dmg",
-         "ratio": 0.5,
-         "target": "randomEnemy"
-        }
-       ]
+      "id": "칸타",
+      "name": "칸타",
+      "nature": "냉정",
+      "race": "요정",
+      "role": "딜러",
+      "star": 2,
+      "hp": 590,
+      "atk": 115,
+      "def": 27,
+      "crit": 10,
+      "blurb": "「최강 팽이 배틀러」를 자처하는 뒷골목 팽이 도박꾼. 삼각회(스노키·피라) 시절 네르에게 사기를 쳐 감옥까지 다녀왔고, 연회장을 팽이 하우스 「칸타피아」로 바꿀 야심을 품습니다. 소원은 무적의 팽이, 제일 싫은 건 애 취급. 지면 절규하며 무승부를 조릅니다.",
+      "keyword": {
+        "name": "쇠팽이",
+        "desc": "판 위를 돌며 긁는 강철 팽이",
+        "carrier": "self",
+        "cap": 4,
+        "rules": [
+          {
+            "name": "팽이판",
+            "when": {
+              "on": "turnEnd"
+            },
+            "fx": [
+              {
+                "k": "perStack",
+                "id": "쇠팽이"
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.7,
+                "target": "randomEnemy"
+              }
+            ]
+          },
+          {
+            "name": "튕겨 나간 팽이",
+            "when": {
+              "on": "stackOver",
+              "id": "쇠팽이"
+            },
+            "fx": [
+              {
+                "k": "perEvent"
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.4,
+                "target": "randomEnemy"
+              }
+            ]
+          }
+        ]
       },
-      {
-       "name": "팽이판",
-       "when": {
-        "on": "turnEnd"
-       },
-       "fx": [
+      "passives": [
         {
-         "k": "perStack",
-         "id": "쇠팽이"
+          "name": "네 번째 공격",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 1
+            }
+          ]
         },
         {
-         "k": "dmg",
-         "ratio": 0.5,
-         "target": "randomEnemy"
+          "name": "진 놈 팽이 부수기",
+          "when": {
+            "on": "break",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "진 놈 팽이 부수기",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 2
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ],
+      "ult": {
+        "name": "탑스핀 크래쉬",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.4,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2
+          },
+          {
+            "k": "perStack",
+            "id": "쇠팽이"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.6,
+            "target": "allEnemies"
+          },
+          {
+            "k": "spend",
+            "id": "쇠팽이",
+            "all": true
+          }
+        ]
+      },
+      "starter": [
+        "칸타_s1",
+        "칸타_u2",
+        "칸타_s2",
+        "칸타_s3"
+      ]
     }
-   ],
-   "passives": [
+  ],
+  "cards": [
     {
-     "name": "네 번째 공격",
-     "when": {
-      "on": "play",
+      "id": "칸타_s1",
+      "name": "팽이 던지기",
+      "hero": "칸타",
+      "cost": 1,
       "type": "공격",
-      "every": 2
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 1
-      }
-     ]
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
     },
     {
-     "name": "진 놈 팽이 부수기",
-     "when": {
-      "on": "break",
-      "mine": true
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 2
-      }
-     ]
+      "id": "칸타_s2",
+      "name": "대왕팽이 던지기",
+      "hero": "칸타",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "칸타_s3",
+      "name": "팽이판 방패",
+      "hero": "칸타",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "칸타_u1",
+      "name": "올인",
+      "hero": "칸타",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "쇠팽이"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.61,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "쇠팽이",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "한 판 더",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "쇠팽이",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "인생 올인",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "쇠팽이",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "팽이 폭풍",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반칙은 딴청",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.67,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "타짜의 손",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "칸타피아",
+          "kind": "power"
+        },
+        {
+          "name": "딴청",
+          "kind": "draw"
+        },
+        {
+          "name": "판돈 올리기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸타_u2",
+      "name": "소매 속 팽이",
+      "hero": "칸타",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "쇠팽이",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "쇠팽이",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "소매 가득 팽이",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "손목 스냅",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "팽이 하우스",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.66
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "팽이 깎기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "들키면 딴청",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.52
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "break"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "나무 고르는 눈",
+          "kind": "cost"
+        },
+        {
+          "name": "빅우드의 선물",
+          "kind": "draw"
+        },
+        {
+          "name": "팽이채",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸타_u3",
+      "name": "탑스핀 블레이드",
+      "hero": "칸타",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.88,
+          "target": "allEnemies"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.79,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "쇠팽이",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "고속 탑스핀",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.09,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가벼운 탑스핀",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.53,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "강철팽이 셋",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "팽이 거두기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "쇠팽이",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "회전력 유지",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.89,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "회전력",
+          "kind": "frost"
+        },
+        {
+          "name": "삼각회",
+          "kind": "ap"
+        },
+        {
+          "name": "강철팽이",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸타_u4",
+      "name": "팽이 회수",
+      "hero": "칸타",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.88,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "쇠팽이"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.39,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "완벽한 회수",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.14,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "미리 숨긴 팽이",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "break"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "쇠팽이",
+                      "v": 2
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "팽이 방패",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.45
+            },
+            {
+              "k": "stack",
+              "id": "쇠팽이",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반칙",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "판돈 두 배",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "쇠팽이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "쇠팽이",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "커스텀 팽이",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "연회장 계약서",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "스노키와 피라",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.53
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "ult": {
-    "name": "탑스핀 크래쉬",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 2.4,
-      "target": "oneEnemy"
-     },
-     {
-      "k": "tough",
-      "v": 2
-     },
-     {
-      "k": "perStack",
-      "id": "쇠팽이"
-     },
-     {
-      "k": "dmg",
-      "ratio": 0.6,
-      "target": "allEnemies"
-     },
-     {
-      "k": "spend",
-      "id": "쇠팽이",
-      "all": true
-     }
-    ]
-   },
-   "starter": [
-    "칸타_s1",
-    "칸타_s1",
-    "칸타_s2",
-    "칸타_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "칸타_s1",
-   "name": "팽이 던지기",
-   "hero": "칸타",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "칸타_s2",
-   "name": "대왕팽이 던지기",
-   "hero": "칸타",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "칸타_s3",
-   "name": "팽이판 방패",
-   "hero": "칸타",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "칸타_u1",
-   "name": "올인",
-   "hero": "칸타",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "choices": [
-    "한 판",
-    "올인"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.6,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "nextAp",
-     "v": -1
-    },
-    {
-     "k": "stack",
-     "id": "판돈",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "풀 베팅",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "소액 베팅",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.9,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "판 엎기",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.9,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "밑장 빼기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "마지막 한 판",
-     "cost": 3,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 4.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "팽이 가속",
-     "kind": "power"
-    },
-    {
-     "name": "허점 노리기",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "묵직한 축",
-     "fx": [
-      {
-       "k": "tough",
-       "v": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "칸타_u2",
-   "name": "팽이 난타",
-   "hero": "칸타",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "choices": [
-    "한 판",
-    "올인"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.7,
-     "target": "oneEnemy",
-     "hits": 2
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "nextAp",
-     "v": -1
-    },
-    {
-     "k": "stack",
-     "id": "판돈",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "고속 회전",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.9,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "손끝 팽이",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.45,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "삼연 팽이",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "흩뿌린 팽이",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.55,
-       "target": "allEnemies",
-       "hits": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "돌려 막기",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.75,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "nextAp",
-       "v": -1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "날 선 팽이",
-     "kind": "power"
-    },
-    {
-     "name": "손목 스냅",
-     "kind": "cost"
-    },
-    {
-     "name": "얼얼한 회전",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "칸타_u3",
-   "name": "탑스핀 블레이드",
-   "hero": "칸타",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "약점 공격"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.8,
-     "target": "allEnemies"
-    },
-    {
-     "k": "dmg",
-     "ratio": 1.5,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "쇠팽이",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "풀스핀 블레이드",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.95,
-       "target": "allEnemies"
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.9,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "반바퀴 블레이드",
-     "cost": 1,
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "allEnemies"
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.0,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "팽이판 독식",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.85,
-       "target": "allEnemies"
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "집중 연베기",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.85,
-       "target": "oneEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "탑스핀 피니시",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "allEnemies"
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "칼날 회전수",
-     "kind": "power"
-    },
-    {
-     "name": "빈틈 베기",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "서늘한 칼바람",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "칸타_u4",
-   "name": "소매 속 팽이",
-   "hero": "칸타",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "신속"
-   ],
-   "fx": [
-    {
-     "k": "draw",
-     "v": 2
-    },
-    {
-     "k": "status",
-     "id": "잔광",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "쇠팽이",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "소매 가득 팽이",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "한 알 팽이",
-     "cost": 0,
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "숨겨 둔 판돈",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "판돈",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "밑천 꺼내기",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "비장의 팽이",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "쇠팽이",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "여분의 팽이",
-     "kind": "ap"
-    },
-    {
-     "name": "소매 털기",
-     "kind": "draw"
-    },
-    {
-     "name": "승부사 눈빛",
-     "kind": "atkUp"
-    }
-   ]
-  }
- ]
+  ]
 }

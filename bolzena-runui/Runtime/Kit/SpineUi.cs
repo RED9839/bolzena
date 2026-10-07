@@ -64,6 +64,9 @@ namespace Bolzena.RunUI
             if (++released >= 12) UnloadSoon();
         }
 
+        /// <summary>쓰는 수와 상관없이 놓는다 — 에디터 미리 굽기(SnapPrebake)용. 편집 모드의 DestroyImmediate 는 StandUser.OnDestroy 를 부르지 않는다.</summary>
+        public static void Drop(string folder) { if (folder == null) return; users.Remove(folder); Release(folder); }
+
         /// <summary>놓은 것들을 실제로 내린다(UnloadUnusedAssets — 비동기, 이미 돌고 있으면 건너뜀).</summary>
         public static void UnloadSoon()
         {

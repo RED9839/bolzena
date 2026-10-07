@@ -194,6 +194,20 @@ namespace Bolzena.RunUI.EditorTools
             ti.textureCompression = TextureImporterCompression.CompressedHQ;
             if (p.Contains("/Sprites/")) ti.textureCompression = TextureImporterCompression.Uncompressed;
             ti.maxTextureSize = 2048;
+            if (p.Contains("/RunArt/Snap/"))
+            {
+                // 미리 구운 사도 정지 그림(SnapPrebake) — 실행 중에 Texture2D 로 읽어 Sprite 를 만든다. 얼굴 칸(256² — 2의 거듭제곱)만 밉맵(초상 줄 64 · 머리표 등 작게 그린다).
+                //   PC 는 BC7(높은 품질 — 실행 중 굽기의 RGBA32 와 거의 같게), 웹은 WebImport 가 DXT5 크런치 · ASTC 6×6 으로 덮어쓴다
+                ti.textureType = TextureImporterType.Default;
+                ti.sRGBTexture = true;
+                bool face = p.Contains("/Snap/face/");
+                ti.mipmapEnabled = face;
+                ti.mipmapFilter = TextureImporterMipFilter.KaiserFilter;
+                ti.filterMode = face ? FilterMode.Trilinear : FilterMode.Bilinear;
+                ti.textureCompression = TextureImporterCompression.CompressedHQ;
+                ti.crunchedCompression = false;
+                return;
+            }
             if (p.Contains("/RunArt/Standing/") || p.Contains("/RunArt/CardPic/") || p.Contains("/RunArt/CardObj/"))
             {
                 // 사도 스탠딩 135장 — 목록 · 카드에서는 작게(밉맵 · 트라이리니어로 지글거리지 않게), 상세에서는 크게.

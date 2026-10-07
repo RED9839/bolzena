@@ -78,8 +78,8 @@ namespace Bolzena.Core
             foreach (var k in keep) cands.Remove(k);   // 한 장만 남긴다(같은 카드가 둘이면 하나는 뺄 수 있다)
             var w = cands.OrderBy(id => DeckEff(run, id)).ThenBy(x => x, StringComparer.Ordinal).FirstOrDefault();
             if (w != null || basicOnly) return w;
-            return deck.Where(id => data.Card(id)?.Neutral == true && !run.ViewOf(id).IsTaboo && plan.Score(run.ViewOf(id)) < 0.9)
-                .OrderBy(id => plan.Score(run.ViewOf(id))).ThenBy(x => x, StringComparer.Ordinal).FirstOrDefault();
+            return deck.Where(id => data.Card(id)?.Neutral == true && !run.ViewOf(id).IsTaboo && NeutralScore(run, run.ViewOf(id)) < 0.85)
+                .OrderBy(id => NeutralScore(run, run.ViewOf(id))).ThenBy(x => x, StringComparer.Ordinal).FirstOrDefault();
         }
 
         /// <summary>이벤트 「카드 빼기」 결과의 값.</summary>
@@ -110,8 +110,9 @@ namespace Bolzena.Core
                     return run.S.Deck.Distinct().Where(run.DupeOk).OrderByDescending(id => plan.Score(run.ViewOf(id))).ThenBy(x => x, StringComparer.Ordinal).FirstOrDefault();
                 case "card":
                     {
-                        var best = p.Cards.Where(id => run.PowerWhy(id) == null).OrderByDescending(id => plan.Score(data.View(id))).ThenBy(x => x, StringComparer.Ordinal).FirstOrDefault();
-                        return best != null && plan.Score(data.View(best)) >= DeckPlan.TakeBar(run.S.Deck.Count) ? best : null;   // 덱에 안 맞으면 건너뛴다
+                        double S(string id) => data.Card(id)?.Neutral == true ? NeutralScore(run, data.View(id)) : plan.Score(data.View(id));
+                        var best = p.Cards.Where(id => run.PowerWhy(id) == null).OrderByDescending(S).ThenBy(x => x, StringComparer.Ordinal).FirstOrDefault();
+                        return best != null && S(best) >= DeckPlan.TakeBar(run.S.Deck.Count) ? best : null;   // 덱에 안 맞으면 건너뛴다
                     }
                 case "grace":
                     {
@@ -165,9 +166,47 @@ namespace Bolzena.Core
             double EqGain(string id) => run.S.Party.Max(k => { run.GearOf(k).TryGetValue(data.Equip(id).Slot, out var old); return GearScore(run, id, k) - GearScore(run, old, k); });
             var eq = items.Select((it, i) => (it, i)).Where(x => x.it.Kind == "equip" && !x.it.Sold).Select(x => (x.it, x.i, v: EqGain(x.it.Id) / Math.Max(30, x.it.Price) * 10)).OrderByDescending(x => x.v).ToList();
             foreach (var x in eq) if (x.v > 0.5 && !x.it.Sold && run.S.Gold >= x.it.Price) { run.Buy(x.i); ManageGear(run, true); }
-            var cards = items.Select((it, i) => (it, i)).Where(x => x.it.Kind == "neutral" && !x.it.Sold).Select(x => (x.it, x.i, v: plan.Score(data.View(x.it.Id)))).OrderByDescending(x => x.v).ToList();
+            var cards = items.Select((it, i) => (it, i)).Where(x => x.it.Kind == "neutral" && !x.it.Sold).Select(x => (x.it, x.i, v: NeutralScore(run, data.View(x.it.Id)))).OrderByDescending(x => x.v).ToList();
             foreach (var x in cards)
-                if (!x.it.Sold && x.v >= DeckPlan.TakeBar(run.S.Deck.Count) + 0.15 && run.S.Gold >= x.it.Price) run.Buy(x.i, PickOwner(run, x.it.Id));
+                if (!x.it.Sold && x.v >= DeckPlan.TakeBar(run.S.Deck.Count) + SHOP_EXTRA && run.S.Gold >= x.it.Price) run.Buy(x.i, PickOwner(run, x.it.Id));
+        }
+
+        // ── 교주 카드 고르기(2026-10-07) ─────────────────────────────
+        /// <summary>상점에서 돈을 내고 사는 카드의 덧문턱(옛 0.15).</summary>
+        const double SHOP_EXTRA = 0.1;
+
+        /// <summary>교주 카드를 받을 값 — DeckPlan.Score + 지금 덱에 모자란 역할의 덤(NeedBonus).</summary>
+        double NeutralScore(Run run, CardView c) => c == null ? -9 : plan.Score(c) + NeedBonus(run, c);
+
+        /// <summary>
+        /// 지금 덱이 모자란 역할이면 덤 — 「상황에 맞게」 사기. 덱(저주 · 상태 빼고)의 장당 드로우 · AP 손 · 실드 · 회복 카드 몫 · 피해 카드 몫 · 평균 비용 · 고유 카드 수를 본다.
+        ///   손 돌리기(드로우 · 서치 · 다음 턴 드로우 · 버리기): 장당 드로우 0.35 밑이면 최대 +0.35
+        ///   AP · 비용(AP · 다음 카드 비용 · 비용 깎기): 평균 비용 1.2 이상이면 +0.25
+        ///   실드 · 회복: 그 카드가 덱의 3할 밑이면 +0.2 · 피해: 4할 밑이면 +0.15
+        ///   서치(버린 더미 · 고유 카드): 고유 카드 6장 이상이면 +0.15
+        /// </summary>
+        double NeedBonus(Run run, CardView c)
+        {
+            var deck = run.S.Deck.Select(run.ViewOf).Where(x => x != null && !x.IsCurse && !x.IsStatus).ToList();
+            if (deck.Count == 0) return 0;
+            int n = deck.Count;
+            static bool DrawLike(Fx f) => f.K == FxK.Draw || f.K == FxK.Pull || f.K == FxK.Discard || (f.K == FxK.Status && f.Id == "다음 턴 드로우");
+            static bool ApLike(Fx f) => f.K == FxK.Ap && f.V > 0 || f.K == FxK.NextCheaper || f.K == FxK.CostMod || (f.K == FxK.CardStatus && f.Id == "비용" && f.V < 0);
+            static bool GuardLike(Fx f) => f.K == FxK.Shield || f.K == FxK.Block || f.K == FxK.Heal;
+            double drawPer = deck.Sum(x => x.Fx.Where(f => f.K == FxK.Draw || f.K == FxK.Pull).Sum(f => Math.Max(1, f.K == FxK.Pull ? f.N : f.V))) / (double)n;
+            double avgCost = deck.Average(x => x.X ? 2 : x.Cost);
+            double guard = deck.Count(x => x.Fx.Any(GuardLike)) / (double)n;
+            double dmg = deck.Count(x => x.Fx.Any(f => f.K == FxK.Dmg)) / (double)n;
+            int uniq = deck.Count(x => x.Unique);
+            double b = 0;
+            if (c.Fx.Any(DrawLike) && drawPer < 0.35) b += 0.1 + 0.25 * (0.35 - drawPer) / 0.35;
+            if (c.Fx.Any(ApLike) && avgCost >= 1.2) b += 0.25;
+            if (c.Fx.Any(GuardLike) && guard < 0.3) b += 0.2;
+            // 회복은 잃은 HP 만큼 값이 있다(2026-10-08) — 파티 HP 가 덜 찼으면 회복 카드에 덤(가득이면 0)
+            if (c.Fx.Any(f => f.K == FxK.Heal)) b += 0.4 * (1 - HpRatio(run));
+            if (c.Fx.Any(f => f.K == FxK.Dmg) && dmg < 0.4) b += 0.15;
+            if (c.Fx.Any(f => f.K == FxK.Pull) && uniq >= 6) b += 0.15;
+            return b;
         }
     }
 }

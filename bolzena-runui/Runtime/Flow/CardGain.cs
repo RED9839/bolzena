@@ -27,12 +27,13 @@ namespace Bolzena.RunUI
             return o;
         }
 
-        /// <summary>얻은 카드를 가운데에 보이고 → 덱으로 날려 보내고 → 주인 없는 카드가 있으면 사도 고르기 → then. 카드가 없으면 사도 고르기만(기다리는 것이 있으면).</summary>
-        public void GainCards(IList<string> ids, Action then)
+        /// <summary>얻은 카드를 가운데에 보이고 → 덱으로 날려 보내고 → 주인 없는 카드가 있으면 사도 고르기 → then. 카드가 없으면 사도 고르기만(기다리는 것이 있으면).
+        /// title · hint 를 주면 그 글로(은총: 「은총!」 · 「다야의 고유 카드 — 덱에」), hold 가 0 이상이면 그만큼만 보여 주고 덱으로(누르면 바로).</summary>
+        public void GainCards(IList<string> ids, Action then, string title = null, string hint = null, float hold = -1)
         {
             var list = (ids ?? new List<string>()).Where(x => x != null && P.Data.Card(x) != null).ToList();
             if (list.Count == 0) { PickOwners(then); return; }
-            CardGain.Show(this, list, () => PickOwners(then));
+            CardGain.Show(this, list, () => PickOwners(then), title, hint, hold);
         }
     }
 
@@ -44,9 +45,9 @@ namespace Bolzena.RunUI
         /// <summary>마지막으로 보인 카드 수(데모 단언).</summary>
         public static int LastCount { get; private set; }
 
-        public static void Show(Flow f, List<string> ids, Action done) => f.StartCoroutine(Run(f, ids, done));
+        public static void Show(Flow f, List<string> ids, Action done, string title = null, string hint = null, float hold = -1) => f.StartCoroutine(Run(f, ids, done, title, hint, hold));
 
-        static IEnumerator Run(Flow f, List<string> ids, Action done)
+        static IEnumerator Run(Flow f, List<string> ids, Action done, string titleText, string hintText, float hold)
         {
             while (OracleReveal.IsOpen) yield return null;   // 신탁 연출이 끝난 뒤에 잇는다(겹치지 않게)
             var st = f.Stage;
@@ -63,10 +64,10 @@ namespace Bolzena.RunUI
             var back = root.gameObject.AddComponent<BackClose>();
             var dim = Ui.Img(root, Theme.White, new Color(0.02f, 0.02f, 0.05f, 0), "dim", true); dim.rectTransform.Fill();
             var halo = Ui.Img(root, Theme.S("soft"), Theme.Gold.A(0), "halo"); halo.rectTransform.At(0.5f, 0.5f, 0, 10, Mathf.Min(size.x, gap * perRow + cw * 2), ch * rows * 1.9f);
-            var title = Ui.Title(root, n > 1 ? $"카드 {n}장을 얻었습니다" : "카드를 얻었습니다", compact ? 34 : 44, Theme.Gold, TextAlignmentOptions.Center, "title");
+            var title = Ui.Title(root, titleText ?? (n > 1 ? $"카드 {n}장을 얻었습니다" : "카드를 얻었습니다"), compact ? 34 : 44, Theme.Gold, TextAlignmentOptions.Center, "title");
             title.rectTransform.At(0.5f, 0.5f, 0, rows * ch * 1.1f / 2 + (compact ? 44 : 62), 900, 60); title.Outline(0.25f, new Color(0.3f, 0.15f, 0)); title.alpha = 0;
-            var hint = Ui.Text(root, "누르면 덱으로", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center, false, "hint");
-            hint.rectTransform.At(0.5f, 0.5f, 0, -rows * ch * 1.1f / 2 - (compact ? 28 : 40), 600, 30); hint.alpha = 0;
+            var hint = Ui.Text(root, hintText ?? "누르면 덱으로", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center, false, "hint");
+            hint.rectTransform.At(0.5f, 0.5f, 0, -rows * ch * 1.1f / 2 - (compact ? 28 : 40), 1100, 30); hint.alpha = 0;
 
             var holders = new List<RectTransform>();
             for (int i = 0; i < n; i++)
@@ -96,7 +97,7 @@ namespace Bolzena.RunUI
             yield return new WaitForSecondsRealtime(0.12f + n * 0.08f + 0.3f);
             Phase = "show";
             hint.alpha = 1;
-            float wait = 0, auto = Settings.ReduceMotion ? 0.9f : 1.8f + 0.15f * n;
+            float wait = 0, auto = hold >= 0 ? (Settings.ReduceMotion ? Mathf.Min(hold, 0.6f) : hold) : Settings.ReduceMotion ? 0.9f : 1.8f + 0.15f * n;
             while (!go && wait < auto && root) { wait += Time.unscaledDeltaTime; yield return null; }
             if (!root) { Phase = null; yield break; }
 

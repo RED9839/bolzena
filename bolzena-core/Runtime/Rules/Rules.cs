@@ -31,6 +31,12 @@ namespace Bolzena.Core
             return (hp, FLOOR_DMG.TryGetValue(k, out var d) ? d : 1);
         }
 
+        // ── 적의 손패 흡수(수 seize) ──────────────────────────────────
+        /// <summary>빼앗긴 카드를 되찾는 피해 — 그 적의 최대 HP 의 이 % (수의 v 가 없을 때). 격파 · 처치로도 되찾는다.</summary>
+        public const int SEIZE_PCT = 20;
+        /// <summary>빼앗은 카드 수를 그 적의 상태 칸에 보이는 이름(칩).</summary>
+        public const string SEIZED = "빼앗은 카드";
+
         // ── 즉시 행동 ────────────────────────────────────────────────
         public const int ENEMY_RUSH_SMALL = 3;
         public const int ENEMY_RUSH_MIN = 3;
@@ -93,6 +99,8 @@ namespace Bolzena.Core
         // ── 이벤트 ───────────────────────────────────────────────────
         public const double EVENT_FLOOR_SHARE = 0.7;
         public const int EVENT_REMOVE_WEIGHT = 5;
+        /// <summary>깃발이 선 줄기 뒤 이벤트의 뽑힐 무게(이벤트 flagWeight 가 없을 때).</summary>
+        public const double EVENT_FLAG_WEIGHT = 3;
 
         // ── 파티 · 적의 수 ───────────────────────────────────────────
         public const double FOE_ALL_X = 2;

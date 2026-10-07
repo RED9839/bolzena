@@ -23,10 +23,10 @@ namespace Bolzena.Core
         static readonly HashSet<string> CONDS = new() { "stack", "hp", "hpMin", "status", "foes", "foesMax", "playedMin", "playedMax", "ownNone", "apLeft", "gauge", "guarded", "rushed", "hurtLast", "killedLast", "firstTurn", "targetBroken",
             "repeat", "held", "spent", "balanced", "debuffs", "paid", "wounded", "onlyMe", "ally", "inDebt", "heldCards", "idleLast", "typeNew" };
         static readonly HashSet<string> INTENTS = new() { "attack", "back", "attackAll", "multi", "charge", "block", "guard", "heal", "buff", "debuff", "jam", "addCard", "summon",
-            "count", "cardDebuff", "handCost", "reshuffle", "autoPlay", "shift", "brace" };
+            "count", "cardDebuff", "handCost", "reshuffle", "autoPlay", "shift", "brace", "seize" };
         static readonly HashSet<string> FOE_ON = new() { "fightStart", "turnStart", "turnEnd", "hurt", "lowHp", "allyDown", "card", "rushed", "debuffed", "broken", "recover",
-            "death", "guardBreak", "act", "afterDraw" };
-        static readonly HashSet<string> OUT_K = new() { "none", "gold", "hp", "maxHp", "remove", "dupe", "unique", "neutral", "equip", "flash", "shin", "noShin", "shinNow", "shinPick", "curse", "gift", "scout", "shopGift", "rewardFlash", "next", "mindBreak" };
+            "death", "guardBreak", "act", "afterDraw", "allyBroken" };
+        static readonly HashSet<string> OUT_K = new() { "none", "gold", "hp", "maxHp", "remove", "dupe", "unique", "neutral", "equip", "flash", "shin", "noShin", "shinNow", "shinPick", "curse", "gift", "scout", "shopGift", "rewardFlash", "next", "mindBreak", "flag" };
         static readonly HashSet<string> BLESS_KIND = new() { "power", "cost", "weakSpot", "frost", "ap", "draw", "heal", "guard", "atkUp", "defUp" };
         static readonly HashSet<string> PER_STAT = new() { "dealt", "taken", "atk", "def", "crit", "guard", "dot", "hot", "tough" };
         static readonly HashSet<string> CARRIERS = new() { "self", "enemy", "ally", "hero" };
@@ -63,6 +63,7 @@ namespace Bolzena.Core
             foreach (var v in d.Villages.Values) Village(v);
             var ids = new HashSet<string>();
             foreach (var e in d.Events) { if (!ids.Add(e.Id)) E($"이벤트 {e.Id}: id 가 겹친다"); Event(e); }
+            Flags();
             foreach (var e in d.Equips.Values) Equip(e);
         }
 
@@ -113,7 +114,7 @@ namespace Bolzena.Core
                     case FxK.ClearDebt: effects++; break;
                     case FxK.HealMod: if (f.V == 0 || Math.Abs(f.V) > 3) E($"{w}: v 는 비율(0.5 = +50%)"); effects++; break;
                     case FxK.IfWounded: if (f.Target != null && f.Target != "oneEnemy" && f.Target != "party") E($"{w}: target 은 party(기본) · oneEnemy"); break;
-                    case FxK.PerTag: if (f.Id == null || Array.IndexOf(Tag.All, f.Id) < 0) E($"{w}: 태그 이름이어야 한다 — 「{f.Id}」"); break;
+                    case FxK.PerTag: if (f.Id == null || (Array.IndexOf(Tag.All, f.Id) < 0 && d.Card(f.Id) == null)) E($"{w}: 태그 이름 또는 카드 id(생성물)여야 한다 — 「{f.Id}」"); break;
                     case FxK.Drain: if (!(f.Ratio > 0 && f.Ratio <= 1)) E($"{w}: ratio 는 0~1(준 피해의 비율)"); effects++; break;
                     case FxK.Extra: if (!(f.Ratio > 0)) E($"{w}: ratio 가 없다"); if (f.Base != null && f.Base != "def") E($"{w}: base 는 def 만"); effects++; break;
                     case FxK.Transform: if (d.Card(f.Id) == null) E($"{w}: 바뀔 카드가 없다 — {f.Id}"); if (f.From != null && f.From != "hand" && !f.From.StartsWith("@") && d.Card(f.From) == null) E($"{w}: from 은 카드 id · hand(거르개와) · @종류 — {f.From}"); effects++; break;
@@ -527,7 +528,7 @@ namespace Bolzena.Core
                 if (p.On == null || !FOE_ON.Contains(p.On)) E($"{at} 패시브 {p.Name}: 모르는 on {p.On}");
                 if (string.IsNullOrEmpty(p.Name)) E($"{at}: 패시브 name 이 없다(횟수를 이름으로 센다)");
                 if (p.On == "lowHp" && !(p.At > 0 && p.At < 1)) E($"{at} 패시브 {p.Name}: lowHp 의 at 은 0~1");
-                if (p.Who != null && (p.On != "allyDown" || d.Enemy(p.Who) == null)) E($"{at} 패시브 {p.Name}: who 는 allyDown 의 적 id");
+                if (p.Who != null && ((p.On != "allyDown" && p.On != "allyBroken") || d.Enemy(p.Who) == null)) E($"{at} 패시브 {p.Name}: who 는 allyDown · allyBroken 의 적 id");
                 Intent($"{at} 패시브 {p.Name}", p.Do, true);
             }
         }
@@ -581,6 +582,7 @@ namespace Bolzena.Core
                 if (o.K == "curse") { var c = d.Card(o.Id); if (c == null || !c.IsCurse) E($"{at}: 골칫거리(저주 카드)가 아니다 — {o.Id}"); }
                 if (o.K == "gift") { var c = d.Card(o.Id); if (c == null || !c.Gift) E($"{at}: 선물 카드(gift)가 아니다 — {o.Id}"); }
                 if (o.K == "next" && o.Next == null) E($"{at}: next 의 내용이 없다");
+                if (o.K == "flag") { if (string.IsNullOrEmpty(o.Id)) E($"{at}: flag 의 id 가 없다"); else flagSet.Add(o.Id); }
                 if (o.K == "flash" && o.All) E($"{at}: flash 의 all(다섯 중 고르기)은 없앴다 — 신탁은 늘 무작위 셋 가운데 하나(2026-10-05)");
                 if (o.K == "next" && o.Next?.Buff != null) foreach (var b in o.Next.Buff.Keys) if (!R.ALL_ST.Contains(b)) E($"{at}: 모르는 상태 {b}");
             }
@@ -615,7 +617,28 @@ namespace Bolzena.Core
                 }
                 if (o.Price != null) Outs(oa + " price", o.Price.Out);
                 if (o.When != null && o.When != "hp30") E($"{oa}: when 은 hp30 만");
+                if (o.Flag != null) flagUse[o.Flag] = oa;
+                if (o.NoFlag != null) flagUse[o.NoFlag] = oa;
             }
+            if (e.NeedFlag != null) flagUse[e.NeedFlag] = at;
+            if (e.FlagWeight < 0) E($"{at}: flagWeight 는 0 이상");
+            foreach (var o in e.Options) foreach (var L in new[] { o.Out }.Concat(o.Gamble?.Select(g => g.Out) ?? Enumerable.Empty<List<Outcome>>()).Concat(o.Judge != null ? new[] { o.Judge.Pass } : new List<Outcome>[0]).Concat(o.Fight != null ? new[] { o.Fight.Win } : new List<Outcome>[0]))
+                foreach (var x in L ?? new List<Outcome>()) if (x.K == "flag" && x.Id != null) flagFloor[x.Id] = Math.Max(flagFloor.TryGetValue(x.Id, out var ff) ? ff : 0, e.Floor);
+            foreach (var f in e.Options.Select(o => o.Flag).Where(x => x != null).Append(e.NeedFlag).Where(x => x != null).Distinct()) flagRead.Add((f, e.Floor, at));
+        }
+
+        // ── 연속 이벤트 깃발 — 세우는 곳 없이 읽기만 하는 깃발 · 세우기만 하고 아무도 안 읽는 깃발 ──
+        readonly HashSet<string> flagSet = new();
+        readonly Dictionary<string, string> flagUse = new();
+        readonly Dictionary<string, int> flagFloor = new();
+        readonly List<(string flag, int floor, string at)> flagRead = new();
+        void Flags()
+        {
+            // 줄기 뒤 이벤트가 뜰 수 있는가 — 깃발을 세우는 이벤트가 2층에서만 나오는데 읽는 이벤트가 1층에서만 나오면 그 깃발은 쓸모가 없다
+            foreach (var (f, fl, at) in flagRead)
+                if (flagFloor.TryGetValue(f, out var sf) && sf > 0 && fl > 0 && fl < sf) W($"{at}: 깃발 「{f}」 을 세우는 이벤트는 {sf}층인데 읽는 이벤트는 {fl}층 — 뜰 수 없다");
+            foreach (var kv in flagUse) if (!flagSet.Contains(kv.Key)) W($"{kv.Value}: 깃발 「{kv.Key}」 을 세우는 결과(flag)가 어느 이벤트에도 없다");
+            foreach (var f in flagSet) if (!flagUse.ContainsKey(f)) W($"깃발 「{f}」: 세우기만 하고 읽는 이벤트(flag · noFlag · needFlag)가 없다");
         }
 
         // ── 장비 ───────────────────────────────────────────────────────

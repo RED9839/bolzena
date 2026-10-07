@@ -47,7 +47,7 @@ for f in sorted(glob.glob(ROOT + '/heroes/*/*.json')):
             if len(d) > 24: problems.append((h['id'], f'부제 「{k["name"]}」 가 김({len(d)}자): {d}'))
             # ② 키워드 성질
             cap = k.get('cap')
-            if cap and not k.get('mode'): need(f'최대 {cap}' if not k.get('wrap') and not (k.get('carrier') == 'hero' and cap == 1) else (f'→ {cap}' if k.get('wrap') else '사도마다 하나'), f'「{k["name"]}」 cap')
+            if cap and not k.get('mode'): need(f'최대 {cap}' if not k.get('wrap') and not (k.get('carrier') == 'hero' and cap == 1) else ((' → '.join(k['stages'][:1]) if k.get('stages') else f'→ {cap}') if k.get('wrap') else '사도마다 하나'), f'「{k["name"]}」 cap')   # 단계 이름이 있으면 글은 「전채 → 메인 → …」(2026-10-08)
             if k.get('endClear'): need('내 턴이 끝나면', f'「{k["name"]}」 endClear')
             if k.get('decay') or k.get('decayAll'): need('적의 차례가 끝나면', f'「{k["name"]}」 decay')
             if k.get('weakens'): need('약점으로 맞음', f'「{k["name"]}」 weakens')

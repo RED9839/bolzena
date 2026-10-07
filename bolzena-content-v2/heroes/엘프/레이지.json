@@ -14,29 +14,36 @@
       "blurb": "못 하는 게 없어 온갖 잡일에 불려 다니는 만능 해결사. 한 턴에 처음 내는 종류마다 그 종류의 작은 일을 덤으로 해치웁니다.",
       "keyword": {
         "name": "출동 기록",
-        "desc": "해치운 일 목록",
+        "desc": "부서마다 불려 다닌 기록",
         "carrier": "self",
-        "cap": 6,
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.07
+          }
+        ],
         "rules": [
           {
-            "name": "만능 해결사",
+            "name": "밤샘 완료",
             "when": {
-              "on": "play",
-              "type": "강화"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
+              "on": "stackReach",
+              "id": "출동 기록",
+              "n": 4
             },
             "fx": [
               {
-                "k": "status",
-                "id": "잔광",
-                "v": 1
+                "k": "spend",
+                "id": "출동 기록",
+                "all": true
               },
               {
-                "k": "stack",
-                "id": "출동 기록",
+                "k": "dmg",
+                "ratio": 0.8,
+                "target": "allEnemies"
+              },
+              {
+                "k": "draw",
                 "v": 1
               }
             ]
@@ -56,14 +63,14 @@
           },
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            },
-            {
               "k": "stack",
               "id": "출동 기록",
               "v": 1
+            },
+            {
+              "k": "extra",
+              "ratio": 0.7,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -79,13 +86,44 @@
           },
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.7
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
             },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "만능 해결사",
+          "when": {
+            "on": "play",
+            "type": "강화"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
             {
               "k": "stack",
               "id": "출동 기록",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "커피 수혈",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 2
             }
           ]
         }
@@ -108,7 +146,7 @@
       },
       "starter": [
         "레이지_s1",
-        "레이지_s1",
+        "레이지_u3",
         "레이지_s2",
         "레이지_s3"
       ]
@@ -161,13 +199,12 @@
       "name": "XG - 레이저",
       "hero": "레이지",
       "unique": true,
-      "signature": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 1.02,
           "target": "allEnemies"
         },
         {
@@ -176,7 +213,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.26,
           "target": "allEnemies"
         },
         {
@@ -187,11 +224,80 @@
       ],
       "oracles": [
         {
-          "name": "출근 도장",
+          "name": "출력 최대",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.19,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "출동 기록",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "풀차지 레이저",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.91,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "한 놈만 조준",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.07,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "출동 기록",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.33,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "레이저 상시 가동",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.91,
               "target": "allEnemies"
             },
             {
@@ -204,21 +310,36 @@
               "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "출동 기록",
-              "all": true
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "출동 기록",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.58,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "마개조 출력",
-          "tags": [
-            "보존"
-          ],
+          "name": "마감 몰아치기",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.25,
               "target": "allEnemies"
             },
             {
@@ -227,104 +348,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.24,
+              "ratio": 0.32,
               "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "출동 기록",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "선 정리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "출동 기록"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.29,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "출동 기록",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "밤샘 몰아치기",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "출동 기록"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.24,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "출동 기록",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "관통 레이저",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "출동 기록"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.36,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "출동 기록",
-              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "출근 도장",
+          "name": "고출력 렌즈",
           "kind": "power"
         },
         {
-          "name": "팀 보이스",
+          "name": "작업 순서표",
           "kind": "ap"
         },
         {
-          "name": "승률 9할",
+          "name": "작업 일지",
           "fx": [
             {
               "k": "stack",
@@ -340,15 +380,12 @@
       "name": "유능한 것도 문제예요",
       "hero": "레이지",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
-      "tags": [
-        "연계"
-      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.6,
+          "ratio": 1.56,
           "target": "oneEnemy"
         },
         {
@@ -359,14 +396,11 @@
       ],
       "oracles": [
         {
-          "name": "또 저예요?",
-          "tags": [
-            "연계"
-          ],
+          "name": "일 잘하는 죄",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.08,
+              "ratio": 1.87,
               "target": "oneEnemy"
             },
             {
@@ -377,15 +411,12 @@
           ]
         },
         {
-          "name": "부서 총동원",
-          "tags": [
-            "연계",
-            "보존"
-          ],
+          "name": "대충 해도 됨",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.92,
+              "ratio": 1.02,
               "target": "oneEnemy"
             },
             {
@@ -396,14 +427,31 @@
           ]
         },
         {
-          "name": "진압반 편입",
-          "tags": [
-            "연계"
-          ],
+          "name": "또 불려 감",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.39,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "출동 기록",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "겸사겸사",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.37,
               "target": "oneEnemy"
             },
             {
@@ -413,60 +461,49 @@
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "잡일 총무는 사양",
-          "tags": [
-            "연계",
-            "신속"
-          ],
+          "name": "휴일 출근",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.92,
+              "ratio": 1.2,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "ifStack",
               "id": "출동 기록",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "안전모와 용접 고글",
-          "cost": 3,
-          "tags": [
-            "연계"
-          ],
-          "fx": [
+              "n": 2
+            },
+            {
+              "k": "spend",
+              "id": "출동 기록",
+              "v": 2
+            },
             {
               "k": "dmg",
-              "ratio": 3.48,
+              "ratio": 1.32,
               "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "출동 기록",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "안전모와 용접 고글",
-          "kind": "power"
+          "name": "정밀 작업",
+          "kind": "weakSpot"
         },
         {
-          "name": "하루 할당량",
-          "kind": "ap"
+          "name": "손에 익은 공구",
+          "kind": "cost"
         },
         {
-          "name": "밤샘 몰아치기",
+          "name": "부서 호출",
           "fx": [
             {
               "k": "stack",
@@ -482,167 +519,28 @@
       "name": "리그 오브 엘프 90.1%",
       "hero": "레이지",
       "unique": true,
-      "cost": 1,
-      "type": "스킬",
+      "cost": 0,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
-        {
-          "k": "shield",
-          "ratio": 1.2
-        },
-        {
-          "k": "draw",
-          "v": 1
-        },
         {
           "k": "stack",
           "id": "출동 기록",
           "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "랭크 게임",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.72
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "출동 기록",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "한타 집중",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "출동 기록",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "팀 보이스",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.44
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "출동 기록",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "하루 할당량",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.74
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "출동 기록",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "승률 9할",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.44
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "출동 기록",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "팀 보이스",
-          "kind": "guard"
-        },
-        {
-          "name": "승률 9할",
-          "kind": "draw"
-        },
-        {
-          "name": "출근 도장",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "출동 기록",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "레이지_u4",
-      "name": "용접 야근",
-      "hero": "레이지",
-      "unique": true,
-      "cost": 1,
-      "type": "강화",
-      "fx": [
-        {
-          "k": "atkMod",
-          "v": 0.1,
-          "run": true,
-          "target": "self"
         },
         {
           "k": "draw",
-          "v": 1
+          "v": 1,
+          "basic": true
         },
         {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "turnEnd"
+                "on": "turnStart"
               },
               "fx": [
                 {
@@ -657,51 +555,27 @@
       ],
       "oracles": [
         {
-          "name": "야근 각",
+          "name": "승률 9할",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 2
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "basic": true
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "출동 기록",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "철야 작업",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
@@ -716,20 +590,17 @@
           ]
         },
         {
-          "name": "도와 달라는 말",
+          "name": "버그 제보",
           "tags": [
-            "보존"
+            "개전"
           ],
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "shield",
+              "ratio": 0.72
             },
             {
-              "k": "stack",
-              "id": "출동 기록",
+              "k": "draw",
               "v": 2
             },
             {
@@ -737,7 +608,7 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
@@ -752,65 +623,109 @@
           ]
         },
         {
-          "name": "종이접기까지",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "출동 기록",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "소원은 자유시간",
+          "name": "밤샘 공략",
           "tags": [
-            "신속"
+            "개전"
           ],
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "allEnemies"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "출동 기록",
-                      "v": 2
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "출동 기록",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.48,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "공략 검색",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "출동 기록",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "쉬는 시간 반납",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 0.72
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "출동 기록",
+                      "v": 1
                     }
                   ]
                 }
@@ -821,15 +736,198 @@
       ],
       "blesses": [
         {
-          "name": "하루 할당량",
-          "kind": "atkUp"
+          "name": "서버실 차폐",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.48
+            }
+          ]
         },
         {
-          "name": "밤샘 몰아치기",
+          "name": "게이밍 의자",
           "kind": "draw"
         },
         {
-          "name": "안전모와 용접 고글",
+          "name": "자유시간 사수",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "레이지_u4",
+      "name": "용접 야근",
+      "hero": "레이지",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.96,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "출동 기록"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.36,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "철야 용접",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "짧은 야근",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "광역 용접",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "출동 기록",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "출동 기록",
+              "n": 4
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.53,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "용접 야근 상시",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "출동 기록",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "출동 기록",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.42,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "밤샘에 설렘",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.05
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "출동 기록"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "달군 용접봉",
+          "kind": "frost"
+        },
+        {
+          "name": "용접 고글",
+          "kind": "draw"
+        },
+        {
+          "name": "야근 기록",
           "fx": [
             {
               "k": "stack",

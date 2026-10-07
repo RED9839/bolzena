@@ -232,7 +232,10 @@ namespace Bolzena.RunUI
                     var bub = Ui.Img(rt, Theme.S("circle"), Theme.NavyPanel, "say"); bub.rectTransform.At(0, 1, -10, 14, 34, 34);
                     var bi = Ui.Img(bub.transform, Theme.S("ic_talk") ?? Theme.S("ic_info"), Theme.Gold, "ic"); bi.rectTransform.Fill(8, 8, 8, 8); bi.preserveAspect = true;   // 작은 금빛 「i」 는 「!」 로 읽혔다 — 말풍선(ic_talk)
                 }
-                float faceW = o.Hero != null ? 44 : 0, inner = cw - 24 - 18 - faceW;
+                // 조건부 칸 얼굴 — 파티에 실제로 있는 그 사도(없으면 조건 맨 앞 사도 = 데려와야 할 사도), price 가 먹으면 그 사도
+                string faceKey = o.Hero != null && o.Hero.Count > 0 ? (o.Hero.FirstOrDefault(k => P.S.Party.Contains(k)) ?? o.Hero[0])
+                               : o.Price != null && P.S.Party.Contains(o.Price.Hero) ? o.Price.Hero : null;
+                float faceW = faceKey != null ? 44 : 0, inner = cw - 24 - 18 - faceW;
                 // 이름 — 줄바꿈(말줄임 없음)
                 var nm = Ui.Title(rt, o.Label, Theme.FsLg, lockWhy != null ? Theme.Dim : Color.white, TextAlignmentOptions.TopLeft, "label");
                 nm.textWrappingMode = TextWrappingModes.Normal; nm.overflowMode = TextOverflowModes.Overflow;
@@ -251,13 +254,26 @@ namespace Bolzena.RunUI
                     float lh = lt.GetPreferredValues(lt.text, chipsW - 24, 0).y;
                     lt.rectTransform.At(0, 1, 24, 0, chipsW - 24, lh);
                     chipsH = Mathf.Max(22, lh);
+                    // 조건이 안 맞아 잠긴 칸(사도 · 종족 · HP · 깃발) — 조건 글 아래에 무엇을 받는지도 보인다(데려오면 열린다)
+                    if (P.CondWhy(o) != null)
+                    {
+                        var c2 = Ui.Rect("chips2", chips); c2.anchorMin = c2.anchorMax = c2.pivot = new Vector2(0, 1);
+                        c2.anchoredPosition = new Vector2(0, -(chipsH + 6));
+                        float h2 = OptionChips(c2, o, chipsW);
+                        c2.sizeDelta = new Vector2(chipsW, h2);
+                        chipsH += 6 + h2;
+                    }
                     b.Interactable = false; b.Why = lockWhy;
                     b.Group().alpha = 0.6f;
                 }
                 else chipsH = OptionChips(chips, o, chipsW);
                 chips.sizeDelta = new Vector2(chipsW, chipsH);
                 float h = Mathf.Max(minH, 14 + labelH + 8 + chipsH + 18);
-                if (o.Hero != null) { var face = W.Face(rt, Roster.OfCore(o.Hero[0]), 36); face.At(1, 1, -12, -10, 36, 36); }
+                if (faceKey != null)
+                {
+                    var face = W.Face(rt, Roster.OfCore(faceKey), 36); face.At(1, 1, -12, -10, 36, 36);
+                    if (lockWhy != null) { face.gameObject.AddComponent<CanvasGroup>().alpha = 0.55f; }
+                }
                 if (on)
                 {
                     var hint = Ui.Text(rt, "한 번 더 누르면 결정합니다", Theme.FsCap, Theme.Gold, TextAlignmentOptions.Center, false, "hint"); hint.rectTransform.At(0.5f, 1, 0, 26, cw, 22); hint.Outline(0.3f);
@@ -379,6 +395,7 @@ namespace Bolzena.RunUI
             {
                 P.Save("event");
                 if (fight) { FightStop(); return; }
+                if (!root) { Event(); return; }   // 사도 고르기 사이에 화면이 다시 지어졌으면(옛 root 는 사라짐) 지금 이벤트 화면을 새로
                 BuildEvent(root, -1);
             });
         }
@@ -425,7 +442,7 @@ namespace Bolzena.RunUI
                 t.textWrappingMode = TextWrappingModes.NoWrap; t.overflowMode = TextOverflowModes.Overflow;
                 Put(t.rectTransform, t.GetPreferredValues(text).x + 2);
             }
-            void Chips(IEnumerable<Outcome> outs) { foreach (var x2 in outs ?? Enumerable.Empty<Outcome>()) { var (rt, w) = OutChip(box, x2); Put(rt, w); } }
+            void Chips(IEnumerable<Outcome> outs) { foreach (var x2 in (outs ?? Enumerable.Empty<Outcome>()).Where(x => x.K != "flag")) { var (rt, w) = OutChip(box, x2); Put(rt, w); } }   // 깃발(연속 이벤트)은 안 보인다
             if (o.Leave) { Lead(P.OutOf(o).Count == 0 ? "아무 대가 없이 떠납니다" : "", Theme.Sub); Chips(P.OutOf(o)); }
             else if (o.Fight != null) { Lead($"전투 — {o.Fight.Name ?? "적"} · 이기면", Theme.Bad); Chips(o.Fight.Win); }
             else if (o.Judge != null)

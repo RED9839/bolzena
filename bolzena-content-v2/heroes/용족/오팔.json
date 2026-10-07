@@ -13,22 +13,22 @@
       "crit": 5,
       "blurb": "금방 울음을 터뜨리는 아기 오팔 용. 파티가 다친 다음 날마다 눈물이 맺히고, 눈물이 보석이 되면 울음을 뚝 그쳐 파티의 기운을 북돋웁니다.",
       "keyword": {
-        "name": "눈물 보석",
-        "desc": "다친 다음 날 맺히는 눈물",
+        "name": "눈물 그렁",
+        "desc": "선배님이 다칠 때마다 차오르는 눈물",
         "carrier": "self",
         "cap": 3,
         "rules": [
           {
-            "name": "보석 되기",
+            "name": "뚝!",
             "when": {
               "on": "stackReach",
-              "id": "눈물 보석",
+              "id": "눈물 그렁",
               "n": 3
             },
             "fx": [
               {
                 "k": "spend",
-                "id": "눈물 보석",
+                "id": "눈물 그렁",
                 "all": true
               },
               {
@@ -36,8 +36,8 @@
                 "v": 1
               },
               {
-                "k": "status",
-                "id": "사기",
+                "k": "make",
+                "id": "오팔_tap",
                 "v": 1
               }
             ]
@@ -48,36 +48,33 @@
         {
           "name": "울먹울먹",
           "when": {
-            "on": "turnStart"
+            "on": "hurt",
+            "guarded": true
           },
-          "conds": [
-            {
-              "c": "hurtLast"
-            }
-          ],
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
           "fx": [
             {
               "k": "stack",
-              "id": "눈물 보석",
+              "id": "눈물 그렁",
               "v": 1
             }
           ]
         },
         {
-          "name": "선배님~!",
+          "name": "파사삭 보석",
           "when": {
-            "on": "lowHp",
-            "pct": 0.5
+            "on": "play",
+            "type": "공격",
+            "every": 3
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "눈물 보석",
-              "v": 2
-            },
-            {
-              "k": "heal",
-              "ratio": 2
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
             }
           ]
         }
@@ -98,7 +95,7 @@
           },
           {
             "k": "stack",
-            "id": "눈물 보석",
+            "id": "눈물 그렁",
             "v": 1
           },
           {
@@ -113,7 +110,7 @@
         "오팔_s1",
         "오팔_s1",
         "오팔_s2",
-        "오팔_s2"
+        "오팔_u2"
       ]
     }
   ],
@@ -146,7 +143,201 @@
       ]
     },
     {
+      "id": "오팔_tap",
+      "name": "탭댄스",
+      "hero": "오팔",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.75
+        },
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ]
+    },
+    {
       "id": "오팔_u1",
+      "name": "선배님~!",
+      "hero": "오팔",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.75
+        },
+        {
+          "k": "perStack",
+          "id": "눈물 그렁"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.45
+        },
+        {
+          "k": "spend",
+          "id": "눈물 그렁",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "선배니임~!",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.98
+            },
+            {
+              "k": "perStack",
+              "id": "눈물 그렁"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.52
+            },
+            {
+              "k": "spend",
+              "id": "눈물 그렁",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "눈물 방패",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "perStack",
+              "id": "눈물 그렁"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "spend",
+              "id": "눈물 그렁",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "참는 중",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.19
+            },
+            {
+              "k": "perStack",
+              "id": "눈물 그렁"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.43
+            }
+          ]
+        },
+        {
+          "name": "칭찬받고 싶어",
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.95
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "눈물 그렁",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.79
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "훌쩍",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.52
+            },
+            {
+              "k": "perStack",
+              "id": "눈물 그렁"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.38
+            },
+            {
+              "k": "spend",
+              "id": "눈물 그렁",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "손수건",
+          "kind": "heal"
+        },
+        {
+          "name": "선배님 사진",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "에헤헤",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오팔_u2",
       "name": "가십 드래곤",
       "hero": "오팔",
       "unique": true,
@@ -160,18 +351,17 @@
         },
         {
           "k": "shield",
-          "ratio": 1.0
+          "ratio": 1.2
         },
         {
           "k": "stack",
-          "id": "눈물 보석",
+          "id": "눈물 그렁",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "귓속말",
-          "cost": 0,
+          "name": "특급 가십",
           "fx": [
             {
               "k": "status",
@@ -179,14 +369,19 @@
               "v": 1
             },
             {
+              "k": "shield",
+              "ratio": 1.88
+            },
+            {
               "k": "stack",
-              "id": "눈물 보석",
+              "id": "눈물 그렁",
               "v": 1
             }
           ]
         },
         {
-          "name": "소문이 소문을",
+          "name": "양산 활짝",
+          "cost": 2,
           "fx": [
             {
               "k": "status",
@@ -195,71 +390,73 @@
             },
             {
               "k": "shield",
-              "ratio": 1.0
+              "ratio": 2.4
             },
             {
               "k": "stack",
-              "id": "눈물 보석",
-              "v": 1
+              "id": "눈물 그렁",
+              "v": 2
             }
           ]
         },
         {
-          "name": "에헤 에헤",
+          "name": "이달의 용족",
           "fx": [
             {
               "k": "status",
               "id": "협공",
               "v": 1
             },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "에헤",
+          "fx": [
             {
               "k": "shield",
               "ratio": 1.2
             },
             {
               "k": "stack",
-              "id": "눈물 보석",
+              "id": "눈물 그렁",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "눈물 그렁",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
               "v": 2
             }
           ]
         },
         {
-          "name": "어허!",
+          "name": "뚝 그쳐",
           "fx": [
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
               "k": "shield",
-              "ratio": 1.0
+              "ratio": 2.86
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "반짝이는 비늘",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "spend",
+              "id": "눈물 그렁",
+              "all": true
             },
             {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "stack",
-              "id": "눈물 보석",
+              "k": "ap",
               "v": 1
             }
           ]
@@ -267,145 +464,19 @@
       ],
       "blesses": [
         {
-          "name": "보석 반사",
+          "name": "양산",
           "kind": "guard"
         },
         {
-          "name": "선배님 이야기",
+          "name": "파티 초대장",
           "kind": "draw"
         },
         {
-          "name": "눈물 자국",
+          "name": "봉제 인형",
           "fx": [
             {
               "k": "stack",
-              "id": "눈물 보석",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blurb": "선배들의 소문을 듣다가 괜히 서러워집니다."
-    },
-    {
-      "id": "오팔_u2",
-      "name": "오팔빛 실드",
-      "hero": "오팔",
-      "unique": true,
-      "cost": 2,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "shield",
-          "ratio": 2.6
-        },
-        {
-          "k": "status",
-          "id": "결정화",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "얇은 막",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.8
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "두꺼운 막",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.2
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "겹겹이",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.6
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "보석 돔",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.6
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "울보의 성",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 4.4
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "눈물 보석",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "반짝 구두",
-          "kind": "guard"
-        },
-        {
-          "name": "리듬 타기",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "앙코르",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "눈물 보석",
+              "id": "눈물 그렁",
               "v": 1
             }
           ]
@@ -422,168 +493,202 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.75,
           "target": "randomEnemy",
           "hits": 2
         },
         {
-          "k": "status",
-          "id": "약화",
+          "k": "stack",
+          "id": "눈물 그렁",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "작은 원석",
-          "cost": 0,
+          "name": "큰 보석",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.98,
               "target": "randomEnemy",
               "hits": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "보석함 통째로",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "randomEnemy",
-              "hits": 3
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "오팔 파편",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "던지고 또 던지고",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "반짝 반짝",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
             },
             {
               "k": "stack",
-              "id": "눈물 보석",
+              "id": "눈물 그렁",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "파사삭",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.02,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "후드리 찹찹",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "눈물 그렁",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "반짝 가루 뿌리기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "make",
+              "id": "오팔_tap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "보석 수집",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "눈물 그렁",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "정조준",
+          "name": "오팔 원석",
           "kind": "power"
         },
         {
-          "name": "보석 가루",
-          "kind": "frost"
+          "name": "깨진 뿔",
+          "kind": "ap"
         },
         {
-          "name": "줍기",
-          "kind": "draw"
+          "name": "반짝 가루",
+          "fx": [
+            {
+              "k": "make",
+              "id": "오팔_tap",
+              "v": 1
+            }
+          ]
         }
       ]
     },
     {
       "id": "오팔_u4",
-      "name": "뚝 그치고",
+      "name": "반짝이는 모든 것들",
       "hero": "오팔",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "스킬",
       "fx": [
         {
           "k": "status",
-          "id": "결정화",
+          "id": "사기",
           "v": 1
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "눈물 보석",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "shield",
+          "ratio": 0.75
+        },
+        {
+          "k": "perStack",
+          "id": "눈물 그렁"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.45
         }
       ],
       "oracles": [
         {
-          "name": "훌쩍",
+          "name": "이달의 우수 용족",
           "fx": [
             {
               "k": "status",
-              "id": "결정화",
+              "id": "사기",
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "눈물 보석",
+              "k": "shield",
+              "ratio": 0.98
+            },
+            {
+              "k": "perStack",
+              "id": "눈물 그렁"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "눈물의 탭댄스",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
               "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.73
             },
             {
               "k": "power",
@@ -595,7 +700,20 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "눈물 보석",
+                      "id": "눈물 그렁",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "눈물 그렁",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
                       "v": 1
                     }
                   ]
@@ -605,147 +723,92 @@
           ]
         },
         {
-          "name": "뚝!",
+          "name": "하늘 위의 서프라이즈",
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
+              "k": "perStack",
+              "id": "눈물 그렁"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "눈물 보석",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "heal",
+              "ratio": 1.31
+            },
+            {
+              "k": "spend",
+              "id": "눈물 그렁",
+              "all": true
+            },
+            {
+              "k": "make",
+              "id": "오팔_tap",
+              "v": 1
             }
           ]
         },
         {
-          "name": "씩씩한 척",
+          "name": "작은 칭찬",
           "fx": [
             {
               "k": "status",
-              "id": "결정화",
+              "id": "사기",
               "v": 1
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "perStack",
+              "id": "눈물 그렁"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "눈물 보석",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "shield",
+              "ratio": 0.82
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.62
             }
           ]
         },
         {
-          "name": "울지 않을 거야",
-          "cost": 0,
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "눈물 보석",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "보석 같은 눈물",
-          "cost": 2,
+          "name": "파티 준비",
           "fx": [
             {
               "k": "status",
-              "id": "결정화",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "눈물 보석",
+              "id": "사기",
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "눈물 보석",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "눈물 그렁"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "손수건",
+          "name": "반짝 왕관",
+          "kind": "defUp"
+        },
+        {
+          "name": "탭슈즈",
+          "kind": "cost"
+        },
+        {
+          "name": "첫 파티",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1
-            }
-          ]
-        },
-        {
-          "name": "선배님 품",
-          "tags": [
-            "개전"
-          ]
-        },
-        {
-          "name": "달래 주기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "눈물 보석",
-              "v": 1
+              "ratio": 0.3
             }
           ]
         }

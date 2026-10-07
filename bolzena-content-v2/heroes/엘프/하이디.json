@@ -91,7 +91,30 @@
           ]
         },
         {
-          "name": "셀카 한 장",
+          "name": "목표 포착!",
+          "when": {
+            "on": "hit",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ifStack",
+              "id": "특종감",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "특종 셀카",
           "when": {
             "on": "huntDown",
             "id": "특종감"
@@ -141,7 +164,7 @@
       },
       "starter": [
         "하이디_s1",
-        "하이디_s1",
+        "하이디_u1",
         "하이디_s2",
         "하이디_s3"
       ]
@@ -199,14 +222,13 @@
       ],
       "fx": [
         {
-          "k": "status",
-          "id": "사기",
+          "k": "draw",
           "v": 1
         },
         {
-          "k": "status",
-          "id": "다음 턴 드로우",
-          "v": 1
+          "k": "stack",
+          "id": "잠복",
+          "v": 2
         }
       ],
       "hero": "하이디",
@@ -217,117 +239,111 @@
       "name": "잠입 취재 중!",
       "hero": "하이디",
       "unique": true,
-      "signature": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "회피",
-          "v": 1
-        },
-        {
           "k": "stack",
           "id": "잠복",
-          "v": 3
+          "v": 2
         },
         {
-          "k": "draw",
+          "k": "status",
+          "id": "회피",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "상자 준비 완료",
+          "name": "상자 속 잠입",
           "fx": [
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 2
-            },
             {
               "k": "stack",
               "id": "잠복",
               "v": 3
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "회피",
               "v": 1
             }
           ]
         },
         {
-          "name": "종군기자 시절",
-          "cost": 1,
+          "name": "장기 잠입",
+          "power": true,
           "fx": [
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 1
+            },
             {
               "k": "status",
               "id": "회피",
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "잠복",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "잠복",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "목표 포착!",
-          "tags": [
-            "보존"
-          ],
+          "name": "제보 검색",
           "fx": [
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 2
-            },
             {
               "k": "stack",
               "id": "잠복",
-              "v": 3
+              "v": 2
             },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "위장 취재",
+          "fx": [
             {
               "k": "stack",
               "id": "특종감",
               "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "골판지 두 겹",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
+              "target": "topEnemy"
+            },
             {
-              "k": "status",
-              "id": "회피",
+              "k": "make",
+              "id": "하이디_t1",
               "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "잠복",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "무기한 정직",
+          "name": "상자째 돌진",
           "fx": [
             {
-              "k": "status",
-              "id": "회피",
+              "k": "discard",
               "v": 1
             },
             {
@@ -336,24 +352,31 @@
               "v": 3
             },
             {
-              "k": "draw",
-              "v": 2
+              "k": "status",
+              "id": "회피",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "종군기자 시절",
-          "kind": "guard"
-        },
-        {
-          "name": "연사 모드",
+          "name": "프리 기자 패스",
           "kind": "draw"
         },
         {
-          "name": "오늘의 베스트 컷",
-          "kind": "defUp"
+          "name": "골판지 상자",
+          "kind": "cost"
+        },
+        {
+          "name": "숨죽이기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -367,73 +390,108 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.45,
-          "hits": 3,
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "연사 모드",
+          "name": "풀 플래시",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.58,
-              "hits": 3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "무한 연사",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "hits": 3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "셀카 겸 엄호",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "hits": 3,
+              "ratio": 1.3,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "특종감",
+              "k": "status",
+              "id": "약화",
               "v": 1,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "상자 틈으로",
+          "name": "찰칵",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "hits": 3,
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "식당 평점",
-          "tags": [
-            "신속"
-          ],
+          "name": "특종의 순간",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.54,
-              "hits": 3,
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "특종감",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "사진첩 뒤지기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "플래시 과열",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "oneEnemy"
             }
           ]
@@ -441,23 +499,16 @@
       ],
       "blesses": [
         {
-          "name": "골판지 두 겹",
+          "name": "대형 플래시",
           "kind": "power"
         },
         {
-          "name": "호외 발행",
+          "name": "셔터 연사",
           "kind": "ap"
         },
         {
-          "name": "어디든 출입 가능 출입증",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "특종감",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
+          "name": "눈부심",
+          "kind": "frost"
         }
       ]
     },
@@ -466,7 +517,7 @@
       "name": "특종감 지정",
       "hero": "하이디",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
@@ -476,20 +527,14 @@
           "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "표식",
-          "v": 1,
-          "target": "oneEnemy"
-        },
-        {
           "k": "dmg",
-          "ratio": 1.9,
+          "ratio": 0.9,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "마감 직전",
+          "name": "1면 특종",
           "fx": [
             {
               "k": "stack",
@@ -498,23 +543,15 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "표식",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
               "k": "dmg",
-              "ratio": 2.47,
+              "ratio": 1.35,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "호외 발행",
-          "tags": [
-            "보존"
-          ],
+          "name": "속보",
+          "cost": 2,
           "fx": [
             {
               "k": "stack",
@@ -523,20 +560,39 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "표식",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 2.2,
               "target": "oneEnemy"
             },
             {
+              "k": "stack",
+              "id": "잠복",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "이미 특종감이면",
+          "fx": [
+            {
               "k": "dmg",
-              "ratio": 2.28,
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "특종감",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "공동 취재",
+          "name": "취재 수첩",
           "fx": [
             {
               "k": "stack",
@@ -545,24 +601,25 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "표식",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.9,
               "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 2.76,
-              "target": "oneEnemy"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "숨어서 찍은 1면",
-          "tags": [
-            "신속"
-          ],
+          "name": "독점 보도",
           "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
             {
               "k": "stack",
               "id": "특종감",
@@ -570,37 +627,8 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "표식",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
               "k": "dmg",
-              "ratio": 2.28,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "가장 약한 특종",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "특종감",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "표식",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 4.14,
+              "ratio": 1.35,
               "target": "oneEnemy"
             }
           ]
@@ -608,16 +636,22 @@
       ],
       "blesses": [
         {
-          "name": "연사 모드",
-          "kind": "power"
-        },
-        {
-          "name": "오늘의 베스트 컷",
-          "kind": "ap"
-        },
-        {
-          "name": "종군기자 시절",
+          "name": "망원 렌즈",
           "kind": "weakSpot"
+        },
+        {
+          "name": "자극적인 제목",
+          "kind": "draw"
+        },
+        {
+          "name": "잠복 준비",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -627,50 +661,88 @@
       "hero": "하이디",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
-          "k": "critMod",
-          "v": 0.1,
-          "run": true,
-          "target": "self"
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "oneEnemy"
         },
         {
-          "k": "make",
-          "id": "하이디_t1",
-          "v": 1
+          "k": "perStack",
+          "id": "잠복"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "crit"
-              },
-              "limit": {
-                "per": "turn",
-                "n": 1
-              },
-              "fx": [
-                {
-                  "k": "draw",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "dmg",
+          "ratio": 0.16,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "오늘의 베스트 컷",
+          "name": "셀카 각도 완벽",
           "fx": [
             {
-              "k": "critMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
             },
+            {
+              "k": "perStack",
+              "id": "잠복"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "대충 한 장",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "잠복"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.14,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "아핫!",
+          "fx": [
+            {
+              "k": "make",
+              "id": "하이디_t1",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "특종감",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "셀카 연재",
+          "power": true,
+          "fx": [
             {
               "k": "make",
               "id": "하이디_t1",
@@ -681,86 +753,12 @@
               "rules": [
                 {
                   "when": {
-                    "on": "crit"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "draw",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "특종 패스",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "critMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "crit"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "엘프 우월주의",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "critMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "make",
-              "id": "하이디_t1",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "crit"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
+                      "k": "stack",
+                      "id": "잠복",
                       "v": 1
                     }
                   ]
@@ -773,99 +771,42 @@
           "name": "블로그 리뷰",
           "fx": [
             {
-              "k": "critMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "make",
-              "id": "하이디_t1",
+              "k": "discard",
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "crit"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
-                    },
-                    {
-                      "k": "gauge",
-                      "v": 15
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "어디든 출입 가능 출입증",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "critMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
             },
             {
-              "k": "make",
-              "id": "하이디_t1",
-              "v": 1
+              "k": "perStack",
+              "id": "잠복"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "crit"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "호외 발행",
+          "name": "셀카봉",
           "kind": "atkUp"
         },
         {
-          "name": "어디든 출입 가능 출입증",
-          "kind": "draw"
+          "name": "식당 평점",
+          "kind": "cost"
         },
         {
-          "name": "골판지 두 겹",
+          "name": "한 장 더",
           "fx": [
             {
-              "k": "stack",
-              "id": "특종감",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "하이디_t1",
+              "v": 1
             }
           ]
         }

@@ -14,13 +14,15 @@ namespace Bolzena.UI
     //   왼쪽 가운데: 뽑을 더미(아이콘 + 수)       오른쪽 가운데: 무덤(버린 더미 — 아이콘 + 수)
     //   (턴 칩 · 웨이브 · 소멸 더미 표시 · 게이지 머리 아이콘 · 「/ 최대」 는 2026-10-07 사용자 요청으로 걷음 — 턴 · 웨이브는 로그 · 스냅샷에만, 소멸 더미는 무덤 창의 탭으로 본다)
     //   왼쪽 아래: 고학년 게이지(큰 % + 세로 칸) 옆에 고학년 띠 셋(비스듬한 초상 · 값 · 쓸 수 있으면 반짝이)
-    //   아래 가운데: 손패 밑 큰 AP 숫자(빛나는 마름모) · 손패 수 「05/10」        오른쪽 아래: 둥근 ✓ 턴 종료(이중 원 · 빛)
+    //   아래 가운데: 손패 밑 큰 AP 숫자(빛나는 마름모) · 손패 수 「05/10」        오른쪽 아래: 턴 종료(금 테 메달 · 다음 턴 화살 · 이름표 — EndTurnButton)
     //   싸움터: 사도 머리 위 고유 효과(키워드) 작은 표시
     public class PartyHud : MonoBehaviour
     {
-        SpriteRenderer hpFill, hpLag, hpGain, hpDue, dueTick, shieldIcon, endBtn, endGlow, speedBg, menuBg, apGem, apGlow;
+        SpriteRenderer hpFill, hpLag, hpGain, hpDue, dueTick, shieldIcon, speedBg, menuBg, apGem, apGlow;
         TextMeshPro hpText, shieldText, apText, handText, deckText, discText, speedText, pvText, gaugeText;
-        Ring endRing;
+        EndTurnButton endTurn;
+        /// <summary>오른쪽 아래 턴 종료 단추(EndTurnButton — 상태별 모양 · 점검).</summary>
+        public EndTurnButton EndButton => endTurn;
         ChipRow chips;
         /// <summary>파티 버프 줄(강화 칩 포함).</summary>
         public ChipRow Chips => chips;
@@ -37,6 +39,8 @@ namespace Bolzena.UI
         int hp, maxHp, gauge, gaugeMax = 300, block, due, ap;
         float fillF = 1, lagF = 1, lagHold, gaugeShown;
         float apPop;
+        // AP 를 얻은 순간(격파 · 격파하며 처치) — AP 숫자 오른쪽 위에 「+N」 이 떠올랐다 사라진다
+        TextMeshPro apPlus; float apPlusT;
 
         // 자리(16:9 기준 좌표 — 무리마다 모서리를 따라 옮겨진다)
         const float BarX0 = -7.72f, BarW = 4.9f, BarY = 4.2f, BarH = 0.13f;
@@ -50,13 +54,12 @@ namespace Bolzena.UI
         const float UltX = -5.86f, UltY0 = -2.62f, UltDy = 0.74f;
         static readonly Vector3 ApAt = new Vector3(0, -3.92f, 0), HandAt = new Vector3(0, -4.34f, 0);
         static readonly Vector3 EndAt = new Vector3(7.02f, -3.58f, 0);
-        const float EndD = 1.22f;
         // 위 오른쪽 줄 — 자동 전투 · 배속 · 메뉴(2026-10-07 사용자: 배속을 옛 자동 전투 자리로, 자동 전투는 그 왼쪽)
         static readonly Vector3 AutoAt = new Vector3(5.74f, 4.05f, 0), MenuAt = new Vector3(7.6f, 4.05f, 0);
         static readonly Vector3 SpeedAt = new Vector3(6.72f, 4.05f, 0);      // 자동 전투와 같은 알약(시계 + 1× · 2×)
         const float PillW = 0.86f, PillH = 0.4f;
 
-        public Vector3 EndPos => endBtn.transform.position;
+        public Vector3 EndPos => endTurn.transform.position;
         public Vector3 SpeedPos => speedBg.transform.position;
         public Vector3 PartyPos => TL.At(new Vector3(BarX0 + BarW / 2, BarY, 0));
         public Vector3 PausePos => menuBg.transform.position;
@@ -197,20 +200,14 @@ namespace Bolzena.UI
             apGem = Make.Box("apgem", bc, Res.UI("diamond"), ApAt, new Vector2(0.62f, 0.62f), OAp + 2, new Color(0.07f, 0.1f, 0.22f, 0.92f));
             apText = Txt("ap", bc, "", ApAt + new Vector3(0, 0.01f, 0), 0.52f, OAp + 4, new Color(1f, 0.96f, 0.84f), TextAlignmentOptions.Center, 0.2f);
             Make.Glow(apText, new Color(1f, 0.92f, 0.7f), 1.25f);
+            apPlus = Txt("ap_plus", bc, "", ApAt + new Vector3(0.62f, 0.2f, 0), 0.4f, OAp + 5, new Color(1f, 0.86f, 0.4f, 0), TextAlignmentOptions.Left, 0.25f);
             Make.Box("handi", bc, Res.UI("ic_cards"), HandAt + new Vector3(-0.42f, 0, 0), new Vector2(0.2f, 0.2f), OAp + 3, new Color(0.85f, 0.88f, 0.95f));
             handText = Txt("hand", bc, "", HandAt + new Vector3(0.08f, -0.005f, 0), Tone.Cap, OAp + 3, Tone.Sub, TextAlignmentOptions.Center, 0.3f);
             TipZone.Add(apGem, new Vector2(1.2f, 1.0f) / apGem.transform.localScale.x, () => Tip.Head("AP") + "\n카드를 내는 값 — 매 턴 3, 남으면 사라집니다.\n격파하면 AP 를 얻습니다." + Tip.Dim("\n아래 줄은 손패 수 / 최대"), 2);
 
-            // ── 오른쪽 아래 — 둥근 ✓ 턴 종료(이중 원 · 빛) ──
-            endGlow = Make.Box("endglow", br, Res.UI("soft"), EndAt, new Vector2(2.4f, 2.4f), O, new Color(0.45f, 0.75f, 1f, 0f), Res.SpriteMat(true, 1.6f));
-            endBtn = Make.Box("end", br, Res.UI("circle"), EndAt, new Vector2(EndD, EndD), O + 2, new Color(0.05f, 0.08f, 0.17f, 0.95f));
-            endRing = Tone.Ring("endring", br, EndAt, EndD, 0.05f, O + 3, new Color(0.62f, 0.82f, 1f), new Color(0, 0, 0, 0));
-            endRing.Set(1);
-            var inner = Tone.Ring("endring2", br, EndAt, EndD - 0.22f, 0.025f, O + 3, new Color(0.62f, 0.82f, 1f, 0.6f), new Color(0, 0, 0, 0));
-            inner.Set(1);
-            Make.Box("check", br, Res.UI("ic_check"), EndAt, new Vector2(0.56f, 0.56f), O + 4, new Color(0.88f, 0.95f, 1f));
-            Txt("endt", br, "턴 종료", EndAt + new Vector3(0, -EndD / 2 - 0.14f, 0), 0.13f, O + 4, Tone.Sub, TextAlignmentOptions.Center, 0.3f);
-            TipZone.Add(endBtn, Vector2.one, () => "턴을 넘깁니다 — 손패를 버리고 적의 차례 · 단축키 E", 2);
+            // ── 오른쪽 아래 — 턴 종료(금 테 메달 + 다음 턴 화살 + 「턴 종료」 이름표 — EndTurnButton, 점검 인자 -endturnstyle) ──
+            endTurn = EndTurnButton.Create(br, EndAt, O, s.Heroes.Count > 0 ? s.Heroes[0].Nature : null, EndTurnButton.Chosen);
+            TipZone.Add(endTurn.Body, new Vector2(endTurn.Half.x * 2 / endTurn.Body.transform.localScale.x, endTurn.Half.y * 2 / endTurn.Body.transform.localScale.y), () => "턴을 넘깁니다 — 손패를 버리고 적의 차례 · 단축키 E", 2);
 
             Anchor();
         }
@@ -262,7 +259,7 @@ namespace Bolzena.UI
             if (hand != null)
             {
                 float left = -hw + k * (UltX + UltButton.SW / 2 + 0.1f + 8f);
-                float right = hw - k * (8f - (EndAt.x - EndD / 2));
+                float right = hw - k * (8f - (EndAt.x - endTurn.Half.x));
                 hand.HalfSpan = Mathf.Min(-left, right) - 0.1f;
                 hand.DeckPos = PilePos(0);
                 hand.DiscardPos = PilePos(1);
@@ -303,6 +300,15 @@ namespace Bolzena.UI
         {
             var sr = tr.GetComponent<SpriteRenderer>();
             yield return Clock.Tween(0.3f, t => Make.Fit(sr, Vector2.one * size * (1 + 0.5f * (1 - Ease.OutBack(t)))));
+        }
+
+        /// <summary>AP 를 얻었다(격파 · 격파하며 처치) — 「+N」 이 떠오르고 숫자가 톡. 숫자 값은 수가 끝난 뒤 ApChanged 가 맞춘다.</summary>
+        public void ApGain(int n)
+        {
+            if (n <= 0 || apPlus == null) return;
+            apPlus.text = "+" + n;
+            apPlusT = 1;
+            apPop = 1;
         }
 
         public void SetAp(int v, int max)
@@ -375,7 +381,7 @@ namespace Bolzena.UI
 
         public void SetTurn(int turn, int wave, int waves) { }   // 턴 · 웨이브 표시는 걷었다(2026-10-07) — 부르는 곳은 그대로 둔다
 
-        public bool OverEnd(Vector2 p) => Vector2.Distance(p, endBtn.transform.position) < (EndD / 2 + 0.04f) * Tone.K;
+        public bool OverEnd(Vector2 p) => endTurn.Over(p);
 
         // 끝 자세 — 전투가 끝나면 위 파티 HP 띠만 남기고 걷고, 왼쪽에 작은 「BATTLE END」 칩(싸움터는 그대로)
         public void EndPose(bool won)
@@ -414,17 +420,28 @@ namespace Bolzena.UI
                 var dc = hpDue.color; dc.a = 0.45f + 0.35f * Mathf.Sin(Clock.Now * 5f); hpDue.color = dc;
                 dueTick.transform.localPosition = new Vector3(BarX0 + BarW * (hp - lose) / maxHp, BarY + BarH / 2 + 0.09f, 0);
             }
-            var g = endGlow.color;
-            g.a = endReady ? 0.35f + 0.25f * Mathf.Sin(Clock.Now * 3.5f) : Mathf.MoveTowards(g.a, 0.12f, Time.unscaledDeltaTime * 3f);
-            if (EndHover) g.a = 0.9f;
-            endGlow.color = g;
-            endRing.SetColors(endReady || EndHover ? new Color(0.75f, 0.9f, 1f) : new Color(0.5f, 0.7f, 0.95f), new Color(0, 0, 0, 0), endReady || EndHover ? 1.6f : 1.1f);
-            float es = Mathf.MoveTowards(endBtn.transform.localScale.x / endBase, EndHover ? 1.06f : 1f, Time.unscaledDeltaTime * 1.5f);
-            endBtn.transform.localScale = Vector3.one * endBase * es;
+            // 턴 종료 단추 — 지금 상태를 넘긴다(모양은 EndTurnButton 이). 점검이 얼려 두면(Frozen) 그대로
+            if (!endTurn.Frozen)
+            {
+                var dir = BattleDirector.I;
+                endTurn.Hover = EndHover;
+                endTurn.Ready = endReady;
+                endTurn.Locked = dir != null && !dir.WaitingInput;
+                endTurn.EnemyTurn = dir != null && dir.EnemyTurn;
+                endTurn.Auto = dir != null && dir.Auto;
+                endTurn.Pressed = PointerInput.Held && !PointerInput.Moved && endTurn.Over(PointerInput.Pos);
+            }
             // AP — 바뀌면 톡
             apPop = Mathf.MoveTowards(apPop, 0, Time.unscaledDeltaTime * 4f);
             apText.transform.localScale = Vector3.one * (1 + 0.25f * Ease.OutCubic(apPop));
             var agc = apGlow.color; agc.a = (ap > 0 ? 0.3f : 0.1f) + 0.1f * Mathf.Sin(Clock.Now * 2.5f) + 0.4f * apPop; apGlow.color = agc;
+            if (apPlus != null && apPlusT > 0)
+            {   // 「+N」 — 1.4초 동안 떠오르며 사라진다(앞 0.25초는 또렷이)
+                apPlusT = Mathf.MoveTowards(apPlusT, 0, Time.unscaledDeltaTime / 1.4f);
+                float k = 1 - apPlusT;
+                apPlus.transform.localPosition = ApAt + new Vector3(0.62f, 0.2f + 0.45f * Ease.OutCubic(k), 0);
+                var pc = apPlus.color; pc.a = k < 0.25f ? 1 : apPlusT / 0.75f; apPlus.color = pc;
+            }
             var hand = BattleDirector.I != null ? BattleDirector.I.Hand : null;
             int hc = hand != null ? hand.Cards.Count : 0;
             handText.text = $"{hc:00}<color={Tone.DimTag}>/{Bolzena.Core.R.HAND_MAX:00}</color>";
@@ -450,8 +467,6 @@ namespace Bolzena.UI
             }
             for (int i = 0; i < Ults.Count; i++) Ults[i].Gauge = gaugeShown;
         }
-
-        float endBase => EndD / Res.UI("circle").bounds.size.x;
 
         void Bar(SpriteRenderer sr, float f)
         {

@@ -144,6 +144,7 @@ namespace Bolzena.RunUI
                 float cw = Mathf.Min(Theme.C(150, 112), (h - 24) / 1.4f);
                 var card = W.Card(rt, this, it.Id, cw);
                 card.At(0, 0.5f, 12, 0, cw, cw * 1.4f);
+                var cid = it.Id; card.gameObject.AddComponent<Btn>().OnClick = () => CardZoom(cid);   // 카드 그림을 누르면 카드 상세(사기는 값 단추)
                 vis = cw + 24;
                 var v = P.View(it.Id);
                 name = v?.Name ?? it.Id;

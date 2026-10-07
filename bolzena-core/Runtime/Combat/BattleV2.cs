@@ -94,7 +94,7 @@ namespace Bolzena.Core
                         return t != null ? new List<Unit> { t } : new List<Unit>();
                     }
             }
-            if (target != null && target.StartsWith("hero:"))
+            if (target != null && target.StartsWith("hero:", StringComparison.Ordinal))
             {   // 그 사도(있으면) — 없으면 공격력이 가장 높은 다른 아군
                 var t = allies.FirstOrDefault(u => u.Key == target.Substring(5)) ?? allies.Where(u => u != ctx.Owner).OrderByDescending(AtkNow).FirstOrDefault() ?? ctx.Owner;
                 return t != null ? new List<Unit> { t } : new List<Unit>();
@@ -237,8 +237,8 @@ namespace Bolzena.Core
         public string Lines()
         {
             var a = new List<string>();
-            if (Oracle != null) a.Add($"신탁 「{Oracle}」");
-            if (Bless != null) a.Add($"축복 「{Bless}」 — {BlessText}");
+            if (Oracle != null) a.Add("신탁");
+            if (Bless != null) a.Add($"축복 — {BlessText}");
             if (Copy) a.Add(COPY_LINE);
             return string.Join("\n", a);
         }

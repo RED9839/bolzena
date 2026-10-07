@@ -13,63 +13,46 @@
       "crit": 10,
       "blurb": "힘 대신 돈으로 가치를 증명하는 자수정의 용족 밀수꾼. 쓰러뜨리고 깨뜨린 만큼 장부에 금화가 쌓이고, 비싼 물건은 금화로만 팝니다.",
       "keyword": {
-        "name": "밀수 장부",
-        "desc": "비용 대신 쓰는 금화",
+        "name": "수수료",
+        "desc": "거래마다 슬쩍 얹는 웃돈",
         "carrier": "self",
         "cap": 6,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.05
-          }
-        ],
-        "rules": [
-          {
-            "name": "장사 수완",
-            "when": {
-              "on": "kill"
-            },
-            "fx": [
-              {
-                "k": "stack",
-                "id": "밀수 장부",
-                "v": 2
-              }
-            ]
-          },
-          {
-            "name": "다음 손님",
-            "when": {
-              "on": "break"
-            },
-            "fx": [
-              {
-                "k": "stack",
-                "id": "밀수 장부",
-                "v": 2
-              }
-            ]
-          },
-          {
-            "name": "현찰 박치기",
-            "when": {
-              "on": "stackOver",
-              "id": "밀수 장부"
-            },
-            "fx": [
-              {
-                "k": "nextCheaper",
-                "v": 1
-              }
-            ],
-            "limit": {
-              "per": "turn",
-              "n": 1
-            }
+            "v": 0.1
           }
         ]
       },
       "passives": [
+        {
+          "name": "장사 수완",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "장사 수완",
+          "when": {
+            "on": "break",
+            "mine": true
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            }
+          ]
+        },
         {
           "name": "개업 자금",
           "when": {
@@ -78,7 +61,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "밀수 장부",
+              "id": "수수료",
               "v": 2
             }
           ]
@@ -100,7 +83,7 @@
           },
           {
             "k": "stack",
-            "id": "밀수 장부",
+            "id": "수수료",
             "v": 2
           }
         ]
@@ -109,7 +92,7 @@
         "시스트_s1",
         "시스트_s1",
         "시스트_s2",
-        "시스트_s2"
+        "시스트_u4"
       ]
     }
   ],
@@ -142,6 +125,32 @@
       ]
     },
     {
+      "id": "시스트_express",
+      "name": "특급 배송",
+      "hero": "시스트",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.19,
+          "target": "lowEnemy"
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "make",
+          "id": "시스트_express",
+          "v": 1
+        }
+      ]
+    },
+    {
       "id": "시스트_u1",
       "name": "총알 배송",
       "hero": "시스트",
@@ -151,118 +160,170 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.1,
-          "target": "oneEnemy"
+          "ratio": 1.62,
+          "target": "lowEnemy"
         },
         {
           "k": "stack",
-          "id": "밀수 장부",
+          "id": "수수료",
+          "v": 1
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "make",
+          "id": "시스트_express",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "특급 배송",
+          "name": "레이징 불",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
+              "ratio": 2.13,
+              "target": "lowEnemy"
             },
             {
               "k": "stack",
-              "id": "밀수 장부",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "대량 주문",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "stack",
-              "id": "밀수 장부",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "반품 불가",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "밀수 장부",
+              "id": "수수료",
               "v": 1
             },
             {
               "k": "ifKill"
             },
             {
-              "k": "stack",
-              "id": "밀수 장부",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "웃돈 얹기",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "밀수 장부",
+              "k": "make",
+              "id": "시스트_express",
               "v": 1
             }
           ]
         },
         {
-          "name": "응원 대행 서비스",
-          "cost": 2,
+          "name": "M1911",
+          "tags": [
+            "약점 공격"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
-              "target": "oneEnemy"
+              "ratio": 1.79,
+              "target": "lowEnemy"
             },
             {
               "k": "stack",
-              "id": "밀수 장부",
-              "v": 3
+              "id": "수수료",
+              "v": 1
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "잔불 배송",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.47,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "택배 묶음",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.54,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수수료"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "몰아 쏘기",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "수수료"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "수수료",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "자수정 탄두",
-          "kind": "power"
+          "name": "글록",
+          "kind": "weakSpot"
         },
         {
-          "name": "배송 추적",
+          "name": "특급 포장",
           "kind": "draw"
         },
         {
-          "name": "덤 하나",
+          "name": "배송비",
           "fx": [
             {
               "k": "stack",
-              "id": "밀수 장부",
+              "id": "수수료",
               "v": 1
             }
           ]
@@ -278,119 +339,127 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "draw",
-          "v": 1
+          "k": "stack",
+          "id": "수수료",
+          "v": 2
         },
         {
-          "k": "stack",
-          "id": "밀수 장부",
+          "k": "draw",
           "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "할인 행사",
-          "cost": 0,
+          "name": "대박 세일",
           "fx": [
             {
-              "k": "draw",
-              "v": 1
-            },
-            {
               "k": "stack",
-              "id": "밀수 장부",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "묶음 판매",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "밀수 장부",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "VIP 패키지",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "밀수 장부",
+              "id": "수수료",
               "v": 3
             },
             {
-              "k": "shield",
-              "ratio": 1
+              "k": "draw",
+              "v": 2
             }
           ]
         },
         {
-          "name": "하자품",
+          "name": "헤헤",
+          "cost": 0,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "재고 정리",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 1
             },
             {
               "k": "stack",
-              "id": "밀수 장부",
+              "id": "수수료",
+              "v": 3
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아군 타겟 상품",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "장사 밑천",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "엘리아스 통째로",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
               "k": "draw",
-              "v": 1
+              "v": 2
             },
             {
-              "k": "stack",
-              "id": "밀수 장부",
-              "v": 4
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수수료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "계산기",
-          "kind": "draw"
+          "name": "명품백",
+          "kind": "guard"
         },
         {
-          "name": "단골 손님",
+          "name": "흥정",
+          "kind": "cost"
+        },
+        {
+          "name": "사장님",
           "fx": [
             {
-              "k": "stack",
-              "id": "밀수 장부",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
-          ]
-        },
-        {
-          "name": "가짜 뿔",
-          "tags": [
-            "보존"
           ]
         }
       ]
@@ -402,11 +471,10 @@
       "unique": true,
       "cost": 2,
       "type": "공격",
-      "payWith": "밀수 장부",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 1.27,
           "target": "allEnemies",
           "hits": 2
         },
@@ -417,11 +485,11 @@
       ],
       "oracles": [
         {
-          "name": "골디의 저금통",
+          "name": "잡동사니 폭탄",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.62,
               "target": "allEnemies",
               "hits": 2
             },
@@ -432,33 +500,12 @@
           ]
         },
         {
-          "name": "초록 괴물",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies",
-              "hits": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "주머니 바구니",
+          "name": "가벼운 척",
           "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.94,
               "target": "allEnemies",
               "hits": 2
             },
@@ -469,51 +516,90 @@
           ]
         },
         {
-          "name": "덤 하나 더",
+          "name": "초록 괴물™",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.57,
               "target": "allEnemies",
               "hits": 2
             },
             {
-              "k": "draw",
-              "v": 2
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 3
             }
           ]
         },
         {
-          "name": "아기 요정까지",
+          "name": "바구니 털기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.1,
               "target": "allEnemies",
-              "hits": 3
+              "hits": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "수수료"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "수수료",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "배송 조회",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "자수정 탄창",
+          "name": "무거운 척",
           "kind": "power"
         },
         {
-          "name": "바구니 끈",
-          "kind": "frost"
+          "name": "4차원 주머니",
+          "kind": "ap"
         },
         {
-          "name": "영수증",
-          "kind": "ap"
+          "name": "덤 끼워 주기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 1
+            }
+          ]
         }
       ],
-      "blurb": "비용은 「밀수 장부」 로만 — 이 바구니에는 무엇이든 들어갑니다."
+      "payWith": "수수료",
+      "payRate": 2,
+      "payMix": true
     },
     {
       "id": "시스트_u4",
@@ -522,6 +608,9 @@
       "unique": true,
       "cost": 1,
       "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
         {
           "k": "atkMod",
@@ -530,16 +619,25 @@
           "target": "self"
         },
         {
+          "k": "stack",
+          "id": "수수료",
+          "v": 2
+        },
+        {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "turnStart"
+                "on": "kill"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 2
               },
               "fx": [
                 {
-                  "k": "stack",
-                  "id": "밀수 장부",
+                  "k": "make",
+                  "id": "시스트_express",
                   "v": 1
                 }
               ]
@@ -549,123 +647,7 @@
       ],
       "oracles": [
         {
-          "name": "개업 전단지",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀수 장부",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "재산 2위",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀수 장부",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "대리 응원",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀수 장부",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "위조지폐는 상종 안 해",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀수 장부",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "좌판 펼치기",
+          "name": "엘리아스 2위 재산",
           "tags": [
             "개전"
           ],
@@ -678,7 +660,52 @@
             },
             {
               "k": "stack",
-              "id": "밀수 장부",
+              "id": "수수료",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "시스트_express",
+                      "v": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "수수료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "우정을 건 승부",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
               "v": 2
             },
             {
@@ -686,12 +713,138 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "밀수 장부",
+                      "k": "make",
+                      "id": "시스트_express",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "화성행 우주선",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "ifStack",
+              "id": "수수료",
+              "n": 3
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "시스트_express",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "응원 대행 서비스",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.62,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "시스트_express",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "소상인 협회",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "시스트_express",
                       "v": 1
                     }
                   ]
@@ -703,24 +856,22 @@
       ],
       "blesses": [
         {
-          "name": "금고",
+          "name": "황금 저금통",
+          "kind": "atkUp"
+        },
+        {
+          "name": "호구 탐지",
+          "kind": "draw"
+        },
+        {
+          "name": "개업 준비",
           "fx": [
             {
-              "k": "stack",
-              "id": "밀수 장부",
+              "k": "make",
+              "id": "시스트_express",
               "v": 1
             }
           ]
-        },
-        {
-          "name": "장부",
-          "tags": [
-            "개전"
-          ]
-        },
-        {
-          "name": "자수정 반지",
-          "kind": "atkUp"
         }
       ]
     }

@@ -129,7 +129,7 @@ namespace Bolzena.RunUI
                 Try = i => P.CampTrain(opts[i].N),
                 Done = i =>
                 {
-                    Toast.Show($"「{tcard.Name}」 — 신탁 「{opts[i].Name}」" + (opts[i].Blessed ? $" · 축복 「{opts[i].BlessName}」" : ""));
+                    Toast.Show($"「{tcard.Name}」 — 신탁 {opts[i].N}" + (opts[i].Blessed ? " · 축복" : ""));
                     P.Save("camp", kind);
                     if (root) BuildCamp(root, kind, withShop);
                 },

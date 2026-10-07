@@ -14,7 +14,7 @@
       "blurb": "숲속에서 스스로 먹고사는 나른한 사냥꾼.",
       "keyword": {
         "name": "나른함",
-        "desc": "쉬는 턴마다 모이는 힘",
+        "desc": "늘어진 채 겨누는 한 발",
         "carrier": "self",
         "cap": 3,
         "per": [
@@ -23,7 +23,41 @@
             "v": 0.3
           }
         ],
-        "consumeAll": true
+        "consumeAll": true,
+        "rules": [
+          {
+            "name": "한적한 숲",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "나른함",
+                "v": 2
+              }
+            ]
+          },
+          {
+            "name": "한적함",
+            "when": {
+              "on": "play",
+              "type": "스킬",
+              "who": "other"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "나른함",
+                "v": 1
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
@@ -40,19 +74,21 @@
           ]
         },
         {
-          "name": "늘어지기",
+          "name": "약하면 설치지 마",
           "when": {
-            "on": "turnEnd"
+            "on": "kill"
           },
-          "conds": [
-            {
-              "c": "ownNone"
-            }
-          ],
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
           "fx": [
             {
-              "k": "stack",
-              "id": "나른함",
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
@@ -80,7 +116,7 @@
       },
       "starter": [
         "유미미_s1",
-        "유미미_s1",
+        "유미미_u3",
         "유미미_s2",
         "유미미_s3"
       ]
@@ -133,12 +169,12 @@
       "name": "발싸! 아뵤~",
       "hero": "유미미",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.3,
+          "ratio": 1.3,
           "target": "topEnemy"
         },
         {
@@ -148,7 +184,8 @@
         },
         {
           "k": "tough",
-          "v": 1
+          "v": 1,
+          "target": "topEnemy"
         }
       ],
       "oracles": [
@@ -157,7 +194,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.75,
+              "ratio": 1.6,
               "target": "topEnemy"
             },
             {
@@ -167,17 +204,18 @@
             },
             {
               "k": "tough",
-              "v": 1
+              "v": 1,
+              "target": "topEnemy"
             }
           ]
         },
         {
           "name": "대충 발싸",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 0.85,
               "target": "topEnemy"
             },
             {
@@ -187,7 +225,49 @@
             },
             {
               "k": "tough",
+              "v": 1,
+              "target": "topEnemy"
+            }
+          ]
+        },
+        {
+          "name": "천벌 예행연습",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.6,
+              "target": "topEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 2,
+              "target": "topEnemy"
+            },
+            {
+              "k": "draw",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "화살 줍기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "topEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
             }
           ]
         },
@@ -196,61 +276,18 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 1.35,
               "target": "topEnemy"
             },
             {
               "k": "ifStack",
               "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
-              "v": 1
+              "n": 2
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.62,
               "target": "topEnemy"
-            }
-          ]
-        },
-        {
-          "name": "화살비 아뵤~",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.7,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "천벌 예행연습",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.6,
-              "target": "topEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
-              "v": 2
             }
           ]
         }
@@ -265,7 +302,7 @@
           "kind": "weakSpot"
         },
         {
-          "name": "화살 줍기",
+          "name": "하품 한 번",
           "kind": "draw"
         }
       ]
@@ -280,16 +317,12 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.1,
+          "ratio": 1,
           "target": "oneEnemy"
         },
         {
-          "k": "ifStack",
+          "k": "stack",
           "id": "나른함",
-          "n": 3
-        },
-        {
-          "k": "tough",
           "v": 1
         }
       ],
@@ -299,16 +332,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.25,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
               "v": 1
             }
           ]
@@ -323,78 +352,78 @@
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
               "v": 1
             }
           ]
         },
         {
-          "name": "졸린 눈 조준",
+          "name": "뿔갈이 습관",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.94,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "나른함",
-              "n": 2
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "나른함",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "연달아 두 발",
+          "name": "잠 깨는 한 발",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy",
-              "hits": 2
+              "ratio": 1.25,
+              "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "유령 사냥 화살",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "하품 섞인 한 발",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "나른함",
-              "n": 3
+              "v": 1
             },
             {
-              "k": "tough",
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "나른함",
               "v": 1
             }
           ]
@@ -407,11 +436,17 @@
         },
         {
           "name": "으스스한 화살",
-          "kind": "frost"
+          "kind": "weakSpot"
         },
         {
-          "name": "하품 섞인 한 발",
-          "kind": "cost"
+          "name": "애벌레 간식",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -433,7 +468,7 @@
         },
         {
           "k": "shield",
-          "ratio": 1.2
+          "ratio": 1
         }
       ],
       "oracles": [
@@ -446,11 +481,11 @@
             {
               "k": "stack",
               "id": "나른함",
-              "v": 3
+              "v": 2
             },
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 1.46
             }
           ]
         },
@@ -468,29 +503,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.8
-            }
-          ]
-        },
-        {
-          "name": "수풀 위장",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.8
+              "ratio": 0.6
             }
           ]
         },
@@ -507,20 +520,52 @@
             },
             {
               "k": "shield",
-              "ratio": 1.0
+              "ratio": 0.8
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
           "name": "본격 낮잠",
-          "cost": 2,
           "tags": [
             "보존"
           ],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "수풀 위장",
           "fx": [
             {
               "k": "stack",
@@ -528,13 +573,8 @@
               "v": 3
             },
             {
-              "k": "shield",
-              "ratio": 2.4
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "k": "draw",
+              "v": 1
             }
           ]
         }
@@ -550,7 +590,13 @@
         },
         {
           "name": "느긋한 마음",
-          "kind": "defUp"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -559,12 +605,12 @@
       "name": "약하면 설치지 마",
       "hero": "유미미",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.9,
+          "ratio": 1.2,
           "target": "oneEnemy"
         },
         {
@@ -573,8 +619,15 @@
         },
         {
           "k": "dmg",
-          "ratio": 1.9,
+          "ratio": 1,
           "target": "oneEnemy"
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "ap",
+          "v": 1
         }
       ],
       "oracles": [
@@ -583,7 +636,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 1.45,
               "target": "oneEnemy"
             },
             {
@@ -592,67 +645,8 @@
             },
             {
               "k": "dmg",
-              "ratio": 2.0,
+              "ratio": 1.2,
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "손가락 튕기기",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifWounded",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "나른한 일격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "나른함",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifWounded",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "제일 약한 놈 골라",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.5,
-              "target": "lowEnemy"
             },
             {
               "k": "ifKill"
@@ -665,16 +659,12 @@
         },
         {
           "name": "끝장내기",
-          "cost": 3,
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.6,
+              "ratio": 2.79,
               "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
             },
             {
               "k": "ifWounded",
@@ -682,7 +672,95 @@
             },
             {
               "k": "dmg",
-              "ratio": 3.6,
+              "ratio": 2.03,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "제일 약한 놈 골라",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "나른한 일격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다음 화살",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.15,
               "target": "oneEnemy"
             }
           ]
@@ -699,7 +777,7 @@
         },
         {
           "name": "잘난 척",
-          "kind": "atkUp"
+          "kind": "ap"
         }
       ]
     }

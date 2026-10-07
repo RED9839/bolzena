@@ -1,885 +1,807 @@
 {
- "heroes": [
-  {
-   "id": "가비아",
-   "name": "가비아",
-   "nature": "순수",
-   "role": "서포터",
-   "star": 2,
-   "hp": 640,
-   "atk": 64,
-   "def": 63,
-   "crit": 5,
-   "blurb": "목소리를 키우면 땅이 울리는 대지의 정령. 카드를 속삭임으로 낼지 외침으로 낼지 고릅니다 — 외침은 두 배지만 목청이 차오릅니다.",
-   "keyword": {
-    "name": "목청",
-    "desc": "외침으로 차는 목청",
-    "carrier": "self",
-    "cap": 1,
-    "rules": [
-     {
-      "name": "지진",
-      "when": {
-       "on": "stackReach",
-       "id": "목청",
-       "n": 1
+  "heroes": [
+    {
+      "id": "가비아",
+      "name": "가비아",
+      "nature": "순수",
+      "role": "서포터",
+      "star": 2,
+      "hp": 640,
+      "atk": 64,
+      "def": 63,
+      "crit": 5,
+      "blurb": "목소리를 키우면 땅이 울리는 대지의 정령. 카드를 속삭임으로 낼지 외침으로 낼지 고릅니다 — 외침은 두 배지만 목청이 차오릅니다.",
+      "keyword": {
+        "name": "삼킨 고함",
+        "desc": "꾹 삼켜 둔 거친 말",
+        "carrier": "self",
+        "cap": 5,
+        "rules": [
+          {
+            "name": "땅울림",
+            "when": {
+              "on": "stackReach",
+              "id": "삼킨 고함",
+              "n": 5
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "삼킨 고함",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.6,
+                "base": "def",
+                "target": "allEnemies"
+              }
+            ]
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "tough",
-        "v": 1,
-        "target": "allEnemies"
-       },
-       {
-        "k": "status",
-        "id": "미끄러움",
-        "v": 1,
-        "target": "party"
-       },
-       {
-        "k": "spend",
-        "id": "목청",
-        "all": true
-       }
+      "passives": [
+        {
+          "name": "우웅⋯",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "조용한 대지",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "ownNone"
+            }
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "지켜⋯줄⋯게⋯",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "shield",
+            "ratio": 2.5
+          },
+          {
+            "k": "status",
+            "id": "불굴",
+            "v": 1
+          },
+          {
+            "k": "tough",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "가비아_s1",
+        "가비아_s1",
+        "가비아_s2",
+        "가비아_u1"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "조용한 대지",
-     "when": {
-      "on": "turnEnd"
-     },
-     "conds": [
-      {
-       "c": "ownNone"
-      }
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "지켜⋯줄⋯게⋯",
-    "cost": 150,
-    "fx": [
-     {
-      "k": "shield",
-      "ratio": 2.5
-     },
-     {
-      "k": "status",
-      "id": "불굴",
-      "v": 1
-     },
-     {
-      "k": "tough",
-      "v": 1,
-      "target": "allEnemies"
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "가비아_s1",
-    "가비아_s1",
-    "가비아_s2",
-    "가비아_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "가비아_s1",
-   "name": "돌멩이…",
-   "hero": "가비아",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "가비아_s1",
+      "name": "돌멩이…",
+      "hero": "가비아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "가비아_s2",
+      "name": "토닥…",
+      "hero": "가비아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.2
+        }
+      ]
+    },
+    {
+      "id": "가비아_statue",
+      "name": "흙 조각상",
+      "hero": "가비아",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.5
+        },
+        {
+          "k": "stack",
+          "id": "삼킨 고함",
+          "v": 1
+        }
+      ],
+      "blurb": "가비아가 심심풀이로 깎아 둔 작은 흙 인형입니다."
+    },
+    {
+      "id": "가비아_u1",
+      "name": "작은 목소리",
+      "hero": "가비아",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "삼킨 고함",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "으응?",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "교주만 알아듣는 말",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "조각칼",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 1
+            },
+            {
+              "k": "make",
+              "id": "가비아_statue",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "땅속의 고요",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 고함",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "말줄임표",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "누워서 숨만",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "흙냄새",
+          "kind": "draw"
+        },
+        {
+          "name": "조각 선물",
+          "fx": [
+            {
+              "k": "make",
+              "id": "가비아_statue",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "가비아_u2",
+      "name": "그만해!!!",
+      "hero": "가비아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "삼킨 고함"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.12,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "삼킨 고함",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "참을 만큼 참았어",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.14,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 고함",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "도시를 묻는 목소리",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "지켜 주려고 낸 소리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 고함",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "유령 늪 간척",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 고함",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "조각상 깨기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "가비아_statue"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "가비아_statue"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "유창한 장문",
+          "kind": "power"
+        },
+        {
+          "name": "꺼지는 땅",
+          "kind": "cost"
+        },
+        {
+          "name": "몸 사리는 정령들",
+          "kind": "frost"
+        }
+      ]
+    },
+    {
+      "id": "가비아_u3",
+      "name": "돌려⋯줄⋯게⋯",
+      "hero": "가비아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.3
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "삼킨 고함",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "단단한 돌벽",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.89
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "돌벽 셋",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "가비아_statue",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흡수한 만큼",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "바위 같은 침묵",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "가장 위험한 친구부터",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.64
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "흙 갑옷",
+          "kind": "guard"
+        },
+        {
+          "name": "반사 피해",
+          "kind": "ap"
+        },
+        {
+          "name": "잔돌",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "가비아_u4",
+      "name": "지하에 누워",
+      "hero": "가비아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "perStack",
+          "id": "삼킨 고함"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.3
+        }
+      ],
+      "oracles": [
+        {
+          "name": "깊은 잠",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.42
+            }
+          ]
+        },
+        {
+          "name": "땅속의 잠",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 고함",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "운동은 싫어",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.52
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 고함",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "최애 응원 준비",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "조각 취미",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.25
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "푹신한 흙",
+          "kind": "defUp"
+        },
+        {
+          "name": "곰팡이 없는 동굴",
+          "kind": "cost"
+        },
+        {
+          "name": "조각 하나 더",
+          "fx": [
+            {
+              "k": "make",
+              "id": "가비아_statue",
+              "v": 1
+            }
+          ]
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "가비아_s2",
-   "name": "토닥…",
-   "hero": "가비아",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 1.2
-    }
-   ]
-  },
-  {
-   "id": "가비아_u1",
-   "name": "작은 목소리",
-   "hero": "가비아",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "choices": [
-    "속삭임",
-    "외침"
-   ],
-   "fx": [
-    {
-     "k": "ifChoice",
-     "n": 1
-    },
-    {
-     "k": "shield",
-     "ratio": 1.6
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "shield",
-     "ratio": 3.2
-    },
-    {
-     "k": "stack",
-     "id": "목청",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "또렷한 목소리",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "shield",
-       "ratio": 4
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "귓속말",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1.4
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "shield",
-       "ratio": 2.8
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "바위 같은 목소리",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "shield",
-       "ratio": 3.96
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "지켜 줄게",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1.8
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "shield",
-       "ratio": 3.6
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "최애를 향한 외침",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1.6
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "shield",
-       "ratio": 3.2
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "단단한 바위",
-     "kind": "guard"
-    },
-    {
-     "name": "한숨",
-     "kind": "draw"
-    },
-    {
-     "name": "가벼운 숨",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "가비아_u2",
-   "name": "돌멩이 던지기",
-   "hero": "가비아",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "choices": [
-    "속삭임",
-    "외침"
-   ],
-   "fx": [
-    {
-     "k": "ifChoice",
-     "n": 1
-    },
-    {
-     "k": "dmg",
-     "ratio": 1.3,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "dmg",
-     "ratio": 2.6,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "목청",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "큰 돌멩이",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "dmg",
-       "ratio": 3.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "조약돌",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "dmg",
-       "ratio": 2.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "바위 굴리기",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.99,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.98,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "정확한 투척",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "dmg",
-       "ratio": 2.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "던지고 숨기",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.54,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "dmg",
-       "ratio": 3.08,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "묵직한 돌",
-     "kind": "power"
-    },
-    {
-     "name": "가벼운 조약돌",
-     "kind": "cost"
-    },
-    {
-     "name": "모래 뿌리기",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "가비아_u3",
-   "name": "토닥토닥",
-   "hero": "가비아",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "choices": [
-    "속삭임",
-    "외침"
-   ],
-   "fx": [
-    {
-     "k": "ifChoice",
-     "n": 1
-    },
-    {
-     "k": "heal",
-     "ratio": 1.2
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "heal",
-     "ratio": 2.4
-    },
-    {
-     "k": "stack",
-     "id": "목청",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "꼭 안아 주기",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.5
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "heal",
-       "ratio": 3
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "살짝 토닥",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "heal",
-       "ratio": 2
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "괜찮아",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.4
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "heal",
-       "ratio": 2.8
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "대지의 온기",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1.8
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "heal",
-       "ratio": 2.8
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "자장가",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.4
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "heal",
-       "ratio": 2.8
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "따뜻한 손",
-     "kind": "heal"
-    },
-    {
-     "name": "작은 손",
-     "kind": "cost"
-    },
-    {
-     "name": "포근한 흙",
-     "kind": "guard"
-    }
-   ]
-  },
-  {
-   "id": "가비아_u4",
-   "name": "목청 가다듬기",
-   "hero": "가비아",
-   "unique": true,
-   "cost": 0,
-   "type": "스킬",
-   "choices": [
-    "속삭임",
-    "외침"
-   ],
-   "fx": [
-    {
-     "k": "ifChoice",
-     "n": 1
-    },
-    {
-     "k": "draw",
-     "v": 1
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "draw",
-     "v": 2
-    },
-    {
-     "k": "stack",
-     "id": "목청",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "발성 연습",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "물 한 모금",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "준비 운동",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "깊은 숨",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "목청",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "응원 연습",
-     "fx": [
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "맑은 목",
-     "kind": "draw"
-    },
-    {
-     "name": "한 걸음 더",
-     "kind": "ap"
-    },
-    {
-     "name": "목 풀기",
-     "tags": [
-      "개전"
-     ]
-    }
-   ]
-  }
- ]
+  ]
 }

@@ -53,6 +53,7 @@ namespace Bolzena.Demo
         void Start()
         {
             perf = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-perf") >= 0;
+            if (Has("-mute")) AudioListener.volume = 0f;   // 캡처 · 점검은 음소거(설정값은 그대로)
             cap = gameObject.AddComponent<Capture>();
             cap.Off = perf;
             if (!perf) Time.captureDeltaTime = 1f / 30f;   // 재기 모드는 실제 시계로
@@ -69,6 +70,7 @@ namespace Bolzena.Demo
             {
                 Shot(s, 1);
                 if (s == "epiphany_window") StartCoroutine(PickEpiphany());
+                if (s == "epiphany_pick" && Has("-pickframes")) StartCoroutine(PickFrames());
             };
             Banners.OnStage += s => Shot(s, 0);
             StartCoroutine(Run());
@@ -263,6 +265,16 @@ namespace Bolzena.Demo
             yield return Wait(0.5f);
             Shot("epiphany_hover", 0);
             yield return Wait(0.3f);
+            if (Has("-blessshots"))
+            {   // 길게 누르면 카드 상세 — 놓아도 고르지 않아야 한다
+                PointerInput.SimHeld = true;
+                yield return Wait(0.7f);
+                Shot("epiphany_longpress", 0);
+                PointerInput.SimHeld = false;
+                yield return Wait(0.6f);
+                Shot("epiphany_after_longpress", 0);
+                yield return Wait(0.3f);
+            }
             PointerInput.SimHeld = true;
             yield return null;
             yield return null;
@@ -359,7 +371,9 @@ namespace Bolzena.Demo
             // -powershot: 첫 손에 강화 카드가 있으면 먼저 내고 강화 칩 · 툴팁을 찍는다(없으면 다음 턴들에서)
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-powershot") >= 0) yield return PowerCard();
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-toughshots") >= 0) { yield return ToughShots(); yield break; }
+            if (Has("-breakkillshots")) { yield return BreakKillShots(); yield break; }
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-holdzoom") >= 0) { yield return HoldZoomShots(); yield break; }
+            if (Has("-blessshots")) { yield return BlessShots(); yield break; }
 
             // ── 1턴 — 화면 둘러보기 ──
             // 카드 올려 두기 → 풀이 툴팁
@@ -604,6 +618,68 @@ namespace Bolzena.Demo
             Application.Quit();
         }
 
+        // -breakkillshots: ① 격파하며 처치 — 강인도 칸이 깎여 0 · 「격파!」 · AP +1 이 쓰러지기 전에 보이는지(0.1초마다 bk_kill_NN)
+        //   ② 격파한 적이 그 차례를 쉬는지 — 불효자손(-foes …magicfork)이면 격파 뒤 스킬을 내 심통을 채워도 못 움직이고, 적 차례에도 쉰다(bk_foeturn_NN) · 정보 창
+        IEnumerator BreakKillShots()
+        {
+            var cb = d.Battle as CoreBattle;
+            if (cb == null) { Application.Quit(); yield break; }
+            yield return WaitInput();
+            var es = d.Battle.Snapshot.Enemies;
+            int B = es.FindIndex(x => !x.Dead && x.Name.Contains("불효자손"));
+            int A = -1;
+            for (int i = 0; i < es.Count && A < 0; i++) if (i != B && !es[i].Dead && es[i].ToughMaxV > 0) A = i;
+            if (A >= 0)
+            {
+                int pa = AttackBy(true, A); if (pa < 0) pa = AttackBy(false, A);
+                cb.AuditSetFoe(A, 1, 0.01);
+                d.RefreshAll();
+                yield return Wait(0.5f);
+                Shot("bk_before", 0);
+                StartCoroutine(Burst("bk_kill", 0.12f, 45));
+                yield return Tap(pa, A);
+                yield return Wait(0.3f);
+                Shot("bk_after", 0);
+            }
+            if (B < 0) B = d.FirstAliveEnemy();
+            if (B >= 0 && !d.Over)
+            {
+                int pb = AttackBy(true, B); if (pb < 0) pb = AttackBy(false, B);
+                cb.AuditSetFoe(B, 5000, 0.01);
+                d.RefreshAll();
+                yield return Wait(0.3f);
+                yield return Tap(pb, B);
+                yield return Wait(0.9f);
+                Shot("bk_broken", 0);
+                // 공격이 아닌 카드 — 불효자손 심통(4 면 즉시 내리찍기)을 채운다. 격파 중이면 다음 차례로 미뤄져야 한다
+                for (int k = 0; k < 5 && !d.Over; k++)
+                {
+                    yield return WaitInput();
+                    int s = -1;
+                    for (int i = 0; i < d.Hand.Cards.Count && s < 0; i++) if (d.Battle.CanPlay(i, out _) && d.Hand.Cards[i].Info.Type != CardType.Attack) s = i;
+                    if (s < 0) break;
+                    yield return Tap(s, B);
+                }
+                yield return Wait(0.5f);
+                Shot("bk_after_skills", 0);
+                yield return InfoShot(B, "bk_info_broken");
+                yield return MoveTo(new Vector2(0, -6), 0.2f);
+                StartCoroutine(Burst("bk_foeturn", 0.25f, 24));
+                yield return EndTurn();
+                yield return Wait(0.6f);
+                Shot("bk_next_turn", 0);
+                yield return InfoShot(B, "bk_info_next");
+            }
+            yield return Wait(0.5f);
+            Debug.Log("[Demo] 끝 — " + shotNo + "장");
+            Application.Quit();
+        }
+
+        IEnumerator Burst(string name, float step, int n)
+        {
+            for (int k = 0; k < n; k++) { cap.Still(name + "_" + k.ToString("D2")); yield return Wait(step); }
+        }
+
         // -toughshots: 강인도 막대만 짧게 — 약점 아닌 카드 겨눔(1/3 예고) · 부분 칸 · 약점 카드 겨눔(아이콘 빛) · 상세 창 · 격파 · 격파 상태 · 일어남
         int AttackBy(bool weak, int target)
         {
@@ -710,6 +786,156 @@ namespace Bolzena.Demo
         {
             for (int i = 0; i < d.Hand.Cards.Count; i++) if (d.Battle.CanPlay(i, out _)) return true;
             return false;
+        }
+
+        static bool Has(string a) => System.Array.IndexOf(System.Environment.GetCommandLineArgs(), a) >= 0;
+
+        // -pickframes — 신탁을 고른 순간부터 2.2초 동안 화면 시각 0.1초마다 한 장(pick_NN_밀리초) — 메모리에 모았다가 끝에 저장(찍는 동안 멈칫이 없게)
+        IEnumerator PickFrames()
+        {
+            var shots = new List<(Texture2D tex, float at)>();
+            float t0 = Time.unscaledTime, next = 0;
+            while (Time.unscaledTime - t0 < 2.2f)
+            {
+                yield return new WaitForEndOfFrame();
+                float e = Time.unscaledTime - t0;
+                if (e >= next) { shots.Add((ScreenCapture.CaptureScreenshotAsTexture(), e)); next += 0.1f; }
+                yield return null;
+            }
+            Directory.CreateDirectory(cap.Dir);
+            for (int i = 0; i < shots.Count; i++)
+            {
+                File.WriteAllBytes(Path.Combine(cap.Dir, $"pick_{i:D2}_{Mathf.RoundToInt(shots[i].at * 1000):D4}ms.png"), shots[i].tex.EncodeToPNG());
+                Destroy(shots[i].tex);
+            }
+            Debug.Log($"[PickFrame] {shots.Count}장");
+        }
+
+        // -blessshots(축복 연출 캡처 · -forcebless 와 함께) — 빛나는 카드를 내어 신탁 창(축복 얹힌 첫 선택지)을 고르고,
+        // 축복 받은 카드가 손에 다시 들어오면 찍는다(손패 · 올려 둔 모습). 그 밖의 시범은 하지 않는다.
+        IEnumerator BlessShots()
+        {
+            yield return Wait(0.5f);
+            // 강화 카드는 내면 판에 남아 손에 돌아오지 않는다 — 공격 · 스킬 가운데 빛나는 카드
+            System.Predicate<CardView> ok = c => c.Info.Epiphany && c.Info.Type != CardType.Power;
+            int g = d.Hand.Cards.FindIndex(ok);
+            for (int k = 0; g < 0 && k < 5 && !d.Over; k++) { yield return EndTurn(); yield return WaitInput(); yield return Wait(0.6f); g = d.Hand.Cards.FindIndex(ok); }
+            if (g < 0) { Debug.LogError("[Demo] 빛나는 카드가 손에 안 들어옴"); Application.Quit(5); yield break; }
+            Shot("epiphany_in_hand", 0);
+            yield return Wait(0.1f);
+            yield return Drag(g, d.FirstAliveEnemy());
+            yield return Wait(0.25f);
+            Shot("after_pick_fly", 0);
+            yield return Wait(0.75f);
+            Shot("after_pick_field", 0);
+            int b = -1;
+            for (int k = 0; k < 8 && !d.Over; k++)
+            {
+                yield return WaitInput();
+                yield return Wait(0.8f);
+                b = d.Hand.Cards.FindIndex(c => !string.IsNullOrEmpty(c.Info.MarkBless));
+                if (b >= 0) break;
+                yield return EndTurn();
+            }
+            if (b < 0) { Debug.LogError("[Demo] 축복 카드가 손에 다시 안 들어옴"); Application.Quit(6); yield break; }
+            Debug.Log($"[Demo] 축복 카드 손에 — {d.Hand.Cards[b].Info.Name} · {d.Hand.Cards[b].Info.MarkBless}");
+            Shot("bless_in_hand", 0);
+            yield return Wait(0.2f);
+            yield return MoveTo(d.Hand.Cards[b].transform.position + new Vector3(0, -0.3f, 0), 0.3f);
+            yield return Wait(1.0f);
+            Shot("bless_in_hand_hover", 0);
+            yield return Wait(0.3f);
+            // 길게 눌러 확대(손가락) — 확대 카드 · 낱말 판에서 축복 표식 · 이름을 본다
+            PointerInput.SimTouch = true;
+            yield return MoveTo(d.Hand.Cards[b].transform.position + new Vector3(0, -0.3f, 0), 0.2f);
+            PointerInput.SimHeld = true;
+            yield return Wait(0.7f);
+            Shot("bless_in_hand_zoom", 0);
+            yield return Wait(0.2f);
+            PointerInput.SimHeld = false;
+            PointerInput.SimTouch = false;
+            yield return Wait(0.5f);
+            // 신탁만 · 축복까지 · 아무것도 없는 카드 나란히
+            {
+                var src = d.Hand.Cards[b].Info;
+                var mc = typeof(CardInfo).GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var plain = (CardInfo)mc.Invoke(src, null); plain.MarkBless = null; plain.MarkBlessText = null; plain.EpiphanyLabel = null; plain.CostDown = false;
+                var ora = (CardInfo)mc.Invoke(src, null); ora.MarkBless = null; ora.MarkBlessText = null; ora.EpiphanyLabel = "신탁 1";
+                var views = new System.Collections.Generic.List<CardView>();
+                int k = 0;
+                foreach (var inf in new[] { plain, ora, src })
+                {
+                    var cv2 = CardView.Create(d.UiRoot, inf);
+                    cv2.ShowDesc = true; cv2.Follow = 40f;
+                    cv2.TargetPos = new Vector3((k - 1) * 3.3f, 0.3f, 0); cv2.TargetScale = 1.5f; cv2.SetOrder(1700 + k * 10); cv2.Snap();
+                    views.Add(cv2); k++;
+                }
+                yield return Wait(0.5f);
+                Shot("marks_compare", 0);
+                yield return Wait(0.3f);
+                foreach (var v in views) Object.Destroy(v.gameObject);
+            }
+            // 겨우살이 표정 후보(Happy_1~4 · Normal · Idle_1) 나란히
+            {
+                var nd = Res.Spine("st_noone");
+                var made = new System.Collections.Generic.List<GameObject>();
+                string[] an = { "Happy_1", "Happy_2", "Happy_3", "Happy_4", "Normal", "Idle_1" };
+                for (int q = 0; q < an.Length; q++)
+                {
+                    if (nd == null || nd.GetSkeletonData(true).FindAnimation(an[q]) == null) continue;
+                    var sa = Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(nd);
+                    sa.transform.SetParent(d.UiRoot, false);
+                    sa.AnimationState.SetAnimation(0, an[q], true); sa.Update(0.3f); sa.LateUpdate();
+                    var mr = sa.GetComponent<MeshRenderer>(); mr.sortingOrder = 1700;
+                    float k = 3.2f / Mathf.Max(0.1f, mr.bounds.size.y);
+                    sa.transform.localScale = Vector3.one * k;
+                    sa.transform.localPosition = new Vector3((q - 2.5f) * 2.7f - mr.bounds.center.x * k, -3f - (mr.bounds.min.y - sa.transform.position.y) * k, 0);
+                    made.Add(sa.gameObject);
+                }
+                var back = Bolzena.View.Make.Box("nbg", d.UiRoot, Res.UI("white"), Vector3.zero, new Vector2(44, 16), 1690, new Color(0.1f, 0.1f, 0.12f, 1));
+                yield return Wait(0.4f);
+                Shot("noone_faces", 0);
+                yield return Wait(0.3f);
+                foreach (var g0 in made) Object.Destroy(g0);
+                Object.Destroy(back.gameObject);
+            }
+            // 축복 카드를 쓰고 버린 더미 창에서도 축복이 남는지
+            string bid = d.Hand.Cards[b].Info.Id; var bInfo = d.Hand.Cards[b].Info;
+            if (d.Battle.CanPlay(b, out _))
+            {
+                yield return Drag(b, d.FirstAliveEnemy());
+                yield return Wait(1.2f);
+                d.OpenPile(1);
+                yield return Wait(0.6f);
+                Shot("pile_discard", 0);
+                var pcv = Modal.Open != null ? Modal.Open.GetComponentsInChildren<CardView>() : new CardView[0];
+                if (pcv.Length > 0) { yield return Click(pcv[0].transform.position, 0.2f); yield return Wait(0.7f); Shot("pile_card_click", 0); yield return Wait(0.2f); }
+                Modal.Open?.Close();
+                yield return Wait(0.3f);
+            }
+            // 두 번째 신탁 창 — 손의 카드 하나에 빛을 얹어 진짜로 한 번 더 열어 잔상이 없는지 본다
+            {
+                var cb = d.Battle as CoreBattle;
+                bool lit = false;
+                for (int k = 0; k < 4 && !lit; k++)
+                {
+                    if (cb != null && cb.DebugGlow()) { yield return EndTurn(); yield return WaitInput(); yield return Wait(0.6f); }
+                    else break;
+                    lit = d.Hand.Cards.Exists(c => c.Info.Epiphany && c.Info.Type != CardType.Power);
+                }
+                int g2 = d.Hand.Cards.FindIndex(c => c.Info.Epiphany && c.Info.Type != CardType.Power);
+                Debug.Log("[Demo] 두 번째 신탁 카드 " + g2 + (g2 >= 0 ? " " + d.Hand.Cards[g2].Info.Name + " 낼수있음=" + d.Battle.CanPlay(g2, out _) : ""));
+                if (g2 >= 0 && d.Battle.CanPlay(g2, out _))
+                {
+                    yield return Drag(g2, d.FirstAliveEnemy());
+                    yield return Wait(1.3f);
+                    Shot("second_window", 0);
+                    yield return Wait(2.5f);
+                    Shot("second_after", 0);
+                }
+            }
+            Debug.Log("[Demo] 끝");
+            Application.Quit(0);
         }
 
         IEnumerator Watchdog()

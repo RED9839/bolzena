@@ -14,12 +14,12 @@
       "blurb": "규칙과 통제를 혐오하는 무정부주의 락커. 적이 쌓아 둔 기세를 기타 소리로 걷어 내고, 파티가 공격과 스킬을 번갈아 낼 때마다 반항심이 끓어올라 가득 차면 모두가 같이 치며 적의 기세가 꺾입니다.",
       "keyword": {
         "name": "반항",
-        "desc": "공격 · 스킬을 번갈아 내는 박자",
+        "desc": "공격과 스킬을 뒤섞는 엇박자",
         "carrier": "self",
         "cap": 4,
         "rules": [
           {
-            "name": "나락도 락",
+            "name": "소음 공해",
             "when": {
               "on": "stackReach",
               "id": "반항",
@@ -33,14 +33,13 @@
               },
               {
                 "k": "status",
-                "id": "협공",
-                "v": 1
-              },
-              {
-                "k": "status",
                 "id": "약화",
                 "v": 1,
                 "target": "allEnemies"
+              },
+              {
+                "k": "dispel",
+                "n": 1
               }
             ]
           }
@@ -82,6 +81,19 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "역조공 이벤트!",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
         }
       ],
       "ult": {
@@ -110,7 +122,7 @@
         "페스타_s1",
         "페스타_s1",
         "페스타_s2",
-        "페스타_s2"
+        "페스타_u3"
       ]
     }
   ],
@@ -148,172 +160,166 @@
       "name": "락 앤 피스!",
       "hero": "페스타",
       "unique": true,
-      "signature": true,
-      "cost": 3,
+      "cost": 1,
       "type": "공격",
-      "tags": [
-        "분쇄"
-      ],
       "fx": [
         {
-          "k": "dispel",
-          "v": 1,
+          "k": "dmg",
+          "ratio": 0.5,
           "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "반항"
         },
         {
           "k": "dmg",
-          "ratio": 1.4,
-          "base": "def",
+          "ratio": 0.2,
           "target": "allEnemies"
         },
         {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
-          "target": "allEnemies"
+          "k": "spend",
+          "id": "반항",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "사운드 체크",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "앰프 최대",
           "fx": [
             {
-              "k": "dispel",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.65,
               "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "반항"
             },
             {
               "k": "dmg",
-              "ratio": 1.82,
-              "base": "def",
+              "ratio": 0.25,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "spend",
+              "id": "반항",
+              "all": true
             }
           ]
         },
         {
-          "name": "고요한 달은 흑역사",
+          "name": "앙코르 없는 공연",
           "cost": 2,
-          "tags": [
-            "분쇄"
-          ],
           "fx": [
             {
-              "k": "dispel",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.95,
               "target": "allEnemies"
             },
             {
+              "k": "perStack",
+              "id": "반항"
+            },
+            {
               "k": "dmg",
-              "ratio": 1.4,
-              "base": "def",
+              "ratio": 0.38,
               "target": "allEnemies"
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "기세 꺾기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dispel",
+              "n": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "반항",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.48,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "심사석 퇴장",
-          "tags": [
-            "분쇄",
-            "보존"
-          ],
+          "name": "세트리스트",
           "fx": [
             {
-              "k": "dispel",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.5,
               "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "반항"
             },
             {
               "k": "dmg",
-              "ratio": 1.85,
-              "base": "def",
+              "ratio": 0.2,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약화",
+              "k": "draw",
               "v": 1,
-              "target": "allEnemies"
+              "who": "other"
             }
           ]
         },
         {
-          "name": "앙코르 없음",
+          "name": "기타 부수기",
           "tags": [
-            "분쇄"
+            "소멸"
           ],
           "fx": [
             {
-              "k": "dispel",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 1.1,
               "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "반항"
             },
             {
               "k": "dmg",
-              "ratio": 2.03,
-              "base": "def",
+              "ratio": 0.45,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "일부러 기괴하게",
-          "tags": [
-            "분쇄",
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dispel",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.85,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "spend",
+              "id": "반항",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "사운드 체크",
+          "name": "한정판 앰프",
           "kind": "power"
         },
         {
-          "name": "깡통 들고",
-          "kind": "ap"
+          "name": "기타 케이스",
+          "kind": "draw"
         },
         {
-          "name": "브랜디 한 잔",
+          "name": "엇박자",
           "fx": [
             {
               "k": "stack",
@@ -329,139 +335,112 @@
       "name": "노숙 락커",
       "hero": "페스타",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "반격",
-          "v": 2
+          "k": "heal",
+          "ratio": 0.95
         },
         {
           "k": "stack",
           "id": "반항",
-          "v": 2
-        },
-        {
-          "k": "shield",
-          "ratio": 1.5
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "자리 펴기",
+          "name": "역 앞 노숙",
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.25
             },
             {
               "k": "stack",
               "id": "반항",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 2.59
+              "v": 1
             }
           ]
         },
         {
-          "name": "역 광장 점거",
-          "cost": 1,
+          "name": "깡통 한 모금",
+          "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.65
             },
             {
               "k": "stack",
               "id": "반항",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 1.5
+              "v": 1
             }
           ]
         },
         {
-          "name": "모두의 무대",
-          "tags": [
-            "보존"
-          ],
+          "name": "깡통 모금",
           "fx": [
             {
+              "k": "heal",
+              "ratio": 0.9
+            },
+            {
               "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "반항",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 2.18
+              "id": "협공",
+              "v": 1
             }
           ]
         },
         {
-          "name": "체제 혐오",
+          "name": "배달 끼니",
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.9
             },
             {
               "k": "stack",
               "id": "반항",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 2.63
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "깡통 들고",
-          "tags": [
-            "신속"
-          ],
+          "name": "부자인데 궁핍",
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.3
             },
             {
               "k": "stack",
               "id": "반항",
               "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 2.18
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "앙코르 없음",
-          "kind": "guard"
+          "name": "브랜디",
+          "kind": "heal"
         },
         {
-          "name": "볼륨 업",
-          "kind": "draw"
+          "name": "침낭",
+          "kind": "cost"
         },
         {
-          "name": "체제 혐오",
+          "name": "자유의 노래",
           "fx": [
             {
               "k": "stack",
@@ -479,78 +458,103 @@
       "unique": true,
       "cost": 1,
       "type": "스킬",
-      "tags": [
-        "연계"
-      ],
       "fx": [
-        {
-          "k": "atkMod",
-          "v": 0.15,
-          "target": "oneAlly",
-          "run": true
-        },
         {
           "k": "stack",
           "id": "반항",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "협공",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "깡통 앞에 두기",
-          "tags": [
-            "연계"
-          ],
+          "name": "길거리 대공연",
           "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.2,
-              "target": "oneAlly",
-              "run": true
-            },
             {
               "k": "stack",
               "id": "반항",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
               "v": 2
             }
           ]
         },
         {
-          "name": "길거리 합주",
-          "cost": 0,
-          "tags": [
-            "연계"
-          ],
+          "name": "매일 버스킹",
+          "power": true,
           "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.15,
-              "target": "oneAlly",
-              "run": true
-            },
             {
               "k": "stack",
               "id": "반항",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "관객 끌어들이기",
-          "tags": [
-            "연계"
-          ],
+          "name": "관객 호응",
           "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.15,
-              "target": "oneAlly",
-              "run": true
-            },
             {
               "k": "stack",
               "id": "반항",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "협공",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "거리 공연 수익",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.34
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "반항",
+              "n": 3
             },
             {
               "k": "draw",
@@ -559,41 +563,20 @@
           ]
         },
         {
-          "name": "볼륨 업",
-          "tags": [
-            "연계",
-            "보존"
-          ],
+          "name": "흥이 오르면",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.18,
-              "target": "oneAlly",
-              "run": true
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "stack",
               "id": "반항",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "각자 다른 꿈",
-          "tags": [
-            "연계",
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.18,
-              "target": "oneAlly",
-              "run": true
+              "v": 3
             },
             {
-              "k": "stack",
-              "id": "반항",
+              "k": "status",
+              "id": "협공",
               "v": 2
             }
           ]
@@ -601,19 +584,19 @@
       ],
       "blesses": [
         {
-          "name": "깡통 들고",
-          "kind": "guard"
+          "name": "즉흥 연주",
+          "kind": "cost"
         },
         {
-          "name": "브랜디 한 잔",
-          "kind": "draw"
+          "name": "앰프 연결",
+          "kind": "ap"
         },
         {
-          "name": "사운드 체크",
+          "name": "떼창 유도",
           "fx": [
             {
-              "k": "stack",
-              "id": "반항",
+              "k": "status",
+              "id": "협공",
               "v": 1
             }
           ]
@@ -625,17 +608,12 @@
       "name": "갓 오브 뮤직!",
       "hero": "페스타",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "강화",
       "fx": [
         {
-          "k": "defMod",
-          "v": 0.15,
-          "run": true,
-          "target": "self"
-        },
-        {
-          "k": "draw",
+          "k": "stack",
+          "id": "반항",
           "v": 1
         },
         {
@@ -643,12 +621,14 @@
           "rules": [
             {
               "when": {
-                "on": "turnStart"
+                "on": "stackReach",
+                "id": "반항",
+                "n": 4
               },
               "fx": [
                 {
-                  "k": "stack",
-                  "id": "반항",
+                  "k": "status",
+                  "id": "협공",
                   "v": 1
                 }
               ]
@@ -658,16 +638,11 @@
       ],
       "oracles": [
         {
-          "name": "무대 입장",
+          "name": "한정판 기타",
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
+              "k": "stack",
+              "id": "반항",
               "v": 1
             },
             {
@@ -675,13 +650,20 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "stackReach",
+                    "id": "반항",
+                    "n": 4
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "반항",
-                      "v": 2
+                      "k": "status",
+                      "id": "협공",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.35,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -690,30 +672,22 @@
           ]
         },
         {
-          "name": "무대 난입",
-          "cost": 1,
+          "name": "무대 뒤 조율",
+          "cost": 0,
           "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "defMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
-            },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "stackReach",
+                    "id": "반항",
+                    "n": 4
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "반항",
+                      "k": "status",
+                      "id": "협공",
                       "v": 1
                     }
                   ]
@@ -723,65 +697,63 @@
           ]
         },
         {
-          "name": "관객과 하나",
-          "tags": [
-            "보존"
-          ],
+          "name": "역조공 이벤트",
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "heal",
+              "ratio": 0.4
             },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "반항",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "협공",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "앨범 재발매",
+          "fx": [
             {
               "k": "stack",
               "id": "반항",
               "v": 2
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "반항",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "한계 없는 볼륨",
-          "fx": [
-            {
-              "k": "defMod",
-              "v": 0.25,
-              "run": true,
-              "target": "self"
-            },
-            {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "other"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "stackReach",
+                    "id": "반항",
+                    "n": 4
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "반항",
+                      "k": "status",
+                      "id": "협공",
                       "v": 1
                     }
                   ]
@@ -791,33 +763,36 @@
           ]
         },
         {
-          "name": "브랜디 한 잔",
-          "tags": [
-            "신속"
-          ],
+          "name": "목 쉬도록",
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "payHpPct",
+              "v": 0.05
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "반항",
+              "v": 3
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "stackReach",
+                    "id": "반항",
+                    "n": 4
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "반항",
-                      "v": 2
+                      "k": "status",
+                      "id": "협공",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.2,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -828,15 +803,15 @@
       ],
       "blesses": [
         {
-          "name": "볼륨 업",
+          "name": "스포트라이트",
           "kind": "atkUp"
         },
         {
-          "name": "체제 혐오",
+          "name": "저작권료",
           "kind": "draw"
         },
         {
-          "name": "앙코르 없음",
+          "name": "떼창",
           "fx": [
             {
               "k": "stack",

@@ -14,10 +14,37 @@
       "blurb": "얼음 대륙 글레이시아에서 동생 델리아와 함께 표류해 온 황제펭귄 탐험가.",
       "keyword": {
         "name": "깃발",
-        "desc": "공격으로 꽂는 깃발",
+        "desc": "먼저 찜한 적에게 꽂는 탐험 깃발",
         "carrier": "enemy",
         "cap": 3,
-        "weakens": true
+        "weakens": true,
+        "rules": [
+          {
+            "name": "동상",
+            "when": {
+              "on": "stackReach",
+              "id": "깃발",
+              "n": 3
+            },
+            "limit": {
+              "per": "fight",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "기절",
+                "v": 1,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "spend",
+                "id": "깃발",
+                "all": true
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
@@ -34,33 +61,8 @@
             {
               "k": "stack",
               "id": "깃발",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "먼저 찜한 쪽이 임자",
-          "when": {
-            "on": "kill"
-          },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "깃발"
-            }
-          ],
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "ap",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -93,7 +95,7 @@
         "그윈_s1",
         "그윈_s1",
         "그윈_s2",
-        "그윈_s2"
+        "그윈_u1"
       ]
     }
   ],
@@ -130,22 +132,18 @@
       "name": "스노우포그",
       "hero": "그윈",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "shield",
-          "ratio": 2.4
-        },
-        {
-          "k": "status",
-          "id": "약화",
+          "k": "stack",
+          "id": "깃발",
           "v": 1,
           "target": "allEnemies"
         },
         {
-          "k": "stack",
-          "id": "깃발",
+          "k": "status",
+          "id": "약화",
           "v": 1,
           "target": "allEnemies"
         }
@@ -155,41 +153,39 @@
           "name": "짙은 눈안개",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 3.0
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "깃발",
-              "v": 1,
+              "k": "status",
+              "id": "고통",
+              "v": 3,
               "target": "allEnemies"
             }
           ]
         },
         {
           "name": "옅은 안개",
-          "cost": 1,
+          "cost": 0,
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.7
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
             {
               "k": "stack",
               "id": "깃발",
               "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
               "target": "allEnemies"
             }
           ]
@@ -198,20 +194,16 @@
           "name": "깃발 행렬",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 2.5
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
               "k": "stack",
               "id": "깃발",
               "v": 2,
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
@@ -219,13 +211,39 @@
           "name": "눈 속 피난처",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
               "k": "shield",
-              "ratio": 3.2
+              "ratio": 1.55
+            }
+          ]
+        },
+        {
+          "name": "서늘한 바람",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "when",
+              "on": "draw"
             },
             {
               "k": "stack",
@@ -234,43 +252,24 @@
               "target": "allEnemies"
             }
           ]
-        },
-        {
-          "name": "극지 한파",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 4.4
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "깃발",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "펭귄 깃털 이불",
-          "kind": "guard"
+          "name": "탐험가의 감",
+          "kind": "draw"
         },
         {
-          "name": "단단한 부리",
-          "kind": "defUp"
+          "name": "빵주 일등항해사",
+          "kind": "ap"
         },
         {
-          "name": "눈 속에 묻어 두기",
-          "tags": [
-            "보존"
+          "name": "추위를 모르는 펭귄",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
           ]
         }
       ]
@@ -285,13 +284,19 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy"
+          "ratio": 0.5,
+          "base": "def",
+          "target": "allEnemies"
         },
         {
           "k": "stack",
           "id": "깃발",
-          "v": 1
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.6
         }
       ],
       "oracles": [
@@ -300,89 +305,112 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy"
+              "ratio": 0.65,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "깃발",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
             }
           ]
         },
         {
-          "name": "빈 가방 휘두르기",
-          "cost": 0,
+          "name": "가방째 던지기",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy"
+              "ratio": 1.3,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "지도에 표시",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "깃발",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "깃발",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "깃발 두 자루",
+          "name": "앵무 대가리!",
           "fx": [
             {
               "k": "dmg",
               "ratio": 1.1,
+              "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "짐 비우기",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "깃발",
               "v": 2,
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "가방 빙글빙글",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "깃발",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "얼음덩이 한가득",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "깃발",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         }
@@ -393,19 +421,14 @@
           "kind": "power"
         },
         {
-          "name": "깃발 노리기",
-          "kind": "weakSpot"
+          "name": "먼 곳까지 휘두르기",
+          "tags": [
+            "개전"
+          ]
         },
         {
-          "name": "깃발 하나 더",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "깃발",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
+          "name": "빙판 위 미끄럼",
+          "kind": "frost"
         }
       ]
     },
@@ -419,11 +442,7 @@
       "fx": [
         {
           "k": "status",
-          "id": "근면",
-          "v": 1
-        },
-        {
-          "k": "draw",
+          "id": "사기",
           "v": 1
         },
         {
@@ -438,7 +457,7 @@
                   "k": "stack",
                   "id": "깃발",
                   "v": 1,
-                  "target": "oneEnemy"
+                  "target": "topEnemy"
                 }
               ]
             }
@@ -447,15 +466,11 @@
       ],
       "oracles": [
         {
-          "name": "보물 지도",
+          "name": "출항 준비",
           "fx": [
             {
               "k": "status",
-              "id": "근면",
-              "v": 1
-            },
-            {
-              "k": "draw",
+              "id": "사기",
               "v": 1
             },
             {
@@ -470,7 +485,7 @@
                       "k": "stack",
                       "id": "깃발",
                       "v": 2,
-                      "target": "allEnemies"
+                      "target": "topEnemy"
                     }
                   ]
                 }
@@ -483,7 +498,8 @@
           "cost": 0,
           "fx": [
             {
-              "k": "draw",
+              "k": "status",
+              "id": "사기",
               "v": 1
             },
             {
@@ -498,7 +514,7 @@
                       "k": "stack",
                       "id": "깃발",
                       "v": 1,
-                      "target": "oneEnemy"
+                      "target": "topEnemy"
                     }
                   ]
                 }
@@ -507,16 +523,22 @@
           ]
         },
         {
-          "name": "일등 깃발",
+          "name": "정복 기념사진",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "status",
-              "id": "근면",
-              "v": 2
+              "k": "stack",
+              "id": "깃발",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2,
+              "who": "self",
+              "type": "공격"
             },
             {
               "k": "power",
@@ -530,7 +552,7 @@
                       "k": "stack",
                       "id": "깃발",
                       "v": 1,
-                      "target": "oneEnemy"
+                      "target": "topEnemy"
                     }
                   ]
                 }
@@ -543,26 +565,26 @@
           "fx": [
             {
               "k": "status",
-              "id": "근면",
+              "id": "사기",
               "v": 1
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "stackReach",
+                    "id": "깃발",
+                    "n": 3
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "깃발",
-                      "v": 1,
-                      "target": "oneEnemy"
+                      "k": "shield",
+                      "ratio": 1.3
                     }
                   ]
                 }
@@ -571,50 +593,29 @@
           ]
         },
         {
-          "name": "찜해 둔 길",
-          "tags": [
-            "축복"
-          ],
+          "name": "남이 가꾼 길은 싫어",
           "fx": [
             {
               "k": "status",
-              "id": "근면",
-              "v": 1
+              "id": "사기",
+              "v": 2
             },
             {
               "k": "stack",
               "id": "깃발",
               "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "깃발",
-                      "v": 2,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "모험 준비 끝",
-          "kind": "ap"
+          "name": "레전드 나침반",
+          "kind": "atkUp"
         },
         {
-          "name": "펼친 탐험 지도",
+          "name": "탐험 준비 끝",
           "kind": "draw"
         },
         {
@@ -635,39 +636,77 @@
       "name": "깃발 꽂고 인증샷",
       "hero": "그윈",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "stack",
+          "k": "perStack",
+          "id": "깃발"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "깃발"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.4
+        },
+        {
+          "k": "spend",
           "id": "깃발",
-          "v": 2,
-          "target": "allEnemies"
-        },
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
-        },
-        {
-          "k": "draw",
-          "v": 1
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "깃발 숲",
+          "name": "모두 다 나오게",
           "fx": [
             {
-              "k": "stack",
-              "id": "깃발",
-              "v": 3,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "깃발"
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "깃발"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "spend",
+              "id": "깃발",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "극지 탐험 기록",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "깃발"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "깃발",
+              "all": true
             },
             {
               "k": "draw",
@@ -676,43 +715,72 @@
           ]
         },
         {
-          "name": "셀카 한 장",
-          "cost": 1,
+          "name": "정복 앨범",
+          "power": true,
           "fx": [
             {
-              "k": "stack",
+              "k": "perStack",
+              "id": "깃발"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit",
+                    "weak": true,
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.35
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "먼저 찜한 적",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "깃발"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "깃발"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "ifStack",
               "id": "깃발",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "기절",
               "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "정상 정복",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "깃발",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "target": "oneEnemy"
             }
           ]
         },
@@ -720,57 +788,48 @@
           "name": "인증샷 공유",
           "fx": [
             {
-              "k": "stack",
-              "id": "깃발",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "깃발"
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
             },
             {
-              "k": "ap",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "극지 탐험 기록",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "깃발",
-              "v": 3,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "깃발"
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 2
+              "k": "shield",
+              "ratio": 0.4
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1,
+              "who": "other"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "브이 포즈",
-          "kind": "ap"
+          "name": "동생을 등 뒤로",
+          "kind": "guard"
         },
         {
-          "name": "연속 촬영",
-          "kind": "draw"
+          "name": "극지 귀가길",
+          "kind": "cost"
         },
         {
-          "name": "사진첩에 꽂기",
-          "tags": [
-            "보존"
+          "name": "한 장 더 찰칵",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "깃발",
+              "v": 1,
+              "target": "oneEnemy"
+            }
           ]
         }
       ]

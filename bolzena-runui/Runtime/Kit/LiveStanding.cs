@@ -26,8 +26,8 @@ namespace Bolzena.RunUI
         /// <summary>한 번 구워 봤는가(그림이 없으면 굽기 실패).</summary>
         public bool Tried => done;
         float next;
-        static int madeFrame = -1, madeCount;
-        const int PerFrame = 2;
+        static int madeFrame = -1, madeCount, preCount;
+        const int PerFrame = 2, PrePerFrame = 16;
 
         void Start()
         {
@@ -59,9 +59,15 @@ namespace Bolzena.RunUI
             if (next > 0) return;
             next = 0.1f;
             if (!Visible()) return;
-            if (madeFrame != Time.frameCount) { madeFrame = Time.frameCount; madeCount = 0; }
-            if (madeCount >= PerFrame || !StandingSnap.CanBakeNow) { next = 0; return; }   // 한 프레임에 둘까지 · 정리(UnloadUnusedAssets) 도는 동안은 쉰다
-            madeCount++;
+            if (madeFrame != Time.frameCount) { madeFrame = Time.frameCount; madeCount = 0; preCount = 0; }
+            // 미리 구운 그림(StandingSnap — 작은 그림 하나 읽기)은 굽기 한도와 따로 한 프레임 PrePerFrame 장까지
+            bool pre = StandingSnap.HasPrebaked(Art, W / H, Frac, List);
+            if (pre) { if (preCount >= PrePerFrame) { next = 0; return; } preCount++; }
+            else
+            {
+                if (madeCount >= PerFrame || !StandingSnap.CanBakeNow) { next = 0; return; }   // 한 프레임에 둘까지 · 정리(UnloadUnusedAssets) 도는 동안은 쉰다
+                madeCount++;
+            }
             done = true;
             var cv = GetComponentInParent<Canvas>();
             float sf = cv != null ? cv.rootCanvas.scaleFactor : 1f;

@@ -137,8 +137,8 @@ namespace Bolzena.Core
             if (id == DISC_PER) return ctx.Discarded;
             if (id == APLEFT_PER) return Ap;
             { int kc = KitCount(ctx, id); if (kc >= 0) return kc; }
-            if (id.StartsWith(TAG_PER)) { var tg = id.Substring(TAG_PER.Length); return Hand.Count(h => HasTagB(h, tg)); }
-            if (id.StartsWith(PAID_PER)) return PaidHp / System.Math.Max(1, int.Parse(id.Substring(PAID_PER.Length)));
+            if (id.StartsWith(TAG_PER, StringComparison.Ordinal)) { var tg = id.Substring(TAG_PER.Length); return Hand.Count(h => HasTagB(h, tg)); }
+            if (id.StartsWith(PAID_PER, StringComparison.Ordinal)) return PaidHp / System.Math.Max(1, int.Parse(id.Substring(PAID_PER.Length)));
             if (id == DEBUFF_PER) { var t = ctx.Holder != null && ctx.Holder.Side == Side.Enemy ? ctx.Holder : Resolve(ctx, "oneEnemy").FirstOrDefault(); return t != null ? DebuffKinds(t) : 0; }
             Kw.TryGetValue(id, out var kw);
             if (kw != null && kw.Carrier == "enemy")
@@ -267,7 +267,7 @@ namespace Bolzena.Core
                             if (f.From == null) { ctx.TransformTo = f.Id; break; }
                             int cnt = 0;
                             for (int i = 0; i < Hand.Count && cnt < f.NOr1; i++)
-                                if (f.From == "hand" || f.From.StartsWith("@") ? FxMatch(f.From.StartsWith("@") ? new Fx { Type = f.From.Substring(1) } : f, Hand[i], owner) && GameData.BaseId(Hand[i]) != f.Id : GameData.BaseId(Hand[i]) == f.From)
+                                if (f.From == "hand" || f.From.StartsWith("@", StringComparison.Ordinal) ? FxMatch(f.From.StartsWith("@", StringComparison.Ordinal) ? new Fx { Type = f.From.Substring(1) } : f, Hand[i], owner) && GameData.BaseId(Hand[i]) != f.Id : GameData.BaseId(Hand[i]) == f.From)
                                 {
                                     var into = f.Id + GameData.PLAIN;
                                     CardCue(Hand[i], "hand", "gone", "transform"); Hand[i] = into; CardCue(into, "new", "hand", "transform"); cnt++;
@@ -343,19 +343,15 @@ namespace Bolzena.Core
                                         continue;
                                     }
                                     int v = f.Fixed ? Math.Max(1, Num.Round(AtkOf(owner) * f.Ratio * k2)) : HitAmount(owner, f.Ratio * k2 + (ctx.Card ? Morale() : 0), boost, crit, f.Base);
-                                    Hurt(t, v, new HurtOpts { From = owner, Crit = !f.Fixed && crit, Tags = ctx.HitTags, Card = ctx.Card, Fixed = f.Fixed, Attack = ctx.Type == "공격" });
+                                    // 처치 일격도 강인도를 깎는다 — 쓰러지기 직전에 이 카드의 강인도 피해(LethalKill)
+                                    var (lf0, lt0) = (lethalFor, lethalTough);
+                                    if (ctx.Card && t.Side == Side.Enemy) { var ht = t; lethalFor = t; lethalTough = () => CardTough(owner, ht, ctx, dTarget, true); }
+                                    try { Hurt(t, v, new HurtOpts { From = owner, Crit = !f.Fixed && crit, Tags = ctx.HitTags, Card = ctx.Card, Fixed = f.Fixed, Attack = ctx.Type == "공격" }); }
+                                    finally { (lethalFor, lethalTough) = (lf0, lt0); }
                                     if (ctx.Card && t.Side == Side.Enemy && !t.Dead)
                                     {
-                                        ctx.Toughed ??= new HashSet<Unit>();
-                                        bool once = ctx.Toughed.Add(t);
-                                        bool glow = once && ctx.Type == "공격" && GlowUse();
-                                        // 강인도 피해는 카드 한 장이 적 하나에 한 번(카제나 단위 — AP 1 당 1/3칸)
-                                        if (once)
-                                        {
-                                            bool weak = IsWeakHit(owner, t, ctx.HitTags);
-                                            if (t.ToughMax > 0 && !t.Broken) { ToughHits++; if (weak) ToughWeakHits++; }
-                                            ToughHit(t, R.ToughDmg(ctx.Cost, weak, dTarget == "allEnemies") + (glow ? R.TOUGH.Glow : 0));
-                                        }
+                                        bool once = ctx.Toughed == null || !ctx.Toughed.Contains(t);
+                                        CardTough(owner, t, ctx, dTarget, false);
                                         if (once && !t.Dead) Mark(owner, t, ctx);
                                     }
                                     else if (first) (ctx.Toughed ??= new HashSet<Unit>()).Add(t);
@@ -514,6 +510,18 @@ namespace Bolzena.Core
         }
 
         /// <summary>잔광 — 이 공격 카드(한 번의 일)에 잔광이 붙었나. 처음 물으면 1 쓴다.</summary>
+        /// <summary>카드 한 장의 강인도 피해 — 적 하나에 한 번(카제나 단위 — AP 1 당 1/3칸). dying 은 처치 일격(LethalKill). 격파했으면 true.</summary>
+        bool CardTough(Unit owner, Unit t, FxCtx ctx, string dTarget, bool dying)
+        {
+            ctx.Toughed ??= new HashSet<Unit>();
+            bool once = ctx.Toughed.Add(t);
+            bool glow = once && ctx.Type == "공격" && GlowUse();
+            if (!once) return false;
+            bool weak = IsWeakHit(owner, t, ctx.HitTags);
+            if (t.ToughMax > 0 && !t.Broken) { ToughHits++; if (weak) ToughWeakHits++; }
+            return ToughHit(t, R.ToughDmg(ctx.Cost, weak, dTarget == "allEnemies") + (glow ? R.TOUGH.Glow : 0), dying);
+        }
+
         bool GlowUse()
         {
             if (ActSeq == 0) return false;

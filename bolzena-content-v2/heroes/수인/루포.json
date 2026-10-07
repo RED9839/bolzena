@@ -14,23 +14,26 @@
       "blurb": "사료스탕스의 브레인이자 티그의 오른팔.",
       "keyword": {
         "name": "계획",
-        "desc": "다음 턴까지 노리는 계획",
+        "desc": "루포 님의 치밀한 작전",
         "carrier": "self",
-        "cap": 2,
-        "decay": 1,
+        "cap": 4,
         "rules": [
           {
-            "name": "역관광",
+            "name": "계획대로",
             "when": {
-              "on": "stackGone",
+              "on": "stackReach",
               "id": "계획",
-              "decay": true
+              "n": 4
             },
             "fx": [
               {
-                "k": "discard",
-                "v": 1,
-                "random": true
+                "k": "spend",
+                "id": "계획",
+                "all": true
+              },
+              {
+                "k": "draw",
+                "v": 2
               }
             ]
           }
@@ -38,28 +41,28 @@
       },
       "passives": [
         {
-          "name": "계획대로",
+          "name": "치밀한 계획",
           "when": {
-            "on": "break"
+            "on": "break",
+            "mine": true
           },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "계획"
-            }
-          ],
           "fx": [
             {
-              "k": "spend",
+              "k": "stack",
               "id": "계획",
-              "all": true
-            },
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "삼총사의 대모험",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
             {
-              "k": "ap",
-              "v": 2
-            },
-            {
-              "k": "draw",
+              "k": "make",
+              "id": "루포_memo",
               "v": 1
             }
           ]
@@ -84,7 +87,7 @@
       },
       "starter": [
         "루포_s1",
-        "루포_s1",
+        "루포_u2",
         "루포_s2",
         "루포_s3"
       ]
@@ -133,11 +136,34 @@
       ]
     },
     {
+      "hero": "루포",
+      "token": true,
+      "id": "루포_memo",
+      "name": "작전 쪽지",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "계획",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "루포 님이 몰래 적어 둔 다음 수입니다."
+    },
+    {
       "id": "루포_u1",
       "name": "루포류 신속베기",
       "hero": "루포",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "tags": [
         "신속"
@@ -145,20 +171,19 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.95,
+          "ratio": 0.57,
           "target": "oneEnemy",
           "hits": 3
         },
         {
-          "k": "tough",
-          "v": 1
+          "k": "status",
+          "id": "고통",
+          "v": 2,
+          "target": "oneEnemy"
         },
         {
-          "k": "ifStack",
-          "id": "계획"
-        },
-        {
-          "k": "tough",
+          "k": "stack",
+          "id": "계획",
           "v": 1
         }
       ],
@@ -171,27 +196,26 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.72,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "계획"
-            },
-            {
-              "k": "tough",
+              "k": "stack",
+              "id": "계획",
               "v": 1
             }
           ]
         },
         {
           "name": "한 박자 베기",
-          "cost": 1,
+          "cost": 0,
           "tags": [
             "신속"
           ],
@@ -200,19 +224,44 @@
               "k": "dmg",
               "ratio": 0.6,
               "target": "oneEnemy",
-              "hits": 3
+              "hits": 2
             },
             {
-              "k": "tough",
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "계획",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오의 신속베기",
+          "cost": 2,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy",
+              "hits": 5
             },
             {
-              "k": "ifStack",
-              "id": "계획"
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "make",
+              "id": "루포_memo",
+              "v": 2
             }
           ]
         },
@@ -224,73 +273,46 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
+              "ratio": 0.78,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "ifStack",
-              "id": "계획"
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
-              "k": "tough",
+              "k": "ifTune"
+            },
+            {
+              "k": "stack",
+              "id": "계획",
               "v": 2
+            }
+          ]
+        },
+        {
+          "name": "뒤통수",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "여우 회오리",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "allEnemies",
-              "hits": 3
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "계획"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "오의 신속베기",
-          "cost": 3,
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy",
-              "hits": 5
-            },
-            {
-              "k": "tough",
-              "v": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "계획"
-            },
-            {
-              "k": "tough",
               "v": 1
             }
           ]
@@ -307,7 +329,7 @@
         },
         {
           "name": "발 빠른 여우",
-          "kind": "cost"
+          "kind": "draw"
         }
       ]
     },
@@ -322,15 +344,15 @@
         {
           "k": "stack",
           "id": "계획",
-          "v": 2
+          "v": 1
+        },
+        {
+          "k": "make",
+          "id": "루포_memo",
+          "v": 1
         },
         {
           "k": "draw",
-          "v": 2
-        },
-        {
-          "k": "status",
-          "id": "피해 감소",
           "v": 1
         }
       ],
@@ -344,12 +366,12 @@
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 3
+              "k": "make",
+              "id": "루포_memo",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "draw",
               "v": 1
             }
           ]
@@ -359,58 +381,18 @@
           "cost": 0,
           "fx": [
             {
-              "k": "stack",
-              "id": "계획",
-              "v": 2
+              "k": "make",
+              "id": "루포_memo",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "치밀한 계획",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "계획",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "ap",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "약점 표시",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "계획",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2
             }
           ]
         },
         {
           "name": "비밀 작전",
-          "tags": [
-            "개전"
-          ],
           "fx": [
             {
               "k": "stack",
@@ -418,12 +400,57 @@
               "v": 2
             },
             {
+              "k": "make",
+              "id": "루포_memo",
+              "v": 1
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "보드게임 룰 조작",
+          "fx": [
+            {
+              "k": "make",
+              "id": "루포_memo",
+              "v": 1
+            },
+            {
               "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "쪽지 몽땅 쓰기",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "계획",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "make",
+              "id": "루포_memo",
               "v": 2
             }
           ]
@@ -436,11 +463,19 @@
         },
         {
           "name": "작전 개시",
-          "kind": "ap"
+          "tags": [
+            "개전"
+          ]
         },
         {
-          "name": "수풀에 숨기",
-          "kind": "defUp"
+          "name": "머리 좋아지는 약",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -451,18 +486,24 @@
       "unique": true,
       "cost": 1,
       "type": "공격",
-      "tags": [
-        "신속"
-      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.4,
+          "ratio": 1.35,
           "target": "oneEnemy"
         },
         {
-          "k": "tough",
-          "v": 1
+          "k": "perTag",
+          "id": "루포_memo"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.68,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.75
         }
       ],
       "oracles": [
@@ -474,12 +515,21 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.75,
+              "ratio": 1.65,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "perTag",
+              "id": "루포_memo"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.75
             }
           ]
         },
@@ -492,72 +542,110 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 0.75,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 0.5
+              "k": "perTag",
+              "id": "루포_memo"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.45
             }
           ]
         },
         {
           "name": "계획된 눈속임",
-          "tags": [
-            "신속"
-          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 1.38,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
+              "k": "perStack",
               "id": "계획"
             },
             {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "단검 흩뿌리기",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "뒤통수",
-          "tags": [
-            "신속",
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.65,
+              "ratio": 0.52,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
+              "k": "status",
+              "id": "회피",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "잔꾀 노트",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "루포_memo",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "계획",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "쪽지 불태우기",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "루포_memo"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "루포_memo"
             }
           ]
         }
@@ -569,7 +657,7 @@
         },
         {
           "name": "허 찌르기",
-          "kind": "frost"
+          "kind": "weakSpot"
         },
         {
           "name": "한 수 앞",
@@ -587,17 +675,22 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.8,
+          "ratio": 2.4,
           "target": "oneEnemy"
         },
         {
-          "k": "ifFoe",
-          "id": "broken"
+          "k": "perStack",
+          "id": "계획"
         },
         {
           "k": "dmg",
-          "ratio": 1.65,
+          "ratio": 0.83,
           "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "계획",
+          "all": true
         }
       ],
       "oracles": [
@@ -606,17 +699,22 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.3,
+              "ratio": 2.85,
               "target": "oneEnemy"
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
+              "k": "perStack",
+              "id": "계획"
             },
             {
               "k": "dmg",
-              "ratio": 2.0,
+              "ratio": 0.98,
               "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "계획",
+              "all": true
             }
           ]
         },
@@ -626,84 +724,111 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.05,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "계획의 마무리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
               "ratio": 1.65,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
+              "k": "perStack",
               "id": "계획"
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.6,
               "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "계획",
+              "all": true
             }
           ]
         },
         {
-          "name": "꼬리 쓸기",
+          "name": "구미호의 계략",
+          "cost": 1,
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.0,
+              "ratio": 1.67,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "계획",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.5,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "오의 여우불",
-          "cost": 3,
+          "tags": [
+            "소멸"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 4.65,
+              "ratio": 6.3,
               "target": "oneEnemy"
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
+              "k": "perTag",
+              "id": "루포_memo"
             },
             {
               "k": "dmg",
-              "ratio": 2.6,
+              "ratio": 1.8,
               "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "루포_memo"
+            }
+          ]
+        },
+        {
+          "name": "최고의 전략가",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.59,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "계획"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -718,8 +843,14 @@
           "kind": "weakSpot"
         },
         {
-          "name": "살랑이는 꼬리",
-          "kind": "cost"
+          "name": "비상 쪽지",
+          "fx": [
+            {
+              "k": "make",
+              "id": "루포_memo",
+              "v": 1
+            }
+          ]
         }
       ]
     }

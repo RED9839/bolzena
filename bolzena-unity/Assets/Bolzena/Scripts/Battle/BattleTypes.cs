@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 // 전투 규칙과 화면 사이에 오가는 자료. 규칙 쪽(CoreBattle — Bolzena.Core 어댑터)은 이것만 내보내고,
@@ -64,6 +65,7 @@ namespace Bolzena.Battle
         public Motion Motion;
         public HitKind Hit;
         public bool Epiphany;            // 신탁이 걸린 빛나는 카드
+        public bool Grace;               // 빛이 은총(내면 그 사도의 고유 카드를 손에 얻는다 — 고르기 없음)이면 true, 카드 신탁이면 false
         public string EpiphanyLabel;     // 신탁으로 바뀐 카드면 그 이름표
         public List<string> Tags = new List<string>();
         public List<Term> Terms = new List<Term>();   // 카드 글에 나오는 낱말 풀이
@@ -74,8 +76,19 @@ namespace Bolzena.Battle
         public string Nature;            // 주인 사도의 성격(카드 틀 빛깔) — 교주 카드는 넣은 사도의 성격, 주인 없는 교주 · 상태 카드는 null
         public string BlessName, BlessText;   // 신탁 선택지에 축복이 얹혔으면(15%) 그 이름 · 글
         public string MarkBless, MarkBlessText;   // 이 카드에 이미 얹힌 축복(core CardMark) — 카드 표식 · 확대 판
+        public bool CostDown;            // 신탁으로 비용이 내려간 카드(비용 숫자 연두)
         public bool Copy;                // 복제본(core CardMark.Copy) — 오른쪽 위 복제 표 「복제 — 신탁 · 축복 불가」
         public List<string> Choices;     // 두 갈래 카드 — 갈래 이름 둘(낼 때 고른다). 없으면 null
+
+        /// <summary>얕은 복사 — 목록(태그 · 낱말 풀이 · 갈래)만 새로. CoreBattle 이 담아 둔 카드 정보를 받는 쪽이 고쳐도 담긴 것은 그대로(2026-10-08 성능).</summary>
+        public CardInfo Clone()
+        {
+            var c = (CardInfo)MemberwiseClone();
+            c.Tags = new List<string>(Tags);
+            c.Terms = new List<Term>(Terms);
+            c.Choices = Choices != null ? new List<string>(Choices) : null;
+            return c;
+        }
     }
 
     // 낀 장비 한 칸 — 정보 창(전투원 탭)
@@ -152,7 +165,12 @@ namespace Bolzena.Battle
         public List<HeroState> Heroes = new List<HeroState>();
         public List<EnemyState> Enemies = new List<EnemyState>();
         public List<CardInfo> Hand = new List<CardInfo>();
-        public List<CardInfo> DrawPile = new List<CardInfo>(), DiscardPile = new List<CardInfo>(), GonePile = new List<CardInfo>();
+        // 더미(뽑을 · 버린 · 사라진) 카드 정보 — 처음 볼 때(더미 창 · 정보 창) PileSource 로 짓는다. 행동마다 다 짓지 않게(2026-10-08 성능). 장수는 위 *Count
+        List<CardInfo> drawPile, discardPile, gonePile;
+        public Func<int, List<CardInfo>> PileSource;   // 0 뽑을 · 1 버린 · 2 사라진
+        public List<CardInfo> DrawPile { get => drawPile ??= PileSource?.Invoke(0) ?? new List<CardInfo>(); set => drawPile = value; }
+        public List<CardInfo> DiscardPile { get => discardPile ??= PileSource?.Invoke(1) ?? new List<CardInfo>(); set => discardPile = value; }
+        public List<CardInfo> GonePile { get => gonePile ??= PileSource?.Invoke(2) ?? new List<CardInfo>(); set => gonePile = value; }
         public List<StatusChip> PartyChips = new List<StatusChip>();
         public bool Over, Won;
     }

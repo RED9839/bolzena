@@ -149,8 +149,9 @@ namespace Bolzena.Core
             u.Hp -= d;
             if (d > 0 || guard > 0) Cue("hurt", u, new Cue { V = d, Guard = guard, Crit = o.Crit, From = Math.Max(0, hp0), To = Math.Max(0, u.Hp) });
             if (u.Side == Side.Party && d > 0) Talk(u, "hit");
-            if (u.Hp <= 0) { Kill(u); return; }
+            if (u.Hp <= 0) { LethalKill(u); return; }
             if (u.Side == Side.Enemy && from != null && from.Side == Side.Party && !o.Dot && (d > 0 || guard > 0)) CounterEvent(u, "hit");
+            if (u.Side == Side.Enemy && d > 0 && u.Seized.Count > 0) SeizeHurt(u, d);   // 빼앗은 적에게 준 피해(지속 피해 포함)
             if (u.Side == Side.Enemy && guard > 0) Say($"{u.Name}: 실드가 {guard} 막음 (남은 실드 {u.Block + u.Shield})");
             if (u.Side == Side.Enemy && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && !u.Dead) { FoePassives("guardBreak", u); Emit("foeShieldBreak", new EmitInfo { Target = u, By = from?.Side == Side.Party ? from.Key : Acting, V = guard }); }
             if (u.Side == Side.Party && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && from != null && from.Side == Side.Enemy) Emit("shieldBreak", new EmitInfo { Who = u, From = from, Target = from, V = guard, By = ShieldBy });
@@ -202,10 +203,14 @@ namespace Bolzena.Core
         }
 
         // ── 강인도 · 격파 ──────────────────────────────────────────────
-        /// <summary>강인도를 n 깎는다. 0 이 되면 격파 — AP +1 · 그 적은 다음 차례 행동 불가 · brk 수는 끊긴다.</summary>
-        void ToughHit(Unit e, double n)
+        /// <summary>
+        /// 강인도를 n 깎는다. 0 이 되면 격파 — AP +1 · 그 적은 다음 차례 행동 불가 · brk 수는 끊긴다. 격파했으면 true.
+        /// dying — 이 일격에 쓰러지는 적(처치 일격, LethalKill). 강인도 · 격파 쪽지와 AP 는 같고, 쉬기 · 끊김 · 적의 「격파되면」 은 없다.
+        /// 「격파」 일(Emit · HandAuto)은 쓰러뜨린 뒤 LethalKill 이 낸다.
+        /// </summary>
+        bool ToughHit(Unit e, double n, bool dying = false)
         {
-            if (e == null || e.Side != Side.Enemy || e.Dead || e.Broken || !(n > 0) || e.ToughMax <= 0) return;
+            if (e == null || e.Side != Side.Enemy || e.Dead || e.Broken || !(n > 0) || e.ToughMax <= 0) return false;
             foreach (var kw in Kw.Values) if (kw.Carrier == "enemy") foreach (var p in kw.Def.Per) if (p.Stat == "tough") n += St(e, kw.Id) * p.V;   // 적 표식 1개당 받는 강인도 피해 +v
             double tt = Data.Enemy(e.Key)?.ToughTaken ?? 0;
             if (tt > 0) n *= tt;
@@ -216,18 +221,49 @@ namespace Bolzena.Core
             ToughDealt += from - e.Tough;
             HitCue(e, "tough", new Cue { From = from, To = e.Tough });
             Say($"{e.Name}: 강인도 {from:0.##} → {e.Tough:0.##} / {e.ToughMax:0.##}");
-            if (e.Tough > 0) return;
+            if (e.Tough > 0) return false;
             e.Broken = true;
             Breaks++;
             BreakSeq = ActSeq;
             GainAp(R.TOUGH.Ap);
+            if (dying)
+            {
+                Say($"{e.Name}: 격파하며 처치! (AP +{R.TOUGH.Ap})");
+                HitCue(e, "break", new Cue { V = R.TOUGH.Ap });
+                return true;
+            }
             e.Sealed = true;
             Say($"{e.Name}: 격파! (AP +{R.TOUGH.Ap} · 다음 차례 행동 불가)");
             HitCue(e, "break", new Cue { V = R.TOUGH.Ap });
             Emit("break", new EmitInfo { Target = e, By = Acting });
             if (e.Intent != null && e.Intent.Brk && !e.Dead) { UltCut(e, "격파"); Say($"{e.Name}: 격파 — 「{e.Intent.Say}」 를 놓쳤다"); StatusCue(e, "끊김!"); e.Intent = null; }
             if (!e.Dead) FoePassives("broken", e);
+            if (Over == null) FoePassives("allyBroken", e);   // 동료가 격파되면(2026-10-07 — 조합 반응)
+            SeizeBack(e, "격파");   // 빼앗긴 카드는 격파하면 돌아온다
             HandAuto("break", new AutoInfo { Target = e });
+            return true;
+        }
+
+        // ── 처치 일격의 강인도 ─────────────────────────────────────────
+        /// <summary>카드의 한 대가 적을 쓰러뜨리면, 쓰러뜨리기 전에 그 카드의 강인도 피해를 먼저 넣는다(BattleFx 가 걸고 Hurt 가 부른다).</summary>
+        Unit lethalFor; Func<bool> lethalTough;
+
+        /// <summary>
+        /// 쓰러뜨린다 — 피해 → 강인도 → 격파 판정 → 죽음(사용자 2026-10-07). 처치 일격에 강인도가 0 이 되면 「격파하며 처치」:
+        /// 격파와 같은 AP +1(적마다 — 보통 격파와 같은 몫) · 「격파」 일은 쓰러뜨린 뒤에(그 적은 이미 없어 「그 적」 효과는 다른 적에게). 근면과는 따로 — 둘 다 받는다.
+        /// </summary>
+        void LethalKill(Unit u)
+        {
+            bool brk = false;
+            if (u.Side == Side.Enemy && lethalTough != null && lethalFor == u)
+            {
+                var f = lethalTough; lethalTough = null; lethalFor = null;
+                brk = f();
+            }
+            Kill(u);
+            if (!brk) return;
+            Emit("break", new EmitInfo { Target = u, By = Acting });
+            HandAuto("break", new AutoInfo { Target = u });
         }
 
         /// <summary>강인도 쪽지는 그 적이 맞은 쪽지 바로 뒤에(맞자마자 움직인 적 패시브 몸짓보다 앞).</summary>

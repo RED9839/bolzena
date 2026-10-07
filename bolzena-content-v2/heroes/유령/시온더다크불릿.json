@@ -13,40 +13,73 @@
       "crit": 10,
       "blurb": "자칭 검은 마탄의 사수, 실상은 편의점 야간 알바. 스킬로 적에게 「좌표」 를 찍어 두면 다음 턴 손에 「진혼의 마탄」 이 장전되고, 좌표 찍힌 적은 아군 공격이 약점으로 박힙니다.",
       "keyword": {
-        "name": "좌표",
-        "desc": "마탄이 노리는 과녁",
-        "carrier": "enemy",
-        "hunt": true,
-        "cap": 2,
-        "weakens": true
+        "name": "검은 탄창",
+        "desc": "어둠의 힘으로 장전한 마탄",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "atk",
+            "v": 0.04
+          }
+        ],
+        "rules": [
+          {
+            "name": "진혼 장전",
+            "when": {
+              "on": "stackReach",
+              "id": "검은 탄창",
+              "n": 5
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "make",
+                "id": "시온더다크불릿_t1",
+                "v": 1
+              }
+            ]
+          }
+        ]
       },
       "passives": [
         {
-          "name": "좌표 잡기",
+          "name": "큭큭, 봉인 해제",
           "when": {
             "on": "play",
-            "type": "스킬"
+            "type": "공격"
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
-              "id": "좌표",
+              "id": "검은 탄창",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "화합",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.4
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
             },
             {
-              "k": "later",
-              "n": 1,
-              "then": [
-                {
-                  "k": "make",
-                  "id": "시온더다크불릿_t1",
-                  "v": 1
-                }
-              ]
+              "k": "make",
+              "id": "시온더다크불릿_t1",
+              "v": 2
             }
           ]
         }
@@ -69,7 +102,7 @@
       },
       "starter": [
         "시온더다크불릿_s1",
-        "시온더다크불릿_s1",
+        "시온더다크불릿_u3",
         "시온더다크불릿_s3",
         "시온더다크불릿_s2"
       ]
@@ -118,574 +151,6 @@
       ]
     },
     {
-      "id": "시온더다크불릿_u1",
-      "name": "마.탄.의.사.수",
-      "hero": "시온더다크불릿",
-      "unique": true,
-      "cost": 2,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.75,
-          "hits": 3,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifFoe",
-          "id": "broken"
-        },
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "검은 마탄 세례",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "마탄 두 발",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "어둠의 연사",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy",
-              "hits": 4
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "좌표 사격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "종말의 탄창",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy",
-              "hits": 5
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "칠흑의 탄두",
-          "kind": "power"
-        },
-        {
-          "name": "급소 조준",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "재장전",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
-      "id": "시온더다크불릿_u2",
-      "name": "디 엑시트로",
-      "hero": "시온더다크불릿",
-      "unique": true,
-      "cost": 2,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.4,
-          "target": "allEnemies"
-        },
-        {
-          "k": "stack",
-          "id": "좌표",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "종말의 서곡",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.05,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "영창 생략",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "어둠의 결계",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "단 하나의 표적",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "금단의 영창",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "마력 폭주",
-          "kind": "power"
-        },
-        {
-          "name": "흩날리는 그림자",
-          "kind": "frost"
-        },
-        {
-          "name": "멋진 포즈",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
-      "id": "시온더다크불릿_u3",
-      "name": "좌표 잡기",
-      "hero": "시온더다크불릿",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "stack",
-          "id": "좌표",
-          "v": 1
-        },
-        {
-          "k": "status",
-          "id": "취약",
-          "v": 1
-        },
-        {
-          "k": "draw",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "정밀 좌표",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "대충 좌표",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "마탄 장전",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "시온더다크불릿_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "먹잇감 고르기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "첫 번째 표적",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "빠른 계산",
-          "kind": "cost"
-        },
-        {
-          "name": "어둠의 속삭임",
-          "kind": "draw"
-        },
-        {
-          "name": "각성한 눈동자",
-          "kind": "atkUp"
-        }
-      ]
-    },
-    {
-      "id": "시온더다크불릿_u4",
-      "name": "진혼의 탄환",
-      "hero": "시온더다크불릿",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "tags": [
-        "약점 공격"
-      ],
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.3,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifKill"
-        },
-        {
-          "k": "make",
-          "id": "시온더다크불릿_t1",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "진혼의 일격",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "시온더다크불릿_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "한 발만",
-          "cost": 0,
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "시온더다크불릿_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "관통 진혼탄",
-          "tags": [
-            "약점 공격",
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "시온더다크불릿_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "표적 낙인탄",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "좌표",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "시온더다크불릿_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "진혼곡",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "시온더다크불릿_t1",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "은빛 탄두",
-          "kind": "power"
-        },
-        {
-          "name": "급소",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "탄피 줍기",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
       "id": "시온더다크불릿_t1",
       "name": "진혼의 마탄",
       "hero": "시온더다크불릿",
@@ -699,8 +164,696 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.5,
+          "ratio": 1,
           "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "시온더다크불릿_u1",
+      "name": "마.탄.의.사.수",
+      "hero": "시온더다크불릿",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "검은 탄창"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "검은 탄창",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "마.탄.전.탄",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "검은 탄창"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "검은 탄창",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "반쯤 비운 탄창",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "검은 탄창"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "어둠의 일제사격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "검은 탄창"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "검은 탄창",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "운.명.의.탄.환",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "검은 탄창"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "검은 탄창",
+              "all": true
+            },
+            {
+              "k": "make",
+              "id": "시온더다크불릿_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "좌표 확인",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "검은 탄창"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "오른눈 렌즈",
+          "kind": "power"
+        },
+        {
+          "name": "검은 탄피",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "큭큭",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시온더다크불릿_u2",
+      "name": "디 엑시트로",
+      "hero": "시온더다크불릿",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.05,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "검은 탄창",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "바가지 쓴 명총",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "관통 사격",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.21,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "네 번째 탄환",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "검은 탄창",
+              "n": 4
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "연속 장전",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.19,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "고물 총 개조",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "maxCost": 0
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검은 탄창",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "총열 청소",
+          "kind": "power"
+        },
+        {
+          "name": "눈가림 섬광",
+          "kind": "frost"
+        },
+        {
+          "name": "편의점 야간 알바",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "시온더다크불릿_u3",
+      "name": "좌표 잡기",
+      "hero": "시온더다크불릿",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "검은 탄창",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정밀 좌표",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다크넷 서핑",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "엄폐 무시",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "시온더다크불릿_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자기 활약상 웹소설",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "어둠의 의식",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검은 탄창",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "검은 음식",
+          "kind": "draw"
+        },
+        {
+          "name": "덜크 발음",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "어두운 곳",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시온더다크불릿_u4",
+      "name": "진혼의 탄환",
+      "hero": "시온더다크불릿",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "make",
+          "id": "시온더다크불릿_t1",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "play",
+                "type": "공격",
+                "maxCost": 0
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "검은 탄창",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진혼곡",
+          "fx": [
+            {
+              "k": "make",
+              "id": "시온더다크불릿_t1",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "maxCost": 0
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검은 탄창",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "구원자의 탄창",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "make",
+              "id": "시온더다크불릿_t1",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "maxCost": 0
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검은 탄창",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "시온더다크불릿_t1",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "화합의 탄환",
+          "fx": [
+            {
+              "k": "make",
+              "id": "시온더다크불릿_t1",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "maxCost": 0
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검은 탄창",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "어.둠.의.구.원.자★",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "시온더다크불릿_t1",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "maxCost": 0
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검은 탄창",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "검은 탄창",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "첫 마탄",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검은 탄창",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "maxCost": 0
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검은 탄창",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "검은 탄두",
+          "kind": "atkUp"
+        },
+        {
+          "name": "진혼의 기도",
+          "kind": "draw"
+        },
+        {
+          "name": "탄피 줍기",
+          "kind": "cost"
         }
       ]
     }

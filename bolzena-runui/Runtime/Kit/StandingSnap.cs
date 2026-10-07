@@ -64,8 +64,8 @@ namespace Bolzena.RunUI
             {
                 if (host != null) return host;
                 var go = new GameObject("RunUI standing snap", typeof(RectTransform));
-                go.AddComponent<Pump>();
-                Object.DontDestroyOnLoad(go);
+                if (Application.isPlaying) { go.AddComponent<Pump>(); Object.DontDestroyOnLoad(go); }
+                else go.hideFlags = HideFlags.HideAndDontSave;   // 에디터 미리 굽기(SnapPrebake) — 장면에 남기지 않는다
                 host = (RectTransform)go.transform;
                 return host;
             }
@@ -73,6 +73,79 @@ namespace Bolzena.RunUI
 
         /// <summary>지금까지 구운 수(재기용).</summary>
         public static int Baked => baked;
+
+        // ── 미리 구운 그림(2026-10-07 「사도 목록 보는 게 너무 무겁다」) ──
+        //   에디터가 빌드 때 사도마다 목록 카드(list) · 얼굴 칸(face — 비율 1 · frac 0.34) · 카드 그림(card) 셋을 이 같은 자르기 · Bake 로 구워
+        //   Resources/RunArt/Snap/<kind>/<art>.png 에 두고(원작 파생 — 프로젝트의 Assets/Resources 는 git 밖), 목록 index.txt 에 그때의 비율 · frac · 자르기 사각형을 적는다.
+        //   실행 중에는 그 작은 그림만 읽는다(스탠딩 스파인 파싱 · 굽기 0). 표(standing_fit · center_fix)나 자르기 값이 바뀌어 지금 사각형이 적힌 것과 다르면
+        //   (또는 그림이 없으면) 예전처럼 그 자리에서 굽는다. 「-nosnap」 이면 미리 구운 그림을 쓰지 않는다(전후 비교).
+        public const string SnapRoot = "RunArt/Snap";
+        public static readonly bool NoSnap = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-nosnap") >= 0;
+        public struct SnapEntry { public float Ratio, Frac; public Rect Src; }
+        static Dictionary<string, SnapEntry> snapIndex;
+        static int prebaked;
+        /// <summary>미리 구운 그림을 읽은 수(재기용).</summary>
+        public static int Prebaked => prebaked;
+
+        static Dictionary<string, SnapEntry> SnapIndex
+        {
+            get
+            {
+                if (snapIndex != null) return snapIndex;
+                snapIndex = new Dictionary<string, SnapEntry>();
+                if (NoSnap) return snapIndex;
+                var ta = Resources.Load<TextAsset>(SnapRoot + "/index");
+                if (ta == null) return snapIndex;
+                var inv = System.Globalization.CultureInfo.InvariantCulture;
+                foreach (var line in ta.text.Split('\n'))
+                {
+                    var p = line.Trim().Split('\t');
+                    if (p.Length < 8 || p[0].StartsWith("#")) continue;
+                    float F(int i) => float.Parse(p[i], inv);
+                    try { snapIndex[p[0] + "|" + p[1]] = new SnapEntry { Ratio = F(2), Frac = F(3), Src = new Rect(F(4), F(5), F(6), F(7)) }; }
+                    catch (System.FormatException) { }
+                }
+                Resources.UnloadAsset(ta);
+                return snapIndex;
+            }
+        }
+
+        /// <summary>이 부름이 미리 굽는 셋 가운데 어느 것인가 — list · face · card, 아니면 null.</summary>
+        public static string SnapKind(float ratio, float frac, bool list, bool card)
+            => card ? "card" : list ? "list" : Mathf.Abs(ratio - 1f) < 0.001f && Mathf.Abs(frac - 0.34f) < 0.001f ? "face" : null;
+
+        /// <summary>그 사도 · 그 자르기의 미리 구운 그림이 지금 표와 맞는가(읽지 않고 답한다).</summary>
+        public static bool HasPrebaked(string art, float ratio, float frac, bool list, bool card = false)
+        {
+            var kind = SnapKind(ratio, frac, list, card);
+            if (kind == null || art == null || !SnapIndex.TryGetValue(kind + "|" + art, out var e)) return false;
+            if (Mathf.Abs(ratio / e.Ratio - 1f) > 0.006f) return false;   // 비율이 거의 같아야(목록 카드 0.694~0.696 — 0.6% 안 늘림은 보이지 않는다)
+            if (!CropRect(art, e.Ratio, e.Frac, out var r, kind == "list", kind == "card")) return false;
+            const float tol = 0.05f;
+            return Mathf.Abs(r.x - e.Src.x) < tol && Mathf.Abs(r.y - e.Src.y) < tol && Mathf.Abs(r.width - e.Src.width) < tol && Mathf.Abs(r.height - e.Src.height) < tol;
+        }
+
+        static Sprite LoadPrebaked(string art, string kind)
+        {
+            using var _h = Hitch.Span("미리 구운 그림 읽기");
+            var tex = Resources.Load<Texture2D>(SnapRoot + "/" + kind + "/" + art);
+            if (tex == null) return null;
+            prebaked++;
+            var s = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect);
+            s.name = "snap " + kind + " " + art;
+            return s;
+        }
+
+        /// <summary>미리 굽기용 — 이 사도 · 자르기의 index 줄(그림 키 뒤 비율 · frac · 사각형). 표에 없으면 null.</summary>
+        public static string SnapLine(string kind, string art, float ratio, float frac)
+        {
+            if (!CropRect(art, ratio, frac, out var r, kind == "list", kind == "card")) return null;
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            return string.Join("\t", kind, art, ratio.ToString("R", inv), frac.ToString("R", inv), r.x.ToString("R", inv), r.y.ToString("R", inv), r.width.ToString("R", inv), r.height.ToString("R", inv));
+        }
+
+        /// <summary>에디터 미리 굽기가 끝나면 숨은 굽기 판을 치운다.</summary>
+        public static void ResetHost() { if (host != null) Object.DestroyImmediate(host.gameObject); host = null; }
 
         /// <summary>사도 목록 카드(세로 칸)가 담는 몫 — 기준 몸(705)의 이만큼(모두 같은 배율 · 안 B). 머리 전체 + 어깨 · 가슴께.</summary>
         public const float ListFrac = 0.64f;
@@ -328,6 +401,19 @@ namespace Bolzena.RunUI
         public static Sprite Upper(string art, float ratio, float frac, int pxH = 0, bool list = false, bool card = false)
         {
             if (string.IsNullOrEmpty(art) || ratio <= 0) return null;
+            // 미리 구운 그림(목록 카드 · 얼굴 칸 · 카드 그림)이 지금 표와 맞으면 그것 — 픽셀 크기는 미리 구운 것 하나(화면이 늘이고 줄인다)
+            var kind = SnapKind(ratio, frac, list, card);
+            if (kind != null)
+            {
+                string pk = art + "|pre|" + kind;
+                if (cache.TryGetValue(pk, out var ps) && ps != null && ps.texture != null) return ps;
+                if (HasPrebaked(art, ratio, frac, list, card) && (ps = LoadPrebaked(art, kind)) != null)
+                {
+                    if (cache.Count >= 320) cache.Clear();
+                    cache[pk] = ps;
+                    return ps;
+                }
+            }
             if (pxH <= 0) pxH = frac < 0.45f && !list && !card ? 224 : 640;
             string key = $"{art}|{ratio:F3}|{(card ? "card" : list ? "list" : frac.ToString("F2"))}|{pxH}";
             if (cache.TryGetValue(key, out var s) && (s == null || s.texture != null)) return s;
@@ -362,7 +448,7 @@ namespace Bolzena.RunUI
             => new Texture2D(w, h, TextureFormat.RGBA32, false, false) { name = "snap " + art, wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
 
         /// <summary>스탠딩 스파인을 src(원본 단위)만큼 w×h 픽셀 Texture2D(곧은 알파 · sRGB)로 굽는다(into 가 있으면 거기에 — 읽을 수 있는 같은 크기). 스파인이 없으면 null.</summary>
-        public static Texture2D Bake(string art, Rect src, int w, int h, Texture2D into = null)
+        public static Texture2D Bake(string art, Rect src, int w, int h, Texture2D into = null, bool readable = false)
         {
             var mat0 = SpineUi.StraightMat;
             if (mat0 == null || !SystemInfo.supportsRenderTextures) return null;
@@ -403,13 +489,13 @@ namespace Bolzena.RunUI
                 tex.ReadPixels(new Rect(0, 0, w, h), 0, 0, false);
                 RenderTexture.active = prev;
                 Unpremultiply(tex);
-                tex.Apply(false, true);   // 읽기 전용(시스템 메모리 사본 버림)
+                tex.Apply(false, !readable);   // 읽기 전용(시스템 메모리 사본 버림) — 미리 굽기는 PNG 로 쓰려고 읽을 수 있게 둔다
                 return tex;
             }
             finally
             {
                 if (rt != null) RenderTexture.ReleaseTemporary(rt);
-                if (mat != null) Object.Destroy(mat);
+                if (mat != null) { if (Application.isPlaying) Object.Destroy(mat); else Object.DestroyImmediate(mat); }
                 // 스켈레톤 데이터는 무겁다(사도 하나 수 MB) — 굽자마자 놓는다: 바로 지워(DestroyImmediate) 스탠딩 수를 줄이면,
                 //   이 사도를 띄운 화면이 따로 없을 때 SpineUi 가 파싱한 데이터를 비우고 12명마다 UnloadUnusedAssets 를 돌린다
                 Object.DestroyImmediate(g.gameObject);

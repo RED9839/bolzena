@@ -1,863 +1,879 @@
 {
- "heroes": [
-  {
-   "id": "라이카",
-   "name": "라이카",
-   "nature": "순수",
-   "role": "딜러",
-   "star": 3,
-   "hp": 830,
-   "atk": 137,
-   "def": 40,
-   "crit": 10,
-   "blurb": "220V 콘센트를 사랑하는 번개 정령. 주먹을 내지를 때마다 제 몸에 전류를 꽂아 다음 주먹을 무겁게 하고, 그 값은 파티 HP로 치릅니다. 원격 충전을 터뜨리면 곧바로 최대 출력에 들어가 주먹이 눈에 보이지 않을 만큼 빨라집니다.",
-   "keyword": {
-    "name": "과충전",
-    "desc": "제 몸에 꽂은 220V",
-    "carrier": "self",
-    "cap": 3,
-    "onMax": {
-     "form": "라이카_최대출력"
-    },
-    "per": [
-     {
-      "stat": "dealt",
-      "v": 0.2
-     }
-    ]
-   },
-   "passives": [
+  "heroes": [
     {
-     "name": "220V 과충전",
-     "when": {
-      "on": "play",
-      "type": "공격"
-     },
-     "conds": [
-      {
-       "c": "hpMin",
-       "pct": 0.3
-      }
-     ],
-     "limit": {
-      "per": "turn",
-      "n": 2
-     },
-     "fx": [
-      {
-       "k": "payHpPct",
-       "v": 0.02
-      },
-      {
-       "k": "stack",
-       "id": "과충전",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "ult": {
-    "name": "원격 충전!!",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 1.6,
-      "target": "allEnemies"
-     },
-     {
-      "k": "status",
-      "id": "충격",
-      "v": 2,
-      "target": "allEnemies"
-     },
-     {
-      "k": "stack",
-      "id": "과충전",
-      "v": 1
-     },
-     {
-      "k": "form",
-      "id": "라이카_최대출력"
-     }
-    ]
-   },
-   "forms": [
-    {
-     "id": "라이카_최대출력",
-     "name": "최대 출력",
-     "desc": "「최대 출력!」 — 220V 가 몸에 꽉 차 주먹이 눈에 안 보이게 빨라짐. 멈출 수 없고, 다 쓰면 방전",
-     "turns": 2,
-     "cards": {
-      "라이카_s1": "라이카_f1"
-     },
-     "bonus": [
-      {
-       "type": "공격",
-       "fx": [
-        {
-         "k": "extra",
-         "ratio": 0.3
-        }
-       ]
-      }
-     ],
-     "off": [
-      {
-       "k": "spend",
-       "id": "과충전",
-       "all": true
-      }
-     ],
-     "anim": "Idle_Change"
-    }
-   ],
-   "race": "정령",
-   "starter": [
-    "라이카_s1",
-    "라이카_s1",
-    "라이카_s2",
-    "라이카_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "라이카_s1",
-   "name": "찌릿 펀치",
-   "hero": "라이카",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "라이카_f1",
-   "name": "최대 출력 펀치",
-   "hero": "라이카",
-   "token": true,
-   "cost": 1,
-   "type": "공격",
-   "blurb": "최대 출력의 찌릿 펀치 — 한 번 낼 주먹이 두 번 들어갑니다",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.65,
-     "target": "oneEnemy",
-     "hits": 2
-    }
-   ]
-  },
-  {
-   "id": "라이카_s2",
-   "name": "콰지직 펀치",
-   "hero": "라이카",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "라이카_s3",
-   "name": "정전기 가드",
-   "hero": "라이카",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 1.5
-    }
-   ]
-  },
-  {
-   "id": "라이카_u1",
-   "name": "급속 충전!",
-   "hero": "라이카",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "signature": true,
-   "fx": [
-    {
-     "k": "payHpPct",
-     "v": 0.03
-    },
-    {
-     "k": "ap",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "과충전",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "220V 직결",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "payHpPct",
-       "v": 0.03
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "과충전",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "카페 콘센트",
-     "fx": [
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "과충전",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "전열은 맡겨",
-     "fx": [
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "과충전",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1.5
-      }
-     ]
-    },
-    {
-     "name": "피뢰침",
-     "tags": [
-      "보존",
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "payHpPct",
-       "v": 0.03
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "과충전",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "스파크 튀기기",
-     "fx": [
-      {
-       "k": "payHpPct",
-       "v": 0.03
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "터보 배터리",
-     "kind": "draw"
-    },
-    {
-     "name": "콘센트 찾기",
-     "tags": [
-      "개전"
-     ]
-    },
-    {
-     "name": "자부심의 스파크",
-     "fx": [
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "라이카_u2",
-   "name": "감전 질주",
-   "hero": "라이카",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.3,
-     "target": "allEnemies"
-    },
-    {
-     "k": "status",
-     "id": "충격",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "tough",
-     "v": 0.5,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "질주 본능",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.76,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "tough",
-       "v": 0.5,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "맨발 질주",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.04,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "tough",
-       "v": 0.5,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "번개 꼬리",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.65,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "tough",
-       "v": 0.5,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "풀 스로틀",
-     "cost": 3,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "tough",
-       "v": 1.5,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "고압선",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.5,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "tough",
-       "v": 0.5,
-       "target": "allEnemies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "불타는 질주",
-     "kind": "power"
-    },
-    {
-     "name": "가벼운 운동화",
-     "kind": "cost"
-    },
-    {
-     "name": "정전기 머리",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "라이카_u3",
-   "name": "220V 스트레이트",
-   "hero": "라이카",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.4,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "tough",
-     "v": 1,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "ifBreak"
-    },
-    {
-     "k": "ap",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "380V 스트레이트",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.89,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifBreak"
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "어퍼컷",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifBreak"
-      },
-      {
-       "k": "ap",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "번개 주먹",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.76,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifBreak"
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "한 방 더",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifBreak"
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "참는 주먹",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.75,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifBreak"
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "무거운 주먹",
-     "kind": "power"
-    },
-    {
-     "name": "약점 감전",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "흐르는 전류",
-     "fx": [
-      {
-       "k": "status",
-       "id": "충격",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "라이카_u4",
-   "name": "자가 발전",
-   "hero": "라이카",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "status",
-     "id": "집중",
-     "v": 1
-    },
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
-        {
-         "k": "stack",
-         "id": "과충전",
-         "v": 1
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "oracles": [
-    {
-     "name": "발전소 사고",
-     "fx": [
-      {
-       "k": "status",
-       "id": "집중",
-       "v": 1
-      },
-      {
-       "k": "atkMod",
-       "v": 0.25,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
+      "id": "라이카",
+      "name": "라이카",
+      "nature": "순수",
+      "role": "딜러",
+      "star": 3,
+      "hp": 830,
+      "atk": 137,
+      "def": 40,
+      "crit": 10,
+      "blurb": "220V 콘센트를 사랑하는 번개 정령. 주먹을 내지를 때마다 제 몸에 전류를 꽂아 다음 주먹을 무겁게 하고, 그 값은 파티 HP로 치릅니다. 원격 충전을 터뜨리면 곧바로 최대 출력에 들어가 주먹이 눈에 보이지 않을 만큼 빨라집니다.",
+      "keyword": {
+        "name": "과충전",
+        "desc": "제 몸에 꽂은 220V",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "form": "라이카_최대출력"
+        },
+        "per": [
           {
-           "k": "stack",
-           "id": "과충전",
-           "v": 1
+            "stat": "dealt",
+            "v": 0.2
           }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "예비 발전기",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
+        ]
       },
-      {
-       "k": "power",
-       "rules": [
+      "passives": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "과충전",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "충전 완료",
-     "fx": [
-      {
-       "k": "status",
-       "id": "집중",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
+          "name": "220V 콘센트",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            }
+          ]
+        },
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "과충전",
-           "v": 2
-          }
-         ]
+          "name": "번개 펀치",
+          "when": {
+            "on": "stackReach",
+            "id": "과충전",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "randomEnemy",
+              "hits": 5
+            }
+          ]
         }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "전기 갑옷",
-     "fx": [
-      {
-       "k": "status",
-       "id": "집중",
-       "v": 2
+      ],
+      "ult": {
+        "name": "원격 충전!!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.6,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "충격",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "과충전",
+            "v": 1
+          },
+          {
+            "k": "form",
+            "id": "라이카_최대출력"
+          }
+        ]
       },
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
+      "forms": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "과충전",
-           "v": 2
-          }
-         ]
+          "id": "라이카_최대출력",
+          "name": "최대 출력",
+          "desc": "「최대 출력!」 — 220V 가 몸에 꽉 차 주먹이 눈에 안 보이게 빨라짐. 멈출 수 없고, 다 쓰면 방전",
+          "turns": 2,
+          "cards": {
+            "라이카_s1": "라이카_f1"
+          },
+          "bonus": [
+            {
+              "type": "공격",
+              "fx": [
+                {
+                  "k": "extra",
+                  "ratio": 0.3
+                }
+              ]
+            }
+          ],
+          "off": [
+            {
+              "k": "spend",
+              "id": "과충전",
+              "all": true
+            }
+          ],
+          "anim": "Idle_Change"
         }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "기다렸다는 듯",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "과충전",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "과충전",
-           "v": 2
-          }
-         ]
-        }
-       ]
-      }
-     ]
+      ],
+      "race": "정령",
+      "starter": [
+        "라이카_s1",
+        "라이카_u1",
+        "라이카_s2",
+        "라이카_s3"
+      ]
     }
-   ],
-   "blesses": [
+  ],
+  "cards": [
     {
-     "name": "스스로 빛나기",
-     "kind": "atkUp"
+      "id": "라이카_s1",
+      "name": "찌릿 펀치",
+      "hero": "라이카",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
     },
     {
-     "name": "얕은 잠",
-     "kind": "cost"
+      "id": "라이카_f1",
+      "name": "최대 출력 펀치",
+      "hero": "라이카",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "blurb": "최대 출력의 찌릿 펀치 — 한 번 낼 주먹이 두 번 들어갑니다",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.65,
+          "target": "oneEnemy",
+          "hits": 2
+        }
+      ]
     },
     {
-     "name": "튼튼한 몸",
-     "kind": "defUp"
+      "id": "라이카_s2",
+      "name": "콰지직 펀치",
+      "hero": "라이카",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "라이카_s3",
+      "name": "정전기 가드",
+      "hero": "라이카",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "라이카_u1",
+      "name": "급속 충전!",
+      "hero": "라이카",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "payHpPct",
+          "v": 0.02
+        },
+        {
+          "k": "stack",
+          "id": "과충전",
+          "v": 2
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "과충전",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "터보 엔진 배터리",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.02
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "카페 충전",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "발전소 출근",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "110V는 싫어",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "찌릿찌릿",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "효율 만땅",
+          "kind": "draw"
+        },
+        {
+          "name": "절전 모드",
+          "kind": "cost"
+        },
+        {
+          "name": "전력 공급",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "라이카_u2",
+      "name": "감전 질주",
+      "hero": "라이카",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "과충전"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.15,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "과충전",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "전력 질주",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "과충전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "충전된 몸",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "과충전",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "일직선 돌파",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "과충전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "경기장 정전",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "과충전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "과충전",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "방전 직전",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "고전압",
+          "kind": "power"
+        },
+        {
+          "name": "감전된 바닥",
+          "kind": "frost"
+        },
+        {
+          "name": "스파크",
+          "kind": "ap"
+        }
+      ]
+    },
+    {
+      "id": "라이카_u3",
+      "name": "220V 스트레이트",
+      "hero": "라이카",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "status",
+          "id": "충격",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "원투 펀치",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "도루",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "강속구",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "hits": 2
+            }
+          ]
+        },
+        {
+          "name": "가운뎃손가락",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "정의의 주먹",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "하핫",
+          "kind": "draw"
+        },
+        {
+          "name": "볼 당기기 금지",
+          "kind": "ap"
+        },
+        {
+          "name": "도루 사인",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "라이카_u4",
+      "name": "풀 스윙",
+      "hero": "라이카",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "과충전"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "홈런",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "찌릿 시그널",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.35
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "전기세 폭탄",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "perStack",
+              "id": "과충전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "번트",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "지니어스 분석",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "과충전",
+              "n": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "최첨단 배터리",
+          "kind": "power"
+        },
+        {
+          "name": "절연 장갑",
+          "kind": "defUp"
+        },
+        {
+          "name": "충전 케이블",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            }
+          ]
+        }
+      ]
     }
-   ]
-  }
- ]
+  ]
 }

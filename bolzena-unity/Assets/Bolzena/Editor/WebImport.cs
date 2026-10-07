@@ -32,6 +32,8 @@ namespace Bolzena.EditorTools
     public class WebImport : AssetPostprocessor
     {
         const int Quality = 50;
+        // 미리 구운 사도 정지 그림(RunArt/Snap — runui SnapPrebake: 목록 카드 · 얼굴 칸 · 카드 그림)은 얼굴이 크게 보여 크런치 품질을 조금 높인다(폰 ASTC 6×6 은 그대로)
+        const int SnapQuality = 70;
         public override int GetPostprocessOrder() => 1000;
         // 규칙이 바뀌면 올린다 — 단, 올리면 PC(Standalone) 그림까지 전부 다시 가져온다(20분 넘게). v3 의 ASTC 갈래는 DXT · PC 결과를 바꾸지 않아
         // 2 그대로 두고, ASTC 로 아직 안 가져온 그림은 ProjectSetup.SwitchWebTextures 가 골라 다시 가져온다
@@ -87,7 +89,7 @@ namespace Bolzena.EditorTools
             if (Web && Astc) { PreprocessAstc(ti, p, k); return; }
             var w = ti.GetPlatformTextureSettings("WebGL");
             w.overridden = true;
-            w.compressionQuality = Quality;
+            w.compressionQuality = p.Contains("/RunArt/Snap/") ? SnapQuality : Quality;
             switch (k)
             {
                 case Kind.Res:
@@ -132,7 +134,9 @@ namespace Bolzena.EditorTools
                     break;
                 default:
                     w.format = TextureImporterFormat.ASTC_6x6;
-                    w.maxTextureSize = 2048;
+                    // 미리 구운 정지 그림(runui SnapPrebake)은 폰에서 작게 — 카드 그림 448×640 → 358×512 · 목록 카드 256×368 → 178×256
+                    //   (폰 화면의 목록 카드는 200px 남짓 · 크게 본 카드도 500px 남짓). 정지 그림 셋 합이 첫 로딩 +20MB 안에 들게
+                    w.maxTextureSize = p.Contains("/RunArt/Snap/card/") ? 512 : p.Contains("/RunArt/Snap/list/") ? 256 : 2048;
                     break;
             }
             ti.SetPlatformTextureSettings(w);

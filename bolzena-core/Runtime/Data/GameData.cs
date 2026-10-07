@@ -162,18 +162,18 @@ namespace Bolzena.Core
         public static string BaseId(string id)
         {
             var s = NoInstCore(Untail(id));
-            int at = s?.IndexOf(OWNER) ?? -1;
+            int at = s?.IndexOf(OWNER, StringComparison.Ordinal) ?? -1;
             return at > 0 ? s.Substring(0, at) : s;
         }
-        public static bool IsCopy(string id) => id != null && id.EndsWith(COPY);
-        public static bool IsPlain(string id) => id != null && id.EndsWith(PLAIN);
+        public static bool IsCopy(string id) => id != null && id.EndsWith(COPY, StringComparison.Ordinal);
+        public static bool IsPlain(string id) => id != null && id.EndsWith(PLAIN, StringComparison.Ordinal);
         /// <summary>복제본 번호 — 「x^」 1 · 「x^^」 2 …(복제할 때 원본 스펙이 앞 복제본과 다르면 꼬리가 하나 는다). 복제본이 아니면 0.</summary>
         public static int CopyNo(string id) => IsCopy(id) ? TailLen(id) : 0;
         /// <summary>꼬리 길이 — 「~」 은 1, 「^」 는 이어진 수만큼(이름 한 글자는 남긴다).</summary>
         static int TailLen(string id)
         {
             if (id == null || id.Length < 2) return 0;
-            if (id.EndsWith(PLAIN)) return 1;
+            if (id.EndsWith(PLAIN, StringComparison.Ordinal)) return 1;
             int n = 0;
             while (n < id.Length - 1 && id[id.Length - 1 - n] == COPY[0]) n++;
             return n;
@@ -186,7 +186,7 @@ namespace Bolzena.Core
         public static string OwnerOf(string id)
         {
             var s = NoInstCore(Untail(id));
-            int at = s?.IndexOf(OWNER) ?? -1;
+            int at = s?.IndexOf(OWNER, StringComparison.Ordinal) ?? -1;
             return at > 0 && at < s.Length - 1 ? s.Substring(at + 1) : null;
         }
         /// <summary>주인을 붙인(바꾼) id — 꼬리(~ · ^)는 그대로.</summary>
@@ -308,7 +308,9 @@ namespace Bolzena.Core
         }
 
         // ── 카드의 실제 모습(신탁을 얹은 것) ─────────────────────────────
-        readonly Dictionary<(string, int, string), CardView> views = new();
+        // id 하나에 (신탁 번호 · 주인) 갈래 몇 개. 열쇠는 string 하나(튜플 열쇠는 문자열 둘을 매번 해시한다),
+        // 읽기는 잠금 없이(시뮬 스레드끼리 잠금 다툼) — 갈래 배열은 새로 만들어 바꿔 끼우기만 한다
+        readonly System.Collections.Concurrent.ConcurrentDictionary<string, (int flash, string owner, CardView v)[]> views = new();
 
         /// <summary>
         /// 그 카드 id 의 지금 모습 — flash 는 신탁 번호(1~5, 0 이면 기본).
@@ -318,15 +320,21 @@ namespace Bolzena.Core
         {
             if (id == null) return null;
             if (IsPlain(id)) flash = 0;
-            lock (views)   // 시뮬은 여러 스레드가 같은 데이터를 본다
+            if (views.TryGetValue(id, out var arr))
+                foreach (var e in arr) if (e.flash == flash && e.owner == owner) return e.v;
+            lock (views)   // 시뮬은 여러 스레드가 같은 데이터를 본다 — 만들기만 잠근다(같은 열쇠는 늘 같은 CardView)
             {
-                if (views.TryGetValue((id, flash, owner), out var v)) return v;
+                if (views.TryGetValue(id, out arr))
+                    foreach (var e in arr) if (e.flash == flash && e.owner == owner) return e.v;
                 var c = Card(id);
                 if (c == null) return null;
-                v = new CardView(id, c, flash > 0 && flash <= c.Oracles.Count ? c.Oracles[flash - 1] : null, flash,
+                var v = new CardView(id, c, flash > 0 && flash <= c.Oracles.Count ? c.Oracles[flash - 1] : null, flash,
                     c.Neutral ? OwnerOf(id) ?? owner : null);
                 v.Target = TargetOf(v.Fx);
-                views[(id, flash, owner)] = v;
+                var na = new (int, string, CardView)[(arr?.Length ?? 0) + 1];
+                arr?.CopyTo(na, 0);
+                na[na.Length - 1] = (flash, owner, v);
+                views[id] = na;
                 return v;
             }
         }

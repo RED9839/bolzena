@@ -9,7 +9,7 @@ namespace Bolzena.RunUI
 {
     // 도감 — 사도 · 교주 카드 · 장비 · 적(Flow.DexFoes.cs)을 한 화면 틀(사도 목록과 같은 꼴)에서 탭으로 오간다.
     //   왼쪽 세로 필터 탭 · 카드 격자 · 위 오른쪽 정렬 + 도감 탭 · 아래 남색 띠(고른 것 · 「상세 정보」) · 누르면 바로 상세
-    //   교주 카드: 교주 카드만(상태 · 저주 · 선물 · 토큰은 뺀다). 필터 = 등급(일반 · 고급 · 희귀 · 전설), 상세 = 카드 크게 + 신탁 · 축복(CardZoom)
+    //   교주 카드: 교주 카드만(상태 · 저주 · 선물 · 토큰은 뺀다). 필터 = 등급(일반 · 고급 · 희귀 · 전설), 상세 = 카드 상세(CardZoom — 낱말 · 신탁 단추, 축복은 보이지 않는다)
     //   장비: 필터 = 종류(무기 · 방어구 · 장신구) + 등급, 상세 = 그림 · 등급 · 능력치 · 효과 · 애착(EquipDetail)
     //   정렬 기본 = 등급 순(전설 먼저) → 같은 등급 안 가나다순. 탭마다 필터 · 정렬 · 스크롤 자리를 기억한다.
     public partial class Flow
@@ -172,7 +172,7 @@ namespace Bolzena.RunUI
                     var id = c.Id;
                     var card = W.Card(content, this, id, cw, "card " + id);
                     var b = card.gameObject.AddComponent<Btn>();
-                    b.OnClick = () => { ls.Focus = id; Rebuild(); CardZoom(id); };
+                    b.OnClick = () => { ls.Focus = id; Rebuild(); CardZoom(id, keys); };
                     if (ls.Focus == id) { var fr = Ui.Img(card, Theme.S("frame_thick", 24), Theme.Sky, "focus"); fr.rectTransform.Fill(-3, -3, -3, -3); focusName = c.Name; focusSub = (c.Grade ?? "교주 카드") + " · " + W.TypeLabel(c.Type); }
                     Stage.Hot["dexcard:" + id] = b;
                     if (anim && idx < 30) Tw.Pop(card, 0.012f * idx, 0.88f, 0.28f);
@@ -196,7 +196,7 @@ namespace Bolzena.RunUI
             var foot = Ui.Rect("foot", host).Band(0, footH, Theme.Gutter, Theme.Gutter, 0);
             var info = Ui.Text(foot, focusName != null ? $"<b>{focusName}</b>  <color={Theme.SubTag}>{focusSub}</color>" : $"{keys.Count}{(eq ? "개" : "장")} · 누르면 상세 정보", Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft);
             info.rectTransform.Fill(0, 0, 280, 0); info.textWrappingMode = TextWrappingModes.NoWrap; info.overflowMode = TextOverflowModes.Ellipsis;
-            var detail = Btn.Make(foot, null, BtnStyle.PillDark, () => { if (ls.Focus == null) return; if (eq) EquipDetail(ls.Focus); else CardZoom(ls.Focus); }, 0, "detail");
+            var detail = Btn.Make(foot, null, BtnStyle.PillDark, () => { if (ls.Focus == null) return; if (eq) EquipDetail(ls.Focus); else CardZoom(ls.Focus, keys); }, 0, "detail");
             var drt = detail.GetComponent<RectTransform>(); drt.At(1, 0.5f, 0, 0, 250, 58);
             var dzi = Ui.Img(drt, Theme.S("ic_zoom"), Theme.Gold, "ic"); dzi.rectTransform.At(0, 0.5f, 22, 0, 24, 24); dzi.preserveAspect = true;
             var dl = Ui.Title(drt, "상세 정보", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight); dl.rectTransform.Fill(50, 0, 26, 0);

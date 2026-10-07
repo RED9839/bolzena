@@ -14,23 +14,22 @@
       "blurb": "누가 무엇을 하든 맞장구치며 포즈까지 따라 하는 리액션 장인. 아군이 공격할 때마다 「맞장구」 가 쌓이고, 사리의 공격은 맞장구를 몽땅 털어 한 마디 촌철살인을 박습니다.",
       "keyword": {
         "name": "맞장구",
-        "desc": "아군 공격에 맞추는 장단",
+        "desc": "동료가 운을 띄울 때마다 터지는 박수",
         "carrier": "self",
-        "cap": 4,
+        "cap": 5,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.1
+            "v": 0.12
           }
         ]
       },
       "passives": [
         {
-          "name": "최고의 조연",
+          "name": "그렇지 그렇지",
           "when": {
             "on": "play",
-            "who": "other",
-            "type": "공격"
+            "who": "other"
           },
           "limit": {
             "per": "turn",
@@ -41,6 +40,23 @@
               "k": "stack",
               "id": "맞장구",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "와아",
+          "when": {
+            "on": "break"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 2
             }
           ]
         }
@@ -67,7 +83,7 @@
       },
       "starter": [
         "사리_s1",
-        "사리_s1",
+        "사리_u4",
         "사리_s3",
         "사리_s2"
       ]
@@ -120,12 +136,12 @@
       "name": "장난스런 웃음",
       "hero": "사리",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2,
+          "ratio": 1.53,
           "target": "oneEnemy"
         },
         {
@@ -134,7 +150,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.51,
           "target": "oneEnemy"
         },
         {
@@ -145,11 +161,124 @@
       ],
       "oracles": [
         {
-          "name": "깔깔 웃음",
+          "name": "촌철살인",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 1.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "맞장구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "맞장구",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "가장 먼 적에게",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.62,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "맞장구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "맞장구",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "박수 아껴 두기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "맞장구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "박수 장인",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.53,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "맞장구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.51,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "맞장구",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "앙코르 리액션",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.64,
               "target": "oneEnemy"
             },
             {
@@ -162,123 +291,27 @@
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
               "id": "맞장구",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "킥킥 웃음",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "맞장구"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "맞장구",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "멈추지 않는 웃음",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "맞장구"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "박수 갈채",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "맞장구"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "맞장구",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "웃음 전염",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.0,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "맞장구"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "맞장구",
-              "all": true
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "날 선 한마디",
+          "name": "리액션 장인",
           "kind": "power"
         },
         {
-          "name": "맞장구 박자",
-          "kind": "draw"
+          "name": "와아아",
+          "kind": "weakSpot"
         },
         {
-          "name": "찡긋",
+          "name": "따라 웃기",
           "fx": [
             {
               "k": "stack",
@@ -294,8 +327,317 @@
       "name": "똑같은 포즈",
       "hero": "사리",
       "unique": true,
-      "cost": 1,
+      "cost": 0,
       "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "맞장구",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "완벽한 포즈",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "따라 하기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "포즈 연습",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "맞장구",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "먼저 말 걸기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "흉내 연습",
+          "fx": [
+            {
+              "k": "transform",
+              "id": "사리_u3",
+              "from": "hand",
+              "basic": true,
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "박수",
+          "kind": "draw"
+        },
+        {
+          "name": "리액션",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "먼저 웃기",
+          "tags": [
+            "개전"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "사리_u3",
+      "name": "뼈 있는 맞장구",
+      "hero": "사리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "연계"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.36,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "맞장구",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "뼈 때리기",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.79,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "맞장구 박수",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.14,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "은근한 한마디",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "맞장구",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "그렇지!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.21,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "맞장구"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "맞장구 장인",
+          "tags": [
+            "연계"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.42,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "맞장구",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "link"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "맞장구",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "뼈",
+          "kind": "power"
+        },
+        {
+          "name": "찰떡 리액션",
+          "kind": "draw"
+        },
+        {
+          "name": "웃음 한 스푼",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "사리_u4",
+      "name": "셋으로 찢긴 수의",
+      "hero": "사리",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
         {
           "k": "status",
@@ -306,11 +648,31 @@
           "k": "stack",
           "id": "맞장구",
           "v": 2
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "맞장구",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "완벽한 포즈",
+          "name": "수의 세 조각",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "status",
@@ -318,59 +680,26 @@
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "맞장구",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "브이",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "거울 놀이",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 4
-            }
-          ]
-        },
-        {
-          "name": "셋이 같은 포즈",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "등장 포즈",
+          "name": "최고의 조연 소원",
           "tags": [
             "개전"
           ],
@@ -383,320 +712,76 @@
             {
               "k": "stack",
               "id": "맞장구",
-              "v": 3
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "거울 포즈",
-          "kind": "draw"
-        },
-        {
-          "name": "찰칵",
-          "kind": "cost"
-        },
-        {
-          "name": "단체 사진",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "사리_u3",
-      "name": "뼈 있는 맞장구",
-      "hero": "사리",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "tags": [
-        "연계"
-      ],
-      "fx": [
-        {
-          "k": "stack",
-          "id": "맞장구",
-          "v": 1
-        },
-        {
-          "k": "status",
-          "id": "취약",
-          "v": 1
-        },
-        {
-          "k": "draw",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "촌철살인",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "그치그치",
-          "cost": 0,
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "장단 맞추기",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "다 들리게",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "맞장구",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "맞장구",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "맞장구",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.6
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "곱씹는 한마디",
-          "tags": [
-            "연계",
-            "보존"
-          ],
+          "name": "누군지 모를 유령",
           "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
             {
               "k": "stack",
               "id": "맞장구",
-              "v": 2
+              "v": 4
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "맞받아치기",
-          "kind": "draw"
-        },
-        {
-          "name": "추임새",
-          "kind": "cost"
-        },
-        {
-          "name": "따라 웃기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "사리_u4",
-      "name": "셋으로 찢긴 수의",
-      "hero": "사리",
-      "unique": true,
-      "cost": 2,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.75,
-          "hits": 3,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifStack",
-          "id": "맞장구",
-          "n": 2
-        },
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
-        },
-        {
-          "k": "spend",
-          "id": "맞장구",
-          "v": 2
-        }
-      ],
-      "oracles": [
-        {
-          "name": "펄럭이는 수의",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
-              "id": "맞장구",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "spend",
-              "id": "맞장구",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "맞장구",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "찢긴 조각",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
-              "id": "맞장구",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "spend",
-              "id": "맞장구",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "장단 맞춘 수의",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
-              "id": "맞장구",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "세 갈래 그림자",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
-              "id": "맞장구",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "spend",
-              "id": "맞장구",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "찢긴 틈새",
+          "name": "찢긴 수의 휘날림",
           "tags": [
-            "약점 공격"
+            "개전"
           ],
           "fx": [
             {
@@ -706,41 +791,78 @@
               "hits": 3
             },
             {
-              "k": "ifStack",
-              "id": "맞장구",
-              "n": 2
-            },
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "맞장구",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "맞장구 찾아다니기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
             {
               "k": "status",
-              "id": "사기",
+              "id": "협공",
               "v": 1
             },
             {
-              "k": "spend",
-              "id": "맞장구",
-              "v": 2
+              "k": "draw",
+              "v": 2,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "맞장구",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "찢긴 끝자락",
-          "kind": "power"
+          "name": "조연의 기쁨",
+          "kind": "atkUp"
         },
         {
-          "name": "펄럭임",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "잊힌 이름",
+          "name": "흐릿해지기",
           "fx": [
             {
-              "k": "stack",
-              "id": "맞장구",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.4
             }
           ]
+        },
+        {
+          "name": "하얀 수의",
+          "kind": "cost"
         }
       ]
     }

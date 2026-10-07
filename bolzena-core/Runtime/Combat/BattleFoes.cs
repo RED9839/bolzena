@@ -40,6 +40,8 @@ namespace Bolzena.Core
                 string a = e.Hist.Count >= 2 ? e.Hist[e.Hist.Count - 2] : null, b = e.Hist.Count >= 1 ? e.Hist[e.Hist.Count - 1] : null;
                 var src = ok.Count > 0 ? ok : list;
                 var pool = src.Where(x => !(a != null && a == b && x.T == a) && ShuffleOk(e, x)).ToList();
+                // 둘 다 서지 않으면 「세 번 잇지 않기」 를 먼저 푼다 — 상한(꽉 찬 소환 · 덱에 max 장인 상태 카드 · 모으기 간격)이 앞선다(2026-10-07)
+                if (pool.Count == 0) pool = src.Where(x => ShuffleOk(e, x)).ToList();
                 if (pool.Count == 0) pool = src.Where(x => !(a != null && a == b && x.T == a)).ToList();
                 if (pool.Count == 0) pool = src;
                 double total = pool.Sum(x => ShuffleW(e, x));
@@ -80,6 +82,8 @@ namespace Bolzena.Core
                 if (alive.Count >= MAX_FOES) return false;
                 if (x.Max > 0 && alive.Count(u => u.Key == x.Id) >= x.Max) return false;
             }
+            // 상태 카드 넣기 상한(2026-10-07 적 리워크 — 전투당 4장 이하) — 그 카드가 덱(뽑을 · 손 · 버린 더미)에 max 장 이상이면 안 고른다
+            if (x.T == "addCard" && x.Max > 0 && x.Id != null && Draw.Concat(Hand).Concat(Discard).Count(id => GameData.BaseId(id) == x.Id) >= x.Max) return false;
             return true;
         }
 
@@ -304,11 +308,13 @@ namespace Bolzena.Core
                     if (p.On != ev) continue;
                     if ((ev == "hurt" || ev == "lowHp" || ev == "rushed" || ev == "debuffed" || ev == "broken" || ev == "recover" || ev == "guardBreak" || ev == "act") && target != e) continue;
                     if (ev == "fightStart" && target != null && target != e) continue;
-                    if (ev == "allyDown" && target == e) continue;
-                    if (ev == "allyDown" && p.Who != null && target?.Key != p.Who) continue;
+                    if ((ev == "allyDown" || ev == "allyBroken") && target == e) continue;
+                    if ((ev == "allyDown" || ev == "allyBroken") && p.Who != null && target?.Key != p.Who) continue;
                     if (ev == "lowHp" && !(before > p.At && after <= p.At)) continue;
                     if (ev == "card" && ((p.Type != null && !TypeOk(p.Type, type)) || (p.Every > 0 && nth % p.Every != 0) || (p.Same && !same))) continue;
                     if (p.Do != null && !IntentOk(e, p.Do)) continue;
+                    // 격파 · 기절로 쉬는 적은 치는 수를 못 한다(카드를 내면 · 동료가 쓰러지면 치는 패시브 포함)
+                    if (e.Sealed && HitLike(p.Do)) continue;
                     if (p.Phase != null && !p.Phase.Contains(e.Phased2 ? 2 : e.Phased ? 1 : 0)) continue;
                     int lim = FoeOnce(ev) ? 1 : (p.Limit ?? 1);
                     e.PUsed.TryGetValue(p.Name, out int used);
@@ -347,6 +353,7 @@ namespace Bolzena.Core
             }
             int seq0 = ActSeq; ActSeq = ++SeqN;
             try { FoeAct(e, it, sayName ?? it.Say); } finally { ActSeq = seq0; }
+            if (HitLike(it) && !e.Dead && Over == null) CounterEvent(e, "attack");   // 쌓이는 수치 clearOnAttack — 친 뒤에 비운다
             // 수를 한 뒤(패시브 말고 제 차례 · 즉시 행동) — 행동 카운트 상태(둔화 · 급속)는 사라지고 「행동하면」 이 돈다
             if (!passive && !e.Dead && Over == null)
             {

@@ -14,15 +14,25 @@
       "blurb": "넘어져도 다시 일어서는 이드. 맞을 때마다 쌓이는 악몽을 스킬로 정면에서 마주해, 적의 걸음을 늦추고 방패로 바꿉니다. 깊이 잠든 동안 받아 둔 아픔은 깨어나는 순간 꿈과 함께 무너져 적을 덮치고 파티를 감쌉니다.",
       "keyword": {
         "name": "악몽",
-        "desc": "파티가 다칠 때 쌓이는 악몽",
+        "desc": "깨면 잊는 밤의 악몽",
         "carrier": "self",
-        "cap": 5
+        "cap": 5,
+        "per": [
+          {
+            "stat": "guard",
+            "v": 0.1
+          }
+        ]
       },
       "passives": [
         {
           "name": "악몽 마주하기",
           "when": {
             "on": "hurt"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
           },
           "fx": [
             {
@@ -33,7 +43,7 @@
           ]
         },
         {
-          "name": "악몽 마주하기",
+          "name": "정면으로 마주하기",
           "when": {
             "on": "play",
             "type": "스킬"
@@ -42,36 +52,13 @@
             {
               "c": "stack",
               "id": "악몽",
-              "n": 3
+              "n": 2
             }
           ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "nextEnemy"
-            }
-          ]
-        },
-        {
-          "name": "악몽 마주하기",
-          "when": {
-            "on": "play",
-            "type": "스킬"
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "악몽",
-              "n": 1
-            }
-          ],
           "fx": [
             {
               "k": "perStack",
@@ -79,12 +66,18 @@
             },
             {
               "k": "shield",
-              "ratio": 0.3
+              "ratio": 0.6
             },
             {
               "k": "spend",
               "id": "악몽",
               "all": true
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -123,7 +116,7 @@
         "이드_재활_s1",
         "이드_재활_s1",
         "이드_재활_s2",
-        "이드_재활_s2"
+        "이드_재활_u3"
       ],
       "keywords": [
         {
@@ -266,158 +259,146 @@
       "name": "뚜렷한 경계",
       "hero": "이드_재활",
       "unique": true,
-      "signature": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 0.55,
           "base": "def",
           "target": "allEnemies"
         },
         {
-          "k": "status",
-          "id": "둔화",
-          "v": 1,
-          "target": "allEnemies"
+          "k": "heal",
+          "ratio": 0.6
         },
         {
-          "k": "status",
-          "id": "사기",
+          "k": "stack",
+          "id": "악몽",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "파동에 닿은 손",
+          "name": "선명한 경계",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.69,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "heal",
+              "ratio": 0.72
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "경계 너머까지",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.02,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "악몽",
               "v": 1
             }
           ]
         },
         {
           "name": "환장의 짝꿍",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.94,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "heal",
+              "ratio": 0.94
             },
             {
               "k": "status",
-              "id": "사기",
-              "v": 1
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "흐려지는 경계",
-          "tags": [
-            "신속"
-          ],
+          "name": "악몽의 경계",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.96,
+              "ratio": 0.56,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "heal",
+              "ratio": 0.62
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "ifStack",
+              "id": "악몽",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "base": "def",
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "뮤트가 일으켜 줌",
-          "cost": 3,
+          "name": "경계 기록",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.95,
+              "ratio": 0.62,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "둔화",
+              "k": "heal",
+              "ratio": 0.62
+            },
+            {
+              "k": "draw",
               "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "꿈의 흔적",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.94
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "다시 일어서는 무릎",
+          "name": "꿈의 경계",
           "kind": "power"
         },
         {
-          "name": "식은땀",
-          "kind": "ap"
+          "name": "보조기",
+          "kind": "draw"
         },
         {
-          "name": "뮤트의 응원",
+          "name": "꿈속 중얼거림",
           "fx": [
             {
               "k": "stack",
@@ -435,168 +416,149 @@
       "unique": true,
       "cost": 1,
       "type": "공격",
-      "tags": [
-        "약점 공격"
-      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.7,
           "base": "def",
-          "target": "allEnemies"
+          "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "둔화",
           "v": 1,
           "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "악몽",
-          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "기어서라도 가기",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "선명한 파장",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.92,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "둔화",
               "v": 1,
               "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 1
             }
           ]
         },
         {
-          "name": "넓게 퍼지는 파장",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.58,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "닿은 자리마다",
+          "name": "작은 파장",
           "cost": 0,
-          "tags": [
-            "약점 공격"
-          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "악몽 공명",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "악몽",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "파장 상시 발산",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.5,
               "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "악몽",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "악몽",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "깊은 잠",
-          "tags": [
-            "약점 공격",
-            "보존"
-          ],
+          "name": "악몽 털어내기",
           "fx": [
+            {
+              "k": "perStack",
+              "id": "악몽"
+            },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.25,
               "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "spend",
               "id": "악몽",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "볼을 당기면",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
+              "all": true
+            },
             {
               "k": "dmg",
               "ratio": 0.5,
               "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
               "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "짝꿍의 손",
-          "kind": "power"
+          "name": "흐트러진 박자",
+          "kind": "frost"
         },
         {
-          "name": "꿈속의 파동",
-          "kind": "ap"
+          "name": "산책길",
+          "kind": "cost"
         },
         {
-          "name": "넘어진 자리",
+          "name": "한 걸음 더",
           "fx": [
             {
               "k": "stack",
@@ -612,237 +574,50 @@
       "name": "잠든 동안",
       "hero": "이드_재활",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
-      "tags": [
-        "종극"
-      ],
       "fx": [
-        {
-          "k": "shield",
-          "ratio": 3
-        },
-        {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 2
-        },
         {
           "k": "stack",
           "id": "악몽",
           "v": 2
-        }
-      ],
-      "oracles": [
-        {
-          "name": "짧은 낮잠",
-          "tags": [
-            "종극"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.9
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 2
-            }
-          ]
         },
         {
-          "name": "겨울잠",
-          "cost": 1,
-          "tags": [
-            "종극"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 2
-            }
-          ]
+          "k": "shield",
+          "ratio": 1
         },
         {
-          "name": "잠결의 악몽",
-          "tags": [
-            "종극",
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.96
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "악몽의 밤",
-          "tags": [
-            "종극"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 4.35
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "깨면 기억 못 해",
-          "tags": [
-            "종극"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.9
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "식은땀",
-          "kind": "guard"
-        },
-        {
-          "name": "뮤트의 응원",
-          "kind": "draw"
-        },
-        {
-          "name": "다시 일어서는 무릎",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "악몽",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "이드_재활_u4",
-      "name": "소중한 순간",
-      "hero": "이드_재활",
-      "unique": true,
-      "cost": 1,
-      "type": "강화",
-      "fx": [
-        {
-          "k": "defMod",
-          "v": 0.1,
-          "run": true,
-          "target": "self"
-        },
-        {
-          "k": "status",
-          "id": "불굴",
+          "k": "draw",
           "v": 1
-        },
-        {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "악몽",
-                  "v": 1
-                }
-              ]
-            }
-          ]
         }
       ],
       "oracles": [
         {
-          "name": "첫 걸음마",
+          "name": "깊은 잠",
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "stack",
+              "id": "악몽",
+              "v": 3
             },
             {
-              "k": "status",
-              "id": "불굴",
+              "k": "shield",
+              "ratio": 0.95
+            },
+            {
+              "k": "draw",
               "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "악몽",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
-          "name": "스스로 마주하기",
-          "cost": 0,
+          "name": "산책 겸 재활",
+          "power": true,
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
             {
               "k": "draw",
               "v": 1
@@ -859,6 +634,10 @@
                       "k": "stack",
                       "id": "악몽",
                       "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.45
                     }
                   ]
                 }
@@ -867,16 +646,31 @@
           ]
         },
         {
-          "name": "파동의 주인",
-          "tags": [
-            "보존"
-          ],
+          "name": "뮤트에게 들려줄 이야기",
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "stack",
+              "id": "악몽",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "꿈 일기",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.23
             },
             {
               "k": "stack",
@@ -884,102 +678,216 @@
               "v": 2
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "악몽",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
+              "k": "shield",
+              "ratio": 1.6
             }
           ]
         },
         {
-          "name": "다시 꾸는 꿈",
+          "name": "잠꼬대",
           "fx": [
             {
-              "k": "defMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "status",
-              "id": "불굴",
+              "k": "discard",
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "악몽",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "짝꿍과의 약속",
-          "fx": [
-            {
-              "k": "defMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "stack",
+              "id": "악몽",
+              "v": 3
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "악몽",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "draw",
+              "v": 3
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "꿈속의 파동",
-          "kind": "atkUp"
+          "name": "꿈틀이 쿠션",
+          "kind": "cost"
         },
         {
-          "name": "넘어진 자리",
-          "kind": "draw"
+          "name": "자매들의 선물",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "짝꿍의 손",
+          "name": "뮤트의 손길",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "이드_재활_u4",
+      "name": "소중한 순간",
+      "hero": "이드_재활",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "악몽"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.35
+        },
+        {
+          "k": "spend",
+          "id": "악몽",
+          "all": true
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "엘생 네컷",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "악몽"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.45
+            },
+            {
+              "k": "spend",
+              "id": "악몽",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "찰칵",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "악몽"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.26
+            },
+            {
+              "k": "spend",
+              "id": "악몽",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "스스로 마주하기",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "악몽"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.15
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "악몽 간직",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "악몽"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "모두의 보조기",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "악몽"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.53
+            },
+            {
+              "k": "heal",
+              "ratio": 0.74
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "사진 부스",
+          "kind": "guard"
+        },
+        {
+          "name": "네컷 한 장 더",
+          "kind": "ap"
+        },
+        {
+          "name": "악몽 한 조각",
           "fx": [
             {
               "k": "stack",

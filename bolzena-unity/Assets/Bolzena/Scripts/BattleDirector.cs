@@ -24,6 +24,8 @@ namespace Bolzena
         public HandView Hand;
         public PartyHud Hud;
         public bool WaitingInput { get; private set; }
+        /// <summary>턴 종료를 누른 뒤 적 차례가 끝날 때까지(턴 종료 단추가 「적 차례」 로 잠긴다).</summary>
+        public bool EnemyTurn { get; private set; }
         public bool Over { get; private set; }
         public event Action<string> Moment;                 // 「hit」 · 「crit」 · 「break」 … 연출의 고비(자동 데모가 캡처)
         public int DemoEpiphanyPick = -1;
@@ -524,7 +526,7 @@ namespace Bolzena
                 Debug.Log($"[Battle] 요청 {r.kind} {r.a} → {r.b}");
                 if (r.kind == ReqKind.Card) yield return PlayCardFlow(r.a, r.b);
                 else if (r.kind == ReqKind.Ult) yield return UltFlow(r.a, r.b);
-                else yield return EndTurnFlow();
+                else { EnemyTurn = true; yield return EndTurnFlow(); EnemyTurn = false; }
             }
             // 판에서 넘어온 싸움 — 끝을 보여 준 뒤 판 화면으로 돌아간다
             if (BattleBridge.Fight != null)
@@ -846,6 +848,12 @@ namespace Bolzena
                     i = j;
                     continue;
                 }
+                if (e.Kind == EventKind.Draw && e.Text != null && e.Text.StartsWith("grace"))
+                {   // 은총으로 얻은 카드 — 크게 보인 뒤 손패로(손이 가득하면 버림 더미로)
+                    yield return GraceIn(e);
+                    i++;
+                    continue;
+                }
                 if (e.Kind == EventKind.Draw)
                 {
                     // 연달아 뽑는 것은 한꺼번에 — 부채가 한 번에 펼쳐지게
@@ -1011,6 +1019,7 @@ namespace Bolzena
         {
             ["form"] = "변신", ["forget"] = "망각", ["remove"] = "제거", ["bond"] = "결속", ["evolve"] = "진화", ["transform"] = "변신", ["pull"] = "끌어옴",
             ["burn"] = "소멸", ["evaporate"] = "증발", ["recall"] = "회수", ["make"] = "생성", ["connect"] = "연결",
+            ["seize"] = "빼앗김",   // 적의 손패 흡수(core 수 seize) — 손 카드가 적에게 끌려간다 · 되찾으면 뽑기처럼 손으로
         };
 
         void CueWord(Vector3 at, string label)
@@ -1219,7 +1228,12 @@ namespace Bolzena
             var info = cv.Info;
             int choice = -1;
             Hand.Remove(cv);
-            if (info.Epiphany)
+            if (info.Epiphany && info.Grace)
+            {   // 은총 — 고르기 없음(선택지 하나). 신탁 창을 열지 않고, 얻은 카드는 PlayCard 의 Draw(grace) 연출(GraceIn)이 크게 보인 뒤 손패로
+                choice = 0;
+                graceFrom = info.Name;
+            }
+            else if (info.Epiphany)
             {
                 var opts = Battle.EpiphanyOptions(handIndex);
                 if (opts.Count > 0) yield return EpiphanyWindow.Run(ScreenRoot, cv, opts, c => choice = c, DemoEpiphanyPick, () => OpenPile(0));   // 덱 보기 — 뽑을 더미 창(사도별 묶음)

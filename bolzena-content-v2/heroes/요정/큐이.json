@@ -1,672 +1,717 @@
 {
- "heroes": [
-  {
-   "id": "큐이",
-   "name": "큐이",
-   "nature": "순수",
-   "race": "요정",
-   "role": "서포터",
-   "star": 1,
-   "hp": 480,
-   "atk": 64,
-   "def": 44,
-   "crit": 5,
-   "blurb": "오이에 인생을 건 요정. 말끝마다 \"오이\"를 붙이고 오이 레시피를 퍼뜨리며, 소원은 요정들이 오이를 좋아하게 되는 것. 어디든 \"오이 심어도 돼요?\"라고 묻는 게 특기이고, 오이 덩굴의 달팽이는 원수.",
-   "keyword": {
-    "name": "오이",
-    "desc": "아군 카드에 몰래 심는 오이",
-    "carrier": "hero",
-    "cap": 2
-   },
-   "passives": [
+  "heroes": [
     {
-     "name": "몰래 오이 심기",
-     "when": {
-      "on": "play",
-      "marked": "오이"
-     },
-     "limit": {
-      "per": "turn",
-      "n": 2
-     },
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 0.4
+      "id": "큐이",
+      "name": "큐이",
+      "nature": "순수",
+      "race": "요정",
+      "role": "서포터",
+      "star": 1,
+      "hp": 480,
+      "atk": 64,
+      "def": 44,
+      "crit": 5,
+      "blurb": "오이에 인생을 건 요정. 말끝마다 \"오이\"를 붙이고 오이 레시피를 퍼뜨리며, 소원은 요정들이 오이를 좋아하게 되는 것. 어디든 \"오이 심어도 돼요?\"라고 묻는 게 특기이고, 오이 덩굴의 달팽이는 원수.",
+      "keyword": {
+        "name": "오이 팩",
+        "desc": "동료에게 몰래 붙여 둔 오이",
+        "carrier": "hero",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ]
       },
-      {
-       "k": "draw",
-       "v": 1
+      "passives": [
+        {
+          "name": "몰래 오이 심기",
+          "when": {
+            "on": "play",
+            "marked": "오이 팩"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.25
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "spend",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "오이의 오의",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "otherAllies"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주의 축복 - 큐이",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "heal",
+            "ratio": 6
+          },
+          {
+            "k": "stack",
+            "id": "오이 팩",
+            "v": 2,
+            "target": "otherAllies"
+          }
+        ]
       },
-      {
-       "k": "spend",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      }
-     ]
+      "starter": [
+        "큐이_s1",
+        "큐이_s1",
+        "큐이_s2",
+        "큐이_u1"
+      ]
     }
-   ],
-   "ult": {
-    "name": "교주의 축복 - 큐이",
-    "cost": 150,
-    "fx": [
-     {
-      "k": "heal",
-      "ratio": 6
-     },
-     {
-      "k": "stack",
-      "id": "오이",
-      "v": 2,
-      "target": "otherAllies"
-     }
-    ]
-   },
-   "starter": [
-    "큐이_s1",
-    "큐이_s1",
-    "큐이_s2",
-    "큐이_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "큐이_s1",
-   "name": "오이 던지기",
-   "hero": "큐이",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "큐이_s1",
+      "name": "오이 던지기",
+      "hero": "큐이",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "큐이_s2",
+      "name": "오이 팩",
+      "hero": "큐이",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "큐이_cucumber",
+      "name": "싱싱한 오이",
+      "hero": "큐이",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.32
+        },
+        {
+          "k": "stack",
+          "id": "오이 팩",
+          "v": 1,
+          "target": "oneAlly"
+        }
+      ]
+    },
+    {
+      "id": "큐이_u1",
+      "name": "몰래 오이 심기",
+      "hero": "큐이",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "오이 팩",
+          "v": 1,
+          "target": "oneAlly"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "오이 두 개 심기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오이 밭 습격",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "otherAllies"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "거절당해도 또",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오이 밭에 물 주기",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "오이 팩",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "몰래몰래",
+          "fx": [
+            {
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "오이 꼭지",
+          "kind": "draw"
+        },
+        {
+          "name": "살금살금",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "싱싱한 잎",
+          "fx": [
+            {
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "큐이_u2",
+      "name": "오이 오일",
+      "hero": "큐이",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.99
+        },
+        {
+          "k": "stack",
+          "id": "오이 팩",
+          "v": 1,
+          "target": "oneAlly"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진한 오이 오일",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.31
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "오일 한 방울",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.59
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "오이 팩 갈아 붙이기",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.35
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오일 코팅",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.17
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "오이 나눔",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.9
+            },
+            {
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "상큼한 향",
+          "kind": "heal"
+        },
+        {
+          "name": "미끌미끌",
+          "kind": "cost"
+        },
+        {
+          "name": "촉촉한 피부",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "큐이_u3",
+      "name": "오이를 권하는 행렬",
+      "hero": "큐이",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 1.08
+        },
+        {
+          "k": "stack",
+          "id": "오이 팩",
+          "v": 1,
+          "target": "otherAllies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "오이 대행진",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.93
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "otherAllies"
+            }
+          ]
+        },
+        {
+          "name": "한 입만 권하기",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "otherAllies"
+            }
+          ]
+        },
+        {
+          "name": "행렬의 선두",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.38
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "otherAllies"
+            }
+          ]
+        },
+        {
+          "name": "온 세상에 오이를",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 2,
+              "target": "otherAllies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "좋아질 때까지",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "큐이_cucumber",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "오이 냉국",
+          "kind": "heal"
+        },
+        {
+          "name": "행렬 박자",
+          "kind": "ap"
+        },
+        {
+          "name": "흥겨운 장단",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "otherAllies"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "큐이_u4",
+      "name": "오이 샌드위치 공세",
+      "hero": "큐이",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "오이 팩",
+          "v": 1,
+          "target": "oneAlly"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "두툼한 샌드위치",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.17,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "샌드위치 뿌리기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "도시락 나눠 먹기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "껍질까지 먹어",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "오이 다 먹이기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "큐이_cucumber"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "큐이_cucumber"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "바삭한 식빵",
+          "kind": "power"
+        },
+        {
+          "name": "오이 피클",
+          "kind": "frost"
+        },
+        {
+          "name": "소풍",
+          "kind": "draw"
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "큐이_s2",
-   "name": "오이 팩",
-   "hero": "큐이",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 2.1
-    }
-   ]
-  },
-  {
-   "id": "큐이_u1",
-   "name": "몰래 오이 심기",
-   "hero": "큐이",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "연계"
-   ],
-   "fx": [
-    {
-     "k": "stack",
-     "id": "오이",
-     "v": 1,
-     "target": "oneAlly"
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "오이 두 개 심기",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "oneAlly"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "오이 꼭지",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "오이 밭 습격",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "몰래몰래",
-     "tags": [
-      "연계",
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "심고 튀기",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      },
-      {
-       "k": "draw",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "싱싱한 잎",
-     "kind": "draw"
-    },
-    {
-     "name": "수분 충전",
-     "kind": "ap"
-    },
-    {
-     "name": "살금살금",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "큐이_u2",
-   "name": "오이 오일",
-   "hero": "큐이",
-   "unique": true,
-   "cost": 2,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 3
-    },
-    {
-     "k": "stack",
-     "id": "오이",
-     "v": 2,
-     "target": "otherAllies"
-    },
-    {
-     "k": "status",
-     "id": "결의",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "진한 오이 오일",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 4.6
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "오일 한 방울",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.8
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "otherAllies"
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "온몸 오이 팩",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 4.2
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "allAllies"
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "오일 코팅",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.5
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "오이 향 결의",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 3.0
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      },
-      {
-       "k": "status",
-       "id": "결의",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "상큼한 향",
-     "kind": "heal"
-    },
-    {
-     "name": "미끌미끌",
-     "kind": "draw"
-    },
-    {
-     "name": "촉촉한 피부",
-     "kind": "defUp"
-    }
-   ]
-  },
-  {
-   "id": "큐이_u3",
-   "name": "오이를 권하는 행렬",
-   "hero": "큐이",
-   "unique": true,
-   "cost": 2,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 2.5
-    },
-    {
-     "k": "status",
-     "id": "사기",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "오이",
-     "v": 1,
-     "target": "otherAllies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "오이 대행진",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 3.2
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      }
-     ]
-    },
-    {
-     "name": "한 입만 권하기",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.2
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "otherAllies"
-      }
-     ]
-    },
-    {
-     "name": "오이 축제",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 2.2
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "otherAllies"
-      }
-     ]
-    },
-    {
-     "name": "행렬의 선두",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 3.1
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "otherAllies"
-      }
-     ]
-    },
-    {
-     "name": "끝없는 행렬",
-     "cost": 3,
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 4.0
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "오이 냉국",
-     "kind": "heal"
-    },
-    {
-     "name": "행렬 박자",
-     "kind": "ap"
-    },
-    {
-     "name": "흥겨운 장단",
-     "kind": "atkUp"
-    }
-   ]
-  },
-  {
-   "id": "큐이_u4",
-   "name": "오이 샌드위치 공세",
-   "hero": "큐이",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.1,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "status",
-     "id": "약화",
-     "v": 1
-    },
-    {
-     "k": "stack",
-     "id": "오이",
-     "v": 1,
-     "target": "oneAlly"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "두툼한 샌드위치",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.45,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      }
-     ]
-    },
-    {
-     "name": "한 입 샌드위치",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      }
-     ]
-    },
-    {
-     "name": "샌드위치 뿌리기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      }
-     ]
-    },
-    {
-     "name": "오이 듬뿍 샌드위치",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 2,
-       "target": "otherAllies"
-      }
-     ]
-    },
-    {
-     "name": "도시락 습격",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.25,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "오이",
-       "v": 1,
-       "target": "oneAlly"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "바삭한 식빵",
-     "kind": "power"
-    },
-    {
-     "name": "차가운 오이",
-     "kind": "frost"
-    },
-    {
-     "name": "빈틈에 오이",
-     "kind": "weakSpot"
-    }
-   ]
-  }
- ]
+  ]
 }

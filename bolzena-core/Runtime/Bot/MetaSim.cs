@@ -33,6 +33,9 @@ namespace Bolzena.Core
             public double AvgDeck, AvgUniques, AvgBasics;
             /// <summary>판당 상점 빼기 횟수.</summary>
             public double AvgRemovals;
+            /// <summary>연속 이벤트 깃발 — 판당 선 수 · 깃발마다 선 판 비율(%).</summary>
+            public double FlagsPerRun, FlagReadsPerRun;
+            public Dictionary<string, double> FlagPct = new();
         }
 
         static readonly Dictionary<string, string> LETTER = new() { ["탱커"] = "T", ["서포터"] = "S", ["딜러"] = "D" };
@@ -122,6 +125,9 @@ namespace Bolzena.Core
                 BreaksPerFight = bk.ToDictionary(kv => kv.Key, kv => kv.Value[0] > 0 ? (double)kv.Value[1] / kv.Value[0] : 0),
                 Label = $"{(skilled ? "숙련" : "초보")} 봇 · {PartyName(party)} 편성{(uonly ? " · 고유 카드만" : "")}",
                 AvgDeck = res.Length > 0 ? res.Average(x => x.Deck) : 0, AvgUniques = res.Length > 0 ? res.Average(x => x.Uniques) : 0, AvgBasics = res.Length > 0 ? res.Average(x => x.Basics) : 0, AvgRemovals = res.Length > 0 ? res.Average(x => x.Removals) : 0,
+                FlagsPerRun = res.Length > 0 ? res.Average(x => x.Flags.Count) : 0,
+                FlagReadsPerRun = res.Length > 0 ? res.Average(x => x.FlagReads) : 0,
+                FlagPct = res.SelectMany(x => x.Flags).GroupBy(x => x).ToDictionary(g => g.Key, g => Pct(g.Count(), res.Length)),
             };
         }
 
@@ -447,6 +453,7 @@ namespace Bolzena.Core
             sb.AppendLine($"  끝난 덱 — 평균 {r.AvgDeck:0.0}장 · 고유 {r.AvgUniques:0.0} · 기본 {r.AvgBasics:0.0} · 상점 빼기 판당 {r.AvgRemovals:0.00}");
             sb.AppendLine($"  마을  {string.Join(" · ", r.Villages.Select(kv => $"{d.Villages[kv.Key].Name} {kv.Value.win:0.0}%({kv.Value.n}판)"))} · 쓰러진 층 1층 {r.Fell[0]:0.0}% · 2층 {r.Fell[1]:0.0}%");
             sb.AppendLine($"  평균 턴 — 일반 싸움 {r.AvgTurnsFight:0.0} · 보스 {r.AvgTurnsBoss:0.0}");
+            if (r.FlagPct.Count > 0) sb.AppendLine($"  깃발(연속 이벤트) — 판당 선 깃발 {r.FlagsPerRun:0.00} · 줄기 뒤 이벤트를 만남 {r.FlagReadsPerRun:0.000} · {string.Join(" · ", r.FlagPct.OrderByDescending(kv => kv.Value).Select(kv => $"{kv.Key} {kv.Value:0.0}%"))}");
             sb.AppendLine($"  격파 — 판당 {r.BreaksPerRun:0.0} · 싸움당 {string.Join(" · ", r.BreaksPerFight.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))} · 강인도 깎은 카드 가운데 약점 공격 {r.WeakPct:0}%");
             sb.AppendLine("편성(역할 셋)");
             foreach (var kv in r.Comps.OrderByDescending(x => x.Value.win)) sb.AppendLine($"  {kv.Key}  {kv.Value.win,5:0}%  ({kv.Value.n}판)");

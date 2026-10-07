@@ -8,6 +8,8 @@
 #   aside_skill_1        — 금빛 바탕의 사도/소품(버프 느낌) → 강화 카드
 #   aside_skill_2 · _3   — 사도가 나오는 장면 그림 → 스킬 카드(남으면 공격)
 #   icon_graduateskill   — 얼굴 클로즈업(고학년 표) → 마지막에만
+# 저학년 칸(2026-10-08): 원작 저학년 스킬이 된 카드는 사도마다 하나 — Tools~/cardart_low.json. 그 카드에 저학년 아이콘을 먼저 걸고(그림 짝이 있어도 덮지 않는다),
+#   다른 카드에는 저학년 아이콘이 가지 않는다(아이콘이 모자라 어쩔 수 없을 때만 한 번 더).
 # 순서: 대표(signature) 카드가 먼저 고르고 → 강화 → 공격 → 스킬. 한 사도 안에서 같은 아이콘은 한 번만.
 import glob, json, os, re
 
@@ -45,6 +47,7 @@ def icon_name(slot, art):
             "aside1": f"aside_skill_{art}_1", "aside2": f"aside_skill_{art}_2", "aside3": f"aside_skill_{art}_3"}[slot]
 
 
+LOW = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "cardart_low.json"), encoding="utf-8"))["cards"]
 cards, heroes = {}, {}
 for src in SOURCES:
     for f in glob.glob(os.path.join(src, "**", "*.json"), recursive=True):
@@ -67,7 +70,16 @@ for hid, h in sorted(heroes.items()):
         continue
     order = sorted(uniq, key=lambda c: (0 if c.get("signature") else 1 if c.get("type") == "강화" else 2 if c.get("type") == "공격" else 3, c["id"]))
     used = set()
+    uses = {}
+    low = next((c for c in uniq if c["id"] in LOW), None)
+    adm = icon_name("admission", art)
+    if low and adm in have:
+        table[low["id"]] = adm
+        used.add(adm)
+        uses[adm] = 1
     for c in order:
+        if low and c["id"] == low["id"] and adm in have:
+            continue
         for slot in PREF.get(c.get("type"), PREF["스킬"]):
             name = icon_name(slot, art)
             if name in have and name not in used:
@@ -75,12 +87,14 @@ for hid, h in sorted(heroes.items()):
                 table[c["id"]] = name
                 break
         else:
-            # 아이콘이 모자란 사도 — 이미 쓴 것 가운데 결이 맞는 것을 한 번 더
-            for slot in PREF.get(c.get("type"), PREF["스킬"]):
-                name = icon_name(slot, art)
-                if name in have:
-                    table[c["id"]] = name
-                    break
+            # 아이콘이 모자란 사도 — 이미 쓴 것 가운데 가장 덜 쓴 것을 한 번 더(저학년 아이콘은 저학년 칸 것이라 맨 마지막 — 다른 것이 하나도 없을 때만)
+            cand = [icon_name(slot, art) for slot in PREF.get(c.get("type"), PREF["스킬"]) if slot != "admission" and icon_name(slot, art) in have]
+            if not cand:
+                cand = [adm] if adm in have else []
+            if cand:
+                table[c["id"]] = min(cand, key=lambda n: (uses.get(n, 0), cand.index(n)))
+        if c["id"] in table:
+            uses[table[c["id"]]] = uses.get(table[c["id"]], 0) + 1
 
 # 고른 원작 그림(사도마다 대조 시트로 골랐다 — Tools~/cardpic_picks.json · cardpic_sheet.py) — 고유 · 생성 카드만, 시작 카드는 늘 스탠딩
 #   "file" = 장면 · SD · 물건 그림 → "pics"(copy_assets.py 가 RunArt/CardPic 으로 굽는다) · "icon" = 내용이 맞는 원작 스킬 아이콘 → "cards" 를 덮는다
@@ -89,10 +103,15 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cardpic
 pics = {}
+lowicon = {cid: table[cid] for cid in LOW if cid in table and table[cid].startswith("icon_admissionskill_")}
 for cid, p in cardpic.load().items():
+    if cid in lowicon:
+        continue   # 저학년 칸 — 저학년 아이콘이 보여야 한다
     if p.get("file"):
         pics[cid] = cardpic.name_of(p)
     elif p.get("icon"):
+        if p["icon"].startswith("icon_admissionskill_") and cards.get(cid, {}).get("unique"):
+            continue   # 고유 카드의 저학년 아이콘은 저학년 칸에만(위에서 이미 걸었다) — 생성 카드는 저학년 스킬이 만드는 것이면 걸 수 있다
         table[cid] = p["icon"]
 
 out = {

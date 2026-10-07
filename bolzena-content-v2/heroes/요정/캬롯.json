@@ -1,718 +1,813 @@
 {
- "heroes": [
-  {
-   "id": "캬롯",
-   "name": "캬롯",
-   "nature": "순수",
-   "race": "요정",
-   "role": "서포터",
-   "star": 3,
-   "hp": 580,
-   "atk": 90,
-   "def": 52,
-   "crit": 5,
-   "blurb": "세계수 외곽에 정원을 꾸린 요정 \"일등 정원사\". 사탕수수를 사랑하고 상냥하게 정원에 초대하지만, 작물을 깔보는 자와 공장제 자동화 농법에는 가차 없습니다. 특제 영양제를 과하게 뿌려 세계수 접근 금지를 당한 전적이 있습니다.",
-   "keyword": {
-    "name": "텃밭",
-    "desc": "턴마다 자라는 텃밭 기운",
-    "carrier": "self",
-    "cap": 3,
-    "rules": [
-     {
-      "name": "거름이 된 텃밭",
-      "when": {
-       "on": "stackOver",
-       "id": "텃밭"
+  "heroes": [
+    {
+      "id": "캬롯",
+      "name": "캬롯",
+      "nature": "순수",
+      "race": "요정",
+      "role": "서포터",
+      "star": 3,
+      "hp": 580,
+      "atk": 90,
+      "def": 52,
+      "crit": 5,
+      "blurb": "세계수 외곽에 정원을 꾸린 요정 \"일등 정원사\". 사탕수수를 사랑하고 상냥하게 정원에 초대하지만, 작물을 깔보는 자와 공장제 자동화 농법에는 가차 없습니다. 특제 영양제를 과하게 뿌려 세계수 접근 금지를 당한 전적이 있습니다.",
+      "keyword": {
+        "name": "텃밭",
+        "desc": "세계수 곁에 일군 정원의 기운",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "hot",
+            "ratio": 0.1
+          }
+        ],
+        "rules": [
+          {
+            "name": "거름이 된 텃밭",
+            "when": {
+              "on": "stackOver",
+              "id": "텃밭"
+            },
+            "fx": [
+              {
+                "k": "gauge",
+                "v": 15
+              }
+            ]
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "gauge",
-        "v": 15
-       }
+      "passives": [
+        {
+          "name": "일등 정원사",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "쑥쑥 자라라!",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "수액 펌프 발사!",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "ap",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "텃밭",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "캬롯_s1",
+        "캬롯_s1",
+        "캬롯_s2",
+        "캬롯_u2"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "사탕수수 텃밭",
-     "when": {
-      "on": "play",
-      "type": "스킬"
-     },
-     "limit": {
-      "per": "turn",
-      "n": 1
-     },
-     "fx": [
-      {
-       "k": "make",
-       "id": "캬롯_sprout",
-       "v": 1,
-       "to": "draw"
-      },
-      {
-       "k": "spend",
-       "id": "텃밭",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "일등 정원사",
-     "when": {
-      "on": "turnStart"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 1
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "수액 펌프 발사!",
-    "cost": 250,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 1.5,
-      "target": "allEnemies"
-     },
-     {
-      "k": "ap",
-      "v": 2
-     },
-     {
-      "k": "stack",
-      "id": "텃밭",
-      "v": 3
-     }
-    ]
-   },
-   "starter": [
-    "캬롯_s1",
-    "캬롯_s1",
-    "캬롯_s2",
-    "캬롯_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "캬롯_s1",
-   "name": "수액 방울",
-   "hero": "캬롯",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
+      "id": "캬롯_s1",
+      "name": "수액 방울",
+      "hero": "캬롯",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "캬롯_s2",
+      "name": "당근 주스",
+      "hero": "캬롯",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.1
+        }
+      ]
+    },
+    {
+      "id": "캬롯_sprout",
+      "name": "당근 새싹",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.3
+        },
+        {
+          "k": "stack",
+          "id": "텃밭",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "hero": "캬롯",
+      "token": true,
+      "evolve": {
+        "n": 2,
+        "into": "캬롯_carrot"
+      }
+    },
+    {
+      "id": "캬롯_carrot",
+      "name": "특 플러스 당근",
+      "hero": "캬롯",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.6
+        },
+        {
+          "k": "stack",
+          "id": "텃밭",
+          "v": 2
+        },
+        {
+          "k": "dealtMod",
+          "v": 0.2,
+          "target": "allAllies"
+        }
+      ]
+    },
+    {
+      "id": "캬롯_u1",
+      "name": "탄산수액 발사",
+      "hero": "캬롯",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "dealtMod",
+          "v": 0.25,
+          "target": "allAllies"
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "make",
+          "id": "캬롯_sprout",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "급성장 수액 발사",
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.35,
+              "target": "allAllies"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "수액 소나기",
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "수액 뒤집어쓰기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.82,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "잠시 후 떨어지는 수액",
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "텃밭",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "햇님이 응원",
+          "power": true,
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.25,
+              "target": "allAllies"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "캬롯_sprout",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "톡 쏘는 탄산",
+          "kind": "ap"
+        },
+        {
+          "name": "사탕수수 빨대",
+          "kind": "draw"
+        },
+        {
+          "name": "햇살",
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "캬롯_u2",
+      "name": "특제 사탕수수 커피",
+      "hero": "캬롯",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "make",
+          "id": "캬롯_sprout",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "진한 커피",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "아침 커피",
+          "tags": [
+            "신속"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "캬롯_sprout",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "유기농 고집",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "교주도 못 견디는 맛",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "테이크아웃",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "사탕수수 원두",
+          "kind": "draw"
+        },
+        {
+          "name": "머그컵",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "설탕 한 스푼",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "텃밭",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "캬롯_u3",
+      "name": "당근 신선도 유지",
+      "hero": "캬롯",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.1
+        },
+        {
+          "k": "perTag",
+          "id": "캬롯_sprout"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.35
+        }
+      ],
+      "oracles": [
+        {
+          "name": "냉장 보관",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "perTag",
+              "id": "캬롯_sprout"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "신선 포장",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.75
+            },
+            {
+              "k": "perTag",
+              "id": "캬롯_sprout"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.25
+            }
+          ]
+        },
+        {
+          "name": "아이스 당근당근",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.5
+            },
+            {
+              "k": "perTag",
+              "id": "캬롯_sprout"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.52
+            }
+          ]
+        },
+        {
+          "name": "유통 기한",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.21
+            },
+            {
+              "k": "perTag",
+              "id": "캬롯_sprout"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.33
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.88
+            }
+          ]
+        },
+        {
+          "name": "싱싱함 가득",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "비닐하우스",
+          "kind": "guard"
+        },
+        {
+          "name": "아침 이슬",
+          "kind": "cost"
+        },
+        {
+          "name": "단단한 껍질",
+          "kind": "defUp"
+        }
+      ]
+    },
+    {
+      "id": "캬롯_u4",
+      "name": "내 정원에 놀러 올래?",
+      "hero": "캬롯",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.5
+        },
+        {
+          "k": "perTag",
+          "id": "캬롯_sprout"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정원 투어",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.7
+            },
+            {
+              "k": "perTag",
+              "id": "캬롯_sprout"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.27
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "먼저 보낸 초대장",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "캬롯_sprout",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "근육 당근",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "위성에서 보이는 정원",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.5
+            },
+            {
+              "k": "perTag",
+              "id": "캬롯_sprout"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "수확 축제",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.02
+            },
+            {
+              "k": "perTag",
+              "id": "캬롯_sprout"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.58
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "캬롯_sprout"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "해바라기",
+          "kind": "heal"
+        },
+        {
+          "name": "정원사 가위",
+          "kind": "atkUp"
+        },
+        {
+          "name": "죽창",
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "캬롯_s2",
-   "name": "당근 주스",
-   "hero": "캬롯",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 2.1
-    }
-   ]
-  },
-  {
-   "id": "캬롯_u1",
-   "name": "탄산수액 발사",
-   "hero": "캬롯",
-   "unique": true,
-   "cost": 2,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "status",
-     "id": "사기",
-     "v": 1
-    },
-    {
-     "k": "status",
-     "id": "피해 감소",
-     "v": 2
-    },
-    {
-     "k": "stack",
-     "id": "텃밭",
-     "v": 2
-    }
-   ],
-   "oracles": [
-    {
-     "name": "탄산 폭발",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "탄산 한 모금",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "기운 펑펑 수액",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "끈적 수액 막",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 2.8
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "새싹 틔우기",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      },
-      {
-       "k": "make",
-       "id": "캬롯_sprout",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "톡 쏘는 맛",
-     "kind": "heal"
-    },
-    {
-     "name": "당분 충전",
-     "kind": "ap"
-    },
-    {
-     "name": "거품 넘침",
-     "kind": "draw"
-    }
-   ]
-  },
-  {
-   "id": "캬롯_u2",
-   "name": "특제 사탕수수 커피",
-   "hero": "캬롯",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "신속"
-   ],
-   "fx": [
-    {
-     "k": "draw",
-     "v": 2
-    },
-    {
-     "k": "stack",
-     "id": "텃밭",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "진한 커피",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "커피 한 방울",
-     "cost": 0,
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "사탕수수 라떼",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "모닝 커피",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "원두 거름",
-     "tags": [
-      "신속"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 3
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "리필",
-     "kind": "draw"
-    },
-    {
-     "name": "샷 추가",
-     "kind": "ap"
-    },
-    {
-     "name": "테이크아웃",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "캬롯_u3",
-   "name": "당근 신선도 유지",
-   "hero": "캬롯",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 3
-    },
-    {
-     "k": "ifStack",
-     "id": "텃밭",
-     "n": 1,
-     "not": true
-    },
-    {
-     "k": "stack",
-     "id": "텃밭",
-     "v": 2
-    }
-   ],
-   "oracles": [
-    {
-     "name": "아삭한 보관",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.8
-      },
-      {
-       "k": "ifStack",
-       "id": "텃밭",
-       "n": 1,
-       "not": true
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "당근 한 토막",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.0
-      },
-      {
-       "k": "ifStack",
-       "id": "텃밭",
-       "n": 1,
-       "not": true
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "진공 포장",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.0
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      },
-      {
-       "k": "ifStack",
-       "id": "텃밭",
-       "n": 1,
-       "not": true
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "울타리 치기",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.2
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "갓 뽑은 당근",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.0
-      },
-      {
-       "k": "heal",
-       "ratio": 1.0
-      },
-      {
-       "k": "ifStack",
-       "id": "텃밭",
-       "n": 1,
-       "not": true
-      },
-      {
-       "k": "stack",
-       "id": "텃밭",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "두꺼운 껍질",
-     "kind": "guard"
-    },
-    {
-     "name": "밭 둘러보기",
-     "kind": "draw"
-    },
-    {
-     "name": "꼼꼼한 관리",
-     "kind": "defUp"
-    }
-   ]
-  },
-  {
-   "id": "캬롯_u4",
-   "name": "내 정원에 놀러 올래?",
-   "hero": "캬롯",
-   "unique": true,
-   "cost": 2,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 1.5
-    },
-    {
-     "k": "ap",
-     "v": 1
-    },
-    {
-     "k": "gauge",
-     "v": 30
-    }
-   ],
-   "oracles": [
-    {
-     "name": "활짝 핀 정원",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 2.4
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "gauge",
-       "v": 30
-      }
-     ]
-    },
-    {
-     "name": "화분 하나",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.0
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "gauge",
-       "v": 15
-      }
-     ]
-    },
-    {
-     "name": "새싹 잔치",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.5
-      },
-      {
-       "k": "gauge",
-       "v": 30
-      },
-      {
-       "k": "make",
-       "id": "캬롯_sprout",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "정원 파티",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.5
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "온실 개방",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.9
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "gauge",
-       "v": 30
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "물뿌리개",
-     "kind": "heal"
-    },
-    {
-     "name": "초대장",
-     "kind": "draw"
-    },
-    {
-     "name": "정원지기 자부심",
-     "kind": "defUp"
-    }
-   ]
-  },
-  {
-   "id": "캬롯_sprout",
-   "name": "새싹",
-   "cost": 0,
-   "type": "스킬",
-   "tags": [
-    "소멸"
-   ],
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 0.8
-    },
-    {
-     "k": "ifStack",
-     "id": "텃밭",
-     "n": 2
-    },
-    {
-     "k": "status",
-     "id": "사기",
-     "v": 1
-    },
-    {
-     "k": "ifStack",
-     "id": "텃밭",
-     "n": 3
-    },
-    {
-     "k": "ap",
-     "v": 1
-    }
-   ],
-   "hero": "캬롯",
-   "token": true
-  }
- ],
+  ],
   "equips": [
     {
       "id": "eq_carrotcane",
@@ -726,12 +821,14 @@
         {
           "name": "달콤한 기운",
           "when": {
-            "on": "turnStart"
+            "on": "play",
+            "type": "스킬",
+            "every": 3
           },
           "fx": [
             {
-              "k": "gauge",
-              "v": 8
+              "k": "draw",
+              "v": 1
             }
           ]
         }
@@ -749,9 +846,9 @@
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "텃밭",
-              "v": 2
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
             }
           ]
         }

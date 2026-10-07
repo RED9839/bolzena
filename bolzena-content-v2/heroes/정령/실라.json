@@ -1,827 +1,836 @@
 {
- "heroes": [
-  {
-   "id": "실라",
-   "name": "실라",
-   "nature": "냉정",
-   "role": "딜러",
-   "star": 3,
-   "hp": 550,
-   "atk": 145,
-   "def": 25,
-   "crit": 10,
-   "blurb": "정면 승부엔 강하고 기습엔 약한 바람의 맏언니. 한 적을 정면으로 마주 보고 쏠수록 그 적은 바람에 깎여 무너집니다.",
-   "keyword": {
-    "name": "정면 승부",
-    "desc": "한 적과 마주 선 승부",
-    "carrier": "enemy",
-    "cap": 3,
-    "hunt": true,
-    "per": [
-     {
-      "stat": "taken",
-      "v": 0.1
-     }
-    ]
-   },
-   "passives": [
+  "heroes": [
     {
-     "name": "맞바람",
-     "when": {
-      "on": "play",
-      "type": "공격"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "기습엔 약해",
-     "when": {
-      "on": "hurt",
-      "guarded": true
-     },
-     "conds": [
-      {
-       "c": "firstTurn"
-      }
-     ],
-     "limit": {
-      "per": "fight",
-      "n": 1
-     },
-     "fx": [
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "ult": {
-    "name": "헥토파스칼 스윙!",
-    "cost": 150,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 2.5,
-      "target": "oneEnemy"
-     },
-     {
-      "k": "status",
-      "id": "둔화",
-      "v": 2,
-      "target": "oneEnemy"
-     },
-     {
-      "k": "tough",
-      "v": 2,
-      "target": "oneEnemy"
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "실라_s1",
-    "실라_s1",
-    "실라_s2",
-    "실라_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "실라_s1",
-   "name": "화살",
-   "hero": "실라",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "실라_s2",
-   "name": "돌풍 화살",
-   "hero": "실라",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "실라_s3",
-   "name": "바람막이",
-   "hero": "실라",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 1.5
-    }
-   ]
-  },
-  {
-   "id": "실라_u1",
-   "name": "정조준",
-   "hero": "실라",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "signature": true,
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.3,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "ifFoe",
-     "id": "attack"
-    },
-    {
-     "k": "dmg",
-     "ratio": 0.65,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "status",
-     "id": "둔화",
-     "v": 1,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "흔들림 없는 시위",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifFoe",
-       "id": "attack"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "맞받아 쏘기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.43,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifFoe",
-       "id": "attack"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.99,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "바람 가르기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifFoe",
-       "id": "attack"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.65,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "속사",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifFoe",
-       "id": "attack"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "겨눠 두기",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.54,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifFoe",
-       "id": "attack"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.77,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "강한 활시위",
-     "kind": "power"
-    },
-    {
-     "name": "빠른 손",
-     "kind": "cost"
-    },
-    {
-     "name": "급소 조준",
-     "kind": "weakSpot"
-    }
-   ]
-  },
-  {
-   "id": "실라_u2",
-   "name": "돌풍 연사",
-   "hero": "실라",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.6,
-     "target": "oneEnemy",
-     "hits": 4
-    },
-    {
-     "k": "stack",
-     "id": "정면 승부",
-     "v": 1,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "폭풍 연사",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.81,
-       "target": "oneEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "산들바람 연사",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.48,
-       "target": "oneEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "소용돌이 화살",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.55,
-       "target": "randomEnemy",
-       "hits": 6
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "관통 화살",
-     "tags": [
-      "분쇄"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.72,
-       "target": "oneEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "바람의 길",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "거센 바람",
-     "kind": "power"
-    },
-    {
-     "name": "순풍",
-     "kind": "cost"
-    },
-    {
-     "name": "찬바람",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "실라_u3",
-   "name": "바람 읽기",
-   "hero": "실라",
-   "unique": true,
-   "cost": 0,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "status",
-     "id": "둔화",
-     "v": 1,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "정면 승부",
-     "v": 1,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "기류 파악",
-     "fx": [
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "바람막이 세우기",
-     "fx": [
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.33
-      }
-     ]
-    },
-    {
-     "name": "맏언니의 눈",
-     "fx": [
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "먼저 보기",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "정면에서",
-     "fx": [
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "날카로운 눈",
-     "kind": "draw"
-    },
-    {
-     "name": "바람 타기",
-     "kind": "ap"
-    },
-    {
-     "name": "겨눈 화살",
-     "fx": [
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "실라_u4",
-   "name": "맏언니의 각오",
-   "hero": "실라",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "status",
-     "id": "잔광",
-     "v": 1
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
-        {
-         "k": "stack",
-         "id": "정면 승부",
-         "v": 1,
-         "target": "oneEnemy"
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "oracles": [
-    {
-     "name": "물러서지 않아",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.25,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
+      "id": "실라",
+      "name": "실라",
+      "nature": "냉정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 550,
+      "atk": 145,
+      "def": 25,
+      "crit": 10,
+      "blurb": "정면 승부엔 강하고 기습엔 약한 바람의 맏언니. 한 적을 정면으로 마주 보고 쏠수록 그 적은 바람에 깎여 무너집니다.",
+      "keyword": {
+        "name": "정면 승부",
+        "desc": "한 적과 마주 선 승부",
+        "carrier": "enemy",
+        "cap": 3,
+        "hunt": true,
+        "per": [
           {
-           "k": "stack",
-           "id": "정면 승부",
-           "v": 2,
-           "target": "oneEnemy"
+            "stat": "taken",
+            "v": 0.13
           }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "가벼운 각오",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
+        ],
+        "rules": [
           {
-           "k": "stack",
-           "id": "정면 승부",
-           "v": 1,
-           "target": "oneEnemy"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "바람의 수호",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
+            "name": "바람의 정령",
+            "when": {
+              "on": "stackReach",
+              "id": "정면 승부",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "tough",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          },
           {
-           "k": "stack",
-           "id": "정면 승부",
-           "v": 2,
-           "target": "oneEnemy"
+            "name": "끼어들기",
+            "when": {
+              "on": "play",
+              "who": "other",
+              "type": "공격"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "정면 승부",
+                "v": 1,
+                "target": "markedEnemy"
+              }
+            ]
           }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "정면 돌파",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
+        ]
       },
-      {
-       "k": "status",
-       "id": "잔광",
-       "v": 3
-      },
-      {
-       "k": "power",
-       "rules": [
+      "passives": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "정면 승부",
-           "v": 1,
-           "target": "oneEnemy"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "먼저 일어선 언니",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "정면 승부",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "power",
-       "rules": [
+          "name": "맞바람",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "정면 승부",
-           "v": 2,
-           "target": "oneEnemy"
-          }
-         ]
+          "name": "정령의 수호자",
+          "when": {
+            "on": "huntDown"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 2,
+              "target": "topEnemy"
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ],
+      "ult": {
+        "name": "헥토파스칼 스윙!",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.5,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 2,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2,
+            "target": "oneEnemy"
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "실라_s1",
+        "실라_u3",
+        "실라_s2",
+        "실라_s3"
+      ]
     }
-   ],
-   "blesses": [
+  ],
+  "cards": [
     {
-     "name": "굳센 팔",
-     "kind": "atkUp"
+      "id": "실라_s1",
+      "name": "화살",
+      "hero": "실라",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
     },
     {
-     "name": "바람 망토",
-     "kind": "defUp"
+      "id": "실라_s2",
+      "name": "돌풍 화살",
+      "hero": "실라",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
     },
     {
-     "name": "가벼운 화살통",
-     "kind": "cost"
+      "id": "실라_s3",
+      "name": "바람막이",
+      "hero": "실라",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "실라_u1",
+      "name": "정조준",
+      "hero": "실라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.85,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "정면 승부"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "명중",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "정면 승부"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "헥토파스칼",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "정면 승부"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "정면 승부",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "정면 돌파",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "정면 승부"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "바람 정령 날리기",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "정면 승부"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "셰이디 저격",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "정면 승부"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "팽팽한 시위",
+          "kind": "power"
+        },
+        {
+          "name": "질서의 눈",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "꼿꼿한 자세",
+          "kind": "ap"
+        }
+      ]
+    },
+    {
+      "id": "실라_u2",
+      "name": "래피드 샷",
+      "hero": "실라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "target": "oneEnemy",
+          "hits": 5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "보이지도 않는 화살",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "oneEnemy",
+              "hits": 5
+            }
+          ]
+        },
+        {
+          "name": "바람살",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "ifStack",
+              "id": "정면 승부",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy",
+              "hits": 2
+            }
+          ]
+        },
+        {
+          "name": "회오리 화살",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.91,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "연사 연습",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "질서의 화살",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "북서부 고기압",
+          "kind": "draw"
+        },
+        {
+          "name": "난기류",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "가벼운 시위",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "실라_u3",
+      "name": "바람 읽기",
+      "hero": "실라",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "정면 승부",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "바람의 흐름",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "돌멩이 하나까지",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "기후 관리",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "정면 승부",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "정령산 정상",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "밀린 만화책",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "손풍기",
+          "kind": "draw"
+        },
+        {
+          "name": "민들레 씨앗",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "맏언니의 눈",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "실라_u4",
+      "name": "맏언니의 각오",
+      "hero": "실라",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "정면 승부",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "play",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "extra",
+                  "ratio": 0.3
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "회오리 바람",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "정령의 수장",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.3
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "공사 구분",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "웃는 연습",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 0.1,
+              "run": true
+            },
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy",
+              "hits": 3
+            }
+          ]
+        },
+        {
+          "name": "전투력 측정기",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.3
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "정면 승부",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "우정의 증표",
+          "kind": "atkUp"
+        },
+        {
+          "name": "추억 속의 정령들",
+          "kind": "ap"
+        },
+        {
+          "name": "바람막이",
+          "kind": "defUp"
+        }
+      ]
     }
-   ]
-  }
- ],
+  ],
   "equips": [
     {
       "id": "eq_sillaarrow",
@@ -856,16 +865,14 @@
         {
           "name": "맞바람 한 발",
           "when": {
-            "on": "play",
-            "type": "공격",
-            "every": 3
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "stack",
               "id": "정면 승부",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "topEnemy"
             }
           ]
         }

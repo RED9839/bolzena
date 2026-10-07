@@ -171,6 +171,9 @@ namespace Bolzena.Core
         /// <summary>한 번의 일(카드 한 장 · 패시브 한 번)에 한 번만 도는 일.</summary>
         static readonly HashSet<string> ONCE_PER_ACT = new() { "debuff", "spend", "crit", "make", "hit" };
 
+        /// <summary>규칙의 계기가 이 일인가 — Matches 의 첫 줄과 같다(Emit 이 미리 거른다).</summary>
+        bool HasPowerOf(string hero) { foreach (var p in Powers) if (p.Hero == hero) return true; return false; }
+        static bool OnEvent(When w, string ev) => w.On == ev || (w.On == "hurt" && w.Guarded && ev == "blocked");
         bool Matches(Unit owner, When w, string ev, EmitInfo info, string kwOf)
         {
             if (w.On != ev && !(w.On == "hurt" && w.Guarded && ev == "blocked")) return false;
@@ -189,6 +192,7 @@ namespace Bolzena.Core
                     if (w.Tag != null && !(info.Tags != null && info.Tags.Any(t => Tag.Parse(t).id == w.Tag))) return false;
                     if (w.MaxCost != null && info.Cost > w.MaxCost.Value) return false;
                     if (w.CardSt != null && CardStOf(info.Id, w.CardSt) <= 0) return false;
+                    if (w.Basic) { var pc = Data.Card(GameData.BaseId(info.Id)); if (pc == null || pc.Hero == null || pc.Unique || pc.Token || GameData.IsCopy(info.Id) || GameData.IsPlain(info.Id)) return false; }   // 시작 카드만(2026-10-08)
                     return true;
                 case "guard": return info.Who != null && info.Who.Side == Side.Party && (w.Kind == null || info.Kind == w.Kind);
                 case "kill":
@@ -257,16 +261,17 @@ namespace Bolzena.Core
                         bool fr = i >= rules.Count;
                         var rt = fr ? frules[i - rules.Count] : rules[i];
                         if (!fr && rt.Own && fd != null && fd.Replace) continue;
+                        if (!OnEvent(rt.R.When, ev)) continue;   // Matches 의 첫 줄 — 안 맞는 규칙은 id 글을 짓기 전에 거른다
                         string id = fr ? $"{owner.Key}|form:{fd.Id}|{i - rules.Count}" : $"{owner.Key}|{i}";
                         FireRule(owner, rt, id, ev, info, 1);
                     }
                     // 강화 카드 지속 규칙 — 켜진 강화(그 사도가 낸 것)마다, 겹 수만큼 효과가 돈다
-                    if (Powers.Count > 0)
+                    if (HasPowerOf(owner.Key))   // 이 사도의 강화가 없으면 목록을 베끼지 않는다
                         foreach (var pw in Powers.ToList())
                         {
                             if (pw.Hero != owner.Key || Over != null) continue;
                             var prs = PowerRules(pw);
-                            for (int i = 0; i < prs.Count; i++) FireRule(owner, prs[i], $"{owner.Key}|pw:{pw.Id}|{i}", ev, info, Math.Max(1, pw.N));
+                            for (int i = 0; i < prs.Count; i++) if (OnEvent(prs[i].R.When, ev)) FireRule(owner, prs[i], $"{owner.Key}|pw:{pw.Id}|{i}", ev, info, Math.Max(1, pw.N));
                         }
                 }
                 if (Forms.Count > 0 && Over == null) FormUntil(ev, info);

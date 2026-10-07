@@ -149,6 +149,24 @@ namespace Bolzena.Battle
         // 힘 모으기(엘리트 · 일반) — 적 자리마다 지난번 본 모습: 쏟을 수 이름 · 쏟는 턴인가 · 쏟을 수 꼴(적 차례 쪽지를 옮길 때 쏟는 턴 · 끊김을 가린다)
         readonly Dictionary<int, (string name, bool now, string t)> chargeSeen = new Dictionary<int, (string, bool, string)>();
 
+        // ── 화면 자료 담아 두기(2026-10-08 성능 — 행동마다 Snapshot 을 다시 지을 때 같은 글을 되풀이해 지었다) ──
+        // 전투(b)가 같으면 CardView 마다 글 · 낱말 풀이 · 주인은 그대로다. 바뀌는 것(비용 · 빛 · 표식 · 생성 카드의 그때 모습)만 덧입힌다.
+        // 사도 · 적의 글(고학년 · 특성 · 장비 · 고유 효과 · 적 패시브)도 전투 동안 그대로라 한 번만 짓는다. 웨이브(새 b)가 열리면 비운다.
+        sealed class InfoBase { public CardInfo Info; public List<(string name, CardView gv)> Gen; }
+        sealed class HeroBase { public string UltText, KeywordText; public List<TraitLine> Traits = new List<TraitLine>(); public List<string> Passives = new List<string>(); public List<GearSlot> Gear = new List<GearSlot>(); }
+        CoreFight cacheOf;
+        readonly Dictionary<CardView, InfoBase> infoBase0 = new Dictionary<CardView, InfoBase>(), infoBase1 = new Dictionary<CardView, InfoBase>();
+        readonly Dictionary<KwRt, string> kwTexts = new Dictionary<KwRt, string>();
+        readonly Dictionary<string, HeroBase> heroBases = new Dictionary<string, HeroBase>();
+        readonly Dictionary<string, List<string>> foePassTexts = new Dictionary<string, List<string>>();
+        readonly Dictionary<(string, int), string> oracleTexts = new Dictionary<(string, int), string>();
+        void CacheFor()
+        {
+            if (cacheOf == b) return;
+            cacheOf = b;
+            infoBase0.Clear(); infoBase1.Clear(); kwTexts.Clear(); heroBases.Clear(); foePassTexts.Clear();
+        }
+
         public CoreBattle(GameData data, Fixture fixture)
         {
             this.data = data;
@@ -206,6 +224,15 @@ namespace Bolzena.Battle
                 if (c == null || c.Oracles.Count == 0) continue;
                 var gl = new Glow { Kind = "card" };
                 for (int n = 1; n <= Math.Min(3, c.Oracles.Count); n++) gl.Picks.Add(new GlowPick { N = n });
+                // -forcebless(점검 · 축복 연출 캡처) — 첫 선택지에 진짜 축복을 얹는다(고르면 규칙에도 들어간다). 기본은 엔진 확률(R.ORACLE_BLESS) 그대로
+                // -blesstest 도 같은 길(둘째 선택지) — 화면에만 보이고 규칙에는 안 붙던 예전 시험 경로를 없앴다(2026-10-08: 쓰고 버린 뒤 축복이 없던 제보)
+                bool fb = Array.IndexOf(Environment.GetCommandLineArgs(), "-forcebless") >= 0, tb = Array.IndexOf(Environment.GetCommandLineArgs(), "-blesstest") >= 0;
+                if ((fb || tb) && gl.Picks.Count > 0)
+                {
+                    int bi = fb ? 0 : Math.Min(1, gl.Picks.Count - 1);
+                    var ks = c.Blesses.Count > 0 ? new List<string> { "own" } : Bolzena.Core.Run.DivineKindsFor(d.View(id, gl.Picks[bi].N));
+                    gl.Picks[bi].Shin = ks.Count > 0 ? ks[0] : "draw";
+                }
                 g[id] = gl;
             }
             return g;
@@ -274,16 +301,16 @@ namespace Bolzena.Battle
                     if (p.N < 1 || p.N > def.Oracles.Count) continue;
                     var o = def.Oracles[p.N - 1];
                     var info = Info(data.View(id, p.N), null);
-                    info.Text = Fmt(NoTagLine(text.Oracle(def, o), info.Tags));
-                    info.EpiphanyLabel = o.Name;
+                    if (!oracleTexts.TryGetValue((id, p.N), out var otx))   // 신탁 글(낱말 맞추기)은 카드 · 갈래마다 그대로
+                        oracleTexts[(id, p.N)] = otx = Fmt(Bolzena.RunUI.OracleDiff.Mark(NoTagLine(text.Card(def), def.Tags), NoTagLine(text.Oracle(def, o), info.Tags)));
+                    info.Text = otx;
+                    info.CostDown = o.Cost.HasValue && o.Cost.Value < def.Cost;
+                    info.EpiphanyLabel = "신탁 " + p.N;   // 이름 대신 갈래 번호(2026-10-08 사용자)
                     info.Epiphany = false;
                     var oo = opts != null ? opts.Find(x => x.N == p.N && x.Shin == p.Shin) : null;
-                    if (oo != null && oo.Blessed) { info.BlessName = oo.BlessName; info.BlessText = Fmt(oo.BlessText); }
+                    if (oo != null && oo.Blessed) { info.BlessName = oo.BlessName; info.BlessText = Fmt(oo.BlessText); info.MarkBless = oo.BlessName; info.MarkBlessText = oo.BlessText; }
                     list.Add(info);
                 }
-                // -blesstest: 축복 모양 확인용 — 얹힌 것이 없으면 둘째 선택지에 축복을 보이게만 단다(규칙에는 안 들어간다)
-                if (list.Count > 1 && !list.Exists(x => x.BlessName != null) && Array.IndexOf(Environment.GetCommandLineArgs(), "-blesstest") >= 0)
-                { list[1].BlessName = "(시험) 축복"; list[1].BlessText = "축복 모양 확인 — 실제로는 15% 확률로 얹힙니다"; }
             }
             else foreach (var opt in g.Options) list.Add(Info(b.CardOf(opt), null));
             return list;
@@ -318,6 +345,16 @@ namespace Bolzena.Battle
                 e.Status["충격"] = 2;
                 if (kw != null && kw.Carrier == "enemy" && !string.IsNullOrEmpty(kw.Name)) e.Status[kw.Name] = 4;
             }
+        }
+
+        /// <summary>점검(-breakkillshots) — 적 하나의 HP · 강인도를 그 값으로(다음 한 대에 격파하며 처치 · 격파만 되는 장면을 찍는다).</summary>
+        public void AuditSetFoe(int idx, int hp, double tough)
+        {
+            if (idx < 0 || idx >= b.Enemies.Count) return;
+            var e = b.Enemies[idx];
+            if (hp > 0) { if (hp > e.MaxHp) e.MaxHp = hp; e.Hp = hp; }   // 넘으면 최대 HP 도 올린다(격파만 되고 안 쓰러지게)
+            if (tough >= 0 && e.ToughMax > 0) e.Tough = Math.Min(e.ToughMax, tough);
+            snap = null;
         }
 
         /// <summary>점검(-ultaudit-break) — 힘 모으는(spend 면 모은 힘을 쏟을) 적의 강인도를 거의 0 으로: 다음 한 대에 격파되어 「끊김」을 본다. 그런 적이 없으면 false.</summary>
@@ -618,6 +655,8 @@ namespace Bolzena.Battle
             string from = c.Pile, to = c.ToPile;
             if (to == "hand" && from != "hand")
                 evs.Add(new BattleEvent { Kind = EventKind.Draw, Card = Info(b.CardOf(c.CardId), null), Text = c.Label });
+            else if (from == "new" && to == "discard" && c.Label == "grace")   // 은총 — 손이 가득해 버림 더미로(화면은 크게 보인 뒤 버림 더미로 날린다)
+                evs.Add(new BattleEvent { Kind = EventKind.Draw, Card = Info(b.CardOf(c.CardId), null), Text = "grace_discard" });
             else if (from == "hand" && to == "play")
             {
                 var ci = Info(b.CardOf(c.CardId), null);
@@ -683,10 +722,12 @@ namespace Bolzena.Battle
         /// <summary>사도 고유 효과 글 — 부제(desc) + CardText.Trait(그 키워드를 쓰는 패시브까지 · 「계기 → 결과」 줄). 칩 · 카드 확대 · 정보 창이 같은 글.</summary>
         string KwText(KwRt kw)
         {
+            CacheFor();
+            if (kwTexts.TryGetValue(kw, out var done)) return done;
             var h = data.Hero(kw.Owner);
             var body = h != null ? text.Trait(h, kw.Def) : text.Keyword(kw.Def);
             var sub = h != null ? kw.Def.Desc?.TrimEnd('.') : null;
-            return Fmt(string.IsNullOrEmpty(sub) ? body : $"<color=#A7B1CC>{sub}</color>\n{body}");
+            return kwTexts[kw] = Fmt(string.IsNullOrEmpty(sub) ? body : $"<color=#A7B1CC>{sub}</color>\n{body}");
         }
 
         /// <summary>
@@ -708,6 +749,20 @@ namespace Bolzena.Battle
                 break;
             }
             return string.Join("\n", lines);
+        }
+
+        /// <summary>점검용(데모) — 지금 손의 신탁 가능한 카드 하나에 빛(신탁 고르기)을 얹는다. 손 화면은 다음 동기 때 바뀐다.</summary>
+        public bool DebugGlow()
+        {
+            foreach (var id in b.Hand.ToList())
+            {
+                if (b.GlowOf(id) != null) continue;
+                var g = GlowFor(data, new[] { id });
+                if (g.Count == 0) continue;
+                b.Glow[id] = g[id];
+                return true;
+            }
+            return false;
         }
 
         static string Fmt(string s)
@@ -733,6 +788,35 @@ namespace Bolzena.Battle
         CardInfo Info(CardView cv, int? handIdx, int depth = 0)
         {
             if (cv == null) return new CardInfo { Id = "?", Name = "?" };
+            CacheFor();
+            var map = depth == 0 ? infoBase0 : infoBase1;
+            if (!map.TryGetValue(cv, out var ib)) map[cv] = ib = InfoBaseOf(cv, depth);
+            var info = ib.Info.Clone();
+            // 바뀌는 것 — 비용(손 자리 할인) · 빛(신탁 · 은총) · 생성 카드(그 카드의 지금 빛 · 표식) · 받은 신탁 · 표식(축복 · 복제). 차례는 예전 Info 그대로
+            info.Cost = handIdx != null ? b.CostOf(cv.Id, handIdx) : cv.Cost;
+            var glow = b.GlowOf(cv.Id);
+            info.Epiphany = glow != null; info.Grace = glow?.Kind == "hero";
+            if (ib.Gen != null)
+                foreach (var g in ib.Gen) info.Terms.Add(new Term(g.name, "이 카드가 만드는 카드", "card") { Card = Info(g.gv, null, depth + 1) });
+            // 받은 신탁 — 이름은 보이지 않는다(2026-10-07 사용자 「이름 말고 별 표시」). 별 줄만으로는 무엇인지 모르니 짧은 상자 하나
+            if (cv.Oracle != null) info.Terms.Insert(0, new Term("신탁 받은 카드", "이번 모험에서 신탁으로 바뀐 카드입니다 — 비용 아래 금빛 별 마크가 그 표시입니다.", "flash"));
+            // 빛나는 카드 — 은총(사도 고유 카드를 손에)과 카드 신탁(바뀔 모습 고르기)은 풀이가 다르다(2026-10-07 제보: 은총이 「신탁」 으로 떴다)
+            if (info.Epiphany) info.Terms.Insert(0, info.Grace
+                ? new Term("은총", "빛나는 카드 — 내면 그 사도의 고유 카드 하나를 손에 얻습니다(그 턴 비용 0)", "flash")
+                : new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고릅니다(이번에는 비용 0)", "flash"));
+            // 표식 — 얹힌 축복 · 복제본(core CardMark, 판 화면 W.Card 와 같은 것)
+            var mk = b.MarkOf(cv.Id);
+            info.MarkBless = mk.Bless; info.MarkBlessText = mk.BlessText; info.Copy = mk.Copy;
+            if (mk.Blessed) info.Terms.Insert(info.Epiphany || cv.Oracle != null ? 1 : 0, new Term("축복", mk.BlessText, "flash"));
+            if (mk.Copy) info.Terms.Add(new Term("복제", "복제할 때 모습 그대로 묶인 카드 — 신탁 · 축복 불가", "flash"));
+            return info;
+        }
+
+        /// <summary>카드 정보의 바뀌지 않는 몫 — 전투(b) · CardView 가 같으면 늘 같다. 카드 글(text.Card)은 한 번만 짓는다(예전엔 세 번).</summary>
+        InfoBase InfoBaseOf(CardView cv, int depth)
+        {
+            var ib = new InfoBase();
+            string card = text.Card(cv);
             // 사도 카드의 주인(Def.Hero) · 교주 카드를 넣은 사도(core CardView.Owner — 덱 id 「카드@사도」). cv.Hero 는 Owner ?? Def.Hero 라
             // 교주 카드를 사도 카드로 읽지 않게 둘을 나눈다(그림 · 더미 차례는 교주 카드 그대로, 틀 빛깔 · 핀만 주인 사도)
             int hero = cv.Def.Hero != null ? b.Party.FindIndex(u => u.Key == cv.Def.Hero) : -1;
@@ -743,20 +827,20 @@ namespace Bolzena.Battle
             var info = new CardInfo
             {
                 Id = cv.Id, Name = cv.Name, Hero = hero, HeroName = hero >= 0 ? b.Party[hero].Name : owner >= 0 ? $"교주({b.Party[owner].Name})" : cv.IsStatus ? "상태" : cv.IsCurse ? "저주" : "교주",
-                Cost = handIdx != null ? b.CostOf(cv.Id, handIdx) : cv.Cost, Type = type, TypeName = cv.Type,
+                Cost = cv.Cost, Type = type, TypeName = cv.Type,
                 Target = cv.Target == "적" ? TargetKind.Enemy : cv.Target == "아군" ? TargetKind.Ally : allDmg ? TargetKind.AllEnemies : TargetKind.None,
-                Text = Fmt(NoTagLine(text.Card(cv), cv.Tags)), Art = Look.CardArt(cv.Def.Hero, GameData.BaseId(cv.Id), cv.Unique, cv.Type),
+                Text = Fmt(cv.Oracle != null ? Bolzena.RunUI.OracleDiff.Mark(NoTagLine(text.Card(cv.Def), cv.Def.Tags), NoTagLine(card, cv.Tags)) : NoTagLine(card, cv.Tags)), CostDown = cv.Oracle != null && cv.Oracle.Cost.HasValue && cv.Oracle.Cost.Value < cv.Def.Cost, Art = Look.CardArt(cv.Def.Hero, GameData.BaseId(cv.Id), cv.Unique, cv.Type),
                 Motion = type == CardType.Attack ? (cv.Cost >= 2 ? Motion.Attack2 : Motion.Attack1) : dmg ? Motion.Skill1 : Motion.None,
-                Hit = Look.Hero(cv.Hero).Hit, Epiphany = b.GlowOf(cv.Id) != null,
-                EpiphanyLabel = cv.Oracle != null ? cv.Oracle.Name : null, Tags = cv.Tags.ToList(), Unplayable = cv.HasTag(Bolzena.Core.Tag.Unplayable),
+                Hit = Look.Hero(cv.Hero).Hit,
+                EpiphanyLabel = cv.Oracle != null ? "신탁 " + cv.FlashN : null, Tags = cv.Tags.ToList(), Unplayable = cv.HasTag(Bolzena.Core.Tag.Unplayable),
                 Unique = cv.Unique, Owner = owner, Grade = cv.Def.Hero == null ? cv.Def.Grade : null, Nature = hero >= 0 ? b.Party[hero].Nature : owner >= 0 ? b.Party[owner].Nature : null,
                 Choices = cv.Choices != null && cv.Choices.Count == 2 ? cv.Choices.ToList() : null,
             };
             // 사도 고유 효과는 카드 주인 사도의 것만(runui CardTerms 와 같은 규칙 — 디아나 「제자」 ↔ 밍스 「제자」 처럼 이름이 겹쳐도 잘못 잇지 않게)
             string cardOwner = cv.Def.Hero ?? cv.Owner;
-            info.Terms = Terms.ForCard(text.Card(cv), cv.Tags, w => b.Kw.TryGetValue(w, out var kw) && (cardOwner == null || kw.Owner == cardOwner) ? (kw.Id, KwText(kw)) : ((string, string)?)null);
+            info.Terms = Terms.ForCard(card, cv.Tags, w => b.Kw.TryGetValue(w, out var kw) && (cardOwner == null || kw.Owner == cardOwner) ? (kw.Id, KwText(kw)) : ((string, string)?)null);
             // 사도 고유 효과 — 부제 + 수치가 다 든 글(CardText.Trait, 「자세히」 없음), 생성 카드 — 작은 카드(runui CardTerms: make · transform · 진화 · 결속 · 금기)
-            var cterms = Bolzena.RunUI.CardTerms.Of(data, text, cv, text.Card(cv));
+            var cterms = Bolzena.RunUI.CardTerms.Of(data, text, cv, card);
             // 위에서 못 잡은 사도 고유 효과 · 변신(성전 모드 · 맨주먹 전성기 …, 변신이 바꿔 넣은 카드 포함) — CardTerms 의 판 글 그대로
             foreach (var ct in cterms)
                 if (!ct.IsCard && ct.Hero && !info.Terms.Exists(x => x.Word == ct.Name))
@@ -770,22 +854,17 @@ namespace Bolzena.Battle
                     info.Terms.RemoveAll(x => x.Kind == "kw" && x.Word.Length < ct.Name.Length && ct.Name.Contains(x.Word) && !rest.Contains(x.Word));
                     info.Terms.Add(new Term(ct.Name, Fmt(ct.Body), ct.Bad ? "status" : "tag"));   // 「tag」 = 엔진 낱말 판 꼴(「kw」 면 CardZoom 이 고유 효과로 적는다)
                 }
+            // 생성 카드(작은 카드) — 그 카드의 정보는 덧입히기에서 그때그때(빛 · 표식이 바뀔 수 있다)
             if (depth == 0)
                 foreach (var ct in cterms)
                     if (ct.IsCard)
                     {
                         var gv = data.View(ct.CardId);
-                        if (gv != null) info.Terms.Add(new Term(ct.Name, "이 카드가 만드는 카드", "card") { Card = Info(gv, null, depth + 1) });
+                        if (gv != null) (ib.Gen ??= new List<(string, CardView)>()).Add((ct.Name, gv));
                     }
             info.Text = Bolzena.RunUI.CardTerms.Mark(info.Text, cterms);   // 글 속 낱말 밑줄 · 색(판 화면 W.Card 와 같은 표)
-            if (cv.Oracle != null) info.Terms.Insert(0, new Term("신탁 · " + cv.Oracle.Name, "이번 모험에서 붙은 신탁 — 카드 글이 바뀐 모습입니다", "flash"));
-            if (info.Epiphany) info.Terms.Insert(0, new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고릅니다(이번에는 비용 0)", "flash"));
-            // 표식 — 얹힌 축복 · 복제본(core CardMark, 판 화면 W.Card 와 같은 것)
-            var mk = b.MarkOf(cv.Id);
-            info.MarkBless = mk.Bless; info.MarkBlessText = mk.BlessText; info.Copy = mk.Copy;
-            if (mk.Blessed) info.Terms.Insert(info.Epiphany || cv.Oracle != null ? 1 : 0, new Term("축복 · " + mk.Bless, mk.BlessText, "flash"));
-            if (mk.Copy) info.Terms.Add(new Term("복제", "복제할 때 모습 그대로 묶인 카드 — 신탁 · 축복 불가", "flash"));
-            return info;
+            ib.Info = info;
+            return ib;
         }
 
         static readonly Dictionary<string, string> STAT_KO = new Dictionary<string, string>
@@ -825,6 +904,13 @@ namespace Bolzena.Battle
                 if (b.Kw.TryGetValue(kv.Key, out var kw))
                 {
                     res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = KwText(kw) });
+                    continue;
+                }
+                if (kv.Key == R.SEIZED)
+                {   // 손패 흡수(core 수 seize) — 쥔 카드 이름 · 되찾는 길
+                    var names = b.SeizedOf(u).Select(x => $"「{b.CardOf(x)?.Name ?? x}」");
+                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "buff",
+                        Text = $"이 적이 빼앗아 쥔 카드: {string.Join(" · ", names)}\n격파하거나 · 쓰러뜨리거나 · 피해 {b.SeizeLeft(u)} 더 주면 손으로 돌아옵니다." });
                     continue;
                 }
                 bool bad = R.BAD_ST.Contains(kv.Key) || kv.Key == R.STUN;
@@ -885,11 +971,69 @@ namespace Bolzena.Battle
             }
         }
 
+        /// <summary>사도의 바뀌지 않는 화면 글 — 고학년 · 고유 효과 · 특성(Traits) · 장비. 전투(b)마다 한 번.</summary>
+        HeroBase HeroBaseOf(Unit u, HeroDef h)
+        {
+            CacheFor();
+            if (heroBases.TryGetValue(u.Key, out var hb)) return hb;
+            hb = new HeroBase
+            {
+                UltText = h?.Ult != null ? Fmt(text.Fx(h.Ult.Fx)) : "",
+                KeywordText = h?.Keyword != null && b.Kw.TryGetValue(h.Keyword.Name, out var hk) ? KwText(hk) : null,
+            };
+            // 고학년 → 고유 효과 → 패시브(core CardText.Traits — 판 화면 사도 상세와 같은 칸 · 글). 키워드를 쓰는 패시브는 고유 효과 칸 아래로
+            if (h != null)
+                foreach (var t in text.Traits(h))
+                {
+                    hb.Traits.Add(new TraitLine { Kind = t.Kind, Name = t.Name, Sub = t.Sub, Body = Fmt(t.Body) });
+                    if (t.Kind == "패시브" && !string.IsNullOrEmpty(t.Body)) hb.Passives.Add(t.Name + " — " + Fmt(t.Body));   // passives 전부(없으면 「없음」 칸 — 목록엔 안 넣음)
+                }
+            try
+            {
+                var g = GearOf?.Invoke(u.Key);
+                foreach (var slot in new[] { "무기", "방어구", "장신구" })
+                {
+                    var gs = new GearSlot { Slot = slot };
+                    if (g != null && g.TryGetValue(slot, out var eid) && !string.IsNullOrEmpty(eid))
+                    {
+                        var ed = data.Equip(eid);
+                        gs.Id = eid; gs.Name = ed?.Name ?? eid; gs.Grade = ed?.Grade;
+                        try { gs.Text = ed != null ? Fmt(text.Equip(ed)) : null; } catch (Exception) { }
+                    }
+                    hb.Gear.Add(gs);
+                }
+            }
+            catch (Exception) { }
+            heroBases[u.Key] = hb;
+            return hb;
+        }
+
+        // -snapperf(재기) — Snapshot 을 새로 지을 때마다 시간 · 할당을 모아 로그 [SnapPerf] 로(2026-10-08 화면 캐시 전후 비교)
+        static readonly bool snapPerf = Array.IndexOf(Environment.GetCommandLineArgs(), "-snapperf") >= 0;
+        static int spN; static double spMs, spMax; static long spAlloc;
         public BattleSnapshot Snapshot
         {
             get
             {
                 if (snap != null) return snap;
+                if (!snapPerf) return snap = BuildSnapshot();
+                // 할당 — Mono 는 스레드 할당 수를 주지 않아, 짓는 동안 GC 를 멈추고 쓰는 힙이 는 만큼을 센다
+                var gm = UnityEngine.Scripting.GarbageCollector.GCMode;
+                try { UnityEngine.Scripting.GarbageCollector.GCMode = UnityEngine.Scripting.GarbageCollector.Mode.Disabled; } catch (Exception) { }
+                long a0 = UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong(); long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+                snap = BuildSnapshot();
+                double ms = (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+                long a1 = UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong();
+                try { UnityEngine.Scripting.GarbageCollector.GCMode = gm; } catch (Exception) { }
+                spN++; spMs += ms; spMax = Math.Max(spMax, ms); spAlloc += Math.Max(0, a1 - a0);
+                if (spN % 10 == 0 || over) Debug.Log($"[SnapPerf] 지음 {spN} · 평균 {spMs / spN:0.000}ms · 최대 {spMax:0.00}ms · 평균 할당 {spAlloc / 1024.0 / spN:0.0}KB · 손 {snap.Hand.Count} · 더미 {b.Draw.Count}/{b.Discard.Count}/{b.Gone.Count}");
+                return snap;
+            }
+        }
+
+        BattleSnapshot BuildSnapshot()
+        {
+            {
                 var s = new BattleSnapshot
                 {
                     Turn = turnBase + b.Turn, Wave = wave + 1, WaveCount = fx.Waves.Count,
@@ -901,39 +1045,19 @@ namespace Bolzena.Battle
                 {
                     var h = data.Hero(u.Key);
                     var look = Look.Hero(u.Key);
+                    var hb = HeroBaseOf(u, h);
                     var hs = new HeroState
                     {
-                        Key = look.Art, Id = u.Key, Name = u.Name, Tint = look.Tint, UltName = h?.Ult?.Name, UltText = h?.Ult != null ? Fmt(text.Fx(h.Ult.Fx)) : "",
+                        Key = look.Art, Id = u.Key, Name = u.Name, Tint = look.Tint, UltName = h?.Ult?.Name, UltText = hb.UltText,
                         Atk = u.Atk, Def = u.Def, Crit = u.Crit, AtkNow = b.AtkNow(u), DefNow = b.DefNow(u), CritNow = u.Crit + Mathf.RoundToInt((float)b.StatMod(u, "crit") * 100),
                         Role = u.Role, Nature = u.Nature, Slot = u.Idx, Blurb = h?.Blurb, Ult = b.Gauge, UltMax = h?.Ult?.Cost ?? 999, Dead = u.Dead,
-                        KeywordName = h?.Keyword?.Name, KeywordText = h?.Keyword != null && b.Kw.TryGetValue(h.Keyword.Name, out var hk) ? KwText(hk) : null,
+                        KeywordName = h?.Keyword?.Name, KeywordText = hb.KeywordText,
                         KeywordStacks = h?.Keyword != null ? b.StackOf(u.Key, h.Keyword.Name) : 0,
                     };
-                    // 고학년 → 고유 효과 → 패시브(core CardText.Traits — 판 화면 사도 상세와 같은 칸 · 글). 키워드를 쓰는 패시브는 고유 효과 칸 아래로
-                    if (h != null)
-                        foreach (var t in text.Traits(h))
-                        {
-                            hs.Traits.Add(new TraitLine { Kind = t.Kind, Name = t.Name, Sub = t.Sub, Body = Fmt(t.Body) });
-                            if (t.Kind == "패시브" && !string.IsNullOrEmpty(t.Body)) hs.Passives.Add(t.Name + " — " + Fmt(t.Body));   // passives 전부(없으면 「없음」 칸 — 목록엔 안 넣음)
-                        }
+                    hs.Traits.AddRange(hb.Traits); hs.Passives.AddRange(hb.Passives);
                     hs.Chips = ChipsOf(u, true);
                     hs.Race = h?.Race;
-                    try
-                    {
-                        var g = GearOf?.Invoke(u.Key);
-                        foreach (var slot in new[] { "무기", "방어구", "장신구" })
-                        {
-                            var gs = new GearSlot { Slot = slot };
-                            if (g != null && g.TryGetValue(slot, out var eid) && !string.IsNullOrEmpty(eid))
-                            {
-                                var ed = data.Equip(eid);
-                                gs.Id = eid; gs.Name = ed?.Name ?? eid; gs.Grade = ed?.Grade;
-                                try { gs.Text = ed != null ? Fmt(text.Equip(ed)) : null; } catch (Exception) { }
-                            }
-                            hs.Gear.Add(gs);
-                        }
-                    }
-                    catch (Exception) { }
+                    hs.Gear.AddRange(hb.Gear);
                     s.Heroes.Add(hs);
                 }
                 foreach (var e in b.Enemies)
@@ -959,14 +1083,22 @@ namespace Bolzena.Battle
                         Nature = tv.Nature, Blurb = def?.Blurb, Weak = tv.Weak ?? new List<string>(),
                         ChargeName = e.Broken ? null : cinfo.name, ChargeNow = cinfo.now, IntentLater = charging,
                     };
-                    if (def != null) foreach (var p in def.Passives) es.Passives.Add(p.Name + (p.Do != null ? " — " + text.Intent(p.Do) : ""));
+                    if (def != null)
+                    {
+                        if (!foePassTexts.TryGetValue(e.Key, out var fp))   // 적 패시브 글은 전투 동안 그대로
+                        {
+                            foePassTexts[e.Key] = fp = new List<string>();
+                            foreach (var p in def.Passives) fp.Add(p.Name + (p.Do != null ? " — " + text.Intent(p.Do) : ""));
+                        }
+                        es.Passives.AddRange(fp);
+                    }
                     es.Chips = ChipsOf(e, false);
                     s.Enemies.Add(es);
                 }
                 for (int i = 0; i < b.Hand.Count; i++) s.Hand.Add(Info(b.CardOf(b.Hand[i]), i));
-                foreach (var id in b.Draw.OrderBy(x => x, StringComparer.Ordinal)) s.DrawPile.Add(Info(b.CardOf(id), null));
-                foreach (var id in b.Discard) s.DiscardPile.Add(Info(b.CardOf(id), null));
-                foreach (var id in b.Gone) s.GonePile.Add(Info(b.CardOf(id), null));
+                // 더미 카드 정보는 처음 볼 때(더미 창 · 정보 창) 짓는다 — 지금의 id 차례만 떠 둔다(장수는 위 *Count)
+                var piles = new[] { b.Draw.OrderBy(x => x, StringComparer.Ordinal).ToList(), b.Discard.ToList(), b.Gone.ToList() };
+                s.PileSource = k => piles[k].ConvertAll(id => Info(b.CardOf(id), null));
                 s.PartyChips = ChipsOf(b.Pool, false);
                 snap = s;
                 return s;

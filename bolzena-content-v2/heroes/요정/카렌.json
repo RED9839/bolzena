@@ -1,787 +1,829 @@
 {
- "heroes": [
-  {
-   "id": "카렌",
-   "name": "카렌",
-   "nature": "활발",
-   "race": "요정",
-   "role": "딜러",
-   "star": 1,
-   "hp": 440,
-   "atk": 93,
-   "def": 23,
-   "crit": 10,
-   "blurb": "생식 요정의 모범이던 엘튜버였지만, 드레싱 뿌린 샐러드를 먹다 찍혀 몰락했습니다. 생당근은 질색, 당근 케이크는 최고. 오늘도 방송을 켜고, 마법쇼의 후원과 당근으로 파티의 상처를 아물게 합니다.",
-   "keyword": {
-    "name": "구독자",
-    "desc": "모으고 잃는 시청자",
-    "carrier": "self",
-    "cap": 10,
-    "per": [
-     {
-      "stat": "dealt",
-      "v": 0.05
-     }
-    ],
-    "rules": [
-     {
-      "name": "생방송 구독자",
-      "when": {
-       "on": "fightStart"
+  "heroes": [
+    {
+      "id": "카렌",
+      "name": "카렌",
+      "nature": "활발",
+      "race": "요정",
+      "role": "딜러",
+      "star": 1,
+      "hp": 440,
+      "atk": 93,
+      "def": 23,
+      "crit": 10,
+      "blurb": "생식 요정의 모범이던 엘튜버였지만, 드레싱 뿌린 샐러드를 먹다 찍혀 몰락했습니다. 생당근은 질색, 당근 케이크는 최고. 오늘도 방송을 켜고, 마법쇼의 후원과 당근으로 파티의 상처를 아물게 합니다.",
+      "keyword": {
+        "name": "시청자 수",
+        "desc": "생방송을 지켜보는 시청자들",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ],
+        "rules": [
+          {
+            "name": "떡상 방송",
+            "when": {
+              "on": "stackReach",
+              "id": "시청자 수",
+              "n": 5
+            },
+            "limit": {
+              "per": "fight",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "사기",
+                "v": 1
+              },
+              {
+                "k": "ap",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "합방",
+            "when": {
+              "on": "play",
+              "who": "other",
+              "type": "스킬"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "시청자 수",
+                "v": 1
+              }
+            ]
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "stack",
-        "id": "구독자",
-        "v": 2
-       }
+      "passives": [
+        {
+          "name": "켜진 방송",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "켜진 방송",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "떡상",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "떡상",
+          "when": {
+            "on": "break",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주의 축복 - 카렌",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "heal",
+            "ratio": 6
+          },
+          {
+            "k": "perStack",
+            "id": "시청자 수"
+          },
+          {
+            "k": "heal",
+            "ratio": 0.5
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "시청자 수",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "카렌_s1",
+        "카렌_u4",
+        "카렌_s2",
+        "카렌_s3"
       ]
-     },
-     {
-      "name": "생방송 구독자",
-      "when": {
-       "on": "kill",
-       "mine": true
-      },
+    }
+  ],
+  "cards": [
+    {
+      "id": "카렌_s1",
+      "name": "당근 던지기",
+      "hero": "카렌",
+      "cost": 1,
+      "type": "공격",
       "fx": [
-       {
-        "k": "stack",
-        "id": "구독자",
-        "v": 2
-       }
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
       ]
-     },
-     {
-      "name": "생방송 구독자",
-      "when": {
-       "on": "break",
-       "mine": true
-      },
+    },
+    {
+      "id": "카렌_s2",
+      "name": "왕당근 던지기",
+      "hero": "카렌",
+      "cost": 2,
+      "type": "공격",
       "fx": [
-       {
-        "k": "stack",
-        "id": "구독자",
-        "v": 2
-       }
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
       ]
-     },
-     {
-      "name": "생방송 구독자",
-      "when": {
-       "on": "overheal"
-      },
-      "limit": {
-       "per": "turn",
-       "n": 1
-      },
+    },
+    {
+      "id": "카렌_s3",
+      "name": "셀카봉 가드",
+      "hero": "카렌",
+      "cost": 1,
+      "type": "스킬",
       "fx": [
-       {
-        "k": "stack",
-        "id": "구독자",
-        "v": 1
-       }
+        {
+          "k": "shield",
+          "ratio": 2
+        }
       ]
-     },
-     {
-      "name": "기적의 회복 방송",
-      "when": {
-       "on": "unwound"
-      },
+    },
+    {
+      "id": "카렌_u1",
+      "name": "어그로 댓글 추적 방송",
+      "hero": "카렌",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
       "fx": [
-       {
-        "k": "stack",
-        "id": "구독자",
-        "v": 3
-       }
+        {
+          "k": "dmg",
+          "ratio": 1.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "시청자 수",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "범인 검거",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "UFC 알바생 추적",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "악플 박제",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.57,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "방송 종료",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.58,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "시청자 수"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "시청자 수",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "실시간 댓글",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.71,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "시청자 수"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "셀카봉",
+          "kind": "power"
+        },
+        {
+          "name": "조회수",
+          "kind": "draw"
+        },
+        {
+          "name": "알고리즘의 선택",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        }
       ]
-     },
-     {
-      "name": "생방송 구독자",
-      "when": {
-       "on": "lowHp",
-       "pct": 0.3
-      },
+    },
+    {
+      "id": "카렌_u2",
+      "name": "엘튜브 생방송 마법쇼",
+      "hero": "카렌",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
       "fx": [
-       {
-        "k": "spend",
-        "id": "구독자",
-        "v": 3
-       }
+        {
+          "k": "dmg",
+          "ratio": 0.61,
+          "target": "randomEnemy",
+          "hits": 3
+        },
+        {
+          "k": "stack",
+          "id": "시청자 수",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "구독 좋아요",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "쇼츠",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "협찬 광고",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "합방 무대",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "시청자 수"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "정기 방송",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시청자 수",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "화려한 조명",
+          "kind": "atkUp"
+        },
+        {
+          "name": "협찬",
+          "kind": "ap"
+        },
+        {
+          "name": "알림 설정",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        }
       ]
-     },
-     {
-      "name": "떡상",
-      "when": {
-       "on": "stackReach",
-       "id": "구독자",
-       "n": 5
-      },
+    },
+    {
+      "id": "카렌_u3",
+      "name": "당근 치유",
+      "hero": "카렌",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
       "fx": [
-       {
-        "k": "status",
-        "id": "사기",
-        "v": 1
-       },
-       {
-        "k": "ap",
-        "v": 1
-       },
-       {
-        "k": "spend",
-        "id": "구독자",
-        "v": 5
-       }
+        {
+          "k": "heal",
+          "ratio": 1.28
+        },
+        {
+          "k": "perStack",
+          "id": "시청자 수"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.32
+        },
+        {
+          "k": "spend",
+          "id": "시청자 수",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "당근 듬뿍 회복",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "perStack",
+              "id": "시청자 수"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.4
+            },
+            {
+              "k": "spend",
+              "id": "시청자 수",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "생당근 한 입",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.8
+            },
+            {
+              "k": "perStack",
+              "id": "시청자 수"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.24
+            },
+            {
+              "k": "spend",
+              "id": "시청자 수",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "당근 텃밭 방송",
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.17
+            },
+            {
+              "k": "perStack",
+              "id": "시청자 수"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.29
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "시청자 수",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.78
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "당근 방패",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.44
+            },
+            {
+              "k": "perStack",
+              "id": "시청자 수"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "spend",
+              "id": "시청자 수",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "기적의 회복 방송",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.28
+            },
+            {
+              "k": "perStack",
+              "id": "시청자 수"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.32
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "특 플러스 당근",
+          "kind": "heal"
+        },
+        {
+          "name": "생방송 후원",
+          "kind": "cost"
+        },
+        {
+          "name": "언니의 텃밭",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        }
       ]
-     }
-    ]
-   },
-   "passives": [
+    },
     {
-     "name": "켜진 방송",
-     "when": {
-      "on": "play",
-      "type": "공격"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 1
-      }
-     ]
+      "id": "카렌_u4",
+      "name": "근본 생식 챌린지",
+      "hero": "카렌",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "시청자 수",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "챌린지 2탄",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "구독 이벤트",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시청자 수",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "합방 섭외",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "떡상 각",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "예약 방송",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "썸네일",
+          "kind": "draw"
+        },
+        {
+          "name": "해시태그",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "생당근 공포증",
+          "kind": "defUp"
+        }
+      ]
     }
-   ],
-   "ult": {
-    "name": "교주의 축복 - 카렌",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "heal",
-      "ratio": 6
-     },
-     {
-      "k": "perStack",
-      "id": "구독자"
-     },
-     {
-      "k": "heal",
-      "ratio": 0.5
-     },
-     {
-      "k": "status",
-      "id": "사기",
-      "v": 1
-     },
-     {
-      "k": "stack",
-      "id": "구독자",
-      "v": 3
-     }
-    ]
-   },
-   "starter": [
-    "카렌_s1",
-    "카렌_s1",
-    "카렌_s2",
-    "카렌_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "카렌_s1",
-   "name": "당근 던지기",
-   "hero": "카렌",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "카렌_s2",
-   "name": "왕당근 던지기",
-   "hero": "카렌",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "카렌_s3",
-   "name": "셀카봉 가드",
-   "hero": "카렌",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "카렌_u1",
-   "name": "어그로 댓글 추적 방송",
-   "hero": "카렌",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.8,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "status",
-     "id": "취약",
-     "v": 2
-    },
-    {
-     "k": "stack",
-     "id": "구독자",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "실시간 급상승",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.5,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "쇼츠 추적",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.9,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "댓글 박제",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "공개 저격 방송",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.0,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "참교육 생방송",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2
-      },
-      {
-       "k": "tough",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "조회수 폭발",
-     "kind": "power"
-    },
-    {
-     "name": "어그로 집중",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "구독 알림",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "카렌_u2",
-   "name": "엘튜브 생방송 마법쇼",
-   "hero": "카렌",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.6,
-     "target": "randomEnemy",
-     "hits": 4
-    },
-    {
-     "k": "drain",
-     "ratio": 0.3
-    },
-    {
-     "k": "stack",
-     "id": "구독자",
-     "v": 2
-    }
-   ],
-   "oracles": [
-    {
-     "name": "100만 기념 쇼",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "drain",
-       "ratio": 0.3
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "짧은 라이브",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.55,
-       "target": "randomEnemy",
-       "hits": 3
-      },
-      {
-       "k": "drain",
-       "ratio": 0.3
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "합동 방송",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "allEnemies",
-       "hits": 3
-      },
-      {
-       "k": "drain",
-       "ratio": 0.3
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "도네이션 폭주",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "drain",
-       "ratio": 0.4
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 4
-      }
-     ]
-    },
-    {
-     "name": "24시간 마라톤",
-     "cost": 3,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.65,
-       "target": "randomEnemy",
-       "hits": 7
-      },
-      {
-       "k": "drain",
-       "ratio": 0.3
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 3
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "특수 효과",
-     "kind": "power"
-    },
-    {
-     "name": "깜짝 연출",
-     "kind": "frost"
-    },
-    {
-     "name": "후원금",
-     "kind": "ap"
-    }
-   ]
-  },
-  {
-   "id": "카렌_u3",
-   "name": "당근 치유",
-   "hero": "카렌",
-   "unique": true,
-   "cost": 2,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 4.0
-    },
-    {
-     "k": "stack",
-     "id": "구독자",
-     "v": 2
-    },
-    {
-     "k": "perStack",
-     "id": "구독자"
-    },
-    {
-     "k": "heal",
-     "ratio": 0.4
-    }
-   ],
-   "oracles": [
-    {
-     "name": "유기농 당근",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 5.0
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      },
-      {
-       "k": "perStack",
-       "id": "구독자"
-      },
-      {
-       "k": "heal",
-       "ratio": 0.5
-      }
-     ]
-    },
-    {
-     "name": "당근 한 입",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 2.6
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      },
-      {
-       "k": "perStack",
-       "id": "구독자"
-      },
-      {
-       "k": "heal",
-       "ratio": 0.2
-      }
-     ]
-    },
-    {
-     "name": "당근 먹방",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 4.0
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "당근 나눔 이벤트",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 3.4
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 4
-      },
-      {
-       "k": "perStack",
-       "id": "구독자"
-      },
-      {
-       "k": "heal",
-       "ratio": 0.4
-      }
-     ]
-    },
-    {
-     "name": "단단한 당근",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 4.0
-      },
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      },
-      {
-       "k": "shield",
-       "ratio": 2.0
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "당근 즙",
-     "kind": "heal"
-    },
-    {
-     "name": "다음 콘텐츠",
-     "kind": "draw"
-    },
-    {
-     "name": "건강 루틴",
-     "kind": "defUp"
-    }
-   ]
-  },
-  {
-   "id": "카렌_u4",
-   "name": "근본 생식 챌린지",
-   "hero": "카렌",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "stack",
-     "id": "구독자",
-     "v": 3
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "챌린지 시즌 2",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 4
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "쇼츠 챌린지",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 2
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "생식 먹방",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 3
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.5
-      }
-     ]
-    },
-    {
-     "name": "챌린지 성공!",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 3
-      },
-      {
-       "k": "ap",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "매일 챌린지",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "구독자",
-       "v": 3
-      },
-      {
-       "k": "draw",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "풀때기 에너지",
-     "kind": "ap"
-    },
-    {
-     "name": "추천 알고리즘",
-     "kind": "draw"
-    },
-    {
-     "name": "근본 텐션",
-     "kind": "atkUp"
-    }
-   ]
-  }
- ]
+  ]
 }

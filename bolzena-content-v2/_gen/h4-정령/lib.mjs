@@ -1,5 +1,6 @@
 // H4 정령 사도 생성기 — 공용 손잡이
 import fs from 'fs';
+const REWORKED = JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')); // 리워크한 사도는 _gen/rework/rework.mjs 가 쓴다 — 여기서 덮어쓰지 않는다
 import path from 'path';
 
 export const E1 = 'oneEnemy', EA = 'allEnemies', ER = 'randomEnemy';
@@ -74,7 +75,7 @@ export function build(spec, outDir) {
   for (const t of spec.tokens || []) cards.push({ ...t, hero: id, token: true });
   const hero = { ...spec.hero, race: '정령', starter };
   const file = path.join(outDir, `${id}.json`);
-  fs.writeFileSync(file, JSON.stringify({ heroes: [hero], cards }, null, 1) + '\n', 'utf8');
+  if (REWORKED.includes(id)) console.log('건너뜀(리워크)', id); else fs.writeFileSync(file, JSON.stringify({ heroes: [hero], cards }, null, 1) + '\n', 'utf8');
   return file;
 }
 

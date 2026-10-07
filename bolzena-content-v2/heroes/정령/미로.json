@@ -1,780 +1,886 @@
 {
- "heroes": [
-  {
-   "id": "미로",
-   "name": "미로",
-   "nature": "활발",
-   "role": "탱커",
-   "star": 3,
-   "hp": 1000,
-   "atk": 75,
-   "def": 76,
-   "crit": 5,
-   "blurb": "거울 속에서 지켜보며 응원하는 정령. 파티를 친 적에게 시선을 꽂아 그 적의 공격을 무디게 합니다. 거울 속으로 숨으면 그동안 날아든 공격을 거울에 비춰 두었다가, 다음 턴 그 수만큼 광선으로 되돌려 보냅니다.",
-   "keyword": {
-    "name": "시선",
-    "desc": "파티를 친 적에게 꽂히는 눈",
-    "carrier": "enemy",
-    "cap": 3,
-    "per": [
-     {
-      "stat": "dealt",
-      "v": -0.1
-     }
-    ],
-    "rules": [
-     {
-      "name": "눈을 피하지 마요",
-      "when": {
-       "on": "stackOver",
-       "id": "시선"
+  "heroes": [
+    {
+      "id": "미로",
+      "name": "미로",
+      "nature": "활발",
+      "role": "탱커",
+      "star": 3,
+      "hp": 1000,
+      "atk": 75,
+      "def": 76,
+      "crit": 5,
+      "blurb": "거울 속에서 지켜보며 응원하는 정령. 파티를 친 적에게 시선을 꽂아 그 적의 공격을 무디게 합니다. 거울 속으로 숨으면 그동안 날아든 공격을 거울에 비춰 두었다가, 다음 턴 그 수만큼 광선으로 되돌려 보냅니다.",
+      "keyword": {
+        "name": "시선",
+        "desc": "파티를 친 적에게 꽂히는 눈",
+        "carrier": "enemy",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": -0.08
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "perEvent"
-       },
-       {
-        "k": "shield",
-        "ratio": 0.3
-       }
+      "passives": [
+        {
+          "name": "지켜보고 있어요",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "거울에 맺힌 공격",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "거울 속",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "cue",
+              "id": "miro_flash"
+            },
+            {
+              "k": "stack",
+              "id": "반사된 시선",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "수많은 시선",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "cue",
+            "id": "miro_hide"
+          },
+          {
+            "k": "stack",
+            "id": "거울 속",
+            "v": 1
+          },
+          {
+            "k": "shield",
+            "ratio": 2.5
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "시선",
+            "v": 3,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "미로_s1",
+        "미로_s1",
+        "미로_s2",
+        "미로_u2"
+      ],
+      "keywords": [
+        {
+          "name": "거울 속",
+          "desc": "거울 안에 숨은 미로",
+          "carrier": "self",
+          "cap": 1,
+          "rules": [
+            {
+              "name": "거울 밖으로",
+              "when": {
+                "on": "turnStart"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "거울 속",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "miro_beam",
+                  "xStack": "반사된 시선",
+                  "n": 5,
+                  "max": 10
+                },
+                {
+                  "k": "perStack",
+                  "id": "반사된 시선",
+                  "n": 5,
+                  "max": 10
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.4,
+                  "target": "randomEnemy"
+                },
+                {
+                  "k": "stack",
+                  "id": "시선",
+                  "v": 1,
+                  "target": "allEnemies"
+                }
+              ]
+            },
+            {
+              "name": "거울 밖으로",
+              "when": {
+                "on": "turnStart"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "거울 속",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "spend",
+                  "id": "반사된 시선",
+                  "all": true
+                },
+                {
+                  "k": "spend",
+                  "id": "거울 속",
+                  "all": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "반사된 시선",
+          "desc": "거울에 맺힌 적의 공격",
+          "carrier": "self",
+          "cap": 10
+        }
       ]
-     }
-    ]
-   },
-   "passives": [
+    }
+  ],
+  "cards": [
     {
-     "name": "지켜보고 있어요",
-     "when": {
-      "on": "hurt",
-      "guarded": true
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "시선",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
+      "id": "미로_s1",
+      "name": "거울 조각",
+      "hero": "미로",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
     },
     {
-     "name": "거울에 맺힌 공격",
-     "when": {
-      "on": "hurt",
-      "guarded": true
-     },
-     "conds": [
-      {
-       "c": "stack",
-       "id": "거울 속",
-       "n": 1
-      }
-     ],
-     "fx": [
-      {
-       "k": "cue",
-       "id": "miro_flash"
-      },
-      {
-       "k": "stack",
-       "id": "반사된 시선",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "ult": {
-    "name": "수많은 시선",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "cue",
-      "id": "miro_hide"
-     },
-     {
-      "k": "stack",
-      "id": "거울 속",
-      "v": 1
-     },
-     {
-      "k": "shield",
-      "ratio": 2.5
-     },
-     {
-      "k": "status",
-      "id": "피해 감소",
-      "v": 2
-     },
-     {
-      "k": "stack",
-      "id": "시선",
-      "v": 3,
-      "target": "allEnemies"
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "미로_s1",
-    "미로_s1",
-    "미로_s2",
-    "미로_s2"
-   ],
-   "keywords": [
-    {
-     "name": "거울 속",
-     "desc": "거울 안에 숨은 미로",
-     "carrier": "self",
-     "cap": 1,
-     "rules": [
-      {
-       "name": "거울 밖으로",
-       "when": {
-        "on": "turnStart"
-       },
-       "conds": [
+      "id": "미로_s2",
+      "name": "거울 뒤로",
+      "hero": "미로",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
         {
-         "c": "stack",
-         "id": "거울 속",
-         "n": 1
+          "k": "shield",
+          "ratio": 1.5
         }
-       ],
-       "fx": [
+      ]
+    },
+    {
+      "id": "미로_u1",
+      "name": "거울 반사",
+      "hero": "미로",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "k": "cue",
-         "id": "miro_beam",
-         "xStack": "반사된 시선",
-         "n": 5,
-         "max": 10
+          "k": "dmg",
+          "ratio": 0.45,
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
-         "k": "perStack",
-         "id": "반사된 시선",
-         "n": 5,
-         "max": 10
+          "k": "stack",
+          "id": "시선",
+          "v": 1,
+          "target": "oneEnemy"
         },
         {
-         "k": "dmg",
-         "ratio": 0.4,
-         "target": "randomEnemy"
+          "k": "shield",
+          "ratio": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "눈부신 빛",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.52
+            }
+          ]
         },
         {
-         "k": "stack",
-         "id": "시선",
-         "v": 1,
-         "target": "allEnemies"
-        }
-       ]
-      },
-      {
-       "name": "거울 밖으로",
-       "when": {
-        "on": "turnStart"
-       },
-       "conds": [
-        {
-         "c": "stack",
-         "id": "거울 속",
-         "n": 1
-        }
-       ],
-       "fx": [
-        {
-         "k": "spend",
-         "id": "반사된 시선",
-         "all": true
+          "name": "세 갈래 빛",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.55
+            }
+          ]
         },
         {
-         "k": "spend",
-         "id": "거울 속",
-         "all": true
+          "name": "반사각",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "시선",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "넘어지며 박치기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "거울 너머",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ],
+      "blesses": [
+        {
+          "name": "눈부심",
+          "kind": "power"
+        },
+        {
+          "name": "거울 파편",
+          "kind": "frost"
+        },
+        {
+          "name": "좌우 반전",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
     },
     {
-     "name": "반사된 시선",
-     "desc": "거울에 맺힌 적의 공격",
-     "carrier": "self",
-     "cap": 10
+      "id": "미로_u2",
+      "name": "거울 속으로",
+      "hero": "미로",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.1
+        },
+        {
+          "k": "stack",
+          "id": "시선",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "거울 사이로",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "수면에 비친 동심",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.1
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "거울 깨뜨리기",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.68
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "겁쟁이 거울",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.97
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.74
+            }
+          ]
+        },
+        {
+          "name": "교주의 방 거울",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시선",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "맑은 거울",
+          "kind": "guard"
+        },
+        {
+          "name": "헤헤",
+          "kind": "draw"
+        },
+        {
+          "name": "거울 너머 응원",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "미로_u3",
+      "name": "이젠 내가 지켜줄 거야",
+      "hero": "미로",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnEnd"
+              },
+              "fx": [
+                {
+                  "k": "shield",
+                  "ratio": 0.35
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "사이드 미로",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.47
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "지켜보기만 하는 건 싫어",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.35
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "lowHp",
+                    "pct": 0.4
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1.5
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "셋째 딸",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.35
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "민트초코",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "상담사",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.35
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "작은 응원",
+          "kind": "defUp"
+        },
+        {
+          "name": "거울 닦기",
+          "kind": "cost"
+        },
+        {
+          "name": "혼잣말 대꾸",
+          "kind": "ap"
+        }
+      ]
+    },
+    {
+      "id": "미로_u4",
+      "name": "깨진 거울 조각",
+      "hero": "미로",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "시선"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "시선",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "산산조각",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "시선"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "시선",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "파편 비",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "시선",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "금 간 거울",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "시선"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "거울 폭발",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "시선"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "시선",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "다시 맞추기",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "시선"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.66
+            },
+            {
+              "k": "spend",
+              "id": "시선",
+              "all": true
+            },
+            {
+              "k": "heal",
+              "ratio": 0.53
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "날카로운 조각",
+          "kind": "power"
+        },
+        {
+          "name": "반짝이는 조각",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "작은 조각",
+          "kind": "cost"
+        }
+      ]
     }
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "미로_s1",
-   "name": "거울 조각",
-   "hero": "미로",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "미로_s2",
-   "name": "거울 뒤로",
-   "hero": "미로",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 1.5
-    }
-   ]
-  },
-  {
-   "id": "미로_u1",
-   "name": "거울 반사",
-   "hero": "미로",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "signature": true,
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.6,
-     "target": "oneEnemy",
-     "base": "def"
-    },
-    {
-     "k": "perStack",
-     "id": "시선"
-    },
-    {
-     "k": "dmg",
-     "ratio": 0.3,
-     "target": "oneEnemy",
-     "base": "def"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "맑은 거울",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "perStack",
-       "id": "시선"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.4,
-       "target": "oneEnemy",
-       "base": "def"
-      }
-     ]
-    },
-    {
-     "name": "손거울",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "perStack",
-       "id": "시선"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.25,
-       "target": "oneEnemy",
-       "base": "def"
-      }
-     ]
-    },
-    {
-     "name": "반사광",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "perStack",
-       "id": "시선"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "shield",
-       "ratio": 1
-      }
-     ]
-    },
-    {
-     "name": "되비추기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "perStack",
-       "id": "시선"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "뚫어지게 보기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "base": "def"
-      },
-      {
-       "k": "stack",
-       "id": "시선",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "perStack",
-       "id": "시선"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy",
-       "base": "def"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "반짝이는 거울",
-     "kind": "power"
-    },
-    {
-     "name": "가벼운 거울",
-     "kind": "cost"
-    },
-    {
-     "name": "눈부심",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "미로_u2",
-   "name": "거울 속으로",
-   "hero": "미로",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2.2
-    },
-    {
-     "k": "status",
-     "id": "반격",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "전신 거울",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.97
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "거울 방",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.2
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "거울 너머",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1.8
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "응원 메시지",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.2
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "지켜 줄게요",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.4
-      },
-      {
-       "k": "status",
-       "id": "반격",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "두꺼운 유리",
-     "kind": "guard"
-    },
-    {
-     "name": "거울 닦기",
-     "kind": "draw"
-    },
-    {
-     "name": "가벼운 틀",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "미로_u3",
-   "name": "수많은 눈",
-   "hero": "미로",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "stack",
-     "id": "시선",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "shield",
-     "ratio": 1.5
-    }
-   ],
-   "oracles": [
-    {
-     "name": "빤히 보기",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "시선",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.5
-      }
-     ]
-    },
-    {
-     "name": "흘깃",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "stack",
-       "id": "시선",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.2
-      }
-     ]
-    },
-    {
-     "name": "거울 미로",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "시선",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.5
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "눈 맞춤",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "시선",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.5
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "밤새 지켜보기",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "시선",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.8
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "든든한 눈",
-     "kind": "guard"
-    },
-    {
-     "name": "깜빡",
-     "kind": "draw"
-    },
-    {
-     "name": "살짝 보기",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "미로_u4",
-   "name": "깨진 거울 조각",
-   "hero": "미로",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.7,
-     "target": "allEnemies",
-     "base": "def"
-    },
-    {
-     "k": "status",
-     "id": "약화",
-     "v": 1,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "산산조각",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.95,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "작은 파편",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.56,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "파편 비",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "시선",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "날카로운 파편",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "손상",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "거울 방패",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "allEnemies",
-       "base": "def"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "날 선 조각",
-     "kind": "power"
-    },
-    {
-     "name": "얇은 거울",
-     "kind": "cost"
-    },
-    {
-     "name": "반사된 빛",
-     "kind": "weakSpot"
-    }
-   ]
-  }
- ]
+  ]
 }

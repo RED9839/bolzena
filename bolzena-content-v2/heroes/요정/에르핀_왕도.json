@@ -1,832 +1,867 @@
 {
- "heroes": [
-  {
-   "id": "에르핀_왕도",
-   "name": "에르핀(왕도)",
-   "nature": "순수",
-   "race": "요정",
-   "role": "딜러",
-   "star": 3,
-   "hp": 720,
-   "atk": 156,
-   "def": 29,
-   "crit": 10,
-   "blurb": "세계수의 힘을 되찾아 엘다인으로 깨어나고, 여섯 종족 지도자의 축복 속에 대관식을 치른 에르핀. 네르가 늘 바라던 「왕도」를 좇아 옳은 길로 곧장 걷겠다는 각오를 주먹과 왕마력에 담았습니다.",
-   "keyword": {
-    "name": "왕도",
-    "desc": "같은 적을 잇달아 치는 왕도",
-    "carrier": "enemy",
-    "hunt": true,
-    "cap": 5,
-    "per": [
-     {
-      "stat": "taken",
-      "v": 0.1
-     }
-    ],
-    "rules": [
-     {
-      "name": "왕도의 끝",
-      "when": {
-       "on": "huntDown"
+  "heroes": [
+    {
+      "id": "에르핀_왕도",
+      "name": "에르핀(왕도)",
+      "nature": "순수",
+      "race": "요정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 720,
+      "atk": 156,
+      "def": 29,
+      "crit": 10,
+      "blurb": "세계수의 힘을 되찾아 엘다인으로 깨어나고, 여섯 종족 지도자의 축복 속에 대관식을 치른 에르핀. 네르가 늘 바라던 「왕도」를 좇아 옳은 길로 곧장 걷겠다는 각오를 주먹과 왕마력에 담았습니다.",
+      "keyword": {
+        "name": "왕마력",
+        "desc": "되찾은 세계수의 힘",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.06
+          }
+        ],
+        "rules": [
+          {
+            "name": "모두를 위한 힘",
+            "when": {
+              "on": "stackReach",
+              "id": "왕마력",
+              "n": 5
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "dealtMod",
+                "v": 0.25,
+                "target": "allAllies"
+              },
+              {
+                "k": "status",
+                "id": "피해 감소",
+                "v": 1
+              }
+            ]
+          }
+        ]
       },
-      "limit": {
-       "per": "turn",
-       "n": 1
+      "passives": [
+        {
+          "name": "망설임 없는 왕도",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "망설임 없는 왕도",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "모두를 위한 배려",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "에르피엔 펀치",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.6,
+            "target": "oneEnemy",
+            "hits": 8
+          },
+          {
+            "k": "tough",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "왕마력",
+            "v": 3
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "status",
-        "id": "사기",
-        "v": 1
-       }
+      "starter": [
+        "에르핀_왕도_s1",
+        "에르핀_왕도_u3",
+        "에르핀_왕도_s2",
+        "에르핀_왕도_s3"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "곧은 왕도",
-     "when": {
-      "on": "hit"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "에르피엔 펀치",
-    "cost": 300,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 0.6,
-      "target": "oneEnemy",
-      "hits": 8
-     },
-     {
-      "k": "tough",
-      "v": 2
-     },
-     {
-      "k": "stack",
-      "id": "왕도",
-      "v": 3,
-      "target": "oneEnemy"
-     }
-    ]
-   },
-   "starter": [
-    "에르핀_왕도_s1",
-    "에르핀_왕도_s1",
-    "에르핀_왕도_s2",
-    "에르핀_왕도_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "에르핀_왕도_s1",
-   "name": "왕마력탄",
-   "hero": "에르핀_왕도",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "에르핀_왕도_s2",
-   "name": "대왕마력탄",
-   "hero": "에르핀_왕도",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "에르핀_왕도_s3",
-   "name": "여왕의 예복",
-   "hero": "에르핀_왕도",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "에르핀_왕도_u1",
-   "name": "에르피엔 왕마력탄",
-   "hero": "에르핀_왕도",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "약점 공격"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.3,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "왕도",
-     "v": 1,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "왕의 일격",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.9,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "한 손 마력탄",
-     "cost": 1,
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "왕좌 각인",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 3,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "왕궁 포격",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.75,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "즉위 마력포",
-     "cost": 3,
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 4.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "왕실 마력",
-     "kind": "power"
-    },
-    {
-     "name": "왕녀의 눈썰미",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "왕도 표지",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "에르핀_왕도_u2",
-   "name": "마력 난타",
-   "hero": "에르핀_왕도",
-   "unique": true,
-   "cost": 0,
-   "type": "공격",
-   "x": true,
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.75,
-     "target": "oneEnemy",
-     "xHits": true
-    },
-    {
-     "k": "perStack",
-     "id": "왕도"
-    },
-    {
-     "k": "dmg",
-     "ratio": 0.25,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "끝없는 난타",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.95,
-       "target": "oneEnemy",
-       "xHits": true
-      },
-      {
-       "k": "perStack",
-       "id": "왕도"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "왕도 몰아치기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "oneEnemy",
-       "xHits": true
-      },
-      {
-       "k": "perStack",
-       "id": "왕도"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "먼저 찍는 주먹",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.8,
-       "target": "oneEnemy",
-       "xHits": true
-      },
-      {
-       "k": "perStack",
-       "id": "왕도"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.25,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "모아 둔 주먹",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.9,
-       "target": "oneEnemy",
-       "xHits": true
-      },
-      {
-       "k": "perStack",
-       "id": "왕도"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "숨 고르는 연타",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.85,
-       "target": "oneEnemy",
-       "xHits": true
-      },
-      {
-       "k": "perStack",
-       "id": "왕도"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "주먹에 실린 왕기",
-     "kind": "power"
-    },
-    {
-     "name": "얼얼한 주먹",
-     "kind": "frost"
-    },
-    {
-     "name": "왕도 한 칸",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "에르핀_왕도_u3",
-   "name": "축복의 왕관",
-   "hero": "에르핀_왕도",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "stack",
-     "id": "왕도",
-     "v": 2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "무거운 왕관",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "종이 왕관",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      }
-     ]
-    },
-    {
-     "name": "모두의 왕관",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "allAllies"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "왕관 쓴 아침",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "물려줄 왕관",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "왕실 예산",
-     "kind": "ap"
-    },
-    {
-     "name": "왕관 손질",
-     "kind": "draw"
-    },
-    {
-     "name": "왕의 위엄",
-     "kind": "atkUp"
-    }
-   ]
-  },
-  {
-   "id": "에르핀_왕도_u4",
-   "name": "모두를 위한 무게",
-   "hero": "에르핀_왕도",
-   "unique": true,
-   "cost": 2,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "status",
-     "id": "불굴",
-     "v": 1
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+      "id": "에르핀_왕도_s1",
+      "name": "왕마력탄",
+      "hero": "에르핀_왕도",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "k": "stack",
-         "id": "왕도",
-         "v": 1,
-         "target": "oneEnemy"
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         }
-       ]
-      }
-     ]
+      ]
+    },
+    {
+      "id": "에르핀_왕도_s2",
+      "name": "대왕마력탄",
+      "hero": "에르핀_왕도",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_s3",
+      "name": "여왕의 예복",
+      "hero": "에르핀_왕도",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u1",
+      "name": "에르피엔 왕마력탄",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "왕마력",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대왕마력탄",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "왕국을 되찾은 한 방",
+          "cost": 2,
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "왕마력 폭발",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "딸기 케이크 한 입",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.17,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "왕마력"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "동화책 펼치기",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "여왕의 의지",
+          "kind": "power"
+        },
+        {
+          "name": "맞춤법 만점",
+          "kind": "draw"
+        },
+        {
+          "name": "왕마력 충전",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u2",
+      "name": "마력 난타",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy",
+          "xHits": true
+        },
+        {
+          "k": "perStack",
+          "id": "왕마력"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "왕마력",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "왕마력 난타",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy",
+              "xHits": true
+            },
+            {
+              "k": "perStack",
+              "id": "왕마력"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "흩어지는 왕마력탄",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "randomEnemy",
+              "xHits": true
+            },
+            {
+              "k": "perStack",
+              "id": "왕마력"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "왕마력은 남겨 두기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "oneEnemy",
+              "xHits": true
+            },
+            {
+              "k": "perStack",
+              "id": "왕마력"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "처치하면 다시",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy",
+              "xHits": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "끝없는 난타",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.67,
+              "target": "oneEnemy",
+              "xHits": true
+            },
+            {
+              "k": "perStack",
+              "id": "왕마력"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "왕마력",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "대관식",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "반동 엉덩방아",
+          "kind": "ap"
+        },
+        {
+          "name": "SP 통",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "x": true
+    },
+    {
+      "id": "에르핀_왕도_u3",
+      "name": "축복의 왕관",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "왕마력",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "모두의 축복",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "왕관의 무게",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "왕마력",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "동화책 읽어 줘",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "존경받는 여왕",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "대관식 날",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "예복",
+          "kind": "atkUp"
+        },
+        {
+          "name": "왕관 광택",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "겨우살이",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u4",
+      "name": "모두를 위한 무게",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "왕마력",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "stackReach",
+                "id": "왕마력",
+                "n": 5
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.4,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "더 무거운 무게",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "왕마력",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.55,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "첫 여왕의 무게",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "왕마력",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.4,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "빵 나눠 주기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "왕마력",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.4,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "매일 아침 수업",
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "왕마력",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "왕마력",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.3,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "모두가 기댈 여왕",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "왕마력",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.4,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.5
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "세계수의 힘",
+          "kind": "defUp"
+        },
+        {
+          "name": "폴랑의 체육 수업",
+          "kind": "draw"
+        },
+        {
+          "name": "딸기 한 입",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.3
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "곧은 무게",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "왕도",
-           "v": 1,
-           "target": "oneEnemy"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "가뿐한 무게",
-     "cost": 1,
-     "tags": [],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "왕도",
-           "v": 1,
-           "target": "oneEnemy"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "왕도의 무게",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "왕도",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "왕도",
-           "v": 2,
-           "target": "oneEnemy"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "아껴 둔 무게",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "왕도",
-           "v": 1,
-           "target": "oneEnemy"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "대관식의 무게",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "왕도",
-           "v": 2,
-           "target": "oneEnemy"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "짐을 나눈 어깨",
-     "kind": "cost"
-    },
-    {
-     "name": "왕녀의 다짐",
-     "kind": "atkUp"
-    },
-    {
-     "name": "흔들림 없는 왕좌",
-     "kind": "defUp"
-    }
-   ]
-  }
- ]
+  ]
 }

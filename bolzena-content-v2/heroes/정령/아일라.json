@@ -1,798 +1,801 @@
 {
- "heroes": [
-  {
-   "id": "아일라",
-   "name": "아일라",
-   "nature": "순수",
-   "role": "서포터",
-   "star": 3,
-   "hp": 660,
-   "atk": 86,
-   "def": 60,
-   "crit": 5,
-   "blurb": "화산섬 볼케니카의 정령. 친구가 맞을 때마다 빠직이 한 단계씩 차오르고, 초폭망에 닿으면 대분화가 섬 전체를 덮는 용암 실드가 됩니다. 실드가 깨지면 화산 정령이 대신 화를 냅니다.",
-   "keyword": {
-    "name": "빠직",
-    "desc": "친구가 맞을 때마다 차오르는 화",
-    "carrier": "self",
-    "cap": 5,
-    "rules": [
-     {
-      "name": "대분화",
-      "when": {
-       "on": "stackReach",
-       "id": "빠직",
-       "n": 5
+  "heroes": [
+    {
+      "id": "아일라",
+      "name": "아일라",
+      "nature": "순수",
+      "role": "서포터",
+      "star": 3,
+      "hp": 660,
+      "atk": 86,
+      "def": 60,
+      "crit": 5,
+      "blurb": "화산섬 볼케니카의 정령. 친구가 맞을 때마다 빠직이 한 단계씩 차오르고, 초폭망에 닿으면 대분화가 섬 전체를 덮는 용암 실드가 됩니다. 실드가 깨지면 화산 정령이 대신 화를 냅니다.",
+      "keyword": {
+        "name": "빠직",
+        "desc": "세며 참는 화산섬의 분노",
+        "carrier": "self",
+        "cap": 4,
+        "stages": [
+          "쫌폭망",
+          "소폭망",
+          "대폭망",
+          "초폭망"
+        ],
+        "rules": [
+          {
+            "name": "대폭발",
+            "when": {
+              "on": "stackReach",
+              "id": "빠직",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "빠직",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 1,
+                "target": "allEnemies"
+              },
+              {
+                "k": "shield",
+                "ratio": 2.4
+              }
+            ]
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "shield",
-        "ratio": 2.0
-       },
-       {
-        "k": "status",
-        "id": "피해 감소",
-        "v": 1
-       },
-       {
-        "k": "spend",
-        "id": "빠직",
-        "all": true
-       }
+      "passives": [
+        {
+          "name": "부글부글",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "화산 정령",
+          "when": {
+            "on": "shieldBreak"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "활활화산",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "shield",
+            "ratio": 3
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 1
+          },
+          {
+            "k": "dmg",
+            "ratio": 1.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "빠직",
+            "v": 2
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "아일라_s1",
+        "아일라_s1",
+        "아일라_s2",
+        "아일라_u1"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "부글부글",
-     "when": {
-      "on": "hurt",
-      "guarded": true
-     },
-     "limit": {
-      "per": "turn",
-      "n": 3
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "빠직",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "화산 정령",
-     "when": {
-      "on": "shieldBreak"
-     },
-     "limit": {
-      "per": "turn",
-      "n": 1
-     },
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "활활화산",
-    "cost": 300,
-    "fx": [
-     {
-      "k": "shield",
-      "ratio": 3.0
-     },
-     {
-      "k": "status",
-      "id": "피해 감소",
-      "v": 1
-     },
-     {
-      "k": "dmg",
-      "ratio": 1.5,
-      "target": "allEnemies"
-     },
-     {
-      "k": "stack",
-      "id": "빠직",
-      "v": 2
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "아일라_s1",
-    "아일라_s1",
-    "아일라_s2",
-    "아일라_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "아일라_s1",
-   "name": "용암 방울",
-   "hero": "아일라",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "아일라_s2",
-   "name": "휴양지 온천",
-   "hero": "아일라",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 1.2
-    }
-   ]
-  },
-  {
-   "id": "아일라_u1",
-   "name": "초폭망 직전",
-   "hero": "아일라",
-   "unique": true,
-   "cost": 0,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "stack",
-     "id": "빠직",
-     "v": 2
-    },
-    {
-     "k": "status",
-     "id": "그을림",
-     "v": 2,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "폭망 단계 상승",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "빠직",
-       "v": 3
-      },
-      {
-       "k": "status",
-       "id": "그을림",
-       "v": 3,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "부글부글 끓기",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "빠직",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "그을림",
-       "v": 2,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "참을 만큼 참았어",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "빠직",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "그을림",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "김 빼기",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "빠직",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "그을림",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "heal",
-       "ratio": 0.6
-      }
-     ]
-    },
-    {
-     "name": "화산재",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "빠직",
-       "v": 2
-      },
-      {
-       "k": "status",
-       "id": "그을림",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "들끓는 마그마",
-     "kind": "draw"
-    },
-    {
-     "name": "뜨거운 숨",
-     "fx": [
-      {
-       "k": "status",
-       "id": "그을림",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "화산 예보",
-     "tags": [
-      "개전"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "아일라_u2",
-   "name": "휴가 중 잠적",
-   "hero": "아일라",
-   "unique": true,
-   "cost": 2,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2.0
-    },
-    {
-     "k": "dmg",
-     "ratio": 0.35,
-     "target": "randomEnemy",
-     "hits": 4
-    },
-    {
-     "k": "status",
-     "id": "약화",
-     "v": 1,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "화산 정령 경비대",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.0
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.45,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "잠깐 자리 비움",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1.7
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.35,
-       "target": "randomEnemy",
-       "hits": 3
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "섬을 맡기고",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 3.0
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.35,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "빠직",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "용암 분출",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.0
-      },
-      {
-       "k": "dmg",
-       "ratio": 1.0,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "그을림",
-       "v": 2,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "분노의 마그마",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.8
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.4,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "용암 실드",
-     "kind": "guard"
-    },
-    {
-     "name": "가벼운 화산탄",
-     "kind": "cost"
-    },
-    {
-     "name": "뜨거운 증기",
-     "kind": "weakSpot"
-    }
-   ],
-   "blurb": "섬은 화산 정령들에게 맡기고 슬쩍 사라지그마"
-  },
-  {
-   "id": "아일라_u3",
-   "name": "화를 삭이는 명상",
-   "hero": "아일라",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 0.8
-    },
-    {
-     "k": "perStack",
-     "id": "빠직"
-    },
-    {
-     "k": "shield",
-     "ratio": 0.6
-    },
-    {
-     "k": "spend",
-     "id": "빠직",
-     "all": true
-    }
-   ],
-   "oracles": [
-    {
-     "name": "깊은 명상",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 1.0
-      },
-      {
-       "k": "perStack",
-       "id": "빠직"
-      },
-      {
-       "k": "shield",
-       "ratio": 0.75
-      },
-      {
-       "k": "spend",
-       "id": "빠직",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "호흡 고르기",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 0.6
-      },
-      {
-       "k": "perStack",
-       "id": "빠직"
-      },
-      {
-       "k": "shield",
-       "ratio": 0.45
-      },
-      {
-       "k": "spend",
-       "id": "빠직",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "온천욕",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 0.8
-      },
-      {
-       "k": "perStack",
-       "id": "빠직"
-      },
-      {
-       "k": "shield",
-       "ratio": 0.65
-      },
-      {
-       "k": "spend",
-       "id": "빠직",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "평정심",
-     "fx": [
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      },
-      {
-       "k": "perStack",
-       "id": "빠직"
-      },
-      {
-       "k": "shield",
-       "ratio": 0.8
-      },
-      {
-       "k": "spend",
-       "id": "빠직",
-       "all": true
-      }
-     ]
-    },
-    {
-     "name": "식은 용암",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1.4
-      },
-      {
-       "k": "perStack",
-       "id": "빠직"
-      },
-      {
-       "k": "heal",
-       "ratio": 0.65
-      },
-      {
-       "k": "spend",
-       "id": "빠직",
-       "all": true
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "따뜻한 물",
-     "kind": "heal"
-    },
-    {
-     "name": "명상 방석",
-     "kind": "cost"
-    },
-    {
-     "name": "한숨 돌리기",
-     "kind": "draw"
-    }
-   ]
-  },
-  {
-   "id": "아일라_u4",
-   "name": "화산섬의 주인",
-   "hero": "아일라",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "status",
-     "id": "불굴",
-     "v": 1
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+      "id": "아일라_s1",
+      "name": "용암 방울",
+      "hero": "아일라",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "k": "stack",
-         "id": "빠직",
-         "v": 1
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         }
-       ]
-      }
-     ]
+      ]
+    },
+    {
+      "id": "아일라_s2",
+      "name": "휴양지 온천",
+      "hero": "아일라",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.2
+        }
+      ]
+    },
+    {
+      "id": "아일라_u1",
+      "name": "초폭망 직전",
+      "hero": "아일라",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "빠직",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.9
+        }
+      ],
+      "oracles": [
+        {
+          "name": "걍폭망",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.9
+            }
+          ]
+        },
+        {
+          "name": "나 좀 냅두라바!!",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.9
+            }
+          ]
+        },
+        {
+          "name": "땅콩 아니라바",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.7
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "일광욕",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.56
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빠직",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "벨라의 장난",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "따스한 햇살",
+          "kind": "guard"
+        },
+        {
+          "name": "해파리 친구",
+          "kind": "draw"
+        },
+        {
+          "name": "끓는 속",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아일라_u2",
+      "name": "휴가 중 잠적",
+      "hero": "아일라",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.8
+        },
+        {
+          "k": "stack",
+          "id": "빠직",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "화산 장벽",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "섬 전체 장벽",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.6
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "휴양지 온천",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "볼케니카 설계",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.57
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "빠직"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.22
+            }
+          ]
+        },
+        {
+          "name": "해적 퇴치",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.3
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "빠직",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "굳은 용암",
+          "kind": "guard"
+        },
+        {
+          "name": "후드티",
+          "kind": "defUp"
+        },
+        {
+          "name": "마그마 찌개",
+          "kind": "ap"
+        }
+      ]
+    },
+    {
+      "id": "아일라_u3",
+      "name": "화를 삭이는 명상",
+      "hero": "아일라",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.9
+        },
+        {
+          "k": "perStack",
+          "id": "빠직"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.35
+        },
+        {
+          "k": "spend",
+          "id": "빠직",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대지의 명상",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.05
+            },
+            {
+              "k": "perStack",
+              "id": "빠직"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.42
+            },
+            {
+              "k": "spend",
+              "id": "빠직",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "가비아의 가르침",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "빠직"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "spend",
+              "id": "빠직",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "참지 않기",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "빠직"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "빠직",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "명상 수행 중",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.97
+            },
+            {
+              "k": "perStack",
+              "id": "빠직"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.35
+            }
+          ]
+        },
+        {
+          "name": "깊은 호흡",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.75
+            },
+            {
+              "k": "perStack",
+              "id": "빠직"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            },
+            {
+              "k": "spend",
+              "id": "빠직",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "파도 소리",
+          "kind": "heal"
+        },
+        {
+          "name": "해먹",
+          "kind": "draw"
+        },
+        {
+          "name": "느긋한 오후",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "아일라_u4",
+      "name": "화산섬의 주인",
+      "hero": "아일라",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 2
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "stackReach",
+                "id": "빠직",
+                "n": 4
+              },
+              "fx": [
+                {
+                  "k": "shield",
+                  "ratio": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "활화산",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "빠직",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "분노 5단계",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "빠직",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빠직",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "섬의 수호자",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "빠직",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "평화 박살 해파리",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "perStack",
+              "id": "빠직"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "빠직",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "그윈과 델리아",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "빠직",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "꿀렁 해파리",
+          "kind": "defUp"
+        },
+        {
+          "name": "짱킹갓",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "섬 순찰",
+          "kind": "cost"
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "화산섬의 여왕",
-     "fx": [
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "빠직",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "잠든 화산",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "빠직",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "뜨거운 대지",
-     "fx": [
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "그을림",
-       "v": 3,
-       "target": "allEnemies"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "빠직",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "용암 갑옷",
-     "fx": [
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "결정화",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "빠직",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "분화 준비",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "빠직",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "빠직",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "화산의 힘",
-     "kind": "atkUp"
-    },
-    {
-     "name": "용암 피부",
-     "kind": "defUp"
-    },
-    {
-     "name": "가벼운 분화",
-     "kind": "cost"
-    }
-   ]
-  }
- ]
+  ]
 }

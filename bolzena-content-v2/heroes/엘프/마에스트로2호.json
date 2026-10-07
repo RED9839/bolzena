@@ -13,34 +13,28 @@
       "crit": 5,
       "blurb": "온갖 연료로 움직이는 로봇. 파티에 실드가 쌓일 때마다 배터리가 차고, 가득 차면 방화벽을 펼쳐 파티를 지키고 적의 기세를 꺾습니다.",
       "keyword": {
-        "name": "배터리",
-        "desc": "실드로 채우는 배터리",
+        "name": "삼킨 연료",
+        "desc": "무엇이든 삼켜 채운 연료",
         "carrier": "self",
-        "cap": 6,
-        "per": [
-          {
-            "stat": "guard",
-            "v": 0.03
-          }
-        ],
+        "cap": 5,
         "rules": [
           {
             "name": "방화벽 가동",
             "when": {
               "on": "stackReach",
-              "id": "배터리",
-              "n": 6
+              "id": "삼킨 연료",
+              "n": 5
             },
             "fx": [
               {
                 "k": "spend",
-                "id": "배터리",
+                "id": "삼킨 연료",
                 "all": true
               },
               {
                 "k": "status",
                 "id": "피해 감소",
-                "v": 1
+                "v": 2
               },
               {
                 "k": "status",
@@ -66,8 +60,25 @@
           "fx": [
             {
               "k": "stack",
-              "id": "배터리",
+              "id": "삼킨 연료",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "자가 회복 기능",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
             }
           ]
         }
@@ -95,7 +106,7 @@
           },
           {
             "k": "stack",
-            "id": "배터리",
+            "id": "삼킨 연료",
             "v": 3
           }
         ]
@@ -104,7 +115,7 @@
         "마에스트로2호_s1",
         "마에스트로2호_s1",
         "마에스트로2호_s2",
-        "마에스트로2호_s2"
+        "마에스트로2호_u2"
       ]
     }
   ],
@@ -142,132 +153,115 @@
       "name": "로보틱 매트릭스",
       "hero": "마에스트로2호",
       "unique": true,
-      "signature": true,
-      "cost": 2,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "shield",
-          "ratio": 3.5
-        },
-        {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 1
+          "ratio": 1.35
         },
         {
           "k": "stack",
-          "id": "배터리",
+          "id": "삼킨 연료",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "가동 즉시 전개",
+          "name": "매트릭스 강화",
           "fx": [
             {
               "k": "shield",
-              "ratio": 4.55
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "ratio": 1.75
             },
             {
               "k": "stack",
-              "id": "배터리",
+              "id": "삼킨 연료",
               "v": 1
             }
           ]
         },
         {
-          "name": "최대 출력 매트릭스",
-          "cost": 1,
+          "name": "전 아군 실드",
+          "cost": 2,
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.5
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "ratio": 2.5
             },
             {
               "k": "stack",
-              "id": "배터리",
+              "id": "삼킨 연료",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "결정화",
               "v": 1
             }
           ]
         },
         {
-          "name": "척살 모드 경고",
-          "tags": [
-            "보존"
-          ],
+          "name": "반사 장갑",
           "fx": [
             {
               "k": "shield",
-              "ratio": 4.2
+              "ratio": 1
             },
             {
               "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "배터리",
+              "id": "반격",
               "v": 1
             }
           ]
         },
         {
-          "name": "과충전 회로",
+          "name": "정비 매뉴얼",
           "fx": [
             {
               "k": "shield",
-              "ratio": 5.08
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "ratio": 1.2
             },
             {
               "k": "stack",
-              "id": "배터리",
+              "id": "삼킨 연료",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "방화벽",
-          "tags": [
-            "신속"
-          ],
+          "name": "연료 직결 장갑",
           "fx": [
             {
               "k": "shield",
-              "ratio": 4.2
+              "ratio": 1.2
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "ifStack",
+              "id": "삼킨 연료",
+              "n": 3
             },
             {
-              "k": "stack",
-              "id": "배터리",
-              "v": 1
+              "k": "spend",
+              "id": "삼킨 연료",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.3
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "배터리 A3쨩",
+          "name": "장갑판",
           "kind": "guard"
         },
         {
@@ -275,11 +269,11 @@
           "kind": "draw"
         },
         {
-          "name": "초록불 빨간불",
+          "name": "주유구 개방",
           "fx": [
             {
               "k": "stack",
-              "id": "배터리",
+              "id": "삼킨 연료",
               "v": 1
             }
           ]
@@ -292,136 +286,219 @@
       "hero": "마에스트로2호",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
       "fx": [
         {
           "k": "stack",
-          "id": "배터리",
-          "v": 2
-        },
-        {
-          "k": "shield",
-          "ratio": 1.5
-        },
-        {
-          "k": "draw",
+          "id": "삼킨 연료",
           "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "삼킨 연료",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "아침 점검",
+          "name": "특대 A3 배터리",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "stack",
-              "id": "배터리",
+              "id": "삼킨 연료",
               "v": 2
             },
             {
-              "k": "shield",
-              "ratio": 2.15
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 연료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "전면 분해 정비",
+          "name": "저전력 충전",
           "cost": 0,
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "stack",
-              "id": "배터리",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 1.5
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 연료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "광석 연료 투입",
+          "name": "자가 정비 루틴",
           "tags": [
-            "보존"
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guard",
+                    "kind": "shield"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 연료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "정비 매뉴얼 검색",
+          "tags": [
+            "개전"
           ],
           "fx": [
             {
               "k": "stack",
-              "id": "배터리",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 1.98
+              "id": "삼킨 연료",
+              "v": 1
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 연료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "수은음료 급속 충전",
+          "name": "무엇이든 삼키기",
           "fx": [
             {
-              "k": "stack",
-              "id": "배터리",
-              "v": 2
+              "k": "exileFrom",
+              "from": "hand",
+              "n": 1,
+              "basic": true
             },
-            {
-              "k": "shield",
-              "ratio": 2.17
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "자가 회복 기능",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
             {
               "k": "stack",
-              "id": "배터리",
-              "v": 2
+              "id": "삼킨 연료",
+              "v": 3
             },
             {
-              "k": "shield",
-              "ratio": 1.8
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 연료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "방화벽",
-          "kind": "guard"
+          "name": "블루 스크린",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            }
+          ]
         },
         {
-          "name": "자가 회복 기능",
-          "kind": "draw"
+          "name": "저전력 모드",
+          "kind": "cost"
         },
         {
-          "name": "광석 연료",
+          "name": "예비 배터리",
           "fx": [
             {
               "k": "stack",
-              "id": "배터리",
+              "id": "삼킨 연료",
               "v": 1
             }
           ]
@@ -433,170 +510,194 @@
       "name": "진격 방해 모드",
       "hero": "마에스트로2호",
       "unique": true,
-      "cost": 3,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.0,
+          "ratio": 0.55,
           "base": "def",
-          "target": "allEnemies"
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "둔화",
-          "v": 2,
-          "target": "allEnemies"
+          "k": "perStack",
+          "id": "삼킨 연료"
         },
         {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
-          "target": "allEnemies"
+          "k": "dmg",
+          "ratio": 0.2,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "삼킨 연료",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "모드 대기",
+          "name": "풀파워 방해",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 0.72,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "삼킨 연료"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.26,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 연료",
+              "all": true
             }
           ]
         },
         {
-          "name": "소음 출력 한계 돌파",
+          "name": "쇼크 웨이브 예열",
           "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.0,
+              "ratio": 1.15,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "방어선 유지",
-          "tags": [
-            "보존"
-          ],
+          "name": "으음… 과연",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.25,
+              "ratio": 0.8,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "삼킨 연료",
+              "n": 3
             },
             {
               "k": "status",
               "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "충전 방전",
+          "name": "방해 모드 상시",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 0.55,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "삼킨 연료"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "삼킨 연료",
+                    "n": 5
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.5,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "초록불 빨간불",
-          "tags": [
-            "신속"
-          ],
+          "name": "연료 폭주",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.75,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "삼킨 연료"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "dmg",
+              "ratio": 0.26,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "수은음료",
+          "name": "기계 팔",
           "kind": "power"
         },
         {
-          "name": "초록불 빨간불",
-          "kind": "ap"
+          "name": "소음 발생기",
+          "kind": "frost"
         },
         {
-          "name": "배터리 A3쨩",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "배터리",
-              "v": 1
-            }
-          ]
+          "name": "남은 연료",
+          "kind": "ap"
         }
       ]
     },
@@ -607,70 +708,67 @@
       "unique": true,
       "cost": 1,
       "type": "스킬",
-      "tags": [
-        "연계"
-      ],
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.5
+          "ratio": 0.8
         },
         {
-          "k": "stack",
-          "id": "배터리",
-          "v": 1
+          "k": "perStack",
+          "id": "삼킨 연료"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.2
         }
       ],
       "oracles": [
         {
-          "name": "녹화 대기",
-          "tags": [
-            "연계"
-          ],
+          "name": "고화질 녹화",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.15
+              "ratio": 1
             },
             {
-              "k": "stack",
-              "id": "배터리",
-              "v": 1
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.25
             }
           ]
         },
         {
-          "name": "다각도 촬영",
+          "name": "셀카봉",
           "cost": 0,
-          "tags": [
-            "연계"
-          ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 0.55
             },
             {
-              "k": "stack",
-              "id": "배터리",
-              "v": 1
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.14
             }
           ]
         },
         {
-          "name": "줌 아웃 경고",
-          "tags": [
-            "연계"
-          ],
+          "name": "녹화본 재생",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 0.6
             },
             {
               "k": "stack",
-              "id": "배터리",
-              "v": 1
+              "id": "삼킨 연료",
+              "v": 2
             },
             {
               "k": "draw",
@@ -679,36 +777,53 @@
           ]
         },
         {
-          "name": "공기 취급",
-          "tags": [
-            "연계"
-          ],
+          "name": "카메라 상시 녹화",
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.17
+              "ratio": 0.7
             },
             {
-              "k": "stack",
-              "id": "배터리",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "삼킨 연료"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.17
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "오프닝 불참",
-          "tags": [
-            "연계",
-            "보존"
-          ],
+          "name": "녹화 테이프 소진",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.98
+              "k": "perStack",
+              "id": "삼킨 연료"
             },
             {
-              "k": "stack",
-              "id": "배터리",
+              "k": "shield",
+              "ratio": 0.38
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 연료",
+              "all": true
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
@@ -716,19 +831,21 @@
       ],
       "blesses": [
         {
-          "name": "자가 회복 기능",
-          "kind": "guard"
+          "name": "자기 성찰",
+          "kind": "defUp"
         },
         {
-          "name": "광석 연료",
-          "kind": "draw"
+          "name": "자동 녹화",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "방화벽",
+          "name": "연료 보충",
           "fx": [
             {
               "k": "stack",
-              "id": "배터리",
+              "id": "삼킨 연료",
               "v": 1
             }
           ]

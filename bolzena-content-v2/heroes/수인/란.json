@@ -13,34 +13,62 @@
       "crit": 10,
       "blurb": "투구꽃 독에도 잠들지 않는 몸으로 오래 떠돌던 첫 수인 엘다인. 강인도가 흔들린 적을 발도로 베어 넘기고, 사냥감이 쓰러지면 쉬지 않고 다음 사냥감에게 칼끝을 돌립니다.",
       "keyword": {
-        "name": "사랑니",
-        "desc": "다음 공격에 싣는 발도",
-        "carrier": "self",
-        "cap": 2,
+        "name": "늑대 표식",
+        "desc": "무리 사냥의 표적에 남는 이빨 자국",
+        "carrier": "enemy",
+        "cap": 3,
         "per": [
           {
+            "stat": "dot",
+            "ratio": 0.15
+          },
+          {
             "stat": "dealt",
-            "v": 0.3
+            "v": -0.05
           }
-        ],
-        "consumeAll": true
+        ]
       },
       "passives": [
         {
-          "name": "사랑니 발도",
+          "name": "허공 가르기",
           "when": {
-            "on": "break",
-            "mine": true
+            "on": "play",
+            "type": "공격",
+            "every": 3
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "사랑니",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
             },
             {
-              "k": "nextCheaper",
-              "v": 1
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "란의 공포",
+          "when": {
+            "on": "kill"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 20
+            },
+            {
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 2,
+              "target": "lowEnemy"
             }
           ]
         }
@@ -76,7 +104,7 @@
       },
       "starter": [
         "란_s1",
-        "란_s1",
+        "란_u1",
         "란_s2",
         "란_s3"
       ]
@@ -129,104 +157,92 @@
       "name": "아랑의 여유",
       "hero": "란",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.3,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifFoe",
-          "id": "tough",
-          "pct": 0.5
-        },
-        {
-          "k": "dmg",
-          "ratio": 1.2,
-          "target": "oneEnemy"
+          "ratio": 0.8,
+          "target": "allEnemies"
         },
         {
           "k": "stack",
-          "id": "사랑니",
-          "v": 1
+          "id": "늑대 표식",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "빈틈 노리기",
+          "name": "칼바람",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.55,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
+              "ratio": 0.99,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "사랑니",
-              "v": 1
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
           "name": "한숨 돌리고",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.65,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
+              "ratio": 0.55,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "사랑니",
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "여유 부리기",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "사랑니 갈기",
+          "name": "벗의 기억",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 2.6,
-              "target": "oneEnemy"
+              "k": "perStack",
+              "id": "늑대 표식",
+              "each": true
             },
             {
-              "k": "stack",
-              "id": "사랑니",
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
               "v": 1
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
             }
           ]
         },
@@ -235,51 +251,20 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.8,
+              "ratio": 0.8,
               "target": "allEnemies"
             },
             {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy"
-            },
-            {
               "k": "stack",
-              "id": "사랑니",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "여유 부리기",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.65,
-              "target": "oneEnemy"
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "사랑니",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             }
           ]
         }
@@ -294,7 +279,7 @@
           "kind": "weakSpot"
         },
         {
-          "name": "사냥꾼 눈빛",
+          "name": "란과 벗님들",
           "kind": "atkUp"
         }
       ]
@@ -309,22 +294,22 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 0.9,
           "target": "oneEnemy"
         },
         {
-          "k": "ifFoe",
-          "id": "tough",
-          "pct": 0.5
+          "k": "perStack",
+          "id": "늑대 표식"
         },
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 0.4,
           "target": "oneEnemy"
         },
         {
-          "k": "tough",
-          "v": 1
+          "k": "spend",
+          "id": "늑대 표식",
+          "all": true
         }
       ],
       "oracles": [
@@ -333,38 +318,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "반쯤 뽑은 칼",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
+              "k": "perStack",
+              "id": "늑대 표식"
             },
             {
               "k": "dmg",
@@ -372,32 +331,55 @@
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 0.5
+              "k": "spend",
+              "id": "늑대 표식",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "칼끝 겨누기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "늑대 표식"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "늑대 표식",
+              "all": true
             }
           ]
         },
         {
           "name": "발도 후 납도",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.14,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "사랑니",
-              "v": 1
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
+              "k": "perStack",
+              "id": "늑대 표식"
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.4,
               "target": "oneEnemy"
             }
           ]
@@ -406,50 +388,49 @@
           "name": "횡베기",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
+              "k": "perStack",
+              "id": "늑대 표식",
+              "each": true
             },
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.35,
               "target": "allEnemies"
             },
             {
-              "k": "tough",
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "일섬",
-          "tags": [
-            "신속"
-          ],
+          "name": "피 냄새",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
+              "k": "perStack",
+              "id": "늑대 표식"
             },
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.65,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "spend",
+              "id": "늑대 표식",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
             }
           ]
         }
@@ -460,12 +441,19 @@
           "kind": "power"
         },
         {
-          "name": "칼끝 겨누기",
-          "kind": "weakSpot"
+          "name": "빠른 손",
+          "kind": "draw"
         },
         {
-          "name": "빠른 손",
-          "kind": "cost"
+          "name": "남은 이빨 자국",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -478,18 +466,20 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "tough",
-          "v": 1
-        },
-        {
-          "k": "status",
-          "id": "취약",
-          "v": 2
+          "k": "stack",
+          "id": "늑대 표식",
+          "v": 2,
+          "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "고통",
-          "v": 3
+          "v": 3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
         }
       ],
       "oracles": [
@@ -497,18 +487,20 @@
           "name": "짙은 독",
           "fx": [
             {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "고통",
-              "v": 5
+              "v": 5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -517,73 +509,95 @@
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "고통",
-              "v": 3
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "독 묻은 이빨",
+          "name": "약초 주머니",
           "fx": [
             {
-              "k": "tough",
-              "v": 1
+              "k": "heal",
+              "ratio": 1.5
             },
             {
-              "k": "status",
-              "id": "취약",
+              "k": "draw",
               "v": 2
             },
             {
               "k": "stack",
-              "id": "사랑니",
-              "v": 2
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "독 안개",
+          "name": "잠재우는 독",
+          "power": true,
           "fx": [
             {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
+              "k": "stack",
+              "id": "늑대 표식",
               "v": 2,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "고통",
-              "v": 2,
-              "target": "allEnemies"
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "늑대 표식",
+                      "v": 1,
+                      "target": "lowEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "마비 독",
+          "name": "독 바른 칼",
           "fx": [
             {
-              "k": "tough",
-              "v": 2
+              "k": "discard",
+              "v": 1
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -594,18 +608,19 @@
           "kind": "cost"
         },
         {
-          "name": "약초 주머니",
-          "kind": "draw"
-        },
-        {
           "name": "번지는 독",
           "fx": [
             {
               "k": "status",
               "id": "고통",
-              "v": 2
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
+        },
+        {
+          "name": "독초 면역",
+          "kind": "draw"
         }
       ]
     },
@@ -614,104 +629,139 @@
       "name": "날선 늑대의 발톱",
       "hero": "란",
       "unique": true,
-      "cost": 2,
-      "type": "공격",
+      "cost": 1,
+      "type": "강화",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.7,
-          "target": "oneEnemy",
-          "hits": 3
-        },
-        {
-          "k": "ifFoe",
-          "id": "tough",
-          "pct": 0.5
-        },
-        {
-          "k": "tough",
-          "v": 1
-        },
-        {
           "k": "stack",
-          "id": "사랑니",
-          "v": 1
+          "id": "늑대 표식",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnEnd"
+              },
+              "fx": [
+                {
+                  "k": "perStack",
+                  "id": "늑대 표식",
+                  "each": true
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.2,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "날카로운 발톱",
+          "name": "사냥 본능",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
               "k": "stack",
-              "id": "사랑니",
-              "v": 1
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "늑대 표식",
+                      "each": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.28,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "발톱 세우기",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
               "k": "stack",
-              "id": "사랑니",
-              "v": 1
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "늑대 표식",
+                      "each": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.2,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "사냥 본능",
+          "name": "으르렁",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy",
-              "hits": 3
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             },
             {
-              "k": "stack",
-              "id": "사랑니",
-              "v": 1
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "tough",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "늑대 표식",
+                      "each": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.21,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -719,66 +769,109 @@
           "name": "늑대 무리",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "allEnemies",
-              "hits": 3
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
               "k": "stack",
-              "id": "사랑니",
-              "v": 1
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "늑대 표식",
+                      "each": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.2,
+                      "target": "allEnemies"
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "늑대 표식",
+                      "v": 2,
+                      "target": "lowEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "갈기갈기",
-          "cost": 3,
+          "name": "깊은 상처",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy",
-              "hits": 5
-            },
-            {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
-            },
-            {
-              "k": "tough",
-              "v": 2
-            },
-            {
               "k": "stack",
-              "id": "사랑니",
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "늑대 표식",
+                      "each": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.2,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "으르렁",
-          "kind": "power"
-        },
-        {
-          "name": "깊은 상처",
-          "kind": "frost"
+          "name": "날카로운 발톱",
+          "kind": "atkUp"
         },
         {
           "name": "사냥의 숨",
-          "kind": "ap"
+          "kind": "draw"
+        },
+        {
+          "name": "무리의 표적",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "늑대 표식",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
         }
       ]
     }

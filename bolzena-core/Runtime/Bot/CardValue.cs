@@ -217,7 +217,7 @@ namespace Bolzena.Core
         }
 
         /// <summary>남은 전투(POWER_T 턴)에 그 규칙이 발동할 대충의 수 — 계기마다 턴당 빈도 × 조건 · 횟수 제한.</summary>
-        public static double RuleFires(PassiveRule r)
+        public static double RuleFires(PassiveRule r, double turns = POWER_T)
         {
             var w = r.When ?? new When();
             double perTurn = w.On switch
@@ -234,9 +234,54 @@ namespace Bolzena.Core
             };
             if (r.Conds.Count > 0) perTurn *= 0.6;
             if (r.Limit != null && r.Limit.Per == "turn") perTurn = Math.Min(perTurn, r.Limit.N);
-            double total = perTurn * POWER_T;
+            double total = perTurn * turns;
             if (r.Limit != null && r.Limit.Per == "fight") total = Math.Min(total, r.Limit.N);
             return total;
+        }
+
+        // ── 판에 맞춘 실드 · 회복 값(2026-10-08 봇 손질) ─────────────
+        /// <summary>
+        /// 손에 쥔 카드의 실드 · 회복 몫을 지금 판에 맞춰 고친 값(카드 값 눈금 — ValueOf 와 같은 단위)을 돌려준다. 결과 = 판에 맞춘 값 − 정적 값(덧셈으로 쓴다).
+        ///   실드: 다음 적 차례에 실제로 막을 피해 = min(카드 실드량, 지금 실드로 못 막는 예고 피해 need). 막을 것이 없으면 0.
+        ///   회복: 실제로 채울 HP = min(카드 회복량, 잃은 HP missing).
+        /// sh · he — 카드의 실드 · 회복 계수 합. guard1 · heal1 — 계수 1 의 실드 · 회복량(카드 주인 기준). atk — 카드 주인 공격력(카드 값 1 ≈ 공격력 × 1.2 의 피해).
+        /// HP 1 은 판 점수에서 1.3 으로 치므로(Bots.Score) 같은 무게로 바꾼다. 정적 값은 ValueOf 의 실드(계수/2 × 0.8) · 회복(계수/2.4 × 0.8).
+        /// </summary>
+        public static double LiveGuard(double sh, double he, int guard1, int heal1, int need, int missing, double atk)
+        {
+            if (atk <= 0 || (sh <= 0 && he <= 0)) return 0;
+            double unit = 1.2 * atk;
+            double stat = sh / 2 * 0.8 + he / 2.4 * 0.8;
+            double live = (Math.Min(sh * guard1, Math.Max(0, need)) + Math.Min(he * heal1, Math.Max(0, missing))) * HP_W / unit;
+            return live - stat;
+        }
+        /// <summary>판 점수에서 파티 HP 1 의 무게(Bots.Score 의 1.3).</summary>
+        public const double HP_W = 1.3;
+
+        // ── 장비 효과 값어치(2026-10-07 봇 손질) ─────────────────────
+        /// <summary>장비 효과가 도는 한 싸움의 턴(일반 3.8 · 보스 5.5 · 엘리트 사이 — 대충).</summary>
+        public const double GEAR_T = 4;
+
+        /// <summary>
+        /// 장비 효과 규칙들의 한 싸움 값어치(1코 카드 ≈ 1.5) — 규칙마다 (한 번 발동의 값 × 한 싸움에 발동할 수).
+        /// 전투 시작 1번 · HP N% 이하 0.5번 · always 는 전투 내내 증감으로 · 나머지는 RuleFires(턴 GEAR_T).
+        /// </summary>
+        public static double GearWorth(IEnumerable<PassiveRule> rules)
+        {
+            double v = 0;
+            foreach (var r in rules ?? Enumerable.Empty<PassiveRule>())
+            {
+                if (r == null) continue;
+                var on = r.When?.On;
+                if (on == "always") { v += ValueOf(r.Fx.Select(x => { var c = x.Copy(); c.Run = true; return c; }).ToList()) * (r.Conds.Count > 0 ? 0.6 : 1); continue; }
+                double fires = on == "fightStart" ? 1 : on == "lowHp" ? 0.5 : RuleFires(r, GEAR_T);
+                if (on == "fightStart" && r.Conds.Count > 0) fires *= 0.6;
+                if (on == "play" && r.When.MaxCost == 0) fires *= 0.4;   // 비용 0 카드는 낸 카드의 1할 남짓 — RuleFires 의 0.5 는 너무 후하다
+                // 치유 증감(healMod)은 ValueOf 가 세지 않는다 — 한 싸움 치유(방어력 300% 안팎)를 v 만큼 늘린다고 친다
+                double heal = r.Fx.Where(x => x.K == FxK.HealMod).Sum(x => Math.Abs(x.V) * (x.Run ? 1.2 : 0.4));
+                v += ValueOf(r.Fx) * fires + heal;
+            }
+            return v;
         }
 
         /// <summary>효과 form 한 조각의 대충의 값(데이터 없이 셀 때).</summary>

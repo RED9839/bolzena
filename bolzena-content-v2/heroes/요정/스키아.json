@@ -1,1055 +1,1039 @@
 {
- "heroes": [
-  {
-   "id": "스키아",
-   "name": "스키아",
-   "nature": "광기",
-   "race": "요정",
-   "role": "딜러",
-   "star": 3,
-   "hp": 550,
-   "atk": 145,
-   "def": 25,
-   "crit": 10,
-   "blurb": "요정을 교주로 추대한 일과 알아선 안 될 것을 알아 버린 일, 두 금기를 속죄하려 입을 닫은 세계수 교단의 초대 사제장. 긴 잠에서 홀로 먼저 깨어나 지금은 막내 사제로 지내지만, 본성은 밝고 칭찬받고 싶은 요정이라 침묵을 지키는 게 제일 큰 수행입니다.",
-   "keyword": {
-    "name": "침묵",
-    "desc": "쥐고 넘기며 참는 말",
-    "carrier": "self",
-    "cap": 3,
-    "rules": [
-     {
-      "name": "지켜 온 침묵",
-      "when": {
-       "on": "stackReach",
-       "id": "침묵",
-       "n": 2
+  "heroes": [
+    {
+      "id": "스키아",
+      "name": "스키아",
+      "nature": "광기",
+      "race": "요정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 550,
+      "atk": 145,
+      "def": 25,
+      "crit": 10,
+      "blurb": "요정을 교주로 추대한 일과 알아선 안 될 것을 알아 버린 일, 두 금기를 속죄하려 입을 닫은 세계수 교단의 초대 사제장. 긴 잠에서 홀로 먼저 깨어나 지금은 막내 사제로 지내지만, 본성은 밝고 칭찬받고 싶은 요정이라 침묵을 지키는 게 제일 큰 수행입니다.",
+      "keyword": {
+        "name": "삼킨 감탄사",
+        "desc": "묵언 수행으로 삼킨 말",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.15
+          }
+        ],
+        "rules": [
+          {
+            "name": "깨진 묵언",
+            "when": {
+              "on": "play",
+              "who": "other",
+              "type": "공격"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "삼킨 감탄사",
+                "v": 1
+              }
+            ]
+          }
+        ]
       },
-      "limit": {
-       "per": "turn",
-       "n": 1
+      "passives": [
+        {
+          "name": "묵언 수행",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "묵언 수행",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "heldCards",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "소리 없는 기도",
+          "when": {
+            "on": "spend",
+            "id": "삼킨 감탄사"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "고대 사제의 기도",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.6,
+            "target": "oneEnemy",
+            "hits": 4
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "삼킨 감탄사",
+            "v": 2
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "spend",
-        "id": "침묵",
-        "v": 2
-       },
-       {
-        "k": "ap",
-        "v": 1
-       }
+      "starter": [
+        "스키아_s1",
+        "스키아_u2",
+        "스키아_s2",
+        "스키아_s3"
+      ],
+      "keywords": [
+        {
+          "name": "언약의 매듭",
+          "desc": "고대 사제가 맺어 둔 매듭",
+          "carrier": "self",
+          "cap": 1,
+          "rules": [
+            {
+              "name": "매듭 폭발",
+              "when": {
+                "on": "ult"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "언약의 매듭",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "skia_knot_burst"
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 1.2,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "status",
+                  "id": "기절",
+                  "v": 1,
+                  "target": "randomEnemy"
+                }
+              ]
+            },
+            {
+              "name": "매듭 맺기",
+              "when": {
+                "on": "ult"
+              },
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "skia_knot"
+                },
+                {
+                  "k": "stack",
+                  "id": "언약의 매듭",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
       ]
-     }
-    ]
-   },
-   "passives": [],
-   "ult": {
-    "name": "고대 사제의 기도",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 0.6,
-      "target": "oneEnemy",
-      "hits": 4
-     },
-     {
-      "k": "status",
-      "id": "기절",
-      "v": 1
-     },
-     {
-      "k": "stack",
-      "id": "침묵",
-      "v": 2
-     }
-    ]
-   },
-   "starter": [
-    "스키아_s1",
-    "스키아_s1",
-    "스키아_s2",
-    "스키아_s3"
-   ],
-   "keywords": [
+    }
+  ],
+  "cards": [
     {
-     "name": "언약의 매듭",
-     "desc": "고대 사제가 맺어 둔 매듭",
-     "carrier": "self",
-     "cap": 1,
-     "rules": [
-      {
-       "name": "매듭 폭발",
-       "when": {
-        "on": "ult"
-       },
-       "conds": [
+      "id": "스키아_s1",
+      "name": "벼락 내리기",
+      "hero": "스키아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "c": "stack",
-         "id": "언약의 매듭",
-         "n": 1
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         }
-       ],
-       "fx": [
+      ]
+    },
+    {
+      "id": "스키아_s2",
+      "name": "천벌 벼락",
+      "hero": "스키아",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
         {
-         "k": "cue",
-         "id": "skia_knot_burst"
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "스키아_s3",
+      "name": "사제의 장막",
+      "hero": "스키아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "스키아_u1",
+      "name": "오래된 맹세",
+      "hero": "스키아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.08,
+          "target": "oneEnemy"
         },
         {
-         "k": "dmg",
-         "ratio": 1.2,
-         "target": "allEnemies"
+          "k": "stack",
+          "id": "삼킨 감탄사",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "굳은 맹세",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
         },
         {
-         "k": "status",
-         "id": "기절",
-         "v": 1,
-         "target": "randomEnemy"
-        }
-       ]
-      },
-      {
-       "name": "매듭 맺기",
-       "when": {
-        "on": "ult"
-       },
-       "fx": [
-        {
-         "k": "cue",
-         "id": "skia_knot"
+          "name": "짧은 맹세",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
         },
         {
-         "k": "stack",
-         "id": "언약의 매듭",
-         "v": 1
-        }
-       ]
-      }
-     ]
-    }
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "스키아_s1",
-   "name": "벼락 내리기",
-   "hero": "스키아",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "스키아_s2",
-   "name": "천벌 벼락",
-   "hero": "스키아",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "스키아_s3",
-   "name": "사제의 장막",
-   "hero": "스키아",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "스키아_u1",
-   "name": "오래된 맹세",
-   "hero": "스키아",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "신속",
-    "보존"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "ifStack",
-     "id": "침묵",
-     "n": 1
-    },
-    {
-     "k": "status",
-     "id": "둔화",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "when",
-     "on": "handEnd"
-    },
-    {
-     "k": "stack",
-     "id": "침묵",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "천년 묵은 벼락",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.5,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "속삭임",
-     "cost": 1,
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.25,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "침묵의 맹세",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "맹세의 낙뢰",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.6,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "금언의 봉인",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.0,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "기절",
-       "v": 1
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "옛 사제의 힘",
-     "kind": "power"
-    },
-    {
-     "name": "꿰뚫는 눈",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "서늘한 기운",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "스키아_u2",
-   "name": "…(끄덕)",
-   "hero": "스키아",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "신속",
-    "보존"
-   ],
-   "fx": [
-    {
-     "k": "draw",
-     "v": 2
-    },
-    {
-     "k": "ifStack",
-     "id": "침묵",
-     "n": 1
-    },
-    {
-     "k": "status",
-     "id": "둔화",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "when",
-     "on": "handEnd"
-    },
-    {
-     "k": "stack",
-     "id": "침묵",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "깊은 끄덕",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 3
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "눈짓",
-     "cost": 0,
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "말 없는 다짐",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "대답은 내일",
-     "tags": [
-      "신속",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "다음 턴 드로우",
-       "v": 1
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "…(도리도리)",
-     "tags": [
-      "신속",
-      "보존",
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "약화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "묵묵한 손짓",
-     "kind": "ap"
-    },
-    {
-     "name": "눈빛 교환",
-     "kind": "draw"
-    },
-    {
-     "name": "입 꾹",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "스키아_u3",
-   "name": "흐읍!?",
-   "hero": "스키아",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "tags": [
-    "보존"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.2,
-     "target": "allEnemies"
-    },
-    {
-     "k": "ifStack",
-     "id": "침묵",
-     "n": 1
-    },
-    {
-     "k": "status",
-     "id": "둔화",
-     "v": 1,
-     "target": "allEnemies"
-    },
-    {
-     "k": "when",
-     "on": "handEnd"
-    },
-    {
-     "k": "stack",
-     "id": "침묵",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "흐으읍!!",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.5,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "흡",
-     "cost": 1,
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.75,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "참았던 숨",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.0,
-       "target": "allEnemies"
-      },
-      {
-       "k": "perStack",
-       "id": "침묵"
-      },
-      {
-       "k": "dmg",
-       "ratio": 0.25,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "놀란 벼락",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "둔화",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "숨 멎는 고함",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.4,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifStack",
-       "id": "침묵",
-       "n": 1
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "when",
-       "on": "handEnd"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "터지는 숨",
-     "kind": "power"
-    },
-    {
-     "name": "소름",
-     "kind": "frost"
-    },
-    {
-     "name": "들숨",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "스키아_u4",
-   "name": "지켜 온 금기",
-   "hero": "스키아",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.1,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+          "name": "매듭 조이기",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.17,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "삼킨 감탄사",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1
+            }
+          ]
+        },
         {
-         "k": "stack",
-         "id": "침묵",
-         "v": 1
+          "name": "맹세 풀기",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "꿈속의 기도",
+          "tags": [
+            "보존"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "삼킨 감탄사"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.32,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ],
+      "blesses": [
+        {
+          "name": "깃털",
+          "kind": "power"
+        },
+        {
+          "name": "검은 날개",
+          "kind": "frost"
+        },
+        {
+          "name": "고대의 언약",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스키아_u2",
+      "name": "…(끄덕)",
+      "hero": "스키아",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "삼킨 감탄사",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnEnd"
+              },
+              "conds": [
+                {
+                  "c": "heldCards",
+                  "n": 2
+                }
+              ],
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "삼킨 감탄사",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "…(끄덕끄덕)",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "heldCards",
+                      "n": 2
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "길잡이 등불",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "heldCards",
+                      "n": 2
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "죠안 쓰다듬기",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "heldCards",
+                      "n": 2
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "읏⋯!",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "heldCards",
+                      "n": 2
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "무릎베개",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.35
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "heldCards",
+                      "n": 2
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "감탄사 참기",
+          "kind": "draw"
+        },
+        {
+          "name": "먼저 깨어난 사제",
+          "kind": "cost"
+        },
+        {
+          "name": "조용한 염탐",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스키아_u3",
+      "name": "흐읍!?",
+      "hero": "스키아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.65,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "삼킨 감탄사"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.22,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "삼킨 감탄사",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "크게 흐읍!?",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 감탄사",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "말문 터짐",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 감탄사",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "한 명에게 흐읍!?",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "터진 말문",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "삼킨 감탄사"
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.14,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "착각으로 깬 묵언",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "삼킨 감탄사",
+              "n": 4
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "사제장 시절",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "벼락",
+          "kind": "ap"
+        },
+        {
+          "name": "초코 케이크",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.32
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스키아_u4",
+      "name": "지켜 온 금기",
+      "hero": "스키아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.76,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "삼킨 감탄사"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.22,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "오래 지킨 금기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.97,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "첫 기도의 금기",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "초대 사제장",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self"
+            }
+          ]
+        },
+        {
+          "name": "알아선 안 될 것",
+          "fx": [
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "묵언 해제",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 감탄사",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "금기의 무게",
+          "kind": "atkUp"
+        },
+        {
+          "name": "검은 수도복",
+          "kind": "draw"
+        },
+        {
+          "name": "세계수에 올린 기도",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "벼락 같은 금기",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "침묵",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "입술 다물기",
-     "cost": 0,
-     "tags": [],
-     "fx": [
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "침묵",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "참아 온 금기",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "침묵",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "깊이 묻은 금기",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "침묵",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "사제의 금기",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "침묵",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "조용한 서약",
-     "kind": "cost"
-    },
-    {
-     "name": "봉인된 힘",
-     "kind": "atkUp"
-    },
-    {
-     "name": "입술 깨물기",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "침묵",
-       "v": 1
-      }
-     ]
-    }
-   ]
-  }
- ]
+  ]
 }

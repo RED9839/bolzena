@@ -231,7 +231,7 @@ namespace Bolzena.RunUI
             {
                 var g = kv.Value;
                 var baseCard = P.Data.Card(kv.Key);
-                string what = g.Kind == "hero" ? $"은총 · {Roster.OfCore(g.Hero).ko}" : $"신탁 · 「{baseCard?.Name}」";
+                string what = g.Kind == "hero" ? $"은총 · {Roster.OfCore(g.Hero).ko}" : "신탁";
                 Line("glow", "빛났던 카드", what, Theme.S("ic_spark"), Theme.Gold, false, () => GlowPick(kv.Key, g, () => { glows.Remove(kv.Key); if (root) BuildReward(root, o, loot, glows, bare); }), "reward.glow");
             }
             if (n == 0) { var none = Ui.Text(list, "챙길 것이 없습니다", Theme.FsMd, Theme.Sub, TextAlignmentOptions.MidlineRight); none.rectTransform.At(1, 1, -34, 0, listW, 40); none.Outline(0.2f); }
@@ -333,10 +333,18 @@ namespace Bolzena.RunUI
         /// 신탁은 그 카드의 후보 셋(+ 축복)을 신탁을 얹은 모습으로, 은총은 받을 고유 카드를. 번호는 붙이지 않는다.</summary>
         void GlowPick(string cardId, Glow g, Action picked)
         {
-            if (OracleReveal.IsOpen) return;
+            if (OracleReveal.IsOpen || CardGain.IsOpen) return;
             List<string> gcs = null;
             var baseCard = P.Data.Card(cardId);
             bool card = g.Kind == "card";
+            if (!card && g.Count == 1)
+            {   // 은총 — 고를 것이 하나뿐이라 고르기 창 없이 받는다(2026-10-07 사용자 「얻은 카드를 눌러야 들어온다」): 「은총!」 으로 크게 → 저절로 덱으로
+                gcs = CardSnap();
+                var why = P.ClaimGlow(cardId, g, 0);
+                if (why != null) { Toast.Show(why); return; }
+                GainCards(NewCards(gcs), picked, "은총!", $"「{baseCard?.Name}」의 은총 — {Roster.OfCore(g.Hero).ko}의 고유 카드 · 덱에 넣습니다", GraceHold);
+                return;
+            }
             var opts = card ? Core.OracleOption.Of(P.Data, cardId, g.Picks) : null;
             List<RevealPick> picks;
             List<int> order;
@@ -357,7 +365,7 @@ namespace Bolzena.RunUI
                 Done = k =>
                 {
                     var o = card ? opts[order[k]] : null;
-                    Toast.Show($"「{picks[k].Label}」 — 받았습니다" + (o != null && o.Blessed ? $" · 축복 「{o.BlessName}」" : ""));
+                    Toast.Show($"{picks[k].Label} — 받았습니다" + (o != null && o.Blessed ? " · 축복" : ""));
                     GainCards(gcs != null ? NewCards(gcs) : null, picked);   // 은총 고유 카드 — 다시 태어난 뒤 가운데에서 덱으로(신탁은 새 카드가 없어 그대로)
                 },
             });
@@ -418,6 +426,7 @@ namespace Bolzena.RunUI
                         go.Interactable = true;
                         go.SetLabel($"「{P.Data.Card(id)?.Name}」 복제");
                     };
+                    b.OnHold = () => CardZoom(id, ids);   // 꾹 누르면 카드 상세(고르기는 그냥 누름)
                     Stage.Hot["copy" + i] = b;
                     Tw.Pop(holder, 0.2f + i * 0.12f, 0.6f, 0.5f);
                     i++;

@@ -188,11 +188,29 @@ namespace Bolzena.Core
             return (hp, shield, later, misc);
         }
 
+        /// <summary>카드의 실드 · 회복 계수 합(조건 · 고정 · 일의 값 실드는 빼고 — 대충).</summary>
+        readonly Dictionary<string, (double sh, double he)> guardCache = new();
+        (double sh, double he) GuardRatios(Battle s, string id, CardView c)
+        {
+            string key = id + ":" + (s.Flash.TryGetValue(id, out var n) ? n : 0) + (s.Forms.Count > 0 ? ":" + s.FormKeyOf(id) : "");
+            if (guardCache.TryGetValue(key, out var g)) return g;
+            double sh = 0, he = 0;
+            foreach (var f in c.Fx)
+            {
+                if ((f.K == FxK.Shield || f.K == FxK.Block) && !f.Fixed && f.OfEvent <= 0 && f.OfStack == null) sh += f.Ratio;
+                else if (f.K == FxK.Heal) he += f.Ratio;
+            }
+            return guardCache[key] = (sh, he);
+        }
+
         double Potential(Battle s)
         {
             if (s.FinaleLock) return 0;   // 종극 — 이번 턴은 끝났다
             int ap = s.Ap;
             var cards = new List<(int cost, double v)>();
+            // 실드 · 회복 카드의 값은 지금 판으로(2026-10-08) — 지금 실드로 못 막는 예고 피해 · 잃은 HP
+            var inc = Incoming(s);
+            int need = Math.Max(0, s.Pool.Hp - inc.hp), missing = Math.Max(0, s.Pool.MaxHp - s.Pool.Hp);
             foreach (var id in s.Hand)
             {
                 var c = s.CardOf(id); if (c == null) continue;
@@ -200,9 +218,16 @@ namespace Bolzena.Core
                 if (s.IsFrozen(id) || s.CanPlay(id) != null && !(c.HasTag(Tag.Link) || c.HasTag(Tag.Heaven))) continue;
                 bool auto = c.HasTag(Tag.Link) || c.HasTag(Tag.Heaven);
                 int cost = auto ? 0 : c.X ? Math.Max(1, ap) : s.CostOf(id);
-                double v = LiveVal(s, id, c) * (auto ? 0.7 : 1);
-                if (v <= 0) continue;
                 var o = c.Hero != null ? s.HeroUnit(c.Hero) : null;
+                double v = LiveVal(s, id, c);
+                var gr = GuardRatios(s, id, c);
+                if (gr.sh > 0 || gr.he > 0)
+                {
+                    var gu = o ?? s.AliveParty().FirstOrDefault();
+                    if (gu != null) v += CardValue.LiveGuard(gr.sh, gr.he, s.GuardAmount(gu, 1, null), s.HealAmount(gu, 1, null), need, missing, o != null ? o.Atk : 12 * K);
+                }
+                v *= auto ? 0.7 : 1;
+                if (v <= 0) continue;
                 cards.Add((cost, v * 1.2 * (o != null ? o.Atk : 12 * K)));
             }
             double sum = 0;

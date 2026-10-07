@@ -13,30 +13,28 @@
       "crit": 5,
       "blurb": "유물만 보면 눈이 도는 도굴꾼 용족. 드릴로 버린 더미 밑바닥까지 파 내려가, 묻혀 있던 카드를 캐 손에 올립니다.",
       "keyword": {
-        "name": "유물 발굴",
-        "desc": "카드마다 파 내려간 깊이",
+        "name": "발굴 자루",
+        "desc": "드릴로 캐낸 광물 꾸러미",
         "carrier": "self",
-        "cap": 3,
+        "cap": 5,
+        "per": [
+          {
+            "stat": "guard",
+            "v": 0.12
+          }
+        ],
         "rules": [
           {
-            "name": "유물이다용!",
+            "name": "자루가 터진다용",
             "when": {
-              "on": "stackReach",
-              "id": "유물 발굴",
-              "n": 3
+              "on": "stackOver",
+              "id": "발굴 자루"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
             },
             "fx": [
-              {
-                "k": "spend",
-                "id": "유물 발굴",
-                "all": true
-              },
-              {
-                "k": "pull",
-                "from": "discard",
-                "at": "bottom",
-                "n": 1
-              },
               {
                 "k": "shield",
                 "ratio": 0.8
@@ -53,12 +51,29 @@
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
-              "id": "유물 발굴",
+              "id": "발굴 자루",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "너로 정했다! 초정밀 탐사!",
+          "when": {
+            "on": "shieldBreak"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -76,7 +91,7 @@
           },
           {
             "k": "stack",
-            "id": "유물 발굴",
+            "id": "발굴 자루",
             "v": 3
           }
         ]
@@ -85,7 +100,7 @@
         "네티_s1",
         "네티_s1",
         "네티_s2",
-        "네티_s2"
+        "네티_u1"
       ]
     }
   ],
@@ -119,7 +134,146 @@
     },
     {
       "id": "네티_u1",
-      "name": "드릴 돌진",
+      "name": "낙석 조심",
+      "hero": "네티",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.74
+        },
+        {
+          "k": "stack",
+          "id": "발굴 자루",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대형 낙석",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.32
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "흔들린 지층",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.9
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 2
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.26
+            }
+          ]
+        },
+        {
+          "name": "광맥 발견",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "basic": true,
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 3
+            },
+            {
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.44
+            }
+          ]
+        },
+        {
+          "name": "발굴 지도",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "무너진 갱도",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.77
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "최신형 지형 스캐너",
+          "kind": "guard"
+        },
+        {
+          "name": "느긋한 수면법",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "안전모 하나 더",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "네티_u2",
+      "name": "드릴 굴착",
       "hero": "네티",
       "unique": true,
       "cost": 1,
@@ -130,71 +284,52 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.55,
           "target": "oneEnemy",
           "hits": 3
         },
         {
           "k": "stack",
-          "id": "유물 발굴",
+          "id": "발굴 자루",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "잔 드릴",
-          "cost": 0,
+          "name": "다이아 드릴",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.73,
               "target": "oneEnemy",
               "hits": 3
             },
             {
               "k": "stack",
-              "id": "유물 발굴",
+              "id": "발굴 자루",
               "v": 1
             }
           ]
         },
         {
-          "name": "대형 드릴",
+          "name": "포크레인 드래곤",
+          "cost": 2,
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy",
+              "ratio": 0.68,
+              "target": "allEnemies",
               "hits": 3
             },
             {
               "k": "stack",
-              "id": "유물 발굴",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "유적 탐험",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "유물 발굴",
+              "id": "발굴 자루",
               "v": 2
             }
           ]
@@ -207,38 +342,88 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.56,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "stack",
-              "id": "유물 발굴",
-              "v": 1
+              "k": "perStack",
+              "id": "발굴 자루"
             },
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 0.48
             }
           ]
         },
         {
-          "name": "기가 드릴",
-          "cost": 2,
+          "name": "쉬지 않는 드릴",
+          "tags": [
+            "분쇄"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.29,
+                      "target": "randomEnemy",
+                      "hits": 2
+                    },
+                    {
+                      "k": "stack",
+                      "id": "발굴 자루",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "폭탄은 질색",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.51,
               "target": "oneEnemy",
-              "hits": 7
+              "hits": 3
             },
             {
-              "k": "stack",
-              "id": "유물 발굴",
-              "v": 2
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "발굴 자루",
+              "all": true
             }
           ]
         }
@@ -249,24 +434,24 @@
           "kind": "power"
         },
         {
-          "name": "자철석 끌",
+          "name": "기름칠",
+          "kind": "ap"
+        },
+        {
+          "name": "생선학자 길냥이",
           "fx": [
             {
               "k": "stack",
-              "id": "유물 발굴",
+              "id": "발굴 자루",
               "v": 1
             }
           ]
-        },
-        {
-          "name": "발굴 지도",
-          "kind": "draw"
         }
       ]
     },
     {
-      "id": "네티_u2",
-      "name": "광맥 발견",
+      "id": "네티_u3",
+      "name": "보모 언니의 나눔",
       "hero": "네티",
       "unique": true,
       "cost": 1,
@@ -274,112 +459,155 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.6
+          "ratio": 1.16
         },
         {
-          "k": "stack",
-          "id": "유물 발굴",
-          "v": 1
+          "k": "perStack",
+          "id": "발굴 자루"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.44
+        },
+        {
+          "k": "spend",
+          "id": "발굴 자루",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "반짝이는 돌",
-          "cost": 0,
+          "name": "반짝이는 광물",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 1.45
             },
             {
-              "k": "stack",
-              "id": "유물 발굴",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "광물 산더미",
-          "fx": [
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
             {
               "k": "shield",
-              "ratio": 2.1
+              "ratio": 0.58
             },
             {
-              "k": "stack",
-              "id": "유물 발굴",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "보모 언니",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "stack",
-              "id": "유물 발굴",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "spend",
+              "id": "발굴 자루",
+              "all": true
             }
           ]
         },
         {
           "name": "광물 감별",
+          "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.6
+              "ratio": 0.87
             },
             {
-              "k": "stack",
-              "id": "유물 발굴",
-              "v": 2
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.44
+            },
+            {
+              "k": "spend",
+              "id": "발굴 자루",
+              "all": true
             }
           ]
         },
         {
-          "name": "신비한 광석",
-          "tags": [
-            "보존"
-          ],
+          "name": "조금만 나눠 줄게용",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.85
+              "ratio": 1.45
+            },
+            {
+              "k": "ifStack",
+              "id": "발굴 자루",
+              "n": 4
+            },
+            {
+              "k": "shield",
+              "ratio": 1.45
+            }
+          ]
+        },
+        {
+          "name": "발굴 천재 네티",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.31
             },
             {
               "k": "stack",
-              "id": "유물 발굴",
+              "id": "발굴 자루",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "발굴 자루"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.17
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신생 용족 알 돌보기",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.72
+            },
+            {
+              "k": "spend",
+              "id": "발굴 자루",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "단단한 광석",
-          "kind": "guard"
+          "name": "보모의 손",
+          "kind": "heal"
         },
         {
-          "name": "광부의 노래",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "유물 발굴",
-              "v": 1
-            }
-          ]
+          "name": "모래 털기",
+          "kind": "draw"
         },
         {
-          "name": "안전 제일",
+          "name": "유물 감정서",
           "fx": [
             {
               "k": "status",
@@ -391,138 +619,12 @@
       ]
     },
     {
-      "id": "네티_u3",
-      "name": "파묻힌 유물",
-      "hero": "네티",
-      "unique": true,
-      "cost": 0,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "pull",
-          "from": "discard",
-          "at": "bottom",
-          "n": 1
-        },
-        {
-          "k": "shield",
-          "ratio": 0.5
-        }
-      ],
-      "oracles": [
-        {
-          "name": "유물이다용!",
-          "fx": [
-            {
-              "k": "pull",
-              "from": "discard",
-              "at": "bottom",
-              "n": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.8
-            }
-          ]
-        },
-        {
-          "name": "신생 용족 알",
-          "fx": [
-            {
-              "k": "pull",
-              "from": "discard",
-              "at": "bottom",
-              "n": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.5
-            },
-            {
-              "k": "stack",
-              "id": "유물 발굴",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "초정밀 탐사",
-          "fx": [
-            {
-              "k": "pull",
-              "from": "discard",
-              "at": "bottom",
-              "n": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 0.5
-            }
-          ]
-        },
-        {
-          "name": "녹슨 왕관",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "pull",
-              "from": "discard",
-              "at": "bottom",
-              "n": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "보물 상자",
-          "fx": [
-            {
-              "k": "pull",
-              "from": "discard",
-              "at": "bottom",
-              "n": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.5
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "모래 털기",
-          "kind": "guard"
-        },
-        {
-          "name": "유물 감정서",
-          "kind": "draw"
-        },
-        {
-          "name": "보모의 손",
-          "tags": [
-            "보존"
-          ]
-        }
-      ],
-      "blurb": "어제 버린 줄 알았던 그것."
-    },
-    {
       "id": "네티_u4",
       "name": "자성 꼬리",
       "hero": "네티",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
           "k": "status",
@@ -530,21 +632,20 @@
           "v": 1
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "유물 발굴",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "dmg",
+          "ratio": 0.65,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "발굴 자루"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.22,
+          "base": "def",
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
@@ -554,29 +655,29 @@
             {
               "k": "status",
               "id": "결정화",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "유물 발굴",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.87,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "쇠붙이 수집",
+          "power": true,
           "fx": [
             {
               "k": "status",
@@ -584,6 +685,12 @@
               "v": 1
             },
             {
+              "k": "dmg",
+              "ratio": 0.96,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
               "k": "power",
               "rules": [
                 {
@@ -593,8 +700,8 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "유물 발굴",
-                      "v": 2
+                      "id": "발굴 자루",
+                      "v": 1
                     }
                   ]
                 }
@@ -611,26 +718,15 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.55,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "유물 발굴",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 2
             }
           ]
         },
@@ -643,75 +739,64 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "perStack",
+              "id": "발굴 자루"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "유물 발굴",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.73,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "발굴 자루",
+              "all": true
             }
           ]
         },
         {
-          "name": "찰싹",
-          "cost": 0,
+          "name": "자석 끌어당기기",
           "fx": [
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "유물 발굴",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "자철석 비늘",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
-            }
-          ]
+          "name": "두 갈래 꼬리",
+          "kind": "power"
         },
         {
-          "name": "나침반",
-          "tags": [
-            "개전"
-          ]
+          "name": "자철석",
+          "kind": "cost"
         },
         {
-          "name": "철가루",
+          "name": "끌려온 칼끝",
           "fx": [
             {
               "k": "status",
-              "id": "결의",
+              "id": "반격",
               "v": 1
             }
           ]
@@ -768,7 +853,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "유물 발굴",
+              "id": "발굴 자루",
               "v": 1
             }
           ]

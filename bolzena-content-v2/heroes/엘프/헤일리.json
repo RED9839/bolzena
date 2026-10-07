@@ -39,6 +39,10 @@
           "when": {
             "on": "hit"
           },
+          "limit": {
+            "per": "turn",
+            "n": 3
+          },
           "fx": [
             {
               "k": "ifStack",
@@ -47,7 +51,31 @@
             },
             {
               "k": "extra",
-              "ratio": 0.5,
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "외계인 격퇴",
+          "when": {
+            "on": "hit",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "ifStack",
+              "id": "외계인",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 1,
               "target": "oneEnemy"
             }
           ]
@@ -78,7 +106,7 @@
       },
       "starter": [
         "헤일리_s1",
-        "헤일리_s1",
+        "헤일리_u3",
         "헤일리_s2",
         "헤일리_s3"
       ]
@@ -131,13 +159,12 @@
       "name": "논 그라타",
       "hero": "헤일리",
       "unique": true,
-      "signature": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.25,
           "hits": 3,
           "target": "allEnemies"
         },
@@ -150,11 +177,11 @@
       ],
       "oracles": [
         {
-          "name": "경례 후 돌입",
+          "name": "채찍 세 번",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.52,
+              "ratio": 0.32,
               "hits": 3,
               "target": "allEnemies"
             },
@@ -167,31 +194,52 @@
           ]
         },
         {
-          "name": "전 함대 집중",
-          "tags": [
-            "보존"
-          ],
+          "name": "쓰라림 폭발",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.43,
               "hits": 3,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "고통",
-              "v": 2,
+              "v": 3,
               "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "아군기지 보호작전",
+          "name": "디버프 감별",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.31,
+              "hits": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perDebuff"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "채찍 정비 교범",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.22,
               "hits": 3,
               "target": "allEnemies"
             },
@@ -203,61 +251,53 @@
             },
             {
               "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "채찍 집중",
+          "fx": [
+            {
+              "k": "discard",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "작전명 선포",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
+            },
             {
               "k": "dmg",
-              "ratio": 0.48,
-              "hits": 3,
-              "target": "allEnemies"
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "status",
               "id": "고통",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "쓰라린 훈계",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "hits": 3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
-              "target": "allEnemies"
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "경례 후 돌입",
+          "name": "가죽 채찍",
           "kind": "power"
         },
         {
-          "name": "선한 원칙주의자",
-          "kind": "ap"
+          "name": "작전 지도",
+          "kind": "draw"
         },
         {
-          "name": "쓰라린 훈계",
-          "kind": "weakSpot"
+          "name": "채찍 정비",
+          "fx": [
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
         }
       ]
     },
@@ -275,29 +315,52 @@
           "target": "oneEnemy"
         },
         {
-          "k": "ifStack",
+          "k": "stack",
           "id": "외계인",
-          "n": 1
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.6,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "status",
-          "id": "약화",
           "v": 1,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "돌파 개시",
+          "name": "돌격 앞으로",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.56,
+              "ratio": 1.46,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "척후",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "외계인 확인 사살",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
               "target": "oneEnemy"
             },
             {
@@ -309,121 +372,45 @@
               "k": "dmg",
               "ratio": 0.78,
               "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "전면 돌격",
-          "cost": 0,
+          "name": "동맹국 지원",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.99,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "외계인",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "포로는 정중히",
-          "tags": [
-            "보존"
-          ],
+          "name": "플랜 B",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 1.44,
+              "ratio": 1.6,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "외계인",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "다음 작전 준비",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.74,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "외계인",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.87,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "뇌운 돌파",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.44,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "외계인",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -432,15 +419,15 @@
       ],
       "blesses": [
         {
-          "name": "함장의 직감",
-          "kind": "power"
+          "name": "장교의 기백",
+          "kind": "weakSpot"
         },
         {
-          "name": "전면 돌격",
-          "kind": "ap"
+          "name": "군사 기밀",
+          "kind": "cost"
         },
         {
-          "name": "작전명 선포",
+          "name": "외계인 발견",
           "fx": [
             {
               "k": "stack",
@@ -461,16 +448,14 @@
       "type": "스킬",
       "fx": [
         {
+          "k": "shield",
+          "ratio": 0.8
+        },
+        {
           "k": "stack",
           "id": "외계인",
           "v": 1,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "status",
-          "id": "고통",
-          "v": 3,
-          "target": "oneEnemy"
+          "target": "topEnemy"
         },
         {
           "k": "draw",
@@ -479,19 +464,17 @@
       ],
       "oracles": [
         {
-          "name": "출항 준비",
+          "name": "전함 출항",
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.19
+            },
             {
               "k": "stack",
               "id": "외계인",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 4,
-              "target": "oneEnemy"
+              "v": 1,
+              "target": "topEnemy"
             },
             {
               "k": "draw",
@@ -500,89 +483,90 @@
           ]
         },
         {
-          "name": "전함 일제 사격",
-          "cost": 0,
+          "name": "상시 순찰",
+          "power": true,
           "fx": [
             {
               "k": "stack",
               "id": "외계인",
               "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
-              "target": "oneEnemy"
+              "target": "topEnemy"
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.68
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "지구를 항해 중",
-          "tags": [
-            "보존"
-          ],
+          "name": "작전 선포",
           "fx": [
             {
-              "k": "stack",
-              "id": "외계인",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 0.8
             },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "함장의 직감",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "외계인",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "뇌운 속 항해",
-          "fx": [
             {
               "k": "stack",
               "id": "외계인",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "topEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "함포 사격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "topEnemy"
             },
             {
               "k": "status",
               "id": "고통",
-              "v": 4,
-              "target": "oneEnemy"
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "경례 대기",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
             },
             {
               "k": "draw",
@@ -593,16 +577,23 @@
       ],
       "blesses": [
         {
-          "name": "선한 원칙주의자",
+          "name": "함장석",
           "kind": "guard"
         },
         {
-          "name": "쓰라린 훈계",
-          "kind": "draw"
+          "name": "제복",
+          "kind": "ap"
         },
         {
-          "name": "경례 후 돌입",
-          "kind": "defUp"
+          "name": "전함 레이더",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "topEnemy"
+            }
+          ]
         }
       ]
     },
@@ -611,19 +602,14 @@
       "name": "엘프군 최전선",
       "hero": "헤일리",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "강화",
       "fx": [
         {
-          "k": "atkMod",
-          "v": 0.15,
-          "run": true,
-          "target": "self"
-        },
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
+          "k": "stack",
+          "id": "외계인",
+          "v": 1,
+          "target": "topEnemy"
         },
         {
           "k": "power",
@@ -650,18 +636,13 @@
       ],
       "oracles": [
         {
-          "name": "현역 복귀",
+          "name": "최전선 사수",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "topEnemy"
             },
             {
               "k": "power",
@@ -678,7 +659,7 @@
                     {
                       "k": "status",
                       "id": "고통",
-                      "v": 3,
+                      "v": 2,
                       "target": "oneEnemy"
                     }
                   ]
@@ -688,18 +669,44 @@
           ]
         },
         {
-          "name": "최전선 사령관",
-          "cost": 1,
+          "name": "순찰 출발",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "재판에 회부",
           "fx": [
             {
               "k": "draw",
               "v": 1
             },
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
@@ -726,21 +733,19 @@
           ]
         },
         {
-          "name": "부하들을 위해",
-          "tags": [
-            "보존"
-          ],
+          "name": "외계인 격퇴 작전",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "topEnemy"
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 2
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             },
             {
               "k": "power",
@@ -767,18 +772,17 @@
           ]
         },
         {
-          "name": "작전 지휘관",
+          "name": "전군 돌격",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.2,
-              "run": true,
-              "target": "self"
+              "k": "payHpPct",
+              "v": 0.05
             },
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "topEnemy"
             },
             {
               "k": "power",
@@ -795,46 +799,7 @@
                     {
                       "k": "status",
                       "id": "고통",
-                      "v": 1,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "선한 원칙주의자",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.2,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "hit"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "고통",
-                      "v": 3,
+                      "v": 2,
                       "target": "oneEnemy"
                     }
                   ]
@@ -846,23 +811,16 @@
       ],
       "blesses": [
         {
-          "name": "전면 돌격",
+          "name": "훈장",
           "kind": "atkUp"
         },
         {
-          "name": "작전명 선포",
-          "kind": "draw"
+          "name": "군사 용어",
+          "kind": "cost"
         },
         {
-          "name": "함장의 직감",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "외계인",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
+          "name": "쓰라린 기억",
+          "kind": "frost"
         }
       ]
     }

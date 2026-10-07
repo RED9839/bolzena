@@ -14,13 +14,19 @@
       "blurb": "수인 마을의 백호 검성이자 사료스탕스 대장.",
       "keyword": {
         "name": "장작 패기",
-        "desc": "이번 턴 공격마다 쌓는 기세",
+        "desc": "이번 턴 휘두를수록 붙는 손맛",
         "carrier": "self",
         "cap": 3,
         "endClear": true,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ],
         "rules": [
           {
-            "name": "손맛",
+            "name": "내려치고 휘두르기",
             "when": {
               "on": "stackReach",
               "id": "장작 패기",
@@ -31,6 +37,11 @@
                 "k": "spend",
                 "id": "장작 패기",
                 "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.8,
+                "target": "allEnemies"
               },
               {
                 "k": "ap",
@@ -46,6 +57,23 @@
           "when": {
             "on": "play",
             "type": "공격"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "허접 처리",
+          "when": {
+            "on": "kill"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
           "fx": [
             {
@@ -80,7 +108,7 @@
       },
       "starter": [
         "티그_s1",
-        "티그_s1",
+        "티그_u2",
         "티그_s2",
         "티그_s3"
       ]
@@ -133,73 +161,38 @@
       "name": "소닉 블레이드",
       "hero": "티그",
       "unique": true,
-      "cost": 3,
+      "cost": 1,
       "type": "공격",
+      "tags": [
+        "신속"
+      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.75,
+          "ratio": 0.8,
           "target": "allEnemies"
         },
         {
           "k": "ifStack",
           "id": "장작 패기",
-          "n": 1
+          "n": 2
         },
         {
           "k": "dmg",
-          "ratio": 1.15,
+          "ratio": 0.4,
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
           "name": "음속 돌파",
+          "tags": [
+            "신속"
+          ],
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.0,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "짧은 칼바람",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
             {
               "k": "dmg",
               "ratio": 0.95,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "달아오른 칼날",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.75,
               "target": "allEnemies"
             },
             {
@@ -209,67 +202,130 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 0.45,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "한 점 돌파",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.0,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.4,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "틈새 가르기",
+          "name": "짧은 칼바람",
+          "cost": 0,
           "tags": [
-            "약점 공격"
+            "신속"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.95,
+              "ratio": 0.5,
               "target": "allEnemies"
             },
             {
               "k": "ifStack",
               "id": "장작 패기",
-              "n": 1
+              "n": 2
             },
             {
               "k": "dmg",
-              "ratio": 1.25,
+              "ratio": 0.25,
               "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "바람 가르는 칼",
+          "cost": 2,
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "장작 쌓아 두기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
+            }
+          ]
+        },
+        {
+          "name": "백호의 바람",
+          "tags": [
+            "신속"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "장작 패기",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.64,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "바람 가르는 칼",
+          "name": "백호의 눈",
           "kind": "power"
         },
         {
-          "name": "백호의 눈",
-          "kind": "weakSpot"
+          "name": "몸이 먼저",
+          "kind": "draw"
         },
         {
-          "name": "몸이 먼저",
-          "kind": "cost"
+          "name": "틈새 가르기",
+          "kind": "weakSpot"
         }
       ]
     },
@@ -283,19 +339,14 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 0.55,
           "target": "oneEnemy",
           "hits": 2
         },
         {
-          "k": "ifStack",
+          "k": "stack",
           "id": "장작 패기",
-          "n": 1
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.7,
-          "target": "oneEnemy"
+          "v": 1
         }
       ],
       "oracles": [
@@ -304,62 +355,9 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 0.68,
               "target": "oneEnemy",
               "hits": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "한 손 베기",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "장작 쌓기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -369,23 +367,19 @@
           ]
         },
         {
-          "name": "쌍검 회전",
+          "name": "한 손 베기",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "target": "allEnemies",
+              "ratio": 0.35,
+              "target": "oneEnemy",
               "hits": 2
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies"
+              "v": 1
             }
           ]
         },
@@ -395,19 +389,56 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
+              "ratio": 0.5,
               "target": "oneEnemy",
-              "hits": 3
+              "hits": 5
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "장작 패기",
-              "n": 1
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
+            }
+          ]
+        },
+        {
+          "name": "장작 쌓기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "쌍검 회전",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy"
+              "ratio": 0.59,
+              "target": "allEnemies",
+              "hits": 2
             }
           ]
         }
@@ -419,36 +450,46 @@
         },
         {
           "name": "엇갈린 상처",
-          "kind": "frost"
+          "kind": "weakSpot"
         },
         {
           "name": "검집 돌리기",
-          "kind": "draw"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
         }
       ]
     },
     {
       "id": "티그_u3",
-      "name": "장작 패기",
+      "name": "통나무 두 동강",
       "hero": "티그",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.55,
+          "ratio": 0.9,
           "target": "oneEnemy"
         },
         {
-          "k": "ifStack",
-          "id": "장작 패기",
-          "n": 1
+          "k": "perStack",
+          "id": "장작 패기"
         },
         {
           "k": "dmg",
-          "ratio": 1.25,
+          "ratio": 0.35,
           "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "장작 패기",
+          "all": true
         }
       ],
       "oracles": [
@@ -457,48 +498,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.0,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "손도끼 패기",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "장작 산더미",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
@@ -507,7 +507,80 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.42,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "장작 패기",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "손도끼 패기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "장작 패기",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "통째로 두 동강",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "장작 산더미",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
               "target": "oneEnemy"
             }
           ]
@@ -517,43 +590,23 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "통째로 두 동강",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.7,
+              "ratio": 0.52,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 1
+              "k": "perStack",
+              "id": "장작 패기"
             },
             {
               "k": "dmg",
-              "ratio": 1.8,
+              "ratio": 0.42,
               "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -569,7 +622,7 @@
         },
         {
           "name": "팔 걷어붙이기",
-          "kind": "atkUp"
+          "kind": "ap"
         }
       ]
     },
@@ -579,30 +632,26 @@
       "hero": "티그",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
-          "k": "atkMod",
-          "v": 0.15,
-          "run": true,
-          "target": "self"
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "장작 패기",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "perStack",
+          "id": "장작 패기"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "basic": true
         }
       ],
       "oracles": [
@@ -610,8 +659,38 @@
           "name": "백호의 일격",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
+            }
+          ]
+        },
+        {
+          "name": "비전서 첫 장",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
               "k": "atkMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
@@ -626,7 +705,7 @@
                     {
                       "k": "stack",
                       "id": "장작 패기",
-                      "v": 2
+                      "v": 1
                     }
                   ]
                 }
@@ -635,104 +714,12 @@
           ]
         },
         {
-          "name": "도끼 손질",
-          "cost": 0,
+          "name": "비전서 속독",
           "fx": [
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "장작 패기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "장작 산더미",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "장작 패기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "쌍검 비전",
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.2,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "장작 패기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "백호의 기백",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "v": 2,
+              "basic": true
             },
             {
               "k": "stack",
@@ -740,36 +727,72 @@
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "장작 패기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "도끼 손질",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "장작 패기",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "백호의 기백",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "비전서 속독",
-          "kind": "cost"
-        },
-        {
           "name": "다음 장 넘기기",
           "kind": "draw"
         },
         {
-          "name": "첫 장 펼치기",
+          "name": "참스승 디아나",
+          "kind": "atkUp"
+        },
+        {
+          "name": "차기 촌장",
           "fx": [
             {
               "k": "stack",

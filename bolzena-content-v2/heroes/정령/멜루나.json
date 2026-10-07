@@ -1,875 +1,945 @@
 {
- "heroes": [
-  {
-   "id": "멜루나",
-   "name": "멜루나",
-   "nature": "냉정",
-   "role": "서포터",
-   "star": 3,
-   "hp": 530,
-   "atk": 86,
-   "def": 58,
-   "crit": 5,
-   "blurb": "법의 빈틈으로 회사를 굴리는 멜론 회장. 멜론비가 적을 때린 만큼 모두를 배부르게 하고, 묻어 둔 AP 는 두 턴 뒤 불어나 돌아오며, 적을 쓰러뜨리면 수익이 붙습니다.",
-   "keyword": {
-    "name": "수익",
-    "desc": "처치로 붙은 이자",
-    "carrier": "self",
-    "cap": 3,
-    "rules": [
-     {
-      "name": "이자 수령",
-      "when": {
-       "on": "stackReach",
-       "id": "수익",
-       "n": 3
+  "heroes": [
+    {
+      "id": "멜루나",
+      "name": "멜루나",
+      "nature": "냉정",
+      "role": "서포터",
+      "star": 3,
+      "hp": 530,
+      "atk": 86,
+      "def": 58,
+      "crit": 5,
+      "blurb": "법의 빈틈으로 회사를 굴리는 멜론 회장. 멜론비가 적을 때린 만큼 모두를 배부르게 하고, 묻어 둔 AP 는 두 턴 뒤 불어나 돌아오며, 적을 쓰러뜨리면 수익이 붙습니다.",
+      "keyword": {
+        "name": "주가",
+        "desc": "오르내리는 멜루 코퍼레이션 주가",
+        "carrier": "self",
+        "cap": 4,
+        "rules": [
+          {
+            "name": "상장",
+            "when": {
+              "on": "stackReach",
+              "id": "주가",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "주가",
+                "all": true
+              },
+              {
+                "k": "ap",
+                "v": 1
+              },
+              {
+                "k": "draw",
+                "v": 2
+              }
+            ]
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "spend",
-        "id": "수익",
-        "all": true
-       },
-       {
-        "k": "ap",
-        "v": 1
-       },
-       {
-        "k": "draw",
-        "v": 1
-       }
+      "passives": [
+        {
+          "name": "이자 수익",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "apLeft",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "멜론 플렉스",
+          "when": {
+            "on": "kill"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "멜론머스크 X",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "drain",
+            "ratio": 0.4
+          },
+          {
+            "k": "ap",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "주가",
+            "v": 2
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "멜루나_s1",
+        "멜루나_s1",
+        "멜루나_s2",
+        "멜루나_u1"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "이자 수익",
-     "when": {
-      "on": "kill"
-     },
-     "limit": {
-      "per": "turn",
-      "n": 1
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "멜론머스크 X",
-    "cost": 150,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 1.0,
-      "target": "allEnemies"
-     },
-     {
-      "k": "drain",
-      "ratio": 0.4
-     },
-     {
-      "k": "ap",
-      "v": 2
-     },
-     {
-      "k": "stack",
-      "id": "수익",
-      "v": 1
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "멜루나_s1",
-    "멜루나_s1",
-    "멜루나_s2",
-    "멜루나_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "멜루나_s1",
-   "name": "멜론 씨 튕기기",
-   "hero": "멜루나",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "멜루나_s2",
-   "name": "멜론 한 조각",
-   "hero": "멜루나",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 1.2
-    }
-   ]
-  },
-  {
-   "id": "멜루나_u1",
-   "name": "장기 투자",
-   "hero": "멜루나",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "signature": true,
-   "fx": [
-    {
-     "k": "later",
-     "n": 2,
-     "then": [
-      {
-       "k": "ap",
-       "v": 2
-      },
-      {
-       "k": "ifStack",
-       "id": "수익"
-      },
-      {
-       "k": "ap",
-       "v": 1
-      },
-      {
-       "k": "spend",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "k": "status",
-     "id": "저장",
-     "v": 1
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "우량주",
-     "fx": [
-      {
-       "k": "later",
-       "n": 2,
-       "then": [
+      "id": "멜루나_s1",
+      "name": "멜론 씨 튕기기",
+      "hero": "멜루나",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "k": "ap",
-         "v": 3
-        },
-        {
-         "k": "ifStack",
-         "id": "수익"
-        },
-        {
-         "k": "ap",
-         "v": 1
-        },
-        {
-         "k": "spend",
-         "id": "수익",
-         "v": 1
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         }
-       ]
-      },
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 2
-      }
-     ]
+      ]
     },
     {
-     "name": "단타",
-     "fx": [
-      {
-       "k": "later",
-       "n": 1,
-       "then": [
+      "id": "멜루나_s2",
+      "name": "멜론 한 조각",
+      "hero": "멜루나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
         {
-         "k": "ap",
-         "v": 2
-        },
-        {
-         "k": "ifStack",
-         "id": "수익"
-        },
-        {
-         "k": "ap",
-         "v": 1
-        },
-        {
-         "k": "spend",
-         "id": "수익",
-         "v": 1
+          "k": "heal",
+          "ratio": 1.2
         }
-       ]
-      },
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 3
-      }
-     ]
+      ]
     },
     {
-     "name": "분산 투자",
-     "fx": [
-      {
-       "k": "later",
-       "n": 2,
-       "then": [
+      "id": "멜루나_melon",
+      "name": "머스크멜론",
+      "hero": "멜루나",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
         {
-         "k": "ap",
-         "v": 2
+          "k": "heal",
+          "ratio": 0.3
         },
         {
-         "k": "draw",
-         "v": 1
+          "k": "stack",
+          "id": "주가",
+          "v": 1
+        }
+      ],
+      "blurb": "머스크가 고른 잘 익은 멜론 한 통."
+    },
+    {
+      "id": "멜루나_u1",
+      "name": "장기 투자",
+      "hero": "멜루나",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "주가",
+          "v": 1
         },
         {
-         "k": "ifStack",
-         "id": "수익"
+          "k": "status",
+          "id": "저장",
+          "v": 1
         },
         {
-         "k": "ap",
-         "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "주가",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
-       ]
-      },
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "적립식",
-     "fx": [
-      {
-       "k": "later",
-       "n": 2,
-       "then": [
+      ],
+      "oracles": [
         {
-         "k": "ap",
-         "v": 2
+          "name": "우량주",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
-         "k": "ifStack",
-         "id": "수익"
+          "name": "분산 투자",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
-         "k": "ap",
-         "v": 1
+          "name": "공매도",
+          "fx": [
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
-         "k": "spend",
-         "id": "수익",
-         "v": 1
-        }
-       ]
-      },
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 2
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "선물 계약",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "later",
-       "n": 2,
-       "then": [
-        {
-         "k": "ap",
-         "v": 2
+          "name": "선물 계약",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 2
+            },
+            {
+              "k": "later",
+              "n": 2,
+              "then": [
+                {
+                  "k": "stack",
+                  "id": "주가",
+                  "v": 3
+                }
+              ]
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
-         "k": "ifStack",
-         "id": "수익"
+          "name": "사내 복지",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 1
+                    },
+                    {
+                      "k": "make",
+                      "id": "멜루나_melon",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "복리",
+          "kind": "draw"
         },
         {
-         "k": "ap",
-         "v": 1
+          "name": "배당금",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            }
+          ]
         },
         {
-         "k": "spend",
-         "id": "수익",
-         "v": 1
+          "name": "미리 산 주식",
+          "kind": "cost"
         }
-       ]
-      },
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 3
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "복리",
-     "kind": "draw"
+      ]
     },
     {
-     "name": "배당금",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "미리 산 주식",
-     "tags": [
-      "개전"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "멜루나_u2",
-   "name": "멜론 씨 기관총",
-   "hero": "멜루나",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.4,
-     "target": "oneEnemy",
-     "hits": 3
-    },
-    {
-     "k": "drain",
-     "ratio": 0.3
-    },
-    {
-     "k": "ifKill"
-    },
-    {
-     "k": "stack",
-     "id": "수익",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "씨 없는 멜론 없다",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.54,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "drain",
-       "ratio": 0.3
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "흩뿌리기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.36,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "drain",
-       "ratio": 0.3
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "적대적 인수",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.55,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "drain",
-       "ratio": 0.25
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "작은 씨앗",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.3,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "drain",
-       "ratio": 0.2
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "정밀 사격",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "tough",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifKill"
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "단단한 씨",
-     "kind": "power"
-    },
-    {
-     "name": "가벼운 씨",
-     "kind": "cost"
-    },
-    {
-     "name": "약점 분석",
-     "kind": "weakSpot"
-    }
-   ]
-  },
-  {
-   "id": "멜루나_u3",
-   "name": "올 때 멜루나~",
-   "hero": "멜루나",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.4,
-     "target": "randomEnemy",
-     "hits": 5
-    },
-    {
-     "k": "drain",
-     "ratio": 0.4
-    },
-    {
-     "k": "stack",
-     "id": "수익",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "멜론비 폭우",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.55,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "drain",
-       "ratio": 0.4
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "한 입 크기",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.32,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "drain",
-       "ratio": 0.3
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "배부른 정산",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.4,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "drain",
-       "ratio": 0.5
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "거대 멜론",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.5,
-       "target": "allEnemies"
-      },
-      {
-       "k": "drain",
-       "ratio": 0.4
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "사내 식당",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "randomEnemy",
-       "hits": 5
-      },
-      {
-       "k": "drain",
-       "ratio": 0.4
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "잘 익은 멜론",
-     "kind": "power"
-    },
-    {
-     "name": "특별 보너스",
-     "kind": "ap"
-    },
-    {
-     "name": "멜론 한 입",
-     "fx": [
-      {
-       "k": "heal",
-       "ratio": 0.4
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "멜루나_u4",
-   "name": "멜론머스크 그룹",
-   "hero": "멜루나",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "status",
-     "id": "근면",
-     "v": 1
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+      "id": "멜루나_u2",
+      "name": "올 때 멜루나~",
+      "hero": "멜루나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "k": "stack",
-         "id": "수익",
-         "v": 1
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "randomEnemy",
+          "hits": 5
+        },
+        {
+          "k": "drain",
+          "ratio": 0.5
+        },
+        {
+          "k": "make",
+          "id": "멜루나_melon",
+          "v": 1
         }
-       ]
-      }
-     ]
+      ],
+      "oracles": [
+        {
+          "name": "잘 익은 멜론",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
+            },
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "멜론비 폭우",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "randomEnemy",
+              "hits": 10
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
+            },
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "배부른 정산",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "perStack",
+              "id": "주가"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "사내 식당",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "멜루나_melon",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "멜루나의 한턱",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "randomEnemy",
+              "hits": 6
+            },
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "최상급 멜론",
+          "kind": "power"
+        },
+        {
+          "name": "특별 보너스",
+          "kind": "ap"
+        },
+        {
+          "name": "멜론 한 입",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "멜루나_u3",
+      "name": "멜론 씨 기관총",
+      "hero": "멜루나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "perStack",
+          "id": "주가"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "주가",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "씨 없는 멜론 없다",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "주가"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "주가",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "적대적 인수",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "주가"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "주가",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "일부 매도",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "주가",
+              "max": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "주가",
+              "v": 2
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "씨 뿌리기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "주가"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "작은 씨앗",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "주가"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "주가",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "단단한 씨",
+          "kind": "power"
+        },
+        {
+          "name": "가벼운 씨",
+          "kind": "cost"
+        },
+        {
+          "name": "약점 분석",
+          "kind": "weakSpot"
+        }
+      ]
+    },
+    {
+      "id": "멜루나_u4",
+      "name": "멜론머스크 그룹",
+      "hero": "멜루나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perTag",
+          "id": "멜루나_melon"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "exileFrom",
+          "from": "hand",
+          "all": true,
+          "tag": "멜루나_melon"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대기업",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "멜루나_melon"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "멜루나_melon"
+            }
+          ]
+        },
+        {
+          "name": "주주 총회",
+          "power": true,
+          "fx": [
+            {
+              "k": "perTag",
+              "id": "멜루나_melon"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "멜루나_melon"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "화성 프로젝트",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "멜루나_melon"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "창립 기념일",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "멜루나_melon"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "멜루나_melon"
+            }
+          ]
+        },
+        {
+          "name": "신규 상장",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "멜루나_melon"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "회장님의 힘",
+          "kind": "power"
+        },
+        {
+          "name": "동행하는 머스크",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "멜론 재고",
+          "fx": [
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 1
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "대기업",
-     "fx": [
-      {
-       "k": "status",
-       "id": "근면",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "저장",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "수익",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "스타트업",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "수익",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "사내 복지",
-     "fx": [
-      {
-       "k": "status",
-       "id": "근면",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "불굴",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "수익",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "글로벌 진출",
-     "fx": [
-      {
-       "k": "status",
-       "id": "근면",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "수익",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "창립 기념일",
-     "tags": [
-      "개막"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "근면",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "수익",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "수익",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "회장님의 힘",
-     "kind": "atkUp"
-    },
-    {
-     "name": "튼튼한 금고",
-     "kind": "defUp"
-    },
-    {
-     "name": "구조 조정",
-     "kind": "cost"
-    }
-   ]
-  }
- ]
+  ]
 }

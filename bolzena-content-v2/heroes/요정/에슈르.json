@@ -1,954 +1,869 @@
 {
- "heroes": [
-  {
-   "id": "에슈르",
-   "name": "에슈르",
-   "nature": "우울",
-   "race": "요정",
-   "role": "딜러",
-   "star": 3,
-   "hp": 550,
-   "atk": 145,
-   "def": 25,
-   "crit": 10,
-   "blurb": "마법 이론만큼은 엘리아스 최정상급인데 학생이 안 모여 차린 빵집 「에심당」이 요정 왕국 명물이 되어 버린 교장. \"여긴 빵집이 아니라 마법학교\"라고 오늘도 우깁니다.",
-   "keyword": {
-    "name": "빵 센디오",
-    "desc": "카드마다 부푸는 빵",
-    "carrier": "self",
-    "cap": 3,
-    "rules": [
-     {
-      "name": "빵과 마법",
-      "when": {
-       "on": "stackReach",
-       "id": "빵 센디오",
-       "n": 3
-      },
-      "fx": [
-       {
-        "k": "heal",
-        "ratio": 1
-       },
-       {
-        "k": "status",
-        "id": "고통",
-        "v": 2
-       },
-       {
-        "k": "spend",
-        "id": "빵 센디오",
-        "all": true
-       }
-      ]
-     }
-    ]
-   },
-   "passives": [
+  "heroes": [
     {
-     "name": "빵집 아니고 마법학교",
-     "when": {
-      "on": "play"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "빵 센디오",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "ult": {
-    "name": "빵테오",
-    "cost": 250,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 3,
-      "target": "oneEnemy"
-     },
-     {
-      "k": "dmg",
-      "ratio": 1,
-      "target": "allEnemies"
-     },
-     {
-      "k": "status",
-      "id": "기절",
-      "v": 1
-     }
-    ]
-   },
-   "starter": [
-    "에슈르_s1",
-    "에슈르_s1",
-    "에슈르_s2",
-    "에슈르_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "에슈르_s1",
-   "name": "마력탄",
-   "hero": "에슈르",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_s2",
-   "name": "입자 마력탄",
-   "hero": "에슈르",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_s3",
-   "name": "오븐 장갑",
-   "hero": "에슈르",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "에슈르_u1",
-   "name": "빵템피드",
-   "hero": "에슈르",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "choices": [
-    "빵",
-    "마법"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.35,
-     "target": "oneEnemy",
-     "hits": 6
-    },
-    {
-     "k": "ifChoice",
-     "n": 1
-    },
-    {
-     "k": "heal",
-     "ratio": 1.5
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "status",
-     "id": "고통",
-     "v": 3
-    }
-   ],
-   "oracles": [
-    {
-     "name": "오븐 폭주",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.45,
-       "target": "oneEnemy",
-       "hits": 6
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.9
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "빵 부스러기 탄",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.25,
-       "target": "oneEnemy",
-       "hits": 6
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.1
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "반죽 폭풍",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.25,
-       "target": "allEnemies",
-       "hits": 6
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.5
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "센디오 굽기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.4,
-       "target": "oneEnemy",
-       "hits": 6
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "stack",
-       "id": "빵 센디오",
-       "v": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 5
-      }
-     ]
-    },
-    {
-     "name": "교장실 대폭발",
-     "cost": 3,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy",
-       "hits": 7
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.4
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 5
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "바삭한 빵가루",
-     "kind": "power"
-    },
-    {
-     "name": "갈라진 껍질",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "버터 듬뿍",
-     "kind": "heal"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_u2",
-   "name": "입자 이론",
-   "hero": "에슈르",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "choices": [
-    "빵",
-    "마법"
-   ],
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "ifChoice",
-     "n": 1
-    },
-    {
-     "k": "heal",
-     "ratio": 2
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "status",
-     "id": "고통",
-     "v": 3
-    }
-   ],
-   "oracles": [
-    {
-     "name": "심화 이론",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.6
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 4
-      }
-     ]
-    },
-    {
-     "name": "쪽지 시험",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.4
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "공동 연구",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "allAllies"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "복습 시간",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "draw",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "교장 직강",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "따끈한 빵",
-     "kind": "heal"
-    },
-    {
-     "name": "참고 문헌",
-     "kind": "draw"
-    },
-    {
-     "name": "교장의 자존심",
-     "kind": "atkUp"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_u3",
-   "name": "화염 주문",
-   "hero": "에슈르",
-   "unique": true,
-   "cost": 3,
-   "type": "공격",
-   "choices": [
-    "빵",
-    "마법"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 3,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "ifChoice",
-     "n": 1
-    },
-    {
-     "k": "heal",
-     "ratio": 2
-    },
-    {
-     "k": "ifChoice",
-     "n": 2
-    },
-    {
-     "k": "status",
-     "id": "고통",
-     "v": 3,
-     "target": "allEnemies"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "겁화 주문",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.8,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.5
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "불씨 주문",
-     "cost": 2,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.5,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 1.6
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "화염 폭풍",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.3,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "불꽃 심판",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2.3
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "마지막 장작",
-     "tags": [
-      "소멸"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 7.0,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifChoice",
-       "n": 1
-      },
-      {
-       "k": "heal",
-       "ratio": 2
-      },
-      {
-       "k": "ifChoice",
-       "n": 2
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3,
-       "target": "allEnemies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "장작 한 단",
-     "kind": "power"
-    },
-    {
-     "name": "불붙은 틈",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "구운 빵 냄새",
-     "kind": "heal"
-    }
-   ]
-  },
-  {
-   "id": "에슈르_u4",
-   "name": "궁극의 그리모어",
-   "hero": "에슈르",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.1,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "stackReach",
-        "id": "빵 센디오",
-        "n": 3
-       },
-       "fx": [
-        {
-         "k": "draw",
-         "v": 1
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "oracles": [
-    {
-     "name": "갓 구운 그리모어",
-     "tags": [],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "stackReach",
-          "id": "빵 센디오",
-          "n": 3
-         },
-         "fx": [
+      "id": "에슈르",
+      "name": "에슈르",
+      "nature": "우울",
+      "race": "요정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 550,
+      "atk": 145,
+      "def": 25,
+      "crit": 10,
+      "blurb": "마법 이론만큼은 엘리아스 최정상급인데 학생이 안 모여 차린 빵집 「에심당」이 요정 왕국 명물이 되어 버린 교장. \"여긴 빵집이 아니라 마법학교\"라고 오늘도 우깁니다.",
+      "keyword": {
+        "name": "빵 센디오",
+        "desc": "평타에 얹는 불타는 빵 주문",
+        "carrier": "self",
+        "cap": 6,
+        "rules": [
           {
-           "k": "draw",
-           "v": 1
+            "name": "불타는 빵",
+            "when": {
+              "on": "play",
+              "type": "공격"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "빵 센디오",
+                "n": 1
+              }
+            ],
+            "fx": [
+              {
+                "k": "extra",
+                "ratio": 0.5
+              },
+              {
+                "k": "status",
+                "id": "고통",
+                "v": 1
+              },
+              {
+                "k": "spend",
+                "id": "빵 센디오",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [
+        {
+          "name": "빵빵한 브레드",
+          "when": {
+            "on": "fightStart"
           },
-          {
-           "k": "heal",
-           "ratio": 0.5
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "빵 한 조각",
-     "cost": 0,
-     "tags": [],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "stackReach",
-          "id": "빵 센디오",
-          "n": 3
-         },
-         "fx": [
-          {
-           "k": "draw",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "부푼 그리모어",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "stackReach",
-          "id": "빵 센디오",
-          "n": 3
-         },
-         "fx": [
-          {
-           "k": "draw",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "발효시킨 그리모어",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "빵 센디오",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "stackReach",
-          "id": "빵 센디오",
-          "n": 3
-         },
-         "fx": [
-          {
-           "k": "draw",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "교장의 그리모어",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "stackReach",
-          "id": "빵 센디오",
-          "n": 3
-         },
-         "fx": [
-          {
-           "k": "draw",
-           "v": 1
-          }
-         ]
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 3
+            }
+          ]
         },
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "빵 센디오",
-           "v": 1
-          }
-         ]
+          "name": "빵집 아니고 마법학교",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 2
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ],
+      "ult": {
+        "name": "빵테오",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 3,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "dmg",
+            "ratio": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "에슈르_s1",
+        "에슈르_u1",
+        "에슈르_s2",
+        "에슈르_s3"
+      ]
     }
-   ],
-   "blesses": [
+  ],
+  "cards": [
     {
-     "name": "얇은 판본",
-     "kind": "cost"
+      "id": "에슈르_s1",
+      "name": "마력탄",
+      "hero": "에슈르",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
     },
     {
-     "name": "책갈피",
-     "kind": "draw"
+      "id": "에슈르_s2",
+      "name": "입자 마력탄",
+      "hero": "에슈르",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
     },
     {
-     "name": "마도서의 위엄",
-     "kind": "atkUp"
+      "id": "에슈르_s3",
+      "name": "오븐 장갑",
+      "hero": "에슈르",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        }
+      ]
+    },
+    {
+      "id": "에슈르_bread",
+      "name": "갓 구운 빵",
+      "hero": "에슈르",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "빵 센디오",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 0.25
+        }
+      ]
+    },
+    {
+      "id": "에슈르_u1",
+      "name": "빵템피드",
+      "hero": "에슈르",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "stack",
+          "id": "빵 센디오",
+          "v": 2
+        },
+        {
+          "k": "make",
+          "id": "에슈르_bread",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "빵 여섯 개",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "대-빵템피드",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy",
+              "hits": 6
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 4
+            },
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "흩어지는 빵",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "빵 몽땅 굽기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "빵 센디오"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "빵 센디오",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신상 빵 줄",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "버터 듬뿍",
+          "kind": "power"
+        },
+        {
+          "name": "단골손님",
+          "kind": "draw"
+        },
+        {
+          "name": "오븐 예열",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에슈르_u2",
+      "name": "입자 이론",
+      "hero": "에슈르",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.65,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "빵 센디오",
+          "n": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "입자 가속",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "빵 센디오",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "이론 강의",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빵 센디오",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "입자 관측",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "빵 센디오",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "불확정 이론",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "입자 폭주",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "빵 센디오",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "이론 수업",
+          "kind": "frost"
+        },
+        {
+          "name": "엘레나와 협업",
+          "kind": "ap"
+        },
+        {
+          "name": "수강생 0명",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에슈르_u3",
+      "name": "화염 주문",
+      "hero": "에슈르",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "빵 센디오"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "빵 센디오",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "대화염 주문",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "빵 센디오"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "빵 센디오",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "작은 불씨",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "빵 센디오"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "빵 센디오",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "불바다",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.83,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "궁극의 마법 이론",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "빵 센디오"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빵 센디오",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "세금 고지서",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "빵 센디오",
+              "n": 4
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.04,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "화상",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "월세 걱정",
+          "kind": "cost"
+        },
+        {
+          "name": "빵테오",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에슈르_u4",
+      "name": "궁극의 그리모어",
+      "hero": "에슈르",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perTag",
+          "id": "에슈르_bread"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "exileFrom",
+          "from": "hand",
+          "all": true,
+          "tag": "에슈르_bread"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "궁극의 마법서",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "에슈르_bread"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "에슈르_bread"
+            }
+          ]
+        },
+        {
+          "name": "요약본",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "에슈르_bread"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "에슈르_bread"
+            }
+          ]
+        },
+        {
+          "name": "마법책빵",
+          "tags": [
+            "개전"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "에슈르_bread",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "풀리지 않는 난제",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "빵 센디오"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "고대 마법 서적",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "에슈르_bread"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "빵 모자",
+          "kind": "atkUp"
+        },
+        {
+          "name": "에심당 간판",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "시식 코너",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.3
+            }
+          ]
+        }
+      ]
     }
-   ]
-  }
- ]
+  ]
 }

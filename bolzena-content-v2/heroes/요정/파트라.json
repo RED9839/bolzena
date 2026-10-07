@@ -1,834 +1,870 @@
 {
- "heroes": [
-  {
-   "id": "파트라",
-   "name": "파트라",
-   "nature": "냉정",
-   "race": "요정",
-   "role": "딜러",
-   "star": 1,
-   "hp": 600,
-   "atk": 104,
-   "def": 26,
-   "crit": 10,
-   "blurb": "최고의 파티셰를 꿈꾸는 민트초코 광신도. 베이커 거리 에슈르의 빵집에서 제빵을 배우며 알바하고, 신메뉴마다 민트를 넣습니다. 요리를 우습게 보는 사도를 싫어하고 주방에 서면 누구보다 진지해집니다. 냉정 뽑기마다 줄줄이 나와 「파트러쉬」로 불립니다.",
-   "keyword": {
-    "name": "민트",
-    "desc": "적에게 치대는 민트 반죽",
-    "carrier": "enemy",
-    "cap": 4,
-    "rules": [
-     {
-      "name": "구워짐",
-      "when": {
-       "on": "stackReach",
-       "id": "민트",
-       "n": 4
+  "heroes": [
+    {
+      "id": "파트라",
+      "name": "파트라",
+      "nature": "냉정",
+      "race": "요정",
+      "role": "딜러",
+      "star": 1,
+      "hp": 600,
+      "atk": 104,
+      "def": 26,
+      "crit": 10,
+      "blurb": "최고의 파티셰를 꿈꾸는 민트초코 광신도. 베이커 거리 에슈르의 빵집에서 제빵을 배우며 알바하고, 신메뉴마다 민트를 넣습니다. 요리를 우습게 보는 사도를 싫어하고 주방에 서면 누구보다 진지해집니다. 냉정 뽑기마다 줄줄이 나와 「파트러쉬」로 불립니다.",
+      "keyword": {
+        "name": "민트 재고",
+        "desc": "아무도 안 사 가는 민트초코",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.12
+          }
+        ],
+        "rules": [
+          {
+            "name": "재고 처분",
+            "when": {
+              "on": "stackReach",
+              "id": "민트 재고",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "민트 재고",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 0.8,
+                "target": "allEnemies"
+              },
+              {
+                "k": "status",
+                "id": "약화",
+                "v": 1,
+                "target": "allEnemies"
+              }
+            ]
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "dmg",
-        "ratio": 1.5,
-        "target": "oneEnemy"
-       },
-       {
-        "k": "status",
-        "id": "약화",
-        "v": 2
-       },
-       {
-        "k": "spend",
-        "id": "민트",
-        "all": true,
-        "target": "oneEnemy"
-       }
+      "passives": [
+        {
+          "name": "잔뜩 만든 민트",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "억지로 먹이기",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교주의 천벌 - 파트라",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 3.5,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "민트 재고",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "파트라_s1",
+        "파트라_u3",
+        "파트라_s2",
+        "파트라_s3"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "민트 반죽",
-     "when": {
-      "on": "hit"
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "교주의 천벌 - 파트라",
-    "cost": 200,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 3.5,
-      "target": "oneEnemy"
-     },
-     {
-      "k": "tough",
-      "v": 2
-     },
-     {
-      "k": "stack",
-      "id": "민트",
-      "v": 3,
-      "target": "oneEnemy"
-     }
-    ]
-   },
-   "starter": [
-    "파트라_s1",
-    "파트라_s1",
-    "파트라_s2",
-    "파트라_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "파트라_s1",
-   "name": "뒤집개 치기",
-   "hero": "파트라",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "파트라_s2",
-   "name": "왕뒤집개 내려치기",
-   "hero": "파트라",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "파트라_s3",
-   "name": "앞치마 가드",
-   "hero": "파트라",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 2
-    }
-   ]
-  },
-  {
-   "id": "파트라_u1",
-   "name": "민트머겅!",
-   "hero": "파트라",
-   "unique": true,
-   "cost": 3,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 3,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "민트",
-     "v": 2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "status",
-     "id": "고통",
-     "v": 2
-    }
-   ],
-   "oracles": [
-    {
-     "name": "민트 폭탄",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.7,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "민트 한 숟갈",
-     "cost": 2,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "민트 범벅",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 3
-      }
-     ]
-    },
-    {
-     "name": "민트 소나기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "status",
-       "id": "고통",
-       "v": 2,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "강제 시식",
-     "tags": [
-      "약점 공격"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 3.2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "상쾌한 한 방",
-     "kind": "power"
-    },
-    {
-     "name": "화한 기운",
-     "kind": "frost"
-    },
-    {
-     "name": "민트 토핑",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "파트라_u2",
-   "name": "민트 반죽 치대기",
-   "hero": "파트라",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy",
-     "hits": 2
-    },
-    {
-     "k": "status",
-     "id": "균열",
-     "v": 2
-    },
-    {
-     "k": "ifChain"
-    },
-    {
-     "k": "stack",
-     "id": "민트",
-     "v": 2,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "힘껏 치대기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.25,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "균열",
-       "v": 2
-      },
-      {
-       "k": "ifChain"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "살살 치대기",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.7,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "균열",
-       "v": 1
-      },
-      {
-       "k": "ifChain"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "반죽 늘이기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.85,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "status",
-       "id": "균열",
-       "v": 2
-      },
-      {
-       "k": "ifChain"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "밀대로 밀기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.05,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "균열",
-       "v": 2
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "반죽 내던지기",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.75,
-       "target": "allEnemies",
-       "hits": 2
-      },
-      {
-       "k": "status",
-       "id": "균열",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifChain"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "쫀득한 반죽",
-     "kind": "power"
-    },
-    {
-     "name": "반죽 결 따라",
-     "kind": "weakSpot"
-    },
-    {
-     "name": "차가운 반죽",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "파트라_u3",
-   "name": "중불까지 키워주세요",
-   "hero": "파트라",
-   "unique": true,
-   "cost": 2,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+      "id": "파트라_s1",
+      "name": "뒤집개 치기",
+      "hero": "파트라",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "k": "stack",
-         "id": "민트",
-         "v": 1,
-         "target": "allEnemies"
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         }
-       ]
-      }
-     ]
-    }
-   ],
-   "oracles": [
+      ]
+    },
     {
-     "name": "상큼한 중불",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.2,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
+      "id": "파트라_s2",
+      "name": "왕뒤집개 내려치기",
+      "hero": "파트라",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "민트",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
         }
-       ]
-      }
-     ]
+      ]
     },
     {
-     "name": "약불",
-     "cost": 1,
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
+      "id": "파트라_s3",
+      "name": "앞치마 가드",
+      "hero": "파트라",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "민트",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
+          "k": "shield",
+          "ratio": 2
         }
-       ]
-      }
-     ]
+      ]
     },
     {
-     "name": "민트 듬뿍 중불",
-     "tags": [],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "power",
-       "rules": [
+      "id": "파트라_mint",
+      "name": "민트초코 쿠키",
+      "hero": "파트라",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "민트",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "숙성한 중불",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
+          "k": "dmg",
+          "ratio": 0.41,
+          "target": "oneEnemy"
+        },
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "민트",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
+          "k": "stack",
+          "id": "민트 재고",
+          "v": 1
         }
-       ]
-      }
-     ]
+      ]
     },
     {
-     "name": "오븐의 축복",
-     "tags": [
-      "축복"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "power",
-       "rules": [
+      "id": "파트라_u1",
+      "name": "민트머겅!",
+      "hero": "파트라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "민트",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
+          "k": "dmg",
+          "ratio": 1.08,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "민트 재고"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.38,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "민트 재고",
+          "all": true
         }
-       ]
-      }
-     ]
+      ],
+      "oracles": [
+        {
+          "name": "민트 듬뿍 머겅!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "민트 재고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "민트 재고",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "민트초코 풀코스",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.43,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "민트 재고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "민트 재고",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "다 같이 머겅!",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "파트라_mint"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "파트라_mint"
+            }
+          ]
+        },
+        {
+          "name": "요리를 쉽게 보면",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.17,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "민트 재고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신메뉴 개발",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.29,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "민트 재고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "민트 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "뒤집개",
+          "kind": "power"
+        },
+        {
+          "name": "빨개진 얼굴",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "민트 향",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "파트라_u2",
+      "name": "민트 반죽 치대기",
+      "hero": "파트라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.74,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "stack",
+          "id": "민트 재고",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "힘껏 치대기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.97,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "살살 치대기",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반죽 다 쓰기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perStack",
+              "id": "민트 재고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "민트 재고",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "반죽 던지기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "반죽 재료 챙기기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "사장님 꿀밤",
+          "kind": "frost"
+        },
+        {
+          "name": "밀가루",
+          "kind": "draw"
+        },
+        {
+          "name": "반죽 숙성",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "파트라_u3",
+      "name": "중불까지 키워주세요",
+      "hero": "파트라",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "민트 재고",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.81
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "민트 재고",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "센 불로",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "민트 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "약불",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.54
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "민트 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "새 조리법",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.68
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "민트 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "오븐 가득",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "민트 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "반죽 숙성 중",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "파트라_mint",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "오븐 장갑",
+          "kind": "defUp"
+        },
+        {
+          "name": "사장님의 비법",
+          "kind": "cost"
+        },
+        {
+          "name": "갓 구운 쿠키",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "파트라_u4",
+      "name": "샤샤와 소풍 도시락",
+      "hero": "파트라",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "파트라_mint",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "큰 도시락",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "샤샤와 함께",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "도시락 나눠 주기",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "매일 도시락",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "파트라_mint",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "민트 샌드위치",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "돗자리",
+          "kind": "ap"
+        },
+        {
+          "name": "소풍 바구니",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "민트초코 쿠키 한 봉",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.41
+            }
+          ]
+        }
+      ]
     }
-   ],
-   "blesses": [
-    {
-     "name": "성급한 점화",
-     "kind": "cost"
-    },
-    {
-     "name": "셰프의 자존심",
-     "kind": "atkUp"
-    },
-    {
-     "name": "레시피 확인",
-     "kind": "draw"
-    }
-   ]
-  },
-  {
-   "id": "파트라_u4",
-   "name": "샤샤와 소풍 도시락",
-   "hero": "파트라",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "tags": [
-    "연계"
-   ],
-   "fx": [
-    {
-     "k": "stack",
-     "id": "민트",
-     "v": 2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "heal",
-     "ratio": 1.5
-    }
-   ],
-   "oracles": [
-    {
-     "name": "도시락 두 칸",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 3,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "heal",
-       "ratio": 2.0
-      }
-     ]
-    },
-    {
-     "name": "주먹밥 하나",
-     "cost": 0,
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "heal",
-       "ratio": 1.2
-      }
-     ]
-    },
-    {
-     "name": "샤샤랑 나눠 먹기",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "heal",
-       "ratio": 1.5
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "민트 디저트 돌리기",
-     "tags": [
-      "연계"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 3,
-       "target": "allEnemies"
-      },
-      {
-       "k": "heal",
-       "ratio": 1.5
-      }
-     ]
-    },
-    {
-     "name": "돗자리 펴기",
-     "tags": [
-      "연계",
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "heal",
-       "ratio": 1.5
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "샤샤의 손맛",
-     "kind": "heal"
-    },
-    {
-     "name": "후식 챙기기",
-     "kind": "draw"
-    },
-    {
-     "name": "민트 한 잎",
-     "fx": [
-      {
-       "k": "stack",
-       "id": "민트",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  }
- ]
+  ]
 }

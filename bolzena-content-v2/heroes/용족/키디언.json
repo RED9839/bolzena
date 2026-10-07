@@ -13,15 +13,18 @@
       "crit": 10,
       "blurb": "흑요석의 용족 닌자. 적이 격파되어 무너진 틈에 그림자처럼 파고들어 마무리하고, 쓰러진 적을 딛고 다음 칼을 바로 꺼냅니다.",
       "keyword": {
-        "name": "그림자 마무리",
-        "desc": "격파 틈을 노리는 그림자",
+        "name": "별빛 조각",
+        "desc": "깨진 흑요석으로 그린 별자리",
         "carrier": "self",
-        "cap": 2,
-        "consumeAll": true,
+        "cap": 4,
         "per": [
           {
+            "stat": "crit",
+            "v": 0.1
+          },
+          {
             "stat": "dealt",
-            "v": 0.25
+            "v": 0.06
           }
         ]
       },
@@ -34,33 +37,44 @@
           "fx": [
             {
               "k": "stack",
-              "id": "그림자 마무리",
+              "id": "별빛 조각",
               "v": 2
             }
           ]
         },
         {
-          "name": "흑요석 단면",
+          "name": "그림자 추적",
           "when": {
-            "on": "kill"
+            "on": "kill",
+            "mine": true
           },
-          "conds": [
-            {
-              "c": "targetBroken"
-            }
-          ],
           "limit": {
             "per": "turn",
             "n": 1
           },
           "fx": [
             {
-              "k": "nextCheaper",
-              "v": 2
-            },
-            {
-              "k": "draw",
+              "k": "stack",
+              "id": "별빛 조각",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "흑요석 단면",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "randomEnemy"
             }
           ]
         }
@@ -81,7 +95,7 @@
           },
           {
             "k": "stack",
-            "id": "그림자 마무리",
+            "id": "별빛 조각",
             "v": 2
           },
           {
@@ -93,7 +107,7 @@
           },
           {
             "k": "dmg",
-            "ratio": 2.0,
+            "ratio": 2,
             "target": "randomEnemy"
           }
         ]
@@ -102,7 +116,7 @@
         "키디언_s1",
         "키디언_s1",
         "키디언_s2",
-        "키디언_s2"
+        "키디언_u2"
       ]
     }
   ],
@@ -136,129 +150,73 @@
     },
     {
       "id": "키디언_u1",
-      "name": "급소 찌르기",
+      "name": "아웃사이드 커터",
       "hero": "키디언",
       "unique": true,
       "cost": 1,
       "type": "공격",
-      "tags": [
-        "약점 공격"
-      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
-          "target": "oneEnemy"
+          "ratio": 0.46,
+          "target": "oneEnemy",
+          "hits": 3
         },
         {
-          "k": "ifFoe",
-          "id": "broken"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.5,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "rushDown",
-          "v": 1,
-          "target": "oneEnemy"
+          "k": "stack",
+          "id": "별빛 조각",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "바늘 찌르기",
-          "cost": 0,
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "아웃사이더 헤딩",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "rushDown",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "흑요석 관통",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "rushDown",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "이중 찌르기",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.46,
               "target": "oneEnemy",
-              "hits": 2
+              "hits": 4
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
-            },
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "급소 베기",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
             {
               "k": "dmg",
               "ratio": 0.5,
-              "target": "oneEnemy"
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
-              "k": "rushDown",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
             }
           ]
         },
         {
-          "name": "숨통",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "격파 틈",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
+              "ratio": 0.46,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
             },
             {
               "k": "ifFoe",
@@ -266,41 +224,57 @@
             },
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "rushDown",
-              "v": 1,
+              "ratio": 0.69,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "그림자 일격",
-          "cost": 2,
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "별자리 긋기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.2,
-              "target": "oneEnemy"
+              "ratio": 0.44,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
+              "k": "perStack",
+              "id": "별빛 조각"
             },
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.25,
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "그림자 수련",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
-              "k": "rushDown",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "별빛 조각",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -311,19 +285,17 @@
           "kind": "power"
         },
         {
-          "name": "독 바른 칼끝",
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔불",
-              "v": 1
-            }
-          ]
+          "name": "그림자 발걸음",
+          "kind": "ap"
         },
         {
-          "name": "칼집",
-          "tags": [
-            "보존"
+          "name": "조각 녹여 먹기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            }
           ]
         }
       ]
@@ -342,14 +314,14 @@
           "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "잔불",
+          "k": "stack",
+          "id": "별빛 조각",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "눈 감고 듣기",
+          "name": "정확한 급소",
           "fx": [
             {
               "k": "tough",
@@ -357,341 +329,9 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "잔불",
+              "k": "stack",
+              "id": "별빛 조각",
               "v": 2
-            }
-          ]
-        },
-        {
-          "name": "완벽한 해부",
-          "fx": [
-            {
-              "k": "tough",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "잔불",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "약점 노출",
-          "fx": [
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "잔불",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "그림자 관찰",
-          "fx": [
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "잔불",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "인내",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "잔불",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "예리한 눈",
-          "kind": "draw"
-        },
-        {
-          "name": "숨 죽이기",
-          "kind": "frost"
-        },
-        {
-          "name": "잠입",
-          "tags": [
-            "개전"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "키디언_u3",
-      "name": "거대 쿠나이",
-      "hero": "키디언",
-      "unique": true,
-      "cost": 2,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 2,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "tough",
-          "v": 1,
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "쿠나이 투척",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "흑요석 폭풍",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "관통 쿠나이",
-          "tags": [
-            "분쇄",
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "회수 쿠나이",
-          "tags": [
-            "회수"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "급소 직격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "무게 중심",
-          "kind": "power"
-        },
-        {
-          "name": "그림자 분신",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "쿠나이 줄",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
-      "id": "키디언_u4",
-      "name": "그림자 수련",
-      "hero": "키디언",
-      "unique": true,
-      "cost": 1,
-      "type": "강화",
-      "fx": [
-        {
-          "k": "status",
-          "id": "잔광",
-          "v": 2
-        },
-        {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "그림자 마무리",
-                  "v": 1
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "oracles": [
-        {
-          "name": "새벽 수련",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "그림자 마무리",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "비전 오의",
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "그림자 마무리",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "흑요석 연마",
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 4
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "그림자 마무리",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
@@ -699,85 +339,463 @@
           "name": "그림자 숨기",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
             },
             {
               "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "그림자 마무리",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "닌자의 길",
-          "cost": 0,
-          "tags": [
-            "개전"
-          ],
+          "name": "깨진 흑요석",
           "fx": [
             {
+              "k": "payHp",
+              "v": 40
+            },
+            {
+              "k": "tough",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
               "k": "stack",
-              "id": "그림자 마무리",
+              "id": "별빛 조각",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "밤눈",
+          "fx": [
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "그림자 마무리",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "쿠나이 표시",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.69,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "검은 두건",
+          "name": "반창고",
+          "kind": "draw"
+        },
+        {
+          "name": "붕대",
           "fx": [
             {
-              "k": "status",
-              "id": "잔불",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.3
             }
           ]
         },
         {
-          "name": "수련 일지",
+          "name": "어둠 속",
           "tags": [
-            "개전"
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "키디언_u3",
+      "name": "밤하늘 다이브",
+      "hero": "키디언",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.92,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "별빛 조각"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "별빛 조각",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "쉐도우 커터",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "별빛 조각"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "별빛 조각",
+              "all": true
+            }
           ]
         },
         {
-          "name": "표창",
+          "name": "별똥별",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.67,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "별빛 조각"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "별빛 조각",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "별 하나는 남겨",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.21,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "별빛 조각",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "마지막 다이브",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "별빛 조각"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.82,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "별빛 조각",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "다시 뛰어들기",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "별빛 조각"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.69,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "별빛 조각",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "별빛 쿠나이",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "그림자 틈",
+          "kind": "cost"
+        },
+        {
+          "name": "친구따라 지상 나들이",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "키디언_u4",
+      "name": "별 관찰",
+      "hero": "키디언",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "status",
+          "id": "잔광",
+          "v": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.57,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "별빛 조각"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.29,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "마음속의 은하수",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "별빛 조각"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "밤하늘의 별자리",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.03,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "별빛 조각",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "break"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "동굴 밖으로",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "별 하나",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "별빛 조각"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "별빛 조각",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "내가 빛내줄게…",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "perStack",
+              "id": "별빛 조각"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "교주의 별자리",
+          "kind": "atkUp"
+        },
+        {
+          "name": "별 관찰 노트",
           "kind": "draw"
+        },
+        {
+          "name": "흑요석 조각",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            }
+          ]
         }
       ]
     }

@@ -13,10 +13,10 @@
       "crit": 10,
       "blurb": "마녀 여왕. 비밀 창고의 초콜릿을 몰래 꺼내 먹으며 전장 전체에 붉은 마력의 비를 뿌리지만, 당이 차오르면 손이 떨립니다.",
       "keyword": {
-        "name": "당",
-        "desc": "몰래 먹은 초콜릿의 당",
+        "name": "당 수치",
+        "desc": "몰래 먹은 초콜릿만큼 오르는 여왕의 당",
         "carrier": "self",
-        "cap": 3,
+        "cap": 5,
         "per": [
           {
             "stat": "dealt",
@@ -28,32 +28,18 @@
             "name": "당쇼크",
             "when": {
               "on": "stackReach",
-              "id": "당",
-              "n": 3
+              "id": "당 수치",
+              "n": 5
             },
             "fx": [
               {
-                "k": "status",
-                "id": "사기",
-                "v": 1
-              },
-              {
-                "k": "later",
-                "n": 1,
-                "then": [
-                  {
-                    "k": "cardStatus",
-                    "id": "봉쇄",
-                    "v": 1,
-                    "to": "hand",
-                    "n": 2
-                  }
-                ]
-              },
-              {
                 "k": "spend",
-                "id": "당",
+                "id": "당 수치",
                 "all": true
+              },
+              {
+                "k": "gauge",
+                "v": 40
               }
             ]
           }
@@ -70,6 +56,19 @@
               "k": "make",
               "id": "벨리타_t1",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "여왕의 심판",
+          "when": {
+            "on": "ult"
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
             }
           ]
         }
@@ -93,7 +92,7 @@
       },
       "starter": [
         "벨리타_s1",
-        "벨리타_s1",
+        "벨리타_u2",
         "벨리타_s2",
         "벨리타_s3"
       ]
@@ -149,16 +148,16 @@
       "cost": 0,
       "type": "스킬",
       "tags": [
-        "증발"
+        "소멸"
       ],
       "fx": [
         {
-          "k": "ap",
+          "k": "stack",
+          "id": "당 수치",
           "v": 1
         },
         {
-          "k": "stack",
-          "id": "당",
+          "k": "draw",
           "v": 1
         }
       ],
@@ -166,445 +165,185 @@
     },
     {
       "id": "벨리타_u1",
-      "name": "크림슨 스파이크",
+      "name": "디멘션 오브 위치",
       "hero": "벨리타",
       "unique": true,
       "cost": 1,
       "type": "공격",
-      "signature": true,
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.15,
-          "target": "oneEnemy"
+          "ratio": 1.01,
+          "target": "allEnemies"
         },
         {
-          "k": "ifStack",
-          "id": "당",
-          "n": 2
+          "k": "perTag",
+          "id": "벨리타_t1"
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.29,
+          "target": "allEnemies"
         }
       ],
-      "blurb": "당이 오르면 마력이 날카로워집니다",
       "oracles": [
         {
-          "name": "핏빛 스파이크",
+          "name": "블랙홀 오브 위치",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
-              "target": "oneEnemy"
+              "ratio": 1.31,
+              "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "당",
-              "n": 2
+              "k": "perTag",
+              "id": "벨리타_t1"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "작은 가시",
+          "name": "작은 차원",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
+              "ratio": 0.8,
+              "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "당",
-              "n": 2
+              "k": "perTag",
+              "id": "벨리타_t1"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "달콤한 가시",
+          "name": "차원 문 열기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy"
+              "ratio": 1.09,
+              "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "당",
-              "n": 1
+              "k": "perTag",
+              "id": "벨리타_t1"
             },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "여왕의 일격",
-          "fx": [
             {
               "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "당",
-              "n": 2
+              "ratio": 0.36,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
               "v": 1,
-              "target": "oneEnemy"
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
             }
           ]
         },
         {
-          "name": "여왕의 비밀",
-          "tags": [
-            "보존"
-          ],
+          "name": "당 충전 차원",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
+              "ratio": 1.16,
+              "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "당",
-              "n": 2
+              "k": "perStack",
+              "id": "당 수치"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "간식 털어 넣기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.09,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "벨리타_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "벨리타_t1"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "붉은 마력",
+          "name": "여왕의 마력",
           "kind": "power"
         },
         {
-          "name": "설탕 코팅",
-          "kind": "weakSpot"
+          "name": "후으",
+          "kind": "ap"
         },
         {
-          "name": "간식 타임",
-          "kind": "draw"
+          "name": "뿌리의 가시",
+          "kind": "weakSpot"
         }
       ]
     },
     {
       "id": "벨리타_u2",
-      "name": "당 충전 마법",
+      "name": "비밀 간식 창고",
       "hero": "벨리타",
       "unique": true,
-      "cost": 1,
-      "type": "공격",
+      "cost": 0,
+      "type": "스킬",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.55,
-          "target": "allEnemies"
-        },
-        {
-          "k": "perStack",
-          "id": "당"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.3,
-          "target": "allEnemies"
+          "k": "make",
+          "id": "벨리타_t1",
+          "v": 2
         }
       ],
-      "blurb": "당 한 칸에 마력 한 칸",
       "oracles": [
         {
-          "name": "과충전",
+          "name": "창고 대방출",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "당"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies"
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 3
             }
           ]
         },
         {
-          "name": "살짝 충전",
-          "cost": 0,
+          "name": "몽유병 창고털이",
+          "power": true,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "당"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "당 폭발",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "당"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "당 스파크",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "당"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "간식 비축",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "당"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "고당도",
-          "kind": "power"
-        },
-        {
-          "name": "빠른 소화",
-          "kind": "cost"
-        },
-        {
-          "name": "사탕 한 알",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "당",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "벨리타_u3",
-      "name": "핏빛 소나기",
-      "hero": "벨리타",
-      "unique": true,
-      "cost": 2,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.4,
-          "target": "allEnemies",
-          "hits": 3
-        }
-      ],
-      "blurb": "여왕의 짜증이 비처럼 쏟아집니다",
-      "oracles": [
-        {
-          "name": "폭우",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies",
-              "hits": 3
-            }
-          ]
-        },
-        {
-          "name": "소나기 한 줄기",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.29,
-              "target": "allEnemies",
-              "hits": 3
-            }
-          ]
-        },
-        {
-          "name": "집중 호우",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "randomEnemy",
-              "hits": 6
-            }
-          ]
-        },
-        {
-          "name": "당 떨어진 짜증",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies",
-              "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "당",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "여왕의 폭풍우",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies",
-              "hits": 3
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "붉은 비",
-          "kind": "power"
-        },
-        {
-          "name": "비구름",
-          "kind": "cost"
-        },
-        {
-          "name": "천둥",
-          "kind": "frost"
-        }
-      ]
-    },
-    {
-      "id": "벨리타_u4",
-      "name": "여왕의 간식 시간",
-      "hero": "벨리타",
-      "unique": true,
-      "cost": 1,
-      "type": "강화",
-      "fx": [
-        {
-          "k": "status",
-          "id": "사기",
-          "v": 1
-        },
-        {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "당",
-                  "v": 1
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blurb": "아무도 보지 않을 때가 간식 시간입니다",
-      "oracles": [
-        {
-          "name": "성대한 간식",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
+              "k": "make",
+              "id": "벨리타_t1",
               "v": 2
             },
             {
@@ -616,17 +355,271 @@
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "당",
-                      "v": 1
-                    },
-                    {
-                      "k": "draw",
+                      "k": "make",
+                      "id": "벨리타_t1",
                       "v": 1
                     }
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "name": "시스트 암거래",
+          "fx": [
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "건강식 먹는 척",
+          "fx": [
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 2
+            },
+            {
+              "k": "when",
+              "on": "draw"
+            },
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "창고 정리",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "목각 인형",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "서마터펀 주문",
+          "kind": "draw"
+        },
+        {
+          "name": "로켓 목걸이",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨리타_u3",
+      "name": "핏빛 소나기",
+      "hero": "벨리타",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.36,
+          "target": "randomEnemy",
+          "hits": 5
+        },
+        {
+          "k": "make",
+          "id": "벨리타_t1",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "크림슨 소나기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "보슬비",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "당 떨어진 짜증",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "ifStack",
+              "id": "당 수치",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "randomEnemy",
+              "hits": 4
+            }
+          ]
+        },
+        {
+          "name": "집중 호우",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.57,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "엘리아스의 수호자들",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "randomEnemy",
+              "hits": 6
+            },
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "핏빛 마력",
+          "kind": "power"
+        },
+        {
+          "name": "굵은 빗방울",
+          "kind": "ap"
+        },
+        {
+          "name": "초콜릿 한 입",
+          "fx": [
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨리타_u4",
+      "name": "여왕의 간식 시간",
+      "hero": "벨리타",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.87,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "당 수치"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.32,
+          "target": "randomEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "성대한 간식",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.13,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "당 수치"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "randomEnemy"
             }
           ]
         },
@@ -635,36 +628,25 @@
           "cost": 0,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "당",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "당 수치"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "randomEnemy"
             }
           ]
         },
         {
-          "name": "초콜릿 비축",
+          "name": "티타임",
+          "power": true,
           "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
             {
               "k": "make",
               "id": "벨리타_t1",
@@ -675,13 +657,15 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "stackReach",
+                    "id": "당 수치",
+                    "n": 5
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "당",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 1.23,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -690,85 +674,66 @@
           ]
         },
         {
-          "name": "티타임",
+          "name": "초콜릿 폭식",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "perTag",
+              "id": "벨리타_t1"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.64,
+              "target": "randomEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "당",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "아침 간식",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "벨리타_t1"
             },
             {
               "k": "stack",
-              "id": "당",
-              "v": 1
+              "id": "당 수치",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "당쇼크 직전",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.23,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "당",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "당 수치"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "당 수치",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "여왕의 위엄",
-          "kind": "atkUp"
+          "name": "뿌리의 수호자",
+          "kind": "weakSpot"
         },
         {
-          "name": "새벽 간식",
-          "tags": [
-            "개전"
-          ]
+          "name": "민트초코 질색",
+          "kind": "draw"
         },
         {
-          "name": "여분 초콜릿",
+          "name": "비밀 창고",
           "fx": [
             {
               "k": "make",
@@ -817,8 +782,8 @@
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "당",
+              "k": "make",
+              "id": "벨리타_t1",
               "v": 1
             }
           ]

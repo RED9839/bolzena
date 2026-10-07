@@ -1,4 +1,5 @@
 import fs from 'fs';
+const REWORKED = JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')); // 리워크한 사도는 _gen/rework/rework.mjs 가 쓴다 — 여기서 덮어쓰지 않는다
 import { build, report } from './lib.mjs';
 import { heroesA } from './heroes-a.mjs';
 import { heroesB } from './heroes-b.mjs';
@@ -18,6 +19,6 @@ for (const h of [...heroesA, ...heroesB]) {
   const d = JSON.parse(fs.readFileSync(file, 'utf8'));
   let ch = false;
   for (const c of d.cards) (c.oracles || []).forEach((o, i) => { const n = bumps[`${c.id}|${i + 1}`] || 0; for (let k = 0; k < n; k++) { bump(o.fx); ch = true; } });
-  if (ch) fs.writeFileSync(file, JSON.stringify(d, null, 1) + '\n', 'utf8');
+  if (ch && !REWORKED.includes(h.hero.id)) fs.writeFileSync(file, JSON.stringify(d, null, 1) + '\n', 'utf8');
 }
 report();

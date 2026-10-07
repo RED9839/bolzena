@@ -463,6 +463,16 @@ def charge_blurb(e, warn, nxt):
     b = e.get('blurb', '')
     e['blurb'] = b.replace(' 희귀종:', ' ' + s + ' 희귀종:', 1) if ' 희귀종:' in b else (b + ' ' + s).strip()
 
+# ═══════════════════════ 카제나식 리워크 — 37종 전부(2026-10-07 사용자 결정 · _measure/적_리워크_지침.md) ═══════════════════════
+# 설계는 _gen/foes/rework.py(몬스터마다 의도 · 패시브 · 격파 반응 · 방해). 힘 모으기도 거기서 넣으므로 아래 ELITE_CHARGE · MOB_CHARGE 는 쓰지 않는다.
+# 전후 측정용: FOE_REWORK=0 이면 리워크 앞(시범 전) 데이터를 그대로 다시 만든다(묶음 고치기도 건너뜀).
+REWORK = os.environ.get('FOE_REWORK', '1') != '0'
+if REWORK:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import rework
+    rework.apply(E)
+    ELITE_CHARGE.clear(); MOB_CHARGE.clear()
+
 if ADD_CHARGE:
     for k, (warn, nxt) in list(ELITE_CHARGE.items()) + list(MOB_CHARGE.items()):
         e = E[k]
@@ -493,7 +503,7 @@ for k, e in E.items():
 # ═══════════════════════ 밸런스(시뮬로 맞춤 — 졸개가 빠진 보스 · 몬스터 정리 뒤 완주율을 리워크 전 근처로) ═══════════════════════
 import math
 # 2026-10-07 평소 수 무작위 · 고학년 강화 · 엘리트/일반 힘 모으기 뒤 보스 몸 HP 1.25 → 1.2(숙련 · 역할 30.9% → 32.0%, _measure/적_리워크.md §8).
-BAL = {'mob_hp': float(os.environ.get('FOE_MOB_HP', 1.1)), 'mob_dmg': float(os.environ.get('FOE_MOB_DMG', 1.155)),
+BAL = {'mob_hp': float(os.environ.get('FOE_MOB_HP', 1.1)), 'mob_dmg': float(os.environ.get('FOE_MOB_DMG', 1.26 if REWORK else 1.155)),
        'boss_hp': float(os.environ.get('FOE_BOSS_HP', 1.2)), 'boss_dmg': float(os.environ.get('FOE_BOSS_DMG', 1.155))}
 HIT = {'attack', 'back', 'multi', 'attackAll'}
 def r5(x, step): return int(round(x / step) * step)
@@ -515,7 +525,27 @@ for k, e in E.items():
 #   간파 · 장작 패기 · 검기)을 빌린 클론이 누구든 46~91% 로 졌다. 2층 엘리트도 퍼리 · 몰락한 큰손 · 머곰 · 두목 줄이 71~80% 패배.
 #   clone_tig 는 수인 부락 2층 보스 칸에만 있어 다른 마을 보스에는 안 걸린다. 측정: _measure/적_리워크.md §5.
 BAL_ONE = {'clone_tig': (0.65, 0.7), 'furring_elite': (0.75, 0.75), 'gluttonbear_elite': (0.75, 0.75)}
+# 카제나식 리워크 뒤 마을 맞춤(2026-10-07 — _measure/적_리워크_전체.md). 리워크 몫(REWORK)일 때만 곱한다. 값은 (HP, 피해) — 위 BAL_ONE 에 더 곱한다.
+REWORK_ONE = {
+    # 모나티엄(리워크 뒤 52% — 엘리트 · 일반이 약했다)
+    'elfsoldiercloserange_elite': (1.15, 1.15), 'droneg_elite': (1.2, 1.25), 'elfsoldiercloserange': (1.1, 1.1), 'drones': (1.0, 1.15), 'droneg': (1.1, 1.1),
+    'elfsoldierlongrange': (1.1, 1.1), 'nururingtanker_elf': (1.1, 1.1), 'nururingwarrior_elf': (1.1, 1.1), 'nururingarcher_elf': (1.1, 1.1), 'nururingsupporter_elf': (1.1, 1.1),
+    # 유령 늪(45% — 1층 엘리트 패배 1% 안팎)
+    'blanketghost_elite': (1.1, 1.1), 'hatsnail_elite': (1.15, 1.15), 'pumpkin_elite': (1.1, 1.15), 'blanketghost': (1.0, 1.1), 'hatsnail': (1.0, 1.1), 'clone_shady': (1.1, 1.05),
+    'shadyfollowercloserange': (1.05, 1.1), 'shadyfollowerlongrange': (1.0, 1.1), 'nururingtanker_ghost': (1.1, 1.1), 'nururingwarrior_ghost': (1.1, 1.1), 'nururingarcher_ghost': (1.1, 1.1), 'nururingsupporter_ghost': (1.1, 1.1),
+    # 에르피엔(28% — 1층 불효자손 · 폭주 27% · 2층 금고 62%)
+    'magicfork_elite': (0.85, 0.9), 'goldring_elite': (0.8, 0.8), 'fairymobcloserange_elite': (0.9, 0.9),
+    'fairymobcloserange': (1.0, 0.8), 'ginseng_elite': (0.95, 0.95), 'magicfork': (1.0, 0.95), 'buseuleogi': (1.0, 0.9), 'mogmaekim': (1.0, 0.9), 'nururingtanker_fairy': (1.0, 0.9), 'nururingwarrior_fairy': (1.0, 0.9), 'marshmallowtanker': (1.0, 0.9), 'nururingarcher_fairy': (1.0, 0.9), 'marshmallowdealer': (1.0, 0.9), 'fairymoblongrange': (0.95, 0.9),
+    # 정령산(2층 산정 · 열매 직전 묶음 62~64%)
+    'lupalu_elite': (0.9, 0.9), 'oldtree_elite': (0.9, 0.9), 'wisps_elite': (1.1, 1.1),
+    # 용족 동굴(2층 조교 묶음 51% · 창시자 49%)
+    'proteindragon_elite': (1.0, 1.0), 'hatchling_elite': (0.95, 0.95), 'imoogi_elite': (1.15, 1.15), 'golem_elite': (1.15, 1.15),
+    # 수인 부락(1층 엘리트 패배 1% 안팎)
+    'foodscavenger_elite': (1.15, 1.1), 'gluttonbear_elite': (1.2, 1.2), 'furrywarriorcloserange_elite': (1.05, 1.05),
+}
 for k, (hp, dmg) in BAL_ONE.items(): scale(E[k], hp, dmg)
+if REWORK:
+    for k, (hp, dmg) in REWORK_ONE.items(): scale(E[k], hp, dmg)
 
 # ═══════════════════════ 마을 필드 ═══════════════════════
 # pools[세기 약 · 중 · 강][싸움 5] · elites[4] · boss[클론 하나]. 마을 종족 몬스터 + 종족 없는 몬스터를 섞는다.
@@ -589,6 +619,57 @@ F['dragon'] = [
 
 VILL_RACE = {'erpien': '요정', 'furry': '수인', 'ghost': '유령', 'monatium': '엘프', 'spirit': '정령', 'dragon': '용족'}
 
+# ═══════════════════════ 묶음 고치기 — 역할 분담(사용자 2026-10-07 「관통 · 큰 수 · 방해 · 회복은 한 묶음에 하나」) ═══════════════════════
+# 몬스터마다 표지(feats): P 관통(back) · C 큰 수(charge) · D 방해(상태 카드 · 카드 상태 · 손 비용 · AP · 빼앗기 — 죽을 때 것은 뺌) · H 지원(회복 · 적 전체 버프 · 적 전체 실드).
+# 옛 묶음을 앞에서부터 읽어, 앞 몬스터와 표지가 겹치거나 같은 몬스터가 또 나오면(물량 컨셉 SWARM 빼고) 그 층 몬스터 가운데
+# 겹치지 않는 것으로 바꾼다 — 같은 종족 / 종족 없음 쪽 · 같은 줄(앞 · 뒤) · 덜 쓴 것 먼저. 엘리트 줄은 맨 앞 엘리트를 두고 곁을 고친다.
+DISRUPT_T = {'addCard', 'cardDebuff', 'handCost', 'jam', 'seize', 'reshuffle', 'autoPlay'}
+SWARM = {'buseuleogi', 'mogmaekim', 'wisps'}
+def feats(k):
+    e = E[k]; f = set()
+    ins = list(e['intents']) + ([e['open']] if e.get('open') else []) + [i for ph in ('phase', 'phase2') if ph in e for i in e[ph]['intents']]
+    for i in ins:
+        t = i['t']
+        if t == 'charge': f.add('C'); t = i['next']['t']
+        if t == 'back': f.add('P')
+        if t in DISRUPT_T: f.add('D')
+        if t in ('heal', 'guard') or (t == 'buff' and i.get('all')): f.add('H')
+    for p in e.get('passives', []):
+        if p['on'] != 'death' and p['do']['t'] in DISRUPT_T: f.add('D')
+    return f
+LINE_LOG = []
+def fix_lines():
+    for vid, floors in F.items():
+        for fi, fl in enumerate(floors):
+            pool = sorted({x for t in fl['pools'] for l in t for x in l})
+            use = collections.Counter(x for t in fl['pools'] for l in t for x in l)
+            for field in ('pools', 'elites'):
+                lines = [l for t in fl['pools'] for l in t] if field == 'pools' else fl['elites']
+                for l in lines:
+                    old = list(l); new = []
+                    for x in old:
+                        taken = set().union(*[feats(y) for y in new]) if new else set()
+                        if not (feats(x) & taken) and (x not in new or x in SWARM): new.append(x); continue
+                        if field == 'elites' and not new: new.append(x); continue
+                        grp = META[x][1] == '없음'
+                        c = [y for y in pool if not (feats(y) & taken) and y not in new and y != x]
+                        c.sort(key=lambda y: ((META[y][1] == '없음') != grp, E[y].get('row') != E[x].get('row'), use[y], y))
+                        if c: new.append(c[0]); use[c[0]] += 1; use[x] -= 1
+                    if new != old: LINE_LOG.append(f'{vid} {fi + 1}층 {field}: {"+".join(old)} → {"+".join(new)}')
+                    l[:] = new
+if REWORK: fix_lines()
+# 2층 엘리트 묶음 가운데 패배 50% 넘는 셋짜리는 곁 하나를 뺀다(지침 §5 · 리워크 뒤 4,500판 × 씨앗 0 · 1 — _measure/적_리워크_전체.md).
+TRIM = [('dragon', 'golem_elite+crayonwizard+hatchling', 'hatchling'), ('dragon', 'proteindragon_elite+hatchling+crayonwarrior', 'crayonwarrior'),
+        ('erpien', 'goldring_elite+fairymobcloserange+buseuleogi', 'buseuleogi'), ('furry', 'furring_elite+nururingtanker_furry+furrywarriorlongrange', 'nururingtanker_furry'),
+        ('ghost', 'shadyfollowercloserange_elite+pumpkin+shadyfollowerlongrange', 'shadyfollowerlongrange'),
+        ('monatium', 'droneg_elite+elfsoldiercloserange+drones', 'drones'), ('monatium', 'elfsoldierlongrange_elite+elfsoldiercloserange+drones', 'drones'),
+        ('spirit', 'lupalu_elite+wisps+oldtree', 'wisps'), ('spirit', 'oldtree_elite+lupalu+wisps', 'lupalu'), ('spirit', 'wisps_elite+pumpkin+lupalu', 'lupalu')]
+if REWORK:
+    for vid, line, drop in TRIM:
+        hit = [l for l in F[vid][1]['elites'] if '+'.join(l) == line]
+        assert len(hit) == 1, (vid, line)
+        hit[0].remove(drop); LINE_LOG.append(f'{vid} 2층 elites: {line} → {"+".join(hit[0])}(곁 하나 뺌)')
+
 # ── 검사(쓰기 전) ──
 errs = []
 used = collections.defaultdict(set)
@@ -613,6 +694,17 @@ for k, e in E.items():
     if g == '일반' and t < 3: errs.append(f'{k}: 일반 강인도 {t} < 3')
     if g == '엘리트' and t < 5: errs.append(f'{k}: 엘리트 강인도 {t} < 5')
     if g == '보스' and t < 7: errs.append(f'{k}: 보스 강인도 {t} < 7')
+# 역할 분담 검사(리워크 뒤) — 한 묶음에 같은 표지 둘 · 같은 몬스터 둘(물량 빼고)이면 오류
+if REWORK:
+    for vid, floors in F.items():
+        for fi, fl in enumerate(floors):
+            for l in [l for t in fl['pools'] for l in t] + fl['elites']:
+                fs = [feats(x) for x in l]
+                for tag in 'PCDH':
+                    if sum(tag in f for f in fs) > 1: errs.append(f'{vid} {fi + 1}층 {"+".join(l)}: 표지 {tag} 둘')
+                if any(l.count(x) > 1 and x not in SWARM for x in l): errs.append(f'{vid} {fi + 1}층 {"+".join(l)}: 같은 몬스터 둘')
+                if len(l) < 2: errs.append(f'{vid} {fi + 1}층 {l}: 몬스터 하나')
+    print(f'묶음 고침 {len(LINE_LOG)}')
 if errs:
     print('\n'.join(errs)); sys.exit(1)
 

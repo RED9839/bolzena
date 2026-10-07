@@ -13,91 +13,46 @@
       "crit": 5,
       "blurb": "은의 용족 공녀. 무례한 손님에게 티파티 초대장을 건네 모두가 노릴 과녁으로 세우고, 그 손님이 손을 올리기 직전 부채로 손등을 탁 칩니다. 동료가 손님을 칠 때마다 다과회의 흐름이 빨라집니다.",
       "keyword": {
-        "name": "티파티 초대장",
-        "desc": "한 번에 한 적에게 보내는 초대장",
-        "carrier": "enemy",
-        "cap": 1,
-        "hunt": true,
-        "per": [
-          {
-            "stat": "taken",
-            "v": 0.2
-          }
-        ],
-        "rules": [
-          {
-            "name": "어머니의 특별 강의",
-            "when": {
-              "on": "hit",
-              "who": "other"
-            },
-            "conds": [
-              {
-                "c": "stack",
-                "id": "티파티 초대장",
-                "n": 1
-              }
-            ],
-            "limit": {
-              "per": "turn",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "gauge",
-                "v": 10
-              }
-            ]
-          }
-        ]
+        "name": "초청객",
+        "desc": "은석의 티파티에 들인 손님",
+        "carrier": "hero",
+        "cap": 1
       },
       "passives": [
         {
-          "name": "숙녀의 접대",
+          "name": "그 어머니에 그 딸",
           "when": {
-            "on": "foeActBefore",
-            "type": "공격"
+            "on": "play",
+            "marked": "초청객",
+            "type": "스킬"
           },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "티파티 초대장",
-              "n": 1
-            }
-          ],
           "limit": {
             "per": "turn",
             "n": 2
           },
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
+              "ratio": 0.3,
+              "base": "def",
+              "target": "randomEnemy"
             }
           ]
         },
         {
-          "name": "다음 손님",
+          "name": "어머니의 특별 강의",
           "when": {
-            "on": "huntDown"
+            "on": "lowHp",
+            "pct": 0.4
           },
           "fx": [
             {
-              "k": "nextCheaper",
+              "k": "cleanse",
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "티파티 초대장",
-              "v": 1,
-              "target": "topEnemy"
+              "k": "shield",
+              "ratio": 2.5
             }
           ]
         }
@@ -131,7 +86,7 @@
         "실비아_s1",
         "실비아_s1",
         "실비아_s2",
-        "실비아_s2"
+        "실비아_u1"
       ]
     }
   ],
@@ -173,9 +128,9 @@
       "fx": [
         {
           "k": "stack",
-          "id": "티파티 초대장",
+          "id": "초청객",
           "v": 1,
-          "target": "oneEnemy"
+          "target": "oneAlly"
         },
         {
           "k": "shield",
@@ -184,91 +139,92 @@
       ],
       "oracles": [
         {
-          "name": "은빛 티파티",
-          "cost": 0,
+          "name": "금박 초대장",
           "fx": [
             {
               "k": "stack",
-              "id": "티파티 초대장",
+              "id": "초청객",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "oneAlly"
             },
             {
               "k": "shield",
-              "ratio": 1.4
+              "ratio": 1.9
             }
           ]
         },
         {
-          "name": "진은의 대공",
+          "name": "모두 모여라",
           "fx": [
             {
               "k": "stack",
-              "id": "티파티 초대장",
+              "id": "초청객",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allAllies"
             },
             {
               "k": "shield",
-              "ratio": 2
+              "ratio": 1.89
             }
           ]
         },
         {
-          "name": "손님은 보호받고",
+          "name": "외로움은 싫어",
           "fx": [
             {
               "k": "stack",
-              "id": "티파티 초대장",
+              "id": "초청객",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "oneAlly"
             },
             {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 1.58
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.08
             }
           ]
         },
         {
-          "name": "무례한 자들은",
+          "name": "결투 장갑",
           "fx": [
             {
               "k": "stack",
-              "id": "티파티 초대장",
+              "id": "초청객",
               "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.89,
+              "base": "def",
               "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.5
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
             }
           ]
         },
         {
-          "name": "차 한 잔",
-          "tags": [
-            "개전"
-          ],
+          "name": "초대 명단",
           "fx": [
             {
               "k": "stack",
-              "id": "티파티 초대장",
+              "id": "초청객",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "oneAlly"
             },
             {
               "k": "shield",
-              "ratio": 1.6
+              "ratio": 1.26
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "스킬"
             }
           ]
         }
@@ -279,18 +235,21 @@
           "kind": "guard"
         },
         {
-          "name": "찻잔",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
+          "name": "세바스티안 인형",
+          "tags": [
+            "보존"
           ]
         },
         {
-          "name": "은방울",
-          "kind": "draw"
+          "name": "오호호",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
         }
       ]
     },
@@ -303,112 +262,159 @@
       "type": "스킬",
       "fx": [
         {
+          "k": "stack",
+          "id": "초청객",
+          "v": 1,
+          "target": "allAllies"
+        },
+        {
           "k": "shield",
-          "ratio": 2.5
+          "ratio": 2.3
         },
         {
           "k": "status",
-          "id": "반격",
-          "v": 2
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "가벼운 유희",
+          "name": "완벽한 티타임",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "초청객",
+              "v": 1,
+              "target": "allAllies"
+            },
+            {
+              "k": "shield",
+              "ratio": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "간단한 다과",
           "cost": 1,
           "fx": [
             {
+              "k": "stack",
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 1.61
             },
             {
               "k": "status",
-              "id": "반격",
-              "v": 2
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "은빛 무도회",
+          "name": "진은의 대공",
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.6
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "맨 앞 막아서기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.5
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "숙녀의 여흥",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.8
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
             {
               "k": "stack",
-              "id": "티파티 초대장",
+              "id": "초청객",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allAllies"
+            },
+            {
+              "k": "heal",
+              "ratio": 3.52
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "끝나지 않는 연회",
-          "cost": 3,
+          "name": "소녀의 단아한 발걸음",
+          "tags": [
+            "종극"
+          ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 4
+              "ratio": 2.76
             },
             {
               "k": "status",
-              "id": "반격",
-              "v": 4
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.57,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "매일 티타임",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "초청객",
+              "v": 1,
+              "target": "allAllies"
+            },
+            {
+              "k": "shield",
+              "ratio": 3.01
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.52
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "세바스티안 인형",
-          "kind": "guard"
+          "name": "은분수",
+          "kind": "heal"
         },
         {
-          "name": "단아한 발걸음",
-          "tags": [
-            "보존"
-          ]
+          "name": "찻잔 세트",
+          "kind": "ap"
         },
         {
-          "name": "빵빵한 볼",
+          "name": "은방울",
           "fx": [
             {
               "k": "status",
-              "id": "반격",
+              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -425,122 +431,123 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
-          "target": "oneEnemy",
-          "base": "def"
-        },
-        {
-          "k": "ifStack",
-          "id": "티파티 초대장",
-          "n": 1
+          "ratio": 0.57,
+          "base": "def",
+          "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "약화",
-          "v": 1
+          "v": 2,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "탁",
-          "cost": 0,
+          "name": "따끔한 꾸중",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "티파티 초대장",
-              "n": 1
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "장갑 던지기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "stack",
-              "id": "티파티 초대장",
-              "v": 1,
+              "ratio": 0.75,
+              "base": "def",
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "손등을 탁",
+          "name": "꼬마라고 했죠?",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "ifStack",
-              "id": "티파티 초대장",
-              "n": 1
+              "ratio": 0.59,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "숙녀의 꾸중",
+          "name": "찻잔 깨기",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "부채질",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies",
-              "base": "def"
-            },
-            {
-              "k": "status",
-              "id": "약화",
+              "k": "stack",
+              "id": "초청객",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneAlly"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.86
+            }
+          ]
+        },
+        {
+          "name": "체육관의 유망주",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "잔소리 폭탄",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.03,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -551,15 +558,15 @@
           "kind": "power"
         },
         {
-          "name": "꾸짖음",
-          "kind": "frost"
+          "name": "볼 빵빵",
+          "kind": "draw"
         },
         {
-          "name": "체육관 유망주",
+          "name": "잔기침",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 0.4
             }
           ]
         }
@@ -583,8 +590,9 @@
           "rules": [
             {
               "when": {
-                "on": "foeActBefore",
-                "type": "공격"
+                "on": "play",
+                "marked": "초청객",
+                "type": "스킬"
               },
               "limit": {
                 "per": "turn",
@@ -593,7 +601,7 @@
               "fx": [
                 {
                   "k": "shield",
-                  "ratio": 0.3
+                  "ratio": 0.35
                 }
               ]
             }
@@ -602,20 +610,25 @@
       ],
       "oracles": [
         {
-          "name": "청소 대작전",
+          "name": "성대한 티파티",
           "fx": [
             {
               "k": "status",
               "id": "결의",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.69
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "foeActBefore",
-                    "type": "공격"
+                    "on": "play",
+                    "marked": "초청객",
+                    "type": "스킬"
                   },
                   "limit": {
                     "per": "turn",
@@ -624,7 +637,79 @@
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 0.3
+                      "ratio": 0.35
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "초대장 대량 발송",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "초청객",
+              "v": 1,
+              "target": "allAllies"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.57
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "초청객",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "오후의 티타임",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "초청객",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.35
                     }
                   ]
                 }
@@ -641,17 +726,17 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.57
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "foeActBefore",
-                    "type": "공격"
+                    "on": "play",
+                    "marked": "초청객",
+                    "type": "스킬"
                   },
                   "limit": {
                     "per": "turn",
@@ -660,7 +745,7 @@
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 0.3
+                      "ratio": 0.35
                     }
                   ]
                 }
@@ -669,7 +754,7 @@
           ]
         },
         {
-          "name": "그 어머니에 그 딸",
+          "name": "작은 다과회",
           "fx": [
             {
               "k": "status",
@@ -677,57 +762,19 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "foeActBefore",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "초대 명단",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "티파티 초대장",
+              "k": "draw",
               "v": 1,
-              "target": "oneEnemy"
+              "who": "other",
+              "type": "스킬"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "foeActBefore",
-                    "type": "공격"
+                    "on": "play",
+                    "marked": "초청객",
+                    "type": "스킬"
                   },
                   "limit": {
                     "per": "turn",
@@ -736,34 +783,7 @@
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "각설탕",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "foeActBefore",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.5
+                      "ratio": 0.35
                     }
                   ]
                 }
@@ -774,27 +794,21 @@
       ],
       "blesses": [
         {
-          "name": "티세트",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
-            }
-          ]
+          "name": "어머니와 딸",
+          "kind": "defUp"
         },
         {
-          "name": "초대 손님 명부",
-          "tags": [
-            "개전"
-          ]
+          "name": "은 찻주전자",
+          "kind": "cost"
         },
         {
-          "name": "은분수",
+          "name": "각설탕",
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "stack",
+              "id": "초청객",
+              "v": 1,
+              "target": "allAllies"
             }
           ]
         }

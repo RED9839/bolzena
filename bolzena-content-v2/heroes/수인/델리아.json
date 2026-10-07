@@ -13,31 +13,57 @@
       "crit": 10,
       "blurb": "언니 그윈을 따라 엘리아스 수인 마을에 자리 잡은 꼬마 펭귄.",
       "keyword": {
-        "name": "미끄럼",
-        "desc": "격파로 모으는 미끄럼 돌진",
-        "carrier": "self",
-        "cap": 3
+        "name": "수족열증",
+        "desc": "발끝부터 화끈거리는 열",
+        "carrier": "enemy",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dot",
+            "ratio": 0.1
+          },
+          {
+            "stat": "taken",
+            "v": 0.06,
+            "from": "owner"
+          }
+        ]
       },
       "passives": [
         {
-          "name": "필살 미끄럼 돌진",
+          "name": "펭귄 탐험대",
           "when": {
-            "on": "break",
-            "mine": true
+            "on": "play",
+            "type": "공격",
+            "who": "other"
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 1
           },
           "fx": [
             {
-              "k": "extra",
-              "ratio": 0.8,
-              "target": "randomEnemy"
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "이글루 도망",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.5
+          },
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "미끄럼",
+              "k": "status",
+              "id": "피해 감소",
               "v": 1
             }
           ]
@@ -59,14 +85,14 @@
           },
           {
             "k": "stack",
-            "id": "미끄럼",
+            "id": "수족열증",
             "v": 1
           }
         ]
       },
       "starter": [
         "델리아_s1",
-        "델리아_s1",
+        "델리아_u1",
         "델리아_s2",
         "델리아_s3"
       ]
@@ -124,12 +150,14 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.1,
-          "target": "oneEnemy"
+          "ratio": 0.34,
+          "target": "allEnemies"
         },
         {
-          "k": "tough",
-          "v": 1
+          "k": "stack",
+          "id": "수족열증",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
@@ -138,12 +166,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
+              "ratio": 0.53,
+              "target": "allEnemies"
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -153,61 +183,82 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 0.5
-            }
-          ]
-        },
-        {
-          "name": "미끄러지며 박치기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "뒤뚱 회오리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 0.33,
               "target": "allEnemies"
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "겁쟁이 대장",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.45
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.97
+            }
+          ]
+        },
+        {
+          "name": "날아차기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.98,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "수족열증",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "분노 폭발",
-          "cost": 2,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.0,
-              "target": "oneEnemy",
-              "hits": 3
+              "k": "discard",
+              "v": 1
             },
             {
-              "k": "tough",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.66,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 2,
+              "target": "allEnemies"
             }
           ]
         }
@@ -219,11 +270,18 @@
         },
         {
           "name": "차가운 눈초리",
-          "kind": "frost"
+          "kind": "weakSpot"
         },
         {
           "name": "씩씩거림",
-          "kind": "atkUp"
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -237,12 +295,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 1
-        },
-        {
-          "k": "stack",
-          "id": "미끄럼",
-          "v": 2
+          "ratio": 0.98
         },
         {
           "k": "draw",
@@ -255,12 +308,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.7
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 2
+              "ratio": 1.31
             },
             {
               "k": "draw",
@@ -274,48 +322,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.6
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "민초 썰매",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.0
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "나눠 먹자",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.0
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "ratio": 0.74
             },
             {
               "k": "draw",
@@ -325,22 +332,67 @@
         },
         {
           "name": "민초 도시락",
-          "tags": [
-            "보존"
-          ],
+          "power": true,
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.2
-            },
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 2
+              "ratio": 0.66
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.41
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "민초 던지기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.66,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "가방 뒤적이기",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.07
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -351,16 +403,17 @@
           "kind": "heal"
         },
         {
-          "name": "가방 뒤적이기",
-          "kind": "draw"
+          "name": "탐험대장 배지",
+          "kind": "ap"
         },
         {
-          "name": "얼음판 닦기",
+          "name": "입가의 민초",
           "fx": [
             {
               "k": "stack",
-              "id": "미끄럼",
-              "v": 1
+              "id": "수족열증",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -376,45 +429,45 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.6,
+          "ratio": 1.23,
           "target": "oneEnemy"
         },
         {
           "k": "perStack",
-          "id": "미끄럼"
+          "id": "수족열증"
         },
         {
           "k": "dmg",
-          "ratio": 0.5,
-          "target": "allEnemies"
+          "ratio": 0.29,
+          "target": "oneEnemy"
         },
         {
           "k": "spend",
-          "id": "미끄럼",
+          "id": "수족열증",
           "all": true
         }
       ],
       "oracles": [
         {
-          "name": "얼음집 무너뜨리기",
+          "name": "대왕 배치기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.0,
+              "ratio": 1.56,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "미끄럼"
+              "id": "수족열증"
             },
             {
               "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies"
+              "ratio": 0.37,
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
-              "id": "미끄럼",
+              "id": "수족열증",
               "all": true
             }
           ]
@@ -425,90 +478,94 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 0.9,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "미끄럼"
+              "id": "수족열증"
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
+              "ratio": 0.26,
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
-              "id": "미끄럼",
+              "id": "수족열증",
               "all": true
             }
           ]
         },
         {
-          "name": "미끄럼 아껴 두기",
+          "name": "반피 이글루",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
+              "ratio": 1.31,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "미끄럼"
+              "id": "수족열증"
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.33,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.31
+            }
+          ]
+        },
+        {
+          "name": "뒤뚱 회오리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "수족열증",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "이글루 통째로",
+          "name": "이글루 한 채",
+          "tags": [
+            "소멸"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "미끄럼"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "미끄럼",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "대왕 배치기",
-          "cost": 3,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.0,
+              "ratio": 2.95,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "미끄럼"
+              "id": "수족열증"
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
+              "ratio": 0.74,
+              "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "미끄럼",
-              "all": true
+              "k": "tough",
+              "v": 1
             }
           ]
         }
@@ -519,12 +576,19 @@
           "kind": "power"
         },
         {
-          "name": "틈새 노리기",
-          "kind": "weakSpot"
+          "name": "도움닫기",
+          "kind": "ap"
         },
         {
-          "name": "도움닫기",
-          "kind": "cost"
+          "name": "열 오른 배",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -534,29 +598,23 @@
       "hero": "델리아",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "공격",
       "fx": [
         {
-          "k": "status",
-          "id": "잔광",
-          "v": 2
+          "k": "stack",
+          "id": "수족열증",
+          "v": 1,
+          "target": "allEnemies"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "미끄럼",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "perStack",
+          "id": "수족열증",
+          "each": true
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.15,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
@@ -564,47 +622,30 @@
           "name": "눈썰매 질주",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "미끄럼",
-                      "v": 2
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "break",
-                    "mine": true
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "수족열증",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "졸린 눈",
-          "cost": 0,
+          "name": "탐험대 출발",
+          "power": true,
           "fx": [
             {
-              "k": "draw",
+              "k": "status",
+              "id": "사기",
               "v": 1
             },
             {
@@ -612,13 +653,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "turnEnd"
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "미끄럼",
-                      "v": 1
+                      "k": "perStack",
+                      "id": "수족열증",
+                      "each": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.12,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -627,34 +673,53 @@
           ]
         },
         {
-          "name": "빙판 위로",
+          "name": "베스트 프렌드",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수족열증"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "draw",
               "v": 2
+            }
+          ]
+        },
+        {
+          "name": "설원의 아침",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "stack",
-              "id": "미끄럼",
-              "v": 2
+              "id": "수족열증",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "미끄럼",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "수족열증",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies"
             }
           ]
         },
@@ -662,86 +727,44 @@
           "name": "탐험 장비",
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
-              "v": 3
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "수족열증",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "미끄럼",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "설원의 아침",
-          "tags": [
-            "축복"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "미끄럼",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "벌떡 일어나기",
-          "kind": "cost"
-        },
-        {
-          "name": "탐험 짐 챙기기",
-          "kind": "draw"
+          "name": "펭귄 탐험대 깃발",
+          "kind": "atkUp"
         },
         {
           "name": "첫 미끄럼",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "미끄럼",
-              "v": 1
-            }
+          "tags": [
+            "개전"
           ]
+        },
+        {
+          "name": "탐험대 구호",
+          "kind": "draw"
         }
       ]
     }

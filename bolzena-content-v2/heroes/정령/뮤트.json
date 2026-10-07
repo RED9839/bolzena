@@ -1,932 +1,793 @@
 {
- "heroes": [
-  {
-   "id": "뮤트",
-   "name": "뮤트",
-   "nature": "순수",
-   "role": "서포터",
-   "star": 3,
-   "hp": 500,
-   "atk": 86,
-   "def": 58,
-   "crit": 5,
-   "blurb": "나타와 뒤섞여 머릿속에서 늘 회의 중. 턴의 첫 카드가 공격이면 뮤트가 의장이 되어 공격마다 적을 「홀로그램」 그물로 감아 지지고, 스킬이면 나타가 의장이 되어 파티를 지킵니다.",
-   "keywords": [
+  "heroes": [
     {
-     "name": "뮤트 의장",
-     "desc": "뮤트가 이끄는 회의",
-     "carrier": "self",
-     "cap": 1,
-     "endClear": true,
-     "rules": [
-      {
-       "name": "뮤트 의장",
-       "when": {
-        "on": "play",
-        "who": "any",
-        "nth": 1,
-        "type": "공격"
-       },
-       "fx": [
+      "id": "뮤트",
+      "name": "뮤트",
+      "nature": "순수",
+      "role": "서포터",
+      "star": 3,
+      "hp": 500,
+      "atk": 86,
+      "def": 58,
+      "crit": 5,
+      "blurb": "나타와 뒤섞여 머릿속에서 늘 회의 중. 턴의 첫 카드가 공격이면 뮤트가 의장이 되어 공격마다 적을 「홀로그램」 그물로 감아 지지고, 스킬이면 나타가 의장이 되어 파티를 지킵니다.",
+      "passives": [
         {
-         "k": "stack",
-         "id": "뮤트 의장",
-         "v": 1
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "나타 의장",
-     "desc": "나타가 이끄는 회의",
-     "carrier": "self",
-     "cap": 1,
-     "endClear": true,
-     "rules": [
-      {
-       "name": "나타 의장",
-       "when": {
-        "on": "play",
-        "who": "any",
-        "nth": 1,
-        "type": "스킬"
-       },
-       "fx": [
-        {
-         "k": "stack",
-         "id": "나타 의장",
-         "v": 1
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "홀로그램",
-     "desc": "표적을 에워싸는 홀로그램 그물",
-     "carrier": "enemy",
-     "cap": 6,
-     "per": [
-      {
-       "stat": "dot",
-       "ratio": 0.15
-      }
-     ],
-     "rules": [
-      {
-       "name": "에러 메시지",
-       "when": {
-        "on": "stackReach",
-        "id": "홀로그램",
-        "n": 6
-       },
-       "fx": [
-        {
-         "k": "spend",
-         "id": "홀로그램",
-         "all": true
+          "name": "웹트래핑",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "topEnemy"
+            }
+          ]
         },
         {
-         "k": "dmg",
-         "ratio": 1.5,
-         "target": "oneEnemy"
+          "name": "SP 주유",
+          "when": {
+            "on": "play",
+            "who": "any",
+            "nth": 4
+          },
+          "fx": [
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "기초적인 해킹",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "status",
+            "id": "취약",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "홀로그램",
+            "v": 3,
+            "target": "allEnemies"
+          },
+          {
+            "k": "ap",
+            "v": 2
+          },
+          {
+            "k": "draw",
+            "v": 1
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "뮤트_s1",
+        "뮤트_s1",
+        "뮤트_s2",
+        "뮤트_u1"
+      ],
+      "keyword": {
+        "name": "홀로그램",
+        "desc": "표적을 에워싸는 홀로그램 그물",
+        "carrier": "enemy",
+        "cap": 6,
+        "per": [
+          {
+            "stat": "dot",
+            "ratio": 0.15
+          }
+        ],
+        "rules": [
+          {
+            "name": "에러 메시지",
+            "when": {
+              "on": "stackReach",
+              "id": "홀로그램",
+              "n": 6
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "홀로그램",
+                "all": true
+              },
+              {
+                "k": "dmg",
+                "ratio": 1.6,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "status",
+                "id": "취약",
+                "v": 2,
+                "target": "oneEnemy"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "cards": [
+    {
+      "id": "뮤트_s1",
+      "name": "데이터 스트림",
+      "hero": "뮤트",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "뮤트_s2",
+      "name": "나타의 복구 코드",
+      "hero": "뮤트",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.2
+        }
+      ]
+    },
+    {
+      "id": "뮤트_u1",
+      "name": "웹트래핑",
+      "hero": "뮤트",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "홀로그램",
+          "v": 3,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "9중 포위",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 5,
+              "target": "oneEnemy"
+            }
+          ]
         },
         {
-         "k": "status",
-         "id": "취약",
-         "v": 2,
-         "target": "oneEnemy"
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "passives": [
-    {
-     "name": "뮤트의 발언",
-     "when": {
-      "on": "play",
-      "type": "공격"
-     },
-     "conds": [
-      {
-       "c": "stack",
-       "id": "뮤트 의장",
-       "n": 1
-      }
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "홀로그램",
-       "v": 3,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "나타의 발언",
-     "when": {
-      "on": "play"
-     },
-     "conds": [
-      {
-       "c": "stack",
-       "id": "나타 의장",
-       "n": 1
-      }
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "ult": {
-    "name": "기초적인 해킹",
-    "cost": 250,
-    "fx": [
-     {
-      "k": "status",
-      "id": "취약",
-      "v": 2,
-      "target": "allEnemies"
-     },
-     {
-      "k": "stack",
-      "id": "홀로그램",
-      "v": 3,
-      "target": "allEnemies"
-     },
-     {
-      "k": "ap",
-      "v": 2
-     },
-     {
-      "k": "draw",
-      "v": 1
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "뮤트_s1",
-    "뮤트_s1",
-    "뮤트_s2",
-    "뮤트_s2"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "뮤트_s1",
-   "name": "데이터 스트림",
-   "hero": "뮤트",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "뮤트_s2",
-   "name": "나타의 복구 코드",
-   "hero": "뮤트",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "heal",
-     "ratio": 1.2
-    }
-   ]
-  },
-  {
-   "id": "뮤트_u1",
-   "name": "안건 상정",
-   "hero": "뮤트",
-   "unique": true,
-   "cost": 0,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "draw",
-     "v": 1
-    },
-    {
-     "k": "ifStack",
-     "id": "뮤트 의장"
-    },
-    {
-     "k": "status",
-     "id": "취약",
-     "v": 1,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "ifStack",
-     "id": "나타 의장"
-    },
-    {
-     "k": "shield",
-     "ratio": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "긴급 안건",
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "shield",
-       "ratio": 1
-      }
-     ]
-    },
-    {
-     "name": "강한 반대",
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.5
-      }
-     ]
-    },
-    {
-     "name": "회의록",
-     "tags": [
-      "보존",
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "shield",
-       "ratio": 1
-      }
-     ]
-    },
-    {
-     "name": "의사봉",
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "shield",
-       "ratio": 1.4
-      }
-     ]
-    },
-    {
-     "name": "나타의 수정안",
-     "fx": [
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "빠른 결론",
-     "kind": "draw"
-    },
-    {
-     "name": "든든한 의견",
-     "kind": "guard"
-    },
-    {
-     "name": "사전 협의",
-     "tags": [
-      "개전"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "뮤트_u2",
-   "name": "강제 종료",
-   "hero": "뮤트",
-   "unique": true,
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.0,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "홀로그램",
-     "v": 2,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "ifStack",
-     "id": "뮤트 의장"
-    },
-    {
-     "k": "status",
-     "id": "취약",
-     "v": 2,
-     "target": "oneEnemy"
-    }
-   ],
-   "oracles": [
-    {
-     "name": "전원 차단",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.6,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "홀로그램",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "재부팅",
-     "cost": 1,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.5,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "홀로그램",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "블루스크린",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.0,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "홀로그램",
-       "v": 4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    },
-    {
-     "name": "과부하",
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.0,
-       "target": "allEnemies"
-      },
-      {
-       "k": "stack",
-       "id": "홀로그램",
-       "v": 1,
-       "target": "allEnemies"
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "allEnemies"
-      }
-     ]
-    },
-    {
-     "name": "작업 관리자",
-     "tags": [
-      "보존"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 2.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "홀로그램",
-       "v": 2,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "ifStack",
-       "id": "뮤트 의장"
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "강제 입력",
-     "kind": "power"
-    },
-    {
-     "name": "빠른 단축키",
-     "kind": "cost"
-    },
-    {
-     "name": "취약점 공략",
-     "kind": "weakSpot"
-    }
-   ]
-  },
-  {
-   "id": "뮤트_u3",
-   "name": "방화벽",
-   "hero": "뮤트",
-   "unique": true,
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 1.8
-    },
-    {
-     "k": "ifStack",
-     "id": "나타 의장"
-    },
-    {
-     "k": "status",
-     "id": "피해 감소",
-     "v": 2
-    }
-   ],
-   "oracles": [
-    {
-     "name": "이중 방화벽",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2.43
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "백신",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1.8
-      },
-      {
-       "k": "cleanse",
-       "v": 1
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "복구 지점",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1.8
-      },
-      {
-       "k": "heal",
-       "ratio": 0.8
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "보안 패치",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 1.6
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "철벽 서버",
-     "fx": [
-      {
-       "k": "shield",
-       "ratio": 2
-      },
-      {
-       "k": "status",
-       "id": "실드 유지",
-       "v": 1
-      },
-      {
-       "k": "ifStack",
-       "id": "나타 의장"
-      },
-      {
-       "k": "status",
-       "id": "피해 감소",
-       "v": 2
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "튼튼한 코드",
-     "kind": "guard"
-    },
-    {
-     "name": "자동 저장",
-     "kind": "draw"
-    },
-    {
-     "name": "가벼운 패치",
-     "kind": "cost"
-    }
-   ]
-  },
-  {
-   "id": "뮤트_u4",
-   "name": "만장일치",
-   "hero": "뮤트",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "status",
-     "id": "사기",
-     "v": 1
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnEnd"
-       },
-       "fx": [
+          "name": "성공률 계산",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
         {
-         "k": "status",
-         "id": "취약",
-         "v": 1,
-         "target": "allEnemies"
+          "name": "다크넷 관찰",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "홀로그램 변장",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 4,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "데이터 덤프",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ],
+      "blesses": [
+        {
+          "name": "데이터 분석",
+          "kind": "draw"
+        },
+        {
+          "name": "확률 맹신",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "규칙과 학습",
+          "tags": [
+            "보존"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "뮤트_u2",
+      "name": "강제 종료",
+      "hero": "뮤트",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "홀로그램"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.15,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "홀로그램",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "강제 포맷",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "홀로그램",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "시스템 다운",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "홀로그램",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "싸늘한 말투",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.98,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "일괄 종료",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.57,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.09,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "침묵",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "오버클럭",
+          "kind": "power"
+        },
+        {
+          "name": "취약점 공격",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "빠른 실행",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "뮤트_u3",
+      "name": "와이어 함정",
+      "hero": "뮤트",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "홀로그램",
+          "v": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "정밀 와이어",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "와이어 그물",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "기본 공격 감지",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "홀로그램",
+              "n": 5
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "나타의 손",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "물이 무서워",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.65
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "강철 와이어",
+          "kind": "power"
+        },
+        {
+          "name": "엉킨 실",
+          "kind": "frost"
+        },
+        {
+          "name": "실뜨기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "뮤트_u4",
+      "name": "뮤트의 뜻대로",
+      "hero": "뮤트",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "홀로그램",
+                  "v": 1,
+                  "target": "topEnemy"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "완전한 평화",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 2,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "실뜨기 전문가",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "홀로그램",
+                    "n": 6
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "언젠가 우리",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "한 시간 연설",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "교단 쪽 첩보",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "엘레나와 함께",
+          "kind": "atkUp"
+        },
+        {
+          "name": "산들바람",
+          "kind": "defUp"
+        },
+        {
+          "name": "규칙 준수",
+          "kind": "ap"
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "완벽한 합의",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnEnd"
-         },
-         "fx": [
-          {
-           "k": "status",
-           "id": "취약",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "빠른 표결",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnEnd"
-         },
-         "fx": [
-          {
-           "k": "status",
-           "id": "취약",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "두 자아의 화해",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "면역",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnEnd"
-         },
-         "fx": [
-          {
-           "k": "status",
-           "id": "취약",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "합동 연설",
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 2,
-       "target": "allEnemies"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnEnd"
-         },
-         "fx": [
-          {
-           "k": "status",
-           "id": "취약",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "첫 안건",
-     "tags": [
-      "개막"
-     ],
-     "fx": [
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      },
-      {
-       "k": "stack",
-       "id": "뮤트 의장",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnEnd"
-         },
-         "fx": [
-          {
-           "k": "status",
-           "id": "취약",
-           "v": 1,
-           "target": "allEnemies"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "날카로운 논리",
-     "kind": "atkUp"
-    },
-    {
-     "name": "차분한 목소리",
-     "kind": "defUp"
-    },
-    {
-     "name": "짧은 회의",
-     "kind": "cost"
-    }
-   ]
-  }
- ]
+  ]
 }

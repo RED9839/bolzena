@@ -13,36 +13,29 @@
       "crit": 10,
       "blurb": "모든 것에 「히익」 떠는 겁쟁이. 적이 움직일 때마다 놀라 전기가 차오르고, 다음 한 방에 몽땅 지져 버립니다. 비명에 놀란 적들은 걸음까지 늦어집니다.",
       "keyword": {
-        "name": "충전",
-        "desc": "적이 움직일 때 차는 전기",
+        "name": "히익 전류",
+        "desc": "겁먹을 때마다 차오르는 전기",
         "carrier": "self",
         "cap": 3,
-        "consumeAll": true,
-        "per": [
-          {
-            "stat": "dealt",
-            "v": 0.2
-          }
-        ],
         "rules": [
           {
             "name": "과충전",
             "when": {
               "on": "stackReach",
-              "id": "충전",
+              "id": "히익 전류",
               "n": 3
             },
             "fx": [
               {
-                "k": "dmg",
-                "ratio": 0.7,
-                "target": "oneEnemy"
+                "k": "spend",
+                "id": "히익 전류",
+                "all": true
               },
               {
                 "k": "status",
                 "id": "약화",
                 "v": 1,
-                "target": "oneEnemy"
+                "target": "randomEnemy"
               }
             ]
           }
@@ -52,12 +45,36 @@
         {
           "name": "히익!",
           "when": {
-            "on": "foeAct"
+            "on": "play",
+            "who": "other",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
           "fx": [
             {
               "k": "stack",
-              "id": "충전",
+              "id": "히익 전류",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "유령 잡는 엘프",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "fight",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "히익 전류",
               "v": 1
             }
           ]
@@ -69,12 +86,12 @@
         "fx": [
           {
             "k": "stack",
-            "id": "충전",
+            "id": "히익 전류",
             "v": 3
           },
           {
             "k": "dmg",
-            "ratio": 1.0,
+            "ratio": 1,
             "target": "allEnemies"
           },
           {
@@ -92,7 +109,7 @@
       },
       "starter": [
         "캐시_s1",
-        "캐시_s1",
+        "캐시_u2",
         "캐시_s2",
         "캐시_s3"
       ]
@@ -145,142 +162,156 @@
       "name": "바삭 지짐이",
       "hero": "캐시",
       "unique": true,
-      "signature": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.6,
+          "ratio": 0.55,
           "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "히익 전류"
         },
         {
           "k": "dmg",
-          "ratio": 0.4,
-          "hits": 2,
-          "target": "randomEnemy"
+          "ratio": 0.24,
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "취약",
-          "v": 1,
-          "target": "oneEnemy"
+          "k": "spend",
+          "id": "히익 전류",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "셋에 못 미치면",
+          "name": "풀파워 지짐이",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.08,
+              "ratio": 0.87,
               "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "히익 전류"
             },
             {
               "k": "dmg",
-              "ratio": 0.52,
-              "hits": 2,
-              "target": "randomEnemy"
+              "ratio": 0.37,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "spend",
+              "id": "히익 전류",
+              "all": true
             }
           ]
         },
         {
-          "name": "세 갈래 연쇄",
-          "tags": [
-            "보존"
-          ],
+          "name": "찌릿",
+          "cost": 0,
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.92,
-              "target": "oneEnemy"
-            },
             {
               "k": "dmg",
               "ratio": 0.48,
-              "hits": 2,
-              "target": "randomEnemy"
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
+              "k": "perStack",
+              "id": "히익 전류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
               "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "히익 전류",
+              "all": true
             }
           ]
         },
         {
-          "name": "캐시가방에들어가심",
+          "name": "정전기 충전",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.32,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 0.58,
-              "hits": 2,
-              "target": "randomEnemy"
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 2
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "지글지글",
-          "tags": [
-            "신속"
-          ],
+          "name": "상시 테이저",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.92,
+              "ratio": 0.7,
               "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "히익 전류"
             },
             {
               "k": "dmg",
-              "ratio": 0.48,
-              "hits": 2,
-              "target": "randomEnemy"
+              "ratio": 0.3,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "히익 전류",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.6,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "반사적으로 바삭",
-          "cost": 3,
+          "name": "바삭바삭바삭",
           "fx": [
             {
+              "k": "discard",
+              "v": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 2.88,
+              "ratio": 0.9,
               "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 0.72,
-              "hits": 2,
-              "target": "randomEnemy"
+              "k": "perStack",
+              "id": "히익 전류"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
+              "k": "dmg",
+              "ratio": 0.38,
               "target": "oneEnemy"
             }
           ]
@@ -288,19 +319,19 @@
       ],
       "blesses": [
         {
-          "name": "히익!",
+          "name": "테이저 건",
           "kind": "power"
         },
         {
-          "name": "가방 속 응원석",
+          "name": "정전기",
           "kind": "ap"
         },
         {
-          "name": "집에 가고 싶어",
+          "name": "찌릿 충전",
           "fx": [
             {
               "k": "stack",
-              "id": "충전",
+              "id": "히익 전류",
               "v": 1
             }
           ]
@@ -317,11 +348,11 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.5
+          "ratio": 0.75
         },
         {
           "k": "stack",
-          "id": "충전",
+          "id": "히익 전류",
           "v": 1
         },
         {
@@ -331,16 +362,16 @@
       ],
       "oracles": [
         {
-          "name": "히익!",
+          "name": "가방 깊숙이",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.15
+              "ratio": 0.95
             },
             {
               "k": "stack",
-              "id": "충전",
-              "v": 1
+              "id": "히익 전류",
+              "v": 2
             },
             {
               "k": "draw",
@@ -349,101 +380,109 @@
           ]
         },
         {
-          "name": "가방째 굴러가기",
-          "cost": 0,
+          "name": "노숙 동굴",
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.5
-            },
-            {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
+              "ratio": 0.75
             },
             {
               "k": "draw",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "히익 전류",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "가방 속 응원석",
-          "tags": [
-            "보존"
-          ],
+          "name": "무전 호출",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 0.75
             },
             {
               "k": "stack",
-              "id": "충전",
+              "id": "히익 전류",
               "v": 1
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "지퍼 틈으로",
+          "name": "깜짝 반격",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.17
+              "ratio": 0.8
             },
             {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
+              "k": "ifStack",
+              "id": "히익 전류",
+              "n": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.02,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "무전 교신",
-          "tags": [
-            "신속"
-          ],
+          "name": "누, 누구야!",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.8
+              "k": "discard",
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "충전",
+              "k": "status",
+              "id": "회피",
               "v": 1
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "지퍼 틈으로",
-          "kind": "guard"
-        },
-        {
-          "name": "지글지글",
+          "name": "해골 가면",
           "kind": "draw"
         },
         {
-          "name": "반사적으로 바삭",
+          "name": "하얀 분칠",
+          "kind": "cost"
+        },
+        {
+          "name": "긴 귀 숨기기",
           "fx": [
             {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.4
             }
           ]
         }
@@ -454,153 +493,129 @@
       "name": "불가사의한 현상",
       "hero": "캐시",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
-      "tags": [
-        "약점 공격"
-      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.28,
-          "hits": 3,
-          "target": "allEnemies"
+          "ratio": 0.78,
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "둔화",
-          "v": 2,
-          "target": "allEnemies"
+          "k": "stack",
+          "id": "히익 전류",
+          "v": 1
         }
       ],
       "oracles": [
         {
           "name": "공포의 유령",
-          "tags": [
-            "약점 공격"
-          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
-              "hits": 3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "유령 잡는 엘프",
-          "tags": [
-            "약점 공격",
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "hits": 3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "도망치는 유령들",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.28,
-              "hits": 3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
+              "ratio": 1.26,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
-              "id": "충전",
+              "id": "히익 전류",
               "v": 1
             }
           ]
         },
         {
-          "name": "늪 전체가 찌릿",
-          "tags": [
-            "약점 공격",
-            "신속"
-          ],
+          "name": "작은 현상",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.34,
-              "hits": 3,
-              "target": "allEnemies"
+              "ratio": 0.65,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
             }
           ]
         },
         {
-          "name": "짜릿한 공포",
-          "cost": 3,
+          "name": "비명의 메아리",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "히익 전류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "유령 수사 수첩",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "심령 사진 소각",
           "tags": [
-            "약점 공격"
+            "소멸"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.56,
-              "hits": 3,
-              "target": "allEnemies"
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
             },
             {
               "k": "status",
-              "id": "둔화",
-              "v": 2,
-              "target": "allEnemies"
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "가방 속 응원석",
-          "kind": "power"
+          "name": "으스스한 기운",
+          "kind": "weakSpot"
         },
         {
-          "name": "집에 가고 싶어",
-          "kind": "ap"
+          "name": "비명 한 번",
+          "kind": "draw"
         },
         {
-          "name": "히익!",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "충전",
-              "v": 1
-            }
-          ]
+          "name": "겁먹은 손",
+          "kind": "frost"
         }
       ]
     },
@@ -609,171 +624,103 @@
       "name": "301일의 동굴",
       "hero": "캐시",
       "unique": true,
-      "cost": 2,
-      "type": "강화",
+      "cost": 1,
+      "type": "공격",
       "fx": [
         {
-          "k": "atkMod",
-          "v": 0.15,
-          "run": true,
-          "target": "self"
+          "k": "dmg",
+          "ratio": 0.45,
+          "target": "oneEnemy"
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "perStack",
+          "id": "히익 전류"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "충전",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "dmg",
+          "ratio": 0.18,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "동굴 밖으로",
+          "name": "동굴 생활 달인",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "히익 전류"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "충전",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "302일째 아침",
-          "cost": 1,
+          "name": "동굴 입구",
+          "cost": 0,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
             },
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true,
-              "target": "self"
+              "k": "perStack",
+              "id": "히익 전류"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "충전",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "내면의 초자아",
-          "tags": [
-            "보존"
-          ],
+          "name": "동굴 메아리",
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "충전",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "충전",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
+              "id": "히익 전류",
+              "v": 1
             }
           ]
         },
         {
-          "name": "공포 중독",
+          "name": "동굴 생활",
+          "power": true,
           "fx": [
             {
-              "k": "atkMod",
-              "v": 0.15,
-              "run": true,
-              "target": "self"
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "히익 전류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "충전",
-                      "v": 2
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "foeAct",
-                    "type": "공격"
+                    "on": "hurt"
                   },
                   "limit": {
                     "per": "turn",
@@ -781,42 +728,8 @@
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "집에 가고 싶어",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "atkMod",
-              "v": 0.2,
-              "run": true,
-              "target": "self"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
                       "k": "stack",
-                      "id": "충전",
+                      "id": "히익 전류",
                       "v": 1
                     }
                   ]
@@ -824,23 +737,47 @@
               ]
             }
           ]
+        },
+        {
+          "name": "동굴 탈출",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "히익 전류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "히익 전류",
+              "all": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "지글지글",
+          "name": "내면의 초자아",
           "kind": "atkUp"
         },
         {
-          "name": "반사적으로 바삭",
-          "kind": "draw"
+          "name": "숨기 명수",
+          "kind": "cost"
         },
         {
-          "name": "지퍼 틈으로",
+          "name": "겁 많은 책임감",
           "fx": [
             {
               "k": "stack",
-              "id": "충전",
+              "id": "히익 전류",
               "v": 1
             }
           ]

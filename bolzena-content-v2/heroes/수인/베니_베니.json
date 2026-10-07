@@ -14,25 +14,16 @@
       "blurb": "마녀 왕국 피난 시절을 거치며 철이 든 불곰 수인이자 사료스탕스 멤버.",
       "keyword": {
         "name": "꿀범벅",
-        "desc": "스킬로 적에게 바르는 꿀",
+        "desc": "끈적하게 들러붙는 꿀",
         "carrier": "enemy",
         "cap": 6,
-        "rules": [
+        "per": [
           {
-            "name": "끈적끈적",
-            "when": {
-              "on": "stackReach",
-              "id": "꿀범벅",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "status",
-                "id": "둔화",
-                "v": 1
-              }
-            ]
-          },
+            "stat": "dealt",
+            "v": -0.05
+          }
+        ],
+        "rules": [
           {
             "name": "꿀 나눔",
             "when": {
@@ -49,16 +40,16 @@
       },
       "passives": [
         {
-          "name": "꿀단지 한 방",
+          "name": "꿀 주먹",
           "when": {
             "on": "play",
-            "type": "스킬"
+            "every": 4
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "꿀범벅",
-              "v": 2
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 1
             }
           ]
         }
@@ -105,7 +96,7 @@
       },
       "starter": [
         "베니_베니_s1",
-        "베니_베니_s1",
+        "베니_베니_u1",
         "베니_베니_s2",
         "베니_베니_s3"
       ]
@@ -154,31 +145,53 @@
       ]
     },
     {
+      "hero": "베니_베니",
+      "token": true,
+      "id": "베니_베니_jar",
+      "name": "꿀단지 폭탄",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "꿀범벅",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "던지면 깨져서 사방에 꿀이 튑니다."
+    },
+    {
       "id": "베니_베니_u1",
       "name": "허니밤",
       "hero": "베니_베니",
       "unique": true,
-      "cost": 2,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.6,
-          "target": "oneEnemy"
+          "ratio": 0.5,
+          "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "꿀범벅"
+          "k": "stack",
+          "id": "꿀범벅",
+          "v": 1,
+          "target": "allEnemies"
         },
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.5,
           "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "꿀범벅",
-          "all": true
         }
       ],
       "oracles": [
@@ -187,66 +200,63 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
+              "ratio": 0.6,
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "꿀범벅"
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.7,
               "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "꿀범벅",
-              "all": true
             }
           ]
         },
         {
           "name": "작은 꿀단지",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
+              "ratio": 0.35,
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "꿀범벅"
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.35,
               "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "꿀범벅",
-              "all": true
             }
           ]
         },
         {
           "name": "꿀비",
+          "cost": 2,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
+              "ratio": 1.27,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
+              "k": "stack",
               "id": "꿀범벅",
-              "each": true
+              "v": 2,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.3,
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
@@ -256,49 +266,47 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.75,
-              "target": "oneEnemy"
+              "ratio": 0.5,
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "꿀범벅"
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
+              "k": "ifStack",
+              "id": "꿀범벅",
+              "n": 4
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "끈적 급소",
-          "tags": [
-            "약점 공격"
-          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.8,
-              "target": "oneEnemy"
+              "ratio": 0.67,
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "꿀범벅"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "꿀범벅",
-              "all": true
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -318,7 +326,8 @@
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -356,7 +365,7 @@
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 2,
+              "v": 3,
               "target": "allEnemies"
             },
             {
@@ -367,7 +376,7 @@
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             }
           ]
         },
@@ -378,7 +387,13 @@
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 2,
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -388,25 +403,38 @@
           ]
         },
         {
-          "name": "끈끈이 바닥",
+          "name": "거대 꿀 웅덩이",
+          "power": true,
           "fx": [
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
+              "v": 3,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꿀범벅",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -414,27 +442,25 @@
           "name": "꿀 수확",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.79,
+              "target": "allEnemies"
+            },
+            {
               "k": "stack",
               "id": "꿀범벅",
               "v": 2,
               "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ap",
-              "v": 1
             }
           ]
         },
         {
-          "name": "꿀 홍수",
-          "cost": 2,
+          "name": "끈끈이 바닥",
           "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
             {
               "k": "stack",
               "id": "꿀범벅",
@@ -446,10 +472,6 @@
               "id": "약화",
               "v": 2,
               "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 2
             }
           ]
         }
@@ -461,18 +483,17 @@
         },
         {
           "name": "한 바가지",
-          "kind": "cost"
+          "fx": [
+            {
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 1
+            }
+          ]
         },
         {
           "name": "느릿느릿 꿀",
-          "fx": [
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
+          "kind": "ap"
         }
       ]
     },
@@ -486,13 +507,23 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 0.6,
           "target": "oneEnemy"
         },
         {
           "k": "stack",
           "id": "꿀범벅",
-          "v": 2
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "꿀범벅"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.15,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
@@ -501,13 +532,23 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
+              "ratio": 0.75,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 2
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "꿀범벅"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -517,29 +558,23 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.4,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿀 흩뿌리기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "allEnemies"
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "꿀범벅",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "꿀범벅"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -547,36 +582,83 @@
           "name": "두 번 바르기",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 3
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "꿀범벅",
+              "n": 4
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "벌집 던지기",
-          "cost": 2,
+          "name": "꿀벌 친구들",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 3
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "취약",
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "꿀범벅",
+                      "each": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.08,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "단지째 비우기",
+          "fx": [
+            {
+              "k": "discard",
               "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "꿀범벅"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -596,7 +678,8 @@
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 1
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
@@ -607,12 +690,12 @@
       "name": "꿀단지 강타",
       "hero": "베니_베니",
       "unique": true,
-      "cost": 3,
+      "cost": 2,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 3,
+          "ratio": 1.6,
           "target": "oneEnemy"
         },
         {
@@ -621,7 +704,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.35,
           "target": "oneEnemy"
         },
         {
@@ -636,7 +719,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.5,
+              "ratio": 1.9,
               "target": "oneEnemy"
             },
             {
@@ -645,7 +728,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.42,
               "target": "oneEnemy"
             },
             {
@@ -657,11 +740,11 @@
         },
         {
           "name": "꿀통 내리치기",
-          "cost": 2,
+          "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
@@ -670,7 +753,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.25,
               "target": "oneEnemy"
             },
             {
@@ -681,35 +764,12 @@
           ]
         },
         {
-          "name": "꿀에 파묻기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 3.0,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "꿀범벅"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1
-            }
-          ]
-        },
-        {
           "name": "꿀 해일",
+          "cost": 3,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.2,
+              "ratio": 2,
               "target": "allEnemies"
             },
             {
@@ -719,20 +779,17 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.4,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "급소에 꿀단지",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "꿀에 파묻기",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.0,
+              "ratio": 1.6,
               "target": "oneEnemy"
             },
             {
@@ -741,12 +798,40 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "단지 깨뜨리기",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "꿀범벅"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
               "k": "tough",
-              "v": 1
+              "v": 2
             }
           ]
         }
@@ -761,8 +846,8 @@
           "kind": "weakSpot"
         },
         {
-          "name": "단지 굴리기",
-          "kind": "cost"
+          "name": "베니는 멋있어",
+          "kind": "ap"
         }
       ]
     }

@@ -1,785 +1,792 @@
 {
- "heroes": [
-  {
-   "id": "니콜",
-   "name": "니콜",
-   "nature": "냉정",
-   "role": "딜러",
-   "star": 3,
-   "hp": 500,
-   "atk": 145,
-   "def": 25,
-   "crit": 10,
-   "blurb": "완벽을 강요하는 감독. 고유 카드는 내고 나면 손으로 돌아와 테이크를 쌓고, 세 번째 테이크에 「오케이 컷」 이 나옵니다.",
-   "keyword": {
-    "name": "테이크",
-    "desc": "공격마다 다시 찍는 테이크",
-    "carrier": "self",
-    "cap": 3,
-    "per": [
-     {
-      "stat": "dealt",
-      "v": 0.15
-     }
-    ],
-    "rules": [
-     {
-      "name": "오케이 컷",
-      "when": {
-       "on": "stackReach",
-       "id": "테이크",
-       "n": 3
+  "heroes": [
+    {
+      "id": "니콜",
+      "name": "니콜",
+      "nature": "냉정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 500,
+      "atk": 145,
+      "def": 25,
+      "crit": 10,
+      "blurb": "완벽을 강요하는 감독. 고유 카드는 내고 나면 손으로 돌아와 테이크를 쌓고, 세 번째 테이크에 「오케이 컷」 이 나옵니다.",
+      "keyword": {
+        "name": "테이크",
+        "desc": "한 컷씩 쌓이는 촬영분",
+        "carrier": "self",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.08
+          }
+        ],
+        "rules": [
+          {
+            "name": "오케이 컷",
+            "when": {
+              "on": "stackReach",
+              "id": "테이크",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "spend",
+                "id": "테이크",
+                "all": true
+              },
+              {
+                "k": "make",
+                "id": "니콜_t1",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "깜짝 출연",
+            "when": {
+              "on": "play",
+              "who": "other",
+              "type": "스킬"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "테이크",
+                "v": 1
+              }
+            ]
+          }
+        ]
       },
-      "fx": [
-       {
-        "k": "spend",
-        "id": "테이크",
-        "all": true
-       },
-       {
-        "k": "make",
-        "id": "니콜_t1",
-        "v": 1
-       }
+      "passives": [
+        {
+          "name": "레디 액션",
+          "when": {
+            "on": "play"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "느와르 니콜",
+          "when": {
+            "on": "kill",
+            "mine": true
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "바삭 바삭 재촬영 파이어",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.8,
+            "target": "allEnemies",
+            "hits": 2
+          },
+          {
+            "k": "stack",
+            "id": "테이크",
+            "v": 2
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "니콜_s1",
+        "니콜_u1",
+        "니콜_s2",
+        "니콜_s3"
       ]
-     }
-    ]
-   },
-   "passives": [
-    {
-     "name": "한 번 더 갑니다",
-     "when": {
-      "on": "play",
-      "type": "공격"
-     },
-     "limit": {
-      "per": "turn",
-      "n": 1
-     },
-     "fx": [
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
     }
-   ],
-   "ult": {
-    "name": "바삭 바삭 재촬영 파이어",
-    "cost": 250,
-    "fx": [
-     {
-      "k": "dmg",
-      "ratio": 0.8,
-      "target": "allEnemies",
-      "hits": 2
-     },
-     {
-      "k": "stack",
-      "id": "테이크",
-      "v": 2
-     }
-    ]
-   },
-   "race": "정령",
-   "starter": [
-    "니콜_s1",
-    "니콜_s1",
-    "니콜_s2",
-    "니콜_s3"
-   ]
-  }
- ],
- "cards": [
-  {
-   "id": "니콜_s1",
-   "name": "팝콘 투척",
-   "hero": "니콜",
-   "cost": 1,
-   "type": "공격",
-   "fx": [
+  ],
+  "cards": [
     {
-     "k": "dmg",
-     "ratio": 1,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "니콜_s2",
-   "name": "팝콘 버킷 투척",
-   "hero": "니콜",
-   "cost": 2,
-   "type": "공격",
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 2.2,
-     "target": "oneEnemy"
-    }
-   ]
-  },
-  {
-   "id": "니콜_s3",
-   "name": "슬레이트 막기",
-   "hero": "니콜",
-   "cost": 1,
-   "type": "스킬",
-   "fx": [
-    {
-     "k": "shield",
-     "ratio": 1.5
-    }
-   ]
-  },
-  {
-   "id": "니콜_u1",
-   "name": "액션!",
-   "hero": "니콜",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "tags": [
-    "회수"
-   ],
-   "signature": true,
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.1,
-     "target": "oneEnemy"
-    },
-    {
-     "k": "stack",
-     "id": "테이크",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "롱테이크",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.49,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "클로즈업",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.4,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "tough",
-       "v": 1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "컷 나누기",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.55,
-       "target": "oneEnemy",
-       "hits": 3
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "연속 촬영",
-     "tags": [
-      "회수 3"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 1.1,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "리허설",
-     "tags": [
-      "회수"
-     ],
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.9,
-       "target": "oneEnemy"
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "완벽한 각도",
-     "kind": "power"
-    },
-    {
-     "name": "빠른 세팅",
-     "kind": "cost"
-    },
-    {
-     "name": "조명 직격",
-     "kind": "weakSpot"
-    }
-   ]
-  },
-  {
-   "id": "니콜_u2",
-   "name": "다시 갑니다",
-   "hero": "니콜",
-   "unique": true,
-   "cost": 1,
-   "type": "공격",
-   "tags": [
-    "회수"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 0.55,
-     "target": "oneEnemy",
-     "hits": 2
-    },
-    {
-     "k": "stack",
-     "id": "테이크",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "한 번 더 갑니다",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.74,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "스턴트",
-     "tags": [
-      "회수"
-     ],
-     "cost": 2,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.89,
-       "target": "allEnemies",
-       "hits": 2
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "NG 모음",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.4,
-       "target": "randomEnemy",
-       "hits": 4
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "카메라 리허설",
-     "tags": [
-      "회수"
-     ],
-     "cost": 0,
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.5,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "감독의 시범",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "dmg",
-       "ratio": 0.6,
-       "target": "oneEnemy",
-       "hits": 2
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "불꽃 연출",
-     "kind": "power"
-    },
-    {
-     "name": "촬영장 질주",
-     "kind": "cost"
-    },
-    {
-     "name": "조명 반사",
-     "kind": "frost"
-    }
-   ]
-  },
-  {
-   "id": "니콜_u3",
-   "name": "NG 컷",
-   "hero": "니콜",
-   "unique": true,
-   "cost": 0,
-   "type": "스킬",
-   "tags": [
-    "회수"
-   ],
-   "fx": [
-    {
-     "k": "stack",
-     "id": "테이크",
-     "v": 1
-    },
-    {
-     "k": "draw",
-     "v": 1
-    }
-   ],
-   "oracles": [
-    {
-     "name": "필름 갈기",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 2
-      }
-     ]
-    },
-    {
-     "name": "슬레이트 치기",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "shield",
-       "ratio": 1
-      }
-     ]
-    },
-    {
-     "name": "모니터 확인",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 2
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "컷 사인",
-     "tags": [
-      "회수"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "status",
-       "id": "사기",
-       "v": 1
-      }
-     ]
-    },
-    {
-     "name": "콘티 수정",
-     "tags": [
-      "회수 3"
-     ],
-     "fx": [
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      },
-      {
-       "k": "draw",
-       "v": 1
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "빠른 손",
-     "kind": "draw"
-    },
-    {
-     "name": "발맞추기",
-     "kind": "ap"
-    },
-    {
-     "name": "확성기",
-     "fx": [
-      {
-       "k": "status",
-       "id": "취약",
-       "v": 1,
-       "target": "oneEnemy"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "니콜_u4",
-   "name": "감독의 고집",
-   "hero": "니콜",
-   "unique": true,
-   "cost": 1,
-   "type": "강화",
-   "fx": [
-    {
-     "k": "atkMod",
-     "v": 0.15,
-     "run": true,
-     "target": "self"
-    },
-    {
-     "k": "power",
-     "rules": [
-      {
-       "when": {
-        "on": "turnStart"
-       },
-       "fx": [
+      "id": "니콜_s1",
+      "name": "팝콘 투척",
+      "hero": "니콜",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
         {
-         "k": "stack",
-         "id": "테이크",
-         "v": 1
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
         }
-       ]
-      }
-     ]
+      ]
+    },
+    {
+      "id": "니콜_s2",
+      "name": "팝콘 버킷 투척",
+      "hero": "니콜",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "니콜_s3",
+      "name": "슬레이트 막기",
+      "hero": "니콜",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "니콜_t1",
+      "name": "오케이 컷",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "필름을 태우며 외치는 완벽한 한 컷.",
+      "hero": "니콜",
+      "token": true
+    },
+    {
+      "id": "니콜_u1",
+      "name": "액션!",
+      "hero": "니콜",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "테이크",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "컷! 다시!",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "32테이크",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "레디",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "큐 사인",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "테이크",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "번아웃",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "아이스 아메리카노",
+          "kind": "draw"
+        },
+        {
+          "name": "캬라멜 팝콘",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "조명 켜기",
+          "kind": "ap"
+        }
+      ]
+    },
+    {
+      "id": "니콜_u2",
+      "name": "다시 갑니다",
+      "hero": "니콜",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "테이크"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "테이크",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "재촬영",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "테이크"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "테이크",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "감독판",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.14,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "테이크"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "테이크",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "편집실",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "테이크"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "트로피 걷어차기",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "테이크"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "테이크",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "오케이 사인",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "테이크"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "테이크",
+              "n": 2
+            },
+            {
+              "k": "make",
+              "id": "니콜_t1",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "파팝!",
+          "kind": "power"
+        },
+        {
+          "name": "와바박",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "조감독",
+          "kind": "cost"
+        }
+      ]
+    },
+    {
+      "id": "니콜_u3",
+      "name": "NG 컷",
+      "hero": "니콜",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "테이크",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "NG 연발",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "화염방사기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "촬영본 태우기",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.33,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다크서클",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 1
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "콘티 확인",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "팝콘 폭탄",
+          "kind": "power"
+        },
+        {
+          "name": "필름 감기",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "테이크",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "컷 사인",
+          "kind": "draw"
+        }
+      ]
+    },
+    {
+      "id": "니콜_u4",
+      "name": "초천재의 연출",
+      "hero": "니콜",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "randomEnemy",
+          "hits": 5
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "천재의 컷",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "열연의 흔적",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.6,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "천재 감독의 시야",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "perStack",
+              "id": "테이크"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "저예산 단편",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "블록버스터",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "randomEnemy",
+              "hits": 8
+            },
+            {
+              "k": "perStack",
+              "id": "테이크"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "테이크",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "크헤헷",
+          "kind": "power"
+        },
+        {
+          "name": "팝콘 리필",
+          "kind": "draw"
+        },
+        {
+          "name": "촬영 일정 당기기",
+          "kind": "cost"
+        }
+      ]
     }
-   ],
-   "oracles": [
-    {
-     "name": "32테이크",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "테이크",
-           "v": 2
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "촬영 개시",
-     "cost": 0,
-     "fx": [
-      {
-       "k": "draw",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "테이크",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "완벽주의",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "critMod",
-       "v": 0.1,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "테이크",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "필름 태우기",
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "draw",
-       "v": 2
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "테이크",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "name": "오프닝 크레딧",
-     "tags": [
-      "개전"
-     ],
-     "fx": [
-      {
-       "k": "atkMod",
-       "v": 0.15,
-       "run": true,
-       "target": "self"
-      },
-      {
-       "k": "stack",
-       "id": "테이크",
-       "v": 1
-      },
-      {
-       "k": "power",
-       "rules": [
-        {
-         "when": {
-          "on": "turnStart"
-         },
-         "fx": [
-          {
-           "k": "stack",
-           "id": "테이크",
-           "v": 1
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    }
-   ],
-   "blesses": [
-    {
-     "name": "명감독",
-     "kind": "atkUp"
-    },
-    {
-     "name": "짧은 회의",
-     "kind": "cost"
-    },
-    {
-     "name": "감독 의자",
-     "kind": "defUp"
-    }
-   ]
-  },
-  {
-   "id": "니콜_t1",
-   "name": "오케이 컷",
-   "cost": 0,
-   "type": "공격",
-   "tags": [
-    "소멸"
-   ],
-   "fx": [
-    {
-     "k": "dmg",
-     "ratio": 1.4,
-     "target": "allEnemies"
-    },
-    {
-     "k": "status",
-     "id": "취약",
-     "v": 1,
-     "target": "allEnemies"
-    }
-   ],
-   "blurb": "필름을 태우며 외치는 완벽한 한 컷.",
-   "hero": "니콜",
-   "token": true
-  }
- ]
+  ]
 }

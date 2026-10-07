@@ -82,6 +82,9 @@ namespace Bolzena.Core
         public Intent ForceNext;
         /// <summary>재 속 — 다음 내 턴 시작까지 남은 턴(0 이면 없음) · 되살아날 체력 비율.</summary>
         public int ReviveIn;
+        /// <summary>손패 흡수(수 seize) — 이 적이 빼앗아 쥔 카드 · 빼앗은 뒤 받은 피해 · 되찾는 피해(Battle.Seize).</summary>
+        public List<string> Seized = new();
+        public int SeizeDmg, SeizeNeed;
         public double ReviveHp;
         /// <summary>가사 — 쓰러졌지만 적이 회복하면 되살아난다.</summary>
         public bool Feign;

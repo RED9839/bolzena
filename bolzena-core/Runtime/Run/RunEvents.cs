@@ -16,13 +16,20 @@ namespace Bolzena.Core
     {
         /// <summary>이 판 이 층의 이벤트인가 — 공용 · 이 판 마을(id) · 이 층의 땅(옛 꼴). floor 가 있으면 그 층에서만.</summary>
         bool Local(EventDef ev) => ev.Pool == S.Village || ev.Pool == Land;
-        bool Eligible(EventDef ev) => !S.EventsSeen.Contains(ev.Id) && (ev.Floor <= 0 || ev.Floor == S.Floor + 1) && (ev.Pool == "공용" || Local(ev));
+        bool Eligible(EventDef ev) => !S.EventsSeen.Contains(ev.Id) && (ev.Floor <= 0 || ev.Floor == S.Floor + 1) && (ev.Pool == "공용" || Local(ev))
+                                      && (string.IsNullOrEmpty(ev.NeedFlag) || S.Flags.Contains(ev.NeedFlag));
+
+        /// <summary>연속 이벤트 깃발이 서 있는가.</summary>
+        public bool HasFlag(string id) => !string.IsNullOrEmpty(id) && S.Flags.Contains(id);
 
         public bool EventLeft() => Data.Events.Any(Eligible);
 
         static bool HasRemove(EventDef e) => e.Options.Any(o => o.Out.Any(x => x.K == "remove") || (o.Gamble?.Any(g => g.Out.Any(x => x.K == "remove")) ?? false));
 
-        /// <summary>마을 풀 70% · 공용 30%(한쪽이 비면 다른 쪽). 카드 제거가 있는 이벤트는 무게 ×5. 한 번 나온 이벤트는 그 판에서 다시 안 나온다.</summary>
+        /// <summary>줄기 뒤 이벤트인데 그 깃발이 서 있다 — needFlag 가 충족됐거나, 선택지의 flag 깃발이 하나라도 서 있다.</summary>
+        public bool FlagHit(EventDef e) => (!string.IsNullOrEmpty(e.NeedFlag) && HasFlag(e.NeedFlag)) || e.Options.Any(o => o.Flag != null && HasFlag(o.Flag));
+
+        /// <summary>마을 풀 70% · 공용 30%(한쪽이 비면 다른 쪽). 카드 제거가 있는 이벤트는 무게 ×5, 깃발이 선 줄기 뒤 이벤트는 ×flagWeight(기본 3). 한 번 나온 이벤트는 그 판에서 다시 안 나온다.</summary>
         public List<EventDef> RollEvents(int n = 1)
         {
             var outs = new List<EventDef>();
@@ -33,7 +40,7 @@ namespace Bolzena.Core
                 var common = left.Where(e => e.Pool == "공용").ToList();
                 var from = floorPool.Count == 0 ? common : common.Count == 0 ? floorPool : Rnd() < R.EVENT_FLOOR_SHARE ? floorPool : common;
                 if (from.Count == 0) break;
-                var w = from.Select(e => HasRemove(e) ? R.EVENT_REMOVE_WEIGHT : 1).ToList();
+                var w = from.Select(e => (HasRemove(e) ? R.EVENT_REMOVE_WEIGHT : 1.0) * (FlagHit(e) ? (e.FlagWeight > 0 ? e.FlagWeight : R.EVENT_FLAG_WEIGHT) : 1.0)).ToList();
                 double x = Rnd() * w.Sum(); int k = 0;
                 while (k < from.Count - 1 && (x -= w[k]) >= 0) k++;
                 outs.Add(from[k]);
@@ -67,16 +74,32 @@ namespace Bolzena.Core
         bool HasHero(string id) => S.Party.Contains(id);
         double HpRatio => (double)S.PartyHp / Math.Max(1, S.PartyMaxHp);
 
-        /// <summary>보이는 선택지(조건이 맞는 것) + 맨 끝 「떠난다」.</summary>
+        /// <summary>
+        /// 이 선택지의 조건(hero · race · when · flag · noFlag)이 안 맞는 까닭 — 맞으면 null.
+        /// 화면은 잠긴 칸에 이 글을 보인다(LockOf 가 맨 먼저 돌려준다).
+        /// </summary>
+        public string CondWhy(EventOption o)
+        {
+            if (o == null || o.Leave) return null;
+            if (o.Flag != null && !HasFlag(o.Flag)) return o.LockText ?? "앞선 일이 있어야 합니다";
+            if (o.NoFlag != null && HasFlag(o.NoFlag)) return o.LockText ?? "이미 지나간 일입니다";
+            if (o.Hero != null && o.Hero.Count > 0 && !o.Hero.Any(HasHero))
+            {
+                var names = o.Hero.Select(k => Data.Hero(k)?.Name ?? k).Distinct().ToList();
+                return o.LockText ?? (names.Count == 1 ? $"{Ko.J(names[0], "이가")} 파티에 있어야 합니다" : $"{string.Join(" · ", names)} 가운데 한 명이 파티에 있어야 합니다");
+            }
+            if (o.Race != null && !S.Party.Any(k => Data.Hero(k)?.Race == o.Race)) return o.LockText ?? $"{o.Race} 사도가 파티에 있어야 합니다";
+            if (o.When == "hp30" && HpRatio > 0.3) return o.LockText ?? "파티 HP 30% 이하일 때만 고를 수 있습니다";
+            return null;
+        }
+
+        /// <summary>조건이 안 맞을 때 잠긴 칸으로 보이는가 — 기본: 사도 · 종족 · HP 조건은 보이고, 깃발 조건은 숨긴다.</summary>
+        static bool ShowsLocked(EventOption o) => o.ShowLocked ?? (o.Flag == null && o.NoFlag == null);
+
+        /// <summary>보이는 선택지 — 조건이 맞는 것 + 잠긴 칸으로 보이는 것(LockOf 가 조건 글을 돌려준다) + 맨 끝 「떠난다」.</summary>
         public List<EventOption> OptionsOf(EventDef ev)
         {
-            var opts = ev.Options.Where(o =>
-            {
-                if (o.Hero != null) return o.Hero.Any(HasHero);
-                if (o.Race != null) return S.Party.Any(k => Data.Hero(k)?.Race == o.Race);
-                if (o.When == "hp30") return HpRatio <= 0.3;
-                return true;
-            }).ToList();
+            var opts = ev.Options.Where(o => CondWhy(o) == null || ShowsLocked(o)).ToList();
             opts.Add(new EventOption { Label = ev.Leave ?? "떠나기", Out = ev.LeaveOut ?? new List<Outcome>(), Leave = true });
             return opts;
         }
@@ -102,6 +125,8 @@ namespace Bolzena.Core
         public string LockOf(EventOption o)
         {
             if (o.Leave) return null;
+            var cond = CondWhy(o);
+            if (cond != null) return cond;
             var ops = OutOf(o);
             int cost = -(int)ops.Where(x => x.K == "gold" && x.V < 0).Sum(x => x.V);
             int need = Math.Max(cost, o.NeedGold);
@@ -241,6 +266,7 @@ namespace Bolzena.Core
                         if (OnlyCard(o.Id) && HasCard(o.Id)) { E.Log.Add($"「{Data.Card(o.Id).Name}」 — 유일, 이미 덱에 있습니다"); break; }
                         GainCard(o.Id); E.Log.Add($"「{Data.Card(o.Id).Name}」 — 덱에"); break;
                     case "mindBreak": S.MindBreak = Math.Max(S.MindBreak, Math.Max(1, o.N)); E.Log.Add($"정신 붕괴 — 다음 전투 {Math.Max(1, o.N)}번이 끝날 때까지 카드 얻기 · 신탁 · 제거를 할 수 없습니다"); break;
+                    case "flag": if (!string.IsNullOrEmpty(o.Id)) S.Flags.Add(o.Id); break;
                     case "scout": S.Scout = true; E.Log.Add("지도 공개 — 다음 이벤트 칸에서 둘 중 하나를 고릅니다"); break;
                     case "shopGift": S.ShopGift = o.Grade; E.Log.Add($"다음 상점에서 {o.Grade} 장비 하나를 공짜로 받습니다"); break;
                     case "rewardFlash": S.RewardFlash = true; E.Log.Add("다음 전투에서 신탁이 꼭 뜹니다"); break;
@@ -341,7 +367,7 @@ namespace Bolzena.Core
                         if (GameData.IsCopy(p.Offer.CardId)) return "복제본은 신탁 · 축복을 받을 수 없습니다";
                         if (!TakeOffer(p.Offer, n)) S.Flash[p.Offer.CardId] = n;
                         var c = Data.Card(p.Offer.CardId);
-                        E.Log.Add($"「{c.Name}」 — 신탁 「{c.Oracles[n - 1].Name}」");
+                        E.Log.Add($"「{c.Name}」 — 신탁 {n}");
                         if (E.ShinChance > 0 && !S.NoShin && Rnd() < E.ShinChance)
                         {
                             S.Shin[p.Offer.CardId] = OwnRandom(c) ?? "power";

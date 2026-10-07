@@ -222,6 +222,8 @@ namespace Bolzena.RunUI
         public List<EventOption> Options(EventDef ev) => Run.OptionsOf(ev);
         public List<Outcome> OutOf(EventOption o) => Run.OutOf(o);
         public string LockOf(EventOption o) => Run.LockOf(o);
+        /// <summary>조건(사도 · 종족 · HP · 깃발)이 안 맞아 잠긴 칸이면 그 조건 글 — 맞으면 null.</summary>
+        public string CondWhy(EventOption o) => Run.CondWhy(o);
         public JudgeResult JudgeOf(EventOption o) => Run.JudgeOf(o);
         public (bool fight, string why) Choose(int i) => Run.Choose(i);
         public string Resolve(object v) => Run.ResolvePending(v);

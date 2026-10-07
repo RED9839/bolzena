@@ -156,7 +156,7 @@ namespace Bolzena.UI
                 string name = $"<color=#{ColorUtility.ToHtmlStringRGB(Color.Lerp(Color.white, kc, 0.55f))}>{c.Id}</color>" + (c.Turns > 0 ? $"  <size=80%><color={Tone.SubTag}>{c.Turns}턴</color></size>" : "");
                 st.Para(name, tx, tw, Tone.Body, Tone.Ink, false, 0.02f, top - 0.04f);
                 st.Y = top - 0.34f;
-                var desc = StripHead(c.Text, c.Id);   // 수치 · 지속이 다 든 한 가지 글 — 자르지 않는다(「자세히」 없음)
+                var desc = StripHead(Tone.StripDiff(c.Text), c.Id);   // 수치 · 지속이 다 든 한 가지 글 — 자르지 않는다(「자세히」 없음)
                 if (!string.IsNullOrEmpty(desc)) st.Para(Orange(desc), tx, tw, Tone.Sm, Tone.Sub, true, 0.04f);
                 st.Y = Mathf.Min(st.Y, top - 0.46f);
             }
@@ -318,9 +318,11 @@ namespace Bolzena.UI
                 }
                 st.Para(e.Name, x, Wd - x - Pad - 1.0f, Tone.Xl, Tone.Ink, false, 0.04f);
                 float pct = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0;
-                PillR(st.T, Wd - Pad, top - 0.26f, e.Dead ? "쓰러짐" : e.Broken ? "격파" : pct >= 0.7f ? "건강" : pct >= 0.3f ? "부상" : "위험",
-                    e.Broken ? new Color(0.62f, 0.5f, 0.12f) : pct >= 0.7f ? new Color(0.2f, 0.55f, 0.36f) : pct >= 0.3f ? new Color(0.6f, 0.48f, 0.16f) : new Color(0.62f, 0.18f, 0.22f), Color.white, 0.15f);
-                float ry = st.Y - 0.13f;
+                // 체력 구간 알약 — 격파는 여기 말고 강인도 줄의 「격파됨」 하나로(금색 「격파」 알약이 약점 속성 아이콘을 덮었다, 2026-10-07)
+                PillR(st.T, Wd - Pad, top - 0.26f, e.Dead ? "쓰러짐" : pct >= 0.7f ? "건강" : pct >= 0.3f ? "부상" : "위험",
+                    pct >= 0.7f ? new Color(0.2f, 0.55f, 0.36f) : pct >= 0.3f ? new Color(0.6f, 0.48f, 0.16f) : new Color(0.62f, 0.18f, 0.22f), Color.white, 0.15f);
+                // 성격 · 약점 줄은 알약(아래 끝 top - 0.405) 밑으로 — 이름이 한 줄로 짧아도 겹치지 않게
+                float ry = Mathf.Min(st.Y - 0.13f, top - 0.405f - 0.2f);
                 EnemyHud.WeakBadge(Make.Node("nat", st.T, new Vector3(Pad + 0.11f, ry, 0)), e.Nature, 0.24f, OC);
                 Tone.Text("natn", st.T, e.Nature, new Vector3(Pad + 0.28f, ry, 0), Tone.Body, OC, Tone.Ink, TextAlignmentOptions.Left, true);
                 bool toughless = e.ToughMaxV <= 0.001f;
