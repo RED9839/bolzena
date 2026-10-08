@@ -106,12 +106,16 @@ namespace Bolzena.UI
         /// <summary>신탁으로 바뀐 부분 표시(\u0001 … \u0002) — 연두. 안쪽의 다른 색(수치 · 「낱말」)은 연두가 이긴다.</summary>
         public const char DiffOn = '\u0001', DiffOff = '\u0002';
         public const string ChangedTag = "#9BE564";
-        public static string StripDiff(string s) => string.IsNullOrEmpty(s) ? s : s.Replace(DiffOn.ToString(), "").Replace(DiffOff.ToString(), "");
+        /// <summary>다음 카드 강화로 커진 수치(\u0003 ... \u0004) — 주황. 신탁 연두 · 수치 하늘색과 다른 색. 연두 안에서는 무시한다.</summary>
+        public const char EmpOn = '\u0003', EmpOff = '\u0004';
+        public const string EmpTag = "#FF9A52";
+        public static readonly Color Emp = Hex("FF7A1F");
+        public static string StripDiff(string s) => string.IsNullOrEmpty(s) ? s : s.Replace(DiffOn.ToString(), "").Replace(DiffOff.ToString(), "").Replace(EmpOn.ToString(), "").Replace(EmpOff.ToString(), "");
         public static string CardText(string rich)
         {
             if (string.IsNullOrEmpty(rich)) return "";
             var sb = new System.Text.StringBuilder(rich.Length + 64);
-            int i = 0; bool green = false; int skipClose = 0;
+            int i = 0; bool green = false, hot = false; int skipClose = 0;
             while (i < rich.Length)
             {
                 int lt = rich.IndexOf('<', i);
@@ -120,12 +124,14 @@ namespace Bolzena.UI
                 int p = 0;
                 while (p < plain.Length)
                 {
-                    int m = plain.IndexOfAny(new[] { DiffOn, DiffOff }, p);
+                    int m = plain.IndexOfAny(new[] { DiffOn, DiffOff, EmpOn, EmpOff }, p);
                     string seg = m < 0 ? plain.Substring(p) : plain.Substring(p, m - p);
-                    sb.Append(green ? seg : num.Replace(seg, "<color=" + SkyTag + ">$1</color>"));
+                    sb.Append(green || hot ? seg : num.Replace(seg, "<color=" + SkyTag + ">$1</color>"));
                     if (m < 0) break;
-                    if (plain[m] == DiffOn && !green) { green = true; skipClose = 0; sb.Append("<color=" + ChangedTag + ">"); }
+                    if (plain[m] == DiffOn && !green && !hot) { green = true; skipClose = 0; sb.Append("<color=" + ChangedTag + ">"); }
                     else if (plain[m] == DiffOff && green) { green = false; sb.Append("</color>"); }
+                    else if (plain[m] == EmpOn && !green && !hot) { hot = true; sb.Append("<color=" + EmpTag + ">"); }
+                    else if (plain[m] == EmpOff && hot) { hot = false; sb.Append("</color>"); }
                     p = m + 1;
                 }
                 if (lt < 0) break;

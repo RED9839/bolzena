@@ -6,6 +6,7 @@
       "nature": "공명",
       "race": "수인",
       "role": "서포터",
+      "style": "거드는 형",
       "star": 3,
       "hp": 610,
       "atk": 95,
@@ -21,7 +22,7 @@
         "per": [
           {
             "stat": "atk",
-            "v": 0.1,
+            "v": 0.06,
             "who": "allies"
           }
         ],
@@ -51,16 +52,23 @@
             },
             "fx": [
               {
-                "k": "dmg",
-                "ratio": 0.3,
-                "target": "randomEnemy",
-                "hits": 2
-              },
+                "k": "empower",
+                "ratio": 0.2,
+                "who": "any"
+              }
+            ]
+          },
+          {
+            "name": "패왕의 귀환",
+            "when": {
+              "on": "stackGone",
+              "id": "지배의 영역",
+              "decay": true
+            },
+            "fx": [
               {
-                "k": "status",
-                "id": "취약",
-                "v": 1,
-                "target": "randomEnemy"
+                "k": "empower",
+                "ratio": 0.4
               }
             ]
           }
@@ -189,7 +197,8 @@
       ],
       "oracles": [
         {
-          "name": "넓은 고리",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "discard",
@@ -207,26 +216,9 @@
           ]
         },
         {
-          "name": "짧은 고리",
+          "name": "신탁 2",
           "cost": 0,
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "되감는 고리",
+          "tags": [],
           "fx": [
             {
               "k": "discard",
@@ -237,20 +229,34 @@
               "v": 3
             },
             {
-              "k": "pull",
-              "from": "discard",
-              "n": 1
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 1
             }
           ]
         },
         {
-          "name": "끝없는 순환",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.68
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
-            {
-              "k": "discard",
-              "v": 2
-            },
             {
               "k": "draw",
               "v": 3
@@ -260,21 +266,22 @@
               "rules": [
                 {
                   "when": {
-                    "on": "discard"
+                    "on": "shuffle"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 2
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "지배의 영역",
-                      "v": 1
+                      "v": 2
                     },
                     {
-                      "k": "shield",
-                      "ratio": 0.4
+                      "k": "empower",
+                      "ratio": 0.3,
+                      "who": "any"
                     }
                   ]
                 }
@@ -283,40 +290,31 @@
           ]
         },
         {
-          "name": "허물 벗기",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "discard",
-              "v": 2
-            },
             {
               "k": "draw",
               "v": 3
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "지배의 영역",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "한 바퀴 더",
+          "name": "축복 1",
           "kind": "draw"
         },
         {
-          "name": "비워 낸 손",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "백사의 혀",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -337,7 +335,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.26,
           "target": "randomEnemy",
           "hits": 2
         },
@@ -347,7 +345,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.26,
           "target": "randomEnemy"
         },
         {
@@ -359,11 +357,12 @@
       ],
       "oracles": [
         {
-          "name": "깊이 꽂힌 비수",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.35,
               "target": "randomEnemy",
               "hits": 2
             },
@@ -373,7 +372,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.35,
               "target": "randomEnemy"
             },
             {
@@ -385,14 +384,15 @@
           ]
         },
         {
-          "name": "작은 비수",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.24,
               "target": "randomEnemy",
-              "hits": 1
+              "hits": 2
             },
             {
               "k": "perStack",
@@ -400,7 +400,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.24,
               "target": "randomEnemy"
             },
             {
@@ -412,64 +412,63 @@
           ]
         },
         {
-          "name": "걸어갈 길",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perStack",
+              "id": "지배의 영역"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "randomEnemy"
+            },
             {
               "k": "stack",
               "id": "지배의 영역",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "target": "randomEnemy",
-              "hits": 4
-            },
-            {
-              "k": "ifStack",
-              "id": "지배의 영역",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "target": "randomEnemy",
-              "hits": 2
             }
           ]
         },
         {
-          "name": "등대의 불빛",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.33,
+              "ratio": 0.24,
               "target": "randomEnemy",
               "hits": 2
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "perStack",
+              "id": "지배의 영역"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "randomEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "지배의 영역"
-                    },
-                    {
                       "k": "dmg",
-                      "ratio": 0.22,
-                      "target": "randomEnemy"
+                      "ratio": 0.26,
+                      "target": "randomEnemy",
+                      "hits": 2
                     }
                   ]
                 }
@@ -478,39 +477,38 @@
           ]
         },
         {
-          "name": "한 놈만 노리는 비수",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "spend",
-              "id": "지배의 영역",
-              "all": true
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perStack",
+              "id": "지배의 영역"
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy",
-              "hits": 4
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
+              "ratio": 0.46,
+              "target": "randomEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "벼린 마음",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "상처를 아는 칼",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "되돌아온 비수",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -557,7 +555,7 @@
       ],
       "oracles": [
         {
-          "name": "보물 상자 박살",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -568,34 +566,8 @@
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지배의 영역",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "작은 똬리",
-          "cost": 0,
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
+              "k": "stack",
+              "id": "지배의 영역",
               "v": 1
             },
             {
@@ -618,19 +590,86 @@
           ]
         },
         {
-          "name": "허물 벗는 뱀",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "개전"
           ],
           "fx": [
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지배의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
               "k": "stack",
               "id": "지배의 영역",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지배의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
             },
             {
               "k": "draw",
-              "v": 2,
+              "v": 1,
               "who": "self",
               "unique": true
             },
@@ -654,61 +693,12 @@
           ]
         },
         {
-          "name": "세계수의 숨결",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "status",
               "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지배의 영역",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "shuffle"
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "또 한 바퀴",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "지배의 영역",
               "v": 2
             },
             {
@@ -727,26 +717,6 @@
                   ]
                 }
               ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "파괴의 손맛",
-          "kind": "atkUp"
-        },
-        {
-          "name": "보물 조각",
-          "kind": "draw"
-        },
-        {
-          "name": "단숨에 부수기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
             }
           ]
         }
@@ -762,7 +732,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 0.85,
           "target": "allEnemies"
         },
         {
@@ -771,7 +741,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.26,
           "target": "allEnemies"
         },
         {
@@ -782,11 +752,12 @@
       ],
       "oracles": [
         {
-          "name": "몸을 감는 뱀",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.15,
               "target": "allEnemies"
             },
             {
@@ -806,12 +777,13 @@
           ]
         },
         {
-          "name": "새끼 뱀",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.69,
+              "ratio": 0.81,
               "target": "allEnemies"
             },
             {
@@ -820,7 +792,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.21,
+              "ratio": 0.24,
               "target": "allEnemies"
             },
             {
@@ -831,13 +803,12 @@
           ]
         },
         {
-          "name": "세계를 휘감는 뱀",
-          "cost": 3,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
-              "target": "allEnemies"
+              "ratio": 1.41,
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -845,33 +816,8 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "꼬리 무는 뱀",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "지배의 영역"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "allEnemies"
+              "ratio": 0.4,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -882,11 +828,11 @@
           ]
         },
         {
-          "name": "잠든 뱀",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.17,
+              "ratio": 0.87,
               "target": "allEnemies"
             },
             {
@@ -895,24 +841,221 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.26,
               "target": "allEnemies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "지배의 영역"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "지배의 영역"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.3,
+                      "who": "any"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "거대한 독니",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "비늘 긁힘",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "압도",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우로스_u5",
+      "name": "똬리 틀기",
+      "hero": "우로스",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "지배의 영역",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.25,
+          "who": "any"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.25,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.25,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.15,
+              "who": "any"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.15,
+                      "who": "any"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "any"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지배의 영역",
+              "v": 1
+            }
+          ]
         }
       ]
     }

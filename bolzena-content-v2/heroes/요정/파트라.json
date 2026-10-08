@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "요정",
       "role": "딜러",
+      "style": "손 만들기형",
       "star": 1,
       "hp": 600,
       "atk": 104,
@@ -20,37 +21,14 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.12
+            "v": 0.08
           }
         ],
-        "rules": [
-          {
-            "name": "재고 처분",
-            "when": {
-              "on": "stackReach",
-              "id": "민트 재고",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "민트 재고",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.8,
-                "target": "allEnemies"
-              },
-              {
-                "k": "status",
-                "id": "약화",
-                "v": 1,
-                "target": "allEnemies"
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -60,8 +38,8 @@
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "민트 재고",
+              "k": "make",
+              "id": "파트라_mint",
               "v": 1
             }
           ]
@@ -80,7 +58,7 @@
             {
               "k": "stack",
               "id": "민트 재고",
-              "v": 3
+              "v": 2
             }
           ]
         }
@@ -168,13 +146,22 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.41,
+          "ratio": 0.61,
           "target": "oneEnemy"
         },
         {
           "k": "stack",
           "id": "민트 재고",
           "v": 1
+        },
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.47,
+          "target": "randomEnemy"
         }
       ]
     },
@@ -188,7 +175,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.08,
+          "ratio": 1.15,
           "target": "oneEnemy"
         },
         {
@@ -197,7 +184,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.38,
+          "ratio": 0.43,
           "target": "oneEnemy"
         },
         {
@@ -208,11 +195,12 @@
       ],
       "oracles": [
         {
-          "name": "민트 듬뿍 머겅!",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.55,
               "target": "oneEnemy"
             },
             {
@@ -221,7 +209,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.58,
               "target": "oneEnemy"
             },
             {
@@ -232,37 +220,36 @@
           ]
         },
         {
-          "name": "민트초코 풀코스",
-          "cost": 2,
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.43,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "민트 재고"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.61,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "민트 재고",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "다 같이 머겅!",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.71,
+              "ratio": 0.85,
               "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "민트 재고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "민트 재고",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.51,
+              "target": "oneEnemy"
             },
             {
               "k": "perTag",
@@ -270,8 +257,8 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.43,
-              "target": "allEnemies"
+              "ratio": 0.62,
+              "target": "oneEnemy"
             },
             {
               "k": "exileFrom",
@@ -282,39 +269,12 @@
           ]
         },
         {
-          "name": "요리를 쉽게 보면",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.17,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "민트 재고"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.37,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "민트 재고",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "신메뉴 개발",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.29,
+              "ratio": 0.88,
               "target": "oneEnemy"
             },
             {
@@ -323,7 +283,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.32,
+              "ratio": 0.34,
               "target": "oneEnemy"
             },
             {
@@ -331,16 +291,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "make"
+                    "on": "spend",
+                    "id": "민트 재고"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 2
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "민트 재고",
+                      "k": "make",
+                      "id": "파트라_mint",
                       "v": 1
                     }
                   ]
@@ -348,19 +309,39 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.07,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "민트 재고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "뒤집개",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "빨개진 얼굴",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "민트 향",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -381,9 +362,14 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.74,
+          "ratio": 0.68,
           "target": "oneEnemy",
           "hits": 2
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2
         },
         {
           "k": "stack",
@@ -393,13 +379,19 @@
       ],
       "oracles": [
         {
-          "name": "힘껏 치대기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.97,
+              "ratio": 0.92,
               "target": "oneEnemy",
               "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2
             },
             {
               "k": "stack",
@@ -409,14 +401,58 @@
           ]
         },
         {
-          "name": "살살 치대기",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.49,
+              "ratio": 0.8,
               "target": "oneEnemy",
               "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -426,79 +462,56 @@
           ]
         },
         {
-          "name": "반죽 다 쓰기",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.74,
+              "ratio": 0.8,
               "target": "oneEnemy",
               "hits": 2
             },
             {
-              "k": "perStack",
-              "id": "민트 재고"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "민트 재고",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "반죽 던지기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "make",
-              "id": "파트라_mint",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "반죽 재료 챙기기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "stack",
-              "id": "민트 재고",
-              "v": 1
+              "k": "status",
+              "id": "고통",
+              "v": 2
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "self"
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.22,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "사장님 꿀밤",
-          "kind": "frost"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "밀가루",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "반죽 숙성",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -527,7 +540,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.81
+          "ratio": 0.95
         },
         {
           "k": "power",
@@ -549,7 +562,7 @@
       ],
       "oracles": [
         {
-          "name": "센 불로",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -583,9 +596,41 @@
           ]
         },
         {
-          "name": "약불",
+          "name": "신탁 2",
           "cost": 0,
-          "tags": [],
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "민트 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -594,102 +639,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.54
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "민트 재고",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "새 조리법",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.68
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "민트 재고",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "오븐 가득",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "make",
-              "id": "파트라_mint",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "민트 재고",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "반죽 숙성 중",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "민트 재고",
-              "v": 2
+              "ratio": 0.81
             },
             {
               "k": "power",
@@ -709,24 +659,74 @@
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "오븐 장갑",
-          "kind": "defUp"
         },
         {
-          "name": "사장님의 비법",
-          "kind": "cost"
-        },
-        {
-          "name": "갓 구운 쿠키",
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "make",
-              "id": "파트라_mint",
-              "v": 1
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "민트 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "민트 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -752,7 +752,7 @@
       ],
       "oracles": [
         {
-          "name": "큰 도시락",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "make",
@@ -766,9 +766,9 @@
           ]
         },
         {
-          "name": "샤샤와 함께",
+          "name": "신탁 2",
           "tags": [
-            "연계"
+            "신속"
           ],
           "fx": [
             {
@@ -778,13 +778,17 @@
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "other"
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
             }
           ]
         },
         {
-          "name": "도시락 나눠 주기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "make",
@@ -792,20 +796,20 @@
               "v": 1
             },
             {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "make",
-              "id": "파트라_mint",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.62
             }
           ]
         },
         {
-          "name": "매일 도시락",
+          "name": "신탁 4",
           "power": true,
           "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            },
             {
               "k": "draw",
               "v": 1
@@ -815,12 +819,16 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "파트라_mint",
+                      "k": "stack",
+                      "id": "민트 재고",
                       "v": 1
                     }
                   ]
@@ -830,12 +838,16 @@
           ]
         },
         {
-          "name": "민트 샌드위치",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "make",
               "id": "파트라_mint",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
             },
             {
               "k": "discard",
@@ -846,21 +858,184 @@
       ],
       "blesses": [
         {
-          "name": "돗자리",
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "소풍 바구니",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "파트라_u5",
+      "name": "밤샘 시험 조리",
+      "hero": "파트라",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "파트라_mint",
+          "v": 1
+        },
+        {
+          "k": "perTag",
+          "id": "파트라_mint"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.34
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            },
+            {
+              "k": "perTag",
+              "id": "파트라_mint"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.55
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "민트 재고",
+              "v": 1
+            },
+            {
+              "k": "perTag",
+              "id": "파트라_mint"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.27
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            },
+            {
+              "k": "perTag",
+              "id": "파트라_mint"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.54
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perTag",
+                      "id": "파트라_mint"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 2
+            },
+            {
+              "k": "perTag",
+              "id": "파트라_mint"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.41
+            },
+            {
+              "k": "nextAp",
+              "v": -1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
           "tags": [
             "보존"
           ]
         },
         {
-          "name": "민트초코 쿠키 한 봉",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.41
+              "k": "make",
+              "id": "파트라_mint",
+              "v": 1
             }
           ]
         }

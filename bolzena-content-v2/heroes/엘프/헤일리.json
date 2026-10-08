@@ -6,34 +6,28 @@
       "nature": "순수",
       "race": "엘프",
       "role": "딜러",
+      "style": "표적형",
       "star": 3,
       "hp": 700,
       "atk": 125,
       "def": 28,
       "crit": 10,
-      "blurb": "엘리아스를 동맹국으로 착각하는 PTSD 장교. 턴마다 적 1명을 외계인으로 착각하고, 그 적을 치면 뒤이어 한 발 더 갈깁니다.",
+      "blurb": "엘리아스를 동맹국으로 착각하는 PTSD 장교. 턴마다 적 1명을 외계인으로 착각해 그놈만 집요하게 갈기고, 외계인이 쓰러지면 잠깐 제정신이 돌아와 파티를 감쌉니다.",
       "keyword": {
         "name": "외계인",
         "desc": "외계인이라 믿는 적 표시",
         "carrier": "enemy",
         "cap": 1,
-        "hunt": true
+        "hunt": true,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.1,
+            "from": "owner"
+          }
+        ]
       },
       "passives": [
-        {
-          "name": "착각 순찰",
-          "when": {
-            "on": "turnStart"
-          },
-          "fx": [
-            {
-              "k": "stack",
-              "id": "외계인",
-              "v": 1,
-              "target": "randomEnemy"
-            }
-          ]
-        },
         {
           "name": "외계인 격퇴",
           "when": {
@@ -41,7 +35,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
@@ -51,8 +45,7 @@
             },
             {
               "k": "extra",
-              "ratio": 0.7,
-              "target": "oneEnemy"
+              "ratio": 0.45
             }
           ]
         },
@@ -75,8 +68,44 @@
             {
               "k": "status",
               "id": "고통",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "착각과 제정신",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "착각과 제정신",
+          "when": {
+            "on": "huntDown",
+            "id": "외계인"
+          },
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "randomEnemy"
             }
           ]
         }
@@ -164,64 +193,40 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.25,
-          "hits": 3,
-          "target": "allEnemies"
+          "ratio": 0.18,
+          "target": "allEnemies",
+          "hits": 3
         },
         {
           "k": "status",
           "id": "고통",
-          "v": 2,
+          "v": 1,
           "target": "allEnemies"
+        },
+        {
+          "k": "perDebuff"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.15,
+          "target": "markedEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "채찍 세 번",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.32,
-              "hits": 3,
-              "target": "allEnemies"
+              "ratio": 0.24,
+              "target": "allEnemies",
+              "hits": 3
             },
             {
               "k": "status",
               "id": "고통",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "쓰라림 폭발",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.43,
-              "hits": 3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "디버프 감별",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.31,
-              "hits": 3,
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -229,24 +234,86 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
+              "ratio": 0.2,
+              "target": "markedEnemy"
             }
           ]
         },
         {
-          "name": "채찍 정비 교범",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.22,
-              "hits": 3,
+              "ratio": 0.2,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "markedEnemy",
+              "hits": 3
             },
             {
               "k": "status",
               "id": "고통",
               "v": 2,
+              "target": "markedEnemy"
+            },
+            {
+              "k": "perDebuff"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "markedEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -258,44 +325,41 @@
           ]
         },
         {
-          "name": "채찍 집중",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy",
+              "ratio": 0.32,
+              "target": "allEnemies",
               "hits": 3
             },
             {
               "k": "status",
               "id": "고통",
-              "v": 3,
-              "target": "oneEnemy"
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "가죽 채찍",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "작전 지도",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "채찍 정비",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "고통",
+              "k": "stack",
+              "id": "외계인",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             }
           ]
         }
@@ -311,7 +375,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 1.1,
           "target": "oneEnemy"
         },
         {
@@ -323,11 +387,12 @@
       ],
       "oracles": [
         {
-          "name": "돌격 앞으로",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.46,
+              "ratio": 1.49,
               "target": "oneEnemy"
             },
             {
@@ -339,12 +404,13 @@
           ]
         },
         {
-          "name": "척후",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 1.05,
               "target": "oneEnemy"
             },
             {
@@ -356,7 +422,7 @@
           ]
         },
         {
-          "name": "외계인 확인 사살",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
@@ -364,23 +430,26 @@
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "외계인",
-              "n": 1
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 0.78,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "약화",
+              "v": 1
             }
           ]
         },
         {
-          "name": "동맹국 지원",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.99,
+              "ratio": 0.89,
               "target": "oneEnemy"
             },
             {
@@ -390,44 +459,61 @@
               "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.5,
+                      "target": "markedEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "플랜 B",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 2,
+              "target": "oneEnemy"
+            },
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "외계인",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "장교의 기백",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "군사 기밀",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "외계인 발견",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -464,11 +550,11 @@
       ],
       "oracles": [
         {
-          "name": "전함 출항",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.19
+              "ratio": 1.21
             },
             {
               "k": "stack",
@@ -483,8 +569,8 @@
           ]
         },
         {
-          "name": "상시 순찰",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "stack",
@@ -495,27 +581,31 @@
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.68
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
-          "name": "작전 선포",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "shield",
@@ -528,21 +618,34 @@
               "target": "topEnemy"
             },
             {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.6
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "함포 사격",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            },
             {
               "k": "stack",
               "id": "외계인",
@@ -550,48 +653,12 @@
               "target": "topEnemy"
             },
             {
-              "k": "status",
-              "id": "고통",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "경례 대기",
-          "fx": [
+              "k": "draw",
+              "v": 3
+            },
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.2
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "함장석",
-          "kind": "guard"
-        },
-        {
-          "name": "제복",
-          "kind": "ap"
-        },
-        {
-          "name": "전함 레이더",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "외계인",
-              "v": 1,
-              "target": "topEnemy"
             }
           ]
         }
@@ -626,8 +693,7 @@
                 {
                   "k": "status",
                   "id": "고통",
-                  "v": 1,
-                  "target": "oneEnemy"
+                  "v": 1
                 }
               ]
             }
@@ -636,13 +702,19 @@
       ],
       "oracles": [
         {
-          "name": "최전선 사수",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "외계인",
               "v": 1,
               "target": "topEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
               "k": "power",
@@ -659,8 +731,7 @@
                     {
                       "k": "status",
                       "id": "고통",
-                      "v": 2,
-                      "target": "oneEnemy"
+                      "v": 1
                     }
                   ]
                 }
@@ -669,7 +740,7 @@
           ]
         },
         {
-          "name": "순찰 출발",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -687,8 +758,7 @@
                     {
                       "k": "status",
                       "id": "고통",
-                      "v": 1,
-                      "target": "oneEnemy"
+                      "v": 1
                     }
                   ]
                 }
@@ -697,43 +767,7 @@
           ]
         },
         {
-          "name": "재판에 회부",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "hit"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "고통",
-                      "v": 1,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "외계인 격퇴 작전",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -742,9 +776,41 @@
               "target": "topEnemy"
             },
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 2,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
               "k": "draw",
               "v": 1,
               "who": "self",
+              "unique": true,
               "type": "공격"
             },
             {
@@ -762,8 +828,7 @@
                     {
                       "k": "status",
                       "id": "고통",
-                      "v": 1,
-                      "target": "oneEnemy"
+                      "v": 1
                     }
                   ]
                 }
@@ -772,17 +837,13 @@
           ]
         },
         {
-          "name": "전군 돌격",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "payHpPct",
-              "v": 0.05
-            },
-            {
-              "k": "stack",
-              "id": "외계인",
-              "v": 1,
-              "target": "topEnemy"
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
               "k": "power",
@@ -793,34 +854,219 @@
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 2
+                    "n": 3
                   },
                   "fx": [
                     {
                       "k": "status",
                       "id": "고통",
-                      "v": 2,
-                      "target": "oneEnemy"
+                      "v": 1
                     }
                   ]
                 }
               ]
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "훈장",
+          "name": "축복 1",
           "kind": "atkUp"
         },
         {
-          "name": "군사 용어",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "쓰라린 기억",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_u5",
+      "name": "배역 나눠 주기",
+      "hero": "헤일리",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "외계인",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "고통",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "외계인",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     }

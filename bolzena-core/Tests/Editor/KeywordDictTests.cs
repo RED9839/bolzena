@@ -600,7 +600,7 @@ namespace Bolzena.Core.Tests
             Assert.IsTrue(run.MindBroken);
             StringAssert.Contains("정신 붕괴", run.ClaimGlow("st2", new Glow { Kind = "hero", Options = new List<string> { "st2" } }, 0));
             var (b2, _) = run.OpenFight();
-            Assert.AreEqual(d.Hero("rico").Atk + 5, b2.Party[0].Atk, "판 단위 성장은 다음 싸움에도");
+            Assert.AreEqual(d.Hero("rico").Atk + 5 + Num.Round(d.Hero("rico").Atk * Grades.STAT_PCT * (run.Grade - 1)), b2.Party[0].Atk, "판 단위 성장은 다음 싸움에도(보스 학점으로 진급한 학년 몫과 함께)");
             run.AfterFight(b2);
             Assert.IsFalse(run.MindBroken, "한 싸움이 지나면 풀린다");
         }

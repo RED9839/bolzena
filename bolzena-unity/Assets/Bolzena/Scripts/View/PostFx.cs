@@ -24,8 +24,9 @@ namespace Bolzena.View
             v.isGlobal = true;
             v.priority = 10;
             // 설정 창 「화면 효과」 — 끄면 이 볼륨을 통째로 끈다(펀치 Kick 은 그대로 불려도 그려지지 않는다)
-            v.enabled = Bolzena.RunUI.DisplayOptions.PostFxOn;   // 저사양 모드면 설정값과 상관없이 끔
-            Bolzena.RunUI.DisplayOptions.PostFxHook = on => { if (I != null) I.GetComponent<Volume>().enabled = on; };
+            // 저사양 모드는 무거운 것(블룸 · 색수차 · 렌즈)만 끄고 색 · 밝기 보정(비네트 · 색 조정)은 남긴다(2026-10-08 — 저사양에서 화면이 어두웠다)
+            v.enabled = Bolzena.RunUI.DisplayOptions.PostFx;
+            Bolzena.RunUI.DisplayOptions.PostFxHook = on => { if (I != null) { I.GetComponent<Volume>().enabled = Bolzena.RunUI.DisplayOptions.PostFx; I.SetHeavy(Bolzena.RunUI.DisplayOptions.PostFxOn); } };
             var p = ScriptableObject.CreateInstance<VolumeProfile>();
             v.sharedProfile = p;
             var me = go.AddComponent<PostFx>();
@@ -48,8 +49,11 @@ namespace Bolzena.View
             me.color.saturation.Override(0f);
             me.color.postExposure.Override(0f);
             I = me;
+            me.SetHeavy(Bolzena.RunUI.DisplayOptions.PostFxOn);
             return me;
         }
+
+        void SetHeavy(bool on) { bloom.active = on; chroma.active = on; lens.active = on; }
 
         // 한 번 확 — 시간이 지나면 저절로 0 으로
         public static void Kick(float chroma = 0f, float lens = 0f, float sat = 0f, float exposure = 0f, float bloom = 0f)

@@ -34,6 +34,10 @@ const OP = { tags: ['개전'] };                                                
 const opc = (o = {}) => ({ ...o, tags: ['개전'] });
 // 새 생성 카드(token) — 백업에 없으니 돌릴 때마다 넣는다
 const token = (j, hero, id, name, type, fx, tags = ['소멸']) => { j.cards = j.cards.filter(c => c.id !== id); j.cards.push({ id, name, cost: 0, type, tags, fx, hero, token: true }); };
+// u5(2026-10-08) — 회수 · 동료 카드 비용↓
+const pullU = { k: 'pull', from: 'discard', who: 'self', unique: true };                 // 버린 더미의 자신의 고유 카드 1장을 손으로
+const pullAtk = { k: 'pull', from: 'discard', who: 'self', type: '공격' };              // 버린 더미의 자신의 공격 카드 1장을 손으로
+const costDownOther = { k: 'cardStatus', id: '비용', v: -1, to: 'hand', n: 1, who: 'other' };   // 손의 다른 사도 카드 1장 비용 -1
 
 // ════════════════════════════════════════════════════════════════════
 // 1. 레이지 — 딜러 · 냉정 · 1성. 부서마다 불려 다니는 만능 해결사: 종류마다 「출동 기록」, 넷이면 밤샘 끝의 레이저
@@ -86,6 +90,14 @@ function lazy(j) {
       O('용접 야근 상시', [dmg(0.6), per(K), dmg(0.2), power(rule('turnStart', [stk(K, 1)]), rule('stackReach', [dmg(0.35, EA)], reach(K, 4)))], { power: true }),
       O('밤샘에 설렘', [payHp(0.05), dmg(1.0), per(K), dmg(0.35)]),
     ], [B('달군 용접봉', 'frost'), B('용접 고글', 'draw'), B('야근 기록', [stk(K, 1)])]),
+    // u5 유틸(서치) — 꼬인 선을 못 본 척 못 해 정리하다 붙잡힌다: 차폐 + 기록 + 고유 카드 서치
+    card(H, 5, '꼬인 선 정리', 1, '스킬', [sh(0.9), stk(K, 1), srchU], [
+      O('신탁 1', [sh(1.2), stk(K, 1), srchU]),
+      O('신탁 2', [sh(0.7), stk(K, 1), srchU], { cost: 0 }),
+      O('신탁 3', [costDownHand('공격'), sh(0.9), stk(K, 2)]),                                     // 재설계 — 서치 대신 공격 카드 비용↓
+      O('신탁 4', [sh(0.7), pullU, srchU]),                                                   // F 회수 + 서치 — BEST
+      O('신탁 5', [disc(1), sh(1.3), stk(K, 3)]),                                           // H 손패 버리기
+    ], [B('축복 1', 'defUp'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '레이지_u3');
@@ -136,6 +148,14 @@ function rohne(j) {
       O('진심의 건틀릿', [ddef(0.6), per(K), ddef(0.3), power(rule('stackReach', [ddef(0.5)], reach(K, 3)))], { power: true }),
       O('마지막 진심', [ddef(1.3), per(K), ddef(0.6), spendAll(K)], { tags: ['소멸'] }),
     ], [B('강철판', 'power'), B('돈까스 힘', 'ap'), B('갑옷 기름칠', [sh(0.5)])]),
+    // u5 굴리기(공격) — 겨울의 스파이(산타 갑옷 돌격): 진심 + 방어 기반 피해
+    card(H, 5, '징글벨 돌격', 1, '공격', [ddef(0.75), stk(K, 1)], [
+      O('신탁 1', [ddef(0.98), stk(K, 1)]),
+      O('신탁 2', [ddef(0.6), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [sh(1.0), stk(K, 1), ifStack(K, 3), ddef(0.5)]),                                // 재설계 — 막고 진심이 차면 친다
+      O('신탁 4', [ddef(0.6), stk(K, 1), power(rule('hurt', [ddef(0.35)], { when: { guarded: true }, limit: 1 }))], { power: true }),   // D — 막아 낼 때마다 되받아침 · BEST
+      O('신탁 5', [per(K), ddef(0.45), spendAll(K)]),                                             // H 진심을 다 쏟는다
+    ], [B('축복 1', 'power'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '로네_u2');
@@ -197,6 +217,14 @@ function rohneMayor(j) {
       O('돈까스 모독 금지령', [dmg(2.0), per(K), dmg(0.5), power(rule('stackReach', [dmg(1.0)], reach(K, 3)))], { power: true }),
       O('시장직을 걸고', [dmg(4.0), per(K), dmg(0.8), make(T, 2)], { tags: ['소멸'] }),
     ], [B('공기 커틀릿', 'weakSpot'), B('빠른 배달', 'ap'), B('짧아진 말투', 'power')]),
+    // u5 유틸(비용) — 업무 효율 131% 상승: 지지율 + 공격 카드 비용↓
+    card(H, 5, '업무 효율 131%', 0, '스킬', [stk(K, 1), costDownHand('공격')], [
+      O('신탁 1', [stk(K, 2), costDownHand('공격')]),
+      O('신탁 2', [stk(K, 1), costDownHand('공격')], { tags: ['보존'] }),
+      O('신탁 3', [make(T, 2)]),                                                                    // 재설계 — 지지율 대신 도시락
+      O('신탁 4', [stk(K, 1), srch('공격'), costDownHand('공격')]),                               // F 공격 서치 + 비용↓ — BEST
+      O('신탁 5', [spendAll(K), make(T, 3), draw(1)]),                                              // H 지지율을 다 털어 도시락으로
+    ], [B('축복 1', 'draw'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '로네_시장_u3');
@@ -253,6 +281,14 @@ function renewa(j) {
       O('편지 배달 추적', [stk(K, 1), srch('공격'), power(rule('stackReach', [hits(3, 0.35, ER)], reach(K, 4)))]),
       O('시간 여행 비용', [payHp(0.05), stk(K, 3), power(rule('stackReach', [hits(3, 0.45, ER)], reach(K, 4)))]),
     ], [B('엘레나의 서명', 'defUp'), B('시공 우편', 'cost'), B('멈춘 시계', [stk(K, 1)])]),
+    // u5 유틸(회수) — 즐거웠던 기억 떠올리기: 실드 + 초침 + 버린 고유 카드 회수
+    card(H, 5, '즐거웠던 기억', 1, '스킬', [sh(0.85), stk(K, 1), pullU], [
+      O('신탁 1', [sh(1.1), stk(K, 1), pullU]),
+      O('신탁 2', [sh(0.85), pullU, ifTune, stk(K, 3)]),                               // E 조율 조건
+      O('신탁 3', [dmg(0.6, EA), stk(K, 1), draw(1)]),                                             // 재설계 — 기억 대신 포격
+      O('신탁 4', [sh(0.85), pullU, srchU]),                                             // F 회수 + 서치 — BEST
+      O('신탁 5', [payHp(0.05), sh(1.2), stk(K, 3)]),                                       // H HP
+    ], [B('축복 1', 'defUp'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '리뉴아_u2');
@@ -309,6 +345,14 @@ function risty(j) {
       O('현실 개변 장치', [mark(K, 1), srch('공격'), power(rule('stackReach', [dmg(0.5)], reach(K, 3)))]),
       O('곰인형 혹사', [payHp(0.05), mark(K, 2), power(rule('stackReach', [dmg(0.7)], reach(K, 3)))]),
     ], [B('말동무', 'atkUp'), B('호숫가 집', 'cost'), B('방구석 바리케이드', [sh(0.4)])]),
+    // u5 유틸(생성) — 독타 페퍼 한 박스: 빈 캔 둘 + 드로우
+    card(H, 5, '독타 페퍼 한 박스', 0, '스킬', [make(C, 2), draw(1)], [
+      O('신탁 1', [make(C, 3), draw(1)]),
+      O('신탁 2', [make(C, 2), draw(1), mark(K, 1)], { tags: ['보존'] }),
+      O('신탁 3', [make(C, 2), mark(K, 1), draw(1, { who: 'other' })]),                            // 재설계 — 협동 게임(동료 카드)
+      O('신탁 4', [make(C, 1), draw(1), power(rule('turnStart', [make(C, 1)]))], { power: true }), // D 매 턴 캔 — BEST
+      O('신탁 5', [disc(1), make(C, 3), mark(K, 1)]),                                              // H 손패 버리기
+    ], [B('축복 1', 'draw'), B('축복 2', 'cost'), B('축복 3', [mark(K, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '리스티_u2');
@@ -369,6 +413,14 @@ function maestro(j) {
       O('카메라 상시 녹화', [sh(0.6), power(rule('turnEnd', [per(K), sh(0.15)]))], { power: true }),
       O('녹화 테이프 소진', [per(K), sh(0.38), spendAll(K), draw(1)]),
     ], [B('자기 성찰', 'defUp'), B('자동 녹화', { tags: ['보존'] }), B('연료 보충', [stk(K, 1)])]),
+    // u5 굴리기(공격) — 척살 모드 전환 경고(실행되진 않음): 연료 + 방어 기반 피해
+    card(H, 5, '척살 모드 전환', 1, '공격', [ddef(0.7), stk(K, 1)], [
+      O('신탁 1', [ddef(0.9), stk(K, 1)]),
+      O('신탁 2', [ddef(0.55), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [ddef(0.7), ifKill, stk(K, 3)]),                                                  // 재설계 — 처치하면 무지개불(연료 셋)
+      O('신탁 4', [ddef(0.6), stk(K, 1), power(rule('guard', [ddef(0.3, ER)], { when: { kind: 'shield' }, limit: 1 }))], { power: true }),   // D — 실드를 얻을 때마다 반격 · BEST
+      O('신탁 5', [payHp(0.05), ddef(1.0), stk(K, 2)]),                                           // H 미숫가루(HP)
+    ], [B('축복 1', 'weakSpot'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '마에스트로2호_u2');
@@ -424,6 +476,14 @@ function amelia(j) {
       O('녹화본 열람', [stk(K, 1), draw(1, { who: 'other' }), power(camera())]),
       O('야근 감시', [payHp(0.05), stk(K, 2), power(camera(2))]),
     ], [B('부동산 카메라', 'cost'), B('채널 고정', 'defUp'), B('서류 더미', [stk(K, 1)])]),
+    // u5 유틸(비용) — 승인 등급은 전부 「그냥」: 서류 + 동료 카드 비용↓
+    card(H, 5, '그냥 승인', 0, '스킬', [stk(K, 1), costDownOther], [
+      O('신탁 1', [stk(K, 2), costDownOther]),
+      O('신탁 2', [stk(K, 1), costDownOther], { tags: ['보존'] }),
+      O('신탁 3', [st('충격', 1, EA), draw(1, { who: 'other' })]),                                  // 재설계 — 입 모양 읽기(감전 + 동료 카드)
+      O('신탁 4', [stk(K, 1), costDownOther, power(rule('stackReach', [costDownOther], reach(K, 4)))], { power: true }),   // D 일괄 결재마다 비용↓ — BEST
+      O('신탁 5', [disc(1), stk(K, 2), costDownOther]),                                            // H 손패 버리기
+    ], [B('축복 1', 'draw'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '아멜리아_u3');
@@ -485,6 +545,14 @@ function ameliaR41(j) {
       O('전자포 자동 장전', [dmg(0.9), perTag(T1), dmg(0.3), power(rule('make', [dmg(0.3, ER)], { limit: 2 }))], { power: true }),
       O('과열 사격', [disc(1), dmg(1.1), perTag(T1), dmg(0.45)]),
     ], [B('전자포 냉각', 'power'), B('나노 기계', 'ap'), B('시제품 하나 더', [make(T1, 1)])]),
+    // u5 굴리기(공격) — 거대 드론이 장비를 사출: 시험 가동 + 시제품
+    card(H, 5, '장비 사출', 1, '공격', [dmg(0.8), stk(K, 1), make(T1, 1)], [
+      O('신탁 1', [dmg(1.05), stk(K, 1), make(T1, 1)]),
+      O('신탁 2', [dmg(0.6), stk(K, 1), make(T1, 1)], { cost: 0 }),
+      O('신탁 3', [dmg(0.55, EA), make(T1, 2)]),                                       // 재설계 — 광역 사출
+      O('신탁 4', [dmg(1.05), make(T1, 1), srchU]),                                                  // F 서치 — BEST
+      O('신탁 5', [payHp(0.05), dmg(1.5), stk(K, 2)]),                                             // H HP · 생성 빼기
+    ], [B('축복 1', 'power'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '아멜리아_R41_u3');
@@ -541,6 +609,14 @@ function eisia(j) {
       O('정복 계획서', [stk(K, 2), power(rule('turnEnd', [per(K), dmg(0.12, ER)]))], { power: true }),
       O('정복 자금 탕진', [dmg(0.8), per(K), dmg(0.3), spendAll(K)]),
     ], [B('프로스트 노바', 'atkUp'), B('경영 효율화', 'cost'), B('선행 기록', [stk(K, 1)])]),
+    // u5 유틸(서치 · 생성) — 아이스크림 수레로 시작: 실드 + 냉장고 + 공격 서치
+    card(H, 5, '아이스크림 수레', 1, '스킬', [sh(0.8), make(F, 1), srch('공격')], [
+      O('신탁 1', [sh(1.05), make(F, 1), srch('공격')]),
+      O('신탁 2', [sh(0.65), make(F, 1), srch('공격')], { cost: 0 }),
+      O('신탁 3', [sh(1.65), make(F, 1), costDownHand('공격')]),                            // 재설계 — 서치 대신 비용↓
+      O('신탁 4', [sh(0.6), make(F, 1), power(rule('turnStart', [make(F, 1)]))], { power: true }), // D 매 턴 냉장고 — BEST
+      O('신탁 5', [disc(1), sh(1.1), make(F, 2)]),                                   // H 손패 버리기
+    ], [B('축복 1', 'defUp'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '아이시아_u2');
@@ -595,6 +671,14 @@ function allet(j) {
       O('자율 훈련 일과', [st('결의', 1), power(rule('turnStart', [stk(K, 1)]))], { power: true }),
       O('훈련 일지 제출', [per(K), sh(0.42), spendAll(K), st('결의', 1)]),
     ], [B('군기', 'defUp'), B('훈련 교본', { tags: ['보존'] }), B('훈련 일지', [stk(K, 1)])]),
+    // u5 유틸(드로우) — 반장님 몫 주스를 몰래 빼돌려 우주식량을 말아 먹는다: 실드 + 명령 + 드로우
+    card(H, 5, '반장님 주스 빼돌리기', 1, '스킬', [sh(1.0), stk(K, 1), draw(1)], [
+      O('신탁 1', [sh(1.3), stk(K, 1), draw(1)]),
+      O('신탁 2', [sh(0.8), stk(K, 1), draw(1)], { cost: 0 }),
+      O('신탁 3', [mark(M, 1, 'oneAlly'), sh(1.2), st('반격', 1)]),                           // 재설계 — 반장님을 옮기고 반격
+      O('신탁 4', [sh(0.9), stk(K, 1), pullU]),                                               // F 회수 — BEST
+      O('신탁 5', [disc(1), sh(1.2), stk(K, 3)]),                                                   // H 손패 버리기
+    ], [B('축복 1', 'draw'), B('축복 2', 'ap'), B('축복 3', [mark(M, 1, 'oneAlly'), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '알레트_u2');
@@ -647,6 +731,14 @@ function elena(j) {
       O('시장 연설', [dmg(0.6), per(K), dmg(0.3), power(rule('turnStart', [stk(K, 1)]))], { power: true }),
       O('3초 이상은 못 참아', [dmg(0.6), per(K), dmg(0.4, EA), spendAll(K)]),
     ], [B('기계마법 공학', 'atkUp'), B('지름길', 'cost'), B('드론 한 대 더', [stk(K, 1)])]),
+    // u5 유틸(서치) — 아메리카노 주말농장 에디션(물 한 샷 · 나머지 에스프레소): 실드 + 드론 + 공격 서치
+    card(H, 5, '아메리카노 주말농장 에디션', 1, '스킬', [sh(0.75), stk(K, 1), srch('공격')], [
+      O('신탁 1', [sh(1.0), stk(K, 1), srch('공격')]),
+      O('신탁 2', [sh(0.6), stk(K, 1), srch('공격')], { cost: 0 }),
+      O('신탁 3', [costDownHand('공격'), sh(1.0), stk(K, 2)]),                                     // 재설계 — 버그는 버그로(비용↓)
+      O('신탁 4', [sh(0.75), stk(K, 1), pullAtk]),                                            // F 버린 공격 회수 — BEST
+      O('신탁 5', [payHp(0.05), sh(0.9), stk(K, 3)]),                                              // H HP · 서치 빼기
+    ], [B('축복 1', 'defUp'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '엘레나_u2');
@@ -703,6 +795,14 @@ function orr(j) {
       O('발명 공방', [make(T, 1), power(rule('turnStart', [stk(K, 1)]))], { power: true }),
       O('부품 몽땅 투입', [per(K), sh(0.35), spendAll(K), make(T, 1)]),
     ], [B('오르나르도 엘빈치', 'guard'), B('자재 창고', 'cost'), B('부품 상자', [stk(K, 1)])]),
+    // u5 굴리기(공격) — 화나면 팔을 번쩍 들고 크앙: 부품 + 피해(스킬만 넷이라 공격 하나)
+    card(H, 5, '기계팔 크앙', 1, '공격', [dmg(0.85), stk(K, 1)], [
+      O('신탁 1', [dmg(1.1), stk(K, 1)]),
+      O('신탁 2', [dmg(0.65), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [st('약화', 1, E1), sh(1.4), stk(K, 1)]),                                        // 재설계 — 헛소리 차단 마스크(막기)
+      O('신탁 4', [dmg(0.7), stk(K, 1), srchU]),                                                    // F 서치 — BEST
+      O('신탁 5', [exBasic, dmg(1.1), stk(K, 2)]),                                                  // H 시작 카드를 고물로(기본 카드 연료)
+    ], [B('축복 1', 'power'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '오르_u2');
@@ -758,6 +858,14 @@ function ed(j) {
       O('눈 감은 방패', [st('결정화', 1), power(rule('stackReach', [sh(1.2)], reach(K, 5)))], { power: true }),
       O('이드 더 이터널 불릿', [per(K), ddef(0.35), spendAll(K)]),
     ], [B('포근한 격벽', 'defUp'), B('잠결의 다짐', 'ap'), B('잠결 경보', [stk(K, 1)])]),
+    // u5 굴리기(공격) — 화나면 나타로 들이받는다: 경보 + 방어 기반 피해(스킬만 넷이라 공격 하나)
+    card(H, 5, '나타로 들이받기', 1, '공격', [ddef(0.75), stk(K, 1)], [
+      O('신탁 1', [ddef(0.98), stk(K, 1)]),
+      O('신탁 2', [ddef(0.6), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [ddef(0.5, EA), st('약화', 1, E1)]),                                             // 재설계 — 커피 컵 걷어차기(광역)
+      O('신탁 4', [ddef(0.6), stk(K, 1), power(rule('hurt', [ddef(0.3)], { when: { guarded: true }, limit: 1 }))], { power: true }),   // D 막을 때마다 들이받음 — BEST
+      O('신탁 5', [per(K), ddef(0.4), spendAll(K), sh(0.6)]),                                      // H 경보를 다 쓴다
+    ], [B('축복 1', 'power'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '이드_u2');
@@ -808,6 +916,14 @@ function edRehab(j) {
       O('악몽 간직', [per(K), sh(0.3), st('둔화', 1, EA), draw(1)]),
       O('모두의 보조기', [disc(1), per(K), sh(0.5), heal(0.7)]),
     ], [B('사진 부스', 'guard'), B('네컷 한 장 더', 'ap'), B('악몽 한 조각', [stk(K, 1)])]),
+    // u5 유틸(동료 카드) — 혼자 걷기 힘들면 같이 걸어 달라고: 실드 + 악몽 + 동료 카드
+    card(H, 5, '같이 걷는 산책', 1, '스킬', [sh(0.9), stk(K, 1), draw(1, { who: 'other' })], [
+      O('신탁 1', [sh(1.2), stk(K, 1), draw(1, { who: 'other' })]),
+      O('신탁 2', [sh(0.7), stk(K, 1), draw(1, { who: 'other' })], { cost: 0 }),
+      O('신탁 3', [heal(1.2), sh(0.8), stk(K, 1)]),                                                          // 재설계 — 뮤트의 꿀밤 치료
+      O('신탁 4', [sh(0.9), stk(K, 1), pullU]),                                            // F 회수 — BEST
+      O('신탁 5', [disc(1), sh(1.0), stk(K, 3)]),                                                   // H 손패 버리기
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '이드_재활_u3');
@@ -863,6 +979,14 @@ function canna(j) {
       O('휴가 신청서', [dmg(0.6), perTag(S), dmg(0.45), power(rule('ult', [st('피해 감소', 2), draw(1)]))], { power: true }),
       O('탄약 낭비', [disc(1), dmg(0.8), perTag(S), dmg(0.55)]),
     ], [B('충격 포탄', 'power'), B('휴가 계획표', 'draw'), B('결재 도장 쾅', [stk(K, 1)])]),
+    // u5 유틸(회수) — 실수엔 「시정하겠슴다」: 도장 + 버린 공격 카드 회수(큰 한 방을 다시)
+    card(H, 5, '시정 보고', 0, '스킬', [stk(K, 1), pullAtk], [
+      O('신탁 1', [stk(K, 2), pullAtk]),
+      O('신탁 2', [stk(K, 1), pullAtk, make(S, 1)]),
+      O('신탁 3', [make(S, 1), draw(1, { who: 'other' })]),                                         // 재설계 — 부하 식단 관리(동료 카드 + 포탄)
+      O('신탁 4', [stk(K, 1), pullAtk, power(rule('stackReach', [pullAtk], reach(K, 3)))], { power: true }),   // D 반려마다 회수 — BEST
+      O('신탁 5', [disc(1), stk(K, 2), pullAtk]),                                                   // H 손패 버리기
+    ], [B('축복 1', 'cost'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '칸나_u1');
@@ -918,6 +1042,14 @@ function kathy(j) {
       O('동굴 생활', [dmg(0.6), per(K), dmg(0.3), power(rule('hurt', [stk(K, 1)], { limit: 1 }))], { power: true }),
       O('동굴 탈출', [per(K), dmg(0.35), spendAll(K), dmg(0.6)]),
     ], [B('내면의 초자아', 'atkUp'), B('숨기 명수', 'cost'), B('겁 많은 책임감', [stk(K, 1)])]),
+    // u5 유틸(서치) — 다크넷에서 찾은 「무서워 보이는 꿀팁」: 실드 + 전류 + 공격 서치
+    card(H, 5, '무서워 보이는 꿀팁', 1, '스킬', [sh(0.8), stk(K, 1), srch('공격')], [
+      O('신탁 1', [sh(1.05), stk(K, 1), srch('공격')]),
+      O('신탁 2', [sh(0.65), stk(K, 1), srch('공격')], { cost: 0 }),
+      O('신탁 3', [sh(1.5), stk(K, 1), costDownOther]),                                         // 재설계 — 이멀전씨!(동료 카드 비용↓)
+      O('신탁 4', [sh(0.85), stk(K, 1), power(rule('play', [stk(K, 1)], { when: { who: 'other', type: '공격' }, limit: 1 }))], { power: true }),   // D — BEST
+      O('신탁 5', [disc(1), sh(1.4), stk(K, 3)]),                                    // H 손패 버리기
+    ], [B('축복 1', 'frost'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '캐시_u2');
@@ -970,6 +1102,14 @@ function taida(j) {
       O('늪지 출장 상주', [dmg(0.6), per(K), dmg(0.3), power(rule('discard', [dmg(0.45, ER)], { limit: 2 }))], { power: true }),
       O('땡땡이 출장', [dmg(0.6), per(K), dmg(0.3), make(C, 1)]),
     ], [B('출장 가방', 'atkUp'), B('법인 카드', 'cost'), B('늪지 장화', 'draw')]),
+    // u5 유틸(동료 카드 + 버리기) — 상관 서랍을 슬쩍: 동료 카드 하나 가져와 하나 떠넘긴다
+    card(H, 5, '상관 서랍 털이', 0, '스킬', [draw(1, { who: 'other' }), disc(1)], [
+      O('신탁 1', [draw(2, { who: 'other' }), disc(1)]),
+      O('신탁 2', [sh(0.8), stk(K, 1)]),                                                            // 재설계 — 진흙탕 구르기
+      O('신탁 3', [draw(1, { who: 'other' }), disc(1), ifStack(K, 3), draw(1)]),                   // E 땡땡이 조건
+      O('신탁 4', [srchU, disc(1), make(C, 1)]),                                                    // F 고유 서치 + 밀린 업무 — BEST
+      O('신탁 5', [payHp(0.05), draw(2), disc(2)]),                                                // H HP
+    ], [B('축복 1', 'ap'), B('축복 2', [sh(0.4)]), B('축복 3', [stk(K, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '타이다_u2');
@@ -1026,6 +1166,14 @@ function festa(j) {
       O('앨범 재발매', [stk(K, 2), draw(1, { who: 'other' }), god()]),
       O('목 쉬도록', [payHp(0.05), stk(K, 3), god(dmg(0.2, EA))]),
     ], [B('스포트라이트', 'atkUp'), B('저작권료', 'draw'), B('떼창', [stk(K, 1)])]),
+    // u5 굴리기(공격) — 일부러 기괴하게 연주: 반항 + 광역
+    card(H, 5, '기괴한 연주', 1, '공격', [dmg(0.7, EA), stk(K, 1)], [
+      O('신탁 1', [dmg(0.88, EA), stk(K, 1)]),
+      O('신탁 2', [dmg(1.25, EA), stk(K, 2), st('협공', 1)], { cost: 2 }),                         // 비용↑ = 협공 + 반항 2
+      O('신탁 3', [st('협공', 1), sh(1.1)]),                                                       // 재설계 — 심사 거부(막기)
+      O('신탁 4', [dmg(0.55, EA), stk(K, 1), power(rule('stackReach', [dmg(0.3, EA)], reach(K, 4)))], { power: true }),   // D — BEST
+      O('신탁 5', [disc(1), dmg(0.95, EA), stk(K, 2)]),                                            // H 손패 버리기
+    ], [B('축복 1', 'power'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '페스타_u3');
@@ -1078,6 +1226,14 @@ function heidi(j) {
       O('셀카 연재', [make(T, 1), power(rule('turnStart', [stk(L, 1)]))], { power: true }),
       O('블로그 리뷰', [disc(1), dmg(0.9), per(L), dmg(0.3)]),
     ], [B('셀카봉', 'atkUp'), B('식당 평점', 'cost'), B('한 장 더', [make(T, 1)])]),
+    // u5 유틸(서치) — 단서 몇 개로 거대한 음모론을 완성: 실드 + 잠복 + 공격 서치
+    card(H, 5, '음모론 완성', 1, '스킬', [sh(0.7), stk(L, 2), srch('공격')], [
+      O('신탁 1', [sh(0.9), stk(L, 3), srch('공격')]),
+      O('신탁 2', [sh(0.55), stk(L, 2), srch('공격')], { cost: 0 }),
+      O('신탁 3', [make(T, 1), mark(K, 1, 'topEnemy'), sh(0.7)]),                                            // 재설계 — 종군기자 시절(특종감 옮겨 찍기)
+      O('신탁 4', [sh(0.8), stk(L, 2), pullAtk]),                                             // F 버린 공격 회수 — BEST
+      O('신탁 5', [disc(1), sh(0.8), stk(L, 4)]),                                                   // H 손패 버리기
+    ], [B('축복 1', 'defUp'), B('축복 2', 'ap'), B('축복 3', [stk(L, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '하이디_u1');
@@ -1132,6 +1288,14 @@ function haley(j) {
       O('외계인 격퇴 작전', [mark(K, 1, 'topEnemy'), srch('공격'), front()]),
       O('전군 돌격', [payHp(0.05), mark(K, 1, 'topEnemy'), front(2)]),
     ], [B('훈장', 'atkUp'), B('군사 용어', 'cost'), B('쓰라린 기억', 'frost')]),
+    // u5 유틸(동료 카드) — 주변에 멋대로 배역을 나눠 준다: 외계인 지정 + 동료 공격 카드
+    card(H, 5, '배역 나눠 주기', 0, '스킬', [mark(K, 1, 'topEnemy'), draw(1, { who: 'other', type: '공격' })], [
+      O('신탁 1', [mark(K, 1, 'topEnemy'), draw(2, { who: 'other', type: '공격' })]),
+      O('신탁 2', [mark(K, 1, 'topEnemy'), draw(1, { who: 'other', type: '공격' }), sh(0.5)], { tags: ['보존'] }),
+      O('신탁 3', [st('고통', 3, E1), sh(0.8)]),                                                   // 재설계 — 방범 순찰
+      O('신탁 4', [mark(K, 1, 'topEnemy'), srch('공격'), draw(1, { who: 'other', type: '공격' })]),   // F 자신 + 동료 공격 — BEST
+      O('신탁 5', [payHp(0.05), mark(K, 1, 'topEnemy'), draw(2, { who: 'other' })]),              // H HP
+    ], [B('축복 1', 'ap'), B('축복 2', 'guard'), B('축복 3', [st('고통', 1, E1)])]),
   ];
   setUnique(j, cards);
   starter(j, '헤일리_u3');
@@ -1183,6 +1347,14 @@ function haleySane(j) {
       O('기록 보관소', [st('결의', 1), power(rule('turnEnd', [per(K), sh(0.15)]))], { power: true }),
       O('기록 공개', [per(K), sh(0.38), spendAll(K), heal(0.5)]),
     ], [B('낯선 과거', 'defUp'), B('느긋한 산책', 'cost'), B('민트초코 사절', [stk(K, 1)])]),
+    // u5 굴리기(0코) — 필요하면 무릎을 꿇는 교섭: 실드 + 훈장
+    card(H, 5, '무릎 꿇는 교섭', 0, '스킬', [sh(0.75), stk(K, 1)], [
+      O('신탁 1', [sh(0.98), stk(K, 1)]),
+      O('신탁 2', [sh(0.75), stk(K, 1)], { tags: ['보존'] }),
+      O('신탁 3', [ddef(0.55), stk(K, 1)]),                                                         // 재설계 — 기대를 배신하는 검(막기 ↔ 치기)
+      O('신탁 4', [sh(0.6), stk(K, 1), srchU]),                                                     // F 서치 — BEST
+      O('신탁 5', [per(K), heal(0.35), spendAll(K), draw(1)]),                                     // H 훈장을 다 쓴다
+    ], [B('축복 1', 'guard'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ];
   setUnique(j, cards);
   starter(j, '헤일리_멀쩡_u3');
@@ -1238,6 +1410,14 @@ function hilde(j) {
       O('상시 처방', [hits(3, 0.42, ER), stk(K, 1), power(rule('stackReach', [hits(2, 0.3, ER)], reach(K, 3)))], { power: true }),
       O('과잉진료', [disc(1), hits(4, 0.42, ER), stk(K, 1)]),
     ], [B('주사기총', 'power'), B('마취 주사', 'frost'), B('차트 기록', [stk(K, 1)])]),
+    // u5 굴리기(공격) — 판이 기운 대국에 뒤집을 수를 둘: 차트 + 피해
+    card(H, 5, '판을 뒤집는 수', 1, '공격', [dmg(0.85), stk(K, 1)], [
+      O('신탁 1', [dmg(1.1), stk(K, 1)]),
+      O('신탁 2', [dmg(0.65), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [make(N, 1), draw(1, { who: 'other' })]),                                         // 재설계 — 지휘관과 전략 회의
+      O('신탁 4', [dmg(0.7), stk(K, 1), power(rule('stackReach', [dmg(0.4, ER)], reach(K, 3)))], { power: true }),   // D 회진마다 한 수 — BEST
+      O('신탁 5', [disc(1), dmg(1.1), stk(K, 2)]),                                                  // H 손패 버리기
+    ], [B('축복 1', 'power'), B('축복 2', 'cost'), B('축복 3', [make(N, 1)])]),
   ];
   setUnique(j, cards);
   starter(j, '힐데_u2');

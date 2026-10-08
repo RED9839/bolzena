@@ -98,7 +98,46 @@ def nature_index(n):
     return NATURES.index(n) if n in NATURES else len(NATURES) - 1
 
 
+# 스탠딩 자르기(2026-10-08 — 시작 카드 · 남는 칸): file = "@stand/<그림 키>/<자리>" · webp = .shots/standing-webp 의 이름(한글 · 웹판 키)
+#   자리 face = 얼굴 확대(성격 바탕 위에 잘라 창을 덮는다 — CardPic) · full = 전신(알파 경계로 자른 사물 꼴 — CardObj, 화면이 자리를 잡는다)
+STAND = r"C:\projects\볼제나\.shots\standing-webp"
+
+
+def is_stand(p):
+    return str(p.get("file", "")).startswith("@stand/")
+
+
+# 풀어 둔 원작 PNG(2026-10-09): file = "@raw/<mumu_pull/png/raw 상대 경로>" — 하이라이트 · 클리어 CG · 로그라이크 카드는 장면(자른다), 테마 등장 그림은 투명(사물 꼴)
+RAW = r"C:\projects\bolzena-unity-tmp\mumu_pull\png\raw"
+RAW_OBJ = ("00.themeevent/", "skillicons/")
+
+
+def is_raw(p):
+    return str(p.get("file", "")).startswith("@raw/")
+
+
+def src_of(p):
+    if is_raw(p):
+        return os.path.join(RAW, *p["file"][5:].split("/")) + ".png"
+    if is_stand(p):
+        return os.path.join(STAND, p.get("webp", "") + ".webp")
+    return os.path.join(SRC, *p["file"].split("/")) + ".png"
+
+
+def _stand_image(p):
+    """스탠딩 렌더 — 투명 가장자리를 자른 것(copy_assets.py 의 RunArt/Standing 과 같은 자르기 · 머리 자리 표 _meta.json 과 좌표가 맞는다)."""
+    im = Image.open(src_of(p)).convert("RGBA")
+    bb = im.getchannel("A").point(lambda a: 255 if a > 24 else 0).getbbox()
+    if bb:
+        im = im.crop((max(0, bb[0] - 8), max(0, bb[1] - 8), min(im.width, bb[2] + 8), min(im.height, bb[3] + 8)))
+    return im
+
+
 def is_obj(p):
+    if is_raw(p):
+        return p["file"][5:].startswith(RAW_OBJ)
+    if is_stand(p):
+        return p["file"].split("/")[2] == "full"
     return bool(p.get("file")) and os.path.basename(p["file"]).split("__")[0] not in FLAT
 
 
@@ -113,10 +152,10 @@ def bake_back(idx, dst):
 
 def bake_obj(p, dst):
     """사물 · SD 그림 — 알파 경계로 자르고 발밑 그림자를 붙인다. 돌려주는 값 = _meta.json 한 줄."""
-    src = os.path.join(SRC, *p["file"].split("/")) + ".png"
+    src = src_of(p)
     if not os.path.exists(src):
         return None
-    im = Image.open(src).convert("RGBA")
+    im = _stand_image(p) if is_stand(p) else Image.open(src).convert("RGBA")
     bb = im.getchannel("A").point(lambda a: 255 if a > 16 else 0).getbbox() or (0, 0) + im.size
     im = im.crop(bb)
     sw, sh = im.size
@@ -147,10 +186,24 @@ def bake_obj(p, dst):
 
 
 def bake(p, dst):
-    src = os.path.join(SRC, *p["file"].split("/")) + ".png"
+    src = src_of(p)
     if not os.path.exists(src):
         return False
-    cat = os.path.basename(p["file"]).split("__")[0]
+    if is_stand(p):
+        # 얼굴 확대 — 투명 바깥은 성격 바탕(그림 창 밖으로 나가는 자리도 바탕으로 채운다)
+        im = _stand_image(p)
+        W, H = im.size
+        x, y, s_ = p.get("c") or [5, 1.5, 0.3]
+        ch = s_ * H
+        cw = ch * RATIO
+        left, top = x / 10 * W - cw / 2, y / 10 * H - FACE_Y * ch
+        part = im.crop((round(left), round(top), round(left + cw), round(top + ch))).resize((OUT_W, OUT_H), Image.LANCZOS)
+        out = _backdrop(p.get("nature"), (0.0, 0.0, 1.0, 0.7))
+        out.alpha_composite(part)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        out.convert("RGB").save(dst, optimize=True)
+        return True
+    cat = "cg" if is_raw(p) and not is_obj(p) else os.path.basename(p["file"]).split("__")[0]
     im = Image.open(src)
     c = p.get("c")
     if cat == "cg" and c:

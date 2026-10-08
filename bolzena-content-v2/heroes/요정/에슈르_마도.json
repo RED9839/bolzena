@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "요정",
       "role": "딜러",
+      "style": "성장형",
       "star": 3,
       "hp": 700,
       "atk": 135,
@@ -120,7 +121,7 @@
                 },
                 {
                   "k": "extra",
-                  "ratio": 0.6
+                  "ratio": 0.66
                 },
                 {
                   "k": "spend",
@@ -199,7 +200,7 @@
       ],
       "oracles": [
         {
-          "name": "억까 종료 선언",
+          "name": "신탁 1",
           "tags": [
             "소멸"
           ],
@@ -216,9 +217,9 @@
           ]
         },
         {
-          "name": "억까 보관",
+          "name": "신탁 2",
           "tags": [
-            "보존"
+            "소멸"
           ],
           "fx": [
             {
@@ -229,26 +230,27 @@
               "k": "stack",
               "id": "마력 증폭",
               "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "거울 형상",
+              "v": 1
             }
           ]
         },
         {
-          "name": "연구 자료",
+          "name": "신탁 3",
           "tags": [
             "소멸"
           ],
           "fx": [
             {
               "k": "draw",
-              "v": 2,
-              "who": "self",
-              "unique": true
+              "v": 3
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 1
+              "k": "burn",
+              "v": 1
             },
             {
               "k": "stack",
@@ -258,65 +260,61 @@
           ]
         },
         {
-          "name": "증명할 기회",
+          "name": "신탁 4",
           "tags": [
             "소멸"
           ],
           "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
             {
               "k": "stack",
               "id": "마력 증폭",
               "v": 3
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "밤샘 연구",
-          "power": true,
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "마력 증폭",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "nextAp",
+              "v": -1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "노트 정리",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "ap"
         },
         {
-          "name": "평가 뒤집기",
+          "name": "축복 2",
           "tags": [
-            "신속"
+            "보존"
           ]
         },
         {
-          "name": "잔소리 차단",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -337,7 +335,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2,
+          "ratio": 1.98,
           "target": "oneEnemy"
         },
         {
@@ -357,11 +355,12 @@
       ],
       "oracles": [
         {
-          "name": "극대 마력 레이저",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.5,
+              "ratio": 2.67,
               "target": "oneEnemy"
             },
             {
@@ -370,7 +369,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.67,
               "target": "oneEnemy"
             },
             {
@@ -381,12 +380,13 @@
           ]
         },
         {
-          "name": "시험 발사",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.88,
               "target": "oneEnemy"
             },
             {
@@ -395,7 +395,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.37,
+              "ratio": 0.47,
               "target": "oneEnemy"
             },
             {
@@ -406,30 +406,36 @@
           ]
         },
         {
-          "name": "광역 레이저",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.22,
+              "ratio": 1.43,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
+              "k": "perStack",
+              "id": "마력 증폭"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.33,
               "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "모든 걸 건 증명",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 4.6,
+              "ratio": 2.04,
               "target": "oneEnemy"
             },
             {
@@ -438,24 +444,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.54,
               "target": "oneEnemy"
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 2
+              "k": "stack",
+              "id": "거울 형상",
+              "v": 1
             }
           ]
         },
         {
-          "name": "억까는 끝",
+          "name": "신탁 5",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.08,
+              "ratio": 1.94,
               "target": "oneEnemy"
             },
             {
@@ -472,7 +477,7 @@
               "rules": [
                 {
                   "when": {
-                    "on": "kill"
+                    "on": "exhaust"
                   },
                   "limit": {
                     "per": "turn",
@@ -482,7 +487,12 @@
                     {
                       "k": "stack",
                       "id": "마력 증폭",
-                      "v": 2
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.45,
+                      "target": "oneEnemy"
                     }
                   ]
                 }
@@ -493,15 +503,15 @@
       ],
       "blesses": [
         {
-          "name": "빛나는 노트",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "세계수 연구",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "증폭 회로",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -522,7 +532,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 0.72,
           "target": "allEnemies"
         },
         {
@@ -539,11 +549,11 @@
       ],
       "oracles": [
         {
-          "name": "화려한 마도술",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.94,
+              "ratio": 0.97,
               "target": "allEnemies"
             },
             {
@@ -560,18 +570,13 @@
           ]
         },
         {
-          "name": "한 점 빵타지아",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.38,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
+              "ratio": 0.55,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -581,58 +586,31 @@
           ]
         },
         {
-          "name": "증명 완료",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "target": "allEnemies"
+              "ratio": 1.41,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "마력 증폭",
-              "n": 1
+              "v": 2
             },
             {
               "k": "stack",
               "id": "마력 증폭",
-              "v": 3
+              "v": 2
             }
           ]
         },
         {
-          "name": "연구 실습",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.92,
-              "target": "allEnemies"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "마력 증폭",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "마법 빵 후보",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.92,
+              "ratio": 0.95,
               "target": "allEnemies"
             },
             {
@@ -644,26 +622,26 @@
               "k": "draw",
               "v": 1,
               "who": "self",
+              "unique": true,
               "type": "공격"
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "새 복장",
-          "kind": "frost"
         },
         {
-          "name": "빵 뽕",
-          "kind": "cost"
-        },
-        {
-          "name": "밤샘 연구",
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.12,
+              "target": "allEnemies"
+            },
             {
               "k": "stack",
               "id": "마력 증폭",
+              "v": 3
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -680,50 +658,272 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 0.66,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "마력 증폭"
+          "k": "perCardSt",
+          "id": "연구",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.22,
           "target": "oneEnemy"
+        },
+        {
+          "k": "ifGained",
+          "id": "마력 증폭",
+          "n": 4
+        },
+        {
+          "k": "cardStatus",
+          "id": "연구",
+          "v": 1,
+          "max": 6
         }
       ],
       "oracles": [
         {
-          "name": "깊은 연구 집중",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.89,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "마력 증폭"
+              "k": "perCardSt",
+              "id": "연구",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.3,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifGained",
+              "id": "마력 증폭",
+              "n": 4
+            },
+            {
+              "k": "cardStatus",
+              "id": "연구",
+              "v": 1,
+              "max": 6
             }
           ]
         },
         {
-          "name": "연구실 불 켜기",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perCardSt",
+              "id": "연구",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifGained",
+              "id": "마력 증폭",
+              "n": 4
+            },
+            {
+              "k": "cardStatus",
+              "id": "연구",
+              "v": 1,
+              "max": 6
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.66,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perCardSt",
+              "id": "연구",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.77,
+              "ratio": 0.75,
               "target": "oneEnemy"
+            },
+            {
+              "k": "perCardSt",
+              "id": "연구",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "마력 증폭",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perCardSt",
+              "id": "연구",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에슈르_마도_u5",
+      "name": "밤샘 스터디",
+      "hero": "에슈르_마도",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "거울 형상",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "마력 증폭",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "거울 형상",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "거울 형상",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "거울 형상",
+              "v": 1
             },
             {
               "k": "stack",
@@ -740,7 +940,7 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "마력 증폭",
+                      "id": "거울 형상",
                       "v": 1
                     }
                   ]
@@ -750,90 +950,65 @@
           ]
         },
         {
-          "name": "대마법 연구 노트",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "거울 형상",
+              "v": 1
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "마법의 빵 비밀 공식",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "마력 증폭"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "마력 증폭",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
+              "unique": true,
               "type": "공격"
             }
           ]
         },
         {
-          "name": "증명 끝",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "거울 형상",
+              "v": 3
             },
             {
-              "k": "perStack",
-              "id": "마력 증폭"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "마력 증폭",
-              "all": true
+              "v": 2
+            },
+            {
+              "k": "nextAp",
+              "v": -1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "공격 속도",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "대-에슈르의 조언",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "tags": [
+            "신속"
+          ]
         },
         {
-          "name": "빵 한 입",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.3
+              "k": "stack",
+              "id": "거울 형상",
+              "v": 1
             }
           ]
         }

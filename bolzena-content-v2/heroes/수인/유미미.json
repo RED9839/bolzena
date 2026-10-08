@@ -6,6 +6,7 @@
       "nature": "광기",
       "race": "수인",
       "role": "딜러",
+      "style": "아껴 두기형",
       "star": 1,
       "hp": 460,
       "atk": 124,
@@ -20,7 +21,7 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.3
+            "v": 0.33
           }
         ],
         "consumeAll": true,
@@ -39,15 +40,9 @@
             ]
           },
           {
-            "name": "한적함",
+            "name": "늘어진 하루",
             "when": {
-              "on": "play",
-              "type": "스킬",
-              "who": "other"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
+              "on": "turnEnd"
             },
             "fx": [
               {
@@ -63,7 +58,7 @@
         {
           "name": "늘어지기",
           "when": {
-            "on": "turnEnd"
+            "on": "keepAp"
           },
           "fx": [
             {
@@ -174,7 +169,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.3,
+          "ratio": 1.82,
           "target": "topEnemy"
         },
         {
@@ -184,59 +179,18 @@
         },
         {
           "k": "tough",
-          "v": 1,
+          "v": 2,
           "target": "topEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "힘껏 발싸!",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
-              "target": "topEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "topEnemy"
-            }
-          ]
-        },
-        {
-          "name": "대충 발싸",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "topEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "topEnemy"
-            }
-          ]
-        },
-        {
-          "name": "천벌 예행연습",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.6,
+              "ratio": 2.46,
               "target": "topEnemy"
             },
             {
@@ -248,35 +202,37 @@
               "k": "tough",
               "v": 2,
               "target": "topEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "화살 줍기",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.72,
               "target": "topEnemy"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 2,
+              "target": "topEnemy"
             }
           ]
         },
         {
-          "name": "늘어지게 조준",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.95,
               "target": "topEnemy"
             },
             {
@@ -285,8 +241,71 @@
               "n": 2
             },
             {
+              "k": "extra",
+              "ratio": 1.05,
+              "target": "topEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
               "k": "dmg",
-              "ratio": 0.62,
+              "ratio": 2.13,
+              "target": "topEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "topEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "topEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.73,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "ifStack",
+              "id": "나른함",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 2,
               "target": "topEnemy"
             }
           ]
@@ -294,16 +313,22 @@
       ],
       "blesses": [
         {
-          "name": "팽팽한 시위",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "급소 관찰",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "하품 한 번",
-          "kind": "draw"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -316,8 +341,11 @@
       "type": "공격",
       "fx": [
         {
+          "k": "strip"
+        },
+        {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 1.4,
           "target": "oneEnemy"
         },
         {
@@ -328,11 +356,15 @@
       ],
       "oracles": [
         {
-          "name": "유령 관통",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
+              "k": "strip"
+            },
+            {
               "k": "dmg",
-              "ratio": 1.25,
+              "ratio": 1.89,
               "target": "oneEnemy"
             },
             {
@@ -343,12 +375,16 @@
           ]
         },
         {
-          "name": "툭 쏘기",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
+              "k": "strip"
+            },
+            {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 1.33,
               "target": "oneEnemy"
             },
             {
@@ -359,12 +395,36 @@
           ]
         },
         {
-          "name": "뿔갈이 습관",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "strip"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.62,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
+              "k": "strip"
+            },
+            {
               "k": "dmg",
-              "ratio": 0.94,
+              "ratio": 1.53,
               "target": "oneEnemy"
             },
             {
@@ -372,13 +432,21 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "나른함",
                       "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.59
                     }
                   ]
                 }
@@ -387,59 +455,31 @@
           ]
         },
         {
-          "name": "잠 깨는 한 발",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "strip"
             },
             {
               "k": "dmg",
-              "ratio": 1.25,
+              "ratio": 2.52,
               "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "하품 섞인 한 발",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "나른함",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "날 선 화살촉",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "으스스한 화살",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "애벌레 간식",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -468,12 +508,12 @@
         },
         {
           "k": "shield",
-          "ratio": 1
+          "ratio": 1.4
         }
       ],
       "oracles": [
         {
-          "name": "푹 늘어지기",
+          "name": "신탁 1",
           "tags": [
             "보존"
           ],
@@ -485,12 +525,12 @@
             },
             {
               "k": "shield",
-              "ratio": 1.46
+              "ratio": 1.89
             }
           ]
         },
         {
-          "name": "잠깐 눕기",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "보존"
@@ -503,12 +543,12 @@
             },
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 0.98
             }
           ]
         },
         {
-          "name": "뒹굴며 줍기",
+          "name": "신탁 3",
           "tags": [
             "보존"
           ],
@@ -520,21 +560,17 @@
             },
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 1.26
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
+              "v": 1
             }
           ]
         },
         {
-          "name": "본격 낮잠",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
@@ -544,19 +580,28 @@
             },
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 1.4
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
+                      "k": "stack",
+                      "id": "나른함",
+                      "v": 1
+                    },
+                    {
                       "k": "shield",
-                      "ratio": 0.6
+                      "ratio": 0.56
                     }
                   ]
                 }
@@ -565,7 +610,8 @@
           ]
         },
         {
-          "name": "수풀 위장",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -573,28 +619,14 @@
               "v": 3
             },
             {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "푹신한 풀밭",
-          "kind": "guard"
-        },
-        {
-          "name": "꿈결에 한 장",
-          "kind": "draw"
-        },
-        {
-          "name": "느긋한 마음",
-          "fx": [
+              "k": "shield",
+              "ratio": 1.68
+            },
             {
-              "k": "stack",
-              "id": "나른함",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -610,16 +642,15 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 1.61,
           "target": "oneEnemy"
         },
         {
-          "k": "ifWounded",
-          "target": "oneEnemy"
+          "k": "ifWounded"
         },
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 1.26,
           "target": "oneEnemy"
         },
         {
@@ -632,16 +663,43 @@
       ],
       "oracles": [
         {
-          "name": "건방진 놈 혼내기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 2.17,
               "target": "oneEnemy"
             },
             {
-              "k": "ifWounded",
+              "k": "ifWounded"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.71,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.53,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifWounded"
             },
             {
               "k": "dmg",
@@ -658,78 +716,17 @@
           ]
         },
         {
-          "name": "끝장내기",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.79,
+              "ratio": 1.99,
               "target": "oneEnemy"
             },
             {
-              "k": "ifWounded",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.03,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "제일 약한 놈 골라",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifWounded",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.08,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "ap",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "나른한 일격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
+              "k": "stack",
               "id": "나른함",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
+              "v": 1
             },
             {
               "k": "ifKill"
@@ -741,26 +738,44 @@
           ]
         },
         {
-          "name": "다음 화살",
+          "name": "신탁 4",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.89,
+              "target": "oneEnemy"
+            },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
+            },
+            {
+              "k": "ifWounded"
             },
             {
               "k": "dmg",
-              "ratio": 1.38,
+              "ratio": 1.46,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.9,
               "target": "oneEnemy"
             },
             {
-              "k": "ifWounded",
-              "target": "oneEnemy"
+              "k": "ifWounded"
             },
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 2.27,
               "target": "oneEnemy"
             }
           ]
@@ -768,16 +783,200 @@
       ],
       "blesses": [
         {
-          "name": "깔보는 눈빛",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "약한 곳 찌르기",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "잘난 척",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "유미미_u5",
+      "name": "귀찮아서 대충",
+      "hero": "유미미",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "나른함",
+          "v": 1
+        },
+        {
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 2
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp",
+                    "kind": "ap"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "나른함",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.84
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 2
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
           "kind": "ap"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나른함",
+              "v": 1
+            }
+          ]
         }
       ]
     }

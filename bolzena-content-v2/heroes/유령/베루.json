@@ -6,22 +6,40 @@
       "nature": "우울",
       "race": "유령",
       "role": "딜러",
+      "style": "표적형",
       "star": 1,
       "hp": 520,
       "atk": 104,
       "def": 25,
       "crit": 10,
-      "blurb": "남의 흠만 쏙쏙 찾아 험하게 늘어지는 결점의 유령. 베루가 친 적에게는 「흠」 이 남고, 흠 붙은 적을 치는 아군 공격은 한 장마다 약점으로 꽂힙니다.",
+      "blurb": "남의 흠만 쏙쏙 찾아 험하게 늘어지는 결점의 유령. 한 놈만 찍어 「흠」 을 파고, 흠 붙은 적을 치는 아군 공격은 한 장마다 약점으로 꽂힙니다. 찍은 적이 쓰러지면 다음 놀림거리를 찾습니다.",
       "keyword": {
         "name": "흠",
         "desc": "베루가 짚어 낸 적의 결점",
         "carrier": "enemy",
         "cap": 4,
+        "hunt": true,
         "weakens": true,
         "per": [
           {
             "stat": "taken",
-            "v": 0.08
+            "v": 0.05
+          }
+        ],
+        "rules": [
+          {
+            "name": "다음 놀림거리",
+            "when": {
+              "on": "huntDown"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "흠",
+                "v": 2,
+                "target": "lowEnemy"
+              }
+            ]
           }
         ]
       },
@@ -146,7 +164,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.48,
+          "ratio": 0.38,
           "target": "oneEnemy",
           "hits": 3
         },
@@ -159,11 +177,12 @@
       ],
       "oracles": [
         {
-          "name": "도끼 셋 명중",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.52,
               "target": "oneEnemy",
               "hits": 3
             },
@@ -176,12 +195,13 @@
           ]
         },
         {
-          "name": "이히히 도끼",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.41,
+              "ratio": 0.37,
               "target": "oneEnemy",
               "hits": 3
             },
@@ -194,13 +214,19 @@
           ]
         },
         {
-          "name": "흩어지는 도끼",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.59,
-              "target": "randomEnemy",
+              "ratio": 0.34,
+              "target": "oneEnemy",
               "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -211,92 +237,46 @@
           ]
         },
         {
-          "name": "익살스러운 표정",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.36,
               "target": "oneEnemy",
               "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 1,
-              "target": "oneEnemy"
             },
             {
               "k": "ifStack",
               "id": "흠",
-              "n": 3
+              "n": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.75,
+              "k": "stack",
+              "id": "흠",
+              "v": 2,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "베-",
-          "power": true,
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.58,
               "target": "oneEnemy",
               "hits": 3
             },
             {
               "k": "stack",
               "id": "흠",
-              "v": 1,
+              "v": 2,
               "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "흠",
-                      "v": 1,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "날 선 도끼",
-          "kind": "power"
-        },
-        {
-          "name": "허점 발견",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "이히히",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "discard",
+              "v": 1
             }
           ]
         }
@@ -312,7 +292,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 0.72,
           "target": "oneEnemy"
         },
         {
@@ -321,7 +301,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.38,
+          "ratio": 0.28,
           "target": "oneEnemy"
         },
         {
@@ -332,82 +312,12 @@
       ],
       "oracles": [
         {
-          "name": "물고 늘어지기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.19,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "흠"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.48,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "흠",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "계속 물고",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.21,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "흠"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.43,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "먼저 지적",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.06,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "흠"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "흠",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "끈질긴 기억",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.98,
               "target": "oneEnemy"
             },
             {
@@ -420,37 +330,20 @@
               "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "흠",
-                      "v": 1,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
+              "k": "spend",
+              "id": "흠",
+              "all": true
             }
           ]
         },
         {
-          "name": "PC방의 기억",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.09,
+              "ratio": 0.65,
               "target": "oneEnemy"
             },
             {
@@ -459,34 +352,106 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.41,
+              "ratio": 0.26,
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "perStack",
+              "id": "흠"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "흠"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "흠"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "끈질긴 이빨",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "결점 노트",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "들통난 흠",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
+              "k": "stack",
+              "id": "흠",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -521,7 +486,7 @@
       ],
       "oracles": [
         {
-          "name": "3년짜리 계약",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -542,44 +507,8 @@
           ]
         },
         {
-          "name": "계약서 던지기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "도장 찍기 전에",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "친구 놀이",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "stack",
@@ -595,111 +524,44 @@
             },
             {
               "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "집문서 담보",
-          "fx": [
-            {
-              "k": "discard",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "깨알 조항",
-          "kind": "draw"
         },
         {
-          "name": "서명 강요",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
               "id": "흠",
-              "v": 1,
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.48,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "빠른 도장",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "베루_u4",
-      "name": "메죵 등 뒤",
-      "hero": "베루",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.38,
-          "target": "allEnemies"
-        },
-        {
-          "k": "perStack",
-          "id": "흠",
-          "each": true
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.22,
-          "target": "allEnemies"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "메죵 등에 착",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "흠",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.28,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "외강내유",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "흠",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "draw",
               "v": 1
             },
             {
@@ -723,10 +585,106 @@
                       "target": "oneEnemy"
                     }
                   ]
-                },
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베루_u4",
+      "name": "캐러멜 팝콘 구경",
+      "hero": "베루",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "hit",
+                "who": "other"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "흠",
+                  "v": 1,
+                  "target": "oneEnemy"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
                 {
                   "when": {
-                    "on": "hurt"
+                    "on": "hit",
+                    "who": "other"
                   },
                   "limit": {
                     "per": "turn",
@@ -746,94 +704,313 @@
           ]
         },
         {
-          "name": "걱정한 게 아니라구",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "흠",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "등 뒤에서 베-",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.31,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "흠",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.19,
-              "target": "allEnemies"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "흠",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "놀릴 거리 모음",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "흠",
-              "each": true
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "흠",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             },
             {
-              "k": "dmg",
-              "ratio": 0.28,
-              "target": "allEnemies"
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "흠",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.48
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "흠",
+                      "v": 1,
+                      "target": "lowEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "메죵의 그림자",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "울음 참기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.4
-            }
-          ]
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "작은 등",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "흠",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베루_u5",
+      "name": "흠 들추기",
+      "hero": "베루",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "흠",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.32
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "흠",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }

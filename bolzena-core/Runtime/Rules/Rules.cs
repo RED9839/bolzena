@@ -19,7 +19,8 @@ namespace Bolzena.Core
         public const int SCALE = 10;
         public static readonly Dictionary<int, double> FLOOR_HP = new() { [1] = 2.0, [2] = 3.25 };
         public static readonly Dictionary<int, double> BOSS_HP = new() { [1] = 0.7, [2] = 0.6 };
-        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.4, [2] = 3.8 };
+        /// <summary>층별 적 피해 배율. 2층 3.8 → 5.15(2026-10-09 — 학년 시스템 켬 · 크레파스 없음 · 숙련 봇 역할 편성 완주 33% 맞춤. 모든 층을 올리면 1층 쓰러짐이 20% 넘어 2층만 올렸다)</summary>
+        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.4, [2] = 5.15 };
         public const double ELITE_HP = 1.5;
 
         /// <summary>층(0부터) · 보스 · 엘리트 → 적 체력 배율 · 피해 배율.</summary>
@@ -206,18 +207,21 @@ namespace Bolzena.Core
             public const int Ap = 1;
             /// <summary>소수 찌꺼기를 지우는 눈금(1/60 — 1/2 · 1/3 · 1/4 · 1/5 · 1/6 · ×0.8 이 다 맞아떨어진다).</summary>
             public const double Grid = 60;
+            /// <summary>광역(allEnemies · 퍼짐) 카드가 적 하나에 주는 강인도 피해 배율 — 1 이면 적마다 단일과 같은 양(2026-10-08 사용자 제보 「1코 광역이 1칸을 못 깎는다」, 옛 0.5).</summary>
+            public const double Area = 1;
         }
 
         /// <summary>
         /// 강인도 피해(카드가 적 하나를 처음 칠 때) — 사용자 확정 단위(Docs/키워드.md §1): 약점 공격은 카드 비용 1 당 1 · 약점이 아니면 그 1/3.
-        /// 비용 0 은 비용 1/2 로 친다(약점 1/2 · 아니면 1/6) · 광역(allEnemies)은 대상마다 절반 · X 는 낸 AP · 고학년은 비용 2.
+        /// 비용은 최소 1 로 친다 — 0코(적힌 0 · 신탁 · 축복으로 0 이 된 것 · X 로 0 낸 것)도 1코처럼 약점 1 · 아니면 1/3(2026-10-08 사용자, 옛 0코 = 1/2).
+        /// 광역(allEnemies)은 대상마다 TOUGH.Area 배(지금 1 — 적마다 단일과 같은 양) · X 는 낸 AP · 고학년은 비용 2.
         /// 2026-10-05 — 옛 「카드마다 0.5 + 약점 0.5」 를 바꿨다.
         /// </summary>
         public static double ToughDmg(int cost, bool weak, bool area)
         {
-            double unit = cost > 0 ? cost : 0.5;
+            double unit = Math.Max(1, cost);
             double v = weak ? unit : unit / 3;
-            return area ? v / 2 : v;
+            return area ? v * TOUGH.Area : v;
         }
 
         /// <summary>약점 속성으로 치면 피해 +25%(카제나 추정값, Docs/키워드.md §0). 약점이 아닌 상성 우위는 NATURE_DMG.</summary>
@@ -243,12 +247,12 @@ namespace Bolzena.Core
 
         // ── 최종 피해 ────────────────────────────────────────────────
         /// <summary>최종 = 스탯 × (배율 + 신탁) × 축복(×1.3) × (1 + 전역) × 치명(×1.5). 증가가 있으면 최소 1.</summary>
-        public static int FinalDamage(double stat, double ratio, double flash = 0, bool shin = false, double global = 0, bool crit = false)
+        public static int FinalDamage(double stat, double ratio, double flash = 0, bool shin = false, double global = 0, bool crit = false, double critX = 0)
         {
             double v = stat * (ratio + flash);
             if (shin) v *= SHIN;
             v *= 1 + global;
-            if (crit) v *= CRIT_MULT;
+            if (crit) v *= CRIT_MULT + critX;
             int o = Num.Round(v);
             if (o == 0 && stat * ratio > 0) return 1;
             return o;

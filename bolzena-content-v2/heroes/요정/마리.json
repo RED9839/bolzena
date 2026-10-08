@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "요정",
       "role": "딜러",
+      "style": "예약형",
       "star": 2,
       "hp": 590,
       "atk": 125,
@@ -14,13 +15,13 @@
       "blurb": "왕국 하나쯤 날려 버릴 폭탄도 만드는 천재 폭파 전문가이자, 과거엔 「황금손」이라 불린 좀도둑. 이제는 도둑이 아닌 모험가로 인정받고 싶은데, 도무지 존재감이 없습니다.",
       "keyword": {
         "name": "폭파 실험",
-        "desc": "폭발에 들뜨는 탐험가의 눈",
+        "desc": "곳곳에 묻어 두고 누를 날만 기다리는 폭약",
         "carrier": "self",
-        "cap": 4,
+        "cap": 6,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.15
+            "v": 0.05
           }
         ]
       },
@@ -151,7 +152,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.3,
           "target": "allEnemies"
         },
         {
@@ -159,7 +160,8 @@
           "id": "폭파 실험",
           "v": 1
         }
-      ]
+      ],
+      "blurb": "던지면 조금 터지고, 나머지는 땅속에 묻혀 기폭을 기다립니다"
     },
     {
       "id": "마리_u1",
@@ -171,38 +173,58 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.75,
+          "ratio": 0.65,
           "target": "allEnemies"
         },
         {
-          "k": "make",
-          "id": "마리_bomb",
+          "k": "status",
+          "id": "잔불",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "폭파 실험",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "특급 배달",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.99,
+              "ratio": 0.88,
               "target": "allEnemies"
             },
             {
-              "k": "make",
-              "id": "마리_bomb",
+              "k": "status",
+              "id": "잔불",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
               "v": 1
             }
           ]
         },
         {
-          "name": "폭탄 공장",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.71,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -210,12 +232,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "마리_bomb",
+                      "k": "stack",
+                      "id": "폭파 실험",
                       "v": 1
                     }
                   ]
@@ -225,57 +252,54 @@
           ]
         },
         {
-          "name": "배달 사고",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "make",
-              "id": "마리_bomb",
-              "v": 3
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "반물질 중성자 폭탄",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 1.17,
               "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "마리_bomb",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "폭파 실험",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "왕국 하나쯤",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "마리_bomb",
-              "v": 2
             },
             {
               "k": "status",
@@ -288,19 +312,19 @@
       ],
       "blesses": [
         {
-          "name": "화약 듬뿍",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "날개 펄럭",
-          "kind": "atkUp"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "정령 호수 지뢰",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "마리_bomb",
+              "k": "stack",
+              "id": "폭파 실험",
               "v": 1
             }
           ]
@@ -316,17 +340,13 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.3,
-          "target": "allEnemies"
-        },
-        {
           "k": "perStack",
-          "id": "폭파 실험"
+          "id": "폭파 실험",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.36,
           "target": "allEnemies"
         },
         {
@@ -337,20 +357,16 @@
       ],
       "oracles": [
         {
-          "name": "고폭 기폭",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies"
-            },
-            {
               "k": "perStack",
-              "id": "폭파 실험"
+              "id": "폭파 실험",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.46,
               "target": "allEnemies"
             },
             {
@@ -361,65 +377,18 @@
           ]
         },
         {
-          "name": "손 안 대고 기폭",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "target": "allEnemies"
-            },
             {
               "k": "perStack",
-              "id": "폭파 실험"
+              "id": "폭파 실험",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.33,
+              "ratio": 0.3,
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "연쇄 기폭",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.31,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "마리_bomb"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "target": "allEnemies"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "마리_bomb"
-            }
-          ]
-        },
-        {
-          "name": "한 놈만 기폭",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.61,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "폭파 실험"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy"
             },
             {
               "k": "spend",
@@ -429,21 +398,45 @@
           ]
         },
         {
-          "name": "실험 일지",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "폭파 실험",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "폭파 실험",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
-            },
-            {
               "k": "perStack",
-              "id": "폭파 실험"
+              "id": "폭파 실험",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.29,
+              "ratio": 0.3,
               "target": "allEnemies"
             },
             {
@@ -451,36 +444,62 @@
               "rules": [
                 {
                   "when": {
-                    "on": "exhaust"
+                    "on": "reserveFire"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 2
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "폭파 실험",
-                      "v": 1
+                      "v": 2
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "폭파 실험",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "폭파 실험",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "빨간 버튼",
-          "kind": "ap"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "원격 장치",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "반짝이는 유물",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -514,7 +533,7 @@
       ],
       "oracles": [
         {
-          "name": "황금손 전성기",
+          "name": "신탁 1",
           "tags": [
             "신속"
           ],
@@ -531,7 +550,7 @@
           ]
         },
         {
-          "name": "금고 털이",
+          "name": "신탁 2",
           "tags": [
             "신속"
           ],
@@ -542,15 +561,37 @@
               "v": 1
             },
             {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
+            },
+            {
               "k": "draw",
-              "v": 2,
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
             }
           ]
         },
         {
-          "name": "좀도둑 버릇",
+          "name": "신탁 4",
           "tags": [
             "신속"
           ],
@@ -561,38 +602,170 @@
               "v": 1
             },
             {
-              "k": "when",
-              "on": "draw"
+              "k": "draw",
+              "v": 1
             },
             {
-              "k": "make",
-              "id": "마리_bomb",
-              "v": 2
+              "k": "shield",
+              "ratio": 0.52
             }
           ]
         },
         {
-          "name": "지도 그리기",
-          "tags": [
-            "신속"
-          ],
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_u4",
+      "name": "숨겨 둔 한 방",
+      "hero": "마리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "payHp",
+          "v": 50
+        },
+        {
+          "k": "perStack",
+          "id": "폭파 실험",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "폭파 실험",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 50
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "폭파 실험",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 30
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "폭파 실험",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 50
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "payHp",
+              "v": 40
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "allEnemies"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "pay"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "마리_bomb",
+                      "k": "stack",
+                      "id": "폭파 실험",
                       "v": 1
                     }
                   ]
@@ -602,14 +775,267 @@
           ]
         },
         {
-          "name": "가출 통로",
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 80
+            },
+            {
+              "k": "perStack",
+              "id": "폭파 실험",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_u5",
+      "name": "막힌 길 뚫기",
+      "hero": "마리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "later",
+          "n": 1,
+          "then": [
+            {
+              "k": "perStack",
+              "id": "폭파 실험",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "폭파 실험",
+              "all": true
+            }
+          ]
+        },
+        {
+          "k": "stack",
+          "id": "폭파 실험",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
           "tags": [
-            "보존"
+            "분쇄"
           ],
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "perStack",
+                  "id": "폭파 실험",
+                  "n": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.36,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "spend",
+                  "id": "폭파 실험",
+                  "all": true
+                }
+              ]
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "perStack",
+                  "id": "폭파 실험",
+                  "n": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.3,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "spend",
+                  "id": "폭파 실험",
+                  "all": true
+                }
+              ]
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "perStack",
+                  "id": "폭파 실험",
+                  "n": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.3,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "spend",
+                  "id": "폭파 실험",
+                  "all": true
+                }
+              ]
+            },
+            {
               "k": "make",
               "id": "마리_bomb",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.97,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "perStack",
+                  "id": "폭파 실험",
+                  "n": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.3,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "spend",
+                  "id": "폭파 실험",
+                  "all": true
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "폭파 실험",
               "v": 3
             },
             {
@@ -621,171 +1047,20 @@
       ],
       "blesses": [
         {
-          "name": "슬쩍",
-          "kind": "draw"
-        },
-        {
-          "name": "날쌘 손",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "주머니 속 폭탄",
-          "fx": [
-            {
-              "k": "make",
-              "id": "마리_bomb",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "마리_u4",
-      "name": "저도 여기 있어요!",
-      "hero": "마리",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "tags": [
-        "연계"
-      ],
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.85,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "폭파 실험",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "진짜 여기 있어요!",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.19,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "폭파 실험",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "혼자서도 있어요",
-          "tags": [],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.91,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "폭파 실험",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "존재감 폭발",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.89,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "폭파 실험"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.21,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "에르핀의 첫 친구",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "폭파 실험",
-              "v": 1
-            },
-            {
-              "k": "ifAllHeroes"
-            },
-            {
-              "k": "make",
-              "id": "마리_bomb",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "같이 가요",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "폭파 실험",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "큰 날개",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "지붕 조심",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "설탕 뿌리기",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.3
+              "k": "stack",
+              "id": "폭파 실험",
+              "v": 1
             }
           ]
         }

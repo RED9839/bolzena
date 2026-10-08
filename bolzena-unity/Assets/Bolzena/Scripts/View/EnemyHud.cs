@@ -652,7 +652,7 @@ namespace Bolzena.View
             return c.Kind == "debuff" ? "ic_weak" : "ic_up";
         }
 
-        public static Color KindColor(string kind) => kind == "debuff" ? new Color(1f, 0.45f, 0.45f) : kind == "key" ? new Color(1f, 0.8f, 0.42f) : kind == "power" ? new Color(0.78f, 0.62f, 1f) : new Color(0.45f, 0.9f, 0.62f);
+        public static Color KindColor(string kind) => kind == "debuff" ? new Color(1f, 0.45f, 0.45f) : kind == "key" ? new Color(1f, 0.8f, 0.42f) : kind == "power" ? new Color(0.78f, 0.62f, 1f) : kind == "empower" ? Bolzena.UI.Tone.Emp : new Color(0.45f, 0.9f, 0.62f);
 
         // 강화 칩 반짝임 — 강화가 새로 켜지거나 겹이 늘면(엔진 쪽지 powerOn 과 같은 때) 그 칩이 잠깐 빛난다
         readonly Dictionary<string, string> powerSeen = new Dictionary<string, string>();
@@ -699,7 +699,9 @@ namespace Bolzena.View
                 var col = new Color(0.05f, 0.075f, 0.16f, 0.94f);
                 var edge = KindColor(c.Kind);
                 var icon = IconOf(c);
-                string label = c.Kind == "power"
+                string label = c.Kind == "empower"
+                    ? $"<size=80%>{c.Id}</size> <color={Bolzena.UI.Tone.EmpTag}>{c.Value}</color>"   // 다음 카드 강화 — 「다음 카드 강화 ×1.5」
+                    : c.Kind == "power"
                     ? $"<size=80%>{c.Id}</size>" + (string.IsNullOrEmpty(c.Value) ? "" : $" ×{c.Value}")   // 강화 칩 — 카드 이름 · 겹
                     : (icon == null ? $"<color=#{ColorUtility.ToHtmlStringRGB(Color.Lerp(Color.white, KindColor(c.Kind), 0.5f))}>{c.Id.Substring(0, 1)}</color> " : "") + c.Value + (c.Turns > 0 ? $"<size=70%><color=#9aa6c8>·{c.Turns}</color></size>" : "");
                 var t = Make.Text("v", chip, label, Vector3.zero, size * 0.62f, order + 2, Color.white, TextAlignmentOptions.Left);
@@ -710,7 +712,7 @@ namespace Bolzena.View
                 float w = iconW + tw + size * 0.35f;
                 Make.Sliced("bg", chip, Res.UI("bar_fill_9s"), new Vector3(w / 2, 0, 0), new Vector2(w, size * 1.02f), order, col);
                 Make.Box("edge", chip, Res.UI("white"), new Vector3(0.02f, 0, 0), new Vector2(0.03f, size * 0.7f), order + 1, edge);
-                if (icon != null) Make.Box("i", chip, IconSprite(icon), new Vector3(size * 0.55f, 0, 0), new Vector2(size * 0.9f, size * 0.9f), order + 1);
+                if (icon != null) Make.Box("i", chip, IconSprite(icon), new Vector3(size * 0.55f, 0, 0), new Vector2(size * 0.9f, size * 0.9f), order + 1, c.Kind == "empower" ? Bolzena.UI.Tone.Emp : (Color?)null);
                 t.rectTransform.pivot = new Vector2(0, 0.5f);
                 t.transform.localPosition = new Vector3(iconW + size * 0.15f, -0.005f, 0);
                 var text = Tone.StripDiff(c.Text);

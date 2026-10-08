@@ -315,6 +315,9 @@ namespace Bolzena.Core
                     if (p.Do != null && !IntentOk(e, p.Do)) continue;
                     // 격파 · 기절로 쉬는 적은 치는 수를 못 한다(카드를 내면 · 동료가 쓰러지면 치는 패시브 포함)
                     if (e.Sealed && HitLike(p.Do)) continue;
+                    // 격파된 적은 행동 · 반응을 모두 멈춘다 — 턴 시작 · 끝 · 행동하면 · 맞으면 · 피가 줄면 · 카드 · 동료 격파 · 쓰러짐의 어떤 수도(2026-10-08 사용자 결정).
+                    // 제 「격파되면」 만 남는다 — 격파의 결과(데이터: 자기 취약 · 쌓이는 수치 깎기뿐, 강해지는 것 없음). 강인도가 다시 차면 원래대로
+                    if (e.Broken && ev != "broken") continue;
                     if (p.Phase != null && !p.Phase.Contains(e.Phased2 ? 2 : e.Phased ? 1 : 0)) continue;
                     int lim = FoeOnce(ev) ? 1 : (p.Limit ?? 1);
                     e.PUsed.TryGetValue(p.Name, out int used);
@@ -420,7 +423,7 @@ namespace Bolzena.Core
                         var t = PickTarget(it.T == "back");
                         if (t == null) break;
                         int d = Dealt(e, it.V);
-                        for (int k = 0; k <= extraHits && !t.Dead; k++) Hurt(t, d, new HurtOpts { From = e, Pierce = it.T == "back" });
+                        for (int k = 0; k <= extraHits && !t.Dead && (k == 0 || !e.Broken && !e.Dead); k++) Hurt(t, d, new HurtOpts { From = e, Pierce = it.T == "back" });
                         Say($"{e.Name}: {say} → 파티 ({d}{(it.T == "back" ? " · 방어 관통" : "")})");
                         if (it.Id != null && !t.Dead) { int v = FoeStatus(e, t, it.Id, Math.Max(1, it.N)); Say($"파티: {it.Id} +{v}"); }
                         break;
@@ -430,6 +433,7 @@ namespace Bolzena.Core
                         int d = Dealt(e, it.V);
                         for (int k = 0; k < Math.Max(1, it.N) + extraHits; k++)
                         {
+                            if (k > 0 && (e.Broken || e.Dead)) break;   // 타격 사이에 격파(우리 반응) · 쓰러지면 남은 타격은 없다
                             var t = PickTarget(false); if (t == null) break;
                             Hurt(t, d, new HurtOpts { From = e });
                             if (it.Id != null) FoeStatus(e, t, it.Id, Math.Max(1, it.Per));
@@ -524,7 +528,7 @@ namespace Bolzena.Core
             int k = 0;
             foreach (var x in subs)
             {
-                if (Over != null || e.Dead) break;
+                if (Over != null || e.Dead || e.Broken) break;   // 고학년 도중 격파 — 남은 수 없음
                 if (IsHit(x.T)) Cue("foeUltHit", e, new Cue { Hero = it.Id, Name = it.Say, V = k++, T = x.T });
                 FoeAct(e, x, x.Say ?? it.Say, true);
             }

@@ -197,7 +197,7 @@ namespace Bolzena.Core
                 {
                     N = p.N, Name = or.Name, Text = tx.Oracle(c, or), Shin = p.Shin,
                     BlessName = p.Shin == null ? null : b?.Name ?? R.DIVINE_NAME,
-                    BlessText = p.Shin == null ? null : b != null ? tx.Bless(b) : (R.DIVINE_KO.TryGetValue(p.Shin, out var k) ? k : p.Shin),
+                    BlessText = p.Shin == null ? null : b != null ? tx.Bless(b) : (R.DIVINE_KO.TryGetValue(p.Shin, out var k) ? (k.Contains("—") ? k.Substring(k.IndexOf('—') + 1).Trim() : k) : p.Shin),
                 });
             }
             return o;
@@ -237,7 +237,6 @@ namespace Bolzena.Core
         public string Lines()
         {
             var a = new List<string>();
-            if (Oracle != null) a.Add("신탁");
             if (Bless != null) a.Add($"축복 — {BlessText}");
             if (Copy) a.Add(COPY_LINE);
             return string.Join("\n", a);

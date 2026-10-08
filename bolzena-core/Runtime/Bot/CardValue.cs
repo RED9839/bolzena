@@ -35,11 +35,20 @@ namespace Bolzena.Core
             [FxK.IfKill] = 0.35, [FxK.IfBreak] = 0.3, [FxK.IfWounded] = 0.3, [FxK.IfChoice] = 0.5, [FxK.IfRandom] = 0.5, [FxK.IfHand] = 0.4, [FxK.IfPile] = 0.5,
             [FxK.IfNth] = 0.35, [FxK.IfStreak] = 0.35, [FxK.IfAllHeroes] = 0.35, [FxK.IfFoe] = 0.4, [FxK.IfCardSt] = 0.5,
             ["drawAny"] = 0.9, ["burn"] = 0.4, ["passion"] = 0.4,
+            // 시범 16(2026-10-08 2단계) — 직전보다 비싼가 · 이번 전투 쌓은 양 · 엘리트/보스 처치
+            [FxK.IfPricier] = 0.4, [FxK.IfGained] = 0.5, ["killElite"] = 0.12, ["killBoss"] = 0.05,
         };
+        /// <summary>시범 16 — 이번 전투 소멸 장수의 보통 수 · 소환물 한 대의 보통 대 수 · 당겨 쓰기(남은 칸 비례)의 보통 몫.</summary>
+        public const double GONE_PER = 3, SUMMON_HITS = 2.5, RIPEN_VAL = 0.9;
         /// <summary>「… 1개당」 의 보통 수 — 버린 장수 · 치른 HP(단위) · 적의 디버프 가짓수.</summary>
         public const double DISC_PER = 1.5, PAID_PER = 1.5, DEBUFF_PER = 2;
         public const int RHYTHM_PER = 2;
         public const double FLIP_VAL = 0.3, HASTEN_VAL = 0.3;
+        /// <summary>
+        /// 판 단위 값(1단계 근사, 성장형) — 남은 싸움 수 · 판에 남는 카드 값 1 의 한 싸움 몫 · 판 성장(공격력 1)의 한 싸움 몫.
+        /// 돈형(판 골드)은 전투 문법이 아직 없어 세지 않는다(시범에서 빠짐).
+        /// </summary>
+        public const double RUN_LEFT = 3, RUN_GROW = 0.05, GROW_RUN = 0.1;
 
         static double Area(string t) => t == "allEnemies" || t == "allAllies" || t == "party" ? 1.6 : t == "randomEnemy" ? 0.9 : 1;
         static readonly HashSet<string> ALLY_SIDE = new() { "self", "oneAlly", "allAllies", "party" };
@@ -71,13 +80,24 @@ namespace Bolzena.Core
                     case FxK.IfRepeat: case FxK.IfHeld: case FxK.IfPlayedMax: case FxK.IfApLeft: case FxK.IfSpent: case FxK.IfBalanced: case FxK.IfHunted: case FxK.IfDebuffs: case FxK.IfHp:
                         cond = live && (f.K == FxK.IfRepeat) ? 1 : COND_VAL[f.K]; break;
                     case FxK.IfKill: case FxK.IfBreak: case FxK.IfWounded: case FxK.IfChoice: case FxK.IfRandom: case FxK.IfHand: case FxK.IfPile: case FxK.IfNth: case FxK.IfStreak: case FxK.IfAllHeroes: case FxK.IfFoe: case FxK.IfCardSt:
-                        cond = f.K == FxK.IfRandom ? (f.Pct > 0 ? f.Pct : 0.5) : COND_VAL[f.K]; break;
+                    case FxK.IfPricier: case FxK.IfGained:
+                        if (f.K == FxK.IfPricier && live && !f.Not) { cond = 1; break; }   // 지금 바로 앞 카드보다 비싸다(봇 LiveVal)
+                        cond = f.K == FxK.IfRandom ? (f.Pct > 0 ? f.Pct : 0.5) : f.K == FxK.IfKill && f.Id != null ? COND_VAL[f.Id == "boss" ? "killBoss" : "killElite"] : COND_VAL[f.K];
+                        if (f.Not && (f.K == FxK.IfKill || f.K == FxK.IfBreak || f.K == FxK.IfPricier || f.K == FxK.IfGained)) cond = 1 - cond;
+                        break;
+                    case FxK.PerGone: per = f.Who == "self" ? GONE_PER * 0.7 : GONE_PER; break;
+                    case FxK.Summon: v += f.Ratio * Math.Min(f.Max > 0 ? f.Max : Battle.SUMMON_CAP, SUMMON_HITS) * 0.83 * Area(f.Target ?? "randomEnemy"); break;
+                    case FxK.Ripen: v += RIPEN_VAL; break;
                     case FxK.PerTag: case FxK.PerPlayed: case FxK.PerCardSt: per = 2; break;
                     case FxK.PerPile: per = 4; break;
                     case FxK.PerEvent: per = 1; break;
                     case FxK.Drain: v += f.Ratio * 1.5; break;
                     case FxK.Extra: v += f.Ratio * f.HitsOr1 * 0.83 * per * Area(f.Target ?? "oneEnemy"); per = 1; break;
-                    case FxK.CardStatus: v += f.Id == "탐구심" ? 0.2 * Math.Max(1, f.V) : 0.15; break;
+                    // 판 단위 값(1단계 근사) — 판에 남는 데이터 카드 값은 남은 싸움(RUN_LEFT)만큼 더 센다. 비용 · 카드 상태 · 이 전투만은 옛 값
+                    case FxK.CardStatus: v += f.Id == "탐구심" ? 0.2 * Math.Max(1, f.V) : f.Id == "비용" || R.IsCardSt(f.Id) || f.Battle || f.V < 0 ? 0.15 : 0.15 + RUN_GROW * Math.Max(1, f.V) * RUN_LEFT; break;
+                    case FxK.Empower: v += 0.9 * f.Ratio; break;   // 다음 카드(값 ≈ 1) × 비율
+                    case FxK.PerGuarded: per = 2; break;
+                    case FxK.PerOverheal: per = 1.5; break;
                     case FxK.Transform: v += 0.4; break;
                     case FxK.Form: v += FORM_VAL; break;   // 대충 — 검사는 FormValue 로 정확히
                     case FxK.FormEnd: break;
@@ -91,7 +111,7 @@ namespace Bolzena.Core
                     case FxK.Pull: v += 0.5 * Math.Max(1, f.N); break;
                     case FxK.ExileFrom: v += 0.1; break;
                     case FxK.Dispel: v += 0.3; break;
-                    case FxK.GrowRun: v += 0.5; break;
+                    case FxK.GrowRun: v += GROW_RUN * Math.Max(1, Math.Abs(f.V)) * RUN_LEFT; break;   // 판 성장 1 × 남은 싸움(1단계 근사 — 옛 0.5 고정)
                     case FxK.PerDiscarded: per = DISC_PER; break;
                     case FxK.PerPaid: per = PAID_PER; break;
                     case FxK.PerDebuff: per = DEBUFF_PER; break;
@@ -230,6 +250,7 @@ namespace Bolzena.Core
                 "drawn" => 1.2, "kill" => 0.35, "break" => 0.3, "crit" => 0.5, "spend" => 0.8, "make" => 0.6,
                 "stackReach" => 0.4, "stackGone" => 0.4, "stackOver" => 0.3, "shieldBreak" => 0.4, "foeAct" => 1.5, "foeActBefore" => 1.5,
                 "discard" => 0.6, "exhaust" => 0.4, "ult" => 0.25, "overheal" => 0.4,
+                "summonAct" => w.Kind == "atk" ? 1.0 : w.Kind == "guard" ? 0.8 : w.Kind == "lost" ? 0.4 : 1.2,
                 _ => 0.5,
             };
             if (r.Conds.Count > 0) perTurn *= 0.6;

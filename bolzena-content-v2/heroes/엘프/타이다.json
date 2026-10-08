@@ -6,12 +6,13 @@
       "nature": "활발",
       "race": "엘프",
       "role": "딜러",
+      "style": "버리기형",
       "star": 1,
       "hp": 420,
       "atk": 114,
       "def": 23,
       "crit": 10,
-      "blurb": "일은 떠넘기고 한 방 쏠 때만 진심인 경비원. 제 카드가 버려질 때마다 땡땡이를 치며 남의 카드를 가볍게 해 주고, 쌓인 땡땡이를 한 방에 쏟습니다.",
+      "blurb": "일은 떠넘기고 한 방 쏠 때만 진심인 경비원. 제 카드를 버려 일을 떠넘길 때마다 땡땡이가 쌓이고, 떠넘긴 일은 「밀린 업무」 가 되어 동료 몫으로 돌아갑니다. 쌓인 땡땡이는 DX-슈터 한 발에 쏟습니다.",
       "keyword": {
         "name": "땡땡이",
         "desc": "일 대신 아껴 둔 힘",
@@ -22,7 +23,12 @@
             "stat": "dealt",
             "v": 0.15
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -39,6 +45,24 @@
               "k": "stack",
               "id": "땡땡이",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "떠넘긴 일",
+          "when": {
+            "on": "discard"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "타이다_chore",
+              "v": 1,
+              "owner": "other"
             },
             {
               "k": "nextCheaper",
@@ -140,17 +164,13 @@
           "v": 1
         },
         {
-          "k": "when",
-          "on": "discard"
-        },
-        {
-          "k": "stack",
-          "id": "땡땡이",
-          "v": 2
+          "k": "shield",
+          "ratio": 0.49
         }
       ],
       "hero": "타이다",
-      "token": true
+      "token": true,
+      "blurb": "타이다가 슬쩍 떠넘긴 일 — 받은 동료가 대신 처리합니다"
     },
     {
       "id": "타이다_u1",
@@ -162,7 +182,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.3,
+          "ratio": 2.66,
           "target": "oneEnemy"
         },
         {
@@ -171,7 +191,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.56,
           "target": "oneEnemy"
         },
         {
@@ -182,11 +202,12 @@
       ],
       "oracles": [
         {
-          "name": "정조준",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.7,
+              "ratio": 3.6,
               "target": "oneEnemy"
             },
             {
@@ -195,7 +216,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.52,
+              "ratio": 0.76,
               "target": "oneEnemy"
             },
             {
@@ -206,12 +227,13 @@
           ]
         },
         {
-          "name": "퇴근 직전 한 발",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.61,
+              "ratio": 2.53,
               "target": "oneEnemy"
             },
             {
@@ -220,7 +242,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.31,
+              "ratio": 0.53,
               "target": "oneEnemy"
             },
             {
@@ -231,11 +253,11 @@
           ]
         },
         {
-          "name": "야근 수당 확정",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.44,
+              "ratio": 2.91,
               "target": "oneEnemy"
             },
             {
@@ -244,26 +266,26 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.62,
               "target": "oneEnemy"
             },
             {
               "k": "ifKill"
             },
             {
-              "k": "stack",
-              "id": "땡땡이",
-              "v": 3
+              "k": "ap",
+              "v": 1
             }
           ]
         },
         {
-          "name": "상시 저격 대기",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.22,
+              "ratio": 2.84,
               "target": "oneEnemy"
             },
             {
@@ -272,7 +294,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
@@ -280,15 +302,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "땡땡이",
-                    "n": 4
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 1,
-                      "target": "oneEnemy"
+                      "k": "stack",
+                      "id": "땡땡이",
+                      "v": 1
                     }
                   ]
                 }
@@ -297,15 +321,11 @@
           ]
         },
         {
-          "name": "관통탄",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 2.78,
+              "ratio": 2.8,
               "target": "oneEnemy"
             },
             {
@@ -314,23 +334,29 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.54,
+              "ratio": 0.59,
               "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "DX 탄창",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "퇴근 시간",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "한숨 돌리기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -358,41 +384,73 @@
           "v": 2
         },
         {
-          "k": "make",
-          "id": "타이다_chore",
+          "k": "stack",
+          "id": "땡땡이",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "몽땅 떠넘기기",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "discard",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
               "v": 3
             },
             {
-              "k": "make",
-              "id": "타이다_chore",
+              "k": "stack",
+              "id": "땡땡이",
               "v": 1
             }
           ]
         },
         {
-          "name": "상습 농땡이",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
             {
               "k": "draw",
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "땡땡이",
+              "k": "make",
+              "id": "타이다_chore",
+              "v": 1,
+              "owner": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
               "v": 2
             },
             {
@@ -400,13 +458,22 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "땡땡이",
                       "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.63,
+                      "target": "oneEnemy"
                     }
                   ]
                 }
@@ -415,78 +482,20 @@
           ]
         },
         {
-          "name": "동료에게 훈수",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "discard",
-              "v": 1
+              "all": true
             },
-            {
-              "k": "draw",
-              "v": 3,
-              "who": "other"
-            },
-            {
-              "k": "make",
-              "id": "타이다_chore",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "업무 분배",
-          "fx": [
-            {
-              "k": "make",
-              "id": "타이다_chore",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "땡땡이",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "사표 쓰기",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
             {
               "k": "draw",
               "v": 3
             },
             {
-              "k": "make",
-              "id": "타이다_chore",
-              "v": 2
-            },
-            {
               "k": "stack",
               "id": "땡땡이",
               "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "방문 기록 삭제",
-          "kind": "draw"
-        },
-        {
-          "name": "훈수 두기",
-          "kind": "cost"
-        },
-        {
-          "name": "밀린 업무 하나 더",
-          "fx": [
-            {
-              "k": "make",
-              "id": "타이다_chore",
-              "v": 1
             }
           ]
         }
@@ -502,7 +511,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.3,
+          "ratio": 1.61,
           "target": "oneEnemy"
         },
         {
@@ -517,11 +526,12 @@
       ],
       "oracles": [
         {
-          "name": "수당 두 배",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.56,
+              "ratio": 2.17,
               "target": "oneEnemy"
             },
             {
@@ -536,12 +546,13 @@
           ]
         },
         {
-          "name": "근무 중 슬쩍",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 1.53,
               "target": "oneEnemy"
             },
             {
@@ -556,65 +567,83 @@
           ]
         },
         {
-          "name": "상관 눈 피하기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
+              "ratio": 0.88,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "when",
+              "on": "discard"
             },
             {
               "k": "stack",
               "id": "땡땡이",
+              "v": 2
+            },
+            {
+              "k": "draw",
               "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "땡땡이",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "근무 일지",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.09,
+              "ratio": 1.79,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "stack",
+              "id": "땡땡이",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "땡땡이",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.54,
               "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 1,
-              "basic": true
-            },
-            {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "stack",
-              "id": "땡땡이",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "난사",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.68,
-              "target": "oneEnemy"
+              "who": "self",
+              "unique": true
             },
             {
               "k": "when",
@@ -630,15 +659,15 @@
       ],
       "blesses": [
         {
-          "name": "수당 계산기",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "비상벨",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "땡땡이 한 번",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -659,7 +688,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.75,
+          "ratio": 0.98,
           "target": "oneEnemy"
         },
         {
@@ -668,17 +697,18 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.42,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "출장비 청구",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.83,
+              "ratio": 1.33,
               "target": "oneEnemy"
             },
             {
@@ -687,18 +717,19 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.57,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "당일치기 출장",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.92,
               "target": "oneEnemy"
             },
             {
@@ -707,46 +738,205 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.39,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "출장 보고서",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "땡땡이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "땡땡이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "땡땡이",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.37,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "땡땡이"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "payHp",
+              "v": 40
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "땡땡이",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "타이다_u5",
+      "name": "상관 서랍 털이",
+      "hero": "타이다",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        },
+        {
+          "k": "discard",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
             {
               "k": "discard",
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 3
-            },
-            {
               "k": "stack",
               "id": "땡땡이",
-              "v": 3
+              "v": 1
             }
           ]
         },
         {
-          "name": "늪지 출장 상주",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "타이다_chore",
+              "v": 1,
+              "owner": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy"
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             },
             {
-              "k": "perStack",
-              "id": "땡땡이"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "oneEnemy"
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "power",
@@ -761,9 +951,8 @@
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.49,
-                      "target": "randomEnemy"
+                      "k": "shield",
+                      "ratio": 0.42
                     }
                   ]
                 }
@@ -772,42 +961,46 @@
           ]
         },
         {
-          "name": "땡땡이 출장",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             },
             {
-              "k": "perStack",
-              "id": "땡땡이"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "타이다_chore",
+              "k": "discard",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "출장 가방",
-          "kind": "atkUp"
-        },
-        {
-          "name": "법인 카드",
-          "kind": "cost"
-        },
-        {
-          "name": "늪지 장화",
+          "name": "축복 1",
           "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "땡땡이",
+              "v": 1
+            }
+          ]
         }
       ]
     }

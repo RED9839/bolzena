@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "유령",
       "role": "딜러",
+      "style": "소멸형",
       "star": 3,
       "hp": 580,
       "atk": 145,
       "def": 25,
       "crit": 10,
-      "blurb": "혼돈의 빈자리를 대신 떠안은 질서의 유령. 공격은 과녁을 고르지 못하고 아무나 베지만 그만큼 셉니다. 적이 여럿일 때 혼돈이 차오르면 한 번에 다 쓸어 버리고, 차원의 눈을 열면 한동안 낫이 차원 너머까지 닿습니다. 맞으면 꿀밤 한 방에 정신이 돌아옵니다.",
+      "blurb": "혼돈의 빈자리를 대신 떠안은 질서의 유령. 동료가 버린 카드를 떠맡아 치울수록 혼돈이 차오르고, 다 차면 다음 한 수가 크게 넘쳐흐릅니다. 차원의 눈을 열면 한동안 낫이 차원 너머까지 닿습니다.",
       "keyword": {
         "name": "혼돈",
         "desc": "억지로 떠안은 어설픈 혼돈",
@@ -23,36 +24,31 @@
             "v": 0.06
           }
         ],
-        "rules": [
-          {
-            "name": "삐끗",
-            "when": {
-              "on": "stackReach",
-              "id": "혼돈",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "혼돈",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 1,
-                "target": "allEnemies"
-              },
-              {
-                "k": "status",
-                "id": "취약",
-                "v": 1,
-                "target": "party"
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
+        {
+          "name": "떠맡은 뒤처리",
+          "when": {
+            "on": "exhaust",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        },
         {
           "name": "어엿한 혼돈",
           "when": {
@@ -74,22 +70,6 @@
               "k": "stack",
               "id": "혼돈",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "잘못 찾아온 손님",
-          "when": {
-            "on": "hurt"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
-          "fx": [
-            {
-              "k": "gauge",
-              "v": 8
             }
           ]
         }
@@ -122,7 +102,7 @@
       },
       "starter": [
         "림_혼돈_s1",
-        "림_혼돈_u1",
+        "림_혼돈_u5",
         "림_혼돈_s3",
         "림_혼돈_s2"
       ],
@@ -196,7 +176,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.72,
+          "ratio": 0.8,
           "target": "allEnemies"
         },
         {
@@ -207,11 +187,12 @@
       ],
       "oracles": [
         {
-          "name": "적진 한가운데",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.94,
+              "ratio": 1.08,
               "target": "allEnemies"
             },
             {
@@ -222,11 +203,30 @@
           ]
         },
         {
-          "name": "차원문 열기",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.61,
+              "ratio": 0.76,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 2,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
               "target": "allEnemies"
             },
             {
@@ -235,103 +235,66 @@
               "v": 2
             },
             {
-              "k": "draw",
+              "k": "status",
+              "id": "기절",
               "v": 1,
-              "who": "self",
-              "type": "공격"
+              "target": "randomEnemy"
             }
           ]
         },
         {
-          "name": "혼돈 전염",
+          "name": "신탁 4",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.63,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "혼돈"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.15,
-              "target": "allEnemies"
-            },
-            {
-              "k": "transform",
-              "id": "림_혼돈_u2",
-              "from": "hand",
-              "basic": true,
-              "n": 1
-            }
-          ]
-        },
-        {
-          "name": "카오틱 에이프런",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "dmg",
               "ratio": 0.94,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
               "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "혼돈",
               "v": 3
-            }
-          ]
-        },
-        {
-          "name": "혼돈 마담의 연회",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.74,
-              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "혼돈",
+              "k": "discard",
               "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "혼돈",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "재잘거리는 림",
-          "kind": "draw"
-        },
-        {
-          "name": "소천사의 대변인",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "야시장 꼬치",
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -373,11 +336,12 @@
       ],
       "oracles": [
         {
-          "name": "차원 너머 베기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.43,
+              "ratio": 1.49,
               "target": "oneEnemy"
             },
             {
@@ -392,21 +356,52 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.66,
+              "ratio": 0.74,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "강화 공격",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.26,
+              "ratio": 1.33,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "혼돈",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -420,47 +415,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.63,
-              "target": "oneEnemy"
+              "ratio": 0.42,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "낫의 잔상",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.21,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "혼돈"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.27,
+              "ratio": 1.15,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "혼돈",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "받아쓰기에서 틀린 낫",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.48,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "혼돈",
-              "v": 1
+              "v": 2
             },
             {
               "k": "draw",
@@ -471,41 +442,33 @@
           ]
         },
         {
-          "name": "꿀밤 맞기 직전",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.77,
+              "ratio": 1.98,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "혼돈"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "혼돈",
-              "all": true
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "날카로운 혼돈",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "차원의 틈",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "어설픈 위협",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -531,14 +494,20 @@
           "target": "oneEnemy"
         },
         {
+          "k": "exileFrom",
+          "from": "discard",
+          "n": 2,
+          "who": "other"
+        },
+        {
           "k": "stack",
           "id": "혼돈",
-          "v": 2
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "정말 무서워하십시오!",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
@@ -547,35 +516,21 @@
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "혼돈",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "모두 무서워하십시오!",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
             },
             {
               "k": "stack",
               "id": "혼돈",
-              "v": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "target": "allEnemies"
+              "v": 1
             }
           ]
         },
         {
-          "name": "말 많은 악당",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "status",
@@ -584,21 +539,42 @@
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "혼돈",
-              "v": 2
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
             }
           ]
         },
         {
-          "name": "큰소리",
-          "cost": 0,
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "status",
@@ -610,45 +586,70 @@
               "k": "stack",
               "id": "혼돈",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "exileFrom",
+                      "from": "discard",
+                      "n": 1,
+                      "who": "other"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "혼돈",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "셰이디를 찾음",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 3
             },
             {
               "k": "stack",
               "id": "혼돈",
-              "v": 2
-            },
-            {
-              "k": "ifAllHeroes"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.21
+              "v": 4
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "과장된 존댓말",
+          "name": "축복 1",
           "kind": "draw"
         },
         {
-          "name": "으스스한 그림자",
-          "kind": "guard"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "샌드백 신세",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -682,11 +683,12 @@
       ],
       "oracles": [
         {
-          "name": "교주의 꿀밤",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.61,
+              "ratio": 0.68,
               "target": "allEnemies"
             },
             {
@@ -695,7 +697,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.24,
+              "ratio": 0.27,
               "target": "allEnemies"
             },
             {
@@ -706,80 +708,13 @@
           ]
         },
         {
-          "name": "정신 차림",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "혼돈"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.23,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "혼돈",
-              "all": true
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "한 명만 꿀밤",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.99,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "혼돈"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.39,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "혼돈",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "정신 교육",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.74,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "혼돈",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "얻어맞은 기억",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.52,
               "target": "allEnemies"
             },
             {
@@ -788,7 +723,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.18,
+              "ratio": 0.21,
               "target": "allEnemies"
             },
             {
@@ -796,8 +731,8 @@
               "rules": [
                 {
                   "when": {
-                    "on": "spend",
-                    "id": "혼돈"
+                    "on": "exhaust",
+                    "who": "any"
                   },
                   "limit": {
                     "per": "turn",
@@ -805,31 +740,240 @@
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 0.59
+                      "k": "stack",
+                      "id": "혼돈",
+                      "v": 1
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "혼돈",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "혼돈"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "혼돈"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "all": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "딱밤",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "원래대로",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "혼돈 털기",
+          "name": "축복 3",
           "fx": [
             {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u5",
+      "name": "남은 음식 떠맡기",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "exileFrom",
+          "from": "discard",
+          "n": 1,
+          "who": "other"
+        },
+        {
+          "k": "stack",
+          "id": "혼돈",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "혼돈",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 4
             }
           ]
         }

@@ -40,7 +40,7 @@ namespace Bolzena.RunUI
             Debug.Log($"[Demo] captures → {dir} ({Screen.width}×{Screen.height})");
             bool keepPrefs = Has("-demo-settings");   // 설정 창 캡처는 저장 · 설정을 건드리지 않는다
             bool arca = Has("-demo-arca");   // 소개 캡처 — 저장 · 설정을 지우지 않는다(-save 로 따로 둔 저장만 쓴다)
-            if (!keepPrefs && !arca) { RunPort.ClearSave(); PlayerPrefs.DeleteKey("bz.calm"); }
+            if (!keepPrefs && !arca && !Has("-demo-touch")) { RunPort.ClearSave(); PlayerPrefs.DeleteKey("bz.calm"); }
             // 감시 — 예외가 나거나 시간이 넘으면 오류 코드로 스스로 꺼진다(먹통으로 남지 않게)
             Application.logMessageReceived += (msg, stack, type) =>
             {
@@ -52,7 +52,7 @@ namespace Bolzena.RunUI
             StartCoroutine(AutoOwner());
             if (Has("-demo-loop")) { limit = float.TryParse(Arg("-demo-timeout"), out var ll) ? ll : 3600f; }
             StartCoroutine(Watchdog(limit));
-            StartCoroutine(arca ? Arca_() : Has("-demo-bless") ? Bless_() : Has("-demo-oraclepeek") ? OraclePeek_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listperf") ? ListPerf_() : Has("-demo-snapdiff") ? SnapDiff_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-resize") ? Resize_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
+            StartCoroutine(Has("-demo-touch") ? Touch_() : Has("-demo-evby") ? EvBy_() : Has("-demo-partykit") ? PartyKit_() : arca ? Arca_() : Has("-demo-grade") ? Grade_() : Has("-demo-crayon") ? Crayon_() : Has("-demo-bless") ? Bless_() : Has("-demo-oraclepeek") ? OraclePeek_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listperf") ? ListPerf_() : Has("-demo-snapdiff") ? SnapDiff_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-resize") ? Resize_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
         }
 
         // 이벤트(-demo-events) — 꼴이 다른 이벤트 여섯(선택지 적음 · 많음 · 카드 고르기 · 신탁 · 전투 · 도박/판정)의 처음 화면 · 고른 뒤 결과를 찍고,
@@ -83,7 +83,9 @@ namespace Bolzena.RunUI
             Add("special", evs.FirstOrDefault(e => e.Id == "G07"), o => o.Hero == null);
             Add("special2", evs.FirstOrDefault(e => e.Id == "G12"), o => o.Hero == null);
             Add("cardpick", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && Out(o, "remove", "unique", "dupe"))), o => o.Hero == null && Out(o, "remove", "unique", "dupe"));
-            Add("oracle", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && Out(o, "flash"))), o => o.Hero == null && Out(o, "flash"));
+            // 조건 칸(종족 · 깃발 · 사도)이 없는 신탁 선택지 — 잠긴 것을 고르면 첫 선택지로 떨어져 신탁 창을 못 본다(2026-10-09)
+            bool Open_(Core.EventOption o) => o.Hero == null && o.Race == null && o.Flag == null && o.NoFlag == null && o.When == null && Out(o, "flash");
+            Add("oracle", evs.FirstOrDefault(e => Free(e) && Has(e, Open_)), Open_);
             Add("fight", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Fight != null && o.Hero == null)), o => o.Fight != null);
             Add("equip", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && o.Fight == null && Out(o, "equip"))), o => o.Hero == null && o.Fight == null && Out(o, "equip"));
             Add("gamble", evs.FirstOrDefault(e => Free(e) && Has(e, o => (o.Gamble != null || o.Judge != null) && o.Hero == null)), o => o.Gamble != null || o.Judge != null);
@@ -877,6 +879,19 @@ namespace Bolzena.RunUI
                 TermPop.Close();
                 var cz = FirstHot("detail.card고유 카드");
                 if (Hot(cz) != null) { yield return Press(cz, 1.0f); yield return Shot("card_zoom_terms"); yield return Press("zoom.close", 0.5f); }
+                yield return Press("detail.close", 0.6f);
+            }
+
+            // 시동 카드 · 카드 상세 점검 — 로네(시장)의 카드 탭(시동 표식 · 고유 카드 줄에서 빠짐)과 카드 상세(큰 카드 · 풀이 상자 가운데)
+            {
+                var rone = Roster.All.FirstOrDefault(h => h.ko != null && h.ko.StartsWith("로네") && h.CoreId != null) ?? gen ?? Roster.ByKey(keys[0]);
+                f.HeroDetail(rone.key, null, null, "카드");
+                yield return Wait(1.2f);
+                yield return Shot("rone_cards");
+                var first = FirstHot("detail.card시작 카드");
+                if (Hot(first) != null) { yield return Press(first, 1.0f); yield return Shot("rone_card_zoom"); yield return Press("zoom.close", 0.5f); }
+                var uz = FirstHot("detail.card고유 카드");
+                if (Hot(uz) != null) { yield return Press(uz, 1.0f); yield return Shot("rone_unique_zoom"); yield return Press("zoom.close", 0.5f); }
                 yield return Press("detail.close", 0.6f);
             }
 

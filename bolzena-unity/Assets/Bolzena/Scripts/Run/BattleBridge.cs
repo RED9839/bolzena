@@ -106,6 +106,22 @@ namespace Bolzena
         /// <summary>보상 오버레이가 막 떴다(전투 HUD 를 걷을 때 · 데모 캡처).</summary>
         public static Action OnOverlay;
 
+        /// <summary>일시정지 메뉴의 「메인 화면으로」 — 싸움을 끝내지 않고(저장은 지도 · 캠프에서 마지막으로 한 그대로) 판 장면으로 돌아가 로비를 연다. 이어하기는 그 저장에서.</summary>
+        public static void LeaveToLobby()
+        {
+            if (Fight == null || Flow.Me == null) { Debug.Log("[Bridge] 판이 없어(전투 시범) 메인 화면으로 못 나감"); return; }
+            Clock.Reset();
+            void Loaded(Scene s, LoadSceneMode m)
+            {
+                SceneManager.sceneLoaded -= Loaded;
+                Fight = null; finished = false;
+                Flow.Me.Stage.Canvas.enabled = true;
+                Flow.Me.Lobby();
+            }
+            SceneManager.sceneLoaded += Loaded;
+            SceneManager.LoadScene(RunScene);
+        }
+
         public static void Return()
         {
             var p = Fight;

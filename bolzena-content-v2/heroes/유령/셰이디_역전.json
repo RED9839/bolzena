@@ -6,49 +6,30 @@
       "nature": "활발",
       "race": "유령",
       "role": "서포터",
+      "style": "쌓고 고르기",
       "star": 3,
       "hp": 580,
       "atk": 86,
       "def": 58,
       "crit": 5,
-      "blurb": "나약함을 인정하고 유령 늪의 파수꾼이 된 장난꾼. 파티를 지켜 줄 때마다 「참음」 이 쌓이고, 넷에서 참다 터지면 파티 전원이 덩달아 달려듭니다. 지키는 방식은 여전히 제멋대로.",
+      "blurb": "나약함을 인정하고 유령 늪의 파수꾼이 된 장난꾼. 착한 척 스킬을 쓰거나 맞을 때마다 「울분」 을 꾹 삼키고, 모은 울분을 인형 샌드백에 고른 만큼 풀지 파티를 쓰다듬는 데 나눌지 고릅니다. 셋이 다 차면 참다 터진 기세가 파티의 다음 한 수에 실립니다.",
       "keyword": {
         "name": "울분",
         "desc": "착한 척하느라 삼킨 화",
         "carrier": "self",
-        "cap": 4,
-        "rules": [
+        "cap": 3,
+        "per": [
           {
-            "name": "인형 패기",
-            "when": {
-              "on": "stackReach",
-              "id": "울분",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "울분",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 1,
-                "target": "allEnemies"
-              },
-              {
-                "k": "later",
-                "n": 1,
-                "then": [
-                  {
-                    "k": "ap",
-                    "v": 1
-                  }
-                ]
-              }
-            ]
+            "stat": "dealt",
+            "v": 0.05,
+            "who": "allies"
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.6,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -76,13 +57,17 @@
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
               "id": "울분",
               "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.52
             }
           ]
         }
@@ -160,7 +145,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 1
+          "ratio": 1.3
         },
         {
           "k": "stack",
@@ -204,12 +189,13 @@
       ],
       "oracles": [
         {
-          "name": "호박 한가득",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
               "id": "울분",
-              "v": 1
+              "v": 2
             },
             {
               "k": "ifChoice",
@@ -218,7 +204,7 @@
             {
               "k": "make",
               "id": "셰이디_역전_pumpkin",
-              "v": 3
+              "v": 2
             },
             {
               "k": "ifChoice",
@@ -232,7 +218,37 @@
           ]
         },
         {
-          "name": "앨리스의 냥의자",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "make",
+              "id": "셰이디_역전_pumpkin",
+              "v": 2
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -254,19 +270,18 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.27,
+              "ratio": 1.43,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "작은 틈",
-          "cost": 0,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "stack",
               "id": "울분",
-              "v": 1
+              "v": 2
             },
             {
               "k": "ifChoice",
@@ -275,26 +290,23 @@
             {
               "k": "make",
               "id": "셰이디_역전_pumpkin",
-              "v": 1
+              "v": 2
             },
             {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "정신 수양",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
               "id": "울분",
-              "v": 1
+              "v": 2
             },
             {
               "k": "ifChoice",
@@ -315,65 +327,24 @@
               "who": "other"
             }
           ]
-        },
-        {
-          "name": "차원의 흔적",
-          "power": true,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "울분",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "k": "ifChoice",
-              "n": 1
-            },
-            {
-              "k": "make",
-              "id": "셰이디_역전_pumpkin",
-              "v": 2
-            },
-            {
-              "k": "ifChoice",
-              "n": 2
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "호박 향",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "레이저 불빛",
+          "name": "축복 2",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 0.52
             }
           ]
         },
         {
-          "name": "늪지 텃밭",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
@@ -398,114 +369,107 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
-          "target": "allEnemies"
-        },
-        {
-          "k": "perStack",
-          "id": "울분"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.38,
+          "ratio": 0.78,
           "target": "allEnemies"
         },
         {
           "k": "spend",
           "id": "울분",
-          "all": true
+          "pick": true
+        },
+        {
+          "k": "perEvent"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.49,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "있는 힘껏 패기",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "울분"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 1.04,
               "target": "allEnemies"
             },
             {
               "k": "spend",
               "id": "울분",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "한 놈만",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.21,
-              "target": "oneEnemy"
+              "pick": true
             },
             {
-              "k": "perStack",
-              "id": "울분"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.69,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "울분",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "호박 던지기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.79,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "셰이디_역전_pumpkin"
+              "k": "perEvent"
             },
             {
               "k": "dmg",
               "ratio": 0.59,
               "target": "allEnemies"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "셰이디_역전_pumpkin"
             }
           ]
         },
         {
-          "name": "샌드백 상시 대기",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.73,
+              "ratio": 0.65,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "울분"
+              "k": "spend",
+              "id": "울분",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
             },
             {
               "k": "dmg",
-              "ratio": 0.37,
+              "ratio": 0.44,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.96,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "울분",
+              "pick": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.09,
               "target": "allEnemies"
             },
             {
@@ -513,14 +477,19 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "울분",
-                    "n": 4
+                    "on": "spend",
+                    "id": "울분"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 1.1
+                      "k": "status",
+                      "id": "약화",
+                      "v": 1,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -529,11 +498,11 @@
           ]
         },
         {
-          "name": "화풀이 시간",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.71,
+              "ratio": 0.72,
               "target": "allEnemies"
             },
             {
@@ -542,31 +511,28 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.39,
               "target": "allEnemies"
-            },
-            {
-              "k": "ifKill"
             },
             {
               "k": "stack",
               "id": "울분",
-              "v": 2
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "인형 솜",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "삼단봉",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "흐흐",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -587,12 +553,12 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.27,
+          "ratio": 1.65,
           "target": "oneEnemy"
         },
         {
           "k": "shield",
-          "ratio": 0.9
+          "ratio": 1.17
         },
         {
           "k": "stack",
@@ -602,16 +568,17 @@
       ],
       "oracles": [
         {
-          "name": "늪지 파수",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.58,
+              "ratio": 2.22,
               "target": "oneEnemy"
             },
             {
               "k": "shield",
-              "ratio": 1.13
+              "ratio": 1.59
             },
             {
               "k": "stack",
@@ -621,107 +588,117 @@
           ]
         },
         {
-          "name": "늪 한 바퀴",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.97,
+              "ratio": 1.57,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.12
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.23,
               "target": "allEnemies"
             },
             {
               "k": "shield",
-              "ratio": 0.97
-            },
-            {
-              "k": "stack",
-              "id": "울분",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "처리할 일 목록",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.45,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.03
+              "ratio": 1.09
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
+              "unique": true
             }
           ]
         },
         {
-          "name": "투덜투덜",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.83,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "울분",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "질서와 책임",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.37,
+              "ratio": 1.78,
               "target": "oneEnemy"
             },
             {
               "k": "shield",
-              "ratio": 0.97
+              "ratio": 1.26
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 0.65
+                      "k": "stack",
+                      "id": "울분",
+                      "v": 1
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.98,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 2.11
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "낫 손질",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "파수꾼 망토",
+          "name": "축복 2",
           "kind": "guard"
         },
         {
-          "name": "투덜",
-          "kind": "draw"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -761,7 +738,7 @@
       ],
       "oracles": [
         {
-          "name": "끝까지 지키겠어",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -769,6 +746,11 @@
             {
               "k": "status",
               "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "울분",
               "v": 1
             },
             {
@@ -783,10 +765,6 @@
                       "k": "stack",
                       "id": "울분",
                       "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.45
                     }
                   ]
                 }
@@ -795,7 +773,33 @@
           ]
         },
         {
-          "name": "교주에게 인정받기",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "울분",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "tags": [
             "개전"
           ],
@@ -803,6 +807,11 @@
             {
               "k": "status",
               "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "울분",
               "v": 1
             },
             {
@@ -822,14 +831,17 @@
                 },
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "울분",
-                    "n": 4
+                    "on": "spend",
+                    "id": "울분"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "heal",
-                      "ratio": 1.35
+                      "ratio": 0.39
                     }
                   ]
                 }
@@ -838,7 +850,7 @@
           ]
         },
         {
-          "name": "유치원 선생님",
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
@@ -849,9 +861,10 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "울분",
-              "v": 2
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
@@ -873,11 +886,8 @@
           ]
         },
         {
-          "name": "활망구",
-          "cost": 2,
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -885,41 +895,8 @@
               "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "울분",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "제멋대로 지키기",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "make",
-              "id": "셰이디_역전_pumpkin",
-              "v": 3
+              "k": "shield",
+              "ratio": 1.3
             },
             {
               "k": "power",
@@ -940,15 +917,92 @@
             }
           ]
         }
-      ],
-      "blesses": [
+      ]
+    },
+    {
+      "id": "셰이디_역전_u5",
+      "name": "헤벌레 쓰다듬기",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
         {
-          "name": "정신 수양 도구",
-          "kind": "defUp"
+          "k": "spend",
+          "id": "울분",
+          "pick": true
         },
         {
-          "name": "평화로운 늪",
+          "k": "perEvent"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.59
+        },
+        {
+          "k": "feed",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
           "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.99
+            },
+            {
+              "k": "feed",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.52
+            },
+            {
+              "k": "feed",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.65
+            },
             {
               "k": "make",
               "id": "셰이디_역전_pumpkin",
@@ -957,8 +1011,82 @@
           ]
         },
         {
-          "name": "나긋한 반말",
-          "kind": "cost"
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.45
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "울분"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "feed",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.04
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "셰이디_역전_pumpkin",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
         }
       ]
     }

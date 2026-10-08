@@ -6,12 +6,13 @@
       "nature": "우울",
       "race": "유령",
       "role": "딜러",
+      "style": "계산형",
       "star": 3,
       "hp": 830,
       "atk": 129,
       "def": 40,
       "crit": 10,
-      "blurb": "입만 열면 아재개그로 분위기를 얼리는 질서의 2인자. 개그를 치면 적이 얼어붙어 굼떠지지만 파티도 김이 빠집니다. 공격과 스킬을 같은 장수 낸 턴엔 저울이 맞아 낫 자국이 깊어집니다.",
+      "blurb": "입만 열면 아재개그로 분위기를 얼리는 질서의 2인자. 공격과 스킬을 같은 장수 낸 턴엔 저울이 맞아 무게추가 파티를 다독이고, 적의 낫 자국이 깊어집니다.",
       "keyword": {
         "name": "낫 자국",
         "desc": "낫에 베여 쓰라린 자리",
@@ -45,10 +46,9 @@
           ]
         },
         {
-          "name": "썰렁한 아재개그",
+          "name": "무게추",
           "when": {
-            "on": "play",
-            "type": "스킬"
+            "on": "tally"
           },
           "limit": {
             "per": "turn",
@@ -56,7 +56,12 @@
           },
           "fx": [
             {
-              "k": "rushDown",
+              "k": "heal",
+              "ratio": 0.3
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
               "v": 1,
               "target": "allEnemies"
             }
@@ -145,7 +150,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.84,
+          "ratio": 0.75,
           "target": "allEnemies"
         },
         {
@@ -155,17 +160,21 @@
           "target": "allEnemies"
         },
         {
+          "k": "ifBalanced"
+        },
+        {
           "k": "heal",
-          "ratio": 0.56
+          "ratio": 0.45
         }
       ],
       "oracles": [
         {
-          "name": "어둠이 내린 참격",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.09,
+              "ratio": 1.01,
               "target": "allEnemies"
             },
             {
@@ -175,17 +184,22 @@
               "target": "allEnemies"
             },
             {
+              "k": "ifBalanced"
+            },
+            {
               "k": "heal",
-              "ratio": 0.56
+              "ratio": 0.61
             }
           ]
         },
         {
-          "name": "회복해버림",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.87,
+              "ratio": 0.71,
               "target": "allEnemies"
             },
             {
@@ -195,17 +209,20 @@
               "target": "allEnemies"
             },
             {
+              "k": "ifBalanced"
+            },
+            {
               "k": "heal",
-              "ratio": 1.31
+              "ratio": 0.43
             }
           ]
         },
         {
-          "name": "기역 부르기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.87,
+              "ratio": 0.7,
               "target": "allEnemies"
             },
             {
@@ -218,17 +235,16 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "unique": true
+              "type": "스킬"
             }
           ]
         },
         {
-          "name": "그림 스크래치",
-          "cost": 2,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.54,
+              "ratio": 0.75,
               "target": "allEnemies"
             },
             {
@@ -236,25 +252,16 @@
               "id": "낫 자국",
               "v": 2,
               "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "낫 자국",
-              "n": 3
-            },
-            {
-              "k": "heal",
-              "ratio": 1.54
             }
           ]
         },
         {
-          "name": "쓰라린 밤",
-          "power": true,
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.77,
+              "ratio": 1.35,
               "target": "allEnemies"
             },
             {
@@ -262,40 +269,8 @@
               "id": "낫 자국",
               "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "낫 자국",
-                      "v": 1,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "명상",
-          "kind": "heal"
-        },
-        {
-          "name": "다기 세트",
-          "kind": "draw"
-        },
-        {
-          "name": "어둠 한 자락",
-          "kind": "power"
         }
       ]
     },
@@ -309,7 +284,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.4,
+          "ratio": 1.05,
           "target": "oneEnemy"
         },
         {
@@ -317,31 +292,25 @@
           "id": "낫 자국",
           "v": 2,
           "target": "oneEnemy"
+        },
+        {
+          "k": "ifBalanced"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "type": "공격"
         }
       ],
       "oracles": [
         {
-          "name": "기역 회전",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.82,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "낫 자국",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "돌아오는 기역",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.26,
+              "ratio": 1.42,
               "target": "oneEnemy"
             },
             {
@@ -351,215 +320,42 @@
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "낫 자국",
-              "n": 4
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.12,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "기역에게 개그",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.79,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "rushDown",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "ifBalanced"
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "혼자 남은 탑",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.96,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "낫 자국",
-              "v": 3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "라크로스 림크로스",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "낫 자국",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "날 선 기역",
-          "kind": "power"
-        },
-        {
-          "name": "쓰라린 상처",
-          "kind": "frost"
-        },
-        {
-          "name": "낫 손질",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "림_u3",
-      "name": "기역의 추수",
-      "hero": "림",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.84,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "낫 자국"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.42,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "낫 자국",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "질서의 추수",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "낫 자국"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "낫 자국",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "남겨 둔 자국",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.98,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "낫 자국"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.49,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "균형 회복",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.87,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "낫 자국"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "낫 자국",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "수확의 낫",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "perStack",
-              "id": "낫 자국"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.59,
+              "ratio": 1.24,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
+              "k": "stack",
               "id": "낫 자국",
-              "all": true
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "tally"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -575,23 +371,255 @@
           ]
         },
         {
-          "name": "마지막 추수",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.96,
+              "ratio": 0.87,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifBalanced"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.09,
               "target": "oneEnemy"
             },
             {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.89,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "림_u3",
+      "name": "기역의 추수",
+      "hero": "림",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "낫 자국",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "낫 자국",
+          "all": true
+        },
+        {
+          "k": "ifBalanced"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.4
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
               "k": "perStack",
-              "id": "낫 자국"
+              "id": "낫 자국",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.91,
+              "ratio": 0.68,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "낫 자국",
+              "all": true
+            },
+            {
+              "k": "ifBalanced"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낫 자국",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "낫 자국",
+              "all": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "tally"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.43,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낫 자국",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "낫 자국",
+              "all": true
+            },
+            {
+              "k": "ifBalanced"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.4
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낫 자국",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "낫 자국",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낫 자국",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
               "target": "oneEnemy"
             },
             {
@@ -604,15 +632,15 @@
       ],
       "blesses": [
         {
-          "name": "예리한 날",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "외딴 탑",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "친구 기다리기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -629,48 +657,103 @@
       "name": "균형의 저울",
       "hero": "림",
       "unique": true,
-      "cost": 1,
-      "type": "공격",
+      "cost": 0,
+      "type": "스킬",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.42,
-          "target": "allEnemies"
-        },
-        {
-          "k": "perStack",
+          "k": "stack",
           "id": "낫 자국",
-          "each": true
+          "v": 1,
+          "target": "allEnemies"
         },
         {
-          "k": "dmg",
-          "ratio": 0.21,
-          "target": "allEnemies"
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "type": "공격"
+        },
+        {
+          "k": "ifBalanced"
+        },
+        {
+          "k": "ap",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "흔들리지 않는 저울",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
+              "k": "stack",
               "id": "낫 자국",
-              "each": true
+              "v": 2,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "allEnemies"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "ifBalanced"
+            },
+            {
+              "k": "ap",
+              "v": 1
             }
           ]
         },
         {
-          "name": "균형 맞추기",
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "ifBalanced"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "ifBalanced"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -680,16 +763,195 @@
               "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.59,
-              "target": "allEnemies"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "tally"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "ap",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 3,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "림_u5",
+      "name": "슴슴한 호박 스프",
+      "hero": "림",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "낫 자국",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.42
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "unique": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.5
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.48
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.5
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낫 자국",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -705,82 +967,36 @@
           ]
         },
         {
-          "name": "명상 시간",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "target": "allEnemies"
-            },
             {
               "k": "stack",
               "id": "낫 자국",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             },
             {
-              "k": "heal",
-              "ratio": 1.08
-            }
-          ]
-        },
-        {
-          "name": "파티 호스트",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
+              "k": "draw",
+              "v": 2
             },
-            {
-              "k": "perStack",
-              "id": "낫 자국",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.17,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "혼돈의 반대편",
-          "fx": [
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "낫 자국",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.28,
-              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "아모르 파티",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "heal"
         },
         {
-          "name": "추위 안 탐",
-          "kind": "defUp"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "저울추",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

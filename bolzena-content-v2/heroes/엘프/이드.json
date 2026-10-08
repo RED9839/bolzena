@@ -6,48 +6,45 @@
       "nature": "냉정",
       "race": "엘프",
       "role": "탱커",
+      "style": "버티형",
       "star": 3,
       "hp": 1040,
       "atk": 90,
       "def": 75,
       "crit": 5,
-      "blurb": "세상 전부를 자기가 꾸는 꿈이라 여기는 영원살이. 손에 들어온 카드마다 꿈결이 번져 방패가 되고, 버려진 꿈은 다음 턴의 손패로 돌아옵니다.",
+      "blurb": "세상 전부를 자기가 꾸는 꿈이라 여기는 영원살이. 나타가 막아 낸 충격이 경보로 쌓이고, 다섯이 차면 다음 한 수에 몰아 되받아칩니다. 쓰러질 고비는 꿈결이 한 번 막아 줍니다.",
       "keyword": {
         "name": "나타 경보",
-        "desc": "나타가 세는 꿈속의 충격",
+        "desc": "나타가 막아 내며 세는 꿈속의 충격",
         "carrier": "self",
         "cap": 5,
-        "rules": [
+        "per": [
           {
-            "name": "꿈의 파동",
-            "when": {
-              "on": "stackReach",
-              "id": "나타 경보",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "나타 경보",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.4,
-                "base": "def",
-                "target": "allEnemies"
-              },
-              {
-                "k": "status",
-                "id": "약화",
-                "v": 1,
-                "target": "allEnemies"
-              }
-            ]
+            "stat": "guard",
+            "v": 0.03
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.6,
+          "consume": true
+        }
       },
       "passives": [
+        {
+          "name": "함께 꾸는 꿈",
+          "when": {
+            "on": "guardSum"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1,
+              "ofEvent": 0.012
+            }
+          ]
+        },
         {
           "name": "함께 꾸는 꿈",
           "when": {
@@ -155,68 +152,54 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.4
+          "ratio": 0.94
         },
         {
           "k": "stack",
           "id": "나타 경보",
           "v": 1
+        },
+        {
+          "k": "perGuarded",
+          "per": 60
+        },
+        {
+          "k": "shield",
+          "ratio": 0.09
         }
       ],
       "oracles": [
         {
-          "name": "전뇌 통신",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 1.27
             },
             {
               "k": "stack",
               "id": "나타 경보",
               "v": 1
+            },
+            {
+              "k": "perGuarded",
+              "per": 60
+            },
+            {
+              "k": "shield",
+              "ratio": 0.12
             }
           ]
         },
         {
-          "name": "나타의 대답",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.95
-            },
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿈 이야기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.53
-            },
-            {
-              "k": "ifStack",
-              "id": "나타 경보",
-              "n": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "나타의 기록",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.25
+              "ratio": 0.89
             },
             {
               "k": "stack",
@@ -224,43 +207,100 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "k": "perGuarded",
+              "per": 60
+            },
+            {
+              "k": "shield",
+              "ratio": 0.09
             }
           ]
         },
         {
-          "name": "리소스 정리",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 0.85
             },
             {
               "k": "stack",
               "id": "나타 경보",
               "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.02
+            },
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guardSum"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "나타 경보",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.44
+            },
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "생명유지장치",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "LLEL-S",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "먼저 건 말",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -296,7 +336,41 @@
       ],
       "oracles": [
         {
-          "name": "기절할 때까지",
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
@@ -315,7 +389,7 @@
           ]
         },
         {
-          "name": "나타의 거부",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -332,17 +406,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "나타 경보",
                       "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.3
                     }
                   ]
                 }
@@ -351,84 +426,20 @@
           ]
         },
         {
-          "name": "잠든 척",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "status",
               "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "스킬"
-            }
-          ]
-        },
-        {
-          "name": "찌릿한 잠꼬대",
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "v": 2
             },
             {
               "k": "stack",
               "id": "나타 경보",
               "v": 2
             },
-            {
-              "k": "shield",
-              "ratio": 0.78
-            }
-          ]
-        },
-        {
-          "name": "꿈속의 전류",
-          "fx": [
             {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "감전 반사",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.4
-            }
-          ]
-        },
-        {
-          "name": "겨울잠 직전",
-          "kind": "cost"
-        },
-        {
-          "name": "전뇌 신호",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나타 경보",
               "v": 1
             }
           ]
@@ -445,7 +456,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.1
+          "ratio": 1.7
         },
         {
           "k": "status",
@@ -455,11 +466,12 @@
       ],
       "oracles": [
         {
-          "name": "세이빙",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.83
+              "ratio": 2.39
             },
             {
               "k": "status",
@@ -469,12 +481,13 @@
           ]
         },
         {
-          "name": "얕은 경계",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 1.62
             },
             {
               "k": "status",
@@ -484,13 +497,11 @@
           ]
         },
         {
-          "name": "꿈과 현실 사이",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.9,
-              "base": "def",
-              "target": "allEnemies"
+              "k": "shield",
+              "ratio": 1.44
             },
             {
               "k": "status",
@@ -505,11 +516,11 @@
           ]
         },
         {
-          "name": "경보 연동 탐색",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.9
+              "ratio": 1.36
             },
             {
               "k": "status",
@@ -525,43 +536,43 @@
           ]
         },
         {
-          "name": "경보 소모 방벽",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "perStack",
-              "id": "나타 경보"
-            },
-            {
               "k": "shield",
-              "ratio": 0.95
-            },
-            {
-              "k": "spend",
-              "id": "나타 경보",
-              "all": true
+              "ratio": 2.71
             },
             {
               "k": "status",
               "id": "끈기",
               "v": 1
+            },
+            {
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "나타의 격벽",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "외롭지 않은 꿈",
-          "tags": [
-            "보존"
-          ]
+          "name": "축복 2",
+          "kind": "defUp"
         },
         {
-          "name": "동료의 온기",
-          "kind": "defUp"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -575,7 +586,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.7
+          "ratio": 0.6
         },
         {
           "k": "perStack",
@@ -583,16 +594,17 @@
         },
         {
           "k": "shield",
-          "ratio": 0.2
+          "ratio": 0.17
         }
       ],
       "oracles": [
         {
-          "name": "함께라면",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.85
+              "ratio": 0.81
             },
             {
               "k": "perStack",
@@ -600,17 +612,18 @@
             },
             {
               "k": "shield",
-              "ratio": 0.25
+              "ratio": 0.23
             }
           ]
         },
         {
-          "name": "겨울잠 이불",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.45
+              "ratio": 0.56
             },
             {
               "k": "perStack",
@@ -618,50 +631,64 @@
             },
             {
               "k": "shield",
-              "ratio": 0.14
+              "ratio": 0.16
             }
           ]
         },
         {
-          "name": "언니 생각",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 0.51
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.15
             },
             {
               "k": "stack",
               "id": "나타 경보",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "눈 감은 방패",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.44
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.13
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "나타 경보",
-                    "n": 5
+                    "on": "guardSum"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 1.2
+                      "ratio": 0.54
                     }
                   ]
                 }
@@ -670,15 +697,97 @@
           ]
         },
         {
-          "name": "이드 더 이터널 불릿",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.89
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.26
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나타 경보",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "이드_u5",
+      "name": "나타로 들이받기",
+      "hero": "이드",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.43,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "나타 경보"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.24,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "나타 경보",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "base": "def",
+              "target": "oneEnemy"
+            },
             {
               "k": "perStack",
               "id": "나타 경보"
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.32,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -688,19 +797,148 @@
               "all": true
             }
           ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.18,
+                      "base": "def",
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "나타 경보",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.89,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "나타 경보"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "포근한 격벽",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "잠결의 다짐",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "잠결 경보",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

@@ -31,7 +31,7 @@ namespace Bolzena.Core
         public List<string> PlayIds;
         public Dictionary<string, int> Held;
         public int ApSpent, PaidHp, DiscardedTurn, TakenNow, TakenPrev;
-        public double EnemyHpx = 1, EnemyDmgx = 1;
+        public double EnemyHpx = 1, EnemyDmgx = 1, CritDmgX;
         public bool EliteFight;
         public string EnemyNature;
         public int Floor;
@@ -55,6 +55,12 @@ namespace Bolzena.Core
         public Dictionary<string, FormRt> Forms;
         // 2026-10-05 강화 카드 지속 규칙
         public List<PowerRt> Powers;
+        // 2026-10-08 18갈래 공용 계기
+        public int GoneN;
+        public bool FightEndDone;
+        // 2026-10-08 1단계 — 막아 낸 양 · 회복 기록
+        public int GuardedNow, GuardedPrev;
+        public List<int> HealLog;
     }
     public sealed class GainedFlashRec { public string CardId; public int N; public string Shin; }
     public sealed class PlayRec { public string Hero, Type; }
@@ -80,9 +86,11 @@ namespace Bolzena.Core
             PlayLog = PlayLog.Select(p => new PlayRec { Hero = p.hero, Type = p.type }).ToList(),
             Echo = Echo.Select(e => new EchoRec { Id = e.id, Target = e.target }).ToList(),
             GearRules = gearRules,
-            EnemyHpx = EnemyHpx, EnemyDmgx = EnemyDmgx, EliteFight = EliteFight, EnemyNature = EnemyNature, Floor = Floor,
+            EnemyHpx = EnemyHpx, EnemyDmgx = EnemyDmgx, CritDmgX = CritDmgX, EliteFight = EliteFight, EnemyNature = EnemyNature, Floor = Floor,
             CardSt = CardSt, Frozen = Frozen, Bond = Bond, Removed = Removed, LastHero = LastHero, BreakSeq = BreakSeq, DealtSeq = DealtSeq, DealtAct = DealtAct, PlayTags = PlayTags, Later = Later, GrowthGain = GrowthGain, PlaysTotal = PlaysTotal, CostMods = CostMods, PlayedPrev = PlayedPrev, BattleVals = BattleVals, DebtNow = DebtNow, ShieldBy = ShieldBy, CutNext = CutNext, Forms = Forms.Count > 0 ? Forms : null, Powers = Powers.Count > 0 ? Powers : null,
             PlayIds = PlayIds, Held = Held, ApSpent = ApSpent, PaidHp = PaidHp, DiscardedTurn = DiscardedTurn, TakenNow = TakenNow, TakenPrev = TakenPrev,
+            GoneN = GoneN, FightEndDone = FightEndDone,
+            GuardedNow = GuardedNow, GuardedPrev = GuardedPrev, HealLog = HealLog.Count > 0 ? HealLog : null,
         };
 
         /// <summary>저장한 전투를 되살린다.</summary>
@@ -104,12 +112,14 @@ namespace Bolzena.Core
             s.PlayLog = x.PlayLog.Select(p => (p.Hero, p.Type)).ToList();
             s.Echo = x.Echo.Select(e => (e.Id, e.Target)).ToList();
             s.PlayIds = x.PlayIds ?? new(); s.Held = x.Held ?? new();
-            s.EnemyHpx = x.EnemyHpx; s.EnemyDmgx = x.EnemyDmgx; s.EliteFight = x.EliteFight; s.EnemyNature = x.EnemyNature; s.Floor = x.Floor;
+            s.EnemyHpx = x.EnemyHpx; s.EnemyDmgx = x.EnemyDmgx; s.CritDmgX = x.CritDmgX; s.EliteFight = x.EliteFight; s.EnemyNature = x.EnemyNature; s.Floor = x.Floor;
             s.ApSpent = x.ApSpent; s.PaidHp = x.PaidHp; s.DiscardedTurn = x.DiscardedTurn; s.TakenNow = x.TakenNow; s.TakenPrev = x.TakenPrev;
             s.CardSt = x.CardSt ?? new(); s.Frozen = x.Frozen ?? new(); s.Bond = x.Bond ?? new(); s.Removed = x.Removed ?? new(); s.LastHero = x.LastHero;
             s.BreakSeq = x.BreakSeq; s.DealtSeq = x.DealtSeq; s.DealtAct = x.DealtAct; s.PlayTags = x.PlayTags ?? new(); s.Later = x.Later ?? new(); s.PlaysTotal = x.PlaysTotal; s.CostMods = x.CostMods ?? new(); s.PlayedPrev = x.PlayedPrev ?? new(); s.BattleVals = x.BattleVals ?? new(); s.DebtNow = x.DebtNow; s.ShieldBy = x.ShieldBy; s.CutNext = x.CutNext; s.GrowthGain = x.GrowthGain ?? new();
             s.Forms = x.Forms ?? new();
             s.Powers = x.Powers ?? new();
+            s.GoneN = x.GoneN; s.FightEndDone = x.FightEndDone;
+            s.GuardedNow = x.GuardedNow; s.GuardedPrev = x.GuardedPrev; s.HealLog = x.HealLog ?? new();
             s.gearRules = x.GearRules;
             s.SetupPassives(x.GearRules);   // 규칙 · 키워드 · 항상 — 데이터에서 다시
             s.Stacks = x.Stacks ?? new(); s.Fired = x.Fired ?? new(); s.Counts = x.Counts ?? new();

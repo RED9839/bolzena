@@ -6,6 +6,7 @@
       "nature": "순수",
       "race": "요정",
       "role": "딜러",
+      "style": "쌓고 고르기",
       "star": 3,
       "hp": 720,
       "atk": 156,
@@ -20,37 +21,29 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.06
+            "v": 0.08
           }
         ],
-        "rules": [
-          {
-            "name": "모두를 위한 힘",
-            "when": {
-              "on": "stackReach",
-              "id": "왕마력",
-              "n": 5
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "dealtMod",
-                "v": 0.25,
-                "target": "allAllies"
-              },
-              {
-                "k": "status",
-                "id": "피해 감소",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
+        {
+          "name": "망설임 없는 왕도",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            }
+          ]
+        },
         {
           "name": "망설임 없는 왕도",
           "when": {
@@ -72,7 +65,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
@@ -185,7 +178,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.1,
+          "ratio": 1.25,
           "target": "oneEnemy"
         },
         {
@@ -196,14 +189,14 @@
       ],
       "oracles": [
         {
-          "name": "대왕마력탄",
+          "name": "신탁 1",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 1.69,
               "target": "oneEnemy"
             },
             {
@@ -214,31 +207,51 @@
           ]
         },
         {
-          "name": "왕국을 되찾은 한 방",
-          "cost": 2,
+          "name": "신탁 2",
           "tags": [
             "약점 공격"
           ],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.2,
+              "ratio": 1.09,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "왕마력",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "왕마력",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "왕마력 폭발",
-          "tags": [],
+          "name": "신탁 3",
+          "tags": [
+            "약점 공격"
+          ],
           "fx": [
             {
               "k": "dmg",
@@ -253,36 +266,14 @@
           ]
         },
         {
-          "name": "딸기 케이크 한 입",
+          "name": "신탁 4",
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.17,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "왕마력"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.17,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "동화책 펼치기",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 1.13,
               "target": "oneEnemy"
             },
             {
@@ -294,22 +285,44 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.63,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "여왕의 의지",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "맞춤법 만점",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "왕마력 충전",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -329,105 +342,47 @@
       "type": "공격",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.6,
-          "target": "oneEnemy",
-          "xHits": true
-        },
-        {
           "k": "perStack",
-          "id": "왕마력"
+          "id": "왕마력",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.25,
-          "target": "oneEnemy"
+          "ratio": 0.63,
+          "target": "randomEnemy"
         },
         {
           "k": "spend",
           "id": "왕마력",
           "all": true
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "stack",
+          "id": "왕마력",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "왕마력 난타",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy",
-              "xHits": true
-            },
-            {
               "k": "perStack",
-              "id": "왕마력"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
               "id": "왕마력",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "흩어지는 왕마력탄",
-          "fx": [
+              "n": 1
+            },
             {
               "k": "dmg",
               "ratio": 0.75,
-              "target": "randomEnemy",
-              "xHits": true
-            },
-            {
-              "k": "perStack",
-              "id": "왕마력"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
               "target": "randomEnemy"
             },
             {
               "k": "spend",
               "id": "왕마력",
               "all": true
-            }
-          ]
-        },
-        {
-          "name": "왕마력은 남겨 두기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.73,
-              "target": "oneEnemy",
-              "xHits": true
-            },
-            {
-              "k": "perStack",
-              "id": "왕마력"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "처치하면 다시",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.86,
-              "target": "oneEnemy",
-              "xHits": true
             },
             {
               "k": "ifKill"
@@ -435,64 +390,133 @@
             {
               "k": "stack",
               "id": "왕마력",
-              "v": 3
+              "v": 2
             }
           ]
         },
         {
-          "name": "끝없는 난타",
-          "power": true,
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.67,
-              "target": "oneEnemy",
-              "xHits": true
+              "k": "perStack",
+              "id": "왕마력",
+              "n": 1
             },
+            {
+              "k": "dmg",
+              "ratio": 0.69,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
             {
               "k": "perStack",
-              "id": "왕마력"
+              "id": "왕마력",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.24,
-              "target": "oneEnemy"
+              "ratio": 0.75,
+              "target": "randomEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "kill"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "왕마력",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "왕마력",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "왕마력",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "대관식",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "반동 엉덩방아",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "SP 통",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -501,8 +525,7 @@
             }
           ]
         }
-      ],
-      "x": true
+      ]
     },
     {
       "id": "에르핀_왕도_u3",
@@ -524,7 +547,7 @@
       ],
       "oracles": [
         {
-          "name": "모두의 축복",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -538,77 +561,59 @@
           ]
         },
         {
-          "name": "왕관의 무게",
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "왕마력",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "왕마력",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "동화책 읽어 줘",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "왕마력",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "존경받는 여왕",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "왕마력",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "왕마력",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "대관식 날",
+          "name": "신탁 2",
           "tags": [
-            "개전"
+            "신속"
           ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
@@ -616,29 +621,11 @@
               "v": 3
             },
             {
-              "k": "discard",
+              "k": "draw",
               "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "예복",
-          "kind": "atkUp"
-        },
-        {
-          "name": "왕관 광택",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "겨우살이",
-          "fx": [
+            },
             {
-              "k": "stack",
-              "id": "왕마력",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -663,14 +650,17 @@
           "rules": [
             {
               "when": {
-                "on": "stackReach",
-                "id": "왕마력",
-                "n": 5
+                "on": "spend",
+                "id": "왕마력"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
                   "k": "dmg",
-                  "ratio": 0.4,
+                  "ratio": 0.44,
                   "target": "allEnemies"
                 }
               ]
@@ -680,7 +670,67 @@
       ],
       "oracles": [
         {
-          "name": "더 무거운 무게",
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "왕마력"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.56,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "왕마력"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.38,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -688,13 +738,99 @@
               "v": 1
             },
             {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "왕마력",
-                    "n": 5
+                    "on": "spend",
+                    "id": "왕마력"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.38,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "status",
+                      "id": "피해 감소",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "왕마력"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.44,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 3
+            },
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "왕마력"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -707,46 +843,121 @@
               ]
             }
           ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "defUp"
         },
         {
-          "name": "첫 여왕의 무게",
+          "name": "축복 2",
           "tags": [
             "개전"
-          ],
+          ]
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "왕마력",
               "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u5",
+      "name": "반쪽 빵",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "왕마력",
+          "v": 1
+        },
+        {
+          "k": "feed",
+          "v": 1,
+          "target": "oneAlly"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "왕마력",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.4,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
+              "k": "feed",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "빵 나눠 주기",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "feed",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
               "id": "왕마력",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.13
+            },
+            {
+              "k": "feed",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "feed",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
               "k": "draw",
@@ -758,51 +969,13 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "왕마력",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.4,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "매일 아침 수업",
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
                     "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "왕마력",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "왕마력",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.3,
-                      "target": "allEnemies"
+                      "k": "feed",
+                      "v": 1,
+                      "target": "oneAlly"
                     }
                   ]
                 }
@@ -811,53 +984,41 @@
           ]
         },
         {
-          "name": "모두가 기댈 여왕",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "왕마력",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.4,
-                      "target": "allEnemies"
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.5
-                    }
-                  ]
-                }
-              ]
+              "k": "feed",
+              "v": 2,
+              "target": "allAllies"
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "세계수의 힘",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "heal"
         },
         {
-          "name": "폴랑의 체육 수업",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "딸기 한 입",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.3
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
             }
           ]
         }

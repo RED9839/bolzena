@@ -5,12 +5,13 @@
       "name": "아일라",
       "nature": "순수",
       "role": "서포터",
+      "style": "쌓고 고르기",
       "star": 3,
       "hp": 660,
       "atk": 86,
       "def": 60,
       "crit": 5,
-      "blurb": "화산섬 볼케니카의 정령. 친구가 맞을 때마다 빠직이 한 단계씩 차오르고, 초폭망에 닿으면 대분화가 섬 전체를 덮는 용암 실드가 됩니다. 실드가 깨지면 화산 정령이 대신 화를 냅니다.",
+      "blurb": "화산섬 볼케니카의 정령. 친구들의 실드가 깨질 때마다 빠직이 한 단계씩 차오르고, 명상으로 가라앉힐지 대폭망까지 참았다 한 번에 터뜨릴지 직접 고릅니다. 실드가 깨지면 화산 정령이 대신 화를 냅니다.",
       "keyword": {
         "name": "빠직",
         "desc": "세며 참는 화산섬의 분노",
@@ -22,30 +23,10 @@
           "대폭망",
           "초폭망"
         ],
-        "rules": [
+        "per": [
           {
-            "name": "대폭발",
-            "when": {
-              "on": "stackReach",
-              "id": "빠직",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "빠직",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 1,
-                "target": "allEnemies"
-              },
-              {
-                "k": "shield",
-                "ratio": 2.4
-              }
-            ]
+            "stat": "guard",
+            "v": 0.1
           }
         ]
       },
@@ -53,12 +34,24 @@
         {
           "name": "부글부글",
           "when": {
-            "on": "hurt",
-            "guarded": true
+            "on": "shieldBreak"
           },
           "limit": {
             "per": "turn",
             "n": 3
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "부글부글",
+          "when": {
+            "on": "fightStart"
           },
           "fx": [
             {
@@ -80,14 +73,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.78,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.52
             }
           ]
         }
@@ -98,22 +94,26 @@
         "fx": [
           {
             "k": "shield",
-            "ratio": 3
-          },
-          {
-            "k": "status",
-            "id": "피해 감소",
-            "v": 1
+            "ratio": 2.4
           },
           {
             "k": "dmg",
-            "ratio": 1.5,
+            "ratio": 1,
             "target": "allEnemies"
           },
           {
-            "k": "stack",
+            "k": "perStack",
+            "id": "빠직"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.35,
+            "target": "allEnemies"
+          },
+          {
+            "k": "spend",
             "id": "빠직",
-            "v": 2
+            "all": true
           }
         ]
       },
@@ -169,12 +169,12 @@
         },
         {
           "k": "shield",
-          "ratio": 0.9
+          "ratio": 1.17
         }
       ],
       "oracles": [
         {
-          "name": "걍폭망",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -183,14 +183,14 @@
             },
             {
               "k": "shield",
-              "ratio": 0.9
+              "ratio": 1.17
             }
           ]
         },
         {
-          "name": "나 좀 냅두라바!!",
+          "name": "신탁 2",
           "tags": [
-            "개전"
+            "신속"
           ],
           "fx": [
             {
@@ -200,12 +200,12 @@
             },
             {
               "k": "shield",
-              "ratio": 0.9
+              "ratio": 1.17
             }
           ]
         },
         {
-          "name": "땅콩 아니라바",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -213,37 +213,43 @@
               "v": 1
             },
             {
-              "k": "heal",
-              "ratio": 0.7
+              "k": "shield",
+              "ratio": 0.91
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "v": 1
             }
           ]
         },
         {
-          "name": "일광욕",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
               "k": "shield",
-              "ratio": 0.56
+              "ratio": 0.99
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "shieldBreak"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "빠직",
-                      "v": 1
+                      "k": "shield",
+                      "ratio": 0.66
                     }
                   ]
                 }
@@ -252,43 +258,19 @@
           ]
         },
         {
-          "name": "벨라의 장난",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "stack",
-              "id": "빠직",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.9
-            },
-            {
-              "k": "ifWounded"
-            },
             {
               "k": "stack",
               "id": "빠직",
               "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "따스한 햇살",
-          "kind": "guard"
-        },
-        {
-          "name": "해파리 친구",
-          "kind": "draw"
-        },
-        {
-          "name": "끓는 속",
-          "fx": [
+            },
             {
-              "k": "stack",
-              "id": "빠직",
+              "k": "shield",
+              "ratio": 1.82
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -305,7 +287,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.8
+          "ratio": 2.21
         },
         {
           "k": "stack",
@@ -315,11 +297,12 @@
       ],
       "oracles": [
         {
-          "name": "화산 장벽",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.2
+              "ratio": 2.99
             },
             {
               "k": "stack",
@@ -329,12 +312,27 @@
           ]
         },
         {
-          "name": "섬 전체 장벽",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.6
+              "ratio": 2.11
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.95
             },
             {
               "k": "stack",
@@ -343,35 +341,19 @@
             },
             {
               "k": "status",
-              "id": "피해 감소",
+              "id": "반격",
               "v": 1
             }
           ]
         },
         {
-          "name": "휴양지 온천",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 2
-            },
-            {
-              "k": "stack",
-              "id": "빠직",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "볼케니카 설계",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.57
+              "ratio": 1.81
             },
             {
               "k": "stack",
@@ -379,21 +361,38 @@
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "빠직"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.22
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shieldBreak"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빠직",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.49
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "해적 퇴치",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.3
+              "ratio": 1.95
             },
             {
               "k": "stack",
@@ -401,30 +400,32 @@
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "빠직",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "굳은 용암",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "후드티",
-          "kind": "defUp"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "마그마 찌개",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -438,7 +439,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.9
+          "ratio": 1.04
         },
         {
           "k": "perStack",
@@ -446,7 +447,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.35
+          "ratio": 0.52
         },
         {
           "k": "spend",
@@ -456,11 +457,12 @@
       ],
       "oracles": [
         {
-          "name": "대지의 명상",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.05
+              "ratio": 1.4
             },
             {
               "k": "perStack",
@@ -468,7 +470,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.42
+              "ratio": 0.7
             },
             {
               "k": "spend",
@@ -478,37 +480,59 @@
           ]
         },
         {
-          "name": "가비아의 가르침",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.01
+            },
             {
               "k": "perStack",
               "id": "빠직"
             },
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 0.51
             },
             {
-              "k": "spend",
-              "id": "빠직",
-              "all": true
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "빠직"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.42
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "참지 않기",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.91
+            },
             {
               "k": "perStack",
               "id": "빠직"
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.39,
               "target": "allEnemies"
             },
             {
@@ -519,14 +543,11 @@
           ]
         },
         {
-          "name": "명상 수행 중",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.97
+              "ratio": 0.91
             },
             {
               "k": "perStack",
@@ -534,17 +555,23 @@
             },
             {
               "k": "shield",
-              "ratio": 0.35
+              "ratio": 0.47
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "깊은 호흡",
-          "cost": 0,
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.75
+              "ratio": 1.87
             },
             {
               "k": "perStack",
@@ -552,28 +579,29 @@
             },
             {
               "k": "shield",
-              "ratio": 0.3
-            },
-            {
-              "k": "spend",
-              "id": "빠직",
-              "all": true
+              "ratio": 0.94
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "파도 소리",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "해먹",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "느긋한 오후",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -588,21 +616,25 @@
         {
           "k": "status",
           "id": "결의",
-          "v": 2
+          "v": 1
         },
         {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "stackReach",
-                "id": "빠직",
-                "n": 4
+                "on": "spend",
+                "id": "빠직"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
-                  "k": "shield",
-                  "ratio": 1
+                  "k": "dmg",
+                  "ratio": 0.52,
+                  "target": "allEnemies"
                 }
               ]
             }
@@ -611,7 +643,7 @@
       ],
       "oracles": [
         {
-          "name": "활화산",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
@@ -623,14 +655,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "빠직",
-                    "n": 4
+                    "on": "spend",
+                    "id": "빠직"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 2
+                      "k": "dmg",
+                      "ratio": 0.59,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -639,12 +675,40 @@
           ]
         },
         {
-          "name": "분노 5단계",
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "빠직"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.52,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
               "id": "결의",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
@@ -656,26 +720,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "빠직",
-                    "n": 4
+                    "on": "spend",
+                    "id": "빠직"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "빠직",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 0.65,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -684,90 +740,76 @@
           ]
         },
         {
-          "name": "섬의 수호자",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
               "k": "status",
               "id": "결의",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "빠직",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "평화 박살 해파리",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 2
-            },
-            {
-              "k": "perStack",
-              "id": "빠직"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "빠직",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "그윈과 델리아",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "빠직",
-                    "n": 4
+                    "on": "spend",
+                    "id": "빠직"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
+                      "k": "dmg",
+                      "ratio": 0.52,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "빠직"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.55,
+                      "target": "allEnemies"
+                    },
+                    {
                       "k": "shield",
-                      "ratio": 1
+                      "ratio": 0.55
                     }
                   ]
                 }
@@ -778,11 +820,15 @@
       ],
       "blesses": [
         {
-          "name": "꿀렁 해파리",
+          "name": "축복 1",
           "kind": "defUp"
         },
         {
-          "name": "짱킹갓",
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -790,10 +836,189 @@
               "v": 1
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "아일라_u5",
+      "name": "영구 추방령",
+      "hero": "아일라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.3,
+          "target": "oneEnemy"
         },
         {
-          "name": "섬 순찰",
-          "kind": "cost"
+          "k": "ifStack",
+          "id": "빠직",
+          "n": 3
+        },
+        {
+          "k": "status",
+          "id": "기절",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.76,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "빠직",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.23,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "빠직",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.31,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "빠직",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.13,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "빠직",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shieldBreak"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.78,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "빠직",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빠직",
+              "v": 1
+            }
+          ]
         }
       ]
     }

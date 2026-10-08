@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "수인",
       "role": "서포터",
+      "style": "돈형",
       "star": 3,
       "hp": 600,
       "atk": 86,
@@ -48,10 +49,11 @@
       },
       "passives": [
         {
-          "name": "조기 매진",
+          "name": "판매 개시",
           "when": {
             "on": "play",
-            "type": "스킬"
+            "type": "스킬",
+            "who": "any"
           },
           "conds": [
             {
@@ -72,7 +74,7 @@
             },
             {
               "k": "heal",
-              "ratio": 0.7
+              "ratio": 0.45
             }
           ]
         },
@@ -174,7 +176,7 @@
           "v": 1
         }
       ],
-      "blurb": "맛은 묻지 마세요. 효과는 확실합니다."
+      "blurb": "맛은 묻지 마세요. 효과는 확실합니다 — 값은 코미 코인으로"
     },
     {
       "id": "코미_수영복_u1",
@@ -196,11 +198,12 @@
       ],
       "oracles": [
         {
-          "name": "풀장 개장",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.62
+              "ratio": 1.61
             },
             {
               "k": "status",
@@ -210,12 +213,13 @@
           ]
         },
         {
-          "name": "튜브 띄우기",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.5
+              "ratio": 0.95
             },
             {
               "k": "status",
@@ -225,85 +229,95 @@
           ]
         },
         {
-          "name": "워터파크 통째로",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.8
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 2
-            },
-            {
-              "k": "make",
-              "id": "코미_수영복_juice",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "물보라 튀기기",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.9
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "주스 재고",
-              "n": 3
-            },
             {
               "k": "heal",
               "ratio": 0.8
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 1
             }
           ]
         },
         {
-          "name": "매점 대목",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "stack",
-              "id": "주스 재고",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.6
             },
             {
-              "k": "make",
-              "id": "코미_수영복_juice",
+              "k": "status",
+              "id": "사기",
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.3
+                    },
+                    {
+                      "k": "stack",
+                      "id": "주스 재고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.8
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "시원한 물",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "입장권 할인",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "튼튼한 튜브",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.5
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 1
             }
           ]
         }
@@ -323,7 +337,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.45
+          "ratio": 0.35
         },
         {
           "k": "spend",
@@ -331,14 +345,15 @@
           "all": true
         },
         {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 2
+          "k": "make",
+          "id": "코미_수영복_juice",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "진한 특제 주스",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "perStack",
@@ -346,7 +361,55 @@
             },
             {
               "k": "heal",
-              "ratio": 0.6
+              "ratio": 0.53
+            },
+            {
+              "k": "spend",
+              "id": "주스 재고",
+              "all": true
+            },
+            {
+              "k": "make",
+              "id": "코미_수영복_juice",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "주스 재고"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.33
+            },
+            {
+              "k": "spend",
+              "id": "주스 재고",
+              "all": true
+            },
+            {
+              "k": "make",
+              "id": "코미_수영복_juice",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "주스 재고"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.73
             },
             {
               "k": "spend",
@@ -361,8 +424,7 @@
           ]
         },
         {
-          "name": "맛보기 주스",
-          "cost": 0,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "perStack",
@@ -373,33 +435,20 @@
               "ratio": 0.3
             },
             {
-              "k": "spend",
-              "id": "주스 재고",
-              "all": true
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "make",
+              "id": "코미_수영복_juice",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "원액 그대로",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.4
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 3
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "주스 가판대",
+          "name": "신탁 5",
           "power": true,
           "fx": [
             {
@@ -408,65 +457,52 @@
             },
             {
               "k": "heal",
-              "ratio": 0.3
+              "ratio": 0.36
+            },
+            {
+              "k": "make",
+              "id": "코미_수영복_juice",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "spend",
+                    "id": "주스 재고"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "코미_수영복_juice",
-                      "v": 1
+                      "k": "heal",
+                      "ratio": 0.36
                     }
                   ]
                 }
               ]
             }
           ]
-        },
-        {
-          "name": "에너지 주스",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "주스 재고"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.45
-            },
-            {
-              "k": "spend",
-              "id": "주스 재고",
-              "all": true
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "얼음 동동",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "빨대 꽂기",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "단골 손님",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "stack",
-              "id": "주스 재고",
+              "k": "make",
+              "id": "코미_수영복_juice",
               "v": 1
             }
           ]
@@ -498,7 +534,7 @@
       ],
       "oracles": [
         {
-          "name": "꽉 찬 병 투척",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "dmg",
@@ -517,17 +553,17 @@
           ]
         },
         {
-          "name": "빨대 튕기기",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
               "k": "heal",
-              "ratio": 0.4
+              "ratio": 0.45
             },
             {
               "k": "stack",
@@ -537,46 +573,63 @@
           ]
         },
         {
-          "name": "한 박스 투척",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "randomEnemy",
-              "hits": 4
+              "ratio": 0.8,
+              "target": "oneEnemy"
             },
             {
               "k": "heal",
-              "ratio": 1
+              "ratio": 0.5
             },
             {
               "k": "make",
               "id": "코미_수영복_juice",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "주스 폭탄",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.98,
-              "target": "allEnemies"
+              "ratio": 1.08,
+              "target": "oneEnemy"
             },
             {
               "k": "heal",
-              "ratio": 0.79
+              "ratio": 0.54
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "주스 재고"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.36,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "투척 판매",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
@@ -585,33 +638,13 @@
             },
             {
               "k": "heal",
-              "ratio": 0.62
+              "ratio": 0.58
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "얼음 넣은 병",
-          "kind": "power"
-        },
-        {
-          "name": "끈적한 과즙",
-          "kind": "frost"
-        },
-        {
-          "name": "다음 병",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "주스 재고",
-              "v": 1
+              "unique": true
             }
           ]
         }
@@ -635,8 +668,8 @@
           "rules": [
             {
               "when": {
-                "on": "play",
-                "type": "스킬"
+                "on": "spend",
+                "id": "주스 재고"
               },
               "limit": {
                 "per": "turn",
@@ -644,8 +677,8 @@
               },
               "fx": [
                 {
-                  "k": "heal",
-                  "ratio": 0.3
+                  "k": "draw",
+                  "v": 1
                 }
               ]
             }
@@ -654,7 +687,7 @@
       ],
       "oracles": [
         {
-          "name": "완판 행진",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -662,12 +695,16 @@
               "v": 2
             },
             {
+              "k": "heal",
+              "ratio": 0.54
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "스킬"
+                    "on": "spend",
+                    "id": "주스 재고"
                   },
                   "limit": {
                     "per": "turn",
@@ -675,8 +712,8 @@
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.55
+                      "k": "draw",
+                      "v": 1
                     }
                   ]
                 }
@@ -685,21 +722,21 @@
           ]
         },
         {
-          "name": "한정 수량",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "stack",
               "id": "주스 재고",
-              "v": 2
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "스킬"
+                    "on": "spend",
+                    "id": "주스 재고"
                   },
                   "limit": {
                     "per": "turn",
@@ -707,8 +744,8 @@
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.3
+                      "k": "draw",
+                      "v": 1
                     }
                   ]
                 }
@@ -717,29 +754,34 @@
           ]
         },
         {
-          "name": "해변 대목",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "make",
-              "id": "코미_수영복_juice",
+              "k": "stack",
+              "id": "주스 재고",
               "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.8
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "스킬"
+                    "on": "spend",
+                    "id": "주스 재고"
                   },
                   "limit": {
                     "per": "turn",
                     "n": 1
                   },
                   "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    },
                     {
                       "k": "heal",
                       "ratio": 0.3
@@ -751,7 +793,7 @@
           ]
         },
         {
-          "name": "코사장 성공 신화",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "stack",
@@ -769,8 +811,8 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "스킬"
+                    "on": "spend",
+                    "id": "주스 재고"
                   },
                   "limit": {
                     "per": "turn",
@@ -778,8 +820,8 @@
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.3
+                      "k": "draw",
+                      "v": 1
                     }
                   ]
                 }
@@ -788,11 +830,164 @@
           ]
         },
         {
-          "name": "단골 확보",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "주스 재고"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "defUp"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_수영복_u5",
+      "name": "물총 세례",
+      "hero": "코미_수영복",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "randomEnemy",
+          "hits": 3
+        },
+        {
+          "k": "stack",
+          "id": "주스 재고",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 0.4
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.38
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "코미_수영복_juice",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "주스 재고",
               "v": 1
             },
             {
@@ -800,36 +995,49 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "스킬"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.3
+                      "k": "dmg",
+                      "ratio": 0.27,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "주스 재고",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "주문서 뭉치",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "차양 모자",
-          "kind": "defUp"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "첫 손님",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

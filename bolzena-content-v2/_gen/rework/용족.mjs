@@ -42,6 +42,9 @@ const scaleU = (j, m) => {
 };
 // 개전 강화 시동(§12-2): 그 카드에 개전 태그 — 신탁에도(대가 갈래 「개전 빼기」 만 뺀다)
 const T_OPEN = { tags: ['개전'] };
+// u5(2026-10-08) — 종류 서치 · 비용↓
+const srchT = type => draw(1, { who: 'self', type });                                     // 자신의 그 종류 카드 1장 드로우
+const costDown = type => ({ k: 'cardStatus', id: '비용', v: -1, to: 'hand', n: 1, who: 'self', type });   // 손의 자신의 그 종류 카드 1장 비용 -1
 
 // ════════════════════════════════════════════════════════════════════
 // 1. 네티 — 탱커 · 광기. 드릴로 캐낸 광물을 「발굴 자루」에 담는다 — 들고 있으면 모든 실드가 두꺼워지고, 쏟으면 파티를 한 번에 덮는다
@@ -92,6 +95,14 @@ function netty(j) {
       O('리츠까지 들러붙음', [st('결정화', 1), per(K), ddef(0.5), spendAll(K)]),   // H 다 쓴다
       O('자석 끌어당기기', [st('결정화', 1), per(K), ddef(0.3), pullU()]),     // F 회수
     ], [B('두 갈래 꼬리', 'power'), B('자철석', 'cost'), B('끌려온 칼끝', [st('반격', 1)])]),
+    // u5 유틸(서치) — 잠금장치는 꼬리로 연다: 실드 + 자루 + 고유 카드 서치
+    card(H, 5, '꼬리 열쇠', 1, '스킬', [sh(0.8), stk(K, 1), srchU()], [
+      O('신탁 1', [sh(1.05), stk(K, 1), srchU()]),
+      O('신탁 2', [sh(0.65), stk(K, 1), srchU()], { cost: 0 }),
+      O('신탁 3', [sh(1.2), srchO(), ifWounded, heal(0.5)]),                                    // 재설계 — 장물 거래(동료 카드 · 회복)
+      O('신탁 4', [sh(0.8), pullU(), srchU()]),                                          // F 회수 + 서치 — BEST
+      O('신탁 5', [payHp(40), sh(1.2), stk(K, 3)]),                                        // H HP
+    ], [B('축복 1', 'draw'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.45);
   starter(j, '네티_u1');
@@ -146,6 +157,14 @@ function daya(j) {
       O('다 털어 넣기', [dmg(1.6), per(K), dmg(0.8)], { tags: ['소멸'] }),         // H 소멸 한 방
       O('첫 소원', [dmg(0.7), per(K), dmg(0.35), srchU()]),                        // F 서치
     ], [B('완벽한 자세', 'atkUp'), B('아침 몸단장', 'draw'), B('반짝임', [make(GEM, 1)])]),
+    // u5 유틸(서치) — 망치로 쳐 봐야 안다: 쓰라림 + 공격 서치(원석은 신탁 쪽 — 혼자 +3.3%p 라 기본형에서 뺐다)
+    card(H, 5, '망치 감별', 0, '스킬', [stk(K, 1, E1), srchT('공격')], [
+      O('신탁 1', [make(GEM, 2), srchT('공격')]),
+      O('신탁 2', [make(GEM, 1), srchT('공격'), stk(K, 1, E1)], { tags: ['보존'] }),
+      O('신탁 3', [heal(0.8), make(GEM, 1), srchO()]),                                                             // 재설계 — 선의의 마사지(동료 카드)
+      O('신탁 4', [make(GEM, 1), draw(2, { who: 'self', type: '공격' })]),                          // F 공격 둘 — BEST
+      O('신탁 5', [payHp(40), dmg(0.8), make(REAL, 1)]),                                                       // H 거금 — 바로 진품
+    ], [B('축복 1', 'ap'), B('축복 2', 'cost'), B('축복 3', [make(GEM, 1)])]),
   ]);
   scaleU(j, 1.2);
   starter(j, '다야_u2');
@@ -199,6 +218,14 @@ function pureshine(j) {
       O('응원 편지', [st('결의', 1), srchO(), power(rule('turnStart', [stk(K, 1)]))], T_OPEN),   // F 서치
       O('늦은 등장', [st('결의', 2), power(rule('turnStart', [stk(K, 1)]))]),                   // H 개전 빼기
     ], [B('마법진', 'defUp'), B('공연 준비', 'cost'), B('반짝 왕관', [heal(0.4)])], T_OPEN),
+    // u5 굴리기(공격) — 변신이 길어지는 게 싫어 1초 만에 끝낸다: 영역 + 피해
+    card(H, 5, '1초 컷', 1, '공격', [dmg(0.65), stk(K, 1)], [
+      O('신탁 1', [dmg(0.85), stk(K, 1)]),
+      O('신탁 2', [dmg(0.5), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [sh(0.8), stk(K, 1), heal(0.5)]),                                                 // 재설계 — 부끄러움 극복(지키기)
+      O('신탁 4', [dmg(0.55), stk(K, 1), srchO()]),                                                  // F 동료 카드 — BEST
+      O('신탁 5', [per(K), dmg(0.35), spendAll(K), make(FIN, 1)]),                                  // H 영역을 다 써서 피니시
+    ], [B('축복 1', 'power'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.7);
   starter(j, '다야_퓨어샤인_u4');
@@ -250,6 +277,14 @@ function leets(j) {
       O('작심삼일', [dmg(0.7), per(K), dmg(0.45), spendAll(K)]),                   // H 다 쓴다
       O('사료스탕스 명예 대원', [dmg(0.65), per(K), dmg(0.25), srchU()]),           // F 서치
     ], [B('갑옷 애호가', 'atkUp'), B('로네의 조언', 'draw'), B('층간소음', [stk(K, 1)])]),
+    // u5 유틸(서치) — 하위 용족의 「통곡의 벽」: 실드 + 정당방위 + 고유 카드 서치
+    card(H, 5, '통곡의 벽', 1, '스킬', [sh(0.85), stk(K, 1), srchU()], [
+      O('신탁 1', [sh(1.1), stk(K, 1), srchU()]),
+      O('신탁 2', [sh(0.7), stk(K, 1), srchU()], { cost: 0 }),
+      O('신탁 3', [sh(1.0), srchO(), ifWounded, stk(K, 2)]),                                    // 재설계 — 시스트를 방패로(동료 카드)
+      O('신탁 4', [sh(0.85), stk(K, 1), pullU()]),                                              // F 회수 — BEST
+      O('신탁 5', [payHp(40), sh(1.0), stk(K, 3)]),                                                  // H HP · 서치 빼기
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ]);
   scaleU(j, 1.35);
   starter(j, '리츠_u2');
@@ -307,6 +342,14 @@ function vivi(j) {
       O('수은 범람', [discard1, ddef(0.45, EA), each, ddef(0.2, EA)]),   // H 손패 버리기
       O('작은 복수', [st('결의', 1), each, ddef(0.3, EA), srchU()]),   // F 서치
     ], [B('세계수의 원한', 'defUp'), B('수은 양동이', { tags: ['개전'] }), B('은빛 독', [st('피해 감소', 1)])]),
+    // u5 유틸(동료 카드) — 수은 주스 대접(본인은 선의): 실드 + 수은 + 동료 카드
+    card(H, 5, '수은 주스 대접', 1, '스킬', [sh(0.85), stk(K, 1, E1), srchO()], [
+      O('신탁 1', [sh(1.1), stk(K, 1, E1), srchO()]),
+      O('신탁 2', [sh(0.7), stk(K, 1, E1), srchO()], { cost: 0 }),
+      O('신탁 3', [sh(1.2), { k: 'cleanse', v: 1 }, stk(K, 1, E1)]),                                               // 재설계 — 결벽증(정화)
+      O('신탁 4', [sh(0.8), srchU(), srchO()]),                                      // F 고유 + 동료 — BEST
+      O('신탁 5', [payHp(40), ddef(0.4, EA), stk(K, 2, EA)]),                                                       // H HP — 재채기 참다 터짐(적 전체)
+    ], [B('축복 1', 'draw'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1, E1)])]),
   ]);
   scaleU(j, 1.25);
   starter(j, '비비_u1');
@@ -366,6 +409,14 @@ function sist(j) {
       O('응원 대행 서비스', [dmg(0.95, LOW), srchU(), shop()], T_OPEN),          // F 서치 — BEST
       O('소상인 협회', [atk10(), stk(K, 4), shop()]),                                // H 개전 빼기
     ], [B('황금 저금통', 'atkUp'), B('호구 탐지', 'draw'), B('개업 준비', [make(EXP, 1)])], T_OPEN),
+    // u5 유틸(비용) — 교주에게서 받는 바보세: 수수료 + 공격 카드 비용↓
+    card(H, 5, '바보세 징수', 0, '스킬', [stk(K, 1), costDown('공격')], [
+      O('신탁 1', [stk(K, 2), costDown('공격')]),
+      O('신탁 2', [stk(K, 1), costDown('공격')], { tags: ['보존'] }),
+      O('신탁 3', [make(EXP, 1), draw(1)]),                                                          // 재설계 — 가짜 뿔 날개(총알 배송)
+      O('신탁 4', [stk(K, 1), srchU(), costDown('공격')]),                                          // F 서치 + 비용↓ — BEST
+      O('신탁 5', [payHp(40), stk(K, 3), costDown('공격')]),                                        // H 자수정 엄살(HP)
+    ], [B('축복 1', 'ap'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.7);
   starter(j, '시스트_u4');
@@ -418,6 +469,14 @@ function silvia(j) {
       O('어머니와 딸', [st('결의', 1), heal(0.5), power(tea(0.3))]),
       O('작은 다과회', [st('결의', 1), srchO('스킬'), power(tea(0.3))]),             // F 서치 — BEST
     ], [B('어머니와 딸', 'defUp'), B('은 찻주전자', 'cost'), B('각설탕', [gAll])]),
+    // u5 굴리기(공격) — 결투를 걸고 다니며 장갑을 던진다: 손님 + 방어 기반 피해
+    card(H, 5, '장갑 던지기', 1, '공격', [g1, ddef(0.65)], [
+      O('신탁 1', [g1, ddef(0.85)]),
+      O('신탁 2', [g1, ddef(0.5)], { cost: 0 }),
+      O('신탁 3', [gAll, sh(1.6)]),                                                                  // 재설계 — 진은의 대공 개입(모두 손님 · 막기)
+      O('신탁 4', [g1, ddef(0.5), power(rule('play', [ddef(0.25, ER)], { when: { marked: K, type: '공격' }, limit: 1 }))], { power: true }),   // D 손님이 칠 때마다 — BEST
+      O('신탁 5', [payHp(40), ddef(1.0), st('약화', 1, E1)]),                                      // H HP · 손님 빼기
+    ], [B('축복 1', 'power'), B('축복 2', 'ap'), B('축복 3', [g1])]),
   ]);
   scaleU(j, 1.15);
   starter(j, '실비아_u1');
@@ -471,6 +530,14 @@ function silphir(j) {
       O('전교 1등 목표', [st('사기', 1), per(K), dmg(0.45), spendAll(K)]),  // H 다 쓴다
       O('셀프 칭찬', [st('사기', 1), per(K), dmg(0.35), srchU()]),          // F 서치
     ], [B('사파이어 광택', 'atkUp'), B('도전장', { tags: ['개전'] }), B('풋풋한 학창 시절', [draw(1)])]),
+    // u5 유틸(서치) — 전설의 검 「엑박스칼리버」를 찾아서: 실드 + 단검 + 공격 서치
+    card(H, 5, '엑박스칼리버 탐색', 1, '스킬', [sh(0.7), stk(K, 2), srchT('공격')], [
+      O('신탁 1', [sh(0.9), stk(K, 2), srchT('공격')]),
+      O('신탁 2', [sh(0.55), stk(K, 2), srchT('공격')], { cost: 0 }),
+      O('신탁 3', [srchO(), stk(K, 1), st('사기', 1)]),                                             // 재설계 — 나이아 받아 주기(동료 카드)
+      O('신탁 4', [sh(0.75), stk(K, 2), pullU()]),                                            // F 회수 — BEST
+      O('신탁 5', [discard1, sh(0.8), stk(K, 4)]),                                                   // H 손패 버리기 · 서치 빼기
+    ], [B('축복 1', 'draw'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.55);
   starter(j, '실피르_u2');
@@ -526,6 +593,14 @@ function arnet(j) {
       O('개막전', [st('사기', 1), srchO('공격'), power(cheer(0.35))], T_OPEN),         // F 서치 — BEST
       O('팝콘', [st('사기', 1), sh(0.6), power(cheer(0.45))]),                        // H 개전 빼기
     ], [B('관람 예절', 'atkUp'), B('명당 자리', 'draw'), B('응원봉', [heal(0.3)])], T_OPEN),
+    // u5 굴리기(공격) — 싸우라며 꿀밤: MVP + 피해
+    card(H, 5, '결투 붙이는 꿀밤', 1, '공격', [dmg(0.75), mvp()], [
+      O('신탁 1', [dmg(0.98), mvp()]),
+      O('신탁 2', [dmg(0.55), mvp()], { cost: 0 }),
+      O('신탁 3', [st('협공', 1), heal(0.6)]),                                                     // 재설계 — 채소끼리 결투(협공 · 회복)
+      O('신탁 4', [dmg(0.6), mvp(), power(rule('play', [st('협공', 1)], { when: { marked: K, type: '공격' }, limit: 1 }))], { power: true }),   // D MVP 가 칠 때 협공 — BEST
+      O('신탁 5', [payHp(40), dmg(1.1), st('취약', 2, E1)]),                                       // H HP · MVP 빼기
+    ], [B('축복 1', 'power'), B('축복 2', 'ap'), B('축복 3', [mvp()])]),
   ]);
   scaleU(j, 1.35);
   starter(j, '아네트_u4');
@@ -580,6 +655,14 @@ function aragnia(j) {
       O('있는 그대로의 특별함', [st('불굴', 1), per(K), sh(0.3), ifWounded, heal(1.2)]),
       O('모래성', [st('불굴', 1), per(K), sh(0.2), srchO()]),               // F 서치
     ], [B('산호 왕관', 'defUp'), B('해안가 새 터', 'cost'), B('진주 한 알', [stk(K, 1)])]),
+    // u5 굴리기(공격) — 바다의 흐름으로 배를 뒤집는다: 구슬 + 피해(공격 한 장뿐이라)
+    card(H, 5, '바다 뒤집기', 1, '공격', [dmg(0.8), stk(K, 1)], [
+      O('신탁 1', [dmg(1.05), stk(K, 1)]),
+      O('신탁 2', [dmg(0.6), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [sh(1.25), stk(K, 2)]),                                                             // 재설계 — 산호 모래성(막기)
+      O('신탁 4', [dmg(0.65), stk(K, 1), srchU()]),                                                  // F 서치 — BEST
+      O('신탁 5', [per(K), dmg(0.35), spendAll(K), draw(1)]),                                                  // H 구슬을 다 쓴다
+    ], [B('축복 1', 'power'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1), sh(0.3)])]),
   ]);
   scaleU(j, 1.0);
   starter(j, '아라그니아_u1');
@@ -635,6 +718,14 @@ function opal(j) {
       O('작은 칭찬', [st('사기', 1), per(K), sh(0.45), ifWounded, heal(0.9)]),
       O('파티 준비', [st('사기', 1), per(K), sh(0.35), srchO()]),            // F 서치
     ], [B('반짝 왕관', 'defUp'), B('탭슈즈', 'cost'), B('첫 파티', [heal(0.3)])]),
+    // u5 굴리기(공격) — 총을 쥐면 「때찌때찌」: 눈물 + 피해
+    card(H, 5, '때찌때찌', 1, '공격', [dmg(0.8), stk(K, 1)], [
+      O('신탁 1', [dmg(1.05), stk(K, 1)]),
+      O('신탁 2', [dmg(0.6), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [make(TAP, 1), heal(1.0), stk(K, 1)]),                                                        // 재설계 — 봉제 인형 선물
+      O('신탁 4', [dmg(0.6), stk(K, 1), power(rule('stackReach', [dmg(0.4, EA)], { when: { id: K, n: 3 } }))], { power: true }),   // D 뚝! 마다 광역 — BEST
+      O('신탁 5', [payHp(40), dmg(1.1), stk(K, 2)]),                                                 // H 뿔이 먼저 부서짐(HP)
+    ], [B('축복 1', 'power'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.5);
   starter(j, '오팔_u2');
@@ -690,6 +781,14 @@ function jade(j) {
       O('베낀 사본', [dmg(0.6), per(K), dmg(0.5), spendAll(K)]),                      // H 다 쓴다
       O('서고 정리', [dmg(0.6), per(K), dmg(0.3), srchU()]),                          // F 서치
     ], [B('초대 교주의 필체', 'atkUp'), B('기록소', { tags: ['보존'] }), B('밀린 만화책', [stk(K, 1)])]),
+    // u5 유틸(서치 · 보존) — 지식은 혼자 알아야 똑똑해진다: 비취옥 + 고유 카드 서치
+    card(H, 5, '지식 독점', 0, '스킬', [stk(K, 1), srchU()], [
+      O('신탁 1', [stk(K, 2), srchU()], keep),
+      O('신탁 2', [dmg(0.7), handEnd, stk(K, 1)], keep),                                            // 재설계 — 왜곡된 지식(유사과학 일격)
+      O('신탁 3', [stk(K, 1), srchU(), handEnd, stk(K, 1)], keep),                                 // E 쥐고 넘기면
+      O('신탁 4', [stk(K, 1), pullU(), srchU()], keep),                                             // F 회수 + 서치 — BEST
+      O('신탁 5', [stk(K, 2), draw(2)]),                                                             // H 보존 빼기
+    ], [B('축복 1', 'draw'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1), sh(0.3)])], keep),
   ]);
   scaleU(j, 1.35);
   starter(j, '제이드_u2');
@@ -744,6 +843,14 @@ function kidian(j) {
       O('별 하나', [st('잔광', 1), per(K), dmg(0.45), spendAll(K)]),          // H 다 쓴다
       O('내가 빛내줄게…', [st('잔광', 1), per(K), dmg(0.35), srchU()]),       // F 서치
     ], [B('교주의 별자리', 'atkUp'), B('별 관찰 노트', 'draw'), B('흑요석 조각', [stk(K, 1)])]),
+    // u5 유틸(서치) — 그늘에서 내다보는 정도는 괜찮다: 붕대(실드) + 별빛 + 공격 서치
+    card(H, 5, '그늘에서 내다보기', 1, '스킬', [sh(0.7), stk(K, 1), srchT('공격')], [
+      O('신탁 1', [sh(0.9), stk(K, 1), srchT('공격')]),
+      O('신탁 2', [sh(0.55), stk(K, 1), srchT('공격')], { cost: 0 }),
+      O('신탁 3', [tough(1), sh(1.1), ifBroken, stk(K, 3)]),                                       // 재설계 — 먼저 물러섰다 틈을(격파 조건)
+      O('신탁 4', [sh(0.7), stk(K, 1), pullU()]),                                             // F 회수 — BEST
+      O('신탁 5', [payHp(40), sh(0.8), stk(K, 3)]),                                                  // H 베인 손(HP) · 서치 빼기
+    ], [B('축복 1', 'ap'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.15);
   starter(j, '키디언_u2');
@@ -796,6 +903,14 @@ function pira(j) {
       O('싸구려 플라스크', [st('사기', 1), per(K), dmg(0.4, ER), spendAll(K)]),   // H 다 쓴다
       O('실험 일지', [st('사기', 1), per(K), dmg(0.4, ER), srchU()]),   // F 서치
     ], [B('화금석', 'atkUp'), B('첫 실험', 'draw'), B('블링블링 우정 목걸이', [heal(0.3)])]),
+    // u5 유틸(서치) — 사채로 받아 낸 물건 감정: 취약 + 부유함 + 공격 서치
+    card(H, 5, '사채 감정', 1, '스킬', [st('취약', 2, E1), stk(K, 1), srchT('공격')], [
+      O('신탁 1', [st('취약', 3, E1), stk(K, 1), srchT('공격')]),
+      O('신탁 2', [st('취약', 1, E1), stk(K, 1), srchT('공격')], { cost: 0 }),
+      O('신탁 3', [sh(0.5), srchO(), st('사기', 1)]),                                                         // 재설계 — 솔직해지라는 말(동료 카드 · 사기)
+      O('신탁 4', [st('취약', 2, E1), stk(K, 1), power(rule('debuff', [stk(K, 1), dmg(0.2, ER)], { limit: 1 }))], { power: true }),   // D 디버프마다 부유함 — BEST
+      O('신탁 5', [discard1, dmg(0.4, EA), st('취약', 2, EA)]),                                        // H 손패 버리기 — 광역 취약
+    ], [B('축복 1', 'ap'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.85);
   starter(j, '피라_u1');

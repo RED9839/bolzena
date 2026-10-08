@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "엘프",
       "role": "서포터",
+      "style": "회복형",
       "star": 3,
       "hp": 630,
       "atk": 75,
@@ -17,32 +18,10 @@
         "desc": "진찰할 때마다 채우는 차트",
         "carrier": "self",
         "cap": 3,
-        "rules": [
-          {
-            "name": "회진",
-            "when": {
-              "on": "stackReach",
-              "id": "진료 차트",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "진료 차트",
-                "all": true
-              },
-              {
-                "k": "heal",
-                "ratio": 1
-              },
-              {
-                "k": "make",
-                "id": "힐데_note",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "힐데_note",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -160,7 +139,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.3
+          "ratio": 0.36
         }
       ],
       "hero": "힐데",
@@ -175,107 +154,128 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "heal",
-          "ratio": 0.7
-        },
-        {
           "k": "perStack",
-          "id": "진료 차트"
+          "id": "진료 차트",
+          "n": 1
         },
         {
           "k": "heal",
-          "ratio": 0.25
+          "ratio": 0.54
         },
         {
           "k": "spend",
           "id": "진료 차트",
           "all": true
+        },
+        {
+          "k": "perOverheal",
+          "pct": 0.8,
+          "per": 20
+        },
+        {
+          "k": "shield",
+          "ratio": 0.14
         }
       ],
       "oracles": [
         {
-          "name": "짙은 피톤치드",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.9
-            },
-            {
               "k": "perStack",
-              "id": "진료 차트"
+              "id": "진료 차트",
+              "n": 1
             },
             {
               "k": "heal",
-              "ratio": 0.32
+              "ratio": 0.73
             },
             {
               "k": "spend",
               "id": "진료 차트",
               "all": true
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 20
+            },
+            {
+              "k": "shield",
+              "ratio": 0.19
             }
           ]
         },
         {
-          "name": "숲의 파동",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.45
-            },
-            {
               "k": "perStack",
-              "id": "진료 차트"
+              "id": "진료 차트",
+              "n": 1
             },
             {
               "k": "heal",
-              "ratio": 0.45
-            },
-            {
-              "k": "make",
-              "id": "힐데_note",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "무차별 처방",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "진료 차트"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.15,
-              "target": "allEnemies"
+              "ratio": 0.52
             },
             {
               "k": "spend",
               "id": "진료 차트",
               "all": true
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 20
+            },
+            {
+              "k": "shield",
+              "ratio": 0.13
             }
           ]
         },
         {
-          "name": "처방 기록 검색",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.62
+              "k": "perStack",
+              "id": "진료 차트",
+              "n": 1
             },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "spend",
+              "id": "진료 차트",
+              "all": true
+            },
+            {
+              "k": "heal",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
             {
               "k": "perStack",
-              "id": "진료 차트"
+              "id": "진료 차트",
+              "n": 1
             },
             {
               "k": "heal",
-              "ratio": 0.22
+              "ratio": 0.48
+            },
+            {
+              "k": "spend",
+              "id": "진료 차트",
+              "all": true
             },
             {
               "k": "draw",
@@ -286,38 +286,37 @@
           ]
         },
         {
-          "name": "매 초 회복",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 1
-            },
-            {
               "k": "perStack",
-              "id": "진료 차트"
+              "id": "진료 차트",
+              "n": 1
             },
             {
               "k": "heal",
-              "ratio": 0.33
+              "ratio": 0.97
+            },
+            {
+              "k": "spend",
+              "id": "진료 차트",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "온천의 효능",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "간이 처방",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "차트 한 장",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -343,7 +342,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.6
+          "ratio": 0.72
         },
         {
           "k": "draw",
@@ -352,16 +351,16 @@
       ],
       "oracles": [
         {
-          "name": "꼼꼼한 회진",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "진료 차트",
-              "v": 2
+              "v": 1
             },
             {
               "k": "heal",
-              "ratio": 0.7
+              "ratio": 1.18
             },
             {
               "k": "draw",
@@ -370,104 +369,72 @@
           ]
         },
         {
-          "name": "정기 검진",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.48
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.96
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 2
+            },
             {
               "k": "heal",
               "ratio": 0.6
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "진료 차트",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "진료 기록 검색",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
               "id": "진료 차트",
-              "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 0.5
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "스킬"
-            }
-          ]
-        },
-        {
-          "name": "소견서 작성",
-          "fx": [
-            {
-              "k": "make",
-              "id": "힐데_note",
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "진료 차트",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "진짜로 아픈 환자",
-          "fx": [
+              "k": "draw",
+              "v": 2
+            },
             {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 1.02
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "청진기",
-          "kind": "heal"
-        },
-        {
-          "name": "파티 게임",
-          "kind": "draw"
-        },
-        {
-          "name": "소견서 한 장",
-          "fx": [
-            {
-              "k": "make",
-              "id": "힐데_note",
               "v": 1
             }
           ]
@@ -484,21 +451,25 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.8
+          "ratio": 0.72
         },
         {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "stackReach",
-                "id": "진료 차트",
-                "n": 3
+                "on": "overheal",
+                "pct": 0.8
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
                   "k": "shield",
-                  "ratio": 1
+                  "ratio": 1,
+                  "ofEvent": 1
                 }
               ]
             }
@@ -507,25 +478,29 @@
       ],
       "oracles": [
         {
-          "name": "보호법 개정",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 0.96
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "진료 차트",
-                    "n": 3
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 1.35
+                      "ratio": 1,
+                      "ofEvent": 1.2
                     }
                   ]
                 }
@@ -534,7 +509,7 @@
           ]
         },
         {
-          "name": "보호법 초안",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -542,14 +517,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "진료 차트",
-                    "n": 3
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 1
+                      "ratio": 1,
+                      "ofEvent": 1
                     }
                   ]
                 }
@@ -558,30 +537,33 @@
           ]
         },
         {
-          "name": "닥터 호칭 복원",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "make",
-              "id": "힐데_note",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.62
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.62
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "진료 차트",
-                    "n": 3
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 1
+                      "k": "stack",
+                      "id": "진료 차트",
+                      "v": 1
                     }
                   ]
                 }
@@ -590,31 +572,35 @@
           ]
         },
         {
-          "name": "판례 검색",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.7
+              "ratio": 0.6
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
+              "unique": true
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "진료 차트",
-                    "n": 3
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 1
+                      "ratio": 1,
+                      "ofEvent": 1
                     }
                   ]
                 }
@@ -623,52 +609,57 @@
           ]
         },
         {
-          "name": "야간 진료",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "payHpPct",
-              "v": 0.05
-            },
-            {
               "k": "shield",
-              "ratio": 1.14
+              "ratio": 1.22
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "진료 차트",
-                    "n": 3
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 1.48
+                      "ratio": 1,
+                      "ofEvent": 1
                     }
                   ]
                 }
               ]
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "리뉴아의 창조주",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "진료 시간 엄수",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "소독약",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
             }
           ]
         }
@@ -684,7 +675,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.42,
+          "ratio": 0.5,
           "target": "randomEnemy",
           "hits": 3
         },
@@ -696,65 +687,30 @@
       ],
       "oracles": [
         {
-          "name": "대량 처방",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
-              "target": "randomEnemy",
-              "hits": 4
-            },
-            {
-              "k": "stack",
-              "id": "진료 차트",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "주사 한 대",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "stack",
-              "id": "진료 차트",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "처방 1장당",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.68,
               "target": "randomEnemy",
               "hits": 3
             },
             {
-              "k": "perStack",
-              "id": "진료 차트"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "target": "randomEnemy"
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
             }
           ]
         },
         {
-          "name": "상시 처방",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.41,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -768,16 +724,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "진료 차트",
-                    "n": 3
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.3,
-                      "target": "randomEnemy",
-                      "hits": 2
+                      "k": "stack",
+                      "id": "진료 차트",
+                      "v": 1
                     }
                   ]
                 }
@@ -786,17 +744,16 @@
           ]
         },
         {
-          "name": "과잉진료",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.91,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.42,
-              "target": "randomEnemy",
-              "hits": 4
+              "k": "heal",
+              "ratio": 0.46
             },
             {
               "k": "stack",
@@ -804,19 +761,225 @@
               "v": 1
             }
           ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "주사기총",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "마취 주사",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "차트 기록",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "힐데_u5",
+      "name": "판을 뒤집는 수",
+      "hero": "힐데",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.72,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifWounded"
+        },
+        {
+          "k": "status",
+          "id": "초재생",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.97,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.59
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

@@ -6,79 +6,53 @@
       "nature": "우울",
       "race": "엘프",
       "role": "서포터",
+      "style": "대가형",
       "star": 2,
       "hp": 680,
       "atk": 83,
       "def": 62,
       "crit": 5,
-      "blurb": "규칙과 통제를 혐오하는 무정부주의 락커. 적이 쌓아 둔 기세를 기타 소리로 걷어 내고, 파티가 공격과 스킬을 번갈아 낼 때마다 반항심이 끓어올라 가득 차면 모두가 같이 치며 적의 기세가 꺾입니다.",
+      "blurb": "규칙과 통제를 혐오하는 무정부주의 락커. 목과 손목을 혹사해 가며 연주를 거세게 몰아치고, 누가 대가를 치르든 반항심이 끓어 넷이 차면 파티의 다음 한 수가 함께 터집니다.",
       "keyword": {
         "name": "반항",
-        "desc": "공격과 스킬을 뒤섞는 엇박자",
+        "desc": "몸을 혹사할수록 끓어오르는 반항심",
         "carrier": "self",
         "cap": 4,
-        "rules": [
+        "per": [
           {
-            "name": "소음 공해",
-            "when": {
-              "on": "stackReach",
-              "id": "반항",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "반항",
-                "all": true
-              },
-              {
-                "k": "status",
-                "id": "약화",
-                "v": 1,
-                "target": "allEnemies"
-              },
-              {
-                "k": "dispel",
-                "n": 1
-              }
-            ]
+            "stat": "dealt",
+            "v": 0.06,
+            "who": "allies"
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
-          "name": "나락도 락",
+          "name": "퇴락도 락",
           "when": {
-            "on": "play",
-            "who": "any",
-            "seq": [
-              "공격",
-              "스킬"
-            ]
+            "on": "pay",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
               "id": "반항",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "나락도 락",
-          "when": {
-            "on": "play",
-            "who": "any",
-            "seq": [
-              "스킬",
-              "공격"
-            ]
-          },
-          "fx": [
+            },
             {
-              "k": "stack",
-              "id": "반항",
-              "v": 1
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -91,7 +65,13 @@
             {
               "k": "stack",
               "id": "반항",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -165,7 +145,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.45,
           "target": "allEnemies"
         },
         {
@@ -174,7 +154,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.18,
           "target": "allEnemies"
         },
         {
@@ -185,11 +165,12 @@
       ],
       "oracles": [
         {
-          "name": "앰프 최대",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.61,
               "target": "allEnemies"
             },
             {
@@ -198,7 +179,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.24,
               "target": "allEnemies"
             },
             {
@@ -209,117 +190,128 @@
           ]
         },
         {
-          "name": "앙코르 없는 공연",
-          "cost": 2,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "반항"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "기세 꺾기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "dispel",
-              "n": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "반항",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.48,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "세트리스트",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "반항"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "기타 부수기",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "반항"
-            },
             {
               "k": "dmg",
               "ratio": 0.45,
               "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "반항",
-              "all": true
+              "k": "perStack",
+              "id": "반항"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "pay",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.22,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "반항"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dispel",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "반항"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "반항"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "한정판 앰프",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "기타 케이스",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "엇박자",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -340,7 +332,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.95
+          "ratio": 0.9
         },
         {
           "k": "stack",
@@ -350,11 +342,12 @@
       ],
       "oracles": [
         {
-          "name": "역 앞 노숙",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.25
+              "ratio": 1.22
             },
             {
               "k": "stack",
@@ -364,12 +357,13 @@
           ]
         },
         {
-          "name": "깡통 한 모금",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.65
+              "ratio": 0.86
             },
             {
               "k": "stack",
@@ -379,11 +373,16 @@
           ]
         },
         {
-          "name": "깡통 모금",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.9
+              "ratio": 0.85
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
             },
             {
               "k": "status",
@@ -393,11 +392,48 @@
           ]
         },
         {
-          "name": "배달 끼니",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.9
+              "ratio": 0.75
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "pay",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.51
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.85
             },
             {
               "k": "stack",
@@ -407,40 +443,23 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "부자인데 궁핍",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 1.3
-            },
-            {
-              "k": "stack",
-              "id": "반항",
-              "v": 2
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "브랜디",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "침낭",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "자유의 노래",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -472,7 +491,7 @@
       ],
       "oracles": [
         {
-          "name": "길거리 대공연",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -482,12 +501,51 @@
             {
               "k": "status",
               "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "협공",
               "v": 2
             }
           ]
         },
         {
-          "name": "매일 버스킹",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -505,7 +563,11 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "pay"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -520,7 +582,7 @@
           ]
         },
         {
-          "name": "관객 호응",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
@@ -535,69 +597,8 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "거리 공연 수익",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.34
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "반항",
-              "n": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "흥이 오르면",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "반항",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "즉흥 연주",
-          "kind": "cost"
-        },
-        {
-          "name": "앰프 연결",
-          "kind": "ap"
-        },
-        {
-          "name": "떼창 유도",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -621,14 +622,21 @@
           "rules": [
             {
               "when": {
-                "on": "stackReach",
-                "id": "반항",
-                "n": 4
+                "on": "pay",
+                "who": "any"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
-                  "k": "status",
-                  "id": "협공",
+                  "k": "shield",
+                  "ratio": 0.5
+                },
+                {
+                  "k": "stack",
+                  "id": "반항",
                   "v": 1
                 }
               ]
@@ -638,98 +646,7 @@
       ],
       "oracles": [
         {
-          "name": "한정판 기타",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "반항",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "반항",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "협공",
-                      "v": 1
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.35,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "무대 뒤 조율",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "반항",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "협공",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "역조공 이벤트",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.4
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "반항",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "협공",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "앨범 재발매",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -737,23 +654,25 @@
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            },
-            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "반항",
-                    "n": 4
+                    "on": "pay",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "협공",
+                      "k": "shield",
+                      "ratio": 0.6
+                    },
+                    {
+                      "k": "stack",
+                      "id": "반항",
                       "v": 1
                     }
                   ]
@@ -763,11 +682,115 @@
           ]
         },
         {
-          "name": "목 쉬도록",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
-              "k": "payHpPct",
-              "v": 0.05
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "pay",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.5
+                    },
+                    {
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "pay",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.59
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "pay",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.54
+                    },
+                    {
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
             },
             {
               "k": "stack",
@@ -779,20 +802,22 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "반항",
-                    "n": 4
+                    "on": "pay",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "협공",
-                      "v": 1
+                      "k": "shield",
+                      "ratio": 1
                     },
                     {
-                      "k": "dmg",
-                      "ratio": 0.2,
-                      "target": "allEnemies"
+                      "k": "stack",
+                      "id": "반항",
+                      "v": 1
                     }
                   ]
                 }
@@ -803,15 +828,176 @@
       ],
       "blesses": [
         {
-          "name": "스포트라이트",
+          "name": "축복 1",
           "kind": "atkUp"
         },
         {
-          "name": "저작권료",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "떼창",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "페스타_u5",
+      "name": "기괴한 연주",
+      "hero": "페스타",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "nextAp",
+          "v": -1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.95,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "반항",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.28,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.09,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dispel",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 40
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "반항",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "pay",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.38,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.02,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

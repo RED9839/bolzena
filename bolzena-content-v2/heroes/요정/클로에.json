@@ -6,6 +6,7 @@
       "nature": "광기",
       "race": "요정",
       "role": "탱커",
+      "style": "두 얼굴형",
       "star": 3,
       "hp": 990,
       "atk": 112,
@@ -17,28 +18,10 @@
         "desc": "인형을 짓는 재단사의 바늘땀",
         "carrier": "self",
         "cap": 2,
-        "rules": [
-          {
-            "name": "세바스티안 바느질",
-            "when": {
-              "on": "stackReach",
-              "id": "바늘땀",
-              "n": 2
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "바늘땀",
-                "all": true
-              },
-              {
-                "k": "make",
-                "id": "클로에_cloth",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "클로에_cloth",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -60,23 +43,9 @@
             "on": "play",
             "type": "스킬"
           },
-          "fx": [
-            {
-              "k": "stack",
-              "id": "바늘땀",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재단사의 손",
-          "when": {
-            "on": "play",
-            "type": "공격"
-          },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
@@ -134,6 +103,60 @@
         "클로에_s1",
         "클로에_s2",
         "클로에_u2"
+      ],
+      "forms": [
+        {
+          "id": "클로에_탑승",
+          "name": "인형의 의지",
+          "desc": "세바스티안에 올라탄 클로에 — 앞발이 연타와 휩쓸기로 바뀌는 탑승",
+          "turns": 3,
+          "mods": {
+            "atk": 0.15
+          },
+          "cards": {
+            "클로에_s1": "클로에_f1"
+          },
+          "bonus": [
+            {
+              "card": "클로에_u3",
+              "fx": [
+                {
+                  "k": "formEnd"
+                }
+              ]
+            }
+          ],
+          "passives": [
+            {
+              "name": "세바스티안의 앞발",
+              "when": {
+                "on": "play",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "바늘땀",
+                  "v": 1
+                }
+              ]
+            }
+          ],
+          "replace": false,
+          "off": [
+            {
+              "k": "make",
+              "id": "클로에_cloth",
+              "v": 1
+            }
+          ],
+          "skin": null,
+          "anim": null
+        }
       ]
     }
   ],
@@ -204,6 +227,31 @@
       "token": true
     },
     {
+      "id": "클로에_f1",
+      "name": "세바스티안 휩쓸기",
+      "hero": "클로에",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.24,
+          "base": "def",
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.32,
+          "base": "def",
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "올라탄 세바스티안이 세 번 할퀴고 크게 휩씁니다"
+    },
+    {
       "id": "클로에_u1",
       "name": "세바스티안 연타",
       "hero": "클로에",
@@ -213,7 +261,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.22,
+          "ratio": 0.25,
           "base": "def",
           "target": "oneEnemy",
           "hits": 3
@@ -226,11 +274,12 @@
       ],
       "oracles": [
         {
-          "name": "인형의 의지",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.29,
+              "ratio": 0.34,
               "base": "def",
               "target": "oneEnemy",
               "hits": 3
@@ -243,14 +292,55 @@
           ]
         },
         {
-          "name": "휘두르는 앞발",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.18,
+              "ratio": 0.16,
               "base": "def",
-              "target": "allEnemies",
+              "target": "oneEnemy",
               "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "바늘땀",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "base": "def",
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
               "k": "stack",
@@ -260,7 +350,7 @@
           ]
         },
         {
-          "name": "마지막 큰 한 방",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
@@ -275,87 +365,48 @@
               "v": 1
             },
             {
-              "k": "ifStack",
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
               "id": "바늘땀",
-              "n": 1
+              "v": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.39,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "천 조각 휘두르기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.24,
-              "base": "def",
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perTag",
-              "id": "클로에_cloth"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.24,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "세바스티안 훈련",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "base": "def",
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "make"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.36,
-                      "base": "def",
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "곰 앞발",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "넉백",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "실밥",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -376,67 +427,57 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.87
+          "ratio": 1.2
         },
         {
           "k": "stack",
           "id": "바늘땀",
-          "v": 2
+          "v": 1
+        },
+        {
+          "k": "form",
+          "id": "클로에_탑승"
         }
       ],
       "oracles": [
         {
-          "name": "회전목마",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.27
+              "ratio": 1.9
             },
             {
               "k": "stack",
               "id": "바늘땀",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "실밥 뜯기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.49
-            },
-            {
-              "k": "stack",
-              "id": "바늘땀",
-              "v": 2
-            },
-            {
-              "k": "discard",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "세바스티안에 올라타기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.78
             },
             {
-              "k": "make",
-              "id": "클로에_sebas",
-              "v": 1
+              "k": "form",
+              "id": "클로에_탑승"
             }
           ]
         },
         {
-          "name": "흔들리지 않는 의지",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.09
+              "ratio": 0.8
+            },
+            {
+              "k": "form",
+              "id": "클로에_탑승"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.14
             },
             {
               "k": "stack",
@@ -444,50 +485,44 @@
               "v": 2
             },
             {
-              "k": "ifWounded"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "form",
+              "id": "클로에_탑승"
             }
           ]
         },
         {
-          "name": "재단소 단골",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.87
+              "ratio": 1.64
             },
             {
-              "k": "stack",
-              "id": "바늘땀",
-              "v": 2
+              "k": "form",
+              "id": "클로에_탑승"
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true,
+              "type": "공격"
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "콩깍지",
-          "kind": "guard"
         },
         {
-          "name": "첫 손님 무료",
-          "kind": "cost"
-        },
-        {
-          "name": "별 문양",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "stack",
-              "id": "바늘땀",
+              "k": "shield",
+              "ratio": 2.88
+            },
+            {
+              "k": "form",
+              "id": "클로에_탑승"
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -509,7 +544,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.78
+          "ratio": 0.7
         },
         {
           "k": "perTag",
@@ -517,12 +552,13 @@
         },
         {
           "k": "shield",
-          "ratio": 0.26
+          "ratio": 0.25
         }
       ],
       "oracles": [
         {
-          "name": "반짝이는 이",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -531,56 +567,7 @@
             },
             {
               "k": "shield",
-              "ratio": 1.04
-            },
-            {
-              "k": "perTag",
-              "id": "클로에_cloth"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.3
-            }
-          ]
-        },
-        {
-          "name": "살짝 미소",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.61
-            },
-            {
-              "k": "perTag",
-              "id": "클로에_cloth"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.22
-            }
-          ]
-        },
-        {
-          "name": "포커페이스",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.78
-            },
-            {
-              "k": "make",
-              "id": "클로에_cloth",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "클로버 문양",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.17
+              "ratio": 0.95
             },
             {
               "k": "perTag",
@@ -589,57 +576,115 @@
             {
               "k": "shield",
               "ratio": 0.34
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
             }
           ]
         },
         {
-          "name": "흠 있는 인형 뜯기",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.66
+            },
             {
               "k": "perTag",
               "id": "클로에_cloth"
             },
             {
               "k": "shield",
-              "ratio": 0.7
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "클로에_cloth"
-            },
+              "ratio": 0.24
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
             {
               "k": "status",
               "id": "피해 감소",
               "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "make",
+              "id": "클로에_cloth",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.79
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.38
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.51
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "다이아몬드",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "물음표",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "새 천 한 필",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "클로에_cloth",
+              "k": "stack",
+              "id": "바늘땀",
               "v": 1
             }
           ]
@@ -679,7 +724,7 @@
       ],
       "oracles": [
         {
-          "name": "넘겨준 모든 힘",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
@@ -687,9 +732,32 @@
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 0.7
-            },
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "바늘땀",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
             {
               "k": "power",
               "rules": [
@@ -710,7 +778,7 @@
           ]
         },
         {
-          "name": "오래전 황무지",
+          "name": "신탁 3",
           "tags": [
             "개전"
           ],
@@ -722,7 +790,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.44
+              "ratio": 0.8
             },
             {
               "k": "power",
@@ -744,53 +812,7 @@
           ]
         },
         {
-          "name": "동생들을 지키라며",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "바늘땀",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "make"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.26
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "k": "shield",
-              "ratio": 0.35
-            }
-          ]
-        },
-        {
-          "name": "자매의 의지",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "status",
@@ -800,7 +822,8 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
@@ -822,16 +845,16 @@
           ]
         },
         {
-          "name": "작은 의지",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.7
+              "k": "status",
+              "id": "결정화",
+              "v": 2
             },
             {
-              "k": "make",
-              "id": "클로에_cloth",
-              "v": 1
+              "k": "nextAp",
+              "v": -1
             },
             {
               "k": "power",
@@ -845,6 +868,10 @@
                       "k": "stack",
                       "id": "바늘땀",
                       "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.39
                     }
                   ]
                 }
@@ -855,21 +882,218 @@
       ],
       "blesses": [
         {
-          "name": "머리 위의 세바스티안",
+          "name": "축복 1",
           "kind": "defUp"
         },
         {
-          "name": "런웨이 오프닝",
+          "name": "축복 2",
           "tags": [
             "개전"
           ]
         },
         {
-          "name": "재단 도구",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.35
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "클로에_u5",
+      "name": "재단 가위질",
+      "hero": "클로에",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perTag",
+          "id": "클로에_cloth"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "exileFrom",
+          "from": "hand",
+          "all": true,
+          "tag": "클로에_cloth"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "클로에_cloth"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "클로에_cloth"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.3,
+                      "base": "def",
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "클로에_cloth"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "클로에_cloth",
+              "v": 1
             }
           ]
         }

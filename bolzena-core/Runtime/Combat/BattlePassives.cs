@@ -9,6 +9,8 @@ namespace Bolzena.Core
     {
         public string Hero, Actor, Type, By, Id, Owner, Kind;
         public int Nth, Cost, Seq, N, V;
+        /// <summary>keepAp — 쥐고 넘긴 보존 카드 수.</summary>
+        public int Kept;
         public bool Sig, Decay, On, Repeat, Fresh, Weak;
         public Unit Target, Who, From;
         public double Before, After;
@@ -160,10 +162,31 @@ namespace Bolzena.Core
                     case "paid": if (PaidHp < System.Math.Max(1, c.N)) return false; break;
                     case "targetBroken": if (!(info.Target != null && info.Target.Side == Side.Enemy && info.Target.Broken)) return false; break;
                     case "wounded": if (!((double)Pool.Hp / Math.Max(1, Pool.MaxHp) < R.SV("부상"))) return false; break;
+                    case "goneMin": if (GoneN < Math.Max(1, c.N)) return false; break;   // 이번 전투에 소멸한 카드가 N장 이상 — 소멸형
+                // 시범 16(2026-10-08 2단계)
+                case "pricier": if (!(Counts.TryGetValue("pricier", out var prv) && prv > 0)) return false; break;   // 방금 낸 카드가 이번 턴 바로 앞 카드보다 비쌌으면
+                case "gained": if ((GainedOf(owner.Key, c.Id) >= Math.Max(1, c.N)) == c.Not) return false; break;  // 이번 전투에 그 고유 효과를 n 이상 쌓았으면(not — 못 쌓았으면)
                     default: throw new InvalidOperationException($"모르는 조건: {c.C}");
                 }
             }
             return true;
+        }
+
+        /// <summary>overheal 의 일의 값 — pct 가 없으면 최대 HP 를 넘친 몫(info.V), 있으면 그 선을 넘은 몫(회복량까지).</summary>
+        static int OverOf(When w, EmitInfo info) => w.Pct > 0 && info.Who != null ? OverPart((int)info.After, info.N, info.Who.MaxHp, w.Pct) : info.V;
+
+        /// <summary>공용 계기의 「갈래마다 한 사도」 — who any · other 로 아군의 일에 반응하는 규칙과 keepAp(파티의 일). 갈래가 없는 사도 · 장비 · 강화 규칙은 빼고.</summary>
+        bool SharedTaken(Unit owner, RuleRt rt, string ev)
+        {
+            if (rt.Gear || rt.Power != null) return false;
+            if (!(rt.R.When.Who == "any" || rt.R.When.Who == "other" || ev == "keepAp")) return false;
+            var style = Data.Hero(owner.Key)?.Style;
+            if (style == null) return false;
+            sharedOnce ??= new Dictionary<string, string>();
+            string k = style + "|" + ev;
+            if (sharedOnce.TryGetValue(k, out var first)) return first != owner.Key;   // 같은 사도의 다른 규칙은 돈다
+            sharedOnce[k] = owner.Key;
+            return false;
         }
 
         static bool Whose(When w, Unit owner, string who) => w.Who == "any" || (w.Who == "other" ? who != null && who != owner.Key : who == owner.Key);
@@ -201,7 +224,9 @@ namespace Bolzena.Core
                 case "lowHp": return info.Who != null && info.Who.Side == Side.Party && info.Before > w.Pct && info.After <= w.Pct;
                 case "ult": return w.Who == "any" || info.Hero == owner.Key;
                 case "debuff": return (w.Who == "any" || info.By == owner.Key) && (!w.Fresh || info.Fresh);
-                case "overheal": return w.Who == "any" || info.By == owner.Key;
+                // 넘친 회복 — pct 가 있으면 「회복 뒤 HP 가 최대 HP × pct 이상, 선을 넘은 몫이 있으면」(파티 HP 하나 — 1단계 다시 정의)
+                case "overheal": return (w.Who == "any" || info.By == owner.Key) && OverOf(w, info) > 0;
+                case "guardSum": return info.V >= Math.Max(1, w.N);
                 // 짝을 잇는 공용 계기 — 기본은 그 사도, who any 면 아군 누구든 · other 면 다른 아군만
                 case "spend": return Whose(w, owner, info.Owner) && (w.Id == null || w.Id == info.Id) && info.N >= Math.Max(1, w.N);
                 case "link": return Whose(w, owner, info.Hero);
@@ -212,7 +237,17 @@ namespace Bolzena.Core
                 case "discard":
                 case "exhaust":
                     if (w.Basic) { var bc = Data.Card(info.Id); if (bc == null || bc.Hero == null || bc.Unique || bc.Token || GameData.IsCopy(info.Id) || GameData.IsPlain(info.Id)) return false; }
+                    // type — 그 카드의 종류만(상태 · 저주 · 공격 · 스킬 …) · who other — 다른 아군의 카드 · 다른 아군이 지운 것만
+                    if (w.Type != null && CardOf(info.Id)?.Type != w.Type) return false;
+                    if (w.Who == "other") return (info.Hero ?? info.By) != null && info.Hero != owner.Key && info.By != owner.Key;
                     return w.Who == "any" || info.Hero == owner.Key || info.By == owner.Key;
+                // 18갈래 공용 계기(2026-10-08) — 셈이 맞으면 · AP 를 남기고 턴 끝 · 예약이 터지면 · 카드가 자라면 · 전투 끝
+                case "tally": return Whose(w, owner, info.By);
+                // 아껴 두기 — 기본: AP 를 n(기본 1) 이상 남겼거나 보존 카드를 쥐고 넘김 · kind ap: AP 만 · kind keep: 보존 카드 n 장 이상만
+                case "keepAp": return w.Kind == "keep" ? info.Kept >= Math.Max(1, w.N) : w.Kind == "ap" ? info.N >= Math.Max(1, w.N) : info.N >= Math.Max(1, w.N) || info.Kept > 0;
+                case "reserveFire": return Whose(w, owner, info.Owner);
+                case "grow": return Whose(w, owner, info.Hero) && (w.CardSt == null || w.CardSt == info.Kind);
+                case "fightEnd": return true;
                 case "pay": return w.Who == "any" || info.By == owner.Key;
                 // 「찍은 적이 쓰러지면」 — 그 사도의 찍기 키워드, who any 면 아군 누구의 찍기든
                 case "huntDown": return (w.Who == "any" || info.Owner == owner.Key) && (w.Id == null || w.Id == info.Id);
@@ -234,6 +269,8 @@ namespace Bolzena.Core
                 case "stackReach": return w.Id == info.Id && info.Before < w.N && info.After >= w.N && (info.Owner == null || info.Owner == owner.Key);
                 case "stackGone": return w.Id == info.Id && (!w.Decay || info.Decay) && (info.Owner == null || info.Owner == owner.Key);
                 case "stackOver": return w.Id == info.Id && (info.Owner == null || info.Owner == owner.Key);
+                // 소환물이 행동하면(시범 16) — kind atk(따라 침) · guard(대신 맞음) · lost(하나가 사라짐), 기본은 그 사도의 소환물
+                case "summonAct": return Whose(w, owner, info.Owner) && (w.Id == null || w.Id == info.Id) && (w.Kind == null || w.Kind == info.Kind);
                 case "switch": return w.Who == "any" || info.Owner == owner.Key;
                 case "rhythm": return info.Before < w.N && info.After >= w.N;
                 default: return true;
@@ -243,8 +280,18 @@ namespace Bolzena.Core
         /// <summary>일이 났다 — 맞는 규칙을 모두 돌린다. 패시브가 패시브를 부르는 고리는 다섯 겹에서 끊는다.</summary>
         void Emit(string ev, EmitInfo info)
         {
+            if (ev == "exhaust")
+            {
+                GoneN++;   // 이번 전투 소멸 장수 — 패시브가 없어도 센다(조건 goneMin)
+                if (info.Hero != null) Counts["gone|" + info.Hero] = GoneOf(info.Hero) + 1;   // 그 사도의 카드 — perGone who self(시범 16 니콜)
+            }
             if (Passives.Count == 0 || Over != null) return;
             if (depth > 4) return;
+            // 연쇄 상한(1단계) — 예약 계기 안에서 난 예약 계기는 패시브를 깨우지 않는다(재촉 ↔ reserveFire 순환 · 깊이 1)
+            bool rsv = ev == "reserveFire" || ev == "reserveGone";
+            if (rsv && reserveIn > 0) { Say("(예약 연쇄 — 예약 계기 안의 예약 계기는 돌지 않는다)"); return; }
+            if (rsv) reserveIn++;
+            var shared0 = sharedOnce; sharedOnce = null;   // 「갈래마다 한 사도」 는 이 일 한 번 몫
             depth++;
             try
             {
@@ -276,7 +323,7 @@ namespace Bolzena.Core
                 }
                 if (Forms.Count > 0 && Over == null) FormUntil(ev, info);
             }
-            finally { depth--; }
+            finally { depth--; sharedOnce = shared0; if (rsv) reserveIn--; }
         }
 
         /// <summary>규칙 하나를 그 일에 맞춰 돌린다(맞지 않으면 그냥 돌아간다). reps — 효과를 되풀이할 수(강화 겹). 횟수 제한은 발동 수로 센다.</summary>
@@ -302,6 +349,8 @@ namespace Bolzena.Core
                 Counts[sk] = PlayLog.Count;
             }
             if (!CondOk(owner, r.Conds, rt.KwOf, info)) return;
+            // 인원 세기 시너지 없음(1단계) — 같은 갈래 사도 여럿이 한 일에 who any · other(· keepAp)로 겹쳐 돌지 않게, 갈래마다 처음 한 사도만
+            if (SharedTaken(owner, rt, ev)) return;
             if (ev == "rhythm") { string rk = $"{id}|rhythm|{Turn}"; if (Counts.ContainsKey(rk)) return; Counts[rk] = 1; }
             if (r.Limit != null)
             {
@@ -319,8 +368,11 @@ namespace Bolzena.Core
             // 일을 당한 적 — 대상 적 · 없으면 때린 적(공격받음 · 막음 · 실드 깨짐)
             var target = info.Target != null && info.Target.Side == Side.Enemy ? info.Target : info.From != null && info.From.Side == Side.Enemy && !info.From.Dead ? info.From : null;
             Unit holder = ((ev == "stackReach" || ev == "stackGone" || ev == "stackOver") && info.Target != null && info.Target != owner)
-                || ((ev == "reserveGone" || ev == "switch") && info.Target != null && info.Target.Side == Side.Enemy) ? info.Target : null;
-            var ally = info.Who != null && info.Who.Side == Side.Party && !info.Who.Dead ? info.Who : owner;
+                || ((ev == "reserveGone" || ev == "reserveFire" || ev == "switch") && info.Target != null && info.Target.Side == Side.Enemy) ? info.Target : null;
+            var ally = info.Who != null && info.Who.Side == Side.Party && !info.Who.Dead ? info.Who
+                // 아군에게 붙은 표시(carrier hero)가 차거나 사라지면 「아군 1명」 = 그 아군(캬롯 씨앗이 여문 아군 — 시범 16)
+                : (ev == "stackReach" || ev == "stackGone" || ev == "reserveGone" || ev == "reserveFire") && info.Target != null && info.Target.Side == Side.Party && !info.Target.Dead ? info.Target
+                : owner;
             firing.Add(id);
             var gs0 = gearSrc; gearSrc = rt.Gear ? "gear:" + owner.Key : null;
             if (ev == "huntDown" || ev == "kill" || ev == "break") holder = info.Target;
@@ -330,7 +382,7 @@ namespace Bolzena.Core
                 for (int k = 0; k < reps && Over == null; k++)
                 {
                     var t = target != null && !target.Dead ? target : null;
-                    RunPassive(owner, r.Fx, new FxCtx { Owner = owner, TargetIdx = t != null ? t.Idx : (AliveEnemies().FirstOrDefault()?.Idx ?? 0), Passive = r.Name ?? rt.Power, Holder = holder, Ally = ally, EventV = info.V, Attacker = info.From }, label);
+                    RunPassive(owner, r.Fx, new FxCtx { Owner = owner, TargetIdx = t != null ? t.Idx : (AliveEnemies().FirstOrDefault()?.Idx ?? 0), Passive = r.Name ?? rt.Power, Holder = holder, Ally = ally, EventV = ev == "overheal" ? OverOf(r.When, info) : info.V, Attacker = info.From, Scale = ripenScale }, label);
                 }
             }
             finally { firing.Remove(id); gearSrc = gs0; }

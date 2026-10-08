@@ -5,12 +5,13 @@
       "name": "잉클",
       "nature": "냉정",
       "role": "딜러",
+      "style": "버리기형",
       "star": 3,
       "hp": 550,
       "atk": 145,
       "def": 25,
       "crit": 10,
-      "blurb": "세상에 한 획 긋기가 소원인 먹물 정령. 공격할 때마다 적 전체에 먹이 번지고, 스킬로 번진 먹을 한 획에 긋습니다.",
+      "blurb": "세상에 한 획 긋기가 소원인 먹물 정령. 버려진 원고를 건져 고쳐 쓰고, 자신의 카드가 버려질 때마다 먹이 번져 적을 무르게 합니다. 번진 먹은 마무리 펜 터치 한 획에 긋습니다.",
       "keyword": {
         "name": "먹빛",
         "desc": "획마다 스며드는 먹물 얼룩",
@@ -20,23 +21,6 @@
           {
             "stat": "taken",
             "v": 0.12
-          }
-        ],
-        "rules": [
-          {
-            "name": "먹빛 현상",
-            "when": {
-              "on": "stackReach",
-              "id": "먹빛",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "tough",
-                "v": 1,
-                "target": "oneEnemy"
-              }
-            ]
           }
         ]
       },
@@ -49,6 +33,23 @@
           },
           "limit": {
             "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "먹빛",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "획 긋기",
+          "when": {
+            "on": "discard"
+          },
+          "limit": {
+            "per": "turn",
             "n": 2
           },
           "fx": [
@@ -56,7 +57,7 @@
               "k": "stack",
               "id": "먹빛",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "randomEnemy"
             }
           ]
         },
@@ -69,8 +70,8 @@
             {
               "k": "dealtMod",
               "v": 0.2,
-              "turns": 2,
-              "target": "self"
+              "target": "self",
+              "turns": 2
             }
           ]
         }
@@ -95,7 +96,7 @@
       "race": "정령",
       "starter": [
         "잉클_s1",
-        "잉클_u1",
+        "잉클_u5",
         "잉클_s2",
         "잉클_s3"
       ]
@@ -150,9 +151,6 @@
       "unique": true,
       "cost": 1,
       "type": "강화",
-      "tags": [
-        "개전"
-      ],
       "fx": [
         {
           "k": "stack",
@@ -181,11 +179,7 @@
       ],
       "oracles": [
         {
-          "name": "일필휘지",
-          "tags": [
-            "개전"
-          ],
-          "power": true,
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -214,11 +208,31 @@
           ]
         },
         {
-          "name": "가장 가까운 곳에서",
-          "tags": [
-            "개전"
-          ],
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "먹빛",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -244,7 +258,7 @@
                 },
                 {
                   "when": {
-                    "on": "kill"
+                    "on": "discard"
                   },
                   "limit": {
                     "per": "turn",
@@ -252,8 +266,10 @@
                   },
                   "fx": [
                     {
-                      "k": "draw",
-                      "v": 1
+                      "k": "stack",
+                      "id": "먹빛",
+                      "v": 1,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
@@ -262,11 +278,7 @@
           ]
         },
         {
-          "name": "셰럼의 동인지",
-          "tags": [
-            "개전"
-          ],
-          "power": true,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "stack",
@@ -302,14 +314,17 @@
           ]
         },
         {
-          "name": "작가의 꿈",
-          "power": true,
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
               "id": "먹빛",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "power",
@@ -324,54 +339,36 @@
                       "id": "먹빛",
                       "v": 1,
                       "target": "allEnemies"
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.24,
+                      "target": "allEnemies"
                     }
                   ]
                 }
               ]
             }
           ]
-        },
-        {
-          "name": "아니, 아니, 아니라오",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "dealtMod",
-              "v": 0.1,
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "먹빛",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "다도",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "atkUp"
         },
         {
-          "name": "족자 펼치기",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "잉잉",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "먹빛",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             }
           ]
         }
@@ -387,7 +384,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.6,
           "target": "allEnemies"
         },
         {
@@ -397,7 +394,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.36,
           "target": "allEnemies"
         },
         {
@@ -409,11 +406,12 @@
       ],
       "oracles": [
         {
-          "name": "화룡점정",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.62,
+              "ratio": 0.82,
               "target": "allEnemies"
             },
             {
@@ -423,7 +421,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.49,
               "target": "allEnemies"
             },
             {
@@ -435,58 +433,9 @@
           ]
         },
         {
-          "name": "한 폭 완성",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "먹빛",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.78,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "먹빛",
-              "all": true,
-              "target": "allEnemies"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "낙관 찍기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "먹빛"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.53,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "먹빛",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "덧칠",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
@@ -500,14 +449,64 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.36,
               "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.26,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "기절할 만큼",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.19,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "먹빛"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.66,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "먹빛",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
+            },
             {
               "k": "perStack",
               "id": "먹빛",
@@ -515,37 +514,66 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.36,
               "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "먹빛",
-              "all": true,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifKill"
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.26,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "먹빛",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "굵은 붓",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "펜촉",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "가벼운 붓대",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "먹빛",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -559,8 +587,18 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 0.72,
           "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "먹빛",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "when",
+          "on": "discard"
         },
         {
           "k": "stack",
@@ -571,12 +609,23 @@
       ],
       "oracles": [
         {
-          "name": "먹물 폭포",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.88,
+              "ratio": 0.97,
               "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "먹빛",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "when",
+              "on": "discard"
             },
             {
               "k": "stack",
@@ -587,32 +636,24 @@
           ]
         },
         {
-          "name": "먹물 한 방울",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
+              "ratio": 0.68,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "먹빛",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "먹물 범벅",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.94,
-              "target": "allEnemies"
+              "k": "when",
+              "on": "discard"
             },
             {
               "k": "stack",
@@ -623,113 +664,33 @@
           ]
         },
         {
-          "name": "번지는 먹",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.74,
+              "ratio": 0.82,
               "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "when",
+              "on": "discard"
             },
             {
               "k": "stack",
               "id": "먹빛",
               "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "대작 수묵화",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "먹빛",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "진한 먹",
-          "kind": "power"
-        },
-        {
-          "name": "먹빛 얼룩",
-          "kind": "frost"
-        },
-        {
-          "name": "묽은 먹",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "잉클_u4",
-      "name": "먹물 정령의 소원",
-      "hero": "잉클",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.5,
-          "target": "allEnemies"
-        },
-        {
-          "k": "perStack",
-          "id": "먹빛",
-          "each": true
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.2,
-          "target": "allEnemies"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "나만의 새로운 이야기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "먹빛",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "삐뚤빼뚤 수묵화",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -748,7 +709,7 @@
               "rules": [
                 {
                   "when": {
-                    "on": "kill"
+                    "on": "discard"
                   },
                   "limit": {
                     "per": "turn",
@@ -756,10 +717,9 @@
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "먹빛",
-                      "v": 2,
-                      "target": "allEnemies"
+                      "k": "dmg",
+                      "ratio": 0.38,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
@@ -768,43 +728,123 @@
           ]
         },
         {
-          "name": "먹 한 방울의 소원",
-          "cost": 0,
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.82,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "stack",
               "id": "먹빛",
-              "each": true
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "먹빛",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "잉클_u4",
+      "name": "고쳐 쓴 원고",
+      "hero": "잉클",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "pull",
+          "from": "discard",
+          "n": 1
+        },
+        {
+          "k": "stack",
+          "id": "먹빛",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1
             },
             {
-              "k": "dmg",
-              "ratio": 0.18,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "먹빛",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "미니 셰럼",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
+              "k": "pull",
+              "from": "discard",
+              "n": 1
             },
             {
-              "k": "perStack",
+              "k": "stack",
               "id": "먹빛",
-              "each": true
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "먹빛",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -815,48 +855,208 @@
           ]
         },
         {
-          "name": "먹물 정령의 꿈",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "perStack",
-              "id": "먹빛",
-              "each": true
+              "k": "pull",
+              "from": "discard",
+              "n": 1
             },
             {
-              "k": "dmg",
-              "ratio": 0.33,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "먹빛",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
-              "k": "spend",
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "먹빛",
+                      "v": 1,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1
+            },
+            {
+              "k": "stack",
               "id": "먹빛",
-              "all": true,
+              "v": 1,
               "target": "allEnemies"
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "먹 가는 소리",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "명상",
-          "kind": "cost"
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "잉크병",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "먹빛",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "잉클_u5",
+      "name": "먹물 파스타",
+      "hero": "잉클",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "discard",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "먹빛",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "먹빛",
+                      "v": 1,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 3
             }
           ]
         }

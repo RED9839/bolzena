@@ -6,6 +6,7 @@
       "nature": "순수",
       "race": "마녀",
       "role": "탱커",
+      "style": "손 만들기형",
       "star": 3,
       "hp": 860,
       "atk": 75,
@@ -17,28 +18,10 @@
         "desc": "받아 적은 흑역사가 쌓이는 원고",
         "carrier": "self",
         "cap": 4,
-        "rules": [
-          {
-            "name": "탈고",
-            "when": {
-              "on": "stackReach",
-              "id": "원고지",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "원고지",
-                "all": true
-              },
-              {
-                "k": "make",
-                "id": "셰럼_t1",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "셰럼_t1",
+          "consume": true
+        }
       },
       "keywords": [
         {
@@ -68,7 +51,7 @@
                 },
                 {
                   "k": "dmg",
-                  "ratio": 0.4,
+                  "ratio": 0.36,
                   "base": "def",
                   "target": "oneEnemy"
                 },
@@ -192,7 +175,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.45,
           "base": "def",
           "target": "allEnemies"
         },
@@ -218,7 +201,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1
+          "ratio": 0.9
         }
       ],
       "blurb": "원고 2회. 방패를 들고 걸어 나옵니다"
@@ -236,7 +219,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.8
+          "ratio": 0.72
         },
         {
           "k": "status",
@@ -256,7 +239,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.8
+          "ratio": 0.72
         },
         {
           "k": "stack",
@@ -266,28 +249,11 @@
       ],
       "oracles": [
         {
-          "name": "왕실 사료 전권",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
-            },
-            {
-              "k": "stack",
-              "id": "원고지",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "정리된 서가",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.9
+              "ratio": 1.08
             },
             {
               "k": "stack",
@@ -297,60 +263,27 @@
           ]
         },
         {
-          "name": "나무 윗치",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.54
+            },
             {
               "k": "stack",
               "id": "원고지",
               "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.8
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "원고지",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
-          "name": "기밀 문서",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 0.63
             },
-            {
-              "k": "stack",
-              "id": "원고지",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "흑역사 보관함",
-          "fx": [
             {
               "k": "stack",
               "id": "원고지",
@@ -362,25 +295,41 @@
               "v": 1
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "깃펜",
-          "kind": "guard"
         },
         {
-          "name": "검은 망토",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "적지 말라면 그 말까지",
+          "name": "신탁 4",
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.63
+            },
             {
               "k": "stack",
               "id": "원고지",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "stack",
+              "id": "원고지",
+              "v": 3
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -397,7 +346,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1
+          "ratio": 0.9
         },
         {
           "k": "status",
@@ -412,11 +361,12 @@
       ],
       "oracles": [
         {
-          "name": "일곱 겹 커튼",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.48
+              "ratio": 1.34
             },
             {
               "k": "status",
@@ -431,17 +381,18 @@
           ]
         },
         {
-          "name": "얇은 커튼",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.7
+              "ratio": 0.86
             },
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 1
+              "v": 2
             },
             {
               "k": "stack",
@@ -451,30 +402,48 @@
           ]
         },
         {
-          "name": "엘리아스실록",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.2
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "원고 속 기사",
+          "name": "신탁 3",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "shield",
               "ratio": 0.81
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "원고지",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.72
             },
             {
               "k": "status",
@@ -489,20 +458,16 @@
           ]
         },
         {
-          "name": "전승 낭독",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.27
+              "ratio": 2.15
             },
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "spend",
-              "id": "원고지",
               "v": 2
             }
           ]
@@ -510,19 +475,19 @@
       ],
       "blesses": [
         {
-          "name": "두꺼운 커튼",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "사관의 길",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "사견 한 줄",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "stack",
-              "id": "원고지",
+              "k": "make",
+              "id": "셰럼_t2",
               "v": 1
             }
           ]
@@ -539,7 +504,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.27,
           "base": "def",
           "target": "allEnemies"
         },
@@ -549,7 +514,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.15,
+          "ratio": 0.14,
           "base": "def",
           "target": "allEnemies"
         },
@@ -561,11 +526,12 @@
       ],
       "oracles": [
         {
-          "name": "완결편 낭독",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.37,
               "base": "def",
               "target": "allEnemies"
             },
@@ -575,7 +541,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.18,
               "base": "def",
               "target": "allEnemies"
             },
@@ -587,8 +553,9 @@
           ]
         },
         {
-          "name": "작가의 말",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -602,7 +569,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.12,
+              "ratio": 0.13,
               "base": "def",
               "target": "allEnemies"
             },
@@ -614,45 +581,66 @@
           ]
         },
         {
-          "name": "생생한 묘사",
-          "power": true,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.5,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "perStack",
-                      "id": "원고지"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.12,
-                      "base": "def",
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "원고지"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "습작 한 편",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.27,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "셰럼_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "셰럼_t1"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.49,
               "base": "def",
               "target": "allEnemies"
             },
@@ -662,57 +650,28 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.16,
+              "ratio": 0.24,
               "base": "def",
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "2쇄 증보판",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "원고지"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.15,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "셰럼_t1",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "처참한 필력",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "깃펜 물기",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "교정한 원고",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "셰럼_t2",
+              "k": "stack",
+              "id": "원고지",
               "v": 1
             }
           ]
@@ -729,7 +688,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.54,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -739,18 +698,19 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.22,
+          "ratio": 0.2,
           "base": "def",
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "궁정 서기관",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.78,
+              "ratio": 0.73,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -760,15 +720,16 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.28,
+              "ratio": 0.27,
               "base": "def",
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "가벼운 필기",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
@@ -782,39 +743,25 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.17,
+              "ratio": 0.16,
               "base": "def",
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "사료와 전례",
-          "power": true,
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "원고지",
-              "v": 2
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "원고지",
-                    "n": 4
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "셰럼_t2",
+                      "k": "stack",
+                      "id": "원고지",
                       "v": 1
                     }
                   ]
@@ -824,26 +771,65 @@
           ]
         },
         {
-          "name": "후대에 남기는 의미",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "원고지"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "base": "def",
+              "target": "oneEnemy"
+            },
             {
               "k": "make",
               "id": "셰럼_t3",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "원고지",
-              "v": 2
             }
           ]
         },
         {
-          "name": "「~함.」",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "원고지"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -858,28 +844,184 @@
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "원고지",
-              "all": true
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "서기관의 기록법",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "검은 잉크",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "원고 마감",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
+              "k": "stack",
+              "id": "원고지",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰럼_u5",
+      "name": "미행 기록",
+      "hero": "셰럼",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.32,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "원고지",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "원고지",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "원고지",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "셰럼_t2",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "원고지",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "원고지",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "원고지",
               "v": 1
             }
           ]

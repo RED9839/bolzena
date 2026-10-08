@@ -357,6 +357,17 @@ MetaSim.Run(data, rounds, seed, hpx, dmgx, threads) → MetaSim.Result;  MetaSim
 
 ## 바뀐 것
 
+- **v3.0(2026-10-08) — 18갈래 1~2단계(시범 16).** 덧붙이기만(이름 바꾼 것 · 지운 것 없음).
+  화면이 쓸 것:
+  - 소모량 고르기 — `List<int> b.SpendChoices(string cardId)`(후보 1 · 절반 · 전부, 고를 것이 없으면 빈 목록) → 고른 수를 `PlayOpts.Spend` 로 `b.PlayCard`(안 주면 전부).
+    자동 전투(봇과 같은 고르기): `int new Bots(data).PickSpend(Battle b, string cardInstanceId, int target)` — 판을 복사해 후보를 다 내 보고 판 점수가 가장 높은 수(고를 것이 없으면 그 하나 · 없으면 0). 판은 바뀌지 않는다.
+  - 다음 카드 강화 — `int b.EmpowerOf(string heroKey)`(그 사도 몫 + 파티 몫, % — 0 이면 없음). 그 사도의 다음 카드(상태 · 저주 빼고)가 쓰면 0 으로.
+  - 만든 카드 주인 — 엔진 id 「카드@사도~」, `b.CardOf(id).Hero` 가 주인.
+  - 이번 전투 셈 — `int b.GoneOf(heroKey)`(소멸한 그 사도 카드 수) · `b.GoneN`(전체) · `int b.GainedOf(heroKey, 고유 효과 이름)`(이번 전투에 쌓은 양 — 소모해도 안 줆).
+  - 소환물 — `Battle.SUMMON_CAP`(한 카드에 따라 치는 대 수 상한 5). 키워드 `uses`(`KeywordDef.Uses` — 소환물 하나가 받는 대 수).
+  봇(2차): `double Bots.StackWorth(Battle b, string 고유 효과 이름, int 겹)` — 판 점수의 고유 효과 몫(예약은 터질 몫 · 소환물은 따라 칠 몫 · 턴 끝 사라지는 겹은 덜).
+  효과 · 계기(데이터.md §19 · §20): `ripen` · `summon` · `ifPricier` · `ifGained` · `perGone` · `ifKill id elite/boss` · `ifBreak not` · `ifStreak type` · `perCardSt n/max` · 계기 `summonAct`(kind atk · guard · lost) · 조건 `pricier` · `gained`.
+
 - **v2.9(2026-10-07) — 빛은 카드 한 장에만.** 덧붙이기만. 같은 id 의 카드가 더미에 여럿이면 `Battle.Start` 가 빛나는 한 장을 `id#n`(`GameData.INST`)으로 갈라 그 한 장에만 `b.Glow` 를 단다(신탁 · 축복 · 카드 값을 이어 받음). 화면은 손패 id 로 `b.GlowOf` · `b.MarkOf` 를 보면 그대로 한 장만 빛난다. `GameData.InstOf` · `IsInst` · `NoInst` · `WithInst` — `BaseId` · `OwnerOf` 는 `#n` 을 뗀다. 판: `run.AfterFight` · `run.ClaimGlow` 가 `#n` 을 덱의 한 장으로 받는다 — 신탁을 받은 한 장만 덱에 `#n` 으로 남고(나머지는 맨 카드), 안 쓴 은총 빛은 덱을 건드리지 않는다. 「강화 카드.」 신탁의 「덱에 한 장」은 `#n` 을 뗀 id 로 센다.
 
 - **v2.8(2026-10-07) — 평소 수는 무작위 · 예고 강화.** 덧붙이기만. `b.ChargeHit(e)` · 쪽지 `foeChargeWarn` · `Battle.CHARGE_GAP` · 고학년 끊김 뒤 보스 취약(`BossUlt.CUT_VULN`) · `BossUlt.DEBUFF_PLUS`. 고학년 기준 피해 1층 300 · 2층 360(옛 210 · 250).

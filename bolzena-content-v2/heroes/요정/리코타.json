@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "요정",
       "role": "탱커",
+      "style": "박자형",
       "star": 3,
       "hp": 960,
       "atk": 90,
@@ -13,56 +14,28 @@
       "crit": 5,
       "blurb": "요정이 요리를 한다고 무시당하던 모나티엄에서 밤잠과 단맛까지 포기하며 버텨 수석으로 졸업한 요정 왕궁 셰프. 요리 실력은 완벽한데 상황을 읽는 눈썰미가 없어 접객만 하면 사고가 나고, 돌맛이 궁금하다며 궁전 바닥까지 핥아 봅니다. 파인애플 피자만큼은 용서 못 합니다.",
       "keyword": {
-        "name": "풀코스 차례",
-        "desc": "전채부터 디저트까지 차리는 코스",
+        "name": "코스",
+        "desc": "가벼운 접시에서 무거운 접시로 이어지는 차림",
         "carrier": "self",
         "cap": 3,
-        "wrap": true,
-        "stages": [
-          "전채",
-          "메인",
-          "디저트"
-        ],
-        "rules": [
-          {
-            "name": "오늘의 디저트",
-            "when": {
-              "on": "stackReach",
-              "id": "풀코스 차례",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "heal",
-                "ratio": 0.5
-              }
-            ]
-          }
-        ]
+        "endClear": true
       },
       "passives": [
         {
           "name": "코스 진행",
           "when": {
-            "on": "fightStart"
+            "on": "play",
+            "who": "any"
           },
-          "fx": [
+          "conds": [
             {
-              "k": "stack",
-              "id": "풀코스 차례",
-              "v": 1
+              "c": "pricier"
             }
-          ]
-        },
-        {
-          "name": "코스 진행",
-          "when": {
-            "on": "play"
-          },
+          ],
           "fx": [
             {
               "k": "stack",
-              "id": "풀코스 차례",
+              "id": "코스",
               "v": 1
             }
           ]
@@ -71,19 +44,19 @@
           "name": "웍질",
           "when": {
             "on": "play",
-            "type": "공격",
-            "every": 3
+            "who": "any",
+            "nth": 4
           },
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.19,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "heal",
-              "ratio": 0.3
+              "ratio": 0.17
             }
           ]
         }
@@ -160,112 +133,98 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.64
-        },
-        {
-          "k": "ifStack",
-          "id": "풀코스 차례",
-          "n": 1,
-          "max": 1
+          "ratio": 0.6
         },
         {
           "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "ifNth",
+          "n": 1
+        },
+        {
+          "k": "stack",
+          "id": "코스",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "한입 가득 아뮤즈",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.91
-            },
-            {
-              "k": "ifStack",
-              "id": "풀코스 차례",
-              "n": 1,
-              "max": 1
+              "ratio": 0.89
             },
             {
               "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "코스 건너뛰기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.56
             },
             {
-              "k": "stack",
-              "id": "풀코스 차례",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재료 손질",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.48
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
+              "k": "ifNth",
               "n": 1
             },
             {
-              "k": "draw",
-              "v": 2
+              "k": "stack",
+              "id": "코스",
+              "v": 1
             }
           ]
         },
         {
-          "name": "손님 맞이",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.64
-            },
-            {
-              "k": "ifStack",
-              "id": "풀코스 차례",
-              "n": 1,
-              "max": 1
+              "ratio": 0.69
             },
             {
               "k": "draw",
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "풀코스 차례",
-              "n": 3,
-              "max": 3
+              "k": "ifNth",
+              "n": 1
             },
             {
-              "k": "heal",
-              "ratio": 0.48
+              "k": "stack",
+              "id": "코스",
+              "v": 1
             }
           ]
         },
         {
-          "name": "퐁듀 분수",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.43
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.64
+              "ratio": 0.51
             },
             {
               "k": "draw",
@@ -276,13 +235,12 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "풀코스 차례",
-                    "n": 3
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "draw",
+                      "k": "stack",
+                      "id": "코스",
                       "v": 1
                     }
                   ]
@@ -290,208 +248,17 @@
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "정갈한 접시",
-          "kind": "guard"
         },
         {
-          "name": "식전주",
-          "kind": "draw"
-        },
-        {
-          "name": "셰프의 추천",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
-            {
-              "k": "stack",
-              "id": "풀코스 차례",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "리코타_u2",
-      "name": "다 조려버리겠습니다",
-      "hero": "리코타",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "tags": [
-        "분쇄"
-      ],
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.56,
-          "base": "def",
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifStack",
-          "id": "풀코스 차례",
-          "n": 2,
-          "max": 2
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.36,
-          "base": "def",
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "센 불로 조리기",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "풀코스 차례",
-              "n": 2,
-              "max": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "진짜 재료 의혹",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.97,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.77
-            }
-          ]
-        },
-        {
-          "name": "파인애플 피자 소각",
-          "tags": [
-            "분쇄",
-            "종극"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.12,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "풀코스 메인 디쉬",
-          "cost": 2,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "풀코스 차례",
-              "n": 2,
-              "max": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.64,
-              "base": "def",
-              "target": "oneEnemy"
-            },
             {
               "k": "shield",
-              "ratio": 0.8
-            }
-          ]
-        },
-        {
-          "name": "웍질 수련",
-          "tags": [
-            "분쇄"
-          ],
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.57,
-              "base": "def",
-              "target": "oneEnemy"
+              "ratio": 1.18
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.24,
-                      "base": "def",
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "날 선 식칼",
-          "kind": "power"
-        },
-        {
-          "name": "친절한 접객",
-          "kind": "cost"
-        },
-        {
-          "name": "메인 요리 준비",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "풀코스 차례",
+              "k": "draw",
               "v": 1
             }
           ]
@@ -503,109 +270,305 @@
       "name": "리코타 풀코스",
       "hero": "리코타",
       "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "코스",
+          "n": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 0.51
+        },
+        {
+          "k": "spend",
+          "id": "코스",
+          "all": true
+        },
+        {
+          "k": "ifPricier"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.5,
+          "who": "any"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.69
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.5,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 1,
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.48
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.5,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스",
+              "n": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.65
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "코스",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.92
+            },
+            {
+              "k": "spend",
+              "id": "코스",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리코타_u5",
+      "name": "똑같이 본뜬 요리",
+      "hero": "리코타",
+      "unique": true,
       "cost": 1,
       "type": "스킬",
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.96
+          "ratio": 0.51
         },
         {
-          "k": "heal",
-          "ratio": 0.4
+          "k": "cardStatus",
+          "id": "비용",
+          "v": 1,
+          "to": "hand",
+          "n": 1
         },
         {
-          "k": "ifStack",
-          "id": "풀코스 차례",
-          "n": 3,
-          "max": 3
-        },
-        {
-          "k": "status",
-          "id": "결의",
-          "v": 1
+          "k": "empower",
+          "ratio": 0.5,
+          "who": "any"
         }
       ],
       "oracles": [
         {
-          "name": "미슐랭 코스",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.38
+              "ratio": 0.82
             },
             {
-              "k": "heal",
-              "ratio": 0.55
+              "k": "cardStatus",
+              "id": "비용",
+              "v": 1,
+              "to": "hand",
+              "n": 1
             },
             {
-              "k": "ifStack",
-              "id": "풀코스 차례",
-              "n": 3,
-              "max": 3
+              "k": "empower",
+              "ratio": 0.5,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
             },
             {
-              "k": "status",
-              "id": "결의",
+              "k": "empower",
+              "ratio": 0.6,
+              "who": "any"
+            },
+            {
+              "k": "stack",
+              "id": "코스",
               "v": 1
             }
           ]
         },
         {
-          "name": "간단한 코스",
-          "cost": 0,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.64
+              "ratio": 0.51
             },
             {
-              "k": "heal",
-              "ratio": 0.28
+              "k": "cardStatus",
+              "id": "비용",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
             },
             {
-              "k": "ifStack",
-              "id": "풀코스 차례",
-              "n": 3,
-              "max": 3
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "empower",
+              "ratio": 0.7,
+              "who": "any"
             }
           ]
         },
         {
-          "name": "유미미? 미미!",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.16
+              "ratio": 0.58
             },
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "empower",
+              "ratio": 0.5,
+              "who": "any"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "풀코스 차례",
-                    "n": 3
+                    "on": "play",
+                    "who": "any"
+                  },
+                  "conds": [
+                    {
+                      "c": "pricier"
+                    }
+                  ],
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.48
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.48
+                      "k": "empower",
+                      "ratio": 0.15,
+                      "who": "any"
                     }
                   ]
                 }
@@ -614,60 +577,43 @@
           ]
         },
         {
-          "name": "코스 서빙",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.96
+              "ratio": 0.94
             },
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "cardStatus",
+              "id": "비용",
+              "v": 1,
+              "to": "hand",
+              "n": 2
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "남은 재료로",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.96
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "pull",
-              "from": "discard",
               "who": "self",
-              "basic": true
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "달콤한 마무리",
-          "kind": "heal"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "대출금 걱정",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "디저트 추가",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "풀코스 차례",
+              "id": "코스",
               "v": 1
             }
           ]
@@ -689,26 +635,27 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.47,
           "base": "def",
           "target": "oneEnemy"
         },
         {
           "k": "ifStack",
-          "id": "풀코스 차례",
+          "id": "코스",
           "n": 3,
           "max": 3
         },
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.43,
           "base": "def",
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "셰프의 분노",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -717,58 +664,27 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.56,
+              "ratio": 0.65,
               "base": "def",
               "target": "oneEnemy"
             },
             {
               "k": "ifStack",
-              "id": "풀코스 차례",
+              "id": "코스",
               "n": 3,
               "max": 3
             },
             {
               "k": "dmg",
-              "ratio": 0.56,
+              "ratio": 0.6,
               "base": "def",
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "한 마디 경고",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "풀코스 차례",
-              "n": 3,
-              "max": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "base": "def",
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "개점 준비",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
@@ -778,7 +694,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.77,
+              "ratio": 0.5,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -787,20 +703,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "풀코스 차례",
-                    "n": 3
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.36,
-                      "base": "def",
-                      "target": "allEnemies"
-                    },
-                    {
-                      "k": "heal",
-                      "ratio": 0.31
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
                     }
                   ]
                 }
@@ -809,30 +723,7 @@
           ]
         },
         {
-          "name": "진상 손님 퇴출",
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.28
-            }
-          ]
-        },
-        {
-          "name": "주방 점검",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
@@ -841,7 +732,30 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.97,
+              "ratio": 0.81,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.39
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.11,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -852,25 +766,229 @@
               "unique": true
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "하얀 앞치마",
+          "name": "축복 1",
           "kind": "defUp"
         },
         {
-          "name": "우주식량 트라우마",
+          "name": "축복 2",
           "tags": [
             "보존"
           ]
         },
         {
-          "name": "셰프의 고집",
+          "name": "축복 3",
           "fx": [
             {
               "k": "status",
               "id": "결의",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리코타_u2",
+      "name": "다 조려버리겠습니다",
+      "hero": "리코타",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifPricier"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.43,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 2,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.51,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "코스",
+              "n": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.77
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "분쇄"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.18,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "코스",
               "v": 1
             }
           ]

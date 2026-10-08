@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "마녀",
       "role": "서포터",
+      "style": "회복형",
       "star": 3,
       "hp": 580,
       "atk": 75,
@@ -23,25 +24,72 @@
             "stat": "dealt",
             "v": -0.04
           }
+        ],
+        "rules": [
+          {
+            "name": "약값은 칼같이",
+            "when": {
+              "on": "play",
+              "type": "공격"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "부작용",
+                "v": 1
+              }
+            ]
+          }
         ]
       },
       "passives": [
         {
-          "name": "약값은 칼같이",
+          "name": "남은 약은 적에게",
           "when": {
-            "on": "play",
-            "type": "공격"
+            "on": "overheal",
+            "pct": 0.8
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 1
           },
           "fx": [
             {
               "k": "stack",
               "id": "부작용",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "남은 약은 적에게",
+          "when": {
+            "on": "overheal",
+            "pct": 0.8
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ifInHand",
+              "id": "포셔_t1"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "포셔_t1"
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -59,7 +107,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.4
+              "ratio": 0.16
             }
           ]
         }
@@ -147,105 +195,56 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "stack",
-          "id": "부작용",
-          "v": 2,
-          "target": "oneEnemy"
+          "k": "heal",
+          "ratio": 0.8
         },
         {
-          "k": "heal",
-          "ratio": 0.7
+          "k": "stack",
+          "id": "부작용",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "초록 포션",
+          "name": "신탁 1",
           "fx": [
-            {
-              "k": "stack",
-              "id": "부작용",
-              "v": 2,
-              "target": "oneEnemy"
-            },
             {
               "k": "heal",
-              "ratio": 1.08
+              "ratio": 1.22
+            },
+            {
+              "k": "stack",
+              "id": "부작용",
+              "v": 2
             }
           ]
         },
         {
-          "name": "신약 견본",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
-            {
-              "k": "stack",
-              "id": "부작용",
-              "v": 2,
-              "target": "oneEnemy"
-            },
             {
               "k": "heal",
-              "ratio": 0.95
+              "ratio": 0.6
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "k": "stack",
+              "id": "부작용",
+              "v": 1
             }
           ]
         },
         {
-          "name": "빨간 포션",
+          "name": "신탁 3",
           "fx": [
-            {
-              "k": "stack",
-              "id": "부작용",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "노란 포션",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "부작용",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "입에 쓴 약",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "부작용",
-              "v": 2,
-              "target": "oneEnemy"
-            },
             {
               "k": "heal",
-              "ratio": 0.5
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "부작용",
+              "v": 2
             },
             {
               "k": "make",
@@ -253,25 +252,62 @@
               "v": 1
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "약초 달이기",
-          "kind": "heal"
         },
         {
-          "name": "장부 대충",
-          "kind": "draw"
-        },
-        {
-          "name": "임상 시험",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.88
+            },
             {
               "k": "stack",
               "id": "부작용",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "부작용",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.8
+            },
+            {
+              "k": "stack",
+              "id": "부작용",
+              "v": 2
+            },
+            {
+              "k": "draw",
               "v": 1,
-              "target": "oneEnemy"
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -287,7 +323,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.33,
+          "ratio": 0.26,
           "base": "def",
           "target": "oneEnemy",
           "hits": 2
@@ -295,17 +331,17 @@
         {
           "k": "stack",
           "id": "부작용",
-          "v": 2,
-          "target": "oneEnemy"
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "독한 두 병",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.36,
               "base": "def",
               "target": "oneEnemy",
               "hits": 2
@@ -313,17 +349,35 @@
             {
               "k": "stack",
               "id": "부작용",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
             }
           ]
         },
         {
-          "name": "흩뿌린 포션",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.28,
+              "ratio": 0.25,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "부작용",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.24,
               "base": "def",
               "target": "allEnemies",
               "hits": 2
@@ -331,35 +385,25 @@
             {
               "k": "stack",
               "id": "부작용",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "약병 하나 더",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.58,
-              "base": "def",
-              "target": "oneEnemy",
-              "hits": 2
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
+              "unique": true
             }
           ]
         },
         {
-          "name": "부식 물약",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.33,
+              "ratio": 0.17,
               "base": "def",
               "target": "oneEnemy",
               "hits": 2
@@ -367,61 +411,71 @@
             {
               "k": "stack",
               "id": "부작용",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "부작용",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "네 병 한꺼번에",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.33,
+              "ratio": 0.4,
               "base": "def",
               "target": "oneEnemy",
-              "hits": 3
+              "hits": 2
             },
             {
               "k": "stack",
               "id": "부작용",
-              "v": 3,
-              "target": "oneEnemy"
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "대폭발 물약",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "약병 하나 더 챙기기",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "감기약이었음",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "부작용",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         }
@@ -438,8 +492,7 @@
         {
           "k": "status",
           "id": "약화",
-          "v": 2,
-          "target": "oneEnemy"
+          "v": 2
         },
         {
           "k": "perStack",
@@ -447,7 +500,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.25
+          "ratio": 0.22
         },
         {
           "k": "spend",
@@ -457,13 +510,13 @@
       ],
       "oracles": [
         {
-          "name": "흐물흐물 포션",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "perStack",
@@ -471,7 +524,7 @@
             },
             {
               "k": "heal",
-              "ratio": 0.37
+              "ratio": 0.34
             },
             {
               "k": "spend",
@@ -481,14 +534,14 @@
           ]
         },
         {
-          "name": "묽은 포션",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "perStack",
@@ -496,7 +549,7 @@
             },
             {
               "k": "heal",
-              "ratio": 0.25
+              "ratio": 0.22
             },
             {
               "k": "spend",
@@ -506,41 +559,37 @@
           ]
         },
         {
-          "name": "해독제 장사",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
+              "k": "perStack",
+              "id": "부작용"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.28
+            },
+            {
+              "k": "spend",
+              "id": "부작용",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "heal",
-                      "ratio": 0.75
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "나른 포션",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 3,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "perStack",
@@ -549,17 +598,39 @@
             {
               "k": "heal",
               "ratio": 0.2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "부작용",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "비상 포션",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "perStack",
@@ -567,35 +638,27 @@
             },
             {
               "k": "heal",
-              "ratio": 0.28
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.9
+              "ratio": 0.4
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "레비용 포션",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "맛은 안중에 없음",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "첨가제",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "부작용",
+              "v": 1
             }
           ]
         }
@@ -611,7 +674,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.36,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -621,18 +684,19 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.16,
           "base": "def",
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "비법서 완본",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.49,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -642,19 +706,20 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.22,
               "base": "def",
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "비법 메모",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.34,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -671,13 +736,52 @@
           ]
         },
         {
-          "name": "임상 기록",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "부작용",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "stack",
-              "id": "부작용",
-              "v": 3,
+              "k": "dmg",
+              "ratio": 0.29,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "부작용"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "base": "def",
               "target": "oneEnemy"
             },
             {
@@ -685,18 +789,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "스킬"
+                    "on": "overheal",
+                    "pct": 0.8
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 2
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "부작용",
-                      "v": 1,
+                      "k": "dmg",
+                      "ratio": 0.44,
+                      "base": "def",
                       "target": "oneEnemy"
                     }
                   ]
@@ -706,28 +810,12 @@
           ]
         },
         {
-          "name": "포션 장인 포셔",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.51
-            },
-            {
-              "k": "perStack",
-              "id": "부작용"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.52
-            }
-          ]
-        },
-        {
-          "name": "개업 준비",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.54,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -737,31 +825,190 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.32,
+              "ratio": 0.24,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "부작용",
-              "all": true
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "예상 못 한 결과",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "약초 도감",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "하얘진 피부",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "부작용",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "포셔_u5",
+      "name": "약초 감별",
+      "hero": "포셔",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.26
+        },
+        {
+          "k": "stack",
+          "id": "부작용",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.32
+            },
+            {
+              "k": "stack",
+              "id": "부작용",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
           "tags": [
-            "개전"
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.28
+            },
+            {
+              "k": "stack",
+              "id": "부작용",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            },
+            {
+              "k": "make",
+              "id": "포셔_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.24
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.16
+                    },
+                    {
+                      "k": "stack",
+                      "id": "부작용",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.32
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "부작용",
+              "v": 1
+            }
           ]
         }
       ]

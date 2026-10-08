@@ -34,6 +34,8 @@ namespace Bolzena.Core
         public Dictionary<string, Stats> Growth;
         /// <summary>카드 값(판에 남는 카드 인스턴스 카운터).</summary>
         public Dictionary<string, Dictionary<string, int>> CardVals;
+        /// <summary>치명 피해 배율에 더하는 몫(크레파스 보드 — R.CRIT_MULT + 이것).</summary>
+        public double CritDmg;
     }
 
     /// <summary>
@@ -58,6 +60,8 @@ namespace Bolzena.Core
         public int? Ally;
         /// <summary>두 갈래 카드(CardDef.Choices) — 고른 갈래 번호(1 · 2). 효과의 ifChoice n 이 이것을 본다.</summary>
         public int? Choice;
+        /// <summary>소모량을 고르는 카드(spend pick) — 소모할 수(없으면 전부). Battle.SpendChoices 가 후보를 준다.</summary>
+        public int? Spend;
         internal double? Scale;
         internal bool Auto, OpeningPlay;
     }
@@ -170,8 +174,22 @@ namespace Bolzena.Core
         public List<LaterRec> Later = new();
         /// <summary>이 전투에서 낸 카드 수(저절로 포함) — 예약 효과가 「걸린 카드」 를 가린다.</summary>
         public int PlaysTotal;
+        /// <summary>이 전투에서 소멸한 카드 수(소멸 계기마다 +1) — 조건 goneMin(소멸형).</summary>
+        public int GoneN;
+        /// <summary>전투 끝 계기(fightEnd)를 이미 냈다 — 한 번만.</summary>
+        public bool FightEndDone;
+        /// <summary>파티 방어 · 실드가 적의 공격을 막아 낸 양 — 이번 판(내 턴 + 적의 차례) · 지난 판(1단계 — 버티형 변환).</summary>
+        public int GuardedNow, GuardedPrev;
+        /// <summary>이번 판 파티 회복 기록 — (회복 뒤 넘치기 전 HP, 회복량, 최대 HP) 셋씩 잇는다(1단계 — 넘친 회복 · 선 넘은 회복의 합).</summary>
+        public List<int> HealLog = new();
+        /// <summary>예약 계기(reserveFire · reserveGone)를 돌리는 중 — 그 안에서 난 예약 계기는 패시브를 깨우지 않는다(연쇄 상한, 1단계).</summary>
+        int reserveIn;
+        /// <summary>한 번의 일(Emit 한 번)에 갈래마다 한 사도만 — who any · other 공용 계기 반응(인원 세기 시너지 없음, 1단계). 「갈래|계기」.</summary>
+        Dictionary<string, string> sharedOnce;
         /// <summary>이 전투에서 생긴 판 단위 성장(판이 AfterFight 에서 RunState.Growth 에 더한다).</summary>
         public Dictionary<string, Stats> GrowthGain = new();
+        /// <summary>치명 피해 배율에 더하는 몫(BattleSetup.CritDmg — 크레파스 보드).</summary>
+        public double CritDmgX;
 
         // ── 기록 · 연출 ──
         public List<string> Log = new();
@@ -216,7 +234,7 @@ namespace Bolzena.Core
             foreach (var u in Party) u.BodyRef = Pool;
 
             double hpx = st.EnemyHp ?? R.ENEMY_HP, dmgx = st.EnemyDmg ?? 1;
-            EnemyHpx = hpx; EnemyDmgx = dmgx; EliteFight = st.Elite;
+            EnemyHpx = hpx; EnemyDmgx = dmgx; EliteFight = st.Elite; CritDmgX = st.CritDmg;
             EnemyNature = string.IsNullOrEmpty(st.EnemyNature) ? null : st.EnemyNature;
             Floor = st.Floor;
             for (int i = 0; i < st.Enemies.Count; i++)
@@ -342,6 +360,7 @@ namespace Bolzena.Core
             s.PlayTags = PlayTags.Select(x => x.ToList()).ToList();
             s.CostMods = CostMods.Select(x => x.Copy()).ToList(); s.PlayedPrev = new(PlayedPrev); s.BattleVals = new(BattleVals);
             s.Later = Later.Select(x => x.Copy()).ToList();
+            s.HealLog = HealLog.ToList(); s.sharedOnce = null; s.reserveIn = 0;
             s.GrowthGain = GrowthGain.ToDictionary(kv => kv.Key, kv => kv.Value + new Stats());
             s.Forms = Forms.ToDictionary(kv => kv.Key, kv => kv.Value.Copy());
             s.Powers = Powers.Select(p => p.Copy()).ToList();   // 규칙 캐시(powerRules)는 나눠 쓴다 — 같은 강화면 규칙이 같다   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다

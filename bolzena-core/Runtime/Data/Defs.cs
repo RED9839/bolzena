@@ -82,6 +82,10 @@ namespace Bolzena.Core
         public string OfStack;
         /// <summary>power — 강화 카드의 지속 규칙(패시브 규칙과 같은 꼴). 카드를 내면 이 전투 끝까지 켜져 있다.</summary>
         public List<PassiveRule> Rules;
+        /// <summary>make — 만든 카드의 주인(2026-10-08 1단계): self(만든 사도 · 기본) · other(파티 차례로 다음 아군) · 사도 id. 손패는 파티에 하나라 「다른 아군 손에」 대신 주인을 바꾼다.</summary>
+        public string Owner;
+        /// <summary>spend — 낼 때 소모량을 고른다(PlayOpts.Spend · 안 고르면 전부). 소모한 양이 일의 값(perEvent)이 된다.</summary>
+        public bool Pick;
 
         [Newtonsoft.Json.JsonIgnore] public int NOr1 => N <= 0 ? 1 : N;
 
@@ -135,13 +139,17 @@ namespace Bolzena.Core
         public const string Power = "power";
         // 연출 쪽지(2026-10-06) — 효과는 없고 화면 · 이펙트에 그 순간을 알린다(cue id · 수). 글에 안 나온다
         public const string Cue = "cue";
+        // 18갈래 1단계(2026-10-08) — 다음 카드 강화 · 막아 낸 양 비례 · 넘친 회복 비례(이번 판)
+        public const string Empower = "empower", PerGuarded = "perGuarded", PerOverheal = "perOverheal";
+        // 시범 16(2026-10-08 2단계) — 직전보다 비싼가 · 이번 전투 소멸 장수 비례 · 이번 전투 쌓은 고유 효과 · 예약 당겨 쓰기(남은 칸 비례) · 소환물 행동
+        public const string IfPricier = "ifPricier", PerGone = "perGone", IfGained = "ifGained", Ripen = "ripen", Summon = "summon";
 
         public static readonly HashSet<string> Conditions = new() { IfBroken, IfTune, IfChain, IfLink, IfPrev, IfRhythm, IfSwitched, IfStack, When,
             IfRepeat, IfHeld, IfPlayedMax, IfApLeft, IfSpent, IfBalanced, IfHunted, IfDebuffs, IfHp, IfKill, IfBreak, IfWounded,
             IfChoice, IfRandom, IfHand, IfPile, IfNth, IfStreak, IfAllHeroes, IfFoe, IfCardSt,
-            IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew };
+            IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, IfPricier, IfGained };
         /// <summary>「… 1개당」 — 바로 뒤 피해 · 방어 · 실드 · 회복 한 줄을 그 수만큼.</summary>
-        public static readonly HashSet<string> Pers = new() { PerStack, PerRhythm, PerDiscarded, PerPaid, PerDebuff, PerApLeft, PerTag, PerPlayed, PerPile, PerCardSt, PerEvent };
+        public static readonly HashSet<string> Pers = new() { PerStack, PerRhythm, PerDiscarded, PerPaid, PerDebuff, PerApLeft, PerTag, PerPlayed, PerPile, PerCardSt, PerEvent, PerGuarded, PerOverheal, PerGone };
         /// <summary>카드의 때 붙은 마디(when on) — 영감(능력으로 뽑힘) · 감응(뽑힘) · 안식(버려짐) · 턴 끝에 손에 · 소각(소멸할 때) · 열정(손에 있을 때 열정 카드가 나가면).</summary>
         public static readonly string[] WHEN_ON = { "draw", "drawAny", "discard", "handEnd", "burn", "passion" };
         /// <summary>옛 운영 방식 부품(리듬 · 전환 · 재촉/예약 · 잇기 · 앞이 … · 되풀이 …) — 지우지 않는다. 새 콘텐츠는 키워드 사전(Docs/키워드.md)의 것을 쓴다.</summary>
@@ -159,7 +167,8 @@ namespace Bolzena.Core
             IfChoice, IfRandom, IfHand, IfPile, IfNth, IfStreak, IfAllHeroes, IfFoe, IfCardSt, PerPlayed, PerPile, PerCardSt, PerEvent,
             Later, AfterCards, Trap, Confuse, AutoPlay, CastOther, Pull, ExileFrom, Dispel, GrowRun,
             Roll, IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, Recast, CostMod, AddTag, CutHit, ClearDebt, HealMod,
-            Form, FormEnd, Power, Cue,
+            Form, FormEnd, Power, Cue, Empower, PerGuarded, PerOverheal,
+            IfPricier, PerGone, IfGained, Ripen, Summon,
         };
         public static string ModStat(string k) => k switch
         {
@@ -291,7 +300,7 @@ namespace Bolzena.Core
         /// <summary>옛 칸 「row」(전열 · 중열 · 후열 — 2026-10-06 걷어냄). 옛 데이터를 읽어도 깨지지 않게 받아서 버리고, 검사기가 주의로 알린다.</summary>
         [Newtonsoft.Json.JsonProperty("row")] string RowOld { set => HadRow = value != null; }
         [Newtonsoft.Json.JsonIgnore] public bool HadRow { get; private set; }
-        /// <summary>옛 — 운영 방식(docs/19, 2026-10-05 틀 폐기). 엔진은 안 본다. 새 콘텐츠는 쓰지 않는다.</summary>
+        /// <summary>갈래(18갈래 v2, 2026-10-08 되살림) — Validator.STYLES 중 하나. 전투 엔진은 아직 안 보고, 검사기(저절로 터짐 주의) · 통계가 본다.</summary>
         public string Style;
         public int Star = 3;
         public int Hp, Atk, Def, Crit;
@@ -396,6 +405,8 @@ namespace Bolzena.Core
         public bool Weakens;
         /// <summary>guard(소환물)가 한 대를 다 막지 않고 이만큼만 깎는다(0.2 = -20%).</summary>
         public double Cut;
+        /// <summary>(시범 16) guard(소환물) 하나가 사라지기 전에 받는 대 수(기본 1) — 모모 분신은 셋을 맞아야 깨진다.</summary>
+        public int Uses;
         /// <summary>겹이 있는 동안 그 사도의 카드(tagType 종류 — 없으면 공격)에 이 태그가 붙는다(약점 공격 · 신속 …).</summary>
         public string TagWhile, TagType;
         /// <summary>겹이 0 이면 그 사도의 공격 카드가 적 1명 대신 적 전체를 친다.</summary>
@@ -420,6 +431,13 @@ namespace Bolzena.Core
     {
         public string Form;
         public bool Consume;
+        /// <summary>
+        /// (2026-10-08 1단계) 다 차면 저절로 터지는 대신 — make: 그 카드(시그니처 · 생성물 id)를 n 장(기본 1) 손에 만든다(주인은 그 사도) ·
+        /// empower: 「next」(그 사도의 다음 카드) · 「any」(파티의 다음 카드) 의 피해 · 실드 · 회복을 ratio 만큼(+50% = 0.5). form · make · empower 가운데 하나.
+        /// </summary>
+        public string Make, Empower;
+        public int N;
+        public double Ratio;
     }
 
     /// <summary>「1개당 …」 — stat: dealt · taken · atk · def · crit(v 는 비율) · dot(턴 끝 공격력 ratio 피해) · hot(턴 끝 방어력 ratio 회복).</summary>
@@ -449,6 +467,10 @@ namespace Bolzena.Core
     /// <summary>
     /// 언제(docs/18 §7). on: fightStart · turnStart · turnEnd · play · guard · break · kill · hurt · lowHp · rush · ult · debuff ·
     /// overheal · stackReach · stackGone · reserveGone · switch · rhythm · always.
+    /// 18갈래 공용 계기(2026-10-08): tally(셈이 맞으면) · keepAp(AP 를 남기고 턴 끝, n = 남긴 AP 이상) · reserveFire(예약이 터지면) ·
+    /// grow(카드가 자라면, cardSt 로 값 이름 거르기) · fightEnd(전투에서 이기기 직전). exhaust 는 type(카드 종류) · who other 도 거른다.
+    /// 1단계(2026-10-08): keepAp 은 보존 카드를 쥐고 턴을 마쳐도 돈다(kind ap · keep 으로 한쪽만) · overheal pct(회복 뒤 HP 그 비율 이상이면, 선을 넘은 몫) ·
+    /// guardSum(내 턴이 시작될 때 지난 판에 막아 낸 양).
     /// </summary>
     public sealed class When
     {
@@ -749,6 +771,11 @@ namespace Bolzena.Core
         public string Label;
         public List<Outcome> Out = new();
         public string Say;
+        /// <summary>
+        /// 결과 글(say · gamble say · judge passSay)의 따옴표 대사마다 말하는 이 — 순서대로. null · 빈 칸 = 장면 npc(기본),
+        /// "hero" = 이 선택지를 연 파티 사도(hero · price.hero 가운데 파티에 있는 사도), 그 밖 = 그 이름(사도 이름 · 「경비대」 따위).
+        /// </summary>
+        public List<string> By;
         /// <summary>파티에 이 사도(들 가운데 하나)가 있어야 보인다.</summary>
         public List<string> Hero;
         public string Race;
@@ -779,7 +806,8 @@ namespace Bolzena.Core
         [Newtonsoft.Json.JsonIgnore] public bool Leave;
     }
 
-    public sealed class Gamble { public double P; public List<Outcome> Out = new(); public string Say; }
+    public sealed class Gamble { public double P; public List<Outcome> Out = new(); public string Say; /// <summary>이 결과 글의 대사별 말하는 이(없으면 선택지의 by).</summary>
+        public List<string> By; }
     public sealed class Judge { public string By; public int At; public List<Outcome> Pass = new(); public List<Outcome> Fail = new(); public string PassSay; }
     public sealed class EventFight
     {

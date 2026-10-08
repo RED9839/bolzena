@@ -6,45 +6,41 @@
       "nature": "냉정",
       "race": "유령",
       "role": "탱커",
+      "style": "버리기형",
       "star": 2,
       "hp": 810,
       "atk": 79,
       "def": 58,
       "crit": 5,
-      "blurb": "레이저 포인터로 싫은 기억을 지우는 망각의 유령. 카드를 낼 때마다 적의 버프를 번쩍 지워 그만큼 실드로 바꾸고, 지운 기억이 쌓이면 파티의 아픔까지 털어 냅니다. 포인터를 몇 번 휘두르면 레이저가 연달아 꽂힙니다.",
+      "blurb": "레이저 포인터로 싫은 기억을 지우는 망각의 유령. 손패를 잠깐 잊어 버릴 때마다 「지운 기억」 이 모이고, 다 차면 잊었던 기억이 카드째 손으로 밀려옵니다. 포인터를 몇 번 휘두르면 레이저가 연달아 꽂힙니다.",
       "keyword": {
         "name": "지운 기억",
         "desc": "레이저로 잠깐 지워 둔 아팠던 기억",
         "carrier": "self",
         "cap": 4,
-        "rules": [
-          {
-            "name": "으히히 리셋",
-            "when": {
-              "on": "stackReach",
-              "id": "지운 기억",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "지운 기억",
-                "all": true
-              },
-              {
-                "k": "heal",
-                "ratio": 0.55
-              },
-              {
-                "k": "status",
-                "id": "피해 감소",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "레테_memory",
+          "consume": true
+        }
       },
       "passives": [
+        {
+          "name": "아팠던 기억",
+          "when": {
+            "on": "discard"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
+            }
+          ]
+        },
         {
           "name": "아팠던 기억",
           "when": {
@@ -52,7 +48,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 1
           },
           "fx": [
             {
@@ -72,7 +68,7 @@
           "fx": [
             {
               "k": "extra",
-              "ratio": 0.15,
+              "ratio": 0.18,
               "hits": 4,
               "target": "oneEnemy"
             }
@@ -137,6 +133,34 @@
       ]
     },
     {
+      "id": "레테_memory",
+      "name": "돌아온 기억",
+      "hero": "레테",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "pull",
+          "from": "discard",
+          "n": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        }
+      ],
+      "blurb": "잠깐 잊었던 기억이 한꺼번에 밀려옵니다"
+    },
+    {
       "id": "레테_u1",
       "name": "뉴럴 링크 스따트",
       "hero": "레테",
@@ -146,7 +170,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1
+          "ratio": 1.44
         },
         {
           "k": "perStack",
@@ -154,7 +178,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.3
+          "ratio": 0.48
         },
         {
           "k": "spend",
@@ -164,11 +188,12 @@
       ],
       "oracles": [
         {
-          "name": "완전 동기화",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.25
+              "ratio": 1.94
             },
             {
               "k": "perStack",
@@ -176,7 +201,7 @@
             },
             {
               "k": "heal",
-              "ratio": 0.38
+              "ratio": 0.65
             },
             {
               "k": "spend",
@@ -186,12 +211,13 @@
           ]
         },
         {
-          "name": "간이 접속",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.7
+              "ratio": 1.37
             },
             {
               "k": "perStack",
@@ -199,7 +225,7 @@
             },
             {
               "k": "heal",
-              "ratio": 0.3
+              "ratio": 0.46
             },
             {
               "k": "spend",
@@ -209,38 +235,15 @@
           ]
         },
         {
-          "name": "기억 소거",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
+              "k": "discard",
+              "v": 1
             },
-            {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 2
-            },
-            {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.35
-            }
-          ]
-        },
-        {
-          "name": "잊지 않을게",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
             {
               "k": "shield",
-              "ratio": 1.04
+              "ratio": 1.6
             },
             {
               "k": "perStack",
@@ -248,53 +251,79 @@
             },
             {
               "k": "heal",
-              "ratio": 0.31
+              "ratio": 0.72
             }
           ]
         },
         {
-          "name": "흑역사 차단",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 1.6
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.53
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "hurt"
+                    "on": "discard"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 1
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "지운 기억",
-                      "v": 1
+                      "k": "heal",
+                      "ratio": 0.22
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.59
+            },
+            {
+              "k": "perStack",
+              "id": "지운 기억"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.86
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "방화벽",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "빠른 접속",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "heal"
         },
         {
-          "name": "저장된 기억",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -315,9 +344,19 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.28,
+          "ratio": 0.36,
           "target": "oneEnemy",
           "hits": 4
+        },
+        {
+          "k": "when",
+          "on": "discard"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy",
+          "hits": 2
         },
         {
           "k": "stack",
@@ -327,13 +366,24 @@
       ],
       "oracles": [
         {
-          "name": "빨간 점 고정",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.49,
               "target": "oneEnemy",
               "hits": 4
+            },
+            {
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "stack",
@@ -343,125 +393,140 @@
           ]
         },
         {
-          "name": "레이저 파티",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "target": "randomEnemy",
-              "hits": 6
-            },
-            {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "기억 지우개",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy",
-              "hits": 4
-            },
-            {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "지운 기억",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "포인터 장전",
+          "name": "신탁 2",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.38,
               "target": "oneEnemy",
               "hits": 4
-            },
-            {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "공격"
+                    "on": "discard"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 1
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "지운 기억",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 0.44,
+                      "target": "oneEnemy"
                     }
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "name": "누구야아아?",
-          "fx": [
+            },
             {
-              "k": "dmg",
-              "ratio": 0.28,
-              "target": "oneEnemy",
-              "hits": 4
+              "k": "when",
+              "on": "discard"
             },
             {
               "k": "stack",
               "id": "지운 기억",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "allEnemies",
+              "hits": 3
             },
             {
-              "k": "ifStack",
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "stack",
               "id": "지운 기억",
-              "n": 3
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy",
+              "hits": 4
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "oneEnemy",
+              "hits": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "매일 연습한 폼",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "눈부심",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "빠른 손목",
-          "kind": "draw"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -474,203 +539,87 @@
       "type": "스킬",
       "fx": [
         {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "discard",
+          "v": 1
+        },
+        {
           "k": "status",
           "id": "약화",
           "v": 1,
           "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "지운 기억",
-          "v": 1
-        },
-        {
-          "k": "draw",
-          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "빨간 점을 봐",
+          "name": "신탁 1",
           "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
+              "v": 1,
               "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "번쩍",
+          "name": "신탁 2",
           "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
             {
               "k": "status",
               "id": "약화",
               "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "환자복 주머니",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "stack",
-              "id": "지운 기억",
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 2,
-              "who": "self"
-            }
-          ]
-        },
-        {
-          "name": "헛기억",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "stack",
               "id": "지운 기억",
               "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "으히히",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 3
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "렌즈 닦기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "지운 기억",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "주운 포인터",
-          "kind": "draw"
-        },
-        {
-          "name": "눈앞이 하얘짐",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "레테_u4",
-      "name": "병상 곁",
-      "hero": "레테",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "status",
-          "id": "불굴",
-          "v": 1
-        },
-        {
-          "k": "perStack",
-          "id": "지운 기억"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.35
-        }
-      ],
-      "oracles": [
-        {
-          "name": "정성 간호",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.51
-            }
-          ]
-        },
-        {
-          "name": "밤샘 간호",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "status",
-              "id": "불굴",
+              "k": "discard",
               "v": 1
             },
             {
@@ -678,7 +627,11 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
@@ -688,7 +641,7 @@
                     },
                     {
                       "k": "shield",
-                      "ratio": 0.3
+                      "ratio": 0.24
                     }
                   ]
                 }
@@ -697,82 +650,354 @@
           ]
         },
         {
-          "name": "헤일리 곁에서",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "draw",
+              "v": 3
             },
             {
-              "k": "perStack",
-              "id": "지운 기억"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.62
+              "k": "discard",
+              "v": 2
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "레테_u4",
+      "name": "기억 소거",
+      "hero": "레테",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "draw",
+          "v": 2
         },
         {
-          "name": "남겨 둔 기억",
+          "k": "discard",
+          "v": 2
+        },
+        {
+          "k": "perDiscarded"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.72
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "discard",
               "v": 2
             },
             {
-              "k": "perStack",
-              "id": "지운 기억"
+              "k": "perDiscarded"
             },
             {
               "k": "shield",
-              "ratio": 0.5
-            },
-            {
-              "k": "spend",
-              "id": "지운 기억",
-              "all": true
+              "ratio": 0.72
             }
           ]
         },
         {
-          "name": "잠깐 들르기",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
+              "k": "draw",
+              "v": 2
             },
             {
-              "k": "perStack",
-              "id": "지운 기억"
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "perDiscarded"
             },
             {
               "k": "shield",
-              "ratio": 0.3
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "perDiscarded"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.18
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.62
+                    },
+                    {
+                      "k": "stack",
+                      "id": "지운 기억",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "링거 거치대",
-          "kind": "heal"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "환자복",
-          "tags": [
-            "보존"
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지운 기억",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레테_u5",
+      "name": "기습 플래시",
+      "hero": "레테",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.54,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.6
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.82
+            }
           ]
         },
         {
-          "name": "쓴 약",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "cleanse",
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.58
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "약화",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.97,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지운 기억",
               "v": 1
             }
           ]

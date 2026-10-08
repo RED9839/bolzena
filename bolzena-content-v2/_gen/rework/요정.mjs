@@ -22,6 +22,7 @@ const drawBasic = v => draw(v, { who: 'self', basic: true });                   
 const pullBasic = { k: 'pull', from: 'discard', who: 'self', basic: true };       // 버린 더미의 시작 카드 1장을 손으로
 const token = (id, name, hero, type, fx, tags = ['소멸']) => ({ id, name, hero, token: true, cost: 0, type, tags, fx });
 const pw = (on, fx, o = {}) => power(rule(on, fx, o));
+const cheap = () => ({ k: 'costMod', v: -1, turns: 1, n: 1, who: 'self', type: '공격' }); // 이번 턴 자신의 공격 카드 1장 비용 -1(u5)
 
 // ════════════════════════════════════════════════════════════════════
 // 1. 네르 — 서포터(버퍼) · 광기. 졸면서 올리는 「꾸벅 기도」 셋이 차면 계시(이번 턴 파티 피해↑) — 아니면 오함마에 다 실어 친다
@@ -75,6 +76,14 @@ function ner(j) {
       O('무적의 기도', [stk(K, 2), power(rule('turnStart', [stk(K, 1)]), reach(K, 3, [sh(0.8)]))]),
       O('갓난 여왕을 지키는 도끼', [st('피해 감소', 2), power(reach(K, 3, [sh(0.8)])), ifWounded, heal(1.0)]),
     ], [B('여왕 특별 보좌관', 'guard'), B('화단 관리', 'defUp'), B('사제장의 축복', [st('사기', 1)])]),
+    // u5 ② 굴리기(u5) — 원작 고학년 「엘드르의 축복」 결: 세계수의 도끼로 광역(방어 기반) + 기도
+    card(H, 5, '세계수의 도끼', 1, '공격', [ddef(0.45, EA), stk(K, 1)], [
+      O('신탁 1', [ddef(0.6, EA), stk(K, 1)]),
+      O('신탁 2', [ddef(0.45, EA), stk(K, 1), srch(1)]),
+      O('신탁 3', [ddef(0.9), stk(K, 1), ifBroken, stk(K, 1)], { tags: bz }),
+      O('신탁 4', [ddef(0.4, EA), per(K), ddef(0.15, EA), spendAll(K)]),
+      O('신탁 5', [ddef(0.35, EA), stk(K, 1), power(reach(K, 3, [ddef(0.3, EA)]))], { power: true }),
+    ], [B('축복 1', 'power'), B('축복 2', 'draw'), B('축복 3', [ifStack(K, 2), sh(0.5)])]),
   ]);
   starter(j, '네르_u1');
   for (const e of j.equips || []) {
@@ -134,6 +143,14 @@ function nerRage(j) {
       O('한쪽 날개', [dmg(1.0), per(K), dmg(0.25), spendAll(K)]),
       O('여왕을 위하여', [sh(1.0), st('피해 감소', 1), stk(K, 2)]),
     ], [B('티그와 대련', 'atkUp'), B('해장국 한 그릇', 'draw'), B('맹세의 날개', [st('피해 감소', 1)])]),
+    // u5 유틸(u5) — 0코 서치: 빡침 + 고유 카드 찾기(본인이 부르고 싶은 이름 「성전 모드」)
+    card(H, 5, '성전 모드', 0, '스킬', [stk(K, 1), srch(1)], [
+      O('신탁 1', [stk(K, 2), srch(1)]),
+      O('신탁 2', [dmg(1.0, EA), stk(K, 2), srch(1)], { cost: 1 }),
+      O('신탁 3', [stk(K, 1), draw(1), pw('turnStart', [stk(K, 1)])], { power: true }),
+      O('신탁 4', [sh(1.0), stk(K, 2)]),
+      O('신탁 5', [stk(K, 4), disc(1)]),
+    ], [B('축복 1', 'atkUp'), B('축복 2', 'draw'), B('축복 3', [ifStack(K, 3), sh(0.6)])]),
   ]);
   starter(j, '네르_빡침_u1');
 }
@@ -192,6 +209,14 @@ function roni(j) {
       O('석양 아래 불침번', [dmg(0.7), per(K), dmg(0.2), ifKill, draw(2)]),
       O('밤샘 정산', [dmg(0.9), per(K), dmg(0.3), spendE(K)]),
     ], [B('모래바람', 'atkUp'), B('낡은 망토', 'draw'), B('별빛 아래', [heal(0.4)])]),
+    // u5 유틸(u5) — 0코: 막대사탕 물고 현상범 관찰(현상금 + 드로우)
+    card(H, 5, '오래가는 막대사탕', 0, '스킬', [stk(K, 1, E1), draw(1)], [
+      O('신탁 1', [stk(K, 2, E1), draw(1)]),
+      O('신탁 2', [stk(K, 1, E1), draw(2, { who: 'self', type: '공격' })]),
+      O('신탁 3', [stk(K, 1, E1), ifStack(K, 3), ap(1)]),
+      O('신탁 4', [draw(1), pw('turnStart', [stk(K, 1, 'topEnemy')])], { power: true }),
+      O('신탁 5', [stk(K, 2, E1), disc(1), draw(2)]),
+    ], [B('축복 1', 'ap'), B('축복 2', { tags: ['보존'] }), B('축복 3', [ifStack(K, 3), dmod(0.15)])]),
   ]);
   starter(j, '로니_u1');
 }
@@ -249,6 +274,14 @@ function ricota(j) {
       O('진상 손님 퇴출', [st('반격', 3), ddef(0.9), ifWounded, sh(1.6)]),
       O('주방 점검', [st('반격', 2), ddef(1.0), srch(1)]),
     ], [B('하얀 앞치마', 'defUp'), B('우주식량 트라우마', { tags: ['보존'] }), B('셰프의 고집', [st('결의', 1)])]),
+    // u5 ② 굴리기(u5) — 실드 + 코스 한 칸 더(차례 맞추기) · 사물을 똑같이 본뜨는 특기
+    card(H, 5, '똑같이 본뜬 찐빵', 1, '스킬', [sh(1.1), stk(K, 1)], [
+      O('신탁 1', [sh(1.45), stk(K, 1)]),
+      O('신탁 2', [sh(0.9), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [sh(1.0), stk(K, 1), srch(1)]),
+      O('신탁 4', [stage(K, 2), ddef(0.9), stage(K, 3), heal(0.6)]),
+      O('신탁 5', [sh(1.6), stk(K, 1), exileBasic(1)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [stage(K, 3), heal(0.4)])]),
   ]);
   starter(j, '리코타_u1');
 }
@@ -303,6 +336,14 @@ function marie(j) {
       O('에르핀의 첫 친구', [dmg(0.85), stk(K, 1), ifAll, make(BOMB, 1)], { tags: lk }),
       O('같이 가요', [dmg(0.85), stk(K, 1), draw(1, { who: 'other' })], { tags: lk }),
     ], [B('큰 날개', 'power'), B('지붕 조심', 'frost'), B('설탕 뿌리기', [heal(0.3)])], { tags: lk }),
+    // u5 ② 굴리기(u5) — 막힌 길은 일단 터뜨린다(분쇄 + 폭탄)
+    card(H, 5, '막힌 길 뚫기', 1, '공격', [dmg(0.9), make(BOMB, 1)], [
+      O('신탁 1', [dmg(1.2), make(BOMB, 1)], { tags: ['분쇄'] }),
+      O('신탁 2', [dmg(1.1, EA), make(BOMB, 2), draw(1)], { cost: 2, tags: ['분쇄'] }),
+      O('신탁 3', [dmg(0.9), perTag(BOMB), dmg(0.4)], { tags: ['분쇄'] }),
+      O('신탁 4', [dmg(0.7), make(BOMB, 1), pw('make', [stk(K, 1)], { limit: 2 })], { tags: ['분쇄'], power: true }),
+      O('신탁 5', [dmg(1.5), make(BOMB, 1)], { tags: [] }),
+    ], [B('축복 1', 'weakSpot'), B('축복 2', 'draw'), B('축복 3', [ifStack(K, 2), make(BOMB, 1)])], { tags: ['분쇄'] }),
   ]);
   starter(j, '마리_u3');
 }
@@ -362,6 +403,14 @@ function mayo(j) {
       O('전당포 진열장', [dmg(0.5), per(K), dmg(0.18), draw(1, { who: 'self', type: '공격' })]),
       O('독 거두기', [dmg(0.6), per(K), dmg(0.25), spendE(K)]),
     ], [B('음침한 웃음', 'atkUp'), B('사진 한 장', 'draw'), B('하나뿐인 수집품', [stk(K, 1, E1)])]),
+    // u5 유틸(u5) — 0코: 무엇이든 값부터 매긴다(마취독 + 공격 카드 서치)
+    card(H, 5, '값 매기기', 0, '스킬', [stk(K, 1, E1), draw(1, { who: 'self', type: '공격' })], [
+      O('신탁 1', [stk(K, 2, E1), draw(1, { who: 'self', type: '공격' })]),
+      O('신탁 2', [make(TR, 1), srch(1)]),
+      O('신탁 3', [stk(K, 4, E1), disc(1)]),
+      O('신탁 4', [stk(K, 1, E1), power(reach(K, 4, [make(TR, 1)]))], { power: true }),
+      O('신탁 5', [hits(3, 0.45), stk(K, 2, EA), draw(1, { who: 'self', type: '공격' })], { cost: 1 }),
+    ], [B('축복 1', 'ap'), B('축복 2', { tags: ['보존'] }), B('축복 3', [ifStack(K, 3), make(TR, 1)])]),
   ]);
   starter(j, '마요_u1');
 }
@@ -419,6 +468,14 @@ function mayoCool(j) {
       O('훌륭한 수집품임.', [sh(0.9), stk(K, 2)]),
       O('최고로 멋진 요정', [hits(3, 0.35), per(K), dmg(0.18, ER), spendAll(K)]),
     ], [B('교주의 손길', 'atkUp'), B('실종된 친구 사진', 'draw'), B('세일 때 주운 옷', { tags: ['보존'] })]),
+    // u5 유틸(u5) — 「수집품!」 외치면 힘이 난다: 동료 스킬을 끌어와 자랑을 채운다
+    card(H, 5, '수집품 발동', 1, '스킬', [stk(K, 1), draw(2, { who: 'other', type: '스킬' })], [
+      O('신탁 1', [stk(K, 1), draw(1, { who: 'other', type: '스킬' })], { cost: 0 }),
+      O('신탁 2', [stk(K, 2), draw(2, { who: 'other', type: '스킬' })]),
+      O('신탁 3', [sh(1.5), per(K), sh(0.25)]),
+      O('신탁 4', [stk(K, 1), draw(1, { who: 'other', type: '스킬' }), pw('play', [draw(1)], { when: { who: 'other', type: '스킬' }, limit: 1 })], { power: true }),
+      O('신탁 5', [stk(K, 4), disc(1), draw(1)]),
+    ], [B('축복 1', 'ap'), B('축복 2', 'cost'), B('축복 3', [ifStack(K, 4), sh(0.5)])]),
   ]);
   starter(j, '마요_멋짐_u1');
 }
@@ -476,6 +533,14 @@ function shasha(j) {
       O('장난 신고엔 물대포', [dmg(0.6, EA), per(K), dmg(0.2, EA), spendAll(K)]),
       O('잡일 대행 접수', [dmg(0.45, EA), per(K), dmg(0.12, EA), draw(1, { who: 'self', type: '공격' })]),
     ], [B('우비', 'defUp'), B('소방 직함', { tags: ['보존'] }), B('장화', [sh(0.4)])]),
+    // u5 ② 굴리기(u5) — 삐진 텀블러를 달래면 실드 + 수압 둘
+    card(H, 5, '텀블러 달래기', 1, '스킬', [sh(1.0), stk(K, 2)], [
+      O('신탁 1', [sh(1.3), stk(K, 2)]),
+      O('신탁 2', [sh(0.75), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [sh(0.9), stk(K, 1), draw(2, { who: 'self', type: '공격' })]),
+      O('신탁 4', [exileBasic(1), stk(K, 3), draw(1)]),
+      O('신탁 5', [sh(1.0), stk(K, 2), ifWounded, heal(0.6)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'draw'), B('축복 3', [ifStack(K, 3), cleanse(1)])]),
   ]);
   starter(j, '샤샤_u1');
 }
@@ -534,6 +599,14 @@ function shoupan(j) {
       O('휙', [st('약화', 2), dmg(0.5, ER), draw(2, { tag: '신속' })], { tags: sw }),
       O('배달 완료', [dmg(0.6, ER), per(K), dmg(0.25, ER), spendAll(K)], { tags: sw }),
     ], [B('경적', 'frost'), B('헬멧', 'draw'), B('거침없는 반말', [heal(0.3)])], { tags: sw }),
+    // u5 유틸(u5) — 「야, 타!」 0코 신속: 속도 + 택배 상자
+    card(H, 5, '야, 타!', 0, '스킬', [stk(K, 1), make(PC, 1)], [
+      O('신탁 1', [stk(K, 1), make(PC, 2)], { tags: sw }),
+      O('신탁 2', [heal(0.6), stk(K, 1), make(PC, 1)], { tags: sw }),
+      O('신탁 3', [stk(K, 1), make(PC, 1), draw(1, { tag: '신속' })], { tags: sw }),
+      O('신탁 4', [stk(K, 1), make(PC, 1), pw('play', [heal(0.45)], { when: { tag: '신속' }, limit: 2 })], { tags: sw, power: true }),
+      O('신탁 5', [make(PC, 3), spendAll(K)], { tags: sw }),
+    ], [B('축복 1', 'draw'), B('축복 2', { tags: ['보존'] }), B('축복 3', [ifStack(K, 3), heal(0.3)])], { tags: sw }),
   ]);
   starter(j, '슈팡_u1');
 }
@@ -594,6 +667,14 @@ function skia(j) {
       O('알아선 안 될 것', [st('둔화', 1, EA), stk(K, 3), draw(1)]),
       O('묵언 해제', [dmg(0.8), per(K), dmg(0.25), spendAll(K)]),
     ], [B('금기의 무게', 'atkUp'), B('검은 수도복', 'draw'), B('세계수에 올린 기도', [stk(K, 1)])]),
+    // u5 유틸(u5) — 말 대신 몸짓(보존 — 쥐고 넘기면 감탄사)
+    card(H, 5, '몸짓 대화', 0, '스킬', [stk(K, 1), draw(1)], [
+      O('신탁 1', [stk(K, 2), draw(1)], { tags: kp }),
+      O('신탁 2', [stk(K, 1), draw(2, { who: 'other', type: '스킬' }), sh(0.4)], { tags: kp }),
+      O('신탁 3', [stk(K, 1), draw(1), pw('spend', [sh(0.6)], { when: { id: K }, limit: 1 })], { tags: kp, power: true }),
+      O('신탁 4', [stk(K, 2), draw(2)], { tags: [] }),
+      O('신탁 5', [per(K), sh(0.25), draw(1)], { tags: kp }),
+    ], [B('축복 1', 'ap'), B('축복 2', { tags: ['개전'] }), B('축복 3', [ifStack(K, 3), sh(0.5)])], { tags: kp }),
   ]);
   starter(j, '스키아_u2');
 }
@@ -652,6 +733,14 @@ function erpinRoyal(j) {
       O('매일 아침 수업', [power(rule('turnStart', [stk(K, 1)]), reach(K, 5, [dmg(0.3, EA)]))]),
       O('모두가 기댈 여왕', [sh(1.0), power(reach(K, 5, [dmg(0.4, EA), sh(0.5)]))]),
     ], [B('세계수의 힘', 'defUp'), B('폴랑의 체육 수업', 'draw'), B('딸기 한 입', [heal(0.3)])]),
+    // u5 유틸(u5) — 사 온 빵을 나눠 주다 제 몫은 반쪽(동료 카드 + 왕마력)
+    card(H, 5, '반쪽 빵', 0, '스킬', [stk(K, 1), draw(1, { who: 'other' })], [
+      O('신탁 1', [stk(K, 2), draw(1, { who: 'other' })]),
+      O('신탁 2', [stk(K, 1), srch(1), heal(0.4)]),
+      O('신탁 3', [draw(1, { who: 'other' }), pw('play', [stk(K, 1)], { when: { who: 'other' }, limit: 1 })], { power: true }),
+      O('신탁 4', [dmg(0.5), per(K), dmg(0.15), spendAll(K)]),
+      O('신탁 5', [dmg(1.0, EA), stk(K, 2), draw(1, { who: 'other' })], { cost: 1 }),
+    ], [B('축복 1', 'heal'), B('축복 2', 'atkUp'), B('축복 3', [ifStack(K, 4), draw(1)])]),
   ]);
   starter(j, '에르핀_왕도_u3');
 }
@@ -709,6 +798,14 @@ function eshur(j) {
       O('풀리지 않는 난제', [dmg(0.8), per(K), dmg(0.25)]),
       O('고대 마법 서적', [dmg(0.6), perTag(BR), dmg(0.35), draw(1, { who: 'self', type: '공격' })]),
     ], [B('빵 모자', 'atkUp'), B('에심당 간판', { tags: ['보존'] }), B('시식 코너', [heal(0.3)])]),
+    // u5 ② 굴리기(u5) — 비싼 수강비 받고 가르치는 제빵(갓 구운 빵 둘 + 장전)
+    card(H, 5, '제빵 수업', 1, '스킬', [make(BR, 2), stk(K, 1)], [
+      O('신탁 1', [make(BR, 3), stk(K, 1)]),
+      O('신탁 2', [make(BR, 1), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [make(BR, 2), stk(K, 1), draw(1, { who: 'self', type: '공격' })]),
+      O('신탁 4', [make(BR, 2), stk(K, 1), pw('make', [stk(K, 1)], { limit: 2 })], { power: true }),
+      O('신탁 5', [dmg(1.0), perTag(BR), dmg(0.75, ER), exileAll(BR)]),
+    ], [B('축복 1', 'draw'), B('축복 2', 'heal'), B('축복 3', [make(BR, 1)])]),
   ]);
   starter(j, '에슈르_u1');
 }
@@ -764,6 +861,14 @@ function eshurMagi(j) {
       O('마법의 빵 비밀 공식', [dmg(0.8), per(K), dmg(0.3), draw(1, { who: 'self', type: '공격' })]),
       O('증명 끝', [dmg(1.0), per(K), dmg(0.4), spendAll(K)]),
     ], [B('공격 속도', 'atkUp'), B('대-에슈르의 조언', 'weakSpot'), B('빵 한 입', [heal(0.3)])]),
+    // u5 유틸(u5) — 0코: 교주와 둘만 남은 밤샘 스터디 — 증폭 + 이번 턴 공격 카드 1장 비용 -1(마력 레이저를 1코로)
+    card(H, 5, '밤샘 스터디', 0, '스킬', [stk(K, 1), cheap()], [
+      O('신탁 1', [stk(K, 2), cheap()]),
+      O('신탁 2', [stk(K, 1), draw(1, { who: 'self', type: '공격' }), cheap()]),
+      O('신탁 3', [exileBasic(1), stk(K, 2), cheap()]),
+      O('신탁 4', [sh(1.0), per(K), sh(0.3)]),
+      O('신탁 5', [stk(K, 1), cheap(), pw('exhaust', [draw(1)], { limit: 1 })], { power: true }),
+    ], [B('축복 1', 'ap'), B('축복 2', 'draw'), B('축복 3', [ifStack(K, 2), draw(1)])]),
   ]);
   starter(j, '에슈르_마도_u3');
 }
@@ -820,6 +925,14 @@ function joanne(j) {
       O('교주를 향한 헌신', [st('사기', 1), draw(1, { who: 'other' }), power(rule('play', [sh(0.6), st('피해 감소', 1)], { conds: c(3), limit: 1 }))]),
       O('짧은 교리', [sh(0.6), power(rule('play', [sh(0.6), st('피해 감소', 1)], { conds: c(3), limit: 1 }))], { cost: 0 }),
     ], [B('주교의 경전', 'defUp'), B('교주 기록', 'draw'), B('형상의 기도', [stk(K, 1)])]),
+    // u5 ② 굴리기(u5) — 비 오는 날 먼지 나도록 두들기던 맨주먹(방어 기반 + 형상 넘기기)
+    card(H, 5, '비 오는 날의 맨주먹', 1, '공격', [ddef(0.65), stk(K, 1)], [
+      O('신탁 1', [ddef(0.85), stk(K, 1)]),
+      O('신탁 2', [ddef(0.45), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [ddef(0.65), stage(K, 3), sh(0.8)]),
+      O('신탁 4', [ddef(0.5), stk(K, 1), pw('play', [sh(0.4)], { when: { type: '공격' }, limit: 1 })], { power: true }),
+      O('신탁 5', [ddef(1.0), disc(1)]),
+    ], [B('축복 1', 'power'), B('축복 2', 'ap'), B('축복 3', [stage(K, 3), sh(0.5)])]),
   ]);
   starter(j, '죠안_u1');
   for (const f of h.forms || []) for (const p of f.passives || []) if (p.name === '꿈결의 교리') p.fx = [sh(1.1), draw(1), st('사기', 1)];
@@ -878,6 +991,14 @@ function karen(j) {
       O('떡상 각', [stk(K, 1), inspire, stk(K, 2)]),
       O('예약 방송', [stk(K, 3), disc(1)], { tags: ['개전'] }),
     ], [B('썸네일', 'draw'), B('해시태그', { tags: ['보존'] }), B('생당근 공포증', 'defUp')]),
+    // u5 ② 굴리기(u5) — 0코: 100캐럿짜리 당근 자랑(시청자 +1)
+    card(H, 5, '100캐럿 당근', 0, '공격', [dmg(0.55), stk(K, 1)], [
+      O('신탁 1', [dmg(0.75), stk(K, 1)]),
+      O('신탁 2', [dmg(0.45, EA), stk(K, 1)]),
+      O('신탁 3', [dmg(0.6), stk(K, 1), draw(1, { who: 'other', type: '스킬' })]),
+      O('신탁 4', [dmg(0.5), per(K), dmg(0.12), spendAll(K)]),
+      O('신탁 5', [dmg(0.6), stk(K, 1), pw('play', [stk(K, 1)], { when: { who: 'other', type: '공격' }, limit: 1 })], { power: true }),
+    ], [B('축복 1', 'weakSpot'), B('축복 2', 'ap'), B('축복 3', [ifStack(K, 4), heal(0.3)])]),
   ]);
   starter(j, '카렌_u4');
 }
@@ -938,6 +1059,14 @@ function kanta(j) {
       O('반칙', [dmg(0.5), per(K), dmg(0.22), srch(1)]),
       O('판돈 두 배', [dmg(0.8), per(K), dmg(0.35), spendAll(K)]),
     ], [B('커스텀 팽이', 'weakSpot'), B('연회장 계약서', { tags: ['보존'] }), B('스노키와 피라', [heal(0.3)])]),
+    // u5 ② 굴리기(u5) — 새로 깎은 팽이는 불도 뿜는다(실드 + 팽이 둘)
+    card(H, 5, '불 뿜는 새 팽이', 1, '스킬', [sh(0.8), stk(K, 2)], [
+      O('신탁 1', [sh(1.05), stk(K, 2)]),
+      O('신탁 2', [sh(0.55), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [stk(K, 2), draw(2, { who: 'self', type: '공격' })]),
+      O('신탁 4', [sh(0.7), stk(K, 2), pw('play', [sh(0.35)], { when: { type: '공격' }, limit: 2 })], { power: true }),
+      O('신탁 5', [stk(K, 4), disc(1), sh(0.6)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [ifStack(K, 3), dmg(0.3, ER)])]),
   ]);
   starter(j, '칸타_u2');
 }
@@ -997,6 +1126,14 @@ function carrot(j) {
       O('위성에서 보이는 정원', [heal(0.5), perTag(SP), heal(0.2), draw(2, { who: 'other' })]),
       O('수확 축제', [heal(0.8), perTag(SP), heal(0.45), exileAll(SP)]),
     ], [B('해바라기', 'heal'), B('정원사 가위', 'atkUp'), B('죽창', [make(SP, 1)])]),
+    // u5 ② 굴리기(u5) — 사탕수수로 맞아 볼래?(공격 + 새싹)
+    card(H, 5, '사탕수수 몽둥이', 1, '공격', [dmg(0.9), make(SP, 1)], [
+      O('신탁 1', [dmg(1.2), make(SP, 1)]),
+      O('신탁 2', [dmg(0.6), make(SP, 1)], { cost: 0 }),
+      O('신탁 3', [dmg(0.6, EA), make(SP, 1), stk(K, 1)]),
+      O('신탁 4', [dmg(0.7), make(SP, 1), pw('play', [make(SP, 1)], { when: { type: '공격' }, limit: 1 })], { power: true }),
+      O('신탁 5', [dmg(0.9), perTag(SP), dmg(0.5), exileAll(SP)]),
+    ], [B('축복 1', 'power'), B('축복 2', 'ap'), B('축복 3', [ifStack(K, 3), draw(1)])]),
   ]);
   starter(j, '캬롯_u2');
   for (const e of j.equips || []) {
@@ -1056,6 +1193,14 @@ function kyui(j) {
       O('껍질까지 먹어', [dmg(1.0), st('약화', 1), ifBroken, make(CU, 2)]),
       O('오이 다 먹이기', [dmg(0.9), perTag(CU), dmg(0.4), exileAll(CU)]),
     ], [B('바삭한 식빵', 'power'), B('오이 피클', 'frost'), B('소풍', 'draw')]),
+    // u5 ② 굴리기(u5) — 0코: 거절당해도 또 권하는 오이(공격 + 싱싱한 오이)
+    card(H, 5, '오이 투척', 0, '공격', [dmg(0.5), make(CU, 1)], [
+      O('신탁 1', [dmg(0.8), make(CU, 1)]),
+      O('신탁 2', [dmg(0.45, EA), make(CU, 1)]),
+      O('신탁 3', [dmg(0.55), make(CU, 1), draw(1, { who: 'other', type: '공격' })]),
+      O('신탁 4', [dmg(0.6), perTag(CU), dmg(0.35), exileAll(CU)]),
+      O('신탁 5', [dmg(0.6), make(CU, 1), pw('exhaust', [heal(0.3)], { limit: 2 })], { power: true }),
+    ], [B('축복 1', 'power'), B('축복 2', 'frost'), B('축복 3', [stk(K, 1, A1)])]),
   ]);
   starter(j, '큐이_u1');
 }
@@ -1112,6 +1257,14 @@ function chloe(j) {
       O('자매의 의지', [st('결정화', 1), draw(1, { who: 'other' }), power(rule('turnStart', [stk(K, 1)]))]),
       O('작은 의지', [sh(0.8), make(CL, 1), power(rule('turnStart', [stk(K, 1)]))]),
     ], [B('머리 위의 세바스티안', 'defUp'), B('런웨이 오프닝', { tags: ['개전'] }), B('재단 도구', [sh(0.4)])]),
+    // u5 ② 굴리기(u5) — 재단 가위질(방어 기반 + 바늘땀)
+    card(H, 5, '재단 가위질', 1, '공격', [ddef(0.7), stk(K, 1)], [
+      O('신탁 1', [ddef(0.95), stk(K, 1)]),
+      O('신탁 2', [ddef(0.5), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [ddef(0.6), stk(K, 1), srch(1)]),
+      O('신탁 4', [perTag(CL), ddef(0.45, EA), exileAll(CL)]),
+      O('신탁 5', [ddef(0.55), stk(K, 1), pw('play', [stk(K, 1)], { when: { type: '공격' }, limit: 1 })], { power: true }),
+    ], [B('축복 1', 'power'), B('축복 2', 'draw'), B('축복 3', [make(CL, 1)])]),
   ]);
   starter(j, '클로에_u2');
 }
@@ -1170,6 +1323,14 @@ function patra(j) {
       O('매일 도시락', [draw(1), pw('turnStart', [make(MT, 1)])], { power: true }),
       O('민트 샌드위치', [make(MT, 3), disc(1)]),
     ], [B('돗자리', 'ap'), B('소풍 바구니', { tags: ['보존'] }), B('민트초코 쿠키 한 봉', [heal(0.3)])]),
+    // u5 ② 굴리기(u5) — 0코: 안 먹히는 걸 알고도 밤새 시험하는 조리(재고 + 쿠키)
+    card(H, 5, '밤샘 시험 조리', 0, '스킬', [stk(K, 1), make(MT, 1)], [
+      O('신탁 1', [stk(K, 2), make(MT, 1)]),
+      O('신탁 2', [dmg(1.3), stk(K, 2), make(MT, 2)], { cost: 1 }),
+      O('신탁 3', [make(MT, 1), draw(2, { who: 'self', type: '공격' })]),
+      O('신탁 4', [stk(K, 2), make(MT, 1), power(reach(K, 4, [make(MT, 2)]))], { power: true }),
+      O('신탁 5', [make(MT, 2), disc(1), draw(1)]),
+    ], [B('축복 1', 'atkUp'), B('축복 2', 'draw'), B('축복 3', [make(MT, 1)])]),
   ]);
   starter(j, '파트라_u3');
 }
@@ -1226,6 +1387,14 @@ function polan(j) {
       O('나도 소녀랍니다', [st('협공', 1), draw(2, { who: 'other', type: '공격' })]),
       O('경례 한 번', [st('협공', 2), per(K), heal(0.35), spendAll(K)]),
     ], [B('진군깃발', 'atkUp'), B('에르피엔 수호', 'defUp'), B('폴랑 버스터', [st('취약', 1, EA)])]),
+    // u5 ② 굴리기(u5) — 셋이 둘러싸 받아 내는 자백(공격 + 장전)
+    card(H, 5, '포위 심문', 1, '공격', [dmg(0.9), stk(K, 1)], [
+      O('신탁 1', [dmg(1.2), stk(K, 1)]),
+      O('신탁 2', [dmg(0.65), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [dmg(0.8), stk(K, 1), draw(1, { who: 'other', type: '공격' })]),
+      O('신탁 4', [dmg(0.65, EA), ifAll, st('협공', 1)]),
+      O('신탁 5', [dmg(0.8), per(K), dmg(0.3), spendAll(K)]),
+    ], [B('축복 1', 'power'), B('축복 2', 'weakSpot'), B('축복 3', [ifStack(K, 2), heal(0.3)])]),
   ]);
   starter(j, '폴랑_u3');
 }

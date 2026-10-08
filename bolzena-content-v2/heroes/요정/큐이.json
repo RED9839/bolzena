@@ -6,6 +6,7 @@
       "nature": "순수",
       "race": "요정",
       "role": "서포터",
+      "style": "회복형",
       "star": 1,
       "hp": 480,
       "atk": 64,
@@ -163,7 +164,7 @@
       ],
       "oracles": [
         {
-          "name": "오이 두 개 심기",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -178,22 +179,10 @@
           ]
         },
         {
-          "name": "오이 밭 습격",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "오이 팩",
-              "v": 1,
-              "target": "otherAllies"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "거절당해도 또",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -202,77 +191,62 @@
               "target": "oneAlly"
             },
             {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "make",
-              "id": "큐이_cucumber",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "오이 밭에 물 주기",
-          "power": true,
-          "fx": [
-            {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "오이 팩",
-                      "v": 1,
-                      "target": "strongestAlly"
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
-          "name": "몰래몰래",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "make",
-              "id": "큐이_cucumber",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.62
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 2,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 2,
+              "target": "oneAlly"
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "gauge",
+              "v": 15
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "오이 꼭지",
-          "kind": "draw"
         },
         {
-          "name": "살금살금",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "싱싱한 잎",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "make",
-              "id": "큐이_cucumber",
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -289,7 +263,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.99
+          "ratio": 1
         },
         {
           "k": "stack",
@@ -300,38 +274,8 @@
       ],
       "oracles": [
         {
-          "name": "진한 오이 오일",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.31
-            },
-            {
-              "k": "stack",
-              "id": "오이 팩",
-              "v": 1,
-              "target": "oneAlly"
-            }
-          ]
-        },
-        {
-          "name": "오일 한 방울",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.59
-            },
-            {
-              "k": "stack",
-              "id": "오이 팩",
-              "v": 1,
-              "target": "oneAlly"
-            }
-          ]
-        },
-        {
-          "name": "오이 팩 갈아 붙이기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
@@ -340,21 +284,19 @@
             {
               "k": "stack",
               "id": "오이 팩",
-              "v": 2,
+              "v": 1,
               "target": "oneAlly"
-            },
-            {
-              "k": "discard",
-              "v": 1
             }
           ]
         },
         {
-          "name": "오일 코팅",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.17
+              "k": "heal",
+              "ratio": 0.95
             },
             {
               "k": "stack",
@@ -365,31 +307,82 @@
           ]
         },
         {
-          "name": "오이 나눔",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.9
+              "ratio": 1.1
             },
             {
-              "k": "make",
-              "id": "큐이_cucumber",
-              "v": 2
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 20
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.8
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.4
+            },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "상큼한 향",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "미끌미끌",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "촉촉한 피부",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -416,18 +409,19 @@
         },
         {
           "k": "heal",
-          "ratio": 1.08
+          "ratio": 1.1
         },
         {
           "k": "stack",
           "id": "오이 팩",
           "v": 1,
-          "target": "otherAllies"
+          "target": "allAllies"
         }
       ],
       "oracles": [
         {
-          "name": "오이 대행진",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -436,38 +430,20 @@
             },
             {
               "k": "heal",
-              "ratio": 1.93
+              "ratio": 1.88
             },
             {
               "k": "stack",
               "id": "오이 팩",
               "v": 1,
-              "target": "otherAllies"
+              "target": "allAllies"
             }
           ]
         },
         {
-          "name": "한 입만 권하기",
+          "name": "신탁 2",
           "cost": 1,
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "오이 팩",
-              "v": 1,
-              "target": "otherAllies"
-            }
-          ]
-        },
-        {
-          "name": "행렬의 선두",
-          "tags": [
-            "개전"
-          ],
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -476,18 +452,18 @@
             },
             {
               "k": "heal",
-              "ratio": 1.38
+              "ratio": 1.05
             },
             {
               "k": "stack",
               "id": "오이 팩",
               "v": 1,
-              "target": "otherAllies"
+              "target": "allAllies"
             }
           ]
         },
         {
-          "name": "온 세상에 오이를",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
@@ -495,26 +471,29 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "오이 팩",
-              "v": 2,
-              "target": "otherAllies"
+              "k": "shield",
+              "ratio": 1.53
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "오이 팩",
               "v": 1,
-              "who": "other"
+              "target": "oneAlly"
             }
           ]
         },
         {
-          "name": "좋아질 때까지",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "status",
               "id": "사기",
               "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.14
             },
             {
               "k": "power",
@@ -525,34 +504,49 @@
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "큐이_cucumber",
-                      "v": 1
+                      "k": "stack",
+                      "id": "오이 팩",
+                      "v": 1,
+                      "target": "oneAlly"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 2.74
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "오이 냉국",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "행렬 박자",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "흥겨운 장단",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "오이 팩",
               "v": 1,
-              "target": "otherAllies"
+              "target": "oneAlly"
             }
           ]
         }
@@ -568,13 +562,18 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
+          "ratio": 0.8,
           "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "약화",
-          "v": 1
+          "k": "perOverheal",
+          "pct": 0.8,
+          "per": 25
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.15,
+          "target": "oneEnemy"
         },
         {
           "k": "stack",
@@ -585,17 +584,23 @@
       ],
       "oracles": [
         {
-          "name": "두툼한 샌드위치",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.17,
+              "ratio": 1.08,
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -606,64 +611,196 @@
           ]
         },
         {
-          "name": "샌드위치 뿌리기",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.63,
-              "target": "allEnemies"
+              "ratio": 0.75,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
             },
             {
-              "k": "stack",
-              "id": "오이 팩",
-              "v": 1,
-              "target": "oneAlly"
+              "k": "dmg",
+              "ratio": 0.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "오이 팩",
+                      "v": 1,
+                      "target": "oneAlly"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "도시락 나눠 먹기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.81,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
             },
             {
-              "k": "draw",
-              "v": 2,
-              "who": "other",
-              "type": "공격"
+              "k": "dmg",
+              "ratio": 0.14,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "껍질까지 먹어",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.87,
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "큐이_u5",
+      "name": "오이 투척",
+      "hero": "큐이",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "make",
+          "id": "큐이_cucumber",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.67,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.6
             },
             {
               "k": "make",
@@ -673,43 +810,67 @@
           ]
         },
         {
-          "name": "오이 다 먹이기",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.93,
+              "ratio": 0.4,
               "target": "oneEnemy"
             },
             {
-              "k": "perTag",
-              "id": "큐이_cucumber"
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 1
             },
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.41,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "큐이_cucumber"
+              "k": "make",
+              "id": "큐이_cucumber",
+              "v": 2
+            },
+            {
+              "k": "nextAp",
+              "v": -1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "바삭한 식빵",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "오이 피클",
-          "kind": "frost"
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "소풍",
-          "kind": "draw"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오이 팩",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
         }
       ]
     }

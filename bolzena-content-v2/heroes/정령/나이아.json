@@ -5,12 +5,13 @@
       "name": "나이아",
       "nature": "순수",
       "role": "서포터",
+      "style": "쌓고 고르기",
       "star": 3,
       "hp": 600,
       "atk": 75,
       "def": 60,
       "crit": 5,
-      "blurb": "인사 대신 물총부터 쏘는 외로운 수문장. 물총을 맞은 아군이 이번 턴 공격하면 물줄기가, 스킬을 쓰면 회복이 따라붙고, 지친 친구는 박박 씻겨 디버프까지 털어 냅니다.",
+      "blurb": "인사 대신 물총부터 쏘는 외로운 수문장. 스킬을 낼 때마다 물탱크가 차올라 친구들이 힘을 내고, 물총에 몇 발을 실을지는 나이아가 고릅니다 — 가득 채우면 넘친 물이 파티의 다음 한 수에 실립니다.",
       "passives": [
         {
           "name": "퓨퓨~",
@@ -31,14 +32,20 @@
           ]
         },
         {
-          "name": "뽀득뽀득 씻어요",
+          "name": "물장난 상대",
           "when": {
-            "on": "ult"
+            "on": "spend",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
             {
-              "k": "gauge",
-              "v": 30
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
             }
           ]
         }
@@ -82,30 +89,29 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.05,
+            "v": 0.07,
             "who": "allies"
           }
         ],
         "rules": [
           {
-            "name": "호수 대청소",
+            "name": "뽀득뽀득 씻어요",
             "when": {
-              "on": "stackReach",
-              "id": "물탱크",
-              "n": 5
+              "on": "ult"
             },
             "fx": [
               {
-                "k": "cleanse",
-                "v": 1
-              },
-              {
-                "k": "heal",
-                "ratio": 1
+                "k": "gauge",
+                "v": 30
               }
             ]
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       }
     }
   ],
@@ -151,6 +157,11 @@
           "v": 1
         },
         {
+          "k": "feed",
+          "v": 1,
+          "target": "oneAlly"
+        },
+        {
           "k": "draw",
           "v": 1,
           "who": "other"
@@ -158,7 +169,7 @@
       ],
       "oracles": [
         {
-          "name": "심심해!",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -166,6 +177,11 @@
               "v": 2
             },
             {
+              "k": "feed",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
               "k": "draw",
               "v": 1,
               "who": "other"
@@ -173,7 +189,7 @@
           ]
         },
         {
-          "name": "얼굴에 물총",
+          "name": "신탁 2",
           "fx": [
             {
               "k": "stack",
@@ -181,21 +197,45 @@
               "v": 1
             },
             {
-              "k": "draw",
+              "k": "feed",
               "v": 1,
-              "who": "other"
+              "target": "oneAlly"
             },
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
+              "k": "draw",
+              "v": 2,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "수문장 교대",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 2
+            },
+            {
+              "k": "feed",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            },
             {
               "k": "draw",
               "v": 1,
@@ -221,59 +261,22 @@
           ]
         },
         {
-          "name": "놀아 줄 때까지",
-          "tags": [
-            "회수"
-          ],
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
               "id": "물탱크",
-              "v": 1
+              "v": 3
             },
             {
               "k": "draw",
               "v": 1,
               "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "엘리아스의 인싸",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "물탱크",
-              "v": 2
             },
             {
-              "k": "pull",
-              "from": "discard",
-              "n": 1,
-              "who": "other"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "돌고래 물총",
-          "kind": "draw"
-        },
-        {
-          "name": "물장구",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "물탱크",
+              "k": "discard",
               "v": 1
             }
-          ]
-        },
-        {
-          "name": "수영 모자",
-          "tags": [
-            "보존"
           ]
         }
       ]
@@ -288,7 +291,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 1.2
+          "ratio": 1.3
         },
         {
           "k": "cleanse",
@@ -302,11 +305,12 @@
       ],
       "oracles": [
         {
-          "name": "스무 번 헹구기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.67
+              "ratio": 1.76
             },
             {
               "k": "cleanse",
@@ -320,111 +324,111 @@
           ]
         },
         {
-          "name": "호수 통째로",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.4
-            },
-            {
-              "k": "stack",
-              "id": "물탱크",
-              "v": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "물탱크",
-              "n": 5
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "넘치는 물",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.32
+              "ratio": 1.23
             },
             {
               "k": "cleanse",
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "물탱크"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
             }
           ]
         },
         {
-          "name": "뽀득뽀득",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 3",
+          "power": true,
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.6
+              "ratio": 1.65
             },
             {
               "k": "cleanse",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "물탱크",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.69
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "물 한 바가지",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.04
+              "ratio": 1.44
             },
             {
-              "k": "stack",
-              "id": "물탱크",
+              "k": "cleanse",
               "v": 1
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.63
+            },
+            {
+              "k": "cleanse",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "맑은 호숫물",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "거품 목욕",
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "물탱크",
               "v": 1
             }
-          ]
-        },
-        {
-          "name": "결벽증",
-          "tags": [
-            "보존"
           ]
         }
       ]
@@ -439,84 +443,82 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.39,
           "target": "oneEnemy",
-          "hits": 3
-        },
-        {
-          "k": "perStack",
-          "id": "물탱크"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.2,
-          "target": "oneEnemy"
+          "hits": 2
         },
         {
           "k": "spend",
           "id": "물탱크",
-          "all": true
+          "pick": true
+        },
+        {
+          "k": "perEvent"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.42,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "돌고래 물대포",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.53,
               "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "물탱크"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
+              "hits": 2
             },
             {
               "k": "spend",
               "id": "물탱크",
-              "all": true
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "물보라 사격",
+          "name": "신탁 2",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "spend",
+              "id": "물탱크",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
             {
               "k": "dmg",
               "ratio": 0.29,
-              "target": "randomEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "물탱크"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
               "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "물탱크",
-              "all": true
             }
           ]
         },
         {
-          "name": "쏘고 또 쏘고",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.39,
               "target": "oneEnemy",
-              "hits": 3
+              "hits": 2
             },
             {
               "k": "perStack",
@@ -524,86 +526,87 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.23,
+              "ratio": 0.33,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "물총 결투",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "물탱크"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "물탱크",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "물총 장전",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.42,
               "target": "oneEnemy",
-              "hits": 3
+              "hits": 2
+            },
+            {
+              "k": "spend",
+              "id": "물탱크",
+              "pick": true
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "스킬"
+                    "on": "spend",
+                    "id": "물탱크"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 2
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.4,
-                      "target": "oneEnemy"
+                      "ratio": 0.45,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "spend",
+              "id": "물탱크",
+              "pick": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "세찬 물살",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "물에 젖은 적",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "빠른 장전",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -613,7 +616,7 @@
       "hero": "나이아",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "강화",
       "fx": [
         {
           "k": "status",
@@ -621,40 +624,26 @@
           "v": 1
         },
         {
-          "k": "perStack",
-          "id": "물탱크"
-        },
-        {
-          "k": "heal",
-          "ratio": 0.2
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "물탱크",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "아가미가 생기면",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 0.52
-            },
-            {
-              "k": "perStack",
-              "id": "물탱크"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.21
-            }
-          ]
-        },
-        {
-          "name": "물이 전하는 메시지",
-          "power": true,
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
@@ -664,6 +653,34 @@
             {
               "k": "stack",
               "id": "물탱크",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "물탱크",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
               "v": 1
             },
             {
@@ -686,10 +703,7 @@
           ]
         },
         {
-          "name": "정령산 입구",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
@@ -697,17 +711,35 @@
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "물탱크"
+              "k": "stack",
+              "id": "물탱크",
+              "v": 2
             },
             {
-              "k": "heal",
-              "ratio": 0.23
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.52
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "잔소리의 용족",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "status",
@@ -715,12 +747,164 @@
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "물탱크"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "물탱크",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "물탱크",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "atkUp"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "나이아_u5",
+      "name": "인사 대신 물총",
+      "hero": "나이아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.39,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "stack",
+          "id": "물탱크",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 0.39
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.53,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
             },
             {
               "k": "heal",
-              "ratio": 0.2
+              "ratio": 0.53
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
             },
             {
               "k": "draw",
@@ -731,37 +915,81 @@
           ]
         },
         {
-          "name": "수문장의 물벼락",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
-              "k": "perStack",
-              "id": "물탱크"
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy",
+              "hits": 3
             },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "물탱크",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.34,
-              "target": "allEnemies"
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
-              "k": "spend",
+              "k": "stack",
               "id": "물탱크",
-              "all": true
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "수문장의 긍지",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "호수의 품",
-          "kind": "defUp"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "폐품 공작",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            }
+          ]
         }
       ]
     }

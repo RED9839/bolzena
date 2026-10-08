@@ -6,12 +6,13 @@
       "nature": "순수",
       "race": "엘프",
       "role": "탱커",
+      "style": "버티형",
       "star": 2,
       "hp": 810,
       "atk": 66,
       "def": 66,
       "crit": 5,
-      "blurb": "거짓말을 하면 더듬는 외교관 겸 첩보원. 두 얼굴을 바꿔 쓰며 — 외교관일 땐 파티를 감싸고, 첩보원일 땐 갑옷 박치기로 적의 강인도를 부숩니다.",
+      "blurb": "거짓말을 하면 더듬는 외교관 겸 첩보원. 갑옷으로 막아 낸 만큼 숨겨 둔 진심이 차오르고, 진심이 셋 모이면 건틀릿에 실은 진심 강타를 손에 쥡니다.",
       "keyword": {
         "name": "로네의 진심",
         "desc": "갑옷 속에 숨겨 둔 진심",
@@ -22,24 +23,24 @@
             "stat": "taken",
             "v": -0.04
           }
-        ]
+        ],
+        "onMax": {
+          "make": "로네_strike",
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "갑옷 속 진심",
           "when": {
-            "on": "hurt",
-            "guarded": true
-          },
-          "limit": {
-            "per": "turn",
-            "n": 2
+            "on": "guardSum"
           },
           "fx": [
             {
               "k": "stack",
               "id": "로네의 진심",
-              "v": 1
+              "v": 1,
+              "ofEvent": 0.008
             }
           ]
         },
@@ -116,6 +117,31 @@
       ]
     },
     {
+      "id": "로네_strike",
+      "name": "건틀릿 진심 강타",
+      "hero": "로네",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "기절",
+          "v": 1
+        }
+      ],
+      "blurb": "갑옷 속에 숨겨 둔 진심 — 이번만큼은 정말로 세게 칩니다"
+    },
+    {
       "id": "로네_u1",
       "name": "어리바리 블랙옵스",
       "hero": "로네",
@@ -125,7 +151,12 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.4
+          "ratio": 0.83
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
         },
         {
           "k": "stack",
@@ -135,11 +166,17 @@
       ],
       "oracles": [
         {
-          "name": "엘프 최고 스파이",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 1.16
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
             },
             {
               "k": "stack",
@@ -149,17 +186,18 @@
           ]
         },
         {
-          "name": "완벽한 위장",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.5
+              "ratio": 0.79
             },
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 2
+              "v": 1
             },
             {
               "k": "stack",
@@ -169,76 +207,92 @@
           ]
         },
         {
-          "name": "가장 약한 아군 곁",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.03
-            }
-          ]
-        },
-        {
-          "name": "첩보 수첩",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
               "ratio": 1.25
             },
             {
+              "k": "perGuarded",
+              "per": 40
+            },
+            {
+              "k": "shield",
+              "ratio": 0.26
+            },
+            {
               "k": "stack",
               "id": "로네의 진심",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
             }
           ]
         },
         {
-          "name": "서류 파쇄",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "discard",
+              "k": "shield",
+              "ratio": 1.47
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
               "v": 1
             },
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guardSum"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.52
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
               "k": "shield",
-              "ratio": 2
+              "ratio": 1.62
             },
             {
-              "k": "stack",
-              "id": "로네의 진심",
+              "k": "status",
+              "id": "피해 감소",
               "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "판금 덧대기",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "외교 대사 직함",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "흐린 존재감",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -260,8 +314,7 @@
         {
           "k": "status",
           "id": "약화",
-          "v": 2,
-          "target": "oneEnemy"
+          "v": 2
         },
         {
           "k": "stack",
@@ -275,13 +328,34 @@
       ],
       "oracles": [
         {
-          "name": "더… 더듬지 않았어오",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 3,
-              "target": "oneEnemy"
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
             },
             {
               "k": "stack",
@@ -295,42 +369,48 @@
           ]
         },
         {
-          "name": "작은 거짓말",
-          "cost": 0,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
               "id": "약화",
               "v": 2,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "로네의 진심",
+              "k": "shield",
+              "ratio": 0.46
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "습관성 거짓말",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.89
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -345,59 +425,19 @@
           ]
         },
         {
-          "name": "거짓말 탄로",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "로네의 진심"
+              "v": 3
             },
             {
               "k": "shield",
-              "ratio": 0.75
-            }
-          ]
-        },
-        {
-          "name": "거짓말 들통",
-          "fx": [
+              "ratio": 1.84
+            },
             {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "식은땀",
-          "kind": "frost"
-        },
-        {
-          "name": "일단 할 수 있다고",
-          "kind": "draw"
-        },
-        {
-          "name": "거짓말 한 겹",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "로네의 진심",
               "v": 1
             }
           ]
@@ -414,12 +454,15 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.8
+          "ratio": 0.45
         },
         {
-          "k": "status",
-          "id": "결의",
-          "v": 1
+          "k": "perGuarded",
+          "per": 40
+        },
+        {
+          "k": "heal",
+          "ratio": 0.09
         },
         {
           "k": "stack",
@@ -429,11 +472,58 @@
       ],
       "oracles": [
         {
-          "name": "곱빼기 소스",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.44
+              "ratio": 0.63
+            },
+            {
+              "k": "perGuarded",
+              "per": 40
+            },
+            {
+              "k": "heal",
+              "ratio": 0.13
+            },
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.43
+            },
+            {
+              "k": "perGuarded",
+              "per": 40
+            },
+            {
+              "k": "heal",
+              "ratio": 0.08
+            },
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
             },
             {
               "k": "status",
@@ -448,52 +538,19 @@
           ]
         },
         {
-          "name": "돈까스 한 조각",
-          "cost": 0,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.6
+              "ratio": 0.43
             },
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "감봉 전 회식",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.7
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 2
-            },
-            {
-              "k": "ifWounded"
+              "k": "perGuarded",
+              "per": 40
             },
             {
               "k": "heal",
-              "ratio": 0.8
-            }
-          ]
-        },
-        {
-          "name": "단골 가게 검색",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.14
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "ratio": 0.08
             },
             {
               "k": "draw",
@@ -504,43 +561,45 @@
           ]
         },
         {
-          "name": "보너스로 사 먹기",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "k": "heal",
+              "ratio": 1.49
             },
             {
-              "k": "perStack",
-              "id": "로네의 진심"
+              "k": "perGuarded",
+              "per": 40
             },
             {
               "k": "heal",
-              "ratio": 0.45
+              "ratio": 0.29
             },
             {
-              "k": "spend",
-              "id": "로네의 진심",
-              "all": true
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "엘프 렌즈 시즌 7",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "포장 주문",
-          "tags": [
-            "보존"
-          ]
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "든든한 한 끼",
-          "kind": "defUp"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -554,7 +613,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.41,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -564,7 +623,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.22,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -576,11 +635,12 @@
       ],
       "oracles": [
         {
-          "name": "진심을 다한 공격",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.55,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -590,7 +650,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.31,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -602,62 +662,13 @@
           ]
         },
         {
-          "name": "넉백",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "로네의 진심"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "진심이 가득하면",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.78,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "로네의 진심",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "진심의 건틀릿",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.38,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -667,7 +678,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.2,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -676,16 +687,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "로네의 진심",
-                    "n": 3
+                    "on": "guardSum"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "base": "def",
-                      "target": "oneEnemy"
+                      "k": "stack",
+                      "id": "로네의 진심",
+                      "v": 1
                     }
                   ]
                 }
@@ -694,14 +706,11 @@
           ]
         },
         {
-          "name": "마지막 진심",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 0.38,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -711,7 +720,63 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.21,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "로네의 진심"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "로네의 진심"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.47,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -725,19 +790,209 @@
       ],
       "blesses": [
         {
-          "name": "강철판",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "돈까스 힘",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "갑옷 기름칠",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.5
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "로네_u5",
+      "name": "징글벨 돌격",
+      "hero": "로네",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "로네의 진심",
+          "v": 1
+        },
+        {
+          "k": "perGuarded",
+          "per": 50
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.09,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 1
+            },
+            {
+              "k": "perGuarded",
+              "per": 50
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 1
+            },
+            {
+              "k": "perGuarded",
+              "per": 50
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.08,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perGuarded",
+              "per": 50
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.11,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "로네의 진심",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "로네의 진심",
+              "v": 1
             }
           ]
         }

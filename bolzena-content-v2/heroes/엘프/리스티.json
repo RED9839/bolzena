@@ -6,43 +6,23 @@
       "nature": "우울",
       "race": "엘프",
       "role": "딜러",
+      "style": "박자형",
       "star": 3,
       "hp": 550,
       "atk": 135,
       "def": 25,
       "crit": 10,
-      "blurb": "곰인형 속 AI 글러브와 함께하는 해커. 공격할 때마다 콤보가 이어지며 고학년 게이지가 차고, 고학년 한 번이면 적의 다음 행동을 통째로 해킹합니다.",
+      "blurb": "곰인형 속 AI 글러브와 함께하는 해커. 한 턴에 공격을 셋 이으면 적의 신상이 다 털려 넷째 공격 「오늘의 POTG」 를 손에 쥡니다 — 손맛은 턴이 끝나면 식습니다.",
       "keyword": {
         "name": "개인정보",
-        "desc": "해킹으로 긁어모은 적의 신상",
-        "carrier": "enemy",
+        "desc": "이번 턴 공격으로 긁어모은 적의 신상",
+        "carrier": "self",
         "cap": 3,
-        "rules": [
-          {
-            "name": "신상 털기",
-            "when": {
-              "on": "stackReach",
-              "id": "개인정보",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "개인정보",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.45,
-                "target": "oneEnemy"
-              },
-              {
-                "k": "tough",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "endClear": true,
+        "onMax": {
+          "make": "리스티_potg",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -54,26 +34,24 @@
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 3
           },
           "fx": [
             {
               "k": "stack",
               "id": "개인정보",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         },
         {
           "name": "천재 해커의 등장",
           "when": {
-            "on": "spend",
-            "id": "개인정보"
+            "on": "make"
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
@@ -102,8 +80,7 @@
           {
             "k": "stack",
             "id": "개인정보",
-            "v": 2,
-            "target": "oneEnemy"
+            "v": 2
           },
           {
             "k": "draw",
@@ -172,12 +149,35 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.16,
           "target": "oneEnemy"
         }
       ],
       "hero": "리스티",
       "token": true
+    },
+    {
+      "id": "리스티_potg",
+      "name": "오늘의 POTG",
+      "hero": "리스티",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "topEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "blurb": "신상을 다 턴 넷째 한 방 — 가장 튼튼한 적부터 정확히"
     },
     {
       "id": "리스티_u1",
@@ -189,132 +189,79 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.45,
-          "target": "oneEnemy",
-          "hits": 3
+          "ratio": 0.68,
+          "target": "topEnemy"
         },
         {
           "k": "perStack",
-          "id": "개인정보"
+          "id": "개인정보",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.4,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "개인정보",
-          "all": true
+          "ratio": 0.36,
+          "target": "topEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "마지막 타격 강화",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.62,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.92,
+              "target": "topEnemy"
             },
             {
               "k": "perStack",
-              "id": "개인정보"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
               "id": "개인정보",
-              "all": true
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "topEnemy"
             }
           ]
         },
         {
-          "name": "라이트 해킹",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "개인정보"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "캔 던지기 해킹",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.62,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perTag",
-              "id": "리스티_can"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "리스티_can"
-            }
-          ]
-        },
-        {
-          "name": "상주 해킹 프로그램",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.55,
+              "target": "topEnemy"
             },
             {
               "k": "perStack",
-              "id": "개인정보"
+              "id": "개인정보",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
+              "ratio": 0.29,
+              "target": "topEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "개인정보",
-                    "n": 3
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.35,
-                      "target": "oneEnemy",
-                      "hits": 2
+                      "k": "extra",
+                      "ratio": 0.45,
+                      "target": "topEnemy"
                     }
                   ]
                 }
@@ -323,51 +270,96 @@
           ]
         },
         {
-          "name": "서버 다운",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.52,
+              "target": "allEnemies"
             },
             {
               "k": "perStack",
-              "id": "개인정보"
+              "id": "개인정보",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
+              "ratio": 0.26,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.64,
+              "target": "topEnemy"
             },
             {
-              "k": "spend",
+              "k": "perStack",
               "id": "개인정보",
-              "all": true
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "topEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.64,
+              "target": "topEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "개인정보",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "topEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "복셀 블록",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "독타 페퍼",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "로그 수집",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "개인정보",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         }
@@ -379,70 +371,100 @@
       "hero": "리스티",
       "unique": true,
       "cost": 0,
-      "type": "스킬",
+      "type": "공격",
       "fx": [
         {
-          "k": "stack",
-          "id": "개인정보",
-          "v": 1,
+          "k": "dmg",
+          "ratio": 0.36,
           "target": "oneEnemy"
         },
         {
           "k": "draw",
-          "v": 1
+          "v": 1,
+          "who": "self",
+          "type": "공격"
         }
       ],
       "oracles": [
         {
-          "name": "공략 완료",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "stack",
-              "id": "개인정보",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.49,
               "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "무한 콤보",
-          "power": true,
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "개인정보",
-                      "v": 1,
-                      "target": "topEnemy"
-                    }
-                  ]
-                }
-              ]
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "공략집 검색",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "리스티_can",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "oneEnemy"
+            },
             {
               "k": "stack",
               "id": "개인정보",
+              "v": 1
+            },
+            {
+              "k": "draw",
               "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
               "target": "oneEnemy"
             },
             {
@@ -452,76 +474,8 @@
               "type": "공격"
             },
             {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "버그 악용",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "개인정보",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "개인정보",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.62,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "밤샘 게임",
-          "fx": [
-            {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "개인정보",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "세이브 파일",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "골판지 왕관",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.4
-            }
-          ]
-        },
-        {
-          "name": "다크넷 계정",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "개인정보",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         }
@@ -537,13 +491,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.75,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "개인정보",
-          "v": 1,
+          "ratio": 0.6,
           "target": "oneEnemy"
         },
         {
@@ -554,17 +502,12 @@
       ],
       "oracles": [
         {
-          "name": "독타 페퍼 캔",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "개인정보",
-              "v": 1,
+              "ratio": 0.84,
               "target": "oneEnemy"
             },
             {
@@ -575,18 +518,13 @@
           ]
         },
         {
-          "name": "찌그러뜨린 캔",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "개인정보",
-              "v": 1,
+              "ratio": 0.57,
               "target": "oneEnemy"
             },
             {
@@ -597,35 +535,67 @@
           ]
         },
         {
-          "name": "캔 탑 쌓기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.78,
+              "ratio": 0.52,
               "target": "oneEnemy"
             },
             {
-              "k": "perTag",
-              "id": "리스티_can"
+              "k": "make",
+              "id": "리스티_can",
+              "v": 2
             },
             {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
               "k": "dmg",
-              "ratio": 0.33,
+              "ratio": 0.62,
               "target": "oneEnemy"
             },
             {
               "k": "make",
               "id": "리스티_can",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.21,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "냉장고 뒤지기",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.88,
               "target": "oneEnemy"
             },
             {
@@ -637,41 +607,23 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "unique": true
-            }
-          ]
-        },
-        {
-          "name": "분리수거",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "리스티_can",
-              "v": 2
+              "unique": true,
+              "type": "공격"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "찌그러진 캔",
-          "kind": "frost"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "한 캔 더",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "캔 하나 더",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
@@ -693,23 +645,32 @@
         {
           "k": "stack",
           "id": "개인정보",
-          "v": 1,
-          "target": "oneEnemy"
+          "v": 1
         },
         {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "stackReach",
-                "id": "개인정보",
-                "n": 3
+                "on": "play",
+                "type": "공격"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "개인정보",
+                  "n": 2
+                }
+              ],
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
-                  "k": "dmg",
-                  "ratio": 0.35,
-                  "target": "oneEnemy"
+                  "k": "extra",
+                  "ratio": 0.32,
+                  "target": "topEnemy"
                 }
               ]
             }
@@ -718,28 +679,37 @@
       ],
       "oracles": [
         {
-          "name": "글러브 풀가동",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "개인정보",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "개인정보",
-                    "n": 3
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "conds": [
+                    {
+                      "c": "stack",
+                      "id": "개인정보",
+                      "n": 2
+                    }
+                  ],
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.75,
-                      "target": "oneEnemy"
+                      "k": "extra",
+                      "ratio": 0.44,
+                      "target": "topEnemy"
                     }
                   ]
                 }
@@ -748,7 +718,7 @@
           ]
         },
         {
-          "name": "글러브 대기 모드",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -756,15 +726,25 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "개인정보",
-                    "n": 3
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "conds": [
+                    {
+                      "c": "stack",
+                      "id": "개인정보",
+                      "n": 2
+                    }
+                  ],
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.45,
-                      "target": "oneEnemy"
+                      "k": "extra",
+                      "ratio": 0.32,
+                      "target": "topEnemy"
                     }
                   ]
                 }
@@ -773,11 +753,223 @@
           ]
         },
         {
-          "name": "양심의 목소리",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.6
+              "k": "stack",
+              "id": "개인정보",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "개인정보",
+                      "v": 1
+                    },
+                    {
+                      "k": "extra",
+                      "ratio": 0.2,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "conds": [
+                    {
+                      "c": "stack",
+                      "id": "개인정보",
+                      "n": 2
+                    }
+                  ],
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.32,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "개인정보",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "conds": [
+                    {
+                      "c": "stack",
+                      "id": "개인정보",
+                      "n": 2
+                    }
+                  ],
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.4,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "atkUp"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "개인정보",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리스티_u5",
+      "name": "독타 페퍼 한 박스",
+      "hero": "리스티",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "리스티_can",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "리스티_can",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "make",
+              "id": "리스티_can",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "리스티_can",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "개인정보",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "리스티_can",
+              "v": 2
             },
             {
               "k": "draw",
@@ -788,19 +980,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "개인정보",
-                    "n": 3
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "target": "oneEnemy"
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.5
+                      "k": "stack",
+                      "id": "개인정보",
+                      "v": 1
                     }
                   ]
                 }
@@ -809,91 +1000,40 @@
           ]
         },
         {
-          "name": "현실 개변 장치",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "stack",
-              "id": "개인정보",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "리스티_can",
+              "v": 3
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
+              "v": 2
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "개인정보",
-                    "n": 3
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "곰인형 혹사",
-          "fx": [
-            {
-              "k": "payHpPct",
-              "v": 0.05
-            },
-            {
-              "k": "stack",
-              "id": "개인정보",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "개인정보",
-                    "n": 3
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.7,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "말동무",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "호숫가 집",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "방구석 바리케이드",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "make",
+              "id": "리스티_can",
+              "v": 1
             }
           ]
         }

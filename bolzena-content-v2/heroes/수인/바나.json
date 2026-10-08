@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "수인",
       "role": "서포터",
+      "style": "거드는 형",
       "star": 2,
       "hp": 500,
       "atk": 75,
@@ -16,50 +17,24 @@
         "name": "단조",
         "desc": "두드려 벼리는 영웅의 검",
         "carrier": "self",
-        "cap": 3,
+        "cap": 2,
         "per": [
           {
             "stat": "guard",
             "v": 0.1
           }
         ],
-        "rules": [
-          {
-            "name": "명검 완성",
-            "when": {
-              "on": "stackReach",
-              "id": "단조",
-              "n": 2
-            },
-            "limit": {
-              "per": "fight",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "단조",
-                "all": true
-              },
-              {
-                "k": "status",
-                "id": "사기",
-                "v": 1
-              },
-              {
-                "k": "draw",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "바나_blade",
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "풀무질",
           "when": {
             "on": "play",
-            "type": "스킬"
+            "who": "any"
           },
           "limit": {
             "per": "turn",
@@ -86,7 +61,7 @@
             },
             {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 1.95
             }
           ]
         }
@@ -159,16 +134,20 @@
       ],
       "fx": [
         {
-          "k": "shield",
-          "ratio": 1.04
+          "k": "status",
+          "id": "사기",
+          "v": 1
         },
         {
-          "k": "stack",
-          "id": "단조",
-          "v": 1
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "other"
         }
       ],
-      "blurb": "흔한 쇠붙이도 바나의 망치를 거치면 영웅의 검이 됩니다."
+      "blurb": "바나의 망치를 거친 쇠붙이 — 동료의 손에 든 것까지 슬쩍 손봐 줍니다"
     },
     {
       "id": "바나_u1",
@@ -180,7 +159,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.95
+          "ratio": 2.21
         },
         {
           "k": "stack",
@@ -190,11 +169,12 @@
       ],
       "oracles": [
         {
-          "name": "장인의 손놀림",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.47
+              "ratio": 2.99
             },
             {
               "k": "stack",
@@ -204,12 +184,13 @@
           ]
         },
         {
-          "name": "호두 한 알",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.17
+              "ratio": 2.11
             },
             {
               "k": "stack",
@@ -219,12 +200,65 @@
           ]
         },
         {
-          "name": "명장의 작업대",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.64
+              "ratio": 2.33
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.18
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.73
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.09
             },
             {
               "k": "stack",
@@ -232,68 +266,23 @@
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "호두 껍질 방패",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.56
-            },
-            {
-              "k": "make",
-              "id": "바나_blade",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "호두까기 공방",
-          "power": true,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.56
-            },
-            {
-              "k": "stack",
-              "id": "단조",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.52
-                    }
-                  ]
-                }
-              ]
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "두꺼운 앞치마",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "해바라기씨",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "풀무 바람",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -314,7 +303,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.98,
+          "ratio": 1.17,
           "target": "allEnemies"
         },
         {
@@ -331,11 +320,12 @@
       ],
       "oracles": [
         {
-          "name": "힘찬 망치질",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.23,
+              "ratio": 1.59,
               "target": "allEnemies"
             },
             {
@@ -352,12 +342,13 @@
           ]
         },
         {
-          "name": "톡톡 망치질",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 1.25,
               "target": "allEnemies"
             },
             {
@@ -367,60 +358,56 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "단조",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "단조",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "전설의 검 두드리기",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.69,
-              "target": "allEnemies"
+              "ratio": 2.18,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "바나_blade",
               "v": 2
-            }
-          ]
-        },
-        {
-          "name": "담금질",
-          "fx": [
+            },
             {
-              "k": "discard",
+              "k": "stack",
+              "id": "단조",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.43,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "불꽃 튀기기",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.18,
+              "ratio": 1.37,
               "target": "allEnemies"
             },
             {
@@ -433,22 +420,39 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.11,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "시뻘건 쇳물",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "금 간 곳",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "손에 익은 망치",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -485,7 +489,7 @@
       ],
       "oracles": [
         {
-          "name": "일꾼 총동원",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -505,7 +509,7 @@
           ]
         },
         {
-          "name": "한 명만 와 줘",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -522,7 +526,7 @@
           ]
         },
         {
-          "name": "불씨 정령",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -530,135 +534,28 @@
               "v": 1
             },
             {
-              "k": "transform",
+              "k": "make",
               "id": "바나_blade",
-              "from": "바나_s1",
-              "n": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "스킬"
-            }
-          ]
-        },
-        {
-          "name": "정령 응원단",
-          "fx": [
-            {
-              "k": "transform",
-              "id": "바나_blade",
-              "from": "바나_s1",
-              "n": 1
-            },
-            {
-              "k": "draw",
               "v": 1
             },
             {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "단조",
-              "v": 2
+              "k": "shield",
+              "ratio": 0.78
             }
           ]
         },
         {
-          "name": "작업장 정리",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "단조",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 2.55
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "정령 방패",
-          "kind": "guard"
-        },
-        {
-          "name": "일당 지급",
-          "kind": "ap"
-        },
-        {
-          "name": "일거리 하나 더",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
-      "id": "바나_u4",
-      "name": "이야기책에 남을 검",
-      "hero": "바나",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "perStack",
-          "id": "단조"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.72
-        },
-        {
-          "k": "perTag",
-          "id": "바나_blade"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.39
-        }
-      ],
-      "oracles": [
-        {
-          "name": "전설의 대장장이",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "단조"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.88
-            },
-            {
-              "k": "perTag",
-              "id": "바나_blade"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.49
-            }
-          ]
-        },
-        {
-          "name": "아침 화로",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "단조",
+              "v": 2
             },
             {
-              "k": "shield",
-              "ratio": 1.04
+              "k": "draw",
+              "v": 1
             },
             {
               "k": "power",
@@ -680,15 +577,70 @@
           ]
         },
         {
-          "name": "영웅에게 바치는 검",
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "바나_blade",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바나_u4",
+      "name": "이야기책에 남을 검",
+      "hero": "바나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "단조",
+          "n": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.65
+        },
+        {
+          "k": "spend",
+          "id": "단조",
+          "all": true
+        },
+        {
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "perStack",
-              "id": "단조"
+              "id": "단조",
+              "n": 1
             },
             {
               "k": "shield",
-              "ratio": 1.07
+              "ratio": 0.88
             },
             {
               "k": "spend",
@@ -696,23 +648,60 @@
               "all": true
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "바나_blade"
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "설계도",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "perStack",
-              "id": "단조"
+              "id": "단조",
+              "n": 1
             },
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 0.62
+            },
+            {
+              "k": "spend",
+              "id": "단조",
+              "all": true
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "단조",
+              "n": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.56
+            },
+            {
+              "k": "spend",
+              "id": "단조",
+              "all": true
             },
             {
               "k": "draw",
@@ -723,43 +712,237 @@
           ]
         },
         {
-          "name": "풀무 한 번",
-          "cost": 0,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "perStack",
-              "id": "단조"
+              "id": "단조",
+              "n": 1
             },
             {
               "k": "shield",
-              "ratio": 0.49
+              "ratio": 0.59
             },
             {
-              "k": "perTag",
-              "id": "바나_blade"
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "단조",
+              "n": 1
             },
             {
               "k": "shield",
-              "ratio": 0.26
+              "ratio": 1.17
+            },
+            {
+              "k": "spend",
+              "id": "단조",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "달군 쇠",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "첫 담금질",
-          "kind": "defUp"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "한 자루 더",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
               "id": "바나_blade",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바나_u5",
+      "name": "시험 베기",
+      "hero": "바나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.17,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "단조",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.35,
+          "who": "any"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.59,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.35,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.12,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.35,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
+              "target": "allEnemies"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.35,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.55,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.15,
+                      "who": "any"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.11,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "단조",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "frost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단조",
               "v": 1
             }
           ]

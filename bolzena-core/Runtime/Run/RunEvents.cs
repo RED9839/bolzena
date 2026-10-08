@@ -162,15 +162,16 @@ namespace Bolzena.Core
             }
             var outs = OutOf(opt);
             string say = opt.Say;
+            var by = opt.By;
             if (opt.Gamble != null && !opt.Choose)
             {
                 double r = Rnd(); var g = opt.Gamble[opt.Gamble.Count - 1];
                 foreach (var x in opt.Gamble) if ((r -= x.P) < 0) { g = x; break; }
-                outs = g.Out; say = g.Say ?? say;
+                outs = g.Out; say = g.Say ?? say; by = g.By ?? by;
             }
             if (opt.Gamble != null && opt.Choose)
             {
-                E.Phase = "result"; E.Say = say;
+                E.Phase = "result"; E.Say = say; E.SayBy = SpeakersOf(opt, by);
                 E.Pending = new List<Pending> { new Pending { K = "gambleChoice", Options = opt.Gamble.Select(g => g.Out).ToList() } };
                 return (false, null);
             }
@@ -182,9 +183,19 @@ namespace Bolzena.Core
                 E.Log.Add(j.Hp ? $"파티 HP {j.Value}% ({j.Need}% 이상이면 성공) · {(j.Pass ? "성공" : "실패")}" : $"{Data.Hero(j.Who)?.Name} — 공격력 {j.Value} ({j.Need} 이상이면 성공) · {(j.Pass ? "성공" : "실패")}");
                 if (j.Pass && opt.Judge.PassSay != null) say = opt.Judge.PassSay;
             }
-            E.Phase = "result"; E.Say = say;
+            E.Phase = "result"; E.Say = say; E.SayBy = SpeakersOf(opt, by);
             ApplyOutcomes(outs);
             return (false, null);
+        }
+
+        /// <summary>선택지 by → 대사별 말하는 이 이름. "hero" = 이 선택지를 연 파티 사도(hero · price.hero 가운데 파티에 있는 첫 사도), null = 장면 npc.</summary>
+        List<string> SpeakersOf(EventOption opt, List<string> by)
+        {
+            if (by == null || by.Count == 0) return null;
+            string opener = null;
+            foreach (var id in (opt.Hero ?? new List<string>()).Concat(opt.Price?.Hero != null ? new[] { opt.Price.Hero } : new string[0]))
+                if (HasHero(id)) { opener = Data.Hero(id)?.Name ?? id; break; }
+            return by.Select(b => string.IsNullOrEmpty(b) ? null : b == "hero" ? opener : b).ToList();
         }
 
         /// <summary>결과를 적용한다. 바로 되는 것은 여기서, 고르는 것은 Pending 에 쌓는다.</summary>
@@ -367,7 +378,7 @@ namespace Bolzena.Core
                         if (GameData.IsCopy(p.Offer.CardId)) return "복제본은 신탁 · 축복을 받을 수 없습니다";
                         if (!TakeOffer(p.Offer, n)) S.Flash[p.Offer.CardId] = n;
                         var c = Data.Card(p.Offer.CardId);
-                        E.Log.Add($"「{c.Name}」 — 신탁 {n}");
+                        E.Log.Add($"「{c.Name}」 — 신탁");
                         if (E.ShinChance > 0 && !S.NoShin && Rnd() < E.ShinChance)
                         {
                             S.Shin[p.Offer.CardId] = OwnRandom(c) ?? "power";

@@ -44,6 +44,10 @@ namespace Bolzena.UI
         /// <summary>장식 선 높이(카드 가운데 기준) · 반 너비 — 장식 선에 붙는 표식(신탁 별 · 축복 …)이 같이 쓴다.</summary>
         public float DecoY { get; private set; }
         public float DecoHalf => deco != null && deco.sprite != null ? deco.transform.localScale.x * deco.sprite.bounds.size.x / 2 : W * 0.275f;
+        // 다음 카드 강화 표시(2026-10-08) — 주황 가는 테 + 옅은 빛 + 윗변에 걸친 작은 「강화 ×1.5」 배지. 신탁(금 별) · 축복(연보라 마름모) · 연두 · 청록 책과 겹치지 않는 색
+        SpriteRenderer empRim, empGlow, empBadgeBg, empBadgeIc;
+        TextMeshPro empBadgeTx;
+        float empT;
         SpriteRenderer blessWingL, blessWingR;   // 축복 표식 — 장식 선 양 끝 금빛 날개(2026-10-07 · 이름 띠 대신)
         int order;
         float epiT, sparkT;
@@ -149,6 +153,12 @@ namespace Bolzena.UI
             Make.Outline(epiText, 0.3f, Tone.Outline);
             // 표식 — 신탁 띠 · 축복 띠 · 복제 표(Refresh 가 켜고 자리를 잡는다)
             oraRim = Make.Box("orarim", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W + 0.05f, H + 0.05f), 0, new Color(1f, 0.82f, 0.4f, 0.95f));
+            empGlow = Make.Box("empglow", t, Res.UI("card_glow"), Vector3.zero, new Vector2(2.3f, 3.1f), 0, new Color(Tone.Emp.r, Tone.Emp.g, Tone.Emp.b, 0f), Res.SpriteMat(true, 1.8f));
+            empRim = Make.Box("emprim", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W + 0.045f, H + 0.045f), 0, Tone.Emp);
+            empBadgeBg = Make.Sliced("empbg", t, Res.UI("bar_fill_9s"), Vector3.zero, new Vector2(0.9f, 0.2f), 0, new Color(0.26f, 0.1f, 0.01f, 0.96f));
+            empBadgeIc = Make.Box("empic", t, Res.UI("ic_up"), Vector3.zero, new Vector2(0.13f, 0.13f), 0, Tone.Emp);
+            empBadgeTx = Make.Text("emptx", t, "", Vector3.zero, 0.105f, 0, new Color(1f, 0.82f, 0.58f));
+            Make.Outline(empBadgeTx, 0.3f, Tone.Outline);
             epiBg = Make.Sliced("epibg", t, Res.UI("bar_fill_9s"), Vector3.zero, new Vector2(1f, 0.22f), 0, new Color(0.35f, 0.25f, 0.05f, 0.95f));
             epiIcon = Make.Box("epiic", t, Bolzena.RunUI.Theme.S("ic_spark"), Vector3.zero, new Vector2(0.14f, 0.14f), 0, new Color(1f, 0.82f, 0.48f));
             blessBg = Make.Sliced("blessbg", t, Res.UI("bar_fill_9s"), Vector3.zero, new Vector2(1f, 0.22f), 0, new Color(0.06f, 0.27f, 0.2f, 0.95f));
@@ -199,7 +209,8 @@ namespace Bolzena.UI
             typeText.ForceMeshUpdate();
             typeBg.size = new Vector2(typeText.preferredWidth + 0.38f, 0.25f);
             typeBg.transform.localPosition = new Vector3(-W / 2 + 0.12f + 0.4f + typeBg.size.x / 2, H / 2 - 0.1f - 0.47f, 0);
-            typeIcon.sprite = Res.UI(info.Type == CardType.Attack ? "ic_sword" : info.Type == CardType.Power ? "ic_up" : info.Type == CardType.Status ? "ic_skull" : "ic_shield");
+            // 판 화면(W.TypeIcon)과 같은 그림 — 칼 둘(ic_swords)은 runui 스프라이트에만 있다(UI/ 에서 찾으면 비어 공격 카드에 아이콘이 없었다)
+            typeIcon.sprite = info.Type == CardType.Attack ? Bolzena.RunUI.Theme.S("ic_swords") : Res.UI(info.Type == CardType.Power ? "ic_up" : info.Type == CardType.Status ? "ic_skull" : "ic_skill");
             Make.Fit(typeIcon, new Vector2(0.18f, 0.18f));
             var h = who >= 0 && HeroOf != null ? HeroOf(who) : null;
             pin.sprite = h != null ? Face(h.Key) : null;
@@ -271,6 +282,7 @@ namespace Bolzena.UI
             epiText.text = "";   // 받은 신탁의 이름 띠도 뺀다(2026-10-07 사용자 — 장식 선의 별 줄 · 금 테로)
             PlaceMarks(info, decoY + 0.14f);
             PlaceCostMark(info);
+            PlaceEmpower(info);
             bool epi = info.Epiphany;
             bool bl0 = !string.IsNullOrEmpty(info.MarkBless);
             rays.enabled = false;   // 손패의 신탁 카드는 은은한 테두리 빛(epiGlow) · 금 테만(띠 글은 뺌)(2026-10-07 사용자 「신탁 연출이 너무 화려」 — 빛줄기 뺌)
@@ -305,6 +317,22 @@ namespace Bolzena.UI
                 blessWingR.transform.localPosition = at;
                 blessWingR.color = new Color(1f, 1f, 1f, blessWingR.color.a);
             }
+        }
+
+        // 다음 카드 강화 — 윗변에 걸친 배지(오른쪽 맞춤. 이름 · 종류 줄은 안 가린다)
+        void PlaceEmpower(CardInfo info)
+        {
+            bool on = info.EmpowerMul > 0;
+            empRim.enabled = empGlow.enabled = empBadgeBg.enabled = empBadgeIc.enabled = empBadgeTx.enabled = on;
+            if (!on) return;
+            empBadgeTx.text = "강화 ×" + (Mathf.Round(info.EmpowerMul * 100f) / 100f).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+            empBadgeTx.ForceMeshUpdate();
+            float tw = empBadgeTx.preferredWidth, bw = tw + 0.3f, cy = H / 2 - 0.01f, right = W / 2 - 0.1f;
+            empBadgeBg.size = new Vector2(bw, 0.2f);
+            empBadgeBg.transform.localPosition = new Vector3(right - bw / 2, cy, 0);
+            empBadgeIc.transform.localPosition = new Vector3(right - bw + 0.12f, cy, 0);
+            Make.Fit(empBadgeIc, new Vector2(0.13f, 0.13f));
+            empBadgeTx.transform.localPosition = new Vector3(right - bw / 2 + 0.1f, cy - 0.005f, 0);
         }
 
         void PlaceOracleStars()
@@ -461,7 +489,7 @@ namespace Bolzena.UI
 
         public static Color TypeColor(CardInfo info) =>
             info.Type == CardType.Attack ? new Color(1f, 0.55f, 0.58f) : info.Type == CardType.Power ? new Color(0.8f, 0.68f, 1f)
-            : info.Type == CardType.Status ? new Color(0.7f, 0.7f, 0.78f) : new Color(0.55f, 0.8f, 1f);
+            : info.Type == CardType.Status ? new Color(0.7f, 0.7f, 0.78f) : new Color(0.38f, 0.9f, 0.82f);
 
         // 정사각 그림을 창 비율로 — 넘치는 쪽을 자르고, 세로는 centerY 에 치우쳐 자른다
         static readonly System.Collections.Generic.Dictionary<string, Sprite> crops = new System.Collections.Generic.Dictionary<string, Sprite>();
@@ -532,6 +560,8 @@ namespace Bolzena.UI
             descText.sortingOrder = o + 7;
             epiText.sortingOrder = o + 7;
             oraRim.sortingOrder = o - 1;
+            empGlow.sortingOrder = o - 2; empRim.sortingOrder = o - 1;
+            empBadgeBg.sortingOrder = o + 9; empBadgeIc.sortingOrder = o + 10; empBadgeTx.sortingOrder = o + 10;
             epiBg.sortingOrder = blessBg.sortingOrder = copyBg.sortingOrder = o + 6;
             epiIcon.sortingOrder = blessIcon.sortingOrder = copyIcon.sortingOrder = o + 7;
             blessText.sortingOrder = copyText.sortingOrder = o + 7;
@@ -588,7 +618,8 @@ namespace Bolzena.UI
             icon.color = dc;
             var pc = iconPlate.color; pc.a = 0.9f * a; iconPlate.color = pc;
             pin.color = dc;
-            typeIcon.color = dc;
+            var tc = Info != null ? TypeColor(Info) : Color.white;   // 유형 글과 같은 색(공격 빨강 · 스킬 청록) — 판 화면 W.TypeColor 처럼
+            typeIcon.color = new Color(tc.r * dim, tc.g * dim, tc.b * dim, a);
             var bc = band.color; bc.a = a; band.color = bc;
             Make.Alpha(shadeT, 0.9f * a);
             Make.Alpha(shadeB, (0.35f + 0.63f * descA) * a);
@@ -598,6 +629,13 @@ namespace Bolzena.UI
             blessText.alpha = copyText.alpha = a;
             Make.Alpha(oraRim, 0.95f * a); Make.Alpha(epiBg, 0.95f * a); Make.Alpha(blessBg, 0.95f * a); Make.Alpha(copyBg, 0.88f * a);
             Make.Alpha(epiIcon, a); Make.Alpha(blessIcon, a); Make.Alpha(copyIcon, a);
+            if (empRim.enabled)
+            {
+                Make.Alpha(empRim, 0.95f * a); Make.Alpha(empBadgeBg, 0.96f * a); Make.Alpha(empBadgeIc, a); empBadgeTx.alpha = a;
+                bool calmE = Bolzena.RunUI.Settings.ReduceMotion || LowSpecFx.On;
+                empT += dt;
+                var egc = empGlow.color; egc.a = (calmE ? 0.38f : 0.34f + 0.1f * Mathf.Sin(empT * 2.6f)) * a; empGlow.color = egc;
+            }
             Make.Alpha(blessWingL, a); Make.Alpha(blessWingR, a); Make.Alpha(markBg, a); Make.Alpha(blessLineIc, descA * a); blessLineTx.alpha = descA * a;
             costText.color = CostTint.HasValue ? new Color(CostTint.Value.r, CostTint.Value.g, CostTint.Value.b, a) : Playable ? new Color(1, 1, 1, a) : new Color(1f, 0.6f, 0.6f, a);
             tagText.alpha = descText.alpha = descA * a;

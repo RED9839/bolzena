@@ -6,6 +6,7 @@
       "nature": "광기",
       "race": "요정",
       "role": "딜러",
+      "style": "아껴 두기형",
       "star": 3,
       "hp": 550,
       "atk": 145,
@@ -23,27 +24,10 @@
             "v": 0.15
           }
         ],
-        "rules": [
-          {
-            "name": "깨진 묵언",
-            "when": {
-              "on": "play",
-              "who": "other",
-              "type": "공격"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "삼킨 감탄사",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5
+        }
       },
       "passives": [
         {
@@ -62,14 +46,8 @@
         {
           "name": "묵언 수행",
           "when": {
-            "on": "turnEnd"
+            "on": "keepAp"
           },
-          "conds": [
-            {
-              "c": "heldCards",
-              "n": 1
-            }
-          ],
           "fx": [
             {
               "k": "stack",
@@ -150,7 +128,7 @@
                 },
                 {
                   "k": "dmg",
-                  "ratio": 1.2,
+                  "ratio": 1.56,
                   "target": "allEnemies"
                 },
                 {
@@ -238,7 +216,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.08,
+          "ratio": 1.23,
           "target": "oneEnemy"
         },
         {
@@ -249,14 +227,14 @@
       ],
       "oracles": [
         {
-          "name": "굳은 맹세",
+          "name": "신탁 1",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 1.66,
               "target": "oneEnemy"
             },
             {
@@ -267,74 +245,7 @@
           ]
         },
         {
-          "name": "짧은 맹세",
-          "cost": 0,
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "삼킨 감탄사",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "매듭 조이기",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.17,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "삼킨 감탄사",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "삼킨 감탄사",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "맹세 풀기",
-          "tags": [],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 감탄사"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "꿈속의 기도",
+          "name": "신탁 2",
           "tags": [
             "보존"
           ],
@@ -342,7 +253,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.86,
+              "ratio": 1.05,
               "target": "oneEnemy"
             },
             {
@@ -355,8 +266,7 @@
               "rules": [
                 {
                   "when": {
-                    "on": "spend",
-                    "id": "삼킨 감탄사"
+                    "on": "keepAp"
                   },
                   "limit": {
                     "per": "turn",
@@ -365,27 +275,92 @@
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.32,
-                      "target": "allEnemies"
+                      "ratio": 0.51,
+                      "target": "oneEnemy"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.11,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.66,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "깃털",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "검은 날개",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "고대의 언약",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -410,7 +385,7 @@
         {
           "k": "stack",
           "id": "삼킨 감탄사",
-          "v": 2
+          "v": 1
         },
         {
           "k": "draw",
@@ -421,14 +396,8 @@
           "rules": [
             {
               "when": {
-                "on": "turnEnd"
+                "on": "keepAp"
               },
-              "conds": [
-                {
-                  "c": "heldCards",
-                  "n": 2
-                }
-              ],
               "fx": [
                 {
                   "k": "stack",
@@ -442,49 +411,10 @@
       ],
       "oracles": [
         {
-          "name": "…(끄덕끄덕)",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "삼킨 감탄사",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "conds": [
-                    {
-                      "c": "heldCards",
-                      "n": 2
-                    }
-                  ],
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "삼킨 감탄사",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "길잡이 등불",
-          "cost": 0,
-          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -500,14 +430,8 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "keepAp"
                   },
-                  "conds": [
-                    {
-                      "c": "heldCards",
-                      "n": 2
-                    }
-                  ],
                   "fx": [
                     {
                       "k": "stack",
@@ -521,100 +445,12 @@
           ]
         },
         {
-          "name": "죠안 쓰다듬기",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "개전"
           ],
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.08
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "conds": [
-                    {
-                      "c": "heldCards",
-                      "n": 2
-                    }
-                  ],
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "삼킨 감탄사",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "읏⋯!",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "삼킨 감탄사",
-              "v": 3
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "conds": [
-                    {
-                      "c": "heldCards",
-                      "n": 2
-                    }
-                  ],
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "삼킨 감탄사",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "삼킨 감탄사",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "무릎베개",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.35
-            },
             {
               "k": "stack",
               "id": "삼킨 감탄사",
@@ -625,14 +461,8 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "keepAp"
                   },
-                  "conds": [
-                    {
-                      "c": "heldCards",
-                      "n": 2
-                    }
-                  ],
                   "fx": [
                     {
                       "k": "stack",
@@ -644,166 +474,74 @@
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "감탄사 참기",
-          "kind": "draw"
         },
         {
-          "name": "먼저 깨어난 사제",
-          "kind": "cost"
-        },
-        {
-          "name": "조용한 염탐",
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "stack",
               "id": "삼킨 감탄사",
               "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.56
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.39
+                    }
+                  ]
+                }
+              ]
             }
           ]
-        }
-      ]
-    },
-    {
-      "id": "스키아_u3",
-      "name": "흐읍!?",
-      "hero": "스키아",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.65,
-          "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "삼킨 감탄사"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.22,
-          "target": "allEnemies"
-        },
-        {
-          "k": "spend",
-          "id": "삼킨 감탄사",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "크게 흐읍!?",
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.84,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 감탄사"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "삼킨 감탄사",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "말문 터짐",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 감탄사"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "삼킨 감탄사",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "한 명에게 흐읍!?",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.08,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 감탄사"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
               "unique": true
-            }
-          ]
-        },
-        {
-          "name": "터진 말문",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.58,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 감탄사"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.17,
-              "target": "allEnemies"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "keepAp"
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "삼킨 감탄사"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.14,
-                      "target": "randomEnemy"
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
                     }
                   ]
                 }
@@ -812,119 +550,13 @@
           ]
         },
         {
-          "name": "착각으로 깬 묵언",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 감탄사"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.23,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
+              "k": "stack",
               "id": "삼킨 감탄사",
-              "n": 4
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "사제장 시절",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "벼락",
-          "kind": "ap"
-        },
-        {
-          "name": "초코 케이크",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.32
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "스키아_u4",
-      "name": "지켜 온 금기",
-      "hero": "스키아",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.76,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "삼킨 감탄사"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.22,
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "오래 지킨 금기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.97,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 감탄사"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "첫 기도의 금기",
-          "tags": [
-            "개전"
-          ],
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 감탄사"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "power",
@@ -942,15 +574,74 @@
                   ]
                 }
               ]
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스키아_u3",
+      "name": "흐읍!?",
+      "hero": "스키아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.78,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "삼킨 감탄사"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.26,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "삼킨 감탄사",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 감탄사",
+              "all": true
             }
           ]
         },
         {
-          "name": "초대 사제장",
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.76,
+              "ratio": 1.38,
               "target": "oneEnemy"
             },
             {
@@ -959,42 +650,244 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.22,
+              "ratio": 0.52,
               "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self"
-            }
-          ]
-        },
-        {
-          "name": "알아선 안 될 것",
-          "fx": [
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
+              "k": "spend",
               "id": "삼킨 감탄사",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "all": true
             }
           ]
         },
         {
-          "name": "묵언 해제",
+          "name": "신탁 3",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.86,
+              "ratio": 0.68,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "삼킨 감탄사"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.34,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 40
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.11,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스키아_u4",
+      "name": "지켜 온 금기",
+      "hero": "스키아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.04,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "삼킨 감탄사"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.29,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 감탄사",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.34,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
               "target": "oneEnemy"
             },
             {
@@ -1007,24 +900,223 @@
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "삼킨 감탄사",
-              "all": true
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.56,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 감탄사"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "금기의 무게",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "weakSpot"
         },
         {
-          "name": "검은 수도복",
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스키아_u5",
+      "name": "몸짓 대화",
+      "hero": "스키아",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "삼킨 감탄사",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "stack",
+          "id": "삼킨 감탄사",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.69
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 감탄사",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
           "kind": "draw"
         },
         {
-          "name": "세계수에 올린 기도",
+          "name": "축복 2",
+          "tags": [
+            "신속"
+          ]
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

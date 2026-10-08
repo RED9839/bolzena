@@ -6,6 +6,7 @@ using Bolzena.Core;
 using UnityEngine;
 using CSide = Bolzena.Core.Side;
 using CoreFight = Bolzena.Core.Battle;
+using CoreFx = Bolzena.Core.Fx;
 
 namespace Bolzena.Battle
 {
@@ -305,7 +306,7 @@ namespace Bolzena.Battle
                         oracleTexts[(id, p.N)] = otx = Fmt(Bolzena.RunUI.OracleDiff.Mark(NoTagLine(text.Card(def), def.Tags), NoTagLine(text.Oracle(def, o), info.Tags)));
                     info.Text = otx;
                     info.CostDown = o.Cost.HasValue && o.Cost.Value < def.Cost;
-                    info.EpiphanyLabel = "신탁 " + p.N;   // 이름 대신 갈래 번호(2026-10-08 사용자)
+                    info.EpiphanyLabel = "신탁";   // 이름 대신 갈래 번호(2026-10-08 사용자)
                     info.Epiphany = false;
                     var oo = opts != null ? opts.Find(x => x.N == p.N && x.Shin == p.Shin) : null;
                     if (oo != null && oo.Blessed) { info.BlessName = oo.BlessName; info.BlessText = Fmt(oo.BlessText); info.MarkBless = oo.BlessName; info.MarkBlessText = oo.BlessText; }
@@ -319,7 +320,7 @@ namespace Bolzena.Battle
         /// <summary>낀 장비(사도 id → 칸 → 장비 id) — 판에서 연 싸움이면 BattleBridge 가 단다. 전투 시범은 null(빈 칸).</summary>
         public static Func<string, Dictionary<string, string>> GearOf;
 
-        public IReadOnlyList<BattleEvent> PlayCard(int i, int target, int choice = -1, int branch = 0)
+        public IReadOnlyList<BattleEvent> PlayCard(int i, int target, int choice = -1, int branch = 0, int spend = 0)
         {
             var evs = new List<BattleEvent>();
             if (!CanPlay(i, out _)) return evs;
@@ -327,10 +328,84 @@ namespace Bolzena.Battle
             var id = b.Hand[i];
             if (b.GlowOf(id) != null) b.ApplyEpiphany(id, Math.Max(0, choice));
             lastTarget = b.CardOf(id)?.Target == "아군" ? -1 : target;   // 아군 카드의 target 은 사도 번호(코어 oneAlly) — 연출의 적 번호로 쓰지 않는다
-            b.PlayCard(i, target, branch > 0 ? new PlayOpts { Choice = branch } : null);
+            b.PlayCard(i, target, branch > 0 || spend > 0 ? new PlayOpts { Choice = branch > 0 ? branch : (int?)null, Spend = spend > 0 ? spend : (int?)null } : null);
             Translate(evs);
             After(evs);
             return evs;
+        }
+
+        // ── 소모량 고르기(spend pick) · 다음 카드 강화 표시 ──
+        /// <summary>소모량을 고르는 카드면 후보와 결과 미리보기(효과 순서: spend pick → perEvent → 피해 · 실드 · 방어 · 회복). 아니면 null.</summary>
+        public SpendPrompt SpendPromptOf(int i)
+        {
+            if (over || b == null || i < 0 || i >= b.Hand.Count) return null;
+            var id = b.Hand[i];
+            var cv = b.CardOf(id);
+            var opts = b.SpendChoices(id);
+            if (cv == null || opts.Count == 0) return null;
+            int si = cv.Fx.FindIndex(f => f.K == FxK.Spend && f.Pick);
+            if (si < 0) return null;
+            var sf = cv.Fx[si];
+            int have = b.StackOf(cv.Hero, sf.Id);
+            double mul = !cv.IsStatus && !cv.IsCurse ? 1 + b.EmpowerOf(cv.Hero) / 100.0 : 1;
+            int pe = cv.Fx.FindIndex(si + 1, f => f.K == FxK.PerEvent);
+            CoreFx eff = pe >= 0 && pe + 1 < cv.Fx.Count ? cv.Fx[pe + 1] : null;
+            if (eff != null && eff.K != FxK.Dmg && eff.K != FxK.Shield && eff.K != FxK.Block && eff.K != FxK.Heal) eff = null;
+            int per = pe >= 0 ? Math.Max(1, cv.Fx[pe].Per) : 1;
+            string what = eff == null ? null : eff.K == FxK.Dmg ? (eff.Fixed || eff.OfEvent > 0 ? "고정 피해" : "피해") : eff.K == FxK.Shield ? (eff.Fixed || eff.OfEvent > 0 ? "고정 실드" : "실드") : eff.K == FxK.Block ? "방어" : "회복";
+            string Val(int n, double m)
+            {
+                if (eff.OfEvent > 0) return Math.Max(1, (int)Math.Round(n * eff.OfEvent * m, MidpointRounding.AwayFromZero)).ToString();
+                return (int)Math.Round(eff.Ratio * eff.HitsOr1 * (n / per) * 100 * m, MidpointRounding.AwayFromZero) + "%";
+            }
+            var sp = new SpendPrompt { Kw = sf.Id, Have = have };
+            if (eff != null)
+                sp.PerUnit = eff.OfEvent > 0 ? $"1개당 {what} {Val(per, 1)}" : $"{(per > 1 ? per + "개" : "1개")}당 {what} {(int)Math.Round(eff.Ratio * eff.HitsOr1 * 100)}%";
+            foreach (var n in opts)
+            {
+                var o = new SpendOption { N = n, Name = n >= have ? "전부" : n == 1 ? "1개" : "절반" };
+                if (eff != null)
+                {
+                    o.Result = what + " " + Val(n, 1);
+                    if (mul > 1.0001) o.Boosted = what + " " + Val(n, mul);
+                }
+                sp.Options.Add(o);
+            }
+            return sp;
+        }
+
+        static readonly System.Text.RegularExpressions.Regex empRx = new System.Text.RegularExpressions.Regex(@"(피해|방어|실드|회복\(방어력) ((?:<[^>]*>|[\u0001\u0002])*)(\d+)%");
+        /// <summary>카드 글의 피해 · 방어 · 실드 · 회복 % 를 강화 배율로 키우고 Tone.EmpOn … EmpOff 로 싼다(Tone.CardText 가 강화색으로).</summary>
+        static string EmpowerText(string t, double mul)
+        {
+            if (string.IsNullOrEmpty(t)) return t;
+            return empRx.Replace(t, m => m.Groups[1].Value + " " + m.Groups[2].Value + Bolzena.UI.Tone.EmpOn
+                + (int)Math.Round(int.Parse(m.Groups[3].Value) * mul, MidpointRounding.AwayFromZero) + "%" + Bolzena.UI.Tone.EmpOff);
+        }
+
+        static string MulText(double mul) => (Math.Round(mul * 100) / 100.0).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+        /// <summary>파티 HUD 칩 — 다음 카드 강화가 걸려 있으면 한 칸(사도별 · 파티 몫을 글에 적는다).</summary>
+        void AddEmpowerChip(List<StatusChip> chips)
+        {
+            if (b == null) return;
+            int party = b.EmpowerOf(null), best = party;
+            var lines = new List<string>();
+            if (party > 0) lines.Add($"파티의 다음 카드 ×{MulText(1 + party / 100.0)}");
+            foreach (var u in b.Party)
+            {
+                if (u.Dead) continue;
+                int own = b.EmpowerOf(u.Key) - party;
+                if (own <= 0) continue;
+                best = Math.Max(best, own + party);
+                lines.Add($"{u.Name}의 다음 카드 ×{MulText(1 + (own + party) / 100.0)}");
+            }
+            if (best <= 0) return;
+            chips.Add(new StatusChip
+            {
+                Id = "다음 카드 강화", Value = "×" + MulText(1 + best / 100.0), Kind = "empower",
+                Text = string.Join("\n", lines) + "\n내는 순간 한 번 쓰이고 사라집니다 — 피해 · 실드 · 회복이 커집니다.",
+            });
         }
 
         /// <summary>점검(-ultaudit-prep) — 조건부 고학년 cue 를 보려고 판을 미리 세운다: 보스가 아닌 적 HP 25% · 충격 2 ·
@@ -794,6 +869,11 @@ namespace Bolzena.Battle
             var info = ib.Info.Clone();
             // 바뀌는 것 — 비용(손 자리 할인) · 빛(신탁 · 은총) · 생성 카드(그 카드의 지금 빛 · 표식) · 받은 신탁 · 표식(축복 · 복제). 차례는 예전 Info 그대로
             info.Cost = handIdx != null ? b.CostOf(cv.Id, handIdx) : cv.Cost;
+            if (handIdx != null && depth == 0 && !cv.IsStatus && !cv.IsCurse)
+            {   // 다음 카드 강화(core EmpowerOf: 사도 몫 + 파티 몫) — 걸려 있으면 배율 · 강화된 수치 글
+                int emp = b.EmpowerOf(cv.Hero);
+                if (emp > 0) { info.EmpowerMul = (float)(1 + emp / 100.0); info.Text = EmpowerText(info.Text, 1 + emp / 100.0); }
+            }
             var glow = b.GlowOf(cv.Id);
             info.Epiphany = glow != null; info.Grace = glow?.Kind == "hero";
             if (ib.Gen != null)
@@ -832,7 +912,7 @@ namespace Bolzena.Battle
                 Text = Fmt(cv.Oracle != null ? Bolzena.RunUI.OracleDiff.Mark(NoTagLine(text.Card(cv.Def), cv.Def.Tags), NoTagLine(card, cv.Tags)) : NoTagLine(card, cv.Tags)), CostDown = cv.Oracle != null && cv.Oracle.Cost.HasValue && cv.Oracle.Cost.Value < cv.Def.Cost, Art = Look.CardArt(cv.Def.Hero, GameData.BaseId(cv.Id), cv.Unique, cv.Type),
                 Motion = type == CardType.Attack ? (cv.Cost >= 2 ? Motion.Attack2 : Motion.Attack1) : dmg ? Motion.Skill1 : Motion.None,
                 Hit = Look.Hero(cv.Hero).Hit,
-                EpiphanyLabel = cv.Oracle != null ? "신탁 " + cv.FlashN : null, Tags = cv.Tags.ToList(), Unplayable = cv.HasTag(Bolzena.Core.Tag.Unplayable),
+                EpiphanyLabel = cv.Oracle != null ? "신탁" : null, Tags = cv.Tags.ToList(), Unplayable = cv.HasTag(Bolzena.Core.Tag.Unplayable),
                 Unique = cv.Unique, Owner = owner, Grade = cv.Def.Hero == null ? cv.Def.Grade : null, Nature = hero >= 0 ? b.Party[hero].Nature : owner >= 0 ? b.Party[owner].Nature : null,
                 Choices = cv.Choices != null && cv.Choices.Count == 2 ? cv.Choices.ToList() : null,
             };
@@ -991,6 +1071,11 @@ namespace Bolzena.Battle
             try
             {
                 var g = GearOf?.Invoke(u.Key);
+                if (g == null && Array.IndexOf(Environment.GetCommandLineArgs(), "-demogear") >= 0)
+                {   // 점검(-demogear) — 장비를 낀 모습을 보려고 슬롯마다 첫 장비를 끼운 것으로 친다(규칙에는 안 들어간다)
+                    g = new Dictionary<string, string>();
+                    foreach (var sl in new[] { "무기", "방어구", "장신구" }) { var eq = data.Equips.Values.FirstOrDefault(e => e.Slot == sl); if (eq != null) g[sl] = eq.Id; }
+                }
                 foreach (var slot in new[] { "무기", "방어구", "장신구" })
                 {
                     var gs = new GearSlot { Slot = slot };
@@ -1100,6 +1185,7 @@ namespace Bolzena.Battle
                 var piles = new[] { b.Draw.OrderBy(x => x, StringComparer.Ordinal).ToList(), b.Discard.ToList(), b.Gone.ToList() };
                 s.PileSource = k => piles[k].ConvertAll(id => Info(b.CardOf(id), null));
                 s.PartyChips = ChipsOf(b.Pool, false);
+                AddEmpowerChip(s.PartyChips);
                 snap = s;
                 return s;
             }

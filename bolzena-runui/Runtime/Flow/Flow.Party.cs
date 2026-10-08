@@ -21,6 +21,7 @@ namespace Bolzena.RunUI
             public string Focus;
             public string Tab = "사도";
             public bool Dex;
+            public bool Quiet;   // 다음 다시 세우기에서 올라오는 효과를 건너뛴다(자리 바꿈 — 칸이 또 날아오지 않게)
         }
 
         public void Party(string village)
@@ -209,7 +210,7 @@ namespace Bolzena.RunUI
             }, 0, "slot" + i);
             var rt = b.GetComponent<RectTransform>();
             if (h == null) b.Bg.sprite = Theme.GlassDim;
-            var lab = Ui.Title(rt, $"자리 {i + 1}", Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center);
+            var lab = Ui.Title(rt, RowNames[i], Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center);
             lab.rectTransform.Band(1, 34, 0, 0, -10);
             if (h == null)
             {
@@ -382,7 +383,7 @@ namespace Bolzena.RunUI
                 foreach (var g in P.Text.Traits(d).GroupBy(x => x.Kind))
                     body += $"<color=#F2CF7A>{g.Key}</color>  {string.Join(" · ", g.Select(x => $"「{x.Name}」"))}\n";
                 body += $"<color=#F2CF7A>시작 카드</color>  {string.Join(" · ", d.Starter.Select(id => P.Data.Card(id)?.Name ?? id))}\n";
-                body += $"<color=#F2CF7A>고유 카드</color>  {string.Join(" · ", P.Data.UniquesOf(d.Id).Select(id => P.Data.Card(id)?.Name ?? id))}";
+                body += $"<color=#F2CF7A>고유 카드</color>  {string.Join(" · ", P.Data.UniquesOf(d.Id).Where(u => !d.Starter.Contains(u)).Select(id => P.Data.Card(id)?.Name ?? id))}";
                 var bt = Ui.Text(box.transform, body, Theme.FsSm, Theme.Ink, TextAlignmentOptions.TopLeft);
                 bt.Pref(-1, 120, -1, 1);
                 bt.enableAutoSizing = true; bt.fontSizeMin = 11; bt.fontSizeMax = Theme.FsSm;

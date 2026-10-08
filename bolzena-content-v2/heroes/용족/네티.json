@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "용족",
       "role": "탱커",
+      "style": "두 얼굴형",
       "star": 3,
       "hp": 900,
       "atk": 75,
       "def": 76,
       "crit": 5,
-      "blurb": "유물만 보면 눈이 도는 도굴꾼 용족. 드릴로 버린 더미 밑바닥까지 파 내려가, 묻혀 있던 카드를 캐 손에 올립니다.",
+      "blurb": "유물만 보면 눈이 도는 도굴꾼 용족. 평소엔 아이들을 지키는 보모지만, 유물 냄새를 맡으면 집착에 빠져 드릴만 돌립니다. 자루가 차면 캐낸 광물을 나눠 줍니다.",
       "keyword": {
         "name": "발굴 자루",
         "desc": "드릴로 캐낸 광물 꾸러미",
@@ -20,28 +21,13 @@
         "per": [
           {
             "stat": "guard",
-            "v": 0.12
+            "v": 0.1
           }
         ],
-        "rules": [
-          {
-            "name": "자루가 터진다용",
-            "when": {
-              "on": "stackOver",
-              "id": "발굴 자루"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "shield",
-                "ratio": 0.8
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "네티_ore",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -85,7 +71,7 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.2,
+            "ratio": 0.24,
             "target": "allEnemies",
             "hits": 8
           },
@@ -93,6 +79,10 @@
             "k": "stack",
             "id": "발굴 자루",
             "v": 3
+          },
+          {
+            "k": "form",
+            "id": "네티_집착"
           }
         ]
       },
@@ -101,6 +91,53 @@
         "네티_s1",
         "네티_s2",
         "네티_u1"
+      ],
+      "forms": [
+        {
+          "id": "네티_집착",
+          "name": "유물 집착",
+          "desc": "파티는 뒷전이고 드릴만 도는 얼굴",
+          "turns": 2,
+          "mods": {
+            "guard": -0.1,
+            "dealt": 0.15
+          },
+          "bonus": [
+            {
+              "type": "공격",
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "발굴 자루",
+                  "v": 1
+                }
+              ]
+            }
+          ],
+          "passives": [
+            {
+              "name": "거대 드릴",
+              "when": {
+                "on": "play",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.25,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ],
+          "replace": false,
+          "skin": null,
+          "anim": null
+        }
       ]
     }
   ],
@@ -133,6 +170,34 @@
       ]
     },
     {
+      "id": "네티_ore",
+      "name": "캐낸 광물",
+      "hero": "네티",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.36
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "dealtMod",
+          "v": 0.15,
+          "target": "allAllies"
+        }
+      ],
+      "blurb": "반짝이는 것, 단단한 것, 신비한 것 — 네티가 자루째 나눠 주는 광물"
+    },
+    {
       "id": "네티_u1",
       "name": "낙석 조심",
       "hero": "네티",
@@ -142,35 +207,24 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.74
+          "ratio": 1.56
         },
         {
           "k": "stack",
           "id": "발굴 자루",
           "v": 2
+        },
+        {
+          "k": "formEnd"
         }
       ],
       "oracles": [
         {
-          "name": "대형 낙석",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.32
-            },
-            {
-              "k": "stack",
-              "id": "발굴 자루",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "흔들린 지층",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.9
+              "ratio": 2.06
             },
             {
               "k": "stack",
@@ -178,22 +232,84 @@
               "v": 2
             },
             {
-              "k": "ifWounded"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.26
+              "k": "formEnd"
             }
           ]
         },
         {
-          "name": "광맥 발견",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 1
+              "k": "shield",
+              "ratio": 0.96
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 1
+            },
+            {
+              "k": "formEnd"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.44
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shieldBreak"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "발굴 자루",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.16
             },
             {
               "k": "stack",
@@ -201,70 +317,7 @@
               "v": 3
             },
             {
-              "k": "perStack",
-              "id": "발굴 자루"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.44
-            }
-          ]
-        },
-        {
-          "name": "발굴 지도",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "stack",
-              "id": "발굴 자루",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            }
-          ]
-        },
-        {
-          "name": "무너진 갱도",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 3.77
-            },
-            {
-              "k": "stack",
-              "id": "발굴 자루",
-              "v": 4
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "최신형 지형 스캐너",
-          "kind": "guard"
-        },
-        {
-          "name": "느긋한 수면법",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "안전모 하나 더",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "발굴 자루",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -284,7 +337,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.54,
           "target": "oneEnemy",
           "hits": 3
         },
@@ -292,11 +345,15 @@
           "k": "stack",
           "id": "발굴 자루",
           "v": 1
+        },
+        {
+          "k": "form",
+          "id": "네티_집착"
         }
       ],
       "oracles": [
         {
-          "name": "다이아 드릴",
+          "name": "신탁 1",
           "tags": [
             "분쇄"
           ],
@@ -311,83 +368,88 @@
               "k": "stack",
               "id": "발굴 자루",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "포크레인 드래곤",
-          "cost": 2,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "allEnemies",
-              "hits": 3
             },
             {
-              "k": "stack",
-              "id": "발굴 자루",
-              "v": 2
+              "k": "form",
+              "id": "네티_집착"
             }
           ]
         },
         {
-          "name": "광맥 따라",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.56,
+              "ratio": 0.52,
               "target": "oneEnemy",
               "hits": 3
             },
-            {
-              "k": "perStack",
-              "id": "발굴 자루"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.48
-            }
-          ]
-        },
-        {
-          "name": "쉬지 않는 드릴",
-          "tags": [
-            "분쇄"
-          ],
-          "power": true,
-          "fx": [
             {
               "k": "stack",
               "id": "발굴 자루",
               "v": 1
             },
             {
+              "k": "form",
+              "id": "네티_집착"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.46,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "form",
+              "id": "네티_집착"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "분쇄"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.66,
               "target": "oneEnemy",
-              "hits": 2
+              "hits": 3
+            },
+            {
+              "k": "form",
+              "id": "네티_집착"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.29,
-                      "target": "randomEnemy",
-                      "hits": 2
-                    },
                     {
                       "k": "stack",
                       "id": "발굴 자루",
@@ -400,45 +462,38 @@
           ]
         },
         {
-          "name": "폭탄은 질색",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.51,
+              "ratio": 0.7,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "perStack",
-              "id": "발굴 자루"
+              "k": "form",
+              "id": "네티_집착"
             },
             {
-              "k": "dmg",
-              "ratio": 0.44,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "발굴 자루",
-              "all": true
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "다이아 드릴 날",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "기름칠",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "생선학자 길냥이",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -459,7 +514,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.16
+          "ratio": 0.96
         },
         {
           "k": "perStack",
@@ -467,7 +522,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.44
+          "ratio": 0.42
         },
         {
           "k": "spend",
@@ -477,11 +532,12 @@
       ],
       "oracles": [
         {
-          "name": "반짝이는 광물",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.45
+              "ratio": 1.3
             },
             {
               "k": "perStack",
@@ -489,7 +545,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.58
+              "ratio": 0.56
             },
             {
               "k": "spend",
@@ -499,196 +555,21 @@
           ]
         },
         {
-          "name": "광물 감별",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.87
-            },
-            {
-              "k": "perStack",
-              "id": "발굴 자루"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.44
-            },
-            {
-              "k": "spend",
-              "id": "발굴 자루",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "조금만 나눠 줄게용",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.45
-            },
-            {
-              "k": "ifStack",
-              "id": "발굴 자루",
-              "n": 4
-            },
-            {
-              "k": "shield",
-              "ratio": 1.45
-            }
-          ]
-        },
-        {
-          "name": "발굴 천재 네티",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.31
+              "ratio": 0.86
             },
             {
-              "k": "stack",
-              "id": "발굴 자루",
-              "v": 1
+              "k": "perStack",
+              "id": "발굴 자루"
             },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "perStack",
-                      "id": "발굴 자루"
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.17
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신생 용족 알 돌보기",
-          "fx": [
             {
               "k": "shield",
-              "ratio": 1.08
-            },
-            {
-              "k": "perStack",
-              "id": "발굴 자루"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.72
-            },
-            {
-              "k": "spend",
-              "id": "발굴 자루",
-              "all": true
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "보모의 손",
-          "kind": "heal"
-        },
-        {
-          "name": "모래 털기",
-          "kind": "draw"
-        },
-        {
-          "name": "유물 감정서",
-          "fx": [
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "네티_u4",
-      "name": "자성 꼬리",
-      "hero": "네티",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "status",
-          "id": "결정화",
-          "v": 1
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.65,
-          "base": "def",
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "발굴 자루"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.22,
-          "base": "def",
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "초강력 자석",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.87,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "발굴 자루"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.29,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "쇠붙이 수집",
-          "power": true,
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.96,
-              "base": "def",
-              "target": "oneEnemy"
+              "ratio": 0.38
             },
             {
               "k": "power",
@@ -710,43 +591,19 @@
           ]
         },
         {
-          "name": "광물 자력",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "발굴 자루",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "리츠까지 들러붙음",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
+              "k": "heal",
+              "ratio": 1.26
             },
             {
               "k": "perStack",
               "id": "발굴 자루"
             },
             {
-              "k": "dmg",
-              "ratio": 0.73,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 0.52
             },
             {
               "k": "spend",
@@ -756,7 +613,109 @@
           ]
         },
         {
-          "name": "자석 끌어당기기",
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.02
+            },
+            {
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.89
+            },
+            {
+              "k": "spend",
+              "id": "발굴 자루",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "네티_u4",
+      "name": "자성 꼬리",
+      "hero": "네티",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.72,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "발굴 자루"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.24,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -764,39 +723,310 @@
               "v": 1
             },
             {
+              "k": "dmg",
+              "ratio": 0.97,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
               "k": "perStack",
               "id": "발굴 자루"
             },
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.32,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "결정화",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.89,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "발굴 자루"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
               "base": "def",
               "target": "oneEnemy"
             },
             {
               "k": "pull",
               "from": "discard",
-              "who": "self",
-              "unique": true
+              "n": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "두 갈래 꼬리",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "자철석",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "끌려온 칼끝",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "네티_u5",
+      "name": "꼬리 열쇠",
+      "hero": "네티",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "stack",
+          "id": "발굴 자루",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "unique": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.68
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.14
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 2
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.31
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "발굴 자루",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "stack",
+              "id": "발굴 자루",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "발굴 자루",
               "v": 1
             }
           ]

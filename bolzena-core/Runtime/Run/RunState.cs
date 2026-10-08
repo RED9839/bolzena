@@ -75,6 +75,12 @@ namespace Bolzena.Core
         /// 화면은 Run.PendingNeutral 이 있으면 사도를 고르게 하고 Run.AssignNeutral 로 넣는다. 덱의 교주 카드는 「id@사도」.
         /// </summary>
         public List<string> NeutralWait = new();
+        /// <summary>학점제 학년(RunGrade.cs · Grades) — 누적 학점 · 지금 학년(1~6, 옛 저장은 1) · 마지막 싸움에서 받은 학점.</summary>
+        public int Credits, Grade = Grades.FIRST, LastCredit;
+        /// <summary>진급 소식 — 화면이 아직 안 보인 새 학년(Run.PopGradeNews 로 꺼낸다).</summary>
+        public List<int> GradeNews = new();
+        /// <summary>교주 능력치(크레파스 — RunCrayon.cs, 판을 열 때 Run.ApplyPerks 가 적는다, atk · def · hp → 사도 기본치 비율). null = 없음.</summary>
+        public Dictionary<string, double> Perks;
     }
 
     public sealed class MapNode
@@ -140,6 +146,8 @@ namespace Bolzena.Core
     {
         public string Key;
         public FlashOffer Train;
+        /// <summary>고른 카드마다 한 번 굴린 신탁 셋(다시 열어도 같은 셋 — 새로고침 리롤 방지).</summary>
+        public List<FlashOffer> Offers = new();
     }
 
     public sealed class CopyOffer
@@ -183,6 +191,8 @@ namespace Bolzena.Core
         public string Judged;
         public string Label;
         public string Say;
+        /// <summary>Say 의 따옴표 대사마다 말하는 이(이름 · null = 장면 npc) — 선택지 by 를 풀어 둔 것.</summary>
+        public List<string> SayBy;
         public double ShinChance;
     }
 

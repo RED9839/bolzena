@@ -24,6 +24,7 @@ run.RollShop(); run.Buy(i); run.RerollShop(); run.RemoveCard(id);
 run.GainEquip(id); run.Equip(hero, id, replace); run.SellEquip(id);
 run.EnterEvent(); run.OptionsOf(ev); run.LockOf(o); run.JudgeOf(o); run.Choose(i); run.ResolvePending(v); run.AfterEventFight(won); run.LeaveEvent();
 run.BossCopyOffer(); run.BossCopy(id); run.Advance();    // run.S.Done == "clear"
+run.Grade; run.GradeSpan; run.S.Credits; run.S.LastCredit; run.PopGradeNews(); Grades.PerksAt(g);   // 학점제 학년(RunGrade.cs — 이긴 싸움마다 학점, 파티 전체 진급)
 string save = run.Save(); run = Run.Load(data, save);
 
 // 전투

@@ -79,6 +79,7 @@ namespace Bolzena.Battle
         public bool CostDown;            // 신탁으로 비용이 내려간 카드(비용 숫자 연두)
         public bool Copy;                // 복제본(core CardMark.Copy) — 오른쪽 위 복제 표 「복제 — 신탁 · 축복 불가」
         public List<string> Choices;     // 두 갈래 카드 — 갈래 이름 둘(낼 때 고른다). 없으면 null
+        public float EmpowerMul;         // 다음 카드 강화가 걸려 있으면 그 배율(1.5 = ×1.5), 아니면 0 — 손패 카드에만(core b.EmpowerOf)
 
         /// <summary>얕은 복사 — 목록(태그 · 낱말 풀이 · 갈래)만 새로. CoreBattle 이 담아 둔 카드 정보를 받는 쪽이 고쳐도 담긴 것은 그대로(2026-10-08 성능).</summary>
         public CardInfo Clone()
@@ -89,6 +90,24 @@ namespace Bolzena.Battle
             c.Choices = Choices != null ? new List<string>(Choices) : null;
             return c;
         }
+    }
+
+    /// <summary>소모량 고르기(spend pick) 후보 하나 — 몇 개를 쓰면 무엇이 되나.</summary>
+    public class SpendOption
+    {
+        public int N;
+        public string Name;              // 「1개」 · 「절반」 · 「전부」
+        public string Result;            // 「피해 360%」 — 결과 미리보기(없으면 null)
+        public string Boosted;           // 다음 카드 강화가 걸려 있으면 강화된 값 「피해 540%」, 아니면 null
+    }
+
+    /// <summary>소모량을 고르는 카드를 낼 때 화면에 띄울 것 — 어느 고유 효과를 몇 개 가졌고 후보는 무엇인가.</summary>
+    public class SpendPrompt
+    {
+        public string Kw;                // 소모할 고유 효과 이름
+        public int Have;
+        public string PerUnit;           // 「1개당 피해 60%」(없으면 null)
+        public List<SpendOption> Options = new List<SpendOption>();
     }
 
     // 낀 장비 한 칸 — 정보 창(전투원 탭)

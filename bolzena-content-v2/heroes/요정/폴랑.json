@@ -6,6 +6,7 @@
       "nature": "광기",
       "race": "요정",
       "role": "서포터",
+      "style": "거드는 형",
       "star": 3,
       "hp": 580,
       "atk": 86,
@@ -17,32 +18,11 @@
         "desc": "셋째 발에 맞춰 재는 장전",
         "carrier": "self",
         "cap": 3,
-        "rules": [
-          {
-            "name": "일제 사격",
-            "when": {
-              "on": "stackReach",
-              "id": "머스킷 장전",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "머스킷 장전",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.45,
-                "target": "allEnemies"
-              },
-              {
-                "k": "heal",
-                "ratio": 0.4
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.4,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -144,7 +124,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.9
+          "ratio": 0.8
         },
         {
           "k": "dealtMod",
@@ -159,11 +139,64 @@
       ],
       "oracles": [
         {
-          "name": "힘찬 경례",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.15
+              "ratio": 1.37
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.72
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "dealtMod",
+                      "v": 0.1,
+                      "target": "allAllies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.1
             },
             {
               "k": "dealtMod",
@@ -171,76 +204,21 @@
               "target": "allAllies"
             },
             {
-              "k": "stack",
-              "id": "머스킷 장전",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "제식 동작",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.9
+              "k": "ifAllHeroes"
             },
             {
               "k": "dealtMod",
-              "v": 0.2,
+              "v": 0.25,
               "target": "allAllies"
-            },
-            {
-              "k": "stack",
-              "id": "머스킷 장전",
-              "v": 2
             }
           ]
         },
         {
-          "name": "왕국 전체 경례",
-          "cost": 2,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.48
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "머스킷 장전",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "후열 경례",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.24
-            },
-            {
-              "k": "dealtMod",
-              "v": 0.2,
-              "target": "allAllies"
-            },
-            {
-              "k": "stack",
-              "id": "머스킷 장전",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "여왕 체육 수업",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.19
+              "ratio": 1.07
             },
             {
               "k": "dealtMod",
@@ -250,23 +228,41 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other",
-              "type": "공격"
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.61
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "경비대 제복",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "진법",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "여왕 바라기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -287,7 +283,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.5,
           "target": "allEnemies"
         },
         {
@@ -307,11 +303,12 @@
       ],
       "oracles": [
         {
-          "name": "탄도 계산",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.68,
               "target": "allEnemies"
             },
             {
@@ -320,7 +317,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.27,
               "target": "allEnemies"
             },
             {
@@ -331,12 +328,11 @@
           ]
         },
         {
-          "name": "견제 사격",
-          "cost": 0,
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.54,
               "target": "allEnemies"
             },
             {
@@ -345,47 +341,51 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.15,
+              "ratio": 0.21,
               "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "머스킷 장전",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "저격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "머스킷 장전"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
+              "k": "ifAllHeroes"
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 1
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "매일 사격 훈련",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "머스킷 장전"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "머스킷 장전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.4,
               "target": "allEnemies"
             },
             {
@@ -394,7 +394,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.15,
+              "ratio": 0.16,
               "target": "allEnemies"
             },
             {
@@ -402,7 +402,13 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -417,11 +423,12 @@
           ]
         },
         {
-          "name": "제 미숙함부터",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.61,
+              "ratio": 0.9,
               "target": "allEnemies"
             },
             {
@@ -430,30 +437,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.22,
+              "ratio": 0.36,
               "target": "allEnemies"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.67
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "머스킷",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "화약 냄새",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "탄약 보급",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -505,7 +505,7 @@
       ],
       "oracles": [
         {
-          "name": "완벽한 편대",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -540,9 +540,41 @@
           ]
         },
         {
-          "name": "편대 합류",
+          "name": "신탁 2",
           "cost": 0,
-          "tags": [],
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -552,40 +584,6 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "머스킷 장전",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "병법",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "draw",
-              "v": 2,
               "who": "other",
               "type": "공격"
             },
@@ -594,13 +592,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "who": "any",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "머스킷 장전",
-                      "v": 1
+                      "k": "heal",
+                      "ratio": 0.76
                     }
                   ]
                 }
@@ -609,87 +612,68 @@
           ]
         },
         {
-          "name": "제식 훈련",
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "basic": true
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "머스킷 장전",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "셋이 둘러싸기",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "머스킷 장전",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "부하들의 신뢰",
-          "kind": "cost"
-        },
-        {
-          "name": "둘러싸기",
-          "kind": "draw"
-        },
-        {
-          "name": "대장님",
           "fx": [
             {
               "k": "stack",
               "id": "머스킷 장전",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -713,17 +697,63 @@
           "ratio": 0.5
         },
         {
-          "k": "perStack",
-          "id": "머스킷 장전"
+          "k": "ifAllHeroes"
         },
         {
-          "k": "heal",
-          "ratio": 0.15
+          "k": "dealtMod",
+          "v": 0.25,
+          "target": "allAllies"
         }
       ],
       "oracles": [
         {
-          "name": "경비대 총출동",
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.81
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.35,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.48
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.25,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
@@ -731,21 +761,22 @@
               "v": 2
             },
             {
-              "k": "heal",
-              "ratio": 0.5
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
             },
             {
-              "k": "perStack",
-              "id": "머스킷 장전"
+              "k": "ifAllHeroes"
             },
             {
-              "k": "heal",
-              "ratio": 0.15
+              "k": "dealtMod",
+              "v": 0.35,
+              "target": "allAllies"
             }
           ]
         },
         {
-          "name": "양익",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -755,21 +786,155 @@
             },
             {
               "k": "heal",
-              "ratio": 1.1
+              "ratio": 0.73
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "머스킷 장전",
-                    "n": 3
+                    "on": "play",
+                    "who": "any",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "피해 감소",
+                      "k": "heal",
+                      "ratio": 0.43
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.78
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "폴랑_u5",
+      "name": "포위 심문",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "머스킷 장전",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.89,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
                       "v": 1
                     }
                   ]
@@ -779,84 +944,78 @@
           ]
         },
         {
-          "name": "물러서지 않는 대장",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 2
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "heal",
-              "ratio": 1.6
-            }
-          ]
-        },
-        {
-          "name": "나도 소녀랍니다",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
+              "k": "stack",
+              "id": "머스킷 장전",
               "v": 1
             },
             {
               "k": "draw",
-              "v": 2,
+              "v": 1,
               "who": "other",
               "type": "공격"
             }
           ]
         },
         {
-          "name": "경례 한 번",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "status",
-              "id": "협공",
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
               "v": 2
             },
             {
-              "k": "perStack",
-              "id": "머스킷 장전"
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.54,
+              "target": "oneEnemy"
             },
             {
-              "k": "heal",
-              "ratio": 0.35
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "머스킷 장전",
-              "all": true
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "진군깃발",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "에르피엔 수호",
-          "kind": "defUp"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "폴랑 버스터",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
             }
           ]
         }

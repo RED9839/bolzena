@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "용족",
       "role": "딜러",
+      "style": "두 얼굴형",
       "star": 3,
       "hp": 880,
       "atk": 119,
       "def": 40,
       "crit": 10,
-      "blurb": "소심하고 공손한 은둔 고수 용족. 먼저 맞기 전까진 몸을 사리지만, 적이 손을 대는 순간 버튼이 눌려 반말로 박살을 냅니다.",
+      "blurb": "소심하고 공손한 은둔 고수 용족. 먼저 맞기 전까진 몸을 사리며 파티를 감싸지만, 정당방위가 서면 버튼이 눌려 반말로 박살을 내고 — 다 털고 나면 간신히 이겼다며 돌아옵니다.",
       "keyword": {
         "name": "정당방위",
         "desc": "먼저 맞고 나서야 서는 명분",
@@ -20,7 +21,7 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.1
+            "v": 0.08
           }
         ]
       },
@@ -58,7 +59,7 @@
           "fx": [
             {
               "k": "takenMod",
-              "v": -0.2,
+              "v": -0.15,
               "target": "party"
             }
           ]
@@ -91,6 +92,50 @@
         "리츠_s1",
         "리츠_s2",
         "리츠_u2"
+      ],
+      "forms": [
+        {
+          "id": "리츠_광전",
+          "name": "버튼 눌린 리츠",
+          "desc": "반말로 박살 내는 강철의 얼굴",
+          "turns": 2,
+          "mods": {
+            "dealt": 0.15,
+            "taken": 0.1
+          },
+          "bonus": [
+            {
+              "card": "리츠_u1",
+              "fx": [
+                {
+                  "k": "formEnd"
+                }
+              ]
+            }
+          ],
+          "passives": [
+            {
+              "name": "한 놈만 노리기",
+              "when": {
+                "on": "play",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "extra",
+                  "ratio": 0.35
+                }
+              ]
+            }
+          ],
+          "replace": false,
+          "skin": null,
+          "anim": null
+        }
       ]
     }
   ],
@@ -132,7 +177,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.01,
+          "ratio": 0.95,
           "target": "oneEnemy"
         },
         {
@@ -141,7 +186,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.34,
+          "ratio": 0.32,
           "target": "oneEnemy"
         },
         {
@@ -152,7 +197,8 @@
       ],
       "oracles": [
         {
-          "name": "반말 모드",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -165,7 +211,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.41,
+              "ratio": 0.43,
               "target": "oneEnemy"
             },
             {
@@ -176,32 +222,22 @@
           ]
         },
         {
-          "name": "정당방위 성립",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.27,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "정당방위",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.12,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "되갚아 주기",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.86,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "정당방위"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
               "target": "oneEnemy"
             },
             {
@@ -209,17 +245,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "hurt"
+                    "on": "hurt",
+                    "guarded": true
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 2
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.6,
-                      "target": "randomEnemy"
+                      "k": "stack",
+                      "id": "정당방위",
+                      "v": 1
                     }
                   ]
                 }
@@ -228,15 +265,12 @@
           ]
         },
         {
-          "name": "정당방위 과잉",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.63,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifWounded"
+              "ratio": 0.68,
+              "target": "allEnemies"
             },
             {
               "k": "perStack",
@@ -244,8 +278,8 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.82,
-              "target": "oneEnemy"
+              "ratio": 0.25,
+              "target": "allEnemies"
             },
             {
               "k": "spend",
@@ -255,15 +289,11 @@
           ]
         },
         {
-          "name": "대지 분쇄",
-          "tags": [
-            "소멸",
-            "분쇄"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.03,
+              "ratio": 0.96,
               "target": "oneEnemy"
             },
             {
@@ -272,28 +302,56 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.68,
+              "ratio": 0.32,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "정당방위",
-              "all": true
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "정당방위"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.67,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "대검 연마",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "큰 웃음소리",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "뽀개기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -314,21 +372,65 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.49
+          "ratio": 1.25
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
         },
         {
           "k": "stack",
           "id": "정당방위",
-          "v": 2
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "완벽한 담금질",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.97
+              "ratio": 1.67
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.1
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
             },
             {
               "k": "stack",
@@ -338,34 +440,12 @@
           ]
         },
         {
-          "name": "준비가 덜 됐는데요…",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.49
-            },
-            {
-              "k": "stack",
-              "id": "정당방위",
-              "v": 2
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "stack",
-              "id": "정당방위",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "은둔 초고수의 수련",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.35
+              "ratio": 1.1
             },
             {
               "k": "stack",
@@ -397,62 +477,22 @@
           ]
         },
         {
-          "name": "방구석 강철",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 5",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.75
+              "ratio": 1.44
             },
             {
-              "k": "stack",
-              "id": "정당방위",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "강철 제련",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.35
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "basic": true
-            },
-            {
-              "k": "ifPulled",
-              "basic": true
-            },
-            {
-              "k": "stack",
-              "id": "정당방위",
-              "v": 3
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "직접 만든 갑옷",
-          "kind": "guard"
-        },
-        {
-          "name": "갑옷 수선",
-          "kind": "ap"
-        },
-        {
-          "name": "숫돌",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "정당방위",
+              "k": "status",
+              "id": "피해 감소",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -468,7 +508,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.88,
+          "ratio": 0.8,
           "target": "allEnemies"
         },
         {
@@ -484,7 +524,8 @@
       ],
       "oracles": [
         {
-          "name": "힘껏 밀어내기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -504,85 +545,37 @@
           ]
         },
         {
-          "name": "한 놈만",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.86,
-              "target": "oneEnemy"
+              "ratio": 0.76,
+              "target": "allEnemies"
             },
             {
               "k": "rushDown",
               "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.57,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "정당방위",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "먼저 치셨으니까",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.88,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "정당방위",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "정당방위",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.54,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "힘 빼기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.84,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "정당방위"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.23,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "정당방위",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "떠돌이 무사",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.96,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "정당방위",
+              "k": "rushDown",
               "v": 1
             },
             {
@@ -592,85 +585,21 @@
               "unique": true
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "넓은 칼날",
-          "kind": "weakSpot"
         },
         {
-          "name": "강철 날",
-          "kind": "cost"
-        },
-        {
-          "name": "기합",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "리츠_u4",
-      "name": "은둔 초고수",
-      "hero": "리츠",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.88,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "정당방위"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.34,
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "초고수의 경지",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "정당방위"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "이미지 트레이닝",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.19,
-              "target": "oneEnemy"
+              "ratio": 0.82,
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "정당방위",
-              "v": 1
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "power",
@@ -692,26 +621,83 @@
           ]
         },
         {
-          "name": "대륙의 강자들",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 1.44,
               "target": "allEnemies"
             },
             {
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
               "k": "stack",
               "id": "정당방위",
-              "v": 2
+              "v": 1
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "리츠_u4",
+      "name": "은둔 초고수",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
         },
         {
-          "name": "작심삼일",
+          "k": "perStack",
+          "id": "정당방위"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.22,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "정당방위",
+          "n": 2
+        },
+        {
+          "k": "form",
+          "id": "리츠_광전"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 1.08,
               "target": "oneEnemy"
             },
             {
@@ -720,22 +706,28 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.61,
+              "ratio": 0.3,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
+              "k": "ifStack",
               "id": "정당방위",
-              "all": true
+              "n": 2
+            },
+            {
+              "k": "form",
+              "id": "리츠_광전"
             }
           ]
         },
         {
-          "name": "사료스탕스 명예 대원",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.88,
+              "ratio": 0.76,
               "target": "oneEnemy"
             },
             {
@@ -744,7 +736,101 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.34,
+              "ratio": 0.21,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "정당방위",
+              "n": 2
+            },
+            {
+              "k": "form",
+              "id": "리츠_광전"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.58,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "정당방위",
+              "n": 1
+            },
+            {
+              "k": "form",
+              "id": "리츠_광전"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "정당방위",
+              "n": 2
+            },
+            {
+              "k": "form",
+              "id": "리츠_광전"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "정당방위",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.41,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "정당방위"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
               "target": "oneEnemy"
             },
             {
@@ -758,15 +844,177 @@
       ],
       "blesses": [
         {
-          "name": "갑옷 애호가",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "로네의 조언",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "층간소음",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리츠_u5",
+      "name": "통곡의 벽",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.1
+        },
+        {
+          "k": "stack",
+          "id": "정당방위",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "unique": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.55
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.05
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.19
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.19
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "정당방위",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.57
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

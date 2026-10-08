@@ -114,7 +114,15 @@
       "form",
       "formEnd",
       "power",
-      "cue"
+      "cue",
+      "empower",
+      "perGuarded",
+      "perOverheal",
+      "ifPricier",
+      "perGone",
+      "ifGained",
+      "ripen",
+      "summon"
      ],
      "description": "효과 조각 종류 — Docs/데이터.md §2"
     },
@@ -281,6 +289,14 @@
       "$ref": "#/$defs/rule"
      },
      "description": "power — 강화 카드 지속 규칙(패시브 규칙과 같은 꼴). 카드를 내면 이 전투 끝까지 켜진다"
+    },
+    "owner": {
+     "type": "string",
+     "description": "make — 만든 카드의 주인: self(기본) · other(파티 차례로 다음 아군) · 사도 id(데이터.md §19)"
+    },
+    "pick": {
+     "type": "boolean",
+     "description": "spend — 낼 때 소모량을 고른다(1 · 절반 · 전부). 소모한 양이 일의 값(perEvent)"
     }
    },
    "required": [
@@ -626,7 +642,14 @@
       "foeAct",
       "foeActBefore",
       "endure",
-      "unwound"
+      "unwound",
+      "tally",
+      "keepAp",
+      "reserveFire",
+      "grow",
+      "fightEnd",
+      "guardSum",
+      "summonAct"
      ]
     },
     "type": {
@@ -674,8 +697,11 @@
     "kind": {
      "enum": [
       "block",
-      "shield"
-     ]
+      "shield",
+      "ap",
+      "keep"
+     ],
+     "description": "guard — block · shield, keepAp — ap(AP 를 남김) · keep(보존 카드를 쥐고 넘김)"
     },
     "mine": {
      "type": "boolean"
@@ -764,7 +790,10 @@
       "inDebt",
       "heldCards",
       "idleLast",
-      "typeNew"
+      "typeNew",
+      "goneMin",
+      "pricier",
+      "gained"
      ]
     },
     "id": {
@@ -962,6 +991,11 @@
     "cut": {
      "type": "number"
     },
+    "uses": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 5
+    },
     "tagWhile": {
      "type": "string"
     },
@@ -978,9 +1012,8 @@
     "onMax": {
      "type": "object",
      "additionalProperties": false,
-     "properties": { "form": { "type": "string" }, "consume": { "type": "boolean" } },
-     "required": [ "form" ],
-     "description": "최대(cap)에 닿으면 그 사도가 변신(데이터.md §16)"
+     "properties": { "form": { "type": "string" }, "consume": { "type": "boolean" }, "make": { "type": "string" }, "n": { "type": "integer" }, "empower": { "enum": [ "next", "any" ] }, "ratio": { "type": "number" } },
+     "description": "최대(cap)에 닿으면 — form(변신, 데이터.md §16) · make(그 카드 n 장을 손에) · empower(next 그 사도 · any 파티의 다음 카드 +ratio) 가운데 하나(데이터.md §19)"
     }
    },
    "required": [
@@ -1725,6 +1758,16 @@
     "lockText": {
      "type": "string"
     },
+    "by": {
+     "type": "array",
+     "items": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "description": "따옴표 대사마다 말하는 이(순서대로) — null = 장면 npc · \"hero\" = 선택지를 연 파티 사도 · 그 밖 = 이름"
+    },
     "gamble": {
      "type": "array",
      "items": {
@@ -1739,6 +1782,15 @@
        },
        "say": {
         "type": "string"
+       },
+       "by": {
+        "type": "array",
+        "items": {
+         "type": [
+          "string",
+          "null"
+         ]
+        }
        }
       },
       "required": [

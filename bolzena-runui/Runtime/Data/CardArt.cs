@@ -5,7 +5,8 @@ using UnityEngine;
 namespace Bolzena.RunUI
 {
     // 카드 · 사도 그림(임시 규칙 — Docs/카드그림.md). 판 화면(W.Card)과 전투 화면(CardView)이 같이 쓴다.
-    //   시작 카드(사도의 기본 카드) = 그 사도 스탠딩의 상반신(카드 비율로 자른다)
+    //   시작 카드(사도의 기본 카드) = 표(pics · cards)에 있으면 그 그림(2026-10-08 — 기본 카드도 카드마다 다른 그림: 싸우는 SD · 장면 · 스탠딩 얼굴 확대 · 전신,
+    //                             Tools~/cardart_fill.py), 없으면 그 사도 스탠딩의 상반신(카드 비율로 자른다)
     //   고유 · 생성 카드          = 카드 그림 표(Resources/RunUI/cardart.json)의 "pics" — 카드와 어울리는 원작 그림(사도마다 대조 시트로 골랐다 · Tools~/cardpic_picks.json)
     //                             표에 없거나 어울리는 그림이 없으면 "cards" 의 원작 스킬 아이콘 — 흐린 확대 바탕 + 가운데 선명한 아이콘
     //   교주 · 상태 · 저주 · 선물 = 장비 · 교주 카드 그림 표(Resources/RunUI/itemart.json)의 원작 아이콘 — 없으면 종류 무늬
@@ -214,7 +215,7 @@ namespace Bolzena.RunUI
         }
 
         /// <summary>카드 그림 종류 — heroArt 는 주인 사도의 그림 키(roster art), 없으면 교주 · 상태 카드.</summary>
-        //   시작 카드(사도의 기본 카드)는 늘 스탠딩 — 그림 표(pics · cards)에는 고유 · 생성 카드만 있다
+        //   기본 · 생성 카드는 표(pics → cards)에 있으면 그 그림, 없으면 스탠딩(상반신). 고유 카드는 표에만(없으면 None)
         public static Kind Of(string cardId, string heroArt, bool unique)
         {
             if (string.IsNullOrEmpty(heroArt)) return Icon(IconOf(cardId)) != null ? Kind.Icon : Kind.None;   // 교주 · 상태 · 저주 · 선물 — 표에 그림이 있으면 아이콘 꼴

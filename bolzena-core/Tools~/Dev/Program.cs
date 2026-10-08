@@ -40,7 +40,17 @@ static class Program
         string b = Opt("bot", "basic"), p = Opt("party", PartyPick.Random); bool u = Flag("uniqueonly");
         if (b != "basic" && b != "skilled") return (null, null, "--bot 은 basic(초보) · skilled(숙련)");
         if (!PartyPick.MODES.Contains(p)) return (null, null, "--party 는 random · role · synergy");
-        return (new SimOpts { Skilled = b == "skilled", UniqueOnly = u }, p, null);
+        // --crayon all | 표.json — 교주 능력치(크레파스) 전부 올린 상태(기본 표: bolzena-runui Resources/RunUI/crayon.json)
+        string cr = Opt("crayon");
+        Dictionary<string, double> perks = null;
+        if (cr != null)
+        {
+            string f = cr == "all" ? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../../bolzena-runui/Runtime/Resources/RunUI/crayon.json")) : cr;
+            if (!File.Exists(f)) return (null, null, "크레파스 표가 없다: " + f);
+            perks = Crayon.Perks(Crayon.Parse(File.ReadAllText(f)), null, all: true);
+            Console.WriteLine("교주 능력치 전부 — " + string.Join(" · ", perks.Select(kv => $"{kv.Key} {kv.Value}")));
+        }
+        return (new SimOpts { Skilled = b == "skilled", UniqueOnly = u, Perks = perks }, p, null);
     }
 
     /// <summary>원작 관계(시너지 편성) — --relations 파일, 없으면 데이터 폴더의 _ref/relations.json, 그다음 사도 데스크의 relations.json. 못 찾으면 빈 표(키워드 맞물림만).</summary>

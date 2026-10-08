@@ -171,7 +171,7 @@ namespace Bolzena.Core
         }
 
         /// <summary>내 턴 시작 — 턴으로 재는 변신의 남은 턴을 1 줄이고 다하면 푼다.</summary>
-        /// <summary>고유 효과가 최대(cap)에 닿았다 — onMax 의 변신으로(이미 그 변신 중이면 아무 일 없다). consume 이면 겹을 다 쓴다.</summary>
+        /// <summary>고유 효과가 최대(cap)에 닿았다 — onMax 의 변신(이미 그 변신 중이면 아무 일 없다) · 카드 만들기 · 다음 카드 강화. consume 이면 겹을 다 쓴다.</summary>
         void FormOnMax(KwRt kw, int before, int after)
         {
             var om = kw.Def.OnMax;
@@ -179,10 +179,13 @@ namespace Bolzena.Core
             if (cap <= 0 || before >= cap || after < cap || kw.Carrier != "self") return;
             var owner = HeroUnit(kw.Owner);
             if (owner == null || owner.Dead) return;
-            if (Forms.TryGetValue(owner.Key, out var cur) && cur.Id == om.Form) return;
+            if (om.Form != null && Forms.TryGetValue(owner.Key, out var cur) && cur.Id == om.Form) return;
             Say($"{owner.Name} — 「{kw.Id}」 최대!");
             if (om.Consume) { AddStack(owner.Key, kw.Id, -StackOf(owner.Key, kw.Id)); KwGone(kw.Id, kw.Owner, owner, false); if (Over != null) return; }
-            EnterForm(owner, om.Form);
+            // 1단계(2026-10-08) — 다 차면 저절로 터지는 대신 시그니처 카드를 손에 만들기 · 다음 카드 강화(고르는 맛을 남긴다)
+            if (om.Make != null) { var (prev, seq0) = (Acting, ActSeq); Acting = owner.Key; ActSeq = ++SeqN; try { Make(om.Make, Math.Max(1, om.N), owner); } finally { Acting = prev; ActSeq = seq0; } return; }
+            if (om.Empower != null) { EmpowerAdd(om.Empower == "any" ? "*" : owner.Key, om.Ratio); return; }
+            if (om.Form != null) EnterForm(owner, om.Form);
         }
 
         void FormTick()

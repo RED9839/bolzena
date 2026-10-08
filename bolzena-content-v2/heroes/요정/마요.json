@@ -6,6 +6,7 @@
       "nature": "광기",
       "race": "요정",
       "role": "딜러",
+      "style": "돈형",
       "star": 2,
       "hp": 500,
       "atk": 125,
@@ -13,41 +14,20 @@
       "crit": 10,
       "blurb": "움직이지 않는 것만 모으는 수집광 요정. 전당포를 운영하며 음침하게 흐흐 웃고, 교주를 최고의 수집품으로 점찍어 둔 채 경쟁자들을 견제합니다. 친구가 사라진 뒤로 「더는 움직이지 않는 것」만 모으게 됐고, 독침으로 움직임을 멈추게 하는 것도 수집의 일부. 말끝은 늘 음슴체임.",
       "keyword": {
-        "name": "마취독",
-        "desc": "수집품을 재우는 독침의 독",
-        "carrier": "enemy",
-        "cap": 4,
+        "name": "감정가",
+        "desc": "전당포 장부에 적어 둔 수집품 값",
+        "carrier": "self",
+        "cap": 5,
         "per": [
           {
-            "stat": "dot",
-            "ratio": 0.18
+            "stat": "dealt",
+            "v": 0.06
           }
         ],
-        "rules": [
-          {
-            "name": "움직이지 않는 수집품",
-            "when": {
-              "on": "stackReach",
-              "id": "마취독",
-              "n": 4
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "status",
-                "id": "약화",
-                "v": 1
-              },
-              {
-                "k": "tough",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "마요_trophy",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -62,10 +42,15 @@
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "마취독",
+              "k": "status",
+              "id": "고통",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "감정가",
+              "v": 1
             }
           ]
         },
@@ -81,9 +66,9 @@
           },
           "fx": [
             {
-              "k": "make",
-              "id": "마요_trophy",
-              "v": 1
+              "k": "stack",
+              "id": "감정가",
+              "v": 2
             }
           ]
         }
@@ -99,8 +84,8 @@
             "hits": 8
           },
           {
-            "k": "stack",
-            "id": "마취독",
+            "k": "status",
+            "id": "고통",
             "v": 2,
             "target": "allEnemies"
           }
@@ -108,7 +93,7 @@
       },
       "starter": [
         "마요_s1",
-        "마요_u1",
+        "마요_u5",
         "마요_s2",
         "마요_s3"
       ]
@@ -168,16 +153,21 @@
       ],
       "fx": [
         {
-          "k": "stack",
-          "id": "마취독",
-          "v": 2,
+          "k": "status",
+          "id": "고통",
+          "v": 3,
           "target": "oneEnemy"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.7
         },
         {
           "k": "draw",
           "v": 1
         }
-      ]
+      ],
+      "blurb": "더는 움직이지 않는 수집품 — 쥐고 있으면 마요가 흐뭇해함"
     },
     {
       "id": "마요_u1",
@@ -189,147 +179,162 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.63,
           "target": "oneEnemy",
           "hits": 3
         },
         {
+          "k": "status",
+          "id": "고통",
+          "v": 2
+        },
+        {
+          "k": "ifKill"
+        },
+        {
           "k": "stack",
-          "id": "마취독",
-          "v": 1,
-          "target": "oneEnemy"
+          "id": "감정가",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "수집가의 눈",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.73,
+              "ratio": 0.85,
               "target": "oneEnemy",
               "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "마취독",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "진짜 보물",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.61,
-              "target": "oneEnemy",
-              "hits": 5
-            },
-            {
-              "k": "stack",
-              "id": "마취독",
-              "v": 2,
-              "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "박제 이야기",
-          "fx": [
+              "id": "고통",
+              "v": 2
+            },
             {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy",
-              "hits": 3
+              "k": "ifKill"
             },
             {
               "k": "stack",
-              "id": "마취독",
+              "id": "감정가",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill",
+                    "mine": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "감정가",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "고통",
               "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "마취독",
-              "n": 3
-            },
-            {
-              "k": "make",
-              "id": "마요_trophy",
-              "v": 1
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "특징으로 부르기",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.58,
+              "ratio": 0.63,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "수집품 점검",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy",
-              "hits": 3
+              "k": "status",
+              "id": "고통",
+              "v": 2
             },
             {
               "k": "stack",
-              "id": "마취독",
-              "v": 1,
-              "target": "oneEnemy"
+              "id": "감정가",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.13,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "k": "status",
+              "id": "고통",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "권총 코코",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "자물쇠 따기",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "독침 장전",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "마취독",
-              "v": 1,
-              "target": "oneEnemy"
+              "id": "감정가",
+              "v": 1
             }
           ]
         }
@@ -348,85 +353,56 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.16,
+          "ratio": 1.19,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "마취독"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.44,
-          "target": "oneEnemy"
+          "k": "ifStack",
+          "id": "감정가",
+          "n": 3
         },
         {
           "k": "spend",
-          "id": "마취독",
-          "all": true,
-          "target": "oneEnemy"
+          "id": "감정가",
+          "v": 3
+        },
+        {
+          "k": "make",
+          "id": "마요_trophy",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "정실 경쟁자 견제",
+          "name": "신탁 1",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.45,
+              "ratio": 1.61,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.51,
-              "target": "oneEnemy"
+              "k": "ifStack",
+              "id": "감정가",
+              "n": 3
             },
             {
               "k": "spend",
-              "id": "마취독",
-              "all": true,
-              "target": "oneEnemy"
+              "id": "감정가",
+              "v": 3
+            },
+            {
+              "k": "make",
+              "id": "마요_trophy",
+              "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 견제",
-          "cost": 0,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "마취독",
-              "all": true,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "오래 지켜보기",
+          "name": "신탁 2",
           "tags": [
             "분쇄"
           ],
@@ -437,39 +413,14 @@
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.46,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "밤에 30분",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.87,
-              "target": "oneEnemy"
+              "k": "ifStack",
+              "id": "감정가",
+              "n": 2
             },
             {
               "k": "spend",
-              "id": "마취독",
-              "all": true,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
+              "id": "감정가",
+              "v": 2
             },
             {
               "k": "make",
@@ -479,7 +430,36 @@
           ]
         },
         {
-          "name": "경매장 낙찰",
+          "name": "신탁 3",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.03,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "감정가",
+              "n": 4
+            },
+            {
+              "k": "spend",
+              "id": "감정가",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "tags": [
             "분쇄"
           ],
@@ -487,16 +467,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.16,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 1.64,
               "target": "oneEnemy"
             },
             {
@@ -504,7 +475,7 @@
               "rules": [
                 {
                   "when": {
-                    "on": "kill"
+                    "on": "make"
                   },
                   "limit": {
                     "per": "turn",
@@ -512,32 +483,61 @@
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "마요_trophy",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 0.81,
+                      "target": "oneEnemy"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.26,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "감정가",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "감정가",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "경매장",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "무표정",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "진열장 한 칸",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "마요_trophy",
+              "k": "stack",
+              "id": "감정가",
               "v": 1
             }
           ]
@@ -554,55 +554,73 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.36,
+          "ratio": 0.42,
           "target": "randomEnemy",
           "hits": 4
         },
         {
-          "k": "stack",
-          "id": "마취독",
+          "k": "status",
+          "id": "고통",
           "v": 1,
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "독침 폭우",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.57,
               "target": "randomEnemy",
               "hits": 4
             },
             {
-              "k": "stack",
-              "id": "마취독",
+              "k": "status",
+              "id": "고통",
               "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "독침 대방출",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.39,
               "target": "randomEnemy",
-              "hits": 8
+              "hits": 4
             },
             {
-              "k": "stack",
-              "id": "마취독",
-              "v": 2,
+              "k": "status",
+              "id": "고통",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "수집품 목록",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "감정가",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
@@ -611,83 +629,59 @@
               "hits": 4
             },
             {
-              "k": "stack",
-              "id": "마취독",
+              "k": "status",
+              "id": "고통",
               "v": 1,
               "target": "allEnemies"
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "self"
+              "who": "self",
+              "unique": true,
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "수집품 회수",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.01,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "마취독",
-              "all": true,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "독 바르기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.73,
-              "target": "oneEnemy"
+              "ratio": 0.59,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
               "k": "status",
-              "id": "약화",
+              "id": "고통",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "마취독",
-              "v": 3,
-              "target": "oneEnemy"
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "마취 효과",
-          "kind": "frost"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "잠옷 차림",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "바늘 연마",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "마취독",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "감정가",
+              "v": 1
             }
           ]
         }
@@ -703,58 +697,57 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.73,
+          "ratio": 1.05,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "마취독"
+          "k": "perTag",
+          "id": "마요_trophy"
         },
         {
           "k": "dmg",
-          "ratio": 0.26,
+          "ratio": 0.56,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "흐흐흐…",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.94,
+              "ratio": 1.41,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "마취독"
+              "k": "perTag",
+              "id": "마요_trophy"
             },
             {
               "k": "dmg",
-              "ratio": 0.32,
+              "ratio": 0.76,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "이미 내꺼임",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.73,
+              "ratio": 0.91,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "마취독"
+              "k": "perTag",
+              "id": "마요_trophy"
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.48,
               "target": "oneEnemy"
             },
             {
@@ -762,14 +755,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "마취독",
-                      "v": 1,
-                      "target": "allEnemies"
+                      "k": "dmg",
+                      "ratio": 0.64,
+                      "target": "oneEnemy"
                     }
                   ]
                 }
@@ -778,24 +774,152 @@
           ]
         },
         {
-          "name": "반항하는 수집품",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.73,
-              "target": "oneEnemy"
+              "ratio": 0.84,
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "마취독"
+              "k": "perTag",
+              "id": "마요_trophy"
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.39,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.02,
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
+              "k": "perTag",
+              "id": "마요_trophy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.58,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "마요_trophy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "감정가",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마요_u5",
+      "name": "값 매기기",
+      "hero": "마요",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "감정가",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "감정가",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "감정가",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "감정가",
+              "v": 2
             },
             {
               "k": "make",
@@ -805,73 +929,41 @@
           ]
         },
         {
-          "name": "전당포 진열장",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.73,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "감정가",
+              "v": 2
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
+              "unique": true,
               "type": "공격"
+            },
+            {
+              "k": "gauge",
+              "v": 15
             }
           ]
         },
         {
-          "name": "독 거두기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.87,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "마취독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.36,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "마취독",
-              "all": true,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "음침한 웃음",
-          "kind": "atkUp"
-        },
-        {
-          "name": "사진 한 장",
-          "kind": "draw"
-        },
-        {
-          "name": "하나뿐인 수집품",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
-              "id": "마취독",
-              "v": 1,
-              "target": "oneEnemy"
+              "id": "감정가",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }

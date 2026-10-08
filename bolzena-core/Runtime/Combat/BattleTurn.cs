@@ -95,6 +95,7 @@ namespace Bolzena.Core
             PlayedPrev = new Dictionary<string, int>(PlayedBy);
             PlayLog.Clear(); PlayIds.Clear(); PlayedThisTurn = 0; PlayedBy.Clear(); RushedThisTurn = false;
             ApSpent = 0; PaidHp = 0; DiscardedTurn = 0; TakenPrev = TakenNow; TakenNow = 0;
+            GuardedPrev = GuardedNow; GuardedNow = 0; HealLog.Clear();
             HurtPrev = HurtNow; HurtNow = new HashSet<string>();
             KillPrev = KillNow; KillNow = new Dictionary<string, int>();
             // 실드(· 옛 방어)는 턴이 바뀌면 사라진다(카제나 — 2026-10-05, 옛 「실드는 남는다」 를 바꿨다).
@@ -117,7 +118,8 @@ namespace Bolzena.Core
             }
             if (Turn > 1) ReviveTick();
             // 격파된 적은 내 턴이 다시 오면 일어선다
-            var risen = AliveEnemies().Where(e => e.Broken).ToList();
+            // 적 차례에 격파된 적(아직 Sealed — 쉬는 차례를 안 거쳤다)은 다음 적 차례를 쉰 뒤에 일어선다(2026-10-08)
+            var risen = AliveEnemies().Where(e => e.Broken && !e.Sealed).ToList();
             foreach (var e in risen)
             {
                 e.Broken = false; e.Tough = e.ToughMax;
@@ -140,6 +142,8 @@ namespace Bolzena.Core
             foreach (var id in Hand.ToList()) if (HasTagB(id, Tag.Lead) && Rng.Next() < 0.5) LeadOn.Add(id);
             Emit("turnStart", new EmitInfo());
             CheckOver();
+            // 버티형 변환 계기 — 지난 판(내 턴 + 적의 차례)에 파티 방어 · 실드가 막아 낸 양(일의 값)
+            if (GuardedPrev > 0 && Over == null) { Emit("guardSum", new EmitInfo { V = GuardedPrev, N = GuardedPrev }); CheckOver(); }
             // 연쇄 — 지난 턴에 낸 연쇄 카드의 효과가 한 번 더(코스트 · 즉시 행동 셈 · 게이지 없이)
             var echo = Echo; Echo = new List<(string, int)>();
             foreach (var (id, target) in echo)
@@ -167,6 +171,9 @@ namespace Bolzena.Core
             ApLeft = Ap;
             Ending = true;
             Emit("turnEnd", new EmitInfo());
+            // 아껴 두기형 공용 계기 — AP 를 남기거나 보존 카드를 쥐고 턴을 마치면(N = 남긴 AP · Kept = 쥐고 넘기는 보존 카드 수(증발 빼고), 일의 값 = 둘의 합)
+            int kept = Hand.Count(id => HasTagB(id, Tag.Keep) && !HasTagB(id, Tag.Evaporate));
+            if ((ApLeft > 0 || kept > 0) && Over == null) Emit("keepAp", new EmitInfo { N = ApLeft, Kept = kept, V = ApLeft + kept });
             TickTurnEnd();
             KwEndDecay();
             CheckOver(); if (Over != null) return this;
@@ -266,6 +273,13 @@ namespace Bolzena.Core
         {
             if (!Enemies.Any(e => !e.Dead))
             {
+                // 전투 끝 계기 — 이기기 직전에 한 번(성장 결산 · 골드 등). 패시브가 다시 CheckOver 를 불러도 한 번만.
+                if (Over == null && !FightEndDone)
+                {
+                    FightEndDone = true;
+                    Emit("fightEnd", new EmitInfo());
+                    if (Over != null || Enemies.Any(e => !e.Dead)) return;
+                }
                 if (Over != "win") { var w = AliveParty().FirstOrDefault(); if (w != null) Talk(w, "win"); Cue("over", PartyRep(), new Cue { Id = "win" }); }
                 Over = "win"; MeterFlush();
             }
@@ -278,6 +292,9 @@ namespace Bolzena.Core
             int overkill = Math.Max(0, -u.Hp);
             u.Hp = 0; u.Dead = true;
             if (u.Side == Side.Party) { Talk(u, "down"); Say("파티 HP 0 — 더 버티지 못한다"); CheckOver(); return; }
+            // 처치한 적의 등급(시범 16 쵸피 — ifKill id elite · boss) — 한 번의 일에 여럿이면 높은 쪽
+            int tier = u.Boss ? 2 : EliteFight ? 1 : 0;
+            if (KillSeq != ActSeq || !Counts.TryGetValue("killTier", out var kt0) || kt0 < tier) Counts["killTier"] = tier;
             KillSeq = ActSeq;
             Cue("die", u);
             FoeDeath(u);

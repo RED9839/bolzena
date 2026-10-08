@@ -6,46 +6,30 @@
       "nature": "우울",
       "race": "엘프",
       "role": "딜러",
+      "style": "거드는 형",
       "star": 3,
       "hp": 650,
       "atk": 125,
       "def": 28,
       "crit": 10,
-      "blurb": "돈까스를 끝내 입에 넣지 못하는 시장. 스킬을 낼 때마다 돈까스 도시락을 돌리고, 도시락이 비워질 때마다 지지율이 올라 시청 앞 축포가 터집니다.",
+      "blurb": "돈까스를 끝내 입에 넣지 못하는 시장. 동료가 카드를 낼 때마다 돈까스 도시락이 배달되고, 도시락이 비워질 때마다 지지율이 올라 파티의 다음 한 수에 힘을 싣습니다.",
       "keyword": {
         "name": "지지율",
         "desc": "도시락으로 모으는 민심",
         "carrier": "self",
         "cap": 3,
-        "rules": [
-          {
-            "name": "시청 앞 축포",
-            "when": {
-              "on": "stackReach",
-              "id": "지지율",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "지지율",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.4,
-                "hits": 3,
-                "target": "allEnemies"
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "돈까스 배달",
           "when": {
-            "on": "play"
+            "on": "play",
+            "who": "other"
           },
           "limit": {
             "per": "turn",
@@ -92,7 +76,7 @@
       },
       "starter": [
         "로네_시장_s1",
-        "로네_시장_u3",
+        "로네_시장_u2",
         "로네_시장_s2",
         "로네_시장_s3"
       ]
@@ -151,7 +135,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.5
+          "ratio": 0.48
         },
         {
           "k": "stack",
@@ -172,9 +156,9 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.2,
-          "hits": 4,
-          "target": "allEnemies"
+          "ratio": 0.22,
+          "target": "allEnemies",
+          "hits": 4
         },
         {
           "k": "perTag",
@@ -182,7 +166,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.34,
           "target": "allEnemies"
         },
         {
@@ -194,13 +178,14 @@
       ],
       "oracles": [
         {
-          "name": "특대 배달",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.25,
-              "hits": 4,
-              "target": "allEnemies"
+              "ratio": 0.29,
+              "target": "allEnemies",
+              "hits": 4
             },
             {
               "k": "perTag",
@@ -208,7 +193,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.46,
               "target": "allEnemies"
             },
             {
@@ -220,85 +205,15 @@
           ]
         },
         {
-          "name": "시민 대축제",
-          "cost": 2,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
-              "hits": 4,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "로네_시장_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "로네_시장_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "도시락 배달 드론",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "target": "oneEnemy",
+              "ratio": 0.24,
+              "target": "allEnemies",
               "hits": 4
-            },
-            {
-              "k": "make",
-              "id": "로네_시장_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "배달 경로 검색",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.21,
-              "hits": 4,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "로네_시장_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.28,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
-            }
-          ]
-        },
-        {
-          "name": "급한 배달",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "hits": 4,
-              "target": "allEnemies"
             },
             {
               "k": "perTag",
@@ -308,21 +223,117 @@
               "k": "dmg",
               "ratio": 0.37,
               "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.3,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "perTag",
+              "id": "로네_시장_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "target": "allEnemies",
+              "hits": 4
+            },
+            {
+              "k": "perTag",
+              "id": "로네_시장_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "allEnemies",
+              "hits": 4
+            },
+            {
+              "k": "perTag",
+              "id": "로네_시장_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "로네_시장_t1"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "바삭한 튀김옷",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "배달 앱",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "덤 도시락",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
@@ -353,7 +364,7 @@
       ],
       "oracles": [
         {
-          "name": "곱빼기 주문",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "make",
@@ -367,50 +378,22 @@
           ]
         },
         {
-          "name": "단골 할인",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "make",
               "id": "로네_시장_t1",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "정기 배달",
-          "power": true,
-          "fx": [
-            {
-              "k": "make",
-              "id": "로네_시장_t1",
               "v": 1
             },
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "make",
-                      "id": "로네_시장_t1",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
-          "name": "시장실 회식",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "make",
@@ -418,23 +401,42 @@
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "지지율",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.44
             },
             {
-              "k": "heal",
-              "ratio": 1.23
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "도시락 몰아 받기",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 2
             },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "shield",
+              "ratio": 0.96
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
             {
               "k": "make",
               "id": "로네_시장_t1",
@@ -442,26 +444,10 @@
             },
             {
               "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "뜨거운 소스",
-          "kind": "defUp"
-        },
-        {
-          "name": "시장 할인",
-          "kind": "cost"
-        },
-        {
-          "name": "도시락 하나 더",
-          "fx": [
+              "v": 2
+            },
             {
-              "k": "make",
-              "id": "로네_시장_t1",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -493,12 +479,12 @@
               },
               "limit": {
                 "per": "turn",
-                "n": 3
+                "n": 2
               },
               "fx": [
                 {
                   "k": "dmg",
-                  "ratio": 0.35,
+                  "ratio": 0.36,
                   "target": "randomEnemy"
                 }
               ]
@@ -508,7 +494,7 @@
       ],
       "oracles": [
         {
-          "name": "돈까스 생각뿐",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -516,7 +502,7 @@
             {
               "k": "stack",
               "id": "지지율",
-              "v": 1
+              "v": 2
             },
             {
               "k": "power",
@@ -527,12 +513,12 @@
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 3
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.54,
+                      "ratio": 0.36,
                       "target": "randomEnemy"
                     }
                   ]
@@ -542,7 +528,7 @@
           ]
         },
         {
-          "name": "한 입 생각",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "개전"
@@ -557,12 +543,12 @@
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 3
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.35,
+                      "ratio": 0.36,
                       "target": "randomEnemy"
                     }
                   ]
@@ -572,7 +558,7 @@
           ]
         },
         {
-          "name": "도시락 공장",
+          "name": "신탁 3",
           "tags": [
             "개전"
           ],
@@ -591,25 +577,13 @@
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 3
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.3,
+                      "ratio": 0.36,
                       "target": "randomEnemy"
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "make",
-                      "id": "로네_시장_t1",
-                      "v": 1
                     }
                   ]
                 }
@@ -618,7 +592,7 @@
           ]
         },
         {
-          "name": "지지자 명단",
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
@@ -643,12 +617,12 @@
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 3
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.35,
+                      "ratio": 0.36,
                       "target": "randomEnemy"
                     }
                   ]
@@ -658,16 +632,12 @@
           ]
         },
         {
-          "name": "퇴근길 돈까스",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
               "id": "지지율",
-              "v": 2
-            },
-            {
-              "k": "make",
-              "id": "로네_시장_t1",
               "v": 1
             },
             {
@@ -679,12 +649,12 @@
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 3
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.4,
+                      "ratio": 0.82,
                       "target": "randomEnemy"
                     }
                   ]
@@ -696,19 +666,19 @@
       ],
       "blesses": [
         {
-          "name": "돈까스 상징 마크",
+          "name": "축복 1",
           "kind": "atkUp"
         },
         {
-          "name": "공약 이행",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "지지자 함성",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "stack",
-              "id": "지지율",
+              "k": "make",
+              "id": "로네_시장_t1",
               "v": 1
             }
           ]
@@ -725,7 +695,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2,
+          "ratio": 2.04,
           "target": "oneEnemy"
         },
         {
@@ -734,7 +704,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.48,
           "target": "oneEnemy"
         },
         {
@@ -745,11 +715,12 @@
       ],
       "oracles": [
         {
-          "name": "말이 짧아짐",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.5,
+              "ratio": 2.76,
               "target": "oneEnemy"
             },
             {
@@ -758,7 +729,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.65,
               "target": "oneEnemy"
             },
             {
@@ -769,12 +740,13 @@
           ]
         },
         {
-          "name": "참을 인 세 번",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.94,
               "target": "oneEnemy"
             },
             {
@@ -783,7 +755,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.46,
               "target": "oneEnemy"
             },
             {
@@ -794,11 +766,11 @@
           ]
         },
         {
-          "name": "도시락 투척",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.5,
+              "ratio": 2.65,
               "target": "oneEnemy"
             },
             {
@@ -807,7 +779,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.71,
+              "ratio": 0.66,
               "target": "oneEnemy"
             },
             {
@@ -819,12 +791,13 @@
           ]
         },
         {
-          "name": "돈까스 모독 금지령",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2,
+              "ratio": 2.18,
               "target": "oneEnemy"
             },
             {
@@ -833,7 +806,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.52,
               "target": "oneEnemy"
             },
             {
@@ -841,14 +814,16 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "지지율",
-                    "n": 3
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 1,
+                      "ratio": 0.36,
                       "target": "oneEnemy"
                     }
                   ]
@@ -858,14 +833,14 @@
           ]
         },
         {
-          "name": "시장직을 걸고",
+          "name": "신탁 5",
           "tags": [
             "소멸"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 4,
+              "ratio": 4.28,
               "target": "oneEnemy"
             },
             {
@@ -874,29 +849,202 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.01,
               "target": "oneEnemy"
             },
             {
-              "k": "make",
-              "id": "로네_시장_t1",
-              "v": 2
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "공기 커틀릿",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "빠른 배달",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "로네_시장_u5",
+      "name": "업무 효율 131%",
+      "hero": "로네_시장",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "지지율",
+          "v": 1
         },
         {
-          "name": "짧아진 말투",
-          "kind": "power"
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 2
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "로네_시장_t1",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "지지율",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.6
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "지지율",
+              "v": 1
+            }
+          ]
         }
       ]
     }

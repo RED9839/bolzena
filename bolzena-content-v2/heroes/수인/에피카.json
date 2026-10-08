@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "수인",
       "role": "딜러",
+      "style": "소환형",
       "star": 3,
       "hp": 680,
       "atk": 146,
@@ -18,7 +19,7 @@
         "carrier": "self",
         "cap": 3,
         "guard": true,
-        "cut": 0.4
+        "cut": 0.3
       },
       "passives": [
         {
@@ -29,17 +30,14 @@
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 1
           },
           "fx": [
             {
-              "k": "perStack",
-              "id": "에피콘"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.15,
-              "target": "randomEnemy"
+              "k": "summon",
+              "id": "에피콘",
+              "ratio": 0.19,
+              "max": 3
             }
           ]
         },
@@ -123,14 +121,9 @@
                   "n": 2
                 },
                 {
-                  "k": "perStack",
+                  "k": "summon",
                   "id": "에피콘",
-                  "n": 2
-                },
-                {
-                  "k": "dmg",
-                  "ratio": 0.3,
-                  "target": "randomEnemy"
+                  "ratio": 0.22
                 }
               ]
             },
@@ -218,30 +211,18 @@
           "v": 1
         },
         {
-          "k": "status",
-          "id": "협공",
-          "v": 1
+          "k": "empower",
+          "ratio": 0.4
+        },
+        {
+          "k": "shield",
+          "ratio": 0.45
         }
       ],
       "oracles": [
         {
-          "name": "앙코르",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "에피콘",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "짧은 막간극",
-          "cost": 0,
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -249,87 +230,125 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "대공연",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "에피콘",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "개막 인사",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "에피콘",
-              "v": 3
+              "k": "empower",
+              "ratio": 0.4
             },
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 0.78
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4
+            },
+            {
+              "k": "shield",
+              "ratio": 0.43
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "summonAct",
+                    "id": "에피콘",
+                    "kind": "guard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "에피콘",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
+              "unique": true,
               "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "관객 모두 기립",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "에피콘",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "박수갈채",
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "대본 넘기기",
-          "kind": "ap"
-        },
-        {
-          "name": "엑스트라 한 명",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -350,17 +369,15 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.41,
           "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "에피콘"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.2,
-          "target": "allEnemies"
+          "k": "summon",
+          "id": "에피콘",
+          "ratio": 0.24,
+          "target": "allEnemies",
+          "max": 3
         },
         {
           "k": "spend",
@@ -370,21 +387,20 @@
       ],
       "oracles": [
         {
-          "name": "돌격 대열",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.55,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "에피콘"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "allEnemies"
+              "k": "summon",
+              "id": "에피콘",
+              "ratio": 0.32,
+              "target": "allEnemies",
+              "max": 3
             },
             {
               "k": "spend",
@@ -394,22 +410,21 @@
           ]
         },
         {
-          "name": "에피콘 하나",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.39,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "에피콘"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.13,
-              "target": "allEnemies"
+              "k": "summon",
+              "id": "에피콘",
+              "ratio": 0.22,
+              "target": "allEnemies",
+              "max": 3
             },
             {
               "k": "spend",
@@ -419,65 +434,18 @@
           ]
         },
         {
-          "name": "클라이맥스",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "allEnemies"
+              "ratio": 0.52,
+              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "에피콘"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "대열 보충",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "에피콘"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.23,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "에피콘 떼 습격",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "에피콘"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.37,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
+              "k": "summon",
               "id": "에피콘",
-              "all": true
+              "ratio": 0.38,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -486,20 +454,67 @@
               "unique": true
             }
           ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
+            },
+            {
+              "k": "summon",
+              "id": "에피콘",
+              "ratio": 0.21,
+              "target": "allEnemies",
+              "max": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "target": "allEnemies"
+            },
+            {
+              "k": "summon",
+              "id": "에피콘",
+              "ratio": 0.43,
+              "target": "allEnemies",
+              "max": 3
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "용기 한 스푼",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "에피콘의 눈치",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "무대 체질",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -522,12 +537,12 @@
         },
         {
           "k": "shield",
-          "ratio": 0.8
+          "ratio": 0.6
         }
       ],
       "oracles": [
         {
-          "name": "에피칸 둘",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -540,12 +555,12 @@
             },
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 0.6
             }
           ]
         },
         {
-          "name": "에피칸 신호",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -556,15 +571,30 @@
             {
               "k": "draw",
               "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.4
             }
           ]
         },
         {
-          "name": "상설 무대",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "연주 중",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -573,8 +603,8 @@
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 1
+              "k": "draw",
+              "v": 1
             },
             {
               "k": "power",
@@ -596,62 +626,19 @@
           ]
         },
         {
-          "name": "즉흥 등장",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "stack",
-              "id": "에피콘",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
             {
               "k": "stack",
               "id": "에피콘",
               "v": 2
-            }
-          ]
-        },
-        {
-          "name": "분장실 숨기",
-          "fx": [
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
             {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "에피콘",
-              "v": 3
-            },
-            {
-              "k": "shield",
-              "ratio": 1.2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "두꺼운 무대막",
-          "kind": "guard"
-        },
-        {
-          "name": "대기실 쪽지",
-          "kind": "draw"
-        },
-        {
-          "name": "조수 에피콘",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "에피콘",
               "v": 1
             }
           ]
@@ -696,7 +683,7 @@
       ],
       "oracles": [
         {
-          "name": "앙코르 공연",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
@@ -706,7 +693,7 @@
             {
               "k": "stack",
               "id": "에피콘",
-              "v": 2
+              "v": 1
             },
             {
               "k": "power",
@@ -733,12 +720,12 @@
           ]
         },
         {
-          "name": "소극장",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "에피콘",
               "v": 1
             },
             {
@@ -766,18 +753,16 @@
           ]
         },
         {
-          "name": "첫 공연",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
             {
               "k": "stack",
               "id": "에피콘",
-              "v": 3
-            },
-            {
-              "k": "draw",
               "v": 1
             },
             {
@@ -785,56 +770,13 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "공격"
+                    "on": "summonAct",
+                    "id": "에피콘",
+                    "kind": "lost"
                   },
                   "limit": {
                     "per": "turn",
                     "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "에피콘",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "커튼콜",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "에피콘",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "ult"
                   },
                   "fx": [
                     {
@@ -849,7 +791,7 @@
           ]
         },
         {
-          "name": "다음 악장",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "status",
@@ -885,15 +827,55 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "에피콘",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "흥겨운 박자",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "defUp"
         },
         {
-          "name": "객석의 에피콘",
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -901,10 +883,169 @@
               "v": 1
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "에피카_u5",
+      "name": "바치는 무대",
+      "hero": "에피카",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.52,
+          "target": "oneEnemy"
         },
         {
-          "name": "켈틱 하프",
-          "kind": "draw"
+          "k": "stack",
+          "id": "에피콘",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "연주 중",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "연주 중",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "연주 중",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "연주 중",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "에피콘",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "연주 중",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "에피콘",
+              "v": 1
+            }
+          ]
         }
       ]
     }

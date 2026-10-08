@@ -64,6 +64,7 @@ namespace Bolzena.RunUI
                 }
                 if (P.S.Hist.Count == 0) Ui.Text(hist, "전투가 없었습니다", 18, Theme.Sub).Pref(-1, 30);
 
+                EndCrayon(root);   // 받은 크레파스(Flow.Crayon.cs)
                 var go = Btn.Make(root, "로비로", BtnStyle.PillGold, Lobby, Theme.FsLg);
                 go.GetComponent<RectTransform>().At(0.5f, 0, 0, Theme.C(34, 22), 340, Theme.C(70, 64));
                 Stage.Hot["end.lobby"] = go;

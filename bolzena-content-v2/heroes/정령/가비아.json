@@ -5,42 +5,42 @@
       "name": "가비아",
       "nature": "순수",
       "role": "서포터",
+      "style": "아껴 두기형",
       "star": 2,
       "hp": 640,
       "atk": 64,
       "def": 63,
       "crit": 5,
-      "blurb": "목소리를 키우면 땅이 울리는 대지의 정령. 카드를 속삭임으로 낼지 외침으로 낼지 고릅니다 — 외침은 두 배지만 목청이 차오릅니다.",
+      "blurb": "목소리를 키우면 땅이 울리는 대지의 정령. 할 일을 미루고 AP 나 쥔 카드를 남긴 채 턴을 마칠 때마다 고함을 꾹 삼키고, 다섯이 차면 손에 땅울림이 맺힙니다 — 언제 터뜨릴지는 가비아가 고릅니다.",
       "keyword": {
         "name": "삼킨 고함",
         "desc": "꾹 삼켜 둔 거친 말",
         "carrier": "self",
         "cap": 5,
-        "rules": [
-          {
-            "name": "땅울림",
-            "when": {
-              "on": "stackReach",
-              "id": "삼킨 고함",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "삼킨 고함",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.6,
-                "base": "def",
-                "target": "allEnemies"
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "가비아_quake",
+          "consume": true
+        }
       },
       "passives": [
+        {
+          "name": "조용한 대지",
+          "when": {
+            "on": "keepAp"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1,
+              "ofEvent": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            }
+          ]
+        },
         {
           "name": "우웅⋯",
           "when": {
@@ -49,30 +49,13 @@
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
               "id": "삼킨 고함",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "조용한 대지",
-          "when": {
-            "on": "turnEnd"
-          },
-          "conds": [
-            {
-              "c": "ownNone"
-            }
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
             }
           ]
         }
@@ -142,6 +125,7 @@
       "cost": 0,
       "type": "스킬",
       "tags": [
+        "보존",
         "소멸"
       ],
       "fx": [
@@ -158,12 +142,41 @@
       "blurb": "가비아가 심심풀이로 깎아 둔 작은 흙 인형입니다."
     },
     {
+      "id": "가비아_quake",
+      "name": "땅울림",
+      "hero": "가비아",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "보존",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "tough",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "아흔아홉 번 참은 고함이 마침내 땅을 울립니다"
+    },
+    {
       "id": "가비아_u1",
       "name": "작은 목소리",
       "hero": "가비아",
       "unique": true,
       "cost": 0,
       "type": "스킬",
+      "tags": [
+        "보존"
+      ],
       "fx": [
         {
           "k": "stack",
@@ -177,7 +190,10 @@
       ],
       "oracles": [
         {
-          "name": "으응?",
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -191,7 +207,10 @@
           ]
         },
         {
-          "name": "교주만 알아듣는 말",
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -200,42 +219,15 @@
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "삼킨 고함",
               "v": 2
             }
           ]
         },
         {
-          "name": "조각칼",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 1
-            },
-            {
-              "k": "make",
-              "id": "가비아_statue",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "삼킨 고함",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "땅속의 고요",
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
           "power": true,
           "fx": [
             {
@@ -252,7 +244,11 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -267,10 +263,31 @@
           ]
         },
         {
-          "name": "말줄임표",
+          "name": "신탁 4",
           "tags": [
-            "소멸"
+            "보존"
           ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -279,29 +296,11 @@
             },
             {
               "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "누워서 숨만",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "흙냄새",
-          "kind": "draw"
-        },
-        {
-          "name": "조각 선물",
-          "fx": [
-            {
-              "k": "make",
-              "id": "가비아_statue",
               "v": 1
+            },
+            {
+              "k": "gauge",
+              "v": 15
             }
           ]
         }
@@ -339,11 +338,12 @@
       ],
       "oracles": [
         {
-          "name": "참을 만큼 참았어",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.54,
               "base": "def",
               "target": "allEnemies"
             },
@@ -353,7 +353,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.14,
+              "ratio": 0.16,
               "base": "def",
               "target": "allEnemies"
             },
@@ -365,14 +365,13 @@
           ]
         },
         {
-          "name": "도시를 묻는 목소리",
-          "cost": 2,
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.77,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -382,26 +381,7 @@
               "k": "dmg",
               "ratio": 0.22,
               "base": "def",
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "지켜 주려고 낸 소리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 고함"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.5
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
@@ -411,35 +391,50 @@
           ]
         },
         {
-          "name": "유령 늪 간척",
+          "name": "신탁 3",
+          "power": true,
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "base": "def",
+              "target": "allEnemies"
+            },
             {
               "k": "perStack",
               "id": "삼킨 고함"
             },
             {
               "k": "dmg",
-              "ratio": 0.22,
+              "ratio": 0.11,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "삼킨 고함",
-              "all": true
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "삼킨 고함",
-              "v": 3
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 고함",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "조각상 깨기",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
@@ -464,20 +459,48 @@
               "tag": "가비아_statue"
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 고함"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "유창한 장문",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "꺼지는 땅",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "몸 사리는 정령들",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -506,11 +529,12 @@
       ],
       "oracles": [
         {
-          "name": "단단한 돌벽",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.89
+              "ratio": 1.9
             },
             {
               "k": "status",
@@ -525,31 +549,13 @@
           ]
         },
         {
-          "name": "돌벽 셋",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.2
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "make",
-              "id": "가비아_statue",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "흡수한 만큼",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.5
+              "ratio": 1.23
             },
             {
               "k": "status",
@@ -557,22 +563,20 @@
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "삼킨 고함"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
             }
           ]
         },
         {
-          "name": "바위 같은 침묵",
+          "name": "신탁 3",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 1.26
             },
             {
               "k": "status",
@@ -593,8 +597,8 @@
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "반격",
+                      "k": "stack",
+                      "id": "삼킨 고함",
                       "v": 1
                     }
                   ]
@@ -604,14 +608,11 @@
           ]
         },
         {
-          "name": "가장 위험한 친구부터",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.64
+              "ratio": 1.62
             },
             {
               "k": "status",
@@ -619,8 +620,24 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "삼킨 고함",
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.64
+            },
+            {
+              "k": "status",
+              "id": "반격",
               "v": 1
             }
           ]
@@ -628,15 +645,15 @@
       ],
       "blesses": [
         {
-          "name": "흙 갑옷",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "반사 피해",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "잔돌",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -661,17 +678,18 @@
           "v": 1
         },
         {
-          "k": "perStack",
-          "id": "삼킨 고함"
+          "k": "stack",
+          "id": "삼킨 고함",
+          "v": 1
         },
         {
-          "k": "shield",
-          "ratio": 0.3
+          "k": "nextAp",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "깊은 잠",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
@@ -679,17 +697,33 @@
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "삼킨 고함"
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 2
             },
             {
-              "k": "shield",
-              "ratio": 0.42
+              "k": "nextAp",
+              "v": 1
             }
           ]
         },
         {
-          "name": "땅속의 잠",
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "power": true,
           "fx": [
             {
@@ -698,11 +732,15 @@
               "v": 1
             },
             {
+              "k": "nextAp",
+              "v": 1
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
@@ -717,29 +755,7 @@
           ]
         },
         {
-          "name": "운동은 싫어",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "삼킨 고함"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.52
-            },
-            {
-              "k": "spend",
-              "id": "삼킨 고함",
-              "all": true
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "최애 응원 준비",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "status",
@@ -747,12 +763,174 @@
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "삼킨 고함"
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 0.3
+              "k": "make",
+              "id": "가비아_statue",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 2
+            },
+            {
+              "k": "nextAp",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "defUp"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "가비아_u5",
+      "name": "위층 쿵쿵 금지",
+      "hero": "가비아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.78,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "삼킨 고함",
+          "v": 1
+        },
+        {
+          "k": "make",
+          "id": "가비아_statue",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.13,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "가비아_statue",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "가비아_statue",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.69,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "가비아_statue",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.98,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "가비아_statue",
+              "v": 1
             },
             {
               "k": "draw",
@@ -763,36 +941,37 @@
           ]
         },
         {
-          "name": "조각 취미",
-          "cost": 0,
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "결정화",
+              "k": "dmg",
+              "ratio": 1.84,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 고함",
+              "v": 2
+            },
+            {
+              "k": "discard",
               "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 고함"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.25
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "푹신한 흙",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "곰팡이 없는 동굴",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "조각 하나 더",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",

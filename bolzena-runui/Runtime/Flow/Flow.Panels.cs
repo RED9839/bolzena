@@ -58,6 +58,20 @@ namespace Bolzena.RunUI
                 lobby.Pref(280);
                 Stage.Hot["settings.lobby"] = lobby;
             }
+            if (!inRun)
+            {   // 크레파스 · 교주 능력치 진행 코드 — 내보내기(클립보드로) · 불러오기(클립보드에서, 체크섬 검사)
+                var cp = Btn.Make(bar, "진행 코드 복사", BtnStyle.Dark, () => { GUIUtility.systemCopyBuffer = CrayonStore.Export(); Toast.Show("크레파스 · 교주 능력치 진행 코드를 복사했습니다"); }, Theme.FsMd);
+                cp.Pref(Theme.C(220, 210)); Stage.Hot["settings.export"] = cp;
+                var ps = Btn.Make(bar, "코드 붙여넣기", BtnStyle.Dark, () =>
+                {
+                    var code = GUIUtility.systemCopyBuffer;
+                    if (string.IsNullOrWhiteSpace(code)) { Toast.Show("클립보드에 코드가 없습니다"); return; }
+                    var chk = Bolzena.Core.Crayon.Import(code, CrayonStore.Table);
+                    if (chk.why != null) { Toast.Show("받지 않았습니다 — " + chk.why); return; }
+                    Confirm("교주 능력치 진행을 바꿀까요?", $"크레파스 {string.Join(" · ", chk.save.Have.Select((n, i) => Bolzena.Core.Crayon.TIERS[i] + " " + n))} · 단계 {string.Join(" · ", chk.save.Level.Select(kv => kv.Key + " " + kv.Value))} 로 바뀝니다. 지금 진행은 사라집니다.", "바꾸기", () => { var w = CrayonStore.Import(code); Toast.Show(w ?? "교주 능력치 진행을 불러왔습니다"); }, true);
+                }, Theme.FsMd);
+                ps.Pref(Theme.C(220, 210)); Stage.Hot["settings.import"] = ps;
+            }
             var ok = Btn.Make(bar, "닫기", BtnStyle.Gold, close, Theme.FsMd);
             ok.Pref(240);
             Stage.Hot["settings.close"] = ok;

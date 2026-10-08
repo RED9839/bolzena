@@ -195,7 +195,7 @@ namespace Bolzena.Core
                 FreeOnce.Add(cardId);
                 GainedFlash.Add((cardId, o.N, o.Shin));
                 var od = Data.Card(cardId).Oracles[o.N - 1];
-                Say($"신탁! 「{Data.Card(cardId).Name}」 → 신탁 {o.N}{(o.Shin != null ? " · 축복" : "")}");
+                Say($"신탁! 「{Data.Card(cardId).Name}」 → 신탁{(o.Shin != null ? " · 축복" : "")}");
             }
             else
             {
@@ -263,6 +263,10 @@ namespace Bolzena.Core
             bool tune = !c.X && !payKw && paid == Ap;
             Ap -= paid;
             ApSpent += paid;
+            // 직전보다 비싼가(시범 16 리코타) — 이번 턴 바로 앞 카드의 비용과 견준다(턴 첫 카드는 아니다)
+            int prevCost = Counts.TryGetValue("lastCostT", out var lct) && lct == Turn && Counts.TryGetValue("lastCost", out var lcv) ? lcv : -1;
+            bool pricier = prevCost >= 0 && cost0 > prevCost;
+            Counts["lastCost"] = cost0; Counts["lastCostT"] = Turn; Counts["pricier"] = pricier ? 1 : 0;
             int held = Held.TryGetValue(cardId, out var hv) ? hv : 0;
             int playedBefore = PlayedThisTurn;
             string baseId = GameData.BaseId(cardId);
@@ -284,8 +288,10 @@ namespace Bolzena.Core
                 HitTags = CardHitTags(cardId, c), Card = true, Type = c.Type, Chain = nat != null && PrevNat == nat, Tune = tune,
                 Link = c.Hero != null && last != null && last.Value.Item1 == c.Hero, Prev = last?.Item2,
                 Repeat = repeat, Held = held, PlayedBefore = playedBefore,
-                CardId = cardId, Made = GameData.IsPlain(cardId), Cost = c.X ? paid : c.Cost, Choice = opts.Choice ?? 0, Scale = opts.Scale ?? 1,
+                CardId = cardId, Made = GameData.IsPlain(cardId), Cost = c.X ? paid : c.Cost, Choice = opts.Choice ?? 0, Scale = opts.Scale ?? 1, SpendPick = opts.Spend, Pricier = pricier,
             };
+            // 다음 카드 강화(empower · onMax empower) — 그 사도 몫 · 파티 몫을 이 카드가 쓴다(상태 카드 · 저주는 안 쓴다)
+            if (!c.IsStatus && !c.IsCurse && Counts.Count > 0 && EmpowerOf(c.Hero) > 0) ctx.Scale *= EmpowerUse(c.Hero);
             bool sealedNow = HasTagB(cardId, Tag.Seal) && !Unsealed.Contains(cardId);
             bool blockedNow = CardStOf(cardId, "봉쇄") > 0;
             if (blockedNow) DelCardSt(cardId, "봉쇄");
@@ -321,7 +327,7 @@ namespace Bolzena.Core
                 else RunFx(c.Fx, ctx);
                 // 그 카드만의 축복 — 덤 효과(배율은 ctx.Shin 이 실었다)
                 var bl = mute ? null : BlessOf(Data.Card(cardId), sh);
-                if (bl != null && bl.Fx.Count > 0) { Say($"{R.DIVINE_NAME} 「{bl.Name}」"); var c2 = ctx.Copy(); c2.Shin = null; RunFx(bl.Fx, c2); }
+                if (bl != null && bl.Fx.Count > 0) { Say(R.DIVINE_NAME); var c2 = ctx.Copy(); c2.Shin = null; RunFx(bl.Fx, c2); }
                 // 협공 — 사도가 공격 카드를 내면 다른 아군의 공격력 100% 로 같은 적을, 1 쓴다
                 // 협공 — 협공을 건 사도의 공격력 100% 로 추가 공격(건 사도가 없으면 낸 사도를 뺀 가장 센 사도), 1 쓴다
                 if (!mute && owner != null && c.Type == "공격" && St(Pool, "협공") > 0 && Over == null)
@@ -382,6 +388,8 @@ namespace Bolzena.Core
             var tgt = Enemies.FirstOrDefault(e => e.Idx == targetIdx && !e.Dead);
             PlayTags.Add(c.Tags.Select(t => Tag.Parse(t).id).ToList());
             Emit("play", new EmitInfo { Id = cardId, Hero = c.Hero, Actor = owner?.Key, Type = c.Type, Nth = PlayedThisTurn, Target = tgt, Cost = c.X ? paid : c.Cost, Sig = c.Signature, Repeat = repeat, Who = owner, Tags = c.Tags });
+            // 계산형 공용 계기 — 이 카드의 셈 조건이 섰으면 「셈이 맞으면」(카드가 다 끝난 뒤)
+            if (ctx.Tallied && Over == null) Emit("tally", new EmitInfo { Id = cardId, Hero = c.Hero, By = owner?.Key, Target = tgt });
             Acting = null; ModSrc = null;
             CheckOver();
             if (Over == null) { FoePassives("card", null, type: c.Type, nth: PlayedThisTurn, same: sameHero); CheckOver(); }

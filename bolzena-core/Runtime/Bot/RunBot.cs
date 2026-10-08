@@ -12,6 +12,8 @@ namespace Bolzena.Core
         public bool Skilled;
         /// <summary>기본 카드 없이 파티 사도의 고유 카드만으로 판을 시작한다(극단 측정).</summary>
         public bool UniqueOnly;
+        /// <summary>교주 능력치(크레파스 — Crayon.Perks) — 판을 열 때 건다. null = 없음(난이도 기준).</summary>
+        public Dictionary<string, double> Perks;
         public int Depth = 1, Width = 3;
         public double Hpx = 1, Dmgx = 1;
         public string Village;
@@ -40,6 +42,8 @@ namespace Bolzena.Core
         /// <summary>강인도 통계 — 카드가 강인도를 깎은 횟수 · 그 가운데 약점 · 격파 수. 싸움 종류(fight · elite · boss …)마다 격파 수.</summary>
         public int ToughHits, ToughWeakHits, Breaks;
         public Dictionary<string, int> BreaksBy = new();
+        /// <summary>학점제 학년 — 판이 끝날 때 학년 · 누적 학점, 마지막(2층) 보스 싸움을 열 때 학년(못 닿았으면 0).</summary>
+        public int Grade, Credits, GradeLastBoss, CreditsLastBoss;
     }
 
     /// <summary>
@@ -129,6 +133,7 @@ namespace Bolzena.Core
         bool Fight(Run run, SimOpts P, SimResult outr)
         {
             string kind = $"{run.S.Floor + 1}:{KindOf(run)}";
+            if (run.IsBoss && run.IsLastFloor && run.S.EventFight == null) { outr.GradeLastBoss = run.Grade; outr.CreditsLastBoss = run.S.Credits; }
             var (st, loot) = run.OpenFight(P.Hpx, P.Dmgx);
             var r = RngOf((uint)(run.S.Seed * 31 + run.S.Step));
             P.OnFight?.Invoke(st, run);
@@ -385,6 +390,7 @@ namespace Bolzena.Core
         public SimResult RunFull(List<string> party, long seed, SimOpts P)
         {
             var run = Run.New(data, party, seed, P.Village);
+            run.ApplyPerks(P.Perks);
             plan = P.Skilled ? new DeckPlan(data, party) : null;
             bots.EpiPick = plan != null ? SkilledEpi : null;
             if (P.UniqueOnly) { run.S.Deck.Clear(); run.S.Deck.AddRange(party.SelectMany(k => data.UniquesOf(k))); }   // 고유만 — 기본 카드 없이 시작
@@ -421,6 +427,7 @@ namespace Bolzena.Core
             o.Basics = run.S.Deck.Count(run.IsBasic);
             o.Removals = run.S.Removals;
             o.Flags = run.S.Flags.ToList();
+            o.Grade = run.Grade; o.Credits = run.S.Credits;
             return o;
         }
     }

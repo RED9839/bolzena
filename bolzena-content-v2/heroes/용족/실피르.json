@@ -6,12 +6,13 @@
       "nature": "우울",
       "race": "용족",
       "role": "딜러",
+      "style": "박자형",
       "star": 2,
       "hp": 590,
       "atk": 115,
       "def": 27,
       "crit": 10,
-      "blurb": "루드와 티격태격하는 사파이어의 용족, 자칭 2인자. 동료가 공격할 때마다 기록을 세어 두었다가 제 공격으로 그 기록을 깨면, 하늘을 가르는 기세에 적들이 한꺼번에 굼떠집니다.",
+      "blurb": "루드에게 늘 한 끗 차로 지는 사파이어의 용족, 자칭 2인자. 첫 자리는 동료에게 내주고 둘째 자리에 날을 세웁니다 — 단검이 다섯 모이면 다음 한 수에 몰아 던집니다.",
       "keyword": {
         "name": "2인자의 단검",
         "desc": "루드보다 하나 더 챙긴 단검",
@@ -22,7 +23,12 @@
             "stat": "dealt",
             "v": 0.12
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.6,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -45,10 +51,24 @@
           ]
         },
         {
-          "name": "청금이라 부르지 마",
+          "name": "넘버 투",
           "when": {
-            "on": "stackOver",
-            "id": "2인자의 단검"
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "한 끗 차",
+          "when": {
+            "on": "play",
+            "type": "공격",
+            "nth": 2
           },
           "limit": {
             "per": "turn",
@@ -56,11 +76,8 @@
           },
           "fx": [
             {
-              "k": "perEvent"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
+              "k": "extra",
+              "ratio": 0.59,
               "target": "randomEnemy"
             }
           ]
@@ -135,7 +152,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.24,
+          "ratio": 1.3,
           "target": "oneEnemy"
         },
         {
@@ -144,7 +161,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.31,
+          "ratio": 0.39,
           "target": "randomEnemy"
         },
         {
@@ -155,11 +172,12 @@
       ],
       "oracles": [
         {
-          "name": "킹갓zi존 단검비",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.55,
+              "ratio": 1.76,
               "target": "oneEnemy"
             },
             {
@@ -168,7 +186,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.39,
+              "ratio": 0.53,
               "target": "randomEnemy"
             },
             {
@@ -179,56 +197,108 @@
           ]
         },
         {
-          "name": "정정당당",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.34,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "nth": 2
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자의 단검",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "2인자의 단검",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.23,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
           "tags": [
-            "약점 공격"
+            "소멸"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.37,
+              "ratio": 2.73,
               "target": "oneEnemy"
             },
-            {
-              "k": "perStack",
-              "id": "2인자의 단검"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "2인자의 단검",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "몇 자루는 아껴 두기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "2인자의 단검",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.39,
-              "target": "randomEnemy",
-              "hits": 3
-            }
-          ]
-        },
-        {
-          "name": "2인자의 집념",
-          "fx": [
             {
               "k": "perStack",
               "id": "2인자의 단검"
@@ -239,40 +309,8 @@
               "target": "randomEnemy"
             },
             {
-              "k": "spend",
-              "id": "2인자의 단검",
-              "all": true
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "2인자의 단검",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "단검 줍기",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "2인자의 단검"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.73,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "2인자의 단검",
-              "all": true
-            },
-            {
-              "k": "pull",
-              "from": "discard",
+              "k": "draw",
+              "v": 1,
               "who": "self",
               "unique": true
             }
@@ -281,15 +319,15 @@
       ],
       "blesses": [
         {
-          "name": "사파이어 날",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "호수 잠수",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "나이아의 응원",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -311,61 +349,25 @@
         {
           "k": "stack",
           "id": "2인자의 단검",
-          "v": 3
+          "v": 2
         },
         {
           "k": "draw",
           "v": 1
+        },
+        {
+          "k": "ifNth",
+          "n": 2
+        },
+        {
+          "k": "stack",
+          "id": "2인자의 단검",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "진짜 2인자",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "2인자의 단검",
-              "v": 4
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "질투의 일격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.93,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "2인자의 단검",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "루드보다 먼저",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "2인자의 단검",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "다야 님 곁으로",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -377,8 +379,8 @@
               "v": 1
             },
             {
-              "k": "when",
-              "on": "draw"
+              "k": "ifNth",
+              "n": 2
             },
             {
               "k": "stack",
@@ -388,13 +390,52 @@
           ]
         },
         {
-          "name": "노력 끝의 보상",
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "ifNth",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "stack",
               "id": "2인자의 단검",
-              "v": 2
+              "v": 3
             },
             {
               "k": "draw",
@@ -405,36 +446,39 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "nth": 2
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "2인자의 단검",
-                      "v": 1
+                      "v": 2
                     }
                   ]
                 }
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "반짝이는 것",
-          "kind": "guard"
         },
         {
-          "name": "쇼핑 봉투",
-          "kind": "cost"
-        },
-        {
-          "name": "웨스트 블루 제독님",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -454,7 +498,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.93,
+          "ratio": 1.04,
           "target": "allEnemies"
         },
         {
@@ -464,21 +508,25 @@
           "target": "allEnemies"
         },
         {
+          "k": "ifNth",
+          "n": 2
+        },
+        {
           "k": "stack",
           "id": "2인자의 단검",
-          "v": 1
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "창공의 패자",
+          "name": "신탁 1",
           "tags": [
             "신속"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.16,
+              "ratio": 1.4,
               "target": "allEnemies"
             },
             {
@@ -488,93 +536,73 @@
               "target": "allEnemies"
             },
             {
+              "k": "ifNth",
+              "n": 2
+            },
+            {
               "k": "stack",
               "id": "2인자의 단검",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "급강하",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "신속"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.95,
-              "target": "oneEnemy"
+              "ratio": 0.99,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "둔화",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifNth",
+              "n": 2
             },
             {
               "k": "stack",
               "id": "2인자의 단검",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "청금이라 부르지 마!",
-          "tags": [
-            "신속"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.93,
+              "ratio": 1.46,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "2인자의 단검",
-              "v": 1
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "2인자의 단검",
-              "n": 4
+              "k": "ifNth",
+              "n": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.62,
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "깃털 단검",
-          "tags": [
-            "신속"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.98,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "2인자의 단검"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "2인자의 단검",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "바람의 지배자",
+          "name": "신탁 4",
           "tags": [
             "신속"
           ],
@@ -582,7 +610,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.19,
+              "ratio": 1.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -590,32 +624,60 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "nth": 2
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "2인자의 단검",
-                      "v": 1
+                      "k": "status",
+                      "id": "둔화",
+                      "v": 1,
+                      "target": "allEnemies"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "푸른 날개",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "바람 가르기",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "비늘 깃",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -635,13 +697,8 @@
       "type": "공격",
       "fx": [
         {
-          "k": "status",
-          "id": "사기",
-          "v": 1
-        },
-        {
           "k": "dmg",
-          "ratio": 0.78,
+          "ratio": 0.98,
           "target": "oneEnemy"
         },
         {
@@ -650,22 +707,26 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.39,
+          "ratio": 0.26,
           "target": "oneEnemy"
+        },
+        {
+          "k": "ifNth",
+          "n": 2
+        },
+        {
+          "k": "extra",
+          "ratio": 0.78
         }
       ],
       "oracles": [
         {
-          "name": "2인자의 품격",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 1.01,
+              "ratio": 1.31,
               "target": "oneEnemy"
             },
             {
@@ -674,23 +735,84 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifNth",
+              "n": 2
+            },
+            {
+              "k": "extra",
+              "ratio": 1.05
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.76,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.47,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "영원한 라이벌",
-          "power": true,
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.21,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
             },
             {
               "k": "dmg",
-              "ratio": 1.85,
+              "ratio": 0.31,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifNth",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.09,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "2인자의 단검"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
               "target": "oneEnemy"
             },
             {
@@ -698,13 +820,11 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
+                    "on": "extra"
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 2
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -719,32 +839,13 @@
           ]
         },
         {
-          "name": "악우의 응원",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
             {
               "k": "dmg",
-              "ratio": 0.97,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "2인자의 단검",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "전교 1등 목표",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "ratio": 1.76,
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -752,58 +853,187 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.81,
+              "ratio": 0.47,
               "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "2인자의 단검",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "셀프 칭찬",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "2인자의 단검"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.69,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "사파이어 광택",
+          "name": "축복 1",
           "kind": "atkUp"
         },
         {
-          "name": "도전장",
-          "tags": [
-            "개전"
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "실피르_u5",
+      "name": "엑박스칼리버 탐색",
+      "hero": "실피르",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.04
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        },
+        {
+          "k": "stack",
+          "id": "2인자의 단검",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.46
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 1
+            }
           ]
         },
         {
-          "name": "풋풋한 학창 시절",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
+              "k": "shield",
+              "ratio": 0.99
+            },
+            {
               "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.78
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.94
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "2인자의 단검",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.25
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "2인자의 단검",
               "v": 1
             }
           ]

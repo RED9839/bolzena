@@ -6,46 +6,49 @@
       "nature": "활발",
       "race": "유령",
       "role": "딜러",
+      "style": "버리기형",
       "star": 3,
       "hp": 550,
       "atk": 135,
       "def": 25,
       "crit": 10,
-      "blurb": "메이드 크레페의 일을 통째로 뒤집어쓴 꼬마 유령. 카드를 낼 때마다 고장 난 청소기가 버린 더미를 한 장씩 빨아들이고, 「잡동사니」 셋이 차면 청소기가 역류해 적 전체에 먼지를 뿜습니다.",
+      "blurb": "메이드 크레페의 일을 통째로 뒤집어쓴 꼬마 유령. 카드가 버려질 때마다 고장 난 청소기가 「잡동사니」 로 빨아들이고, 쌓인 잡동사니를 흡입구로 한꺼번에 뱉습니다. 넷이 다 차면 청소기가 폭주해 다음 한 수가 크게 나가고, 버린 더미가 수북할수록 특훈 솜씨가 붙습니다.",
       "keyword": {
         "name": "잡동사니",
         "desc": "고장 난 청소기에 빨려 든 것들",
         "carrier": "self",
         "cap": 4,
-        "rules": [
+        "per": [
           {
-            "name": "터보 배출",
-            "when": {
-              "on": "stackReach",
-              "id": "잡동사니",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "잡동사니",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.3,
-                "target": "randomEnemy",
-                "hits": 5
-              },
-              {
-                "k": "ap",
-                "v": 1
-              }
-            ]
+            "stat": "dealt",
+            "v": 0.06
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.6,
+          "consume": true
+        }
       },
       "passives": [
+        {
+          "name": "고장난 청소기",
+          "when": {
+            "on": "discard",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        },
         {
           "name": "고장난 청소기",
           "when": {
@@ -54,7 +57,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 1
           },
           "fx": [
             {
@@ -101,7 +104,7 @@
       },
       "starter": [
         "스피키_메이드_s1",
-        "스피키_메이드_u1",
+        "스피키_메이드_u3",
         "스피키_메이드_s3",
         "스피키_메이드_s2"
       ]
@@ -159,7 +162,13 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.95,
+          "ratio": 0.98,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
           "target": "allEnemies"
         },
         {
@@ -170,11 +179,18 @@
       ],
       "oracles": [
         {
-          "name": "호박 낙하",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.22,
+              "ratio": 1.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -185,33 +201,19 @@
           ]
         },
         {
-          "name": "전단지",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.89,
-              "target": "allEnemies"
-            },
-            {
-              "k": "rushDown",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
-            }
-          ]
-        },
-        {
-          "name": "먼지 한 톨",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.81,
+              "ratio": 0.92,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -222,33 +224,31 @@
           ]
         },
         {
-          "name": "대청소의 날",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.77,
+              "ratio": 1.47,
               "target": "allEnemies"
+            },
+            {
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "stack",
               "id": "잡동사니",
               "v": 2
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 2,
-              "basic": true
             }
           ]
         },
         {
-          "name": "청소 운",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 1.35,
               "target": "allEnemies"
             },
             {
@@ -257,13 +257,42 @@
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "잡동사니",
-              "n": 4
-            },
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.45,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.54,
+              "ratio": 1.76,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
@@ -271,15 +300,15 @@
       ],
       "blesses": [
         {
-          "name": "터보 버튼",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "크레페 배지",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "호박 장식",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -300,7 +329,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.41,
+          "ratio": 0.53,
           "target": "randomEnemy",
           "hits": 3
         },
@@ -310,7 +339,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.39,
           "target": "randomEnemy"
         },
         {
@@ -321,11 +350,12 @@
       ],
       "oracles": [
         {
-          "name": "최대 흡입",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.72,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -335,7 +365,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.53,
               "target": "randomEnemy"
             },
             {
@@ -346,79 +376,13 @@
           ]
         },
         {
-          "name": "한 곳만 청소",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.43,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "잡동사니"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "잡동사니",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "조금만 뱉기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.49,
-              "target": "randomEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "잡동사니"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "흡입구 역류",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "target": "randomEnemy",
-              "hits": 3
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
-            },
-            {
-              "k": "stack",
-              "id": "잡동사니",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "물청소 질색",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.53,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -428,7 +392,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.27,
+              "ratio": 0.39,
               "target": "randomEnemy"
             },
             {
@@ -436,267 +400,8 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "잡동사니",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "청소기 수리",
-          "kind": "power"
-        },
-        {
-          "name": "흡입력",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "먼지 봉투",
-          "kind": "ap"
-        }
-      ]
-    },
-    {
-      "id": "스피키_메이드_u3",
-      "name": "호박 장식 시즌",
-      "hero": "스피키_메이드",
-      "unique": true,
-      "cost": 0,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "exileFrom",
-          "from": "hand",
-          "n": 1,
-          "basic": true
-        },
-        {
-          "k": "stack",
-          "id": "잡동사니",
-          "v": 2
-        },
-        {
-          "k": "shield",
-          "ratio": 0.54
-        }
-      ],
-      "oracles": [
-        {
-          "name": "호박 테마 저택",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
-            },
-            {
-              "k": "stack",
-              "id": "잡동사니",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 0.91
-            }
-          ]
-        },
-        {
-          "name": "세상 가장 청결한 호박",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
-            },
-            {
-              "k": "stack",
-              "id": "잡동사니",
-              "v": 2
-            },
-            {
-              "k": "heal",
-              "ratio": 1.08
-            }
-          ]
-        },
-        {
-          "name": "호박 장식 찾기",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
-            },
-            {
-              "k": "stack",
-              "id": "잡동사니",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "장식 정리",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
-            },
-            {
-              "k": "shield",
-              "ratio": 0.81
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "잡동사니",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "시즌 준비",
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "잡동사니",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.54
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "잡동사니",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "호박 쟁반",
-          "kind": "guard"
-        },
-        {
-          "name": "콧노래",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "잡동사니",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "메이드 미소",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
-      "id": "스피키_메이드_u4",
-      "name": "크레페 선배의 특훈",
-      "hero": "스피키_메이드",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.41,
-          "target": "randomEnemy",
-          "hits": 2
-        },
-        {
-          "k": "perStack",
-          "id": "잡동사니"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.27,
-          "target": "randomEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "특훈 이수",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.51,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "perStack",
-              "id": "잡동사니"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "메이드 교육",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "스킬"
+                    "on": "discard",
+                    "who": "any"
                   },
                   "limit": {
                     "per": "turn",
@@ -715,14 +420,13 @@
           ]
         },
         {
-          "name": "까다로운 업무",
-          "cost": 0,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.34,
-              "target": "randomEnemy",
-              "hits": 2
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "perStack",
@@ -730,41 +434,22 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.23,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "선배의 칭찬",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "target": "randomEnemy",
-              "hits": 2
+              "ratio": 0.47,
+              "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
+              "k": "spend",
               "id": "잡동사니",
-              "v": 2
+              "all": true
             }
           ]
         },
         {
-          "name": "완벽한 메이드",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.41,
+              "ratio": 0.52,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -774,7 +459,34 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.36,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "잡동사니"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
               "target": "randomEnemy"
             }
           ]
@@ -782,15 +494,487 @@
       ],
       "blesses": [
         {
-          "name": "메이드 복",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "칭찬 한마디",
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "kind": "ap"
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_u3",
+      "name": "호박 장식 시즌",
+      "hero": "스피키_메이드",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "discard",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "잡동사니",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.04
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "잡동사니",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_u4",
+      "name": "크레페 선배의 특훈",
+      "hero": "스피키_메이드",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.52,
+          "target": "randomEnemy",
+          "hits": 2
+        },
+        {
+          "k": "ifPile",
+          "n": 5,
+          "from": "discard"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.52,
+          "target": "randomEnemy",
+          "hits": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifPile",
+              "n": 5,
+              "from": "discard"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "randomEnemy",
+              "hits": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifPile",
+              "n": 5,
+              "from": "discard"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "randomEnemy",
+              "hits": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifPile",
+              "n": 5,
+              "from": "discard"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "잡동사니",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifPile",
+              "n": 5,
+              "from": "discard"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "빗자루",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스피키_메이드_u5",
+      "name": "베이킹 소다 한 줌",
+      "hero": "스피키_메이드",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "discard",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "잡동사니",
+          "v": 1
+        },
+        {
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 2
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.04
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "잡동사니",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "잡동사니",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 2",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

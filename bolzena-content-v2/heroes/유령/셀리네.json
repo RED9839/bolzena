@@ -6,44 +6,38 @@
       "nature": "활발",
       "race": "유령",
       "role": "탱커",
+      "style": "버티형",
       "star": 3,
       "hp": 880,
       "atk": 75,
       "def": 70,
       "crit": 5,
-      "blurb": "남의 화난 표정을 수집하는 도발의 여왕 엘튜버 유령. 약을 올리거나 얻어맞을 때마다 「표정」 이 모이고, 모은 표정으로 적을 얼어붙게 하거나 갤러리째 들이밉니다. 넘친 표정은 반격이 됩니다.",
+      "blurb": "남의 화난 표정을 수집하는 도발의 여왕 엘튜버 유령. 약 올려 끌어온 공격을 막아 낼수록 「표정」 이 모이고, 다 차면 조회수 폭발 셀카를 올립니다. 모은 표정은 갤러리째 들이밉니다.",
       "keyword": {
         "name": "표정",
         "desc": "약 올려서 모은 화난 표정",
         "carrier": "self",
         "cap": 5,
-        "rules": [
-          {
-            "name": "업로드",
-            "when": {
-              "on": "stackReach",
-              "id": "표정",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "표정",
-                "all": true
-              },
-              {
-                "k": "shield",
-                "ratio": 2
-              },
-              {
-                "k": "draw",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "셀리네_viral",
+          "consume": true
+        }
       },
       "passives": [
+        {
+          "name": "방금 그 표정 좋았어",
+          "when": {
+            "on": "guardSum"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1,
+              "ofEvent": 0.02
+            }
+          ]
+        },
         {
           "name": "방금 그 표정 좋았어",
           "when": {
@@ -51,7 +45,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 1
           },
           "fx": [
             {
@@ -70,7 +64,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.4
+              "ratio": 0.36
             },
             {
               "k": "status",
@@ -162,7 +156,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.35
+          "ratio": 0.32
         }
       ],
       "blurb": "화난 얼굴 옆에서 브이. 구독자용 비하인드 컷."
@@ -180,7 +174,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.2
+          "ratio": 1.08
         },
         {
           "k": "stack",
@@ -204,7 +198,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.33,
+          "ratio": 0.3,
           "base": "def",
           "target": "allEnemies"
         },
@@ -222,11 +216,12 @@
       ],
       "oracles": [
         {
-          "name": "하트 에너지",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.46,
+              "ratio": 0.44,
               "base": "def",
               "target": "allEnemies"
             },
@@ -244,12 +239,13 @@
           ]
         },
         {
-          "name": "하트 폭발",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.76,
+              "ratio": 0.28,
               "base": "def",
               "target": "allEnemies"
             },
@@ -260,23 +256,18 @@
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "randomEnemy"
+              "k": "stack",
+              "id": "표정",
+              "v": 1
             }
           ]
         },
         {
-          "name": "한 명만 노려",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 1.13,
+              "ratio": 0.45,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -285,39 +276,21 @@
               "id": "약화",
               "v": 2,
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "후훗",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.39,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
+              "unique": true
             }
           ]
         },
         {
-          "name": "관객 몰이",
-          "power": true,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.27,
               "base": "def",
               "target": "allEnemies"
             },
@@ -328,44 +301,27 @@
               "target": "allEnemies"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "debuff"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.62
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "사근사근",
-          "kind": "power"
-        },
-        {
-          "name": "토끼 펀치",
-          "kind": "frost"
-        },
-        {
-          "name": "구독 버튼",
-          "fx": [
-            {
               "k": "make",
               "id": "셀리네_selfie",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.66,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -381,7 +337,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.21
+          "ratio": 1.08
         },
         {
           "k": "stack",
@@ -396,11 +352,12 @@
       ],
       "oracles": [
         {
-          "name": "화난 표정 인증샷",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.88
+              "ratio": 1.69
             },
             {
               "k": "stack",
@@ -415,44 +372,47 @@
           ]
         },
         {
-          "name": "연속 촬영",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.99
-            },
-            {
-              "k": "make",
-              "id": "셀리네_selfie",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "무한 일회용 카메라",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.09
+              "ratio": 1.03
             },
             {
               "k": "stack",
               "id": "표정",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self"
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 1
             }
           ]
         },
         {
-          "name": "셀카 각도",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.98
+              "ratio": 0.9
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
             },
             {
               "k": "make",
@@ -460,24 +420,30 @@
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "표정",
-              "n": 4
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guardSum"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "셀리네_selfie",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "채널 No.5",
-          "cost": 2,
+          "name": "신탁 5",
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.07
+              "ratio": 1.44
             },
             {
               "k": "make",
@@ -485,8 +451,7 @@
               "v": 2
             },
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -494,15 +459,15 @@
       ],
       "blesses": [
         {
-          "name": "포즈",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "플래시",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "필터",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -523,7 +488,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.45,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -533,7 +498,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.18,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -545,7 +510,8 @@
       ],
       "oracles": [
         {
-          "name": "명예의 전당",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -571,7 +537,29 @@
           ]
         },
         {
-          "name": "갤러리 공개",
+          "name": "신탁 2",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "표정"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
@@ -585,7 +573,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.15,
+              "ratio": 0.12,
               "base": "def",
               "target": "allEnemies"
             },
@@ -597,68 +585,13 @@
           ]
         },
         {
-          "name": "셀카 전시회",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.46,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "셀리네_selfie"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "셀리네_selfie"
-            }
-          ]
-        },
-        {
-          "name": "구독자 0부터",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "표정"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "표정",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "셀럽 복귀",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.42,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -668,7 +601,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.18,
+              "ratio": 0.17,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -677,36 +610,62 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "표정",
-                    "n": 5
+                    "on": "guardSum"
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.44,
+                      "ratio": 0.28,
                       "base": "def",
-                      "target": "allEnemies"
+                      "target": "oneEnemy"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "표정"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "액자",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "약 올리기",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "조회수",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -719,16 +678,19 @@
       "type": "강화",
       "fx": [
         {
-          "k": "status",
-          "id": "결의",
-          "v": 1
+          "k": "shield",
+          "ratio": 0.72
         },
         {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "turnStart"
+                "on": "blocked"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 2
               },
               "fx": [
                 {
@@ -743,69 +705,27 @@
       ],
       "oracles": [
         {
-          "name": "나긋한 반말",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.99
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "표정",
-                      "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.33
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "체스의 검은 말",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "표정",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "표정",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "반격",
                       "v": 1
                     }
                   ]
@@ -815,35 +735,59 @@
           ]
         },
         {
-          "name": "뒷일 생각 안 함",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "표정",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.63
             },
             {
               "k": "stack",
               "id": "표정",
-              "v": 3
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "표정",
-                      "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.33
+                      "k": "reflect",
+                      "ratio": 0.4
                     }
                   ]
                 }
@@ -852,59 +796,61 @@
           ]
         },
         {
-          "name": "판 짜기",
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.54
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "표정",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
           "tags": [
-            "개전"
+            "종극"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "표정",
-              "v": 2
+              "k": "shield",
+              "ratio": 1.35
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "blocked"
                   },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "표정",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "무미호 장난",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "make",
-              "id": "셀리네_selfie",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
@@ -921,21 +867,179 @@
       ],
       "blesses": [
         {
-          "name": "기부 챌린지",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "셀럽 미소",
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셀리네_u5",
+      "name": "어그로 썸네일",
+      "hero": "셀리네",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "표정",
+          "v": 1
+        },
+        {
+          "k": "make",
+          "id": "셀리네_selfie",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "아하하",
-          "kind": "cost"
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.9
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "셀리네_selfie",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "셀리네_selfie",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "표정",
+              "v": 1
+            }
+          ]
         }
       ]
     }

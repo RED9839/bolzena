@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "마녀",
       "role": "서포터",
+      "style": "손 만들기형",
       "star": 2,
       "hp": 460,
       "atk": 64,
@@ -21,30 +22,27 @@
           {
             "name": "서가 정리",
             "when": {
-              "on": "stackReach",
-              "id": "북카트",
-              "n": 3
+              "on": "make"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
             },
             "fx": [
               {
-                "k": "spend",
-                "id": "북카트",
-                "all": true
-              },
-              {
-                "k": "make",
-                "id": "바리에_book",
-                "v": 2
-              },
-              {
                 "k": "stack",
                 "id": "빌린 책",
-                "v": 2,
+                "v": 1,
                 "target": "strongestAlly"
               }
             ]
           }
-        ]
+        ],
+        "onMax": {
+          "make": "바리에_book",
+          "n": 2,
+          "consume": true
+        }
       },
       "keywords": [
         {
@@ -98,7 +96,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.5
+              "ratio": 0.65
             }
           ]
         }
@@ -178,7 +176,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.4
+          "ratio": 0.52
         }
       ],
       "blurb": "분리수거장에서 건진 고서. 펼치면 누군가의 비법이 적혀 있습니다"
@@ -205,7 +203,7 @@
       ],
       "oracles": [
         {
-          "name": "두 권 대출",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -221,30 +219,64 @@
           ]
         },
         {
-          "name": "추천 도서",
+          "name": "신탁 2",
           "fx": [
             {
               "k": "stack",
               "id": "빌린 책",
-              "v": 3,
+              "v": 2,
               "target": "oneAlly"
             },
             {
               "k": "draw",
               "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.82
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빌린 책",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1,
               "who": "other",
               "type": "공격"
+            },
+            {
+              "k": "gauge",
+              "v": 15
             }
           ]
         },
         {
-          "name": "연장 대출",
-          "power": true,
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
               "id": "빌린 책",
-              "v": 1,
+              "v": 4,
               "target": "oneAlly"
             },
             {
@@ -253,76 +285,7 @@
               "who": "other"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "빌린 책",
-                      "v": 1,
-                      "target": "strongestAlly"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "예약 도서",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "빌린 책",
-              "v": 2,
-              "target": "oneAlly"
-            },
-            {
-              "k": "make",
-              "id": "바리에_book",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "반납 독촉",
-          "fx": [
-            {
-              "k": "pull",
-              "from": "discard",
-              "n": 1,
-              "basic": true
-            },
-            {
-              "k": "stack",
-              "id": "빌린 책",
-              "v": 3,
-              "target": "oneAlly"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "책 모자",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "대출 카드",
-          "kind": "draw"
-        },
-        {
-          "name": "헌 책 한 권",
-          "fx": [
-            {
-              "k": "make",
-              "id": "바리에_book",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -339,7 +302,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.6
+          "ratio": 2.08
         },
         {
           "k": "stack",
@@ -355,11 +318,12 @@
       ],
       "oracles": [
         {
-          "name": "고서 카트",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.1
+              "ratio": 2.81
             },
             {
               "k": "stack",
@@ -375,54 +339,11 @@
           ]
         },
         {
-          "name": "책 한 칸",
-          "cost": 0,
+          "name": "신탁 2",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.75
-            },
-            {
-              "k": "stack",
-              "id": "북카트",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "빌린 책",
-              "v": 1,
-              "target": "strongestAlly"
-            }
-          ]
-        },
-        {
-          "name": "분리수거장의 헌 책",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.8
-            },
-            {
-              "k": "stack",
-              "id": "북카트",
-              "v": 1
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "n": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "북카트 들이받기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "base": "def",
-              "target": "oneEnemy"
+              "ratio": 1.56
             },
             {
               "k": "stack",
@@ -437,35 +358,88 @@
           ]
         },
         {
-          "name": "정숙 경고",
+          "name": "신탁 3",
+          "tags": [],
+          "power": true,
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "shield",
-              "ratio": 2.35
+              "ratio": 2.34
             },
             {
               "k": "stack",
               "id": "북카트",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.98
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.39
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.74
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "제자리에",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "단것부터",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "정숙 표지판",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -486,7 +460,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.72,
+          "ratio": 0.94,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -496,7 +470,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.39,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -508,11 +482,12 @@
       ],
       "oracles": [
         {
-          "name": "몽둥이 독촉",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.89,
+              "ratio": 1.26,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -522,7 +497,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.34,
+              "ratio": 0.53,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -534,12 +509,13 @@
           ]
         },
         {
-          "name": "쉿",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.88,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -549,7 +525,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.18,
+              "ratio": 0.36,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -561,13 +537,13 @@
           ]
         },
         {
-          "name": "연체 고지서",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.83,
+              "ratio": 0.65,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
               "k": "perStack",
@@ -575,47 +551,52 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.26,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "잉크 폭탄",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 1.18,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "북카트"
+              "k": "perTag",
+              "id": "바리에_book"
             },
             {
               "k": "dmg",
-              "ratio": 0.34,
+              "ratio": 0.59,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "n": 1
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "바리에_book"
             }
           ]
         },
         {
-          "name": "헌 책 압수",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.43,
+              "ratio": 1.69,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -625,35 +606,29 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.16,
+              "ratio": 0.7,
               "base": "def",
               "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "바리에_book",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "고서 카트 들이받기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "연체료",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "정숙해주세요오",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
             }
           ]
         }
@@ -669,7 +644,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.7
+          "ratio": 0.91
         },
         {
           "k": "perTag",
@@ -677,7 +652,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.35
+          "ratio": 0.45
         },
         {
           "k": "stack",
@@ -688,11 +663,12 @@
       ],
       "oracles": [
         {
-          "name": "대청소",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.9
+              "ratio": 1.23
             },
             {
               "k": "perTag",
@@ -700,7 +676,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.45
+              "ratio": 0.61
             },
             {
               "k": "stack",
@@ -711,12 +687,13 @@
           ]
         },
         {
-          "name": "분류 번호",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.5
+              "ratio": 0.86
             },
             {
               "k": "perTag",
@@ -724,7 +701,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.25
+              "ratio": 0.43
             },
             {
               "k": "stack",
@@ -735,12 +712,177 @@
           ]
         },
         {
-          "name": "신착 도서",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.78
+            },
+            {
+              "k": "perTag",
+              "id": "바리에_book"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.39
+            },
+            {
+              "k": "make",
+              "id": "바리에_book",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "shield",
+              "ratio": 1.03
+            },
+            {
+              "k": "perTag",
+              "id": "바리에_book"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.52
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.49
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "perTag",
+              "id": "바리에_book"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.49
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "바리에_book",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바리에_u5",
+      "name": "책 아령",
+      "hero": "바리에",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.04,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "북카트",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "북카트",
               "v": 1
             },
             {
@@ -753,9 +895,8 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "빌린 책",
-                      "v": 1,
-                      "target": "strongestAlly"
+                      "id": "북카트",
+                      "v": 1
                     }
                   ]
                 }
@@ -764,57 +905,59 @@
           ]
         },
         {
-          "name": "개관 준비",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "pull",
-              "from": "discard",
-              "n": 1,
-              "who": "other"
+              "k": "dmg",
+              "ratio": 0.98,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "make",
-              "id": "바리에_book",
+              "k": "stack",
+              "id": "북카트",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "벨리타가 인정한 학위",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.23
+              "k": "dmg",
+              "ratio": 1.56,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "perTag",
-              "id": "바리에_book"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.64
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "북카트",
-              "all": true
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "셰럼 몰래",
-          "kind": "guard"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "만년 막내",
-          "tags": [
-            "개전"
-          ]
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "헌 책 사랑",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

@@ -19,9 +19,13 @@ namespace Bolzena.Core
         static readonly HashSet<string> ALLY_TARGETS = new() { "self", "oneAlly", "allAllies", "otherAllies" };
         static readonly HashSet<string> WHEN_ON = new() { "fightStart", "turnStart", "turnEnd", "play", "guard", "break", "kill", "hurt", "lowHp", "rush", "ult", "debuff", "overheal", "stackReach", "stackGone", "stackOver", "reserveGone", "switch", "rhythm", "always",
             "discard", "pay", "exhaust", "huntDown", "blocked", "spend", "link", "crit", "make",
-            "drawn", "shuffle", "extra", "hit", "shieldBreak", "foeShieldBreak", "foeGuard", "foeAct", "foeActBefore", "endure", "unwound" };
+            "drawn", "shuffle", "extra", "hit", "shieldBreak", "foeShieldBreak", "foeGuard", "foeAct", "foeActBefore", "endure", "unwound",
+            "tally", "keepAp", "reserveFire", "grow", "fightEnd", "guardSum", "summonAct" };
         static readonly HashSet<string> CONDS = new() { "stack", "hp", "hpMin", "status", "foes", "foesMax", "playedMin", "playedMax", "ownNone", "apLeft", "gauge", "guarded", "rushed", "hurtLast", "killedLast", "firstTurn", "targetBroken",
-            "repeat", "held", "spent", "balanced", "debuffs", "paid", "wounded", "onlyMe", "ally", "inDebt", "heldCards", "idleLast", "typeNew" };
+            "repeat", "held", "spent", "balanced", "debuffs", "paid", "wounded", "onlyMe", "ally", "inDebt", "heldCards", "idleLast", "typeNew", "goneMin", "pricier", "gained" };
+        /// <summary>사도 갈래(style) — 18갈래 v2(2026-10-08). 같은 갈래끼리의 통계 · 반응이 본다.</summary>
+        public static readonly HashSet<string> STYLES = new() { "쌓고 고르기", "박자형", "아껴 두기형", "버리기형", "계산형", "대가형", "예약형", "손 만들기형", "표적형",
+            "거드는 형", "두 얼굴형", "버티형", "격파형", "소멸형", "성장형", "돈형", "소환형", "회복형" };
         static readonly HashSet<string> INTENTS = new() { "attack", "back", "attackAll", "multi", "charge", "block", "guard", "heal", "buff", "debuff", "jam", "addCard", "summon",
             "count", "cardDebuff", "handCost", "reshuffle", "autoPlay", "shift", "brace", "seize" };
         static readonly HashSet<string> FOE_ON = new() { "fightStart", "turnStart", "turnEnd", "hurt", "lowHp", "allyDown", "card", "rushed", "debuffed", "broken", "recover",
@@ -79,7 +83,10 @@ namespace Bolzena.Core
                 if (f.K == null || !FxK.All.Contains(f.K)) { E($"{w}: 모르는 효과 조각"); continue; }
                 if (f.OfStack != null && (!keywords.Contains(f.OfStack) || !(f.OfEvent > 0) || (f.K != FxK.Dmg && f.K != FxK.Shield))) E($"{w}: ofStack 은 dmg · shield 에, 사도 키워드 이름 + ofEvent 와 같이 — 「{f.OfStack}」");
                 if (f.Target != null && !TARGETS.Contains(f.Target) && !(f.Target.StartsWith("hero:") && d.Hero(f.Target.Substring(5)) != null)) E($"{w}: 모르는 대상 {f.Target}");
-                if (f.Who != null && f.Who != "self" && f.Who != "other" && d.Hero(f.Who) == null) E($"{w}: who 는 self · other · 사도 id");
+                if (f.K == FxK.Empower) { if (f.Who != null && f.Who != "self" && f.Who != "any") E($"{w}: empower 의 who 는 self(그 사도의 다음 카드 · 기본) · any(파티의 다음 카드)"); }
+                else if (f.Who != null && f.Who != "self" && f.Who != "other" && d.Hero(f.Who) == null) E($"{w}: who 는 self · other · 사도 id");
+                if (f.Owner != null && (f.K != FxK.Make || (f.Owner != "self" && f.Owner != "other" && d.Hero(f.Owner) == null))) E($"{w}: owner 는 make 에만 — self · other · 사도 id");
+                if (f.Pick && (f.K != FxK.Spend || f.All || (f.Id != null && keywords.Contains(f.Id) && d.CarrierOf(f.Id) != "self"))) E($"{w}: pick(소모량 고르기)은 spend 에만 · all 과 같이 쓰지 않는다 · 자기 주머니(carrier self) 고유 효과만");
                 if (f.Else != null) FxList(w + " else", f.Else);
                 switch (f.K)
                 {
@@ -101,7 +108,29 @@ namespace Bolzena.Core
                         if (f.V == 0) E($"{w}: v 가 없다");
                         if (f.V < 0 && R.IsCardSt(f.Id)) E($"{w}: {f.Id} 는 음수로 걸 수 없다(비용 · 카드 값만)");
                         effects++; break;
-                    case FxK.IfKill: case FxK.IfBreak: case FxK.IfAllHeroes: break;
+                    case FxK.IfKill: if (f.Id != null && f.Id != "elite" && f.Id != "boss") E($"{w}: id 는 elite(엘리트 · 보스) · boss(보스만)"); break;
+                    case FxK.IfBreak: case FxK.IfAllHeroes: break;
+                    // 시범 16(2026-10-08 2단계)
+                    case FxK.IfPricier: break;
+                    case FxK.IfGained: if (f.Id == null || !keywords.Contains(f.Id)) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」"); if (f.N <= 0) E($"{w}: n 이 없다(이번 전투에 쌓은 양 n 이상)"); break;
+                    case FxK.PerGone: if (f.Who != null && f.Who != "self") E($"{w}: who 는 self(자신의 카드만) 또는 없음(파티 전체)"); break;
+                    case FxK.Ripen:
+                        {
+                            var rk = d.Heroes.Values.SelectMany(h => h.AllKeywords).FirstOrDefault(k => k.Name == f.Id);
+                            if (rk == null) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」");
+                            else if (!rk.Reserve) E($"{w}: 당겨 쓰기는 예약 키워드(reserve)만 — 「{f.Id}」");
+                            if (f.V < 0 || f.V > 1) E($"{w}: v 는 0~1(남은 칸 1당 효과를 깎는 비율, 기본 0.25)");
+                            effects++; break;
+                        }
+                    case FxK.Summon:
+                        {
+                            var sk = d.Heroes.Values.SelectMany(h => h.AllKeywords).FirstOrDefault(k => k.Name == f.Id);
+                            if (sk == null) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」");
+                            if (!(f.Ratio > 0)) E($"{w}: ratio 가 없다(소환물 한 대의 공격력 비율)");
+                            if (f.Base != null && f.Base != "def") E($"{w}: base 는 def 만");
+                            if (f.Max < 0 || f.Max > Battle.SUMMON_CAP) E($"{w}: max 는 0~{Battle.SUMMON_CAP}(한 카드에 따라 치는 대 수 상한)");
+                            effects++; break;
+                        }
                     case FxK.Roll: if (f.N < 2 || f.N > 6) E($"{w}: n 은 2~6(셋 중 하나면 3)"); break;
                     case FxK.IfRoll: if (f.N < 1) E($"{w}: n 은 1 이상(굴린 눈)"); if (!fx.Take(i).Any(x => x.K == FxK.Roll)) E($"{w}: 앞에 roll 이 있어야 한다"); break;
                     case FxK.IfPrevSame: case FxK.IfLastMine: case FxK.IfPulled: case FxK.IfShield: case FxK.IfDebt: case FxK.IfTypeNew: break;
@@ -123,11 +152,14 @@ namespace Bolzena.Core
                     case FxK.IfHand: if (f.N < 0) E($"{w}: n 은 0 이상(손패 n 장 이하)"); break;
                     case FxK.IfPile: case FxK.PerPile: if (f.From != null && !PILES.Contains(f.From)) E($"{w}: from 은 draw · discard · gone · hand"); if (f.K == FxK.IfPile && f.N <= 0) E($"{w}: n 이 없다"); break;
                     case FxK.IfNth: if (f.N <= 0) E($"{w}: n 이 없다(1 이상)"); break;
-                    case FxK.IfStreak: if (f.N < 2) E($"{w}: n 은 2 이상(같은 사도 카드를 잇달아 n 장째)"); break;
+                    case FxK.IfStreak: if (f.N < 2) E($"{w}: n 은 2 이상(같은 사도 카드를 잇달아 n 장째)"); if (f.Type != null && f.Type != "공격" && f.Type != "스킬" && f.Type != "강화") E($"{w}: type 은 공격 · 스킬 · 강화"); break;
                     case FxK.IfFoe: if (f.Id != "broken" && f.Id != "tough" && f.Id != "guarded" && f.Id != "attack" && f.Id != "hp" && f.Id != "hpMob" && !R.ALL_ST.Contains(f.Id)) E($"{w}: id 는 broken · tough · guarded · attack · hp · hpMob · 상태 이름"); break;
                     case FxK.IfCardSt: case FxK.PerCardSt: if (string.IsNullOrEmpty(f.Id)) E($"{w}: id(카드 값 이름)가 없다"); break;
                     case FxK.PerPlayed: if (f.Id != null && Array.IndexOf(Tag.All, f.Id) < 0) E($"{w}: id 는 태그 이름(없으면 낸 카드 전부)"); break;
                     case FxK.PerEvent: break;
+                    case FxK.PerGuarded: if (f.Per < 0) E($"{w}: per 는 양수(막아 낸 양 몇 마다)"); if (f.Max < 0) E($"{w}: max 는 0 이상(최대 몇 번)"); break;
+                    case FxK.PerOverheal: if (f.Per < 0) E($"{w}: per 는 양수(넘친 회복 몇 마다)"); if (f.Max < 0) E($"{w}: max 는 0 이상(최대 몇 번)"); if (f.Pct < 0 || f.Pct >= 1) E($"{w}: pct 는 0~1(회복 뒤 HP 그 비율을 넘은 몫 — 0 이면 최대 HP 를 넘친 몫)"); break;
+                    case FxK.Empower: if (!(f.Ratio > 0 && f.Ratio <= 3)) E($"{w}: ratio 는 0~3(다음 카드 피해 · 실드 · 회복 +비율)"); effects++; break;
                     case FxK.Later: case FxK.AfterCards: case FxK.Trap:
                         if (f.Then == null || f.Then.Count == 0) E($"{w}: then(안에 든 효과)이 없다"); else FxList(w + " then", f.Then);
                         if (f.K != FxK.Trap && f.N <= 0) E($"{w}: n 이 없다(턴 · 장수)");
@@ -141,7 +173,7 @@ namespace Bolzena.Core
                     case FxK.GrowRun: if (f.Id != null && f.Id != "atk" && f.Id != "def" && f.Id != "crit") E($"{w}: id 는 atk · def · crit"); if (f.V == 0) E($"{w}: v 가 없다"); effects++; break;
                     case FxK.Stack: case FxK.Spend:
                         if (f.Id == null || !keywords.Contains(f.Id)) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」");
-                        if (f.K == FxK.Spend && !f.All && f.V <= 0) E($"{w}: v 또는 all 이 필요하다");
+                        if (f.K == FxK.Spend && !f.All && !f.Pick && f.V <= 0) E($"{w}: v · all · pick 가운데 하나가 필요하다");
                         if (f.K == FxK.Stack && f.V <= 0) E($"{w}: v 가 없다");
                         effects++; break;
                     case FxK.IfStack: case FxK.PerStack:
@@ -216,6 +248,13 @@ namespace Bolzena.Core
         static readonly HashSet<string> LASTING_ST = new() { "사기", "불굴", "결의", "결정화", "고동", "근면", "계몽", "집중" };
         static bool HasLasting(List<Fx> fx) => fx != null && fx.Any(f => f.K == FxK.Power || (f.K == FxK.Status && f.Target == null && LASTING_ST.Contains(f.Id ?? "")) || (FxK.Mods.Contains(f.K) && f.Run));
 
+        /// <summary>다 차면 저절로 터지나 — stackReach · stackOver 규칙에 만들기 · 강화 · 소모 · 연출 말고 다른 효과가 있거나, onMax 가 변신이면.</summary>
+        static readonly HashSet<string> NOT_BURST = new() { FxK.Make, FxK.Empower, FxK.Spend, FxK.Cue };
+        public static bool AutoBurst(HeroDef h) =>
+            h.Passives.Concat(h.AllKeywords.SelectMany(k => k.Rules)).Any(r => r.When != null && (r.When.On == "stackReach" || r.When.On == "stackOver")
+                && r.Fx.Any(f => !NOT_BURST.Contains(f.K) && !FxK.Conditions.Contains(f.K) && !FxK.Pers.Contains(f.K)))
+            || h.AllKeywords.Any(k => k.OnMax != null && k.OnMax.Form != null);
+
         void Rule(string at, PassiveRule r)
         {
             if (r.When == null || r.When.On == null || !WHEN_ON.Contains(r.When.On)) E($"{at}: 모르는 언제 「{r.When?.On}」");
@@ -225,12 +264,15 @@ namespace Bolzena.Core
                 if (r.When.On == "stackReach" && r.When.N <= 0) E($"{at}: stackReach 에 n 이 없다");
                 if (r.When.On == "rhythm" && r.When.N <= 0) E($"{at}: rhythm 에 n 이 없다");
                 if (r.When.On == "lowHp" && !(r.When.Pct > 0 && r.When.Pct < 1)) E($"{at}: lowHp 의 pct 는 0~1");
+                if (r.When.On == "keepAp" && r.When.Kind != null && r.When.Kind != "ap" && r.When.Kind != "keep") E($"{at}: keepAp 의 kind 는 ap(AP 를 남김) · keep(보존 카드를 쥐고 넘김) — 없으면 둘 다");
+                if (r.When.On == "summonAct" && r.When.Kind != null && r.When.Kind != "atk" && r.When.Kind != "guard" && r.When.Kind != "lost") E($"{at}: summonAct 의 kind 는 atk(따라 침) · guard(대신 맞음) · lost(하나가 사라짐) — 없으면 모두");
+                if (r.When.On == "overheal" && (r.When.Pct < 0 || r.When.Pct >= 1)) E($"{at}: overheal 의 pct 는 0~1(회복 뒤 HP 가 그 비율 이상이면 — 0 이면 최대 HP 를 넘칠 때)");
                 if (r.When.Seq != null && (r.When.Seq.Count < 2 || r.When.Seq.Count > 3)) E($"{at}: seq 는 종류 2~3");
                 if (r.When.On == "huntDown" && r.When.Id != null && !keywords.Contains(r.When.Id)) E($"{at}: 키워드가 아니다 — 「{r.When.Id}」");
                 if (r.When.Fresh && r.When.On != "debuff") E($"{at}: fresh 는 debuff 에만");
                 if (r.When.Repeat && r.When.On != "play") E($"{at}: repeat 는 play 에만");
                 if (r.When.Who != null && r.When.Who != "any" && r.When.Who != "other") E($"{at}: who 는 any · other");
-                if (r.When.Who == "other" && !new[] { "play", "spend", "link", "crit", "make", "hit", "drawn", "extra", "unwound" }.Contains(r.When.On)) E($"{at}: who other 는 play · spend · link · crit · make · hit · drawn · extra · unwound 에만");
+                if (r.When.Who == "other" && !new[] { "play", "spend", "link", "crit", "make", "hit", "drawn", "extra", "unwound", "exhaust", "discard" }.Contains(r.When.On)) E($"{at}: who other 는 play · spend · link · crit · make · hit · drawn · extra · unwound · exhaust · discard 에만");
                 if (r.When.CardSt != null && r.When.On != "play") E($"{at}: cardSt 는 play 에만");
                 foreach (var c in r.Conds) if (c.C == "ally" && d.Hero(c.Id) == null) W($"{at}: 조건 ally 의 사도 {c.Id} 가 없다");
                 if (r.When.Guarded && r.When.On != "hurt") E($"{at}: guarded 는 hurt 에만");
@@ -250,6 +292,10 @@ namespace Bolzena.Core
             if (Array.IndexOf(R.ROLES, h.Role) < 0) E($"{at}: role 은 탱커 · 서포터 · 딜러");
             if (h.Nature != null && Array.IndexOf(R.NATURES, h.Nature) < 0) E($"{at}: 모르는 성격 {h.Nature}");
             if (h.HadRow) W($"{at}: row 는 이제 쓰지 않는다(사도 열은 없다 — 맞는 모습은 편성 순서) — 지워라");
+            // 갈래(18갈래 v2) — 이름 확인 · 쌓고 고르기 밖에서 「다 차면 저절로 터짐」(stackReach · stackOver · onMax)은 주의
+            if (h.Style != null && !STYLES.Contains(h.Style)) E($"{at}: 모르는 갈래 style 「{h.Style}」 — {string.Join(" · ", STYLES)}");
+            // 1단계(2026-10-08 사용자) — 쌓고 고르기도 센다. 다 차면 「카드 만들기 · 다음 카드 강화」(make · empower · onMax make/empower)로 바꾼 것은 터짐이 아니다
+            if (h.Style != null && AutoBurst(h)) W($"{at}: {h.Style} 인데 키워드가 다 차면 저절로 터진다(stackReach · stackOver · onMax 변신) — 「다 차면 카드 만들기(make) · 다음 카드 강화(empower)」 로 바꾼다");
             if (h.Hp <= 0 || h.Atk <= 0) E($"{at}: hp · atk 가 없다");
             foreach (var id in h.Starter) { var c = d.Card(id); if (c == null) E($"{at}: 없는 시작 카드 {id}"); else if (c.Hero != h.Id) E($"{at}: 시작 카드 {id} 의 주인이 다르다"); }
             if (h.Starter.Count == 0) W($"{at}: 시작 카드가 없다");
@@ -266,6 +312,7 @@ namespace Bolzena.Core
                 if (k.Weakens && k.Carrier != "enemy") E($"{at}: weakens 는 적에게 거는 표식(carrier enemy)에만");
                 if (k.Guard && k.Carrier != "self" && k.Carrier != "hero") E($"{at}: guard(소환물)는 carrier self · hero 에만");
                 if (k.Cut > 0 && (!k.Guard || k.Cut > 1)) E($"{at}: cut 은 guard 와 같이(0~1)");
+                if (k.Uses != 0 && (!k.Guard || k.Uses < 1 || k.Uses > 5)) E($"{at}: uses 는 guard 와 같이(1~5 — 소환물 하나가 받는 대 수)");
                 if (k.TagWhile != null && Array.IndexOf(Tag.All, k.TagWhile) < 0) E($"{at}: tagWhile 은 태그 이름 — 「{k.TagWhile}」");
                 if (k.Spread && k.Carrier != "self") E($"{at}: spread 는 carrier self 에만");
                 foreach (var p in k.Per) { if (p.From != null && (p.From != "owner" || k.Carrier != "enemy")) E($"{at}: per.from 은 owner(적 표식)만"); if (p.Stat == "tough" && k.Carrier != "enemy") E($"{at}: per stat tough 는 적 표식에만"); }
@@ -288,6 +335,14 @@ namespace Bolzena.Core
                 .Concat(h.AllKeywords.Where(k => k.OnMax != null).Select(k => k.OnMax.Form)).ToList();
             foreach (var k in h.AllKeywords.Where(k => k.OnMax != null))
             {
+                var om = k.OnMax;
+                int kinds = (om.Form != null ? 1 : 0) + (om.Make != null ? 1 : 0) + (om.Empower != null ? 1 : 0);
+                if (kinds != 1) E($"{at}: 「{k.Name}」 onMax 는 form · make · empower 가운데 하나만");
+                if (om.Make != null && d.Card(om.Make) == null) E($"{at}: 「{k.Name}」 onMax make — 없는 카드 「{om.Make}」");
+                if (om.Empower != null && om.Empower != "next" && om.Empower != "any") E($"{at}: 「{k.Name}」 onMax empower 는 next(그 사도의 다음 카드) · any(파티의 다음 카드)");
+                if (om.Empower != null && !(om.Ratio > 0 && om.Ratio <= 3)) E($"{at}: 「{k.Name}」 onMax empower 의 ratio 는 0~3");
+                if (om.Make == null && om.N != 0) E($"{at}: 「{k.Name}」 onMax n 은 make 와만");
+                if (om.Make != null && !om.Consume) W($"{at}: 「{k.Name}」 onMax make — consume 이 없으면 최대에 머물러 다시 만들지 않는다(다시 차려면 겹이 줄어야)");
                 if (k.Cap == null || k.Cap <= 0 || k.Mode || k.Wrap) E($"{at}: 「{k.Name}」 onMax 는 최대(cap)가 있는 쌓이는 고유 효과에만(mode · wrap 아님)");
                 if ((k.Carrier ?? "self") != "self") E($"{at}: 「{k.Name}」 onMax 는 carrier self 에만");
                 if (k.Consumes) W($"{at}: 「{k.Name}」 onMax — 발동하면 사라지는 고유 효과는 최대까지 잘 안 찬다");
@@ -393,6 +448,9 @@ namespace Bolzena.Core
             powerOk = c.Type == "강화";
             FxList(at, c.Fx);
             if (c.Fx.Count == 0 && !c.Tags.Contains(Tag.Unplayable) && c.Type != "저주" && c.Type != "상태") W($"{at}: 효과가 없다");
+            // 연쇄 상한(1단계) — 0코로 태우고(burn · exileFrom) 뽑거나 꺼내는 카드는 「소멸」 을 단다(소멸 더미 되살리기와 도는 0코 순환)
+            if (c.Cost == 0 && !c.X && c.Fx.Any(f => f.K == FxK.Burn || f.K == FxK.ExileFrom) && c.Fx.Any(f => f.K == FxK.Draw || f.K == FxK.Pull) && !c.Tags.Any(t => Tag.Parse(t).id == Tag.Exhaust || Tag.Parse(t).id == Tag.Evaporate))
+                W($"{at}: 0코 태우기 + 뽑기 카드는 「소멸」 태그를 단다(소멸 더미 되살리기와 0코 순환이 된다)");
             if (c.Fx.Any(f => f.XHits) && !c.X) E($"{at}: xHits 는 X 코스트 카드에만");
             if (c.Oracles.Count != 0 && c.Oracles.Count != 5) E($"{at}: 신탁은 다섯(①~⑤) — 지금 {c.Oracles.Count}");
             if (c.Unique && c.Hero != null && c.Oracles.Count == 0) W($"{at}: 고유 카드에 신탁이 없다");
@@ -616,6 +674,9 @@ namespace Bolzena.Core
                     Outs(oa + " 이기면", o.Fight.Win);
                 }
                 if (o.Price != null) Outs(oa + " price", o.Price.Out);
+                // by — 대사별 말하는 이. "hero" 는 사도 조건(hero · price.hero)이 있는 선택지에서만
+                foreach (var b in (o.By ?? new List<string>()).Concat(o.Gamble?.SelectMany(g => g.By ?? new List<string>()) ?? Enumerable.Empty<string>()))
+                    if (b == "hero" && (o.Hero == null || o.Hero.Count == 0) && o.Price?.Hero == null) E($"{oa}: by 「hero」 는 hero · price.hero 가 있는 선택지에서만");
                 if (o.When != null && o.When != "hp30") E($"{oa}: when 은 hp30 만");
                 if (o.Flag != null) flagUse[o.Flag] = oa;
                 if (o.NoFlag != null) flagUse[o.NoFlag] = oa;

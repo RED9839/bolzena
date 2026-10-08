@@ -321,6 +321,46 @@ namespace Bolzena.Demo
         }
         bool BossWave => d.Battle.Snapshot.Enemies.Exists(e => e.Boss);
 
+        // -enginedemo: 소모량 고르기 창(강화 없이 · 강화가 걸린 채) · 강화 표시가 붙은 손패 · 파티 칩 · 소모되면 사라지나
+        int HandIdx(string id) => d.Hand.Cards.FindIndex(c => c.Info.Id == id || c.Info.Id.StartsWith(id + "@"));
+        IEnumerator EngineShots()
+        {
+            int windows = 0;
+            SpendWindow.OnStage = _ => { windows++; StartCoroutine(ShotLater(windows == 1 ? "spend_window" : "spend_window_boost", 0.5f)); };
+            d.DemoSpendPick = 1;   // 절반
+            yield return Wait(0.3f);
+            Shot("engine_hand0", 0);
+            Debug.Log("[Engine] 손 " + string.Join(", ", d.Hand.Cards.ConvertAll(c => c.Info.Id + (c.Info.EmpowerMul > 0 ? "(강화)" : ""))));
+            yield return Drag(HandIdx(EngineDemo.Stack), d.FirstAliveEnemy());
+            var pr = d.Battle.SpendPromptOf(HandIdx(EngineDemo.SpendA));
+            Debug.Log("[Engine] 소모 후보 — " + (pr == null ? "없음" : $"{pr.Kw} 가진 {pr.Have} · {pr.PerUnit} · " + string.Join(" / ", pr.Options.ConvertAll(o => $"{o.N}:{o.Name}:{o.Result}:{o.Boosted}"))));
+            yield return Drag(HandIdx(EngineDemo.SpendA), d.FirstAliveEnemy());
+            Debug.Log("[Engine] 소모 뒤 후보 — " + (d.Battle.SpendPromptOf(HandIdx(EngineDemo.SpendB))?.Have.ToString() ?? "없음"));
+            yield return Drag(HandIdx(EngineDemo.Empower), d.FirstAliveEnemy());
+            yield return Wait(0.6f);
+            Shot("empower_hand", 0);
+            Debug.Log("[Engine] 강화 뒤 손 " + string.Join(", ", d.Hand.Cards.ConvertAll(c => c.Info.Id + (c.Info.EmpowerMul > 0 ? $"(강화 ×{c.Info.EmpowerMul})" : ""))) + " · 칩 " + string.Join(", ", d.Battle.Snapshot.PartyChips.ConvertAll(c => c.Id + " " + c.Value)));
+            int hi = HandIdx(EngineDemo.SpendB);
+            if (hi >= 0)
+            {   // 강화된 카드 위에 올려 두기 — 본문 수치
+                yield return MoveTo(d.Hand.Cards[hi].transform.position + new Vector3(0, -0.3f, 0), 0.3f);
+                yield return Wait(0.8f);
+                Shot("empower_hover", 0);
+            }
+            var chip = d.Battle.Snapshot.PartyChips.Find(c => c.Kind == "empower");
+            var at = chip != null && d.Hud.Chips != null ? d.Hud.Chips.PosOf(chip.Id) : null;
+            if (at.HasValue) { yield return MoveTo(at.Value, 0.3f); yield return Wait(0.8f); Shot("empower_chip_tip", 0); }
+            yield return MoveTo(new Vector2(0, -6), 0.2f);
+            d.DemoSpendPick = 0;   // 1개 — 강화된 값을 보인 뒤
+            yield return Drag(HandIdx(EngineDemo.SpendB), d.FirstAliveEnemy());
+            yield return Wait(0.6f);
+            Shot("empower_gone", 0);
+            Debug.Log("[Engine] 소모 뒤 손 " + string.Join(", ", d.Hand.Cards.ConvertAll(c => c.Info.Id + (c.Info.EmpowerMul > 0 ? "(강화)" : ""))) + " · 칩 " + d.Battle.Snapshot.PartyChips.Count + " · 창 " + windows);
+            yield return Wait(0.5f);
+            Debug.Log("[Demo] -enginedemo 끝");
+            Application.Quit(0);
+        }
+
         // -holdzoom: 손패 길게 누르기 확대 — 누르기 전 · 누르는 중(마우스) · 키워드가 가장 많은 카드(터치) · 뗀 뒤 · 누른 채 끌면 확대가 접히나
         IEnumerator HoldZoomShots()
         {
@@ -374,6 +414,7 @@ namespace Bolzena.Demo
             if (Has("-breakkillshots")) { yield return BreakKillShots(); yield break; }
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-holdzoom") >= 0) { yield return HoldZoomShots(); yield break; }
             if (Has("-blessshots")) { yield return BlessShots(); yield break; }
+            if (EngineDemo.On) { yield return EngineShots(); yield break; }
 
             // ── 1턴 — 화면 둘러보기 ──
             // 카드 올려 두기 → 풀이 툴팁
@@ -934,6 +975,34 @@ namespace Bolzena.Demo
                     Shot("second_after", 0);
                 }
             }
+            // 일시정지 메뉴 — 일반 / 저사양 / 나가기 확인
+            for (int pass = 0; pass < 2; pass++)
+            {
+                if (pass == 1) { Bolzena.RunUI.DisplayOptions.SetLowSpec(true); yield return Wait(0.5f); }
+                yield return Wait(0.6f);
+                Shot(pass == 0 ? "scene_normal" : "scene_lowspec", 0);
+                yield return Wait(0.3f);
+                d.OpenPause();
+                yield return Wait(0.6f);
+                Shot(pass == 0 ? "pause_normal" : "pause_lowspec", 0);
+                yield return Wait(0.2f);
+                var pu = Modal.Open != null ? Modal.Open.GetComponent<PauseUi>() : null;
+                if (pu != null) { pu.DemoAskExit(); yield return Wait(0.5f); Shot(pass == 0 ? "pause_confirm_normal" : "pause_confirm_lowspec", 0); yield return Wait(0.2f); }
+                Modal.Open?.Close();
+                yield return Wait(0.3f);
+            }
+            for (int pass = 0; pass < 2; pass++)
+            {
+                Bolzena.RunUI.DisplayOptions.SetLowSpec(pass == 1);
+                yield return Wait(0.4f);
+                d.OpenHeroInfo(1);
+                yield return Wait(0.6f);
+                Shot(pass == 0 ? "party_normal" : "party_lowspec", 0);
+                yield return Wait(0.2f);
+                Modal.Open?.Close();
+                yield return Wait(0.3f);
+            }
+            Bolzena.RunUI.DisplayOptions.SetLowSpec(false);
             Debug.Log("[Demo] 끝");
             Application.Quit(0);
         }

@@ -299,9 +299,9 @@ namespace Bolzena.Core
             {
                 Party = S.Party.ToList(), Deck = S.Deck.ToList(), Enemies = CurrentEnemies().ToList(),
                 PartyHp = S.PartyHp, PartyMaxHp = S.PartyMaxHp, Gear = GearStats(), GearRules = GearRules(), Flash = S.Flash,
-                EnemyHp = sc.hp * hpx, EnemyDmg = sc.dmg * dmgx, Next = next, Shin = S.Shin, Gauge = S.Gauge,
+                EnemyHp = sc.hp * hpx, EnemyDmg = sc.dmg * dmgx, Next = next, Shin = S.Shin, Gauge = GradeGauge(),
                 Elite = S.EventFight != null ? S.EventFight.Elite : S.Elite || BossAsElite, EnemyNature = S.EnemyNature, Floor = S.Floor + 1,
-                Glow = glow, Growth = S.Growth, CardVals = S.CardVals,
+                Glow = glow, Growth = GradeGrowth(), CardVals = S.CardVals, CritDmg = Perk("critDmg"),
                 Seed = (uint)(S.Seed + S.Floor * 101 + S.Node * 7 + S.Step * 13 + (S.EventFight != null ? 555 : 0)),
             };
             var b = Battle.Start(Data, setup, cues, onCue);
@@ -356,6 +356,7 @@ namespace Bolzena.Core
             });
             S.PartyHp = Math.Max(0, b.Pool.Hp); S.PartyMaxHp = b.Pool.MaxHp;
             S.Gauge = Num.Clamp(b.Gauge, 0, R.GAUGE_MAX);
+            GainCredits(b);   // 학점 · 진급(RunGrade.cs)
         }
 
         public bool PartyWiped => S.PartyHp <= 0;
@@ -396,7 +397,7 @@ namespace Bolzena.Core
             var graced = new HashSet<string>(glow.Values.Select(x => x.Hero));
             var free = owners.Where(x => !graced.Contains(x.owner)).ToList();
             var lit = new List<string>();
-            foreach (var (_, ids) in free) if (Rnd() < (R.EPI_CARD.TryGetValue(kind, out var q) ? q : 0)) lit.Add(Pick(ids));
+            foreach (var (_, ids) in free) if (Rnd() < (R.EPI_CARD.TryGetValue(kind, out var q) ? q + Perk("oracleChance") : 0)) lit.Add(Pick(ids));   // 크레파스 보드 — 신탁 확률
             if (able.Count > 0 && lit.Count == 0 && (S.RewardFlash || R.EPI_SURE_CARD.Contains(kind)))
             {
                 var freeIds = free.SelectMany(x => x.ids).ToList();
@@ -428,7 +429,7 @@ namespace Bolzena.Core
             if (c == null) return new List<GlowPick>();
             var pool = Enumerable.Range(1, c.Oracles.Count).Where(n => n != not && FlashOk(cardId, n)).ToList();
             var picks = new List<int>();
-            while (picks.Count < R.ORACLE_PICKS && pool.Count > 0) { int i = RndInt(pool.Count); picks.Add(pool[i]); pool.RemoveAt(i); }
+            while (picks.Count < OraclePicks && pool.Count > 0) { int i = RndInt(pool.Count); picks.Add(pool[i]); pool.RemoveAt(i); }
             picks.Sort();
             var opts = picks.Select(n => new GlowPick { N = n }).ToList();
             if (opts.Count > 0 && Rnd() < R.ORACLE_BLESS)
@@ -469,7 +470,7 @@ namespace Bolzena.Core
         }
 
         /// <summary>아직 얻을 수 있는 고유 카드 — 덱에 있는 것 · 빼 버린 것은 빠진다.</summary>
-        public List<string> UniquesLeft(string heroKey) => Data.UniquesOf(heroKey).Where(id => !S.Deck.Contains(id) && !S.Dropped.Contains(id)).ToList();
+        public List<string> UniquesLeft(string heroKey) => Data.GraceUniquesOf(heroKey).Where(id => !S.Deck.Contains(id) && !S.Dropped.Contains(id)).ToList();
 
         void ForgetCard(string cardId)
         {
@@ -581,6 +582,7 @@ namespace Bolzena.Core
             var table = IsBoss ? R.BOSS_EQUIP : S.Elite ? R.ELITE_EQUIP : R.FIGHT_EQUIP;
             double chance = IsBoss || S.Elite ? 1 : R.DROP_FIGHT;
             var w = table[Math.Min(S.Floor, table.Length - 1)];
+            if (S.Elite && !IsBoss && Perk("eliteUp") > 0 && Rnd() < Perk("eliteUp")) w = GradeUp(w);   // 크레파스 보드 — 엘리트 장비 한 등급 위
             var eq = !lastBoss && (S.DevDrop || Rnd() < chance) ? OfferEquip(w, 1) : new List<string>();
             S.Reward = new RewardState { Equip = eq.Count > 0 ? eq : null, Gold = gold };
             return S.Reward;
@@ -616,6 +618,16 @@ namespace Bolzena.Core
             S.PartyHp = Math.Min(S.PartyMaxHp, S.PartyHp + Math.Max(0, CampHealOf()));
             S.Stops[S.Camp.Key] = "rest";
             return null;
+        }
+        /// <summary>수련할 카드를 골랐다 — 그 카드의 신탁 후보 무작위 셋(R.ORACLE_PICKS). 한 번 굴리면 캠프 상태에 남아 다시 열어도 같다.</summary>
+        public FlashOffer CampOffer(string cardId)
+        {
+            if (S.Camp == null || cardId == null || !FlashTargets().Contains(cardId)) return null;
+            S.Camp.Offers ??= new();
+            var o = S.Camp.Offers.Find(x => x.CardId == cardId);
+            if (o == null) { o = OfferOf(cardId); S.Camp.Offers.Add(o); }
+            S.Camp.Train = o;
+            return o;
         }
         public string CampTrain(int n)
         {
@@ -683,7 +695,7 @@ namespace Bolzena.Core
             return null;
         }
 
-        public int RemovePrice => R.PRICE_REMOVE + R.PRICE_REMOVE_STEP * S.Removals;
+        public int RemovePrice => Math.Max(0, R.PRICE_REMOVE + R.PRICE_REMOVE_STEP * S.Removals - (int)Perk("removeCost"));   // 크레파스 보드 — 빼기 값
         public string RemoveCard(string cardId)
         {
             if (S.Shop == null || S.Shop.RemoveUsed) return "이번에는 더 뺄 수 없습니다";

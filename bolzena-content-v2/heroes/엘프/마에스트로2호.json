@@ -6,52 +6,40 @@
       "nature": "광기",
       "race": "엘프",
       "role": "탱커",
+      "style": "소멸형",
       "star": 2,
       "hp": 880,
       "atk": 66,
       "def": 66,
       "crit": 5,
-      "blurb": "온갖 연료로 움직이는 로봇. 파티에 실드가 쌓일 때마다 배터리가 차고, 가득 차면 방화벽을 펼쳐 파티를 지키고 적의 기세를 꺾습니다.",
+      "blurb": "온갖 연료로 움직이는 로봇. 손의 무엇이든 삼켜 연료로 바꾸고, 연료가 찰수록 파티를 감싸는 실드가 두꺼워지며, 가득 차면 다음 한 수에 힘을 싣습니다.",
       "keyword": {
         "name": "삼킨 연료",
         "desc": "무엇이든 삼켜 채운 연료",
         "carrier": "self",
         "cap": 5,
-        "rules": [
+        "per": [
           {
-            "name": "방화벽 가동",
-            "when": {
-              "on": "stackReach",
-              "id": "삼킨 연료",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "삼킨 연료",
-                "all": true
-              },
-              {
-                "k": "status",
-                "id": "피해 감소",
-                "v": 2
-              },
-              {
-                "k": "status",
-                "id": "약화",
-                "v": 1,
-                "target": "allEnemies"
-              }
-            ]
+            "stat": "guard",
+            "v": 0.04
+          },
+          {
+            "stat": "taken",
+            "v": -0.03
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "무엇이든 연료로",
           "when": {
-            "on": "guard",
-            "kind": "shield"
+            "on": "exhaust",
+            "who": "any"
           },
           "limit": {
             "per": "turn",
@@ -62,6 +50,10 @@
               "k": "stack",
               "id": "삼킨 연료",
               "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.42
             }
           ]
         },
@@ -78,7 +70,23 @@
             },
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 0.84
+            }
+          ]
+        },
+        {
+          "name": "자가 회복 기능",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.17
             }
           ]
         }
@@ -115,7 +123,7 @@
         "마에스트로2호_s1",
         "마에스트로2호_s1",
         "마에스트로2호_s2",
-        "마에스트로2호_u2"
+        "마에스트로2호_u4"
       ]
     }
   ],
@@ -158,74 +166,122 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.35
+          "ratio": 1.12
         },
         {
-          "k": "stack",
+          "k": "perStack",
+          "id": "삼킨 연료"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.28
+        },
+        {
+          "k": "spend",
           "id": "삼킨 연료",
-          "v": 1
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "매트릭스 강화",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.75
+              "ratio": 1.51
             },
             {
-              "k": "stack",
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.38
+            },
+            {
+              "k": "spend",
               "id": "삼킨 연료",
-              "v": 1
+              "all": true
             }
           ]
         },
         {
-          "name": "전 아군 실드",
-          "cost": 2,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.5
+              "ratio": 1.13
             },
             {
-              "k": "stack",
-              "id": "삼킨 연료",
-              "v": 2
+              "k": "perStack",
+              "id": "삼킨 연료"
             },
             {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.28
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.48
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "반사 장갑",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1
+              "k": "heal",
+              "ratio": 1.58
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.39
+            },
+            {
+              "k": "spend",
+              "id": "삼킨 연료",
+              "all": true
             }
           ]
         },
         {
-          "name": "정비 매뉴얼",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 0.98
             },
             {
-              "k": "stack",
-              "id": "삼킨 연료",
-              "v": 1
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.25
             },
             {
               "k": "draw",
@@ -236,40 +292,42 @@
           ]
         },
         {
-          "name": "연료 직결 장갑",
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 2.35
             },
             {
-              "k": "ifStack",
-              "id": "삼킨 연료",
-              "n": 3
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.59
             },
             {
               "k": "spend",
               "id": "삼킨 연료",
-              "v": 3
-            },
-            {
-              "k": "shield",
-              "ratio": 1.3
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "장갑판",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "수은음료",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "주유구 개방",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -297,6 +355,10 @@
           "v": 1
         },
         {
+          "k": "shield",
+          "ratio": 0.56
+        },
+        {
           "k": "power",
           "rules": [
             {
@@ -316,7 +378,7 @@
       ],
       "oracles": [
         {
-          "name": "특대 A3 배터리",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -327,6 +389,10 @@
               "v": 2
             },
             {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
               "k": "power",
               "rules": [
                 {
@@ -346,43 +412,15 @@
           ]
         },
         {
-          "name": "저전력 충전",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "삼킨 연료",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "자가 정비 루틴",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "draw",
+              "k": "stack",
+              "id": "삼킨 연료",
               "v": 1
             },
             {
@@ -390,8 +428,42 @@
               "rules": [
                 {
                   "when": {
-                    "on": "guard",
-                    "kind": "shield"
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 연료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.89
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
                   },
                   "limit": {
                     "per": "turn",
@@ -410,15 +482,14 @@
           ]
         },
         {
-          "name": "정비 매뉴얼 검색",
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "stack",
-              "id": "삼킨 연료",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.84
             },
             {
               "k": "draw",
@@ -446,18 +517,13 @@
           ]
         },
         {
-          "name": "무엇이든 삼키기",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
-            },
             {
               "k": "stack",
               "id": "삼킨 연료",
-              "v": 3
+              "v": 2
             },
             {
               "k": "power",
@@ -475,26 +541,27 @@
                   ]
                 }
               ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "블루 스크린",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.4
-            }
-          ]
+          "name": "축복 1",
+          "kind": "defUp"
         },
         {
-          "name": "저전력 모드",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "예비 배터리",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -515,7 +582,317 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 1.05,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "burn",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "삼킨 연료",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.32,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.43,
+                      "base": "def",
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.98,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마에스트로2호_u4",
+      "name": "무엇이든 삼키기",
+      "hero": "마에스트로2호",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "burn",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "삼킨 연료",
+          "v": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 0.98
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.12
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "burn",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.04
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.89
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "삼킨 연료",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.59
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "n": 1,
+              "basic": true
+            },
+            {
+              "k": "stack",
+              "id": "삼킨 연료",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마에스트로2호_u5",
+      "name": "척살 모드 전환",
+      "hero": "마에스트로2호",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.84,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -525,50 +902,19 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.28,
           "base": "def",
           "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "삼킨 연료",
-          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "풀파워 방해",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.72,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 연료"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "삼킨 연료",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "쇼크 웨이브 예열",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 1.13,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -581,17 +927,13 @@
               "ratio": 0.38,
               "base": "def",
               "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "으음… 과연",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -600,31 +942,42 @@
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "삼킨 연료",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "둔화",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "perStack",
+              "id": "삼킨 연료"
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.27,
               "base": "def",
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "방해 모드 상시",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.28
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.62
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.67,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -634,7 +987,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.22,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -643,16 +996,13 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "삼킨 연료",
-                    "n": 5
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "base": "def",
-                      "target": "allEnemies"
+                      "k": "stack",
+                      "id": "삼킨 연료",
+                      "v": 1
                     }
                   ]
                 }
@@ -661,187 +1011,43 @@
           ]
         },
         {
-          "name": "연료 폭주",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.26,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "삼킨 연료"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "base": "def",
+              "target": "oneEnemy"
+            },
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 연료"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "base": "def",
-              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기계 팔",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "소음 발생기",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "남은 연료",
-          "kind": "ap"
-        }
-      ]
-    },
-    {
-      "id": "마에스트로2호_u4",
-      "name": "카메라 담당",
-      "hero": "마에스트로2호",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "shield",
-          "ratio": 0.8
-        },
-        {
-          "k": "perStack",
-          "id": "삼킨 연료"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.2
-        }
-      ],
-      "oracles": [
-        {
-          "name": "고화질 녹화",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 연료"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.25
-            }
-          ]
-        },
-        {
-          "name": "셀카봉",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.55
-            },
-            {
-              "k": "perStack",
-              "id": "삼킨 연료"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.14
-            }
-          ]
-        },
-        {
-          "name": "녹화본 재생",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "stack",
-              "id": "삼킨 연료",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "카메라 상시 녹화",
-          "power": true,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.7
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "perStack",
-                      "id": "삼킨 연료"
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.17
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "녹화 테이프 소진",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "삼킨 연료"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.38
-            },
-            {
-              "k": "spend",
-              "id": "삼킨 연료",
-              "all": true
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "자기 성찰",
-          "kind": "defUp"
-        },
-        {
-          "name": "자동 녹화",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "연료 보충",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

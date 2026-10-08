@@ -54,6 +54,14 @@ function rude(j) {
     ], [B('정면 승부', 'power'), B('하체 운동', 'frost'), B('근육 기억', [stk(R, 1)])]),
   ];
   j.cards = [...j.cards.filter(c => !c.unique), ...cards];
+  // u5 유틸(0코 공격) — 황금 덤벨: 황금 왕관의 주인이 드는 덤벨 — 작은 피해 · 렙 · 드로우
+  j.cards.push(card(H, 5, '황금 덤벨', 0, '공격', [ddef(0.35), stk(R, 1)], [
+    O('신탁 1', [ddef(0.45), stk(R, 1)]),
+    O('신탁 2', [ddef(0.3), stk(R, 1), draw(1, { who: 'self', unique: true })]),
+    O('신탁 3', [ddef(0.27, EA), stk(R, 1)]),
+    O('신탁 4', [ddef(0.25), stk(R, 1), power(rule('play', [sh(0.3)], { when: { type: '공격' }, limit: 2 }))], { power: true }),
+    O('신탁 5', [{ k: 'discard', v: 1 }, ddef(0.35), stk(R, 3)]),
+  ], [B('축복 1', 'weakSpot'), B('축복 2', 'draw'), B('축복 3', [stk(R, 1)])]));
   starter(j, '루드_u2');
   // 애착 장비(희귀) — 범용 몫은 장비 지침 §2-2 희귀(싸움당 1코 카드 1~1.5장), 애착 몫은 「렙」 축
   for (const e of j.equips || []) {
@@ -113,6 +121,15 @@ function erpin(j) {
     ], [B('주먹에 마력', 'power'), B('금 간 결계', 'weakSpot'), B('밥 먹고 힘내기', 'ap')], { tags: ['분쇄'] }),
   ];
   j.cards = [...j.cards.filter(c => !c.unique), ...cards];
+  // u5 유틸(0코 스킬) — 깡총이 파자마(토끼인 척하는 잠옷 차림): 케이크 · 실드 · 공격 카드 드로우(공격 셋이라 스킬 쪽)
+  const atkDraw = draw(1, { who: 'self', type: '공격' });
+  j.cards.push(card(H, 5, '깡총이 파자마', 0, '스킬', [make(CAKE, 1), sh(0.3), atkDraw], [
+    O('신탁 1', [make(CAKE, 1), sh(0.6), atkDraw]),
+    O('신탁 2', [make(CAKE, 1), sh(0.45), atkDraw], { tags: ['보존'] }),
+    O('신탁 3', [stk(K, 3), heal(0.6), atkDraw]),
+    O('신탁 4', [make(CAKE, 1), sh(0.7), power(rule('exhaust', [stk(K, 1), sh(0.4)], { limit: 2 }))], { power: true }),
+    O('신탁 5', [{ k: 'discard', v: 1 }, make(CAKE, 2), sh(0.6)]),
+  ], [B('축복 1', 'guard'), B('축복 2', 'heal'), B('축복 3', [make(CAKE, 1)])]));
   starter(j, '에르핀_u2');
   // 애착 장비(전설) — 범용 몫(다치지 않은 날 게이지)은 그대로, 애착 몫은 케이크 축: 전투 시작에 케이크 2장
   for (const e of j.equips || []) e.affinityEffect = [{ name: '간식 꺼내기', when: { on: 'fightStart' }, fx: [make(CAKE, 2)] }];
@@ -170,6 +187,15 @@ function vivi(j) {
     ], [B('세계수의 뿌리', 'atkUp'), B('아침 햇살', { tags: ['개전'] }), B('새잎', [stk(K, 1)])]),
   ];
   j.cards = [...j.cards.filter(c => !c.unique), ...cards];
+  // u5 유틸(0코 스킬) — 연못가 대화(우이와 연못가에서 나누는 긴 대화): 새싹 · 실드 · 연계 카드 서치(엘다인 — 수치는 일반과 같게)
+  const linkDraw = draw(1, { who: 'self', tag: '연계' });
+  j.cards.push(card(H, 5, '연못가 대화', 0, '스킬', [stk(K, 1), sh(0.4), linkDraw], [
+    O('신탁 1', [stk(K, 2), sh(0.3), linkDraw]),
+    O('신탁 2', [stk(K, 1), sh(0.4), linkDraw], { tags: ['보존'] }),
+    O('신탁 3', [heal(0.7), stk(K, 2), ifAll, stk(K, 2)]),
+    O('신탁 4', [sh(0.65), stk(K, 1), power(rule('play', [stk(K, 1)], { when: { who: 'other', type: '스킬' }, limit: 1 }))], { power: true }),
+    O('신탁 5', [{ k: 'discard', v: 1 }, stk(K, 3), sh(0.6)]),
+  ], [B('축복 1', 'guard'), B('축복 2', 'frost'), B('축복 3', [stk(K, 1)])]));
   starter(j, '비비_신성_u3');
 }
 
@@ -229,6 +255,14 @@ function meluna(j) {
     ], [B('회장님의 힘', 'power'), B('동행하는 머스크', [st('협공', 1)]), B('멜론 재고', [make(MELON, 1)])]),
   ];
   j.cards = [...j.cards.filter(c => !c.unique), ...cards];
+  // u5 유틸(0코 스킬) — 광합성: 취미가 광합성 — 회복 · 주가 · 드로우(공격 셋이라 스킬 쪽)
+  j.cards.push(card(H, 5, '광합성', 0, '스킬', [heal(0.4), stk(K, 1), draw(1)], [
+    O('신탁 1', [heal(0.55), stk(K, 2), draw(1)]),
+    O('신탁 2', [heal(0.3), make(MELON, 1), draw(1)]),
+    O('신탁 3', [heal(0.3), stk(K, 1), ifStack(K, 3), draw(2)]),
+    O('신탁 4', [heal(0.5), stk(K, 2), power(rule('turnStart', [heal(0.3)]))], { power: true }),
+    O('신탁 5', [{ k: 'spend', id: K, v: 2 }, heal(0.6), ap(1)]),
+  ], [B('축복 1', 'guard'), B('축복 2', 'heal'), B('축복 3', [stk(K, 1)])]));
   starter(j, '멜루나_u1');
 }
 
@@ -285,6 +319,14 @@ function diana(j) {
     ], [B('새벽 수련', 'ap'), B('굳은살', 'defUp'), B('약수 한 모금', [stk(K, 1)])]),
   ];
   j.cards = [...j.cards.filter(c => !c.unique), ...cards];
+  // u5 유틸(0코 공격) — 해바라기 톡톡: 어린 꽃사슴 차림으로 해바라기를 휘두른다 — 작은 피해 · 기혈 · 드로우
+  j.cards.push(card(H, 5, '해바라기 톡톡', 0, '공격', [dmg(0.45), stk(K, 1), draw(1)], [
+    O('신탁 1', [dmg(0.7), stk(K, 1), draw(1)]),
+    O('신탁 2', [dmg(0.65), make(RICE, 1)]),
+    O('신탁 3', [dmg(0.55), heal(0.6), draw(1)]),
+    O('신탁 4', [dmg(0.5), stk(K, 1), power(rule('play', [stk(K, 1)], { when: { type: '스킬' }, limit: 1 }))], { power: true }),
+    O('신탁 5', [{ k: 'discard', v: 1 }, dmg(0.9), stk(K, 2)]),
+  ], [B('축복 1', 'weakSpot'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1)])]));
   starter(j, '디아나_u2');
 }
 
@@ -339,6 +381,15 @@ function kisha(j) {
     ], [B('우렁찬 함성', 'power'), B('쿵쿵 박자', 'frost'), B('열기 유지', [stk('저장된 환호', 3)])]),
   ];
   j.cards = [...j.cards.filter(c => !c.unique), ...cards];
+  // u5 유틸(0코 스킬) — 립싱크 무대: 입만 맞추고 넘기는 무대 — 짱팬 · 실드 · 고유 카드 서치
+  const mineDraw = draw(1, { who: 'self', unique: true });
+  j.cards.push(card(H, 5, '립싱크 무대', 0, '스킬', [fan, mineDraw], [
+    O('신탁 1', [fan, sh(0.3), mineDraw]),
+    O('신탁 2', [fan, sh(0.2), mineDraw], { tags: ['개전'] }),
+    O('신탁 3', [fan, sh(0.3), draw(1, { who: 'other', type: '공격' })]),
+    O('신탁 4', [fan, mineDraw, power(rule('play', [sh(0.3)], { when: { marked: K }, limit: 2 }))], { power: true }),
+    O('신탁 5', [{ k: 'discard', v: 1 }, sh(0.4), draw(2, { who: 'other' })]),
+  ], [B('축복 1', 'guard'), B('축복 2', 'heal'), B('축복 3', [fan])]));
   starter(j, '키샤_u1');
 }
 

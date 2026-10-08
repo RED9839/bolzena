@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "마녀",
       "role": "탱커",
+      "style": "버티형",
       "star": 3,
       "hp": 920,
       "atk": 101,
@@ -19,31 +20,26 @@
         "cap": 3,
         "rules": [
           {
-            "name": "세 병째",
+            "name": "구역 수금",
             "when": {
-              "on": "stackReach",
-              "id": "밀두유",
-              "n": 3
+              "on": "guardSum",
+              "n": 30
             },
             "fx": [
               {
-                "k": "spend",
+                "k": "stack",
                 "id": "밀두유",
-                "all": true
-              },
-              {
-                "k": "shield",
-                "ratio": 0.6
-              },
-              {
-                "k": "status",
-                "id": "취약",
                 "v": 1,
-                "target": "allEnemies"
+                "ofEvent": 0.015
               }
             ]
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -60,7 +56,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.2
+              "ratio": 0.23
             },
             {
               "k": "stack",
@@ -76,7 +72,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
@@ -166,7 +162,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.48
+          "ratio": 0.55
         },
         {
           "k": "power",
@@ -188,7 +184,7 @@
       ],
       "oracles": [
         {
-          "name": "철통 경호",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -200,7 +196,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.64
+              "ratio": 0.69
             },
             {
               "k": "power",
@@ -222,38 +218,7 @@
           ]
         },
         {
-          "name": "돈을 모시는 오른팔",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "밀두유",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 0.72
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀두유",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "대기 중인 경호원",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "개전"
@@ -284,7 +249,45 @@
           ]
         },
         {
-          "name": "경호 교대",
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.69
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.29
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
@@ -297,8 +300,8 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other",
-              "type": "공격"
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
@@ -320,53 +323,36 @@
           ]
         },
         {
-          "name": "구역 순찰",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "밀두유",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "부하 모집",
-          "kind": "defUp"
-        },
-        {
-          "name": "문워크",
-          "kind": "cost"
-        },
-        {
-          "name": "콩 한 줌",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
               "id": "밀두유",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -382,7 +368,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.96
+          "ratio": 1.1
         },
         {
           "k": "stack",
@@ -392,11 +378,12 @@
       ],
       "oracles": [
         {
-          "name": "냉장 두유",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.25
+              "ratio": 1.5
             },
             {
               "k": "stack",
@@ -406,12 +393,13 @@
           ]
         },
         {
-          "name": "한 병 건네기",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.72
+              "ratio": 1.05
             },
             {
               "k": "stack",
@@ -421,64 +409,97 @@
           ]
         },
         {
-          "name": "두유 영업",
+          "name": "신탁 3",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.08
+              "ratio": 0.99
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guardSum"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.48
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.98
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other",
-              "type": "공격"
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "갈아 만든 콩물",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.49
+              "k": "shield",
+              "ratio": 1.54
             },
             {
               "k": "stack",
               "id": "밀두유",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "재고 처분",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2
+              "v": 2
             },
             {
-              "k": "spend",
-              "id": "밀두유",
-              "v": 1
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "두유 상자 방패",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "의리",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "미숫가루",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.24
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
             }
           ]
         }
@@ -494,7 +515,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.28,
+          "ratio": 0.32,
           "base": "def",
           "target": "allEnemies"
         },
@@ -504,7 +525,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.12,
+          "ratio": 0.14,
           "base": "def",
           "target": "allEnemies"
         },
@@ -516,11 +537,12 @@
       ],
       "oracles": [
         {
-          "name": "대형 상자",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.44,
               "base": "def",
               "target": "allEnemies"
             },
@@ -530,7 +552,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.16,
+              "ratio": 0.18,
               "base": "def",
               "target": "allEnemies"
             },
@@ -542,14 +564,13 @@
           ]
         },
         {
-          "name": "날아 차기",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.31,
               "base": "def",
               "target": "allEnemies"
             },
@@ -571,45 +592,13 @@
           ]
         },
         {
-          "name": "스물네 병",
-          "power": true,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.57,
               "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "밀두유",
-                    "n": 3
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.51,
-                      "base": "def",
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "유통 장부",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.28,
-              "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -617,9 +606,9 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.12,
+              "ratio": 0.25,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -630,14 +619,38 @@
           ]
         },
         {
-          "name": "상자째 투척",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.44,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perGuarded",
+              "per": 30
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "밀두유",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.57,
               "base": "def",
               "target": "allEnemies"
             },
@@ -647,7 +660,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.24,
+              "ratio": 0.25,
               "base": "def",
               "target": "allEnemies"
             }
@@ -656,16 +669,22 @@
       ],
       "blesses": [
         {
-          "name": "발차기 각도",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "콩 금단 현상",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "밀두유 한 상자",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -679,94 +698,118 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.48,
+          "ratio": 0.52,
           "base": "def",
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "밀두유"
+          "k": "perGuarded",
+          "per": 50
         },
         {
           "k": "dmg",
-          "ratio": 0.24,
+          "ratio": 0.17,
           "base": "def",
           "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "밀두유",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "전국 유통망",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.58,
+              "ratio": 0.7,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "밀두유"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.28,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "동네 유통",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.36,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "밀두유"
+              "k": "perGuarded",
+              "per": 50
             },
             {
               "k": "dmg",
-              "ratio": 0.18,
+              "ratio": 0.23,
               "base": "def",
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "삼각회",
-          "power": true,
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
             },
             {
               "k": "stack",
               "id": "밀두유",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perGuarded",
+              "per": 50
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perGuarded",
+              "per": 50
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "공격",
-                    "every": 3
+                    "on": "guardSum"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.8,
+                      "ratio": 0.44,
                       "base": "def",
-                      "target": "allEnemies"
+                      "target": "oneEnemy"
                     }
                   ]
                 }
@@ -775,60 +818,234 @@
           ]
         },
         {
-          "name": "경호 계약",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.45
+              "k": "dmg",
+              "ratio": 0.55,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "밀두유"
+              "k": "perGuarded",
+              "per": 50
             },
             {
-              "k": "shield",
-              "ratio": 0.5
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "새벽 배송",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.64,
+              "ratio": 0.93,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "밀두유"
+              "k": "perGuarded",
+              "per": 50
             },
             {
               "k": "dmg",
-              "ratio": 0.32,
+              "ratio": 0.31,
               "base": "def",
               "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "밀두유",
-              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "내 꿈은 빅보스",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "금테 장신구",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스노키_u5",
+      "name": "명절 선물 세트",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.37
+        },
+        {
+          "k": "stack",
+          "id": "밀두유",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.69
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.35
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.69
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.52
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guardSum"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.35
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.57
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
           "kind": "draw"
         },
         {
-          "name": "두목 자리",
+          "name": "축복 2",
+          "tags": [
+            "신속"
+          ]
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

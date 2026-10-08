@@ -78,6 +78,11 @@ namespace Bolzena.Core
                 bool rep = s.PlayIds.Count > 0 && s.PlayIds[s.PlayIds.Count - 1] == GameData.BaseId(id);
                 return rep ? CardValue.ValueOf(c, true) : CardVal(s, id);
             }
+            if (oc == null && !rh && c.Fx.Any(f => f.K == FxK.IfPricier))
+            {   // 직전보다 비싼가(2단계) — 이번 턴 바로 앞 카드보다 비싸면 그 덤이 선다(아니면 옛 값 — 더 싼 카드를 먼저 내면 설 수 있다)
+                bool pr = s.Counts.TryGetValue("lastCostT", out var lt) && lt == s.Turn && s.Counts.TryGetValue("lastCost", out var lc) && s.CostOf(id) > lc;
+                return pr ? CardValue.ValueOf(c, true) : CardVal(s, id);
+            }
             if (oc == null && !rh) return CardVal(s, id);
             var last = s.PlayLog.Count > 0 ? s.PlayLog[s.PlayLog.Count - 1] : ((string hero, string type)?)null;
             bool on = oc != null && last != null && (oc.K == FxK.IfLink ? c.Hero != null && last.Value.hero == c.Hero : last.Value.type == oc.Type);
@@ -110,8 +115,24 @@ namespace Bolzena.Core
             return v;
         }
 
-        bool Orderly(Battle s) => s.Hand.Any(id => { var fx = s.CardOf(id)?.Fx; return CardValue.OrderCond(fx) != null || CardValue.RhythmUse(fx) || (fx != null && fx.Any(f => f.K == FxK.IfRepeat || f.K == FxK.IfSpent || f.K == FxK.IfBalanced)); })
+        /// <summary>
+        /// 박자형 손(1단계) — 셋째 · 넷째 카드에 덤이 붙는 카드 · 패시브가 있나(n장째 3 이상 · 리듬 2 이상 · 같은 사도 3장 연속 · 이번 턴 낸 장수 비례 ·
+        /// 한 턴 N장째(3 이상) · 한 턴 N장마다(3 이상) · 이번 턴 N장 이상 냈으면). 있으면 세 수 앞까지 본다.
+        /// </summary>
+        public static bool Rhythmic(Battle s) =>
+            s.Hand.Any(id => { var fx = s.CardOf(id)?.Fx; return fx != null && fx.Any(f => (f.K == FxK.IfNth && f.N >= 3) || (f.K == FxK.IfRhythm && f.N >= 2) || (f.K == FxK.IfStreak && f.N >= 3) || f.K == FxK.PerPlayed || f.K == FxK.IfPricier); })
+            || s.AliveParty().Any(u => s.Passives.TryGetValue(u.Key, out var rs) && rs.Any(r => (r.R.When.On == "play" && (r.R.When.Nth >= 3 || (r.R.When.Every >= 3 && r.R.When.PerTurn)))
+                || (r.R.When.On == "rhythm" && r.R.When.N >= 3) || r.R.Conds.Any(c => c.C == "playedMin" && c.N >= 2)));
+
+        bool Orderly(Battle s) => s.Hand.Any(id => { var fx = s.CardOf(id)?.Fx; return CardValue.OrderCond(fx) != null || CardValue.RhythmUse(fx) || (fx != null && fx.Any(f => f.K == FxK.IfRepeat || f.K == FxK.IfSpent || f.K == FxK.IfBalanced || Setup(f))); })
+            || HasEmpower(s)
             || s.AliveParty().Any(u => s.Passives.TryGetValue(u.Key, out var rs) && rs.Any(r => r.R.When.Seq != null && r.R.When.Seq.Count > 0));
+
+        /// <summary>뒤 카드를 세게 하는 판 꾸미기(봇 손질 2026-10-08) — 다음 카드 강화 · 아군 주는 피해 · 공격력 증가. 1수만 보면 큰 카드를 먼저 내고 꾸미기를 버린다.</summary>
+        static bool Setup(Fx f) => f.K == FxK.Empower || ((f.K == FxK.DealtMod || f.K == FxK.AtkMod) && f.V > 0 && f.Target != "oneEnemy" && f.Target != "allEnemies");
+        static bool HasEmpower(Battle s) => s.Counts.Any(kv => kv.Value > 0 && kv.Key.StartsWith("empower|", StringComparison.Ordinal));
+        /// <summary>그 사도가 이번 턴 아직 칠 카드가 손에 있나(남은 AP 로 낼 수 있는 피해 카드).</summary>
+        static bool CanStillHit(Battle s, Unit u) => s.Hand.Any(id => { var c = s.CardOf(id); return c != null && c.Hero == u.Key && s.CostOf(id) <= s.Ap && c.Fx.Any(f => f.K == FxK.Dmg || f.K == FxK.Extra); });
 
         readonly Dictionary<string, double> threatCache = new();
         static double HitOf(Intent it) => it == null ? 0 : it.T == "attack" || it.T == "back" ? it.V : it.T == "multi" ? it.V * Math.Max(1, it.N) : it.T == "attackAll" ? it.V * R.FOE_ALL_X
@@ -185,7 +206,37 @@ namespace Bolzena.Core
                 }
                 Done();
             }
+            hp += LowHpRescue(s, hp);
             return (hp, shield, later, misc);
+        }
+
+        /// <summary>
+        /// 「HP가 n% 이하가 되면」(lowHp) — 이번 적의 차례에 선을 넘어 내려가면 돌 회복 · 실드(아직 안 쓴 것만). 봇 손질(2026-10-08):
+        /// 옛 셈은 이것을 몰라 위기 패시브가 있는 사도도 HP 가 낮으면 막기만 골랐다.
+        /// </summary>
+        int LowHpRescue(Battle s, int hp)
+        {
+            if (hp <= 0 || hp >= s.Pool.Hp) return 0;
+            double before = (double)s.Pool.Hp / Math.Max(1, s.Pool.MaxHp), after = (double)hp / Math.Max(1, s.Pool.MaxHp);
+            int add = 0;
+            foreach (var u in s.AliveParty())
+            {
+                if (!s.Passives.TryGetValue(u.Key, out var rules)) continue;
+                for (int i = 0; i < rules.Count; i++)
+                {
+                    var r = rules[i].R;
+                    if (r.When.On != "lowHp" || !(before > r.When.Pct && after <= r.When.Pct)) continue;
+                    string key = $"{u.Key}|{i}|f";
+                    int lim = r.Limit != null && r.Limit.Per == "fight" ? r.Limit.N : 1;
+                    if ((s.Fired.TryGetValue(key, out var fv) ? fv : 0) >= lim) continue;
+                    foreach (var f in r.Fx)
+                    {
+                        if (f.K == FxK.Heal && f.Ratio > 0) add += s.HealAmount(u, f.Ratio, null);
+                        else if ((f.K == FxK.Shield || f.K == FxK.Block) && f.Ratio > 0 && !f.Fixed && f.OfEvent <= 0) add += s.GuardAmount(u, f.Ratio, null) / 2;   // 실드는 이미 지난 공격 뒤라 반만
+                    }
+                }
+            }
+            return Math.Min(add, s.Pool.MaxHp - hp);
         }
 
         /// <summary>카드의 실드 · 회복 계수 합(조건 · 고정 · 일의 값 실드는 빼고 — 대충).</summary>
@@ -211,6 +262,7 @@ namespace Bolzena.Core
             // 실드 · 회복 카드의 값은 지금 판으로(2026-10-08) — 지금 실드로 못 막는 예고 피해 · 잃은 HP
             var inc = Incoming(s);
             int need = Math.Max(0, s.Pool.Hp - inc.hp), missing = Math.Max(0, s.Pool.MaxHp - s.Pool.Hp);
+            bool conv = s.AliveParty().Any(u => s.Passives.TryGetValue(u.Key, out var rs) && rs.Any(r => r.R.When.On == "overheal"));
             foreach (var id in s.Hand)
             {
                 var c = s.CardOf(id); if (c == null) continue;
@@ -225,6 +277,9 @@ namespace Bolzena.Core
                 {
                     var gu = o ?? s.AliveParty().FirstOrDefault();
                     if (gu != null) v += CardValue.LiveGuard(gr.sh, gr.he, s.GuardAmount(gu, 1, null), s.HealAmount(gu, 1, null), need, missing, o != null ? o.Atk : 12 * K);
+                    // 봇 손질(2026-10-08): 넘친 회복을 바꾸는 사도(패시브 overheal · 카드 perOverheal)면 HP 가 차도 넘칠 몫에 값이 있다(반값 — 무엇으로 바뀌는지는 판마다)
+                    if (gu != null && gr.he > 0 && (conv || c.Fx.Any(f => f.K == FxK.PerOverheal)))
+                        v += 0.5 * Math.Max(0, gr.he * s.HealAmount(gu, 1, null) - missing) * CardValue.HP_W / (1.2 * (o != null ? o.Atk : 12 * K));
                 }
                 v *= auto ? 0.7 : 1;
                 if (v <= 0) continue;
@@ -264,7 +319,8 @@ namespace Bolzena.Core
                 if (e.Dead) { v += 12 * K + 3 * ThreatOf(e.Key); continue; }
                 v -= e.Hp;
                 foreach (var kv in FOE_ST) v += kv.Value * Useful(kv.Key, Math.Max(0, s.St(e, kv.Key) - (kv.Key == "약화" ? 1 : 0)));
-                foreach (var kv in e.Status) if (!FOE_ST.ContainsKey(kv.Key) && !R.ALL_ST.Contains(kv.Key) && s.CounterOf(e, kv.Key) == null) v += 1.2 * K * kv.Value;   // 키워드 표식(적의 쌓이는 수치는 빼고)
+                foreach (var kv in e.Status) if (!FOE_ST.ContainsKey(kv.Key) && !R.ALL_ST.Contains(kv.Key) && s.CounterOf(e, kv.Key) == null)
+                    v += s.Kw.TryGetValue(kv.Key, out var ek) && ReservePayoff(s, ek) is double rp && rp > 0 && kv.Value > 0 ? rp + 0.3 * K * kv.Value : 1.2 * K * kv.Value;   // 키워드 표식(적의 쌓이는 수치는 빼고) · 예약 표식은 터질 몫(2단계)
                 if (e.ToughMax > 0) v += TOUGH_W * (e.ToughMax - e.Tough) + (e.Broken ? BROKEN_W : 0);
                 foreach (var m in e.Mods) { double w = m.Stat == "taken" ? 10 * K : m.Stat == "dealt" || m.Stat == "atk" ? -10 * K : 0; v += w * m.V * Math.Min(m.Left, 3); }
             }
@@ -287,14 +343,17 @@ namespace Bolzena.Core
             {
                 foreach (var kv in ALLY_ST) if (R.HERO_ST.Contains(kv.Key)) v += kv.Value * Useful(kv.Key, s.St(u, kv.Key)) * (u.Role == "딜러" ? 1.4 : 0.8);
                 double rw = u.Role == "딜러" ? 1.4 : 0.8;
-                foreach (var m in u.Mods) v += (MOD_W.TryGetValue(m.Stat, out var w) ? w : 0) * rw * m.V * Math.Min(m.Left, 3);
+                foreach (var m in u.Mods)
+                {
+                    double eff = Math.Min(m.Left, 3);
+                    // 봇 손질(2026-10-08): 주는 피해 · 공격력 증가의 이번 턴 몫은 그 사도가 아직 칠 카드가 있을 때만(턴 끝에 남은 1턴짜리 버프를 한 턴 값으로 치던 것)
+                    if ((m.Stat == "dealt" || m.Stat == "atk") && m.V > 0 && !m.Run && !CanStillHit(s, u)) eff -= 1;
+                    v += (MOD_W.TryGetValue(m.Stat, out var w) ? w : 0) * rw * m.V * eff;
+                }
             }
             foreach (var kv in s.Stacks)
                 foreach (var st in kv.Value)
-                {
-                    bool grows = s.Hand.Any(id => CardValue.GrowsWith(s.CardOf(id)?.Fx, st.Key));
-                    v += (grows ? 3.5 : 1.5) * K * st.Value;
-                }
+                    if (st.Value > 0) v += StackWorth(s, st.Key, st.Value);
             v += 0.06 * K * s.Gauge;
             // 켜진 강화 — 남은 전투에 돌 몫(카드 한 장 값과 같은 눈금 · 겹마다)
             foreach (var pw in s.Powers)
@@ -304,6 +363,7 @@ namespace Bolzena.Core
                 double pv = 0; foreach (var r in pw.Rules) pv += CardValue.RuleWorth(r);
                 v += 0.8 * 1.2 * o.Atk * pv * Math.Max(1, pw.N);
             }
+            v += ReserveWorth(s) + RunWorth(s) + EmpowerWorth(s);
             foreach (var id in s.Hand)
             {
                 var c = s.CardOf(id);
@@ -320,6 +380,108 @@ namespace Bolzena.Core
             return v;
         }
 
+        // ── 1단계(2026-10-08) — 걸어 둔 예약 · 판 단위 값(성장) · 다음 카드 강화 ─────────
+        /// <summary>예약 할인 — 턴으로 거는 예약(다음 턴 이후) · 카드 장수로 거는 예약 · 함정(적이 쳐야 돈다).</summary>
+        public const double LATER_W = 0.8, AFTER_W = 0.9, TRAP_W = 0.6;
+        /// <summary>판 단위 값 — 남은 싸움 수(대충). 판에 남는 카드 값 1 · 판 성장 공격력 1 의 무게.</summary>
+        public const double RUN_LEFT = 3, CARDST_RUN_W = 1.0 * K, CARDST_W = 1.5 * K, GROW_ATK_W = 5 * K, GROW_DEF_W = 3 * K, GROW_CRIT_W = 2 * K;
+
+        /// <summary>걸어 둔 예약(later · afterCards)과 적에게 깐 함정 — 터질 효과의 값(카드 한 장 눈금)을 할인해 판 점수에. 예약 카드를 내는 수 · 일찍 캐기 판단이 이것을 본다.</summary>
+        public double ReserveWorth(Battle s)
+        {
+            double v = 0;
+            foreach (var r in s.Later)
+            {
+                var o = s.HeroUnit(r.Owner);
+                if (r.Owner != null && (o == null || o.Dead)) continue;
+                v += (r.Cards > 0 ? AFTER_W : LATER_W) * 1.2 * (o != null ? o.Atk : 12 * K) * Math.Max(0, CardValue.ValueOf(r.Fx));
+            }
+            foreach (var e in s.Enemies)
+            {
+                if (e.Dead) continue;
+                foreach (var r in e.Traps) { var o = s.HeroUnit(r.Owner); v += TRAP_W * 1.2 * (o != null ? o.Atk : 12 * K) * Math.Max(0, CardValue.ValueOf(r.Fx)); }
+            }
+            return v;
+        }
+
+        /// <summary>판 단위 값(성장형 근사) — 카드에 붙은 데이터 값(비용 · 카드 상태 빼고, 이 전투만이면 덜) · 이 전투에서 생긴 판 성장(공격력 · 방어력 · 치명).</summary>
+        public double RunWorth(Battle s)
+        {
+            double v = 0;
+            foreach (var kv in s.CardSt)
+                foreach (var st in kv.Value)
+                {
+                    if (st.Value <= 0 || st.Key == "비용" || R.IsCardSt(st.Key)) continue;
+                    v += st.Value * (s.BattleVals.Contains(st.Key) ? CARDST_W : CARDST_W + CARDST_RUN_W * RUN_LEFT);
+                }
+            foreach (var g in s.GrowthGain.Values) v += g.Atk * GROW_ATK_W + g.Def * GROW_DEF_W + g.Crit * GROW_CRIT_W;
+            return v;
+        }
+
+        // ── 2단계(2026-10-08 시범 16) — 고유 효과 겹을 실제 쓰임대로 ─────────
+        /// <summary>
+        /// 고유 효과 겹 n 의 판 점수. 옛 셈(겹마다 1.5K, 쥐면 세지는 카드가 손에 있으면 3.5K)에 더해:
+        /// 예약(reserve + 「다 닳으면」 규칙)은 터질 몫(LATER_W 할인) — 일찍 캐기(ripen) · 재촉 판단이 이것과 견준다 ·
+        /// 턴 끝에 사라지는 것(endClear · endDecay)은 이번 턴에 쓸 데가 없으면 0.3배 · 1개당 주는 피해/공격력(손맛)은 이번 턴 낼 수 있는 그 사도 공격 카드만큼 ·
+        /// 소환물(summon 이 부르는 키워드)은 남은 따라 치기 몫.
+        /// </summary>
+        public double StackWorth(Battle s, string id, int n)
+        {
+            if (!s.Kw.TryGetValue(id, out var kw)) return 1.5 * K * n;
+            bool grows = s.Hand.Any(h => CardValue.GrowsWith(s.CardOf(h)?.Fx, id));
+            double v = (grows ? 3.5 : 1.5) * K * n;
+            var d = kw.Def; var o = s.HeroUnit(kw.Owner); double atk = o != null ? o.Atk : 12 * K;
+            double rp = ReservePayoff(s, kw);
+            if (rp > 0) return rp + 0.3 * K * n;
+            bool once = d.EndClear || d.EndDecay > 0;
+            if (once && !grows) v *= 0.3;
+            double perV = d.Per.Where(p => p.Stat == "dealt" || p.Stat == "atk").Sum(p => p.V);
+            if (perV > 0 && o != null)
+            {
+                int atkCards = s.Hand.Count(h => { var c = s.CardOf(h); return c != null && c.Hero == o.Key && c.Type == "공격" && s.CanPlay(h) == null; });
+                v += n * perV * atk * 0.83 * Math.Min(atkCards, 2) * (once ? 1 : 1.5);
+            }
+            double sr = SummonRatio(s, kw);
+            if (sr > 0) v += Math.Min(n, Battle.SUMMON_CAP) * sr * atk * 0.83 * SUMMON_LEFT;
+            return v;
+        }
+        /// <summary>소환물 한 겹이 남은 싸움에 따라 칠 대 수(대충 — 공격 카드 1.5장).</summary>
+        public const double SUMMON_LEFT = 1.5;
+
+        /// <summary>예약 키워드가 다 닳으면 터질 몫(LATER_W 할인 · 카드 한 장 눈금 × 공격력) — 예약이 아니면 0.</summary>
+        double ReservePayoff(Battle s, KwRt kw)
+        {
+            if (!kw.Def.Reserve) return 0;
+            var o = s.HeroUnit(kw.Owner); double atk = o != null ? o.Atk : 12 * K;
+            double pv = 0;
+            foreach (var r in kw.Def.Rules) if (r.When?.On == "stackGone" && r.When.Decay) pv += Math.Max(0, CardValue.ValueOf(r.Fx));
+            return LATER_W * 1.2 * atk * pv;
+        }
+
+        /// <summary>그 키워드를 부르는 소환물 행동(summon)의 가장 큰 비율 — 주인 사도의 패시브 · 손패 카드에서.</summary>
+        double SummonRatio(Battle s, KwRt kw)
+        {
+            double r = 0;
+            if (s.Passives.TryGetValue(kw.Owner, out var rules))
+                foreach (var rt in rules) foreach (var f in rt.R.Fx) if (f.K == FxK.Summon && f.Id == kw.Id) r = Math.Max(r, f.Ratio);
+            foreach (var h in s.Hand) { var c = s.CardOf(h); if (c != null) foreach (var f in c.Fx) if (f.K == FxK.Summon && f.Id == kw.Id) r = Math.Max(r, f.Ratio * 0.5); }
+            return r;
+        }
+
+        /// <summary>걸려 있는 다음 카드 강화 — 카드 한 장(값 1) × 강화 비율.</summary>
+        public double EmpowerWorth(Battle s)
+        {
+            double v = 0;
+            foreach (var kv in s.Counts)
+            {
+                if (!kv.Key.StartsWith("empower|", StringComparison.Ordinal) || kv.Value <= 0) continue;
+                var o = s.HeroUnit(kv.Key.Substring(8));
+                double atk = o != null ? o.Atk : s.AliveParty().Select(u => (double)u.Atk).DefaultIfEmpty(12 * K).Max();
+                v += 0.8 * 1.2 * atk * kv.Value / 100.0;
+            }
+            return v;
+        }
+
         /// <summary>턴 끝 패시브 가운데 조건이 붙은 것(조건이 지금 서 있으면 그 효과의 값). 조건 없는 것은 어느 수든 같아 셀 필요가 없다.</summary>
         double TurnEndBonus(Battle s)
         {
@@ -327,8 +489,20 @@ namespace Bolzena.Core
             foreach (var u in s.AliveParty())
             {
                 if (!s.Passives.TryGetValue(u.Key, out var rules)) continue;
+                int kept = -1;
                 foreach (var rt in rules)
                 {
+                    // 아껴 두기 계기(keepAp) — AP 를 남겼거나 보존 카드를 쥐고 있으면 턴을 넘길 때 돈다(1단계: 보존도)
+                    if (rt.R.When.On == "keepAp")
+                    {
+                        if (kept < 0) kept = s.Hand.Count(id => s.HasTagB(id, Tag.Keep) && !s.HasTagB(id, Tag.Evaporate));
+                        var w = rt.R.When; int n = Math.Max(1, w.N);
+                        bool on = w.Kind == "keep" ? kept >= n : w.Kind == "ap" ? s.Ap >= n : s.Ap >= n || kept > 0;
+                        // 3단계(118명): 쌓기에 ofEvent 가 있으면 일의 값(남긴 AP + 쥔 보존 장수)만큼 센다 — 옛 셈은 v 만 봐 「아껴 둔 몫」 을 작게 쳤다
+                        int ev = (w.Kind == "keep" ? 0 : Math.Max(0, s.Ap)) + (w.Kind == "ap" ? 0 : kept);
+                        if (on && s.CondsHold(u, rt)) v += 0.8 * 1.2 * u.Atk * Math.Max(0, CardValue.ValueOf(rt.R.Fx)) + 1.5 * K * rt.R.Fx.Where(f => f.K == FxK.Stack).Sum(f => f.OfEvent > 0 ? Math.Floor(ev * f.OfEvent) : f.V);
+                        continue;
+                    }
                     if (rt.R.When.On != "turnEnd" || rt.R.Conds.Count == 0) continue;
                     if (!s.CondsHold(u, rt)) continue;
                     v += 0.8 * 1.2 * u.Atk * Math.Max(0, CardValue.ValueOf(rt.R.Fx)) + 1.5 * K * rt.R.Fx.Where(f => f.K == FxK.Stack).Sum(f => f.V);
@@ -362,6 +536,8 @@ namespace Bolzena.Core
             public int I; public string Id; public int T; public int? Ally; public List<string> Discard; public string Hero;
             /// <summary>두 갈래 카드 — 고른 갈래.</summary>
             public int? Choice;
+            /// <summary>소모량을 고르는 카드 — 고른 수(1 · 절반 · 전부를 다 둬 본다).</summary>
+            public int? Spend;
         }
 
         public List<Move> Moves(Battle s)
@@ -394,12 +570,15 @@ namespace Bolzena.Core
                     discard = s.Hand.Where((_, j) => j != i).OrderBy(x => DiscardWorth(s, x, burning)).Take(need).ToList();
                 }
                 var picks = c.Choices != null && c.Choices.Count == 2 ? new int?[] { 1, 2 } : new int?[] { null };   // 두 갈래 — 둘 다 둬 본다
+                var sp = s.SpendChoices(id);   // 소모량 고르기 — 1 · 절반 · 전부를 다 둬 본다(1단계)
+                var spends = sp.Count > 1 ? sp.Select(x => (int?)x).ToArray() : new int?[] { null };
                 foreach (var ch in picks)
-                    foreach (var t in ts)
-                    {
-                        if (allyToo) foreach (var a in allies) outs.Add(new Move { I = i, Id = id, T = t, Ally = a, Discard = discard, Choice = ch });
-                        else outs.Add(new Move { I = i, Id = id, T = t, Discard = discard, Choice = ch });
-                    }
+                    foreach (var spn in spends)
+                        foreach (var t in ts)
+                        {
+                            if (allyToo) foreach (var a in allies) outs.Add(new Move { I = i, Id = id, T = t, Ally = a, Discard = discard, Choice = ch, Spend = spn });
+                            else outs.Add(new Move { I = i, Id = id, T = t, Discard = discard, Choice = ch, Spend = spn });
+                        }
             }
             foreach (var u in s.Party)
             {
@@ -426,7 +605,30 @@ namespace Bolzena.Core
             var id = s.Hand[m.I];
             var g = s.GlowOf(id);
             if (g != null) s.ApplyEpiphany(id, g.Kind == "card" ? (EpiPick ?? EpiChoice)(s, id) : 0);
-            return s.PlayCard(m.I, m.T, new PlayOpts { Ally = m.Ally, Discard = m.Discard?.ToList(), Choice = m.Choice }).Ok;
+            return s.PlayCard(m.I, m.T, new PlayOpts { Ally = m.Ally, Discard = m.Discard?.ToList(), Choice = m.Choice, Spend = m.Spend }).Ok;
+        }
+
+        /// <summary>
+        /// 소모량 고르기(spend pick) — 봇이 수를 고를 때와 같은 셈으로 소모량을 하나 돌려준다(시범 16 · 화면의 자동 전투용).
+        /// 후보는 b.SpendChoices(카드) 의 1 · 절반 · 전부. 판을 복사해 하나씩 내 보고 판 점수(Score)가 가장 높은 수를 고른다.
+        /// 고를 것이 없으면(소모량 고르기 카드가 아니거나 겹이 0 · 1) 그 하나(없으면 0)를 돌려준다. 손에 그 카드가 없으면 전부(가진 겹).
+        /// </summary>
+        public int PickSpend(Battle b, string cardInstanceId, int target)
+        {
+            var sp = b.SpendChoices(cardInstanceId);
+            if (sp.Count == 0) return 0;
+            if (sp.Count == 1) return sp[0];
+            int i = b.Hand.IndexOf(cardInstanceId);
+            if (i < 0) return sp[sp.Count - 1];
+            int best = sp[sp.Count - 1]; double bv = double.MinValue;
+            foreach (var x in sp)
+            {
+                var sh = TryMove(b, new Move { I = i, Id = cardInstanceId, T = target, Spend = x });
+                if (sh == null) continue;
+                double v = Score(sh, true);
+                if (v > bv) { bv = v; best = x; }
+            }
+            return best;
         }
 
         Battle TryMove(Battle s, Move m)
@@ -443,8 +645,10 @@ namespace Bolzena.Core
             int g = 0;
             while (s.Over == null && g++ < 60)
             {
-                bool deep = depth0 < 2 && Orderly(s);
-                int depth = deep ? 2 : depth0, width = deep ? 2 : width0;
+                // 차례가 값을 바꾸는 손이면 두 수, 셋째 · 넷째 카드 덤(박자형)이 있으면 세 수 앞까지(폭 2) — 1단계
+                bool deeper = depth0 < 3 && Rhythmic(s);
+                bool deep = depth0 < 2 && (deeper || Orderly(s));
+                int depth = deeper ? 3 : deep ? 2 : depth0, width = deep ? 2 : width0;
                 double stop = Score(s, false);
                 var ms = Moves(s);
                 if (ms.Count == 0) break;
@@ -458,9 +662,7 @@ namespace Bolzena.Core
                     {
                         var x = tried[i];
                         if (x.sh.Over != null) continue;
-                        double best = Score(x.sh, false);
-                        foreach (var m2 in Moves(x.sh)) { var sh2 = TryMove(x.sh, m2); if (sh2 != null) best = Math.Max(best, Score(sh2, true)); }
-                        tried[i] = (x.m, x.sh, x.v, Math.Max(x.v, best));
+                        tried[i] = (x.m, x.sh, x.v, Math.Max(x.v, Look(x.sh, depth - 1, width)));
                     }
                     tried = tried.OrderByDescending(x => x.v2 ?? x.v).ToList();
                 }
@@ -471,12 +673,24 @@ namespace Bolzena.Core
             }
         }
 
+        /// <summary>그 판에서 d 수 안에 닿을 가장 좋은 점수(멈추기 포함). 다음 단계는 점수가 높은 width 개만 더 판다.</summary>
+        double Look(Battle s, int d, int width)
+        {
+            double best = Score(s, false);
+            var kids = new List<(Battle sh, double v)>();
+            foreach (var m in Moves(s)) { var sh = TryMove(s, m); if (sh == null) continue; double v = Score(sh, true); kids.Add((sh, v)); if (v > best) best = v; }
+            if (d > 1)
+                foreach (var k in kids.Where(k => k.sh.Over == null).OrderByDescending(k => k.v).Take(width))
+                    best = Math.Max(best, Look(k.sh, d - 1, width));
+            return best;
+        }
+
         public string Describe(Battle s, Move m)
         {
             string Foe(int i) => s.Enemies.FirstOrDefault(x => x.Idx == i)?.Name ?? "-";
             if (m.Ult) return $"고학년 {s.HeroUnit(m.Hero).Name} 「{s.UltOf(m.Hero).Name}」 → {Foe(m.T)}";
             var c = s.CardOf(m.Id);
-            return $"「{c.Name}」({s.CostOf(m.Id)}AP · {data.Hero(c.Hero)?.Name ?? "교주"}){(c.Target == "적" ? " → " + Foe(m.T) : "")}{(m.Discard != null ? $" · 버림 {m.Discard.Count}" : "")}";
+            return $"「{c.Name}」({s.CostOf(m.Id)}AP · {data.Hero(c.Hero)?.Name ?? "교주"}){(c.Target == "적" ? " → " + Foe(m.T) : "")}{(m.Discard != null ? $" · 버림 {m.Discard.Count}" : "")}{(m.Spend != null ? $" · 소모 {m.Spend}" : "")}";
         }
     }
 }

@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "수인",
       "role": "딜러",
+      "style": "손 만들기형",
       "star": 2,
       "hp": 810,
       "atk": 119,
@@ -29,7 +30,8 @@
         {
           "name": "먹고 나면 힘",
           "when": {
-            "on": "kill"
+            "on": "kill",
+            "mine": true
           },
           "limit": {
             "per": "turn",
@@ -37,13 +39,14 @@
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "포만감",
+              "k": "make",
+              "id": "베니_fish",
               "v": 1
             },
             {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "포만감",
+              "v": 1
             }
           ]
         },
@@ -146,7 +149,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.3
+          "ratio": 0.35
         },
         {
           "k": "stack",
@@ -154,7 +157,7 @@
           "v": 1
         }
       ],
-      "blurb": "배고픈 곰이 아껴 두는 비상식량입니다."
+      "blurb": "배고픈 곰이 아껴 두는 비상식량 — 지금 먹을까, 도끼에 실을까"
     },
     {
       "id": "베니_u1",
@@ -181,7 +184,7 @@
       ],
       "oracles": [
         {
-          "name": "두 마리째",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "heal",
@@ -200,7 +203,7 @@
           ]
         },
         {
-          "name": "한 입 간식",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -220,26 +223,26 @@
           ]
         },
         {
-          "name": "배 터지게 먹기",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.41
+              "ratio": 0.5
             },
             {
-              "k": "stack",
-              "id": "포만감",
-              "v": 3
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "사료 나눠 먹기",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "heal",
@@ -249,496 +252,6 @@
               "k": "make",
               "id": "베니_fish",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "아침 생선",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "make",
-              "id": "베니_fish",
-              "v": 2
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "포만감",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "기름 오른 생선",
-          "kind": "heal"
-        },
-        {
-          "name": "생선 냄새",
-          "kind": "draw"
-        },
-        {
-          "name": "입가심",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "포만감",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "베니_u2",
-      "name": "힘으로 하는 공사",
-      "hero": "베니",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.1,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifStack",
-          "id": "포만감",
-          "n": 1
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.4,
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "곡괭이질",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "포만감",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "벽돌 나르기",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "포만감",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "강제 철거",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "포만감",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "빈속 공사",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "포만감",
-              "n": 1,
-              "not": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
-            }
-          ]
-        },
-        {
-          "name": "공사장 새참",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "베니_fish",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "굵은 팔뚝",
-          "kind": "power"
-        },
-        {
-          "name": "망치 자국",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "현장 체력",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.4
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "베니_u3",
-      "name": "사료스탕스 뽀너스",
-      "hero": "베니",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.8,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perTag",
-          "id": "베니_fish"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.35,
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "곱빼기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "베니_fish"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.42,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "뽀너스 정기 배송",
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "포만감",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "make",
-                      "id": "베니_fish",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "생선 한입에",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.89,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "베니_fish"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "든든한 밥심",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "포만감"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.47,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.84
-            }
-          ]
-        },
-        {
-          "name": "사료 축제",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "베니_fish"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "뽀너스 쿠폰",
-          "kind": "power"
-        },
-        {
-          "name": "두툼한 뱃살",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "생선 한 마리 더",
-          "fx": [
-            {
-              "k": "make",
-              "id": "베니_fish",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "베니_u4",
-      "name": "배고픈 곰의 도끼",
-      "hero": "베니",
-      "unique": true,
-      "cost": 2,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 2,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifStack",
-          "id": "포만감",
-          "n": 1,
-          "not": true
-        },
-        {
-          "k": "dmg",
-          "ratio": 1,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifKill"
-        },
-        {
-          "k": "stack",
-          "id": "포만감",
-          "v": 2
-        }
-      ],
-      "oracles": [
-        {
-          "name": "통나무 쪼개기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "포만감",
-              "n": 1,
-              "not": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "포만감",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "손도끼",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "포만감",
-              "n": 1,
-              "not": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.62,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "포만감",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "굶주린 도끼",
-          "fx": [
-            {
-              "k": "spend",
-              "id": "포만감",
-              "all": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 2.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "베니_fish",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "곰의 사냥 본능",
-          "cost": 1,
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "target": "oneEnemy"
             },
             {
               "k": "power",
@@ -764,23 +277,292 @@
           ]
         },
         {
-          "name": "한 입 거리",
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포만감",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베니_u2",
+      "name": "힘으로 하는 공사",
+      "hero": "베니",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 1
+        },
+        {
+          "k": "ifStack",
+          "id": "포만감",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.34,
+              "ratio": 1.35,
               "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "ifStack",
               "id": "포만감",
-              "n": 1,
-              "not": true
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 1.17,
+              "ratio": 0.61,
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "포만감",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.51,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "frost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베니_u3",
+      "name": "사료스탕스 뽀너스",
+      "hero": "베니",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perTag",
+          "id": "베니_fish"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "make",
+          "id": "베니_fish",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.01,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -789,23 +571,422 @@
               "unique": true
             }
           ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "베니_fish",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.51,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "날 선 도끼날",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "배고픈 눈빛",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "나눠 먹는 생선",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "make",
+              "id": "베니_fish",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베니_u4",
+      "name": "배고픈 곰의 도끼",
+      "hero": "베니",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.7,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perTag",
+          "id": "베니_fish"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "exileFrom",
+          "from": "hand",
+          "all": true,
+          "tag": "베니_fish"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "베니_fish"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 1,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.62,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "베니_fish"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.62,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.78,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "베니_fish"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "포만감",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베니_u5",
+      "name": "앞장서는 곰",
+      "hero": "베니",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1
+        },
+        {
+          "k": "make",
+          "id": "베니_fish",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.81
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.95
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "베니_fish",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.01
+            },
+            {
+              "k": "make",
+              "id": "베니_fish",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포만감",
+              "v": 1
             }
           ]
         }

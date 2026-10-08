@@ -84,6 +84,7 @@ namespace Bolzena.RunUI
         public void NewRun(List<string> party, string village, long seed, string foeNature = null)
         {
             Run = Run.New(Data, party, seed, village, foeNature);
+            Run.ApplyPerks(CrayonStore.Perks);   // 교주 능력치(크레파스) — 올린 단계의 영구 능력치
         }
 
         public bool Has => Run != null;

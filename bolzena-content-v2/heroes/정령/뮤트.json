@@ -5,12 +5,13 @@
       "name": "뮤트",
       "nature": "순수",
       "role": "서포터",
+      "style": "계산형",
       "star": 3,
       "hp": 500,
       "atk": 86,
       "def": 58,
       "crit": 5,
-      "blurb": "나타와 뒤섞여 머릿속에서 늘 회의 중. 턴의 첫 카드가 공격이면 뮤트가 의장이 되어 공격마다 적을 「홀로그램」 그물로 감아 지지고, 스킬이면 나타가 의장이 되어 파티를 지킵니다.",
+      "blurb": "나타와 뒤섞여 머릿속에서 늘 회의 중인 정보의 정령. 표적을 홀로그램 그물로 감아 지지고, 이번 턴 쓴 AP 를 딱 맞추면 SP 를 채우듯 AP 가 돌아옵니다 — 확률 99% 정도?",
       "passives": [
         {
           "name": "웹트래핑",
@@ -29,9 +30,11 @@
         {
           "name": "SP 주유",
           "when": {
-            "on": "play",
-            "who": "any",
-            "nth": 4
+            "on": "tally"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
           "fx": [
             {
@@ -40,6 +43,20 @@
             },
             {
               "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "SP 주유",
+          "when": {
+            "on": "play",
+            "who": "any",
+            "nth": 4
+          },
+          "fx": [
+            {
+              "k": "ap",
               "v": 1
             }
           ]
@@ -104,15 +121,9 @@
                 "all": true
               },
               {
-                "k": "dmg",
-                "ratio": 1.6,
-                "target": "oneEnemy"
-              },
-              {
-                "k": "status",
-                "id": "취약",
-                "v": 2,
-                "target": "oneEnemy"
+                "k": "empower",
+                "ratio": 0.6,
+                "who": "any"
               }
             ]
           }
@@ -161,27 +172,87 @@
           "id": "홀로그램",
           "v": 3,
           "target": "oneEnemy"
+        },
+        {
+          "k": "ifSpent",
+          "n": 3
+        },
+        {
+          "k": "draw",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "9중 포위",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "홀로그램",
               "v": 5,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifSpent",
+              "n": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "성공률 계산",
+          "name": "신탁 2",
           "fx": [
             {
               "k": "stack",
               "id": "홀로그램",
               "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifSpent",
+              "n": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 4,
               "target": "oneEnemy"
             },
             {
@@ -193,9 +264,312 @@
           ]
         },
         {
-          "name": "다크넷 관찰",
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "뮤트_u2",
+      "name": "강제 종료",
+      "hero": "뮤트",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.48,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "홀로그램"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.12,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "홀로그램",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "홀로그램",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.11,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "홀로그램",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifSpent",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.11,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "tally"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 2,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "홀로그램"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "뮤트_u3",
+      "name": "와이어 함정",
+      "hero": "뮤트",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.64,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "홀로그램",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifSpent",
+          "n": 3
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifSpent",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifSpent",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "oneEnemy"
+            },
             {
               "k": "stack",
               "id": "홀로그램",
@@ -223,249 +597,30 @@
           ]
         },
         {
-          "name": "홀로그램 변장",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "stack",
-              "id": "홀로그램",
-              "v": 4,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "데이터 덤프",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "홀로그램",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "allEnemies"
             },
-            {
-              "k": "ap",
-              "v": 1
-            },
-            {
-              "k": "discard",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "데이터 분석",
-          "kind": "draw"
-        },
-        {
-          "name": "확률 맹신",
-          "fx": [
             {
               "k": "stack",
               "id": "홀로그램",
               "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "규칙과 학습",
-          "tags": [
-            "보존"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "뮤트_u2",
-      "name": "강제 종료",
-      "hero": "뮤트",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.7,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "홀로그램"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.15,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "홀로그램",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "강제 포맷",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "홀로그램"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.18,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "홀로그램",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "시스템 다운",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "홀로그램"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.15,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "홀로그램",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "싸늘한 말투",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.98,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "홀로그램"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "일괄 종료",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.57,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "홀로그램",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.09,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "침묵",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "홀로그램"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "오버클럭",
-          "kind": "power"
         },
         {
-          "name": "취약점 공격",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "빠른 실행",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "뮤트_u3",
-      "name": "와이어 함정",
-      "hero": "뮤트",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.9,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "홀로그램",
-          "v": 2,
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "정밀 와이어",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -479,97 +634,19 @@
               "target": "oneEnemy"
             }
           ]
-        },
-        {
-          "name": "와이어 그물",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "홀로그램",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "기본 공격 감지",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "홀로그램",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "홀로그램",
-              "n": 5
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "나타의 손",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "홀로그램",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "물이 무서워",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "홀로그램",
-              "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.65
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "강철 와이어",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "엉킨 실",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "실뜨기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -615,11 +692,150 @@
       ],
       "oracles": [
         {
-          "name": "완전한 평화",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
               "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "topEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "topEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "topEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "tally"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "홀로그램",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 3,
+              "target": "topEnemy"
+            },
+            {
+              "k": "discard",
               "v": 1
             },
             {
@@ -641,93 +857,64 @@
               ]
             }
           ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "atkUp"
         },
         {
-          "name": "실뜨기 전문가",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "홀로그램",
-                      "v": 1,
-                      "target": "topEnemy"
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "홀로그램",
-                    "n": 6
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "언젠가 우리",
-          "tags": [
-            "개전"
-          ],
+          "name": "축복 3",
           "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "홀로그램",
-              "v": 2,
+              "v": 1,
               "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "홀로그램",
-                      "v": 1,
-                      "target": "topEnemy"
-                    }
-                  ]
-                }
-              ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "뮤트_u5",
+      "name": "옆집 반찬 돌리기",
+      "hero": "뮤트",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "홀로그램",
+          "v": 2,
+          "target": "oneEnemy"
         },
         {
-          "name": "한 시간 연설",
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        },
+        {
+          "k": "ifSpent",
+          "n": 2
+        },
+        {
+          "k": "stack",
+          "id": "홀로그램",
+          "v": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
           "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "홀로그램",
@@ -735,18 +922,77 @@
               "target": "oneEnemy"
             },
             {
-              "k": "ap",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "ifSpent",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "교단 쪽 첩보",
+          "name": "신탁 2",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "ifSpent",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 2,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -758,13 +1004,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "tally"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "홀로그램",
-                      "v": 1,
+                      "v": 2,
                       "target": "topEnemy"
                     }
                   ]
@@ -772,20 +1022,47 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "엘레나와 함께",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "산들바람",
-          "kind": "defUp"
+          "name": "축복 2",
+          "kind": "guard"
         },
         {
-          "name": "규칙 준수",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "홀로그램",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     }

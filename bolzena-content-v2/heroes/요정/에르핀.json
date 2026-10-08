@@ -6,6 +6,7 @@
       "nature": "순수",
       "race": "요정",
       "role": "딜러",
+      "style": "손 만들기형",
       "star": 3,
       "hp": 550,
       "atk": 155,
@@ -137,6 +138,8 @@
     {
       "id": "에르핀_cake",
       "name": "케이크",
+      "hero": "에르핀",
+      "token": true,
       "cost": 0,
       "type": "스킬",
       "tags": [
@@ -145,7 +148,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.4
+          "ratio": 0.44
         },
         {
           "k": "stack",
@@ -153,8 +156,7 @@
           "v": 1
         }
       ],
-      "hero": "에르핀",
-      "token": true
+      "blurb": "친구 몰래 꺼내 먹는 케이크 — 먹으면 배가 부르고, 안 먹으면 탄알이 됩니다"
     },
     {
       "id": "에르핀_u1",
@@ -166,7 +168,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.5,
           "target": "randomEnemy",
           "hits": 3
         },
@@ -176,7 +178,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.63,
           "target": "randomEnemy"
         },
         {
@@ -188,11 +190,37 @@
       ],
       "oracles": [
         {
-          "name": "마력 대방출",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.47,
+              "ratio": 0.63,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perTag",
+              "id": "에르핀_cake"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "에르핀_cake"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
               "target": "randomEnemy",
               "hits": 4
             },
@@ -202,52 +230,26 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.52,
+              "ratio": 0.61,
               "target": "randomEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "에르핀_cake"
             }
           ]
         },
         {
-          "name": "그건 아까잖아",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.66,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "에르핀_cake"
+            },
             {
               "k": "dmg",
               "ratio": 0.59,
-              "target": "randomEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "배부름"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "백성들이여!",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.72,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "에르핀_cake"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
               "target": "allEnemies"
             },
             {
@@ -259,40 +261,12 @@
           ]
         },
         {
-          "name": "사교 적성",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "randomEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perTag",
-              "id": "에르핀_cake"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "make",
-              "id": "에르핀_cake",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "와구와구 발사!!",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.49,
+              "ratio": 0.6,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -302,7 +276,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.6,
               "target": "randomEnemy"
             },
             {
@@ -310,12 +284,16 @@
               "rules": [
                 {
                   "when": {
-                    "on": "exhaust"
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.62,
+                      "ratio": 0.38,
                       "target": "randomEnemy"
                     }
                   ]
@@ -323,19 +301,45 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.53,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perTag",
+              "id": "에르핀_cake"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "아이스크림 케이크",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "숨 쉬고 먹고 자고",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "쫀득한 초코 층",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
@@ -366,7 +370,7 @@
       ],
       "oracles": [
         {
-          "name": "열두 끼 정식",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "make",
@@ -374,25 +378,14 @@
               "v": 3
             },
             {
-              "k": "discard",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "한 입만",
+          "name": "신탁 2",
           "cost": 0,
-          "fx": [
-            {
-              "k": "make",
-              "id": "에르핀_cake",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "친구 몰래 한 조각",
-          "power": true,
           "fx": [
             {
               "k": "make",
@@ -402,6 +395,35 @@
             {
               "k": "draw",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.75
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
             },
             {
               "k": "power",
@@ -423,62 +445,22 @@
           ]
         },
         {
-          "name": "먹어도 먹어도 다시",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "make",
               "id": "에르핀_cake",
-              "v": 2
+              "v": 3
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "make",
-              "id": "에르핀_cake",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "친구 몫까지",
-          "fx": [
-            {
-              "k": "make",
-              "id": "에르핀_cake",
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "당 충전",
-          "kind": "ap"
-        },
-        {
-          "name": "포크 하나 더",
-          "fx": [
-            {
-              "k": "make",
-              "id": "에르핀_cake",
+              "k": "discard",
               "v": 1
             }
           ]
-        },
-        {
-          "name": "배고파서 서두름",
-          "kind": "cost"
         }
       ]
     },
@@ -495,7 +477,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.85,
+          "ratio": 0.94,
           "target": "oneEnemy"
         },
         {
@@ -506,14 +488,91 @@
       ],
       "oracles": [
         {
-          "name": "진심 전력!!!",
+          "name": "신탁 1",
           "tags": [
             "연계"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.38,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "연계"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "에르핀_cake",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "연계"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
               "target": "oneEnemy"
             },
             {
@@ -530,32 +589,14 @@
           ]
         },
         {
-          "name": "케이크 폭탄!!!",
+          "name": "신탁 5",
           "tags": [
             "연계"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.79,
-              "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "에르핀_cake",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "크림 방패",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.48,
               "target": "oneEnemy"
             },
             {
@@ -564,64 +605,30 @@
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 0.72
-            }
-          ]
-        },
-        {
-          "name": "케이크 하나 더!",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "에르핀_cake",
-              "v": 2
-            },
-            {
-              "k": "ap",
+              "k": "discard",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "혼자 다 먹기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "에르핀_cake",
-              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "설탕 듬뿍",
-          "kind": "power"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "휘핑크림",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "한 조각 더",
-          "kind": "draw"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -638,7 +645,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.8,
+          "ratio": 2.13,
           "target": "oneEnemy"
         },
         {
@@ -647,7 +654,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.53,
           "target": "oneEnemy"
         },
         {
@@ -658,14 +665,14 @@
       ],
       "oracles": [
         {
-          "name": "진심 펀치",
+          "name": "신탁 1",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
+              "ratio": 2.88,
               "target": "oneEnemy"
             },
             {
@@ -674,35 +681,8 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.71,
               "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "에르핀_cake",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "결계째 박살",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "배부름"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.31,
-              "target": "allEnemies"
             },
             {
               "k": "spend",
@@ -712,14 +692,71 @@
           ]
         },
         {
-          "name": "밥값은 했어",
+          "name": "신탁 2",
+          "cost": 1,
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.96,
+              "ratio": 2.03,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "배부름"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "배부름",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.63,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "배부름"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "분쇄"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
               "target": "oneEnemy"
             },
             {
@@ -732,24 +769,36 @@
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
-            },
-            {
-              "k": "ap",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "배부름"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "에르핀_cake",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "한 방 올인",
-          "tags": [
-            "분쇄",
-            "소멸"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 4.4,
+              "ratio": 2.76,
               "target": "oneEnemy"
             },
             {
@@ -758,58 +807,191 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.69,
               "target": "oneEnemy"
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "에르핀_cake"
-            }
-          ]
-        },
-        {
-          "name": "결계 툭툭",
-          "cost": 1,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "배부름"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "배부름",
-              "all": true
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "주먹에 마력",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "금 간 결계",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "밥 먹고 힘내기",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_u5",
+      "name": "배고픈 여왕",
+      "hero": "에르핀",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "에르핀_cake",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "ifStack",
+          "id": "배부름",
+          "n": 1,
+          "not": true
+        },
+        {
+          "k": "empower",
+          "ratio": 0.4
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "배부름",
+              "n": 1,
+              "not": true
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "배부름",
+              "n": 1,
+              "not": true
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.99
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "배부름",
+              "all": true
+            },
+            {
+              "k": "heal",
+              "ratio": 2.13
+            },
+            {
+              "k": "empower",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
           "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_cake",
+              "v": 1
+            }
+          ]
         }
       ]
     }

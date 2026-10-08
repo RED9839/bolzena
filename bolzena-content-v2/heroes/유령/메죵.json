@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "유령",
       "role": "딜러",
+      "style": "아껴 두기형",
       "star": 1,
       "hp": 420,
       "atk": 104,
       "def": 23,
       "crit": 10,
-      "blurb": "어디든 들어가면 거기가 내 집이 되는 태평한 유령. 적 1명에게 「입주」해 눌러앉고, 적이 실드를 세우면 제 집 담장인 양 파티가 나눠 씁니다. 집주인이 쓰러지면 짐 싸서 다음 집으로.",
+      "blurb": "어디든 들어가면 거기가 내 집이 되는 태평한 유령. 집문서와 수리검을 손에 눌러앉힌 채 턴을 넘길수록 「입주」 가 늘고, 집주인이 쓰러지면 짐 싸서 다음 집으로.",
       "keyword": {
         "name": "입주",
         "desc": "발 닿는 곳마다 눌러앉은 자리",
@@ -28,7 +29,7 @@
         {
           "name": "여기가 내 집",
           "when": {
-            "on": "turnEnd"
+            "on": "keepAp"
           },
           "fx": [
             {
@@ -140,12 +141,13 @@
       "cost": 0,
       "type": "스킬",
       "tags": [
+        "보존",
         "소멸"
       ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 1.04,
           "target": "randomEnemy"
         },
         {
@@ -158,7 +160,7 @@
           "v": 1
         }
       ],
-      "blurb": "어디서 났는지 모를 남의 집문서. 메죵 이름이 연필로 적혀 있습니다."
+      "blurb": "어디든 내 집 — 쥐고 있으면 눌러앉고, 내면 짐을 풉니다"
     },
     {
       "id": "메죵_u1",
@@ -167,153 +169,190 @@
       "unique": true,
       "cost": 1,
       "type": "공격",
+      "tags": [
+        "보존"
+      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.65,
           "target": "oneEnemy",
           "hits": 3
         },
         {
-          "k": "stack",
-          "id": "입주",
-          "v": 1
+          "k": "ifHeld",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.65,
+          "target": "oneEnemy",
+          "hits": 2
         }
       ],
       "oracles": [
         {
-          "name": "수리검 한 움큼",
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.78,
+              "ratio": 0.88,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "stack",
-              "id": "입주",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "흩날리는 수리검",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
+              "k": "ifHeld",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.63,
-              "target": "randomEnemy",
-              "hits": 5
-            },
-            {
-              "k": "stack",
-              "id": "입주",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "집들이 선물",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "make",
-              "id": "메죵_deed",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "오래 머문 손목",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "입주",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "입주",
-              "n": 4
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.88,
               "target": "oneEnemy",
               "hits": 2
             }
           ]
         },
         {
-          "name": "수리검 세트",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.57,
+              "ratio": 0.62,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "stack",
-              "id": "입주",
-              "v": 1
+              "k": "ifHeld",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "oneEnemy",
+              "hits": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "ifHeld",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy",
+              "hits": 3
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
+                    "on": "keepAp",
+                    "kind": "keep"
                   },
                   "fx": [
                     {
-                      "k": "extra",
-                      "ratio": 0.3
+                      "k": "stack",
+                      "id": "입주",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.52,
+                      "target": "randomEnemy",
+                      "hits": 2
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifHeld",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "붕대 감은 손",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "평안한 손목",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "어서 오세요~",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "메죵_deed",
+              "k": "stack",
+              "id": "입주",
               "v": 1
             }
           ]
@@ -330,7 +369,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.5,
+          "ratio": 1.3,
           "target": "oneEnemy"
         },
         {
@@ -339,7 +378,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.52,
           "target": "oneEnemy"
         },
         {
@@ -350,11 +389,12 @@
       ],
       "oracles": [
         {
-          "name": "집문서 당장 내놔",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.8,
+              "ratio": 1.76,
               "target": "oneEnemy"
             },
             {
@@ -363,7 +403,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.54,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
@@ -374,63 +414,53 @@
           ]
         },
         {
-          "name": "부동산 뒤엎기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.12,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "입주"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "입주",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "집주인 행세",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.42,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "입주"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "make",
-              "id": "메죵_deed",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "집문서 수집",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.23,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "입주"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "메죵_deed",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.17,
               "target": "oneEnemy"
             },
             {
@@ -443,34 +473,19 @@
               "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "입주",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 1
             }
           ]
         },
         {
-          "name": "이삿짐 정리",
+          "name": "신탁 4",
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 1.95,
+              "ratio": 2.34,
               "target": "oneEnemy"
             },
             {
@@ -479,7 +494,27 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.94,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.34,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "입주"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.94,
               "target": "oneEnemy"
             }
           ]
@@ -487,16 +522,22 @@
       ],
       "blesses": [
         {
-          "name": "도장 쾅",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "등기부 등본",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "이사 준비",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -536,7 +577,7 @@
       ],
       "oracles": [
         {
-          "name": "깊숙이 눌러앉기",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -566,41 +607,7 @@
           ]
         },
         {
-          "name": "평안한 집",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.5
-            },
-            {
-              "k": "stack",
-              "id": "입주",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "make",
-                      "id": "메죵_deed",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "셰이디의 아공간",
+          "name": "신탁 2",
           "tags": [
             "개전"
           ],
@@ -609,69 +616,6 @@
               "k": "make",
               "id": "메죵_deed",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "make",
-                      "id": "메죵_deed",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "먼저 맞이하기",
-          "fx": [
-            {
-              "k": "make",
-              "id": "메죵_deed",
-              "v": 3
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "make",
-                      "id": "메죵_deed",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "느긋한 하루",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "입주",
-              "v": 3
             },
             {
               "k": "power",
@@ -696,98 +640,22 @@
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "편한 자리",
-          "kind": "draw"
         },
         {
-          "name": "집 찾아다니기",
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
           "fx": [
+            {
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 1
+            },
             {
               "k": "stack",
               "id": "입주",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "집 보러 오기",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "메죵_u4",
-      "name": "제가 주인인 양",
-      "hero": "메죵",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.9,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perTag",
-          "id": "메죵_deed"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.68,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "exileFrom",
-          "from": "hand",
-          "all": true,
-          "tag": "메죵_deed"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "진짜 주인처럼",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.13,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "메죵_deed"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.83,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "메죵_deed"
-            }
-          ]
-        },
-        {
-          "name": "겁줘 보세요",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
             },
             {
               "k": "power",
@@ -795,6 +663,19 @@
                 {
                   "when": {
                     "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "메죵_deed",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "keepAp",
+                    "kind": "keep"
                   },
                   "fx": [
                     {
@@ -809,54 +690,113 @@
           ]
         },
         {
-          "name": "집문서 쥐고 있기",
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.29,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 1
             },
             {
-              "k": "perTag",
-              "id": "메죵_deed"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             },
             {
-              "k": "dmg",
-              "ratio": 0.74,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "메죵_deed",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "집 넓히기",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "perStack",
-              "id": "입주"
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "입주",
+              "v": 2
             },
             {
-              "k": "perTag",
-              "id": "메죵_deed"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "메죵_deed",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "메죵_u4",
+      "name": "제가 주인인 양",
+      "hero": "메죵",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.04,
+          "target": "oneEnemy"
         },
         {
-          "name": "놀라지 않음",
-          "cost": 0,
+          "k": "perTag",
+          "id": "메죵_deed"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.78,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "exileFrom",
+          "from": "hand",
+          "all": true,
+          "tag": "메죵_deed"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
@@ -865,7 +805,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 1.05,
               "target": "oneEnemy"
             },
             {
@@ -875,16 +815,173 @@
               "tag": "메죵_deed"
             }
           ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "메죵_deed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.98,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "메죵_deed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "메죵_deed"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "메죵_deed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp",
+                    "kind": "keep"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "메죵_deed",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "메죵_deed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "생기 없는 눈",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "음침한 웃음",
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
           "fx": [
+            {
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "메죵_u5",
+      "name": "안방 차지",
+      "hero": "메죵",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.56
+        },
+        {
+          "k": "stack",
+          "id": "입주",
+          "v": 1
+        },
+        {
+          "k": "make",
+          "id": "메죵_deed",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.28
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
             {
               "k": "make",
               "id": "메죵_deed",
@@ -893,8 +990,114 @@
           ]
         },
         {
-          "name": "새 안식처",
-          "kind": "cost"
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.48
+            },
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.3
+            },
+            {
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.69
+            },
+            {
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp",
+                    "kind": "keep"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "입주",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.77
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.82
+            },
+            {
+              "k": "make",
+              "id": "메죵_deed",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "입주",
+              "v": 1
+            }
+          ]
         }
       ]
     }

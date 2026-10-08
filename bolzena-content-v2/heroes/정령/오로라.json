@@ -5,15 +5,16 @@
       "name": "오로라",
       "nature": "우울",
       "role": "탱커",
+      "style": "거드는 형",
       "star": 3,
       "hp": 900,
       "atk": 75,
       "def": 70,
       "crit": 5,
-      "blurb": "혼자 남겨지는 걸 두려워하는 다정한 방패. 아군이 카드를 낼 때마다 빛무리가 짙어지고, 셋이 함께 움직인 턴엔 극광이 한 겹 더 내려앉습니다. 마음먹고 오로라를 불러내면 적 진영 위에 장막이 드리워, 한동안 턴마다 빛의 비가 쏟아집니다.",
+      "blurb": "혼자 남겨지는 걸 두려워하는 다정한 방패. 맞을 때마다, 셋이 함께 움직인 턴마다 빛울림이 짙어지고, 다섯이 차면 동료의 다음 한 수에 극광을 실어 줍니다. 오로라를 불러내면 적 진영 위에 장막이 드리워 턴마다 빛의 비가 쏟아집니다.",
       "keyword": {
         "name": "빛울림",
-        "desc": "맞을수록 모이는 빛의 떨림",
+        "desc": "함께 있을 때 모이는 빛의 떨림",
         "carrier": "self",
         "cap": 5,
         "per": [
@@ -22,29 +23,27 @@
             "v": 0.1
           }
         ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        },
         "rules": [
           {
-            "name": "오로라 빛",
+            "name": "혼자가 아니야",
             "when": {
-              "on": "stackReach",
-              "id": "빛울림",
-              "n": 5
+              "on": "fightStart"
             },
             "fx": [
               {
-                "k": "spend",
+                "k": "stack",
+                "id": "오로라 장막",
+                "v": 1
+              },
+              {
+                "k": "stack",
                 "id": "빛울림",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.4,
-                "base": "def",
-                "target": "allEnemies"
-              },
-              {
-                "k": "heal",
-                "ratio": 1
+                "v": 1
               }
             ]
           }
@@ -62,6 +61,27 @@
             "n": 3
           },
           "fx": [
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "다정한 빛마중",
+          "when": {
+            "on": "play",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "ifAllHeroes"
+            },
             {
               "k": "stack",
               "id": "빛울림",
@@ -233,7 +253,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.91
+          "ratio": 0.8
         },
         {
           "k": "status",
@@ -241,18 +261,19 @@
           "v": 1
         },
         {
-          "k": "stack",
-          "id": "빛울림",
-          "v": 1
+          "k": "dealtMod",
+          "v": 0.15,
+          "target": "otherAllies"
         }
       ],
       "oracles": [
         {
-          "name": "긍정의 기운",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.29
+              "ratio": 1.17
             },
             {
               "k": "status",
@@ -260,37 +281,20 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "빛울림",
-              "v": 1
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "otherAllies"
             }
           ]
         },
         {
-          "name": "모두에게 빛무늬",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.97
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 3
-            },
-            {
-              "k": "heal",
               "ratio": 0.76
-            }
-          ]
-        },
-        {
-          "name": "황색 아우라",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.26
             },
             {
               "k": "status",
@@ -298,20 +302,37 @@
               "v": 1
             },
             {
-              "k": "heal",
-              "ratio": 0.97
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "otherAllies"
             }
           ]
         },
         {
-          "name": "빛무늬 유지",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.05
+              "ratio": 0.98
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "otherAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
             },
             {
               "k": "status",
@@ -319,42 +340,55 @@
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "빛울림",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "dealtMod",
+                      "v": 0.1,
+                      "target": "otherAllies"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "선명한 빛울림",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.22
+              "ratio": 1.93
             },
             {
               "k": "status",
               "id": "피해 감소",
               "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "빛울림"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.28
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "따뜻한 빛",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "밤하늘",
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -362,10 +396,6 @@
               "v": 1
             }
           ]
-        },
-        {
-          "name": "흰 리본",
-          "kind": "ap"
         }
       ]
     },
@@ -390,7 +420,7 @@
       ],
       "oracles": [
         {
-          "name": "녹색 아우라",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -405,7 +435,25 @@
           ]
         },
         {
-          "name": "청색 아우라",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -418,42 +466,31 @@
               "who": "other"
             },
             {
-              "k": "heal",
-              "ratio": 0.35
+              "k": "cleanse",
+              "v": 1
             }
           ]
         },
         {
-          "name": "천궁도",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "stack",
               "id": "빛울림",
-              "v": 2
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "n": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "별자리 지도",
-          "power": true,
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -468,7 +505,7 @@
           ]
         },
         {
-          "name": "직접 대화하기",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
@@ -477,38 +514,11 @@
             },
             {
               "k": "draw",
-              "v": 1,
+              "v": 2,
               "who": "other"
             },
             {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "빛울림",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "예언가 놀이",
-          "kind": "draw"
-        },
-        {
-          "name": "고양이 파자마",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "반짝 눈빛",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "빛울림",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -525,7 +535,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.21,
+          "ratio": 0.35,
           "base": "def",
           "target": "allEnemies"
         },
@@ -535,7 +545,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.06,
+          "ratio": 0.1,
           "base": "def",
           "target": "allEnemies"
         },
@@ -547,11 +557,12 @@
       ],
       "oracles": [
         {
-          "name": "플라즈마 조각",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.27,
+              "ratio": 0.47,
               "base": "def",
               "target": "allEnemies"
             },
@@ -561,7 +572,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.07,
+              "ratio": 0.14,
               "base": "def",
               "target": "allEnemies"
             },
@@ -573,66 +584,13 @@
           ]
         },
         {
-          "name": "오~로로로로라!",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "빛울림"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "빛울림",
-              "all": true
-            },
-            {
-              "k": "heal",
-              "ratio": 0.76
-            }
-          ]
-        },
-        {
-          "name": "한 점 집중",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.42,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "빛울림"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.11,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "빛울림",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "빛 아끼기",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.32,
               "base": "def",
               "target": "allEnemies"
             },
@@ -645,123 +603,239 @@
               "ratio": 0.09,
               "base": "def",
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "목장 불태우기",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "빛울림"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.11,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "빛울림",
-              "all": true
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "빛울림",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "눈부신 극광",
-          "kind": "power"
-        },
-        {
-          "name": "빛의 잔상",
-          "kind": "frost"
-        },
-        {
-          "name": "가벼운 빛",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "오로라_u4",
-      "name": "함께 있는 밤",
-      "hero": "오로라",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "status",
-          "id": "불굴",
-          "v": 1
-        },
-        {
-          "k": "perStack",
-          "id": "빛울림"
-        },
-        {
-          "k": "heal",
-          "ratio": 0.14
-        }
-      ],
-      "oracles": [
-        {
-          "name": "고요한 밤",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "빛울림"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.18
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "벨벳과 함께",
-          "power": true,
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "빛울림",
-                    "n": 5
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "draw",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 0.12,
+                      "base": "def",
+                      "target": "allEnemies"
                     }
                   ]
-                },
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "빛울림"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "빛울림",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "빛울림"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.09,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "빛울림"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오로라_u4",
+      "name": "고요한 빛무리",
+      "hero": "오로라",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "오로라 장막",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.6
+        },
+        {
+          "k": "stack",
+          "id": "빛울림",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오로라 장막",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.92
+            },
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오로라 장막",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.57
+            },
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오로라 장막",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.69
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오로라 장막",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.54
+            },
+            {
+              "k": "power",
+              "rules": [
                 {
                   "when": {
                     "on": "turnStart"
@@ -779,90 +853,209 @@
           ]
         },
         {
-          "name": "외톨이 아니야",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
+              "k": "stack",
+              "id": "오로라 장막",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.21
+            },
+            {
+              "k": "discard",
               "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "빛울림"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.14
-            }
-          ]
-        },
-        {
-          "name": "깜짝 파티",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "빛울림"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.18,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "빛울림",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "마녀 왕국 생활",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "빛울림"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.14
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "밤하늘 바라보기",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "따뜻한 담요",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "작은 별",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오로라_u5",
+      "name": "꺼지지 않는 불꽃",
+      "hero": "오로라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.45,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "빛울림",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 0.3
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.41
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            },
+            {
+              "k": "heal",
               "ratio": 0.28
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "빛울림",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빛울림",
+              "v": 1
             }
           ]
         }

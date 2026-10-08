@@ -156,7 +156,7 @@ namespace Bolzena.Core
             if (u.Side == Side.Enemy && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && !u.Dead) { FoePassives("guardBreak", u); Emit("foeShieldBreak", new EmitInfo { Target = u, By = from?.Side == Side.Party ? from.Key : Acting, V = guard }); }
             if (u.Side == Side.Party && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && from != null && from.Side == Side.Enemy) Emit("shieldBreak", new EmitInfo { Who = u, From = from, Target = from, V = guard, By = ShieldBy });
             if (u.Side == Side.Enemy && o.Card && from != null && from.Side == Side.Party && (d > 0 || guard > 0) && !u.Dead) Emit("hit", new EmitInfo { By = from.Key, Target = u, V = d + guard, Seq = ActSeq, Weak = IsWeakHit(from, u, o.Tags) });
-            if (u.Side == Side.Party && !o.Pure && !o.Dot && from != null && from.Side == Side.Enemy) TakenNow += d + guard;
+            if (u.Side == Side.Party && !o.Pure && !o.Dot && from != null && from.Side == Side.Enemy) { TakenNow += d + guard; GuardedNow += guard; }
             if (u.Side == Side.Party && (d > 0 || (guard > 0 && from != null && from.Side == Side.Enemy)) && !o.Pure && !o.Dot)
             {
                 if (d > 0) foreach (var h in Party) HurtNow.Add(h.Key);
@@ -180,7 +180,7 @@ namespace Bolzena.Core
                     double critPct = g != null ? g.Crit + StatMod(g, "crit") * 100 : 0;
                     bool isCrit = !Preview && Rng.Next() * 100 < critPct;
                     int bas = g != null ? R.DefDmgStat(AtkNow(g), DefNow(g)) : PartyDef();
-                    int cv = R.FinalDamage(bas, full ? R.SV("반격Full") : R.SV("반격"), crit: isCrit);
+                    int cv = R.FinalDamage(bas, full ? R.SV("반격Full") : R.SV("반격"), crit: isCrit, critX: CritDmgX);
                     Say($"파티: 반격{(full ? "(다 막음)" : "")} → {from.Name} ({cv}{(isCrit ? " 치명" : "")})");
                     StatusCue(u, full ? "반격!!" : "반격!", true);
                     Hurt(from, cv, new HurtOpts { From = g ?? u, Counter = true, Crit = isCrit });

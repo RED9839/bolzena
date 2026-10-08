@@ -37,7 +37,10 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0, b.St(K.E(b, 1), "사기"), "자기 격파 · 다른 동료에는 안 돈다");
             Assert.AreEqual(1, b.St(K.E(b, 2), "사기"), "who 가 없으면 어느 동료든");
             K.Play(b, "p_brk", 0);   // 벽 격파
-            Assert.AreEqual(1, b.St(K.E(b, 1), "사기"), "who 의 그 동료가 격파되면");
+            Assert.AreEqual(0, b.St(K.E(b, 1), "사기"), "지켜보는 적은 격파 중 — 반응하지 않는다(2026-10-08 사용자)");
+            var b2 = F("wall", "watcher", "any"); K.Hand(b2, "p_brk");
+            K.Play(b2, "p_brk", 0);
+            Assert.AreEqual(1, b2.St(K.E(b2, 1), "사기"), "who 의 그 동료가 격파되면");
         }
 
         [Test] public void 공격하면_비우는_수치는_친_뒤에_0_그_공격에는_실린다()

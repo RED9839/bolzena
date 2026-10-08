@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "용족",
       "role": "서포터",
+      "style": "거드는 형",
       "star": 3,
       "hp": 580,
       "atk": 75,
       "def": 60,
       "crit": 5,
-      "blurb": "결투를 붙이고 판정하는 구경꾼 석류석 용족. 아군 하나를 챔피언으로 찍어 두고, 챔피언이 칠 때마다 관중석이 들끓습니다.",
+      "blurb": "결투를 붙이고 판정하는 구경꾼 석류석 용족. 아군 하나를 오늘의 MVP로 찍어 두면 MVP가 칠 때마다 관중석이 들끓고, 함성이 넷이면 파티의 다음 한 수가 한껏 달아오릅니다.",
       "keyword": {
         "name": "오늘의 MVP",
         "desc": "아네트가 점찍은 오늘의 주인공",
@@ -38,6 +39,11 @@
               "id": "오늘의 MVP",
               "v": 1,
               "target": "strongestAlly"
+            },
+            {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 2
             }
           ]
         },
@@ -45,8 +51,7 @@
           "name": "싸워라 싸워~",
           "when": {
             "on": "play",
-            "marked": "오늘의 MVP",
-            "type": "공격"
+            "marked": "오늘의 MVP"
           },
           "limit": {
             "per": "turn",
@@ -54,8 +59,13 @@
           },
           "fx": [
             {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
+            },
+            {
               "k": "heal",
-              "ratio": 0.4
+              "ratio": 0.24
             }
           ]
         }
@@ -88,6 +98,19 @@
         "아네트_s1",
         "아네트_s2",
         "아네트_u4"
+      ],
+      "keywords": [
+        {
+          "name": "관중 함성",
+          "desc": "MVP가 칠 때마다 터지는 관중석의 함성",
+          "carrier": "self",
+          "cap": 4,
+          "onMax": {
+            "empower": "any",
+            "ratio": 0.5,
+            "consume": true
+          }
+        }
       ]
     }
   ],
@@ -130,34 +153,68 @@
         {
           "k": "status",
           "id": "협공",
-          "v": 2
+          "v": 1
         },
         {
           "k": "stack",
           "id": "오늘의 MVP",
           "v": 1,
           "target": "oneAlly"
+        },
+        {
+          "k": "stack",
+          "id": "관중 함성",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "대결투",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
               "id": "협공",
-              "v": 3
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
             },
             {
               "k": "stack",
               "id": "오늘의 MVP",
               "v": 1,
               "target": "oneAlly"
+            },
+            {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
             }
           ]
         },
         {
-          "name": "즉석 매치",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
@@ -165,14 +222,59 @@
               "v": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.81,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "지하 투기장",
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "오늘의 MVP",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "관중 함성",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
           "fx": [
             {
               "k": "status",
@@ -188,81 +290,28 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "최강자는 누구냐!",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "오늘의 MVP",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "ifAllHeroes"
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "매일 밤 결투",
-          "power": true,
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "협공",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "심판 호루라기",
-          "kind": "guard"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "빠른 매칭",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "구경꾼 함성",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "오늘의 MVP",
-              "v": 1,
-              "target": "oneAlly"
+              "id": "관중 함성",
+              "v": 1
             }
           ]
         }
@@ -281,151 +330,167 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.81,
+          "ratio": 0.96,
           "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "취약",
-          "v": 2,
-          "target": "oneEnemy"
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "관중 함성",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "허접허접~",
+          "name": "신탁 1",
           "tags": [
             "연계"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.17,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
             }
           ]
         },
         {
-          "name": "깐죽 중계",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "연계"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.72,
+              "ratio": 0.91,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "오늘의 MVP",
-              "v": 1,
-              "target": "oneAlly"
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
-              "k": "heal",
-              "ratio": 0.55
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "대놓고 도발",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.57,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 3,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
-              "k": "stack",
-              "id": "오늘의 MVP",
-              "v": 1,
-              "target": "oneAlly"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "debuff"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "관중 함성",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.32,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "참교육 각",
+          "name": "신탁 5",
           "tags": [
             "연계"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.81,
+              "ratio": 1.73,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.81,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "레드카드 무서워",
-          "tags": [
-            "연계"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.74,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "얄미운 혀",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "석류 아니야",
-          "kind": "draw"
-        },
-        {
-          "name": "메스가키",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "오늘의 MVP",
-              "v": 1,
-              "target": "oneAlly"
+              "id": "관중 함성",
+              "v": 1
             }
           ]
         }
@@ -446,13 +511,23 @@
           "target": "oneAlly"
         },
         {
+          "k": "perStack",
+          "id": "관중 함성"
+        },
+        {
           "k": "shield",
-          "ratio": 1.49
+          "ratio": 0.38
+        },
+        {
+          "k": "spend",
+          "id": "관중 함성",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "확실한 예측",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -461,28 +536,24 @@
               "target": "oneAlly"
             },
             {
-              "k": "shield",
-              "ratio": 1.96
-            }
-          ]
-        },
-        {
-          "name": "연속 선정",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "오늘의 MVP",
-              "v": 2,
-              "target": "oneAlly"
+              "k": "perStack",
+              "id": "관중 함성"
             },
             {
               "k": "shield",
-              "ratio": 1.22
+              "ratio": 0.52
+            },
+            {
+              "k": "spend",
+              "id": "관중 함성",
+              "all": true
             }
           ]
         },
         {
-          "name": "역전의 주인공",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "stack",
@@ -491,20 +562,62 @@
               "target": "oneAlly"
             },
             {
-              "k": "shield",
-              "ratio": 1.49
+              "k": "perStack",
+              "id": "관중 함성"
             },
             {
-              "k": "ifWounded"
+              "k": "shield",
+              "ratio": 0.35
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "관중 함성",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "perStack",
+              "id": "관중 함성"
             },
             {
               "k": "heal",
-              "ratio": 1.35
+              "ratio": 0.58
+            },
+            {
+              "k": "spend",
+              "id": "관중 함성",
+              "all": true
             }
           ]
         },
         {
-          "name": "응원 도시락",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "stack",
@@ -513,48 +626,57 @@
               "target": "oneAlly"
             },
             {
-              "k": "heal",
-              "ratio": 2.25
-            }
-          ]
-        },
-        {
-          "name": "승부 예측표",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "오늘의 MVP",
-              "v": 1,
-              "target": "oneAlly"
+              "k": "perStack",
+              "id": "관중 함성"
             },
             {
               "k": "shield",
-              "ratio": 1.35
+              "ratio": 0.34
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other",
-              "type": "공격"
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "perStack",
+              "id": "관중 함성"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "확성기",
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
           "kind": "heal"
         },
         {
-          "name": "특제 메달",
-          "kind": "ap"
-        },
-        {
-          "name": "판정 깃발",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "관중 함성",
               "v": 1
             }
           ]
@@ -593,7 +715,7 @@
               "fx": [
                 {
                   "k": "extra",
-                  "ratio": 0.35
+                  "ratio": 0.36
                 }
               ]
             }
@@ -602,7 +724,7 @@
       ],
       "oracles": [
         {
-          "name": "VIP 관람석",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -610,11 +732,7 @@
             {
               "k": "status",
               "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.68
+              "v": 2
             },
             {
               "k": "power",
@@ -632,7 +750,7 @@
                   "fx": [
                     {
                       "k": "extra",
-                      "ratio": 0.35
+                      "ratio": 0.36
                     }
                   ]
                 }
@@ -641,7 +759,8 @@
           ]
         },
         {
-          "name": "한 판 더",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "개전"
           ],
@@ -667,13 +786,38 @@
                   "fx": [
                     {
                       "k": "extra",
-                      "ratio": 0.35
+                      "ratio": 0.3
                     }
                   ]
-                },
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
                 {
                   "when": {
-                    "on": "kill"
+                    "on": "play",
+                    "marked": "오늘의 MVP",
+                    "type": "공격"
                   },
                   "limit": {
                     "per": "turn",
@@ -681,57 +825,63 @@
                   },
                   "fx": [
                     {
-                      "k": "draw",
+                      "k": "extra",
+                      "ratio": 0.36
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "오늘의 MVP",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.36
+                    },
+                    {
+                      "k": "stack",
+                      "id": "관중 함성",
                       "v": 1
                     }
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "name": "하루의 마무리",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
+            },
             {
-              "k": "stack",
-              "id": "오늘의 MVP",
+              "k": "draw",
               "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "shield",
-              "ratio": 2.16
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "marked": "오늘의 MVP",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "extra",
-                      "ratio": 0.35
-                    }
-                  ]
-                }
-              ]
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "개막전",
+          "name": "신탁 5",
           "tags": [
             "개전"
           ],
@@ -744,8 +894,8 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other",
-              "type": "공격"
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
@@ -763,43 +913,7 @@
                   "fx": [
                     {
                       "k": "extra",
-                      "ratio": 0.35
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "팝콘",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.81
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "marked": "오늘의 MVP",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "extra",
-                      "ratio": 0.45
+                      "ratio": 0.36
                     }
                   ]
                 }
@@ -807,22 +921,183 @@
             }
           ]
         }
+      ]
+    },
+    {
+      "id": "아네트_u5",
+      "name": "결투 붙이는 꿀밤",
+      "hero": "아네트",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.08,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "오늘의 MVP",
+          "v": 1,
+          "target": "oneAlly"
+        },
+        {
+          "k": "stack",
+          "id": "관중 함성",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.46,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.03,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.13,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "오늘의 MVP",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "관중 함성",
+                      "v": 1
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.14
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "오늘의 MVP",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
       ],
       "blesses": [
         {
-          "name": "관람 예절",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "명당 자리",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "응원봉",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.3
+              "k": "stack",
+              "id": "관중 함성",
+              "v": 1
             }
           ]
         }

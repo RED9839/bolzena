@@ -5,56 +5,42 @@
       "name": "아멜리아",
       "nature": "냉정",
       "race": "엘프",
-      "role": "서포터",
+      "role": "딜러",
+      "style": "회복형",
       "star": 3,
       "hp": 520,
       "atk": 86,
       "def": 58,
       "crit": 5,
-      "blurb": "시장님 일을 도맡는 자타공인 최고의 비서. 스킬을 내면 손의 다른 아군 카드 한 장을 대신 처리하고(카드는 손에 남습니다), 결재가 넷 모이면 일정을 앞당깁니다.",
+      "blurb": "시장님 일을 도맡는 자타공인 최고의 비서. 넘치게 받은 회복은 결재 서류로 쌓이고, 서류는 감봉 통보와 위성 폭격으로 처리됩니다.",
       "keyword": {
         "name": "결재 서류",
-        "desc": "아군이 일할 때 올라오는 서류",
+        "desc": "넘치는 일손으로 올라오는 서류",
         "carrier": "self",
         "cap": 4,
-        "rules": [
-          {
-            "name": "일괄 결재",
-            "when": {
-              "on": "stackReach",
-              "id": "결재 서류",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "결재 서류",
-                "all": true
-              },
-              {
-                "k": "ap",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.7,
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "서류 접수",
           "when": {
-            "on": "play",
-            "who": "other"
+            "on": "overheal",
+            "pct": 0.7,
+            "who": "any"
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
               "id": "결재 서류",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -72,8 +58,11 @@
             {
               "k": "status",
               "id": "충격",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
+            },
+            {
+              "k": "extra",
+              "ratio": 0.45
             }
           ]
         }
@@ -175,15 +164,26 @@
           "id": "충격",
           "v": 1,
           "target": "allEnemies"
+        },
+        {
+          "k": "perOverheal",
+          "pct": 0.8,
+          "per": 30
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.13,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "Mk.2 폭격",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.06,
+              "ratio": 1.14,
               "target": "allEnemies"
             },
             {
@@ -191,23 +191,59 @@
               "id": "충격",
               "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 30
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "새틀라이트 오버히트",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "hits": 4,
+              "ratio": 0.81,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "충격",
-              "v": 2,
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 30
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -218,31 +254,13 @@
           ]
         },
         {
-          "name": "결재된 폭격",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.93,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "결재 서류",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "좌표 요청",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.99,
               "target": "allEnemies"
             },
             {
@@ -252,49 +270,61 @@
               "target": "allEnemies"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.42,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "서류 1장당 폭격",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "perStack",
-              "id": "결재 서류"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 1.3,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "충격",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "결재 서류",
-              "all": true
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "레이저 출력",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "엘레나 사진",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "결재 도장",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -315,16 +345,17 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.78,
           "target": "oneEnemy"
         },
         {
           "k": "perStack",
-          "id": "결재 서류"
+          "id": "결재 서류",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.52,
           "target": "oneEnemy"
         },
         {
@@ -335,20 +366,22 @@
       ],
       "oracles": [
         {
-          "name": "일괄 감봉",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.05,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "결재 서류"
+              "id": "결재 서류",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
@@ -359,71 +392,23 @@
           ]
         },
         {
-          "name": "구두 경고",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "결재 서류"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "결재 서류",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "감전된 직원",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.14,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "충격"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.83,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "상시 감봉 제도",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.82,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "결재 서류"
+              "id": "결재 서류",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.55,
               "target": "oneEnemy"
             },
             {
@@ -431,14 +416,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "결재 서류",
-                    "n": 4
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.6,
+                      "ratio": 0.45,
                       "target": "oneEnemy"
                     }
                   ]
@@ -448,41 +436,103 @@
           ]
         },
         {
-          "name": "징계 위원회",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "결재 서류",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.39,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "결재 서류",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "결재 서류"
+              "id": "결재 서류",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.53,
               "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.64,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "결재 서류",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.09,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "찌릿한 서명",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "야근 금지",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "감봉 서식",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -495,36 +545,27 @@
       "type": "스킬",
       "fx": [
         {
+          "k": "heal",
+          "ratio": 0.59
+        },
+        {
           "k": "stack",
           "id": "결재 서류",
-          "v": 2
+          "v": 1
         },
         {
           "k": "draw",
-          "v": 1,
-          "who": "other"
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "일괄 처리",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "stack",
-              "id": "결재 서류",
-              "v": 3
+              "k": "heal",
+              "ratio": 1.03
             },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "상시 대행",
-          "power": true,
-          "fx": [
             {
               "k": "stack",
               "id": "결재 서류",
@@ -532,15 +573,79 @@
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "other"
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.55
+            },
+            {
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.39
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 20
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.56
+            },
+            {
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -555,74 +660,19 @@
           ]
         },
         {
-          "name": "업무 대행",
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.63
+            },
             {
               "k": "stack",
               "id": "결재 서류",
               "v": 2
             },
             {
-              "k": "castOther"
-            }
-          ]
-        },
-        {
-          "name": "결재 우선순위",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "결재 서류",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "시장님 일정 우선",
-          "fx": [
-            {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "결재 서류",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "관리자 직함",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "일기 작성",
-          "kind": "ap"
-        },
-        {
-          "name": "복지 탄원서 반려",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "결재 서류",
               "v": 1
             }
           ]
@@ -647,9 +697,8 @@
           "rules": [
             {
               "when": {
-                "on": "play",
-                "who": "other",
-                "type": "공격"
+                "on": "overheal",
+                "pct": 0.8
               },
               "limit": {
                 "per": "turn",
@@ -657,9 +706,9 @@
               },
               "fx": [
                 {
-                  "k": "status",
-                  "id": "충격",
-                  "v": 1,
+                  "k": "dmg",
+                  "ratio": 1,
+                  "ofEvent": 1,
                   "target": "oneEnemy"
                 }
               ]
@@ -669,7 +718,7 @@
       ],
       "oracles": [
         {
-          "name": "64대 증설",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -677,13 +726,16 @@
               "v": 1
             },
             {
+              "k": "shield",
+              "ratio": 0.65
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
+                    "on": "overheal",
+                    "pct": 0.8
                   },
                   "limit": {
                     "per": "turn",
@@ -691,9 +743,9 @@
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "충격",
-                      "v": 2,
+                      "k": "dmg",
+                      "ratio": 1,
+                      "ofEvent": 1.3,
                       "target": "oneEnemy"
                     }
                   ]
@@ -703,7 +755,7 @@
           ]
         },
         {
-          "name": "몰래카메라",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -711,9 +763,8 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
+                    "on": "overheal",
+                    "pct": 0.8
                   },
                   "limit": {
                     "per": "turn",
@@ -721,9 +772,9 @@
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "충격",
-                      "v": 1,
+                      "k": "dmg",
+                      "ratio": 1,
+                      "ofEvent": 0.8,
                       "target": "oneEnemy"
                     }
                   ]
@@ -733,46 +784,7 @@
           ]
         },
         {
-          "name": "녹화본 판독",
-          "fx": [
-            {
-              "k": "status",
-              "id": "충격",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "충격",
-                      "v": 1,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "녹화본 열람",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -780,9 +792,8 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "k": "shield",
+              "ratio": 0.65
             },
             {
               "k": "power",
@@ -801,7 +812,44 @@
                     {
                       "k": "status",
                       "id": "충격",
-                      "v": 1,
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "shield",
+              "ratio": 0.52
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1,
+                      "ofEvent": 1,
                       "target": "oneEnemy"
                     }
                   ]
@@ -811,25 +859,24 @@
           ]
         },
         {
-          "name": "야근 감시",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "payHpPct",
-              "v": 0.05
-            },
             {
               "k": "stack",
               "id": "결재 서류",
               "v": 2
             },
             {
+              "k": "shield",
+              "ratio": 0.52
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
+                    "on": "overheal",
+                    "pct": 0.8
                   },
                   "limit": {
                     "per": "turn",
@@ -837,9 +884,9 @@
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "충격",
-                      "v": 2,
+                      "k": "dmg",
+                      "ratio": 1,
+                      "ofEvent": 1.5,
                       "target": "oneEnemy"
                     }
                   ]
@@ -851,15 +898,177 @@
       ],
       "blesses": [
         {
-          "name": "부동산 카메라",
+          "name": "축복 1",
+          "kind": "atkUp"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_u5",
+      "name": "그냥 승인",
+      "hero": "아멜리아",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.52
+        },
+        {
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.7
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.6
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.52
+            },
+            {
+              "k": "stack",
+              "id": "결재 서류",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.34
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "결재 서류",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.04
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 2,
+              "who": "other"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "채널 고정",
-          "kind": "defUp"
-        },
-        {
-          "name": "서류 더미",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

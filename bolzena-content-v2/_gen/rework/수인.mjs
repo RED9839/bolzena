@@ -28,11 +28,16 @@ const exileAll = tag => ({ k: 'exileFrom', from: 'hand', all: true, tag });
 const tfFrom = (id, from) => ({ k: 'transform', id, from, n: 1 });   // 손의 시작 카드(from) 1장 → 생성 카드(이 전투) — 기본 카드 연료
 const exileBasic = { k: 'exileFrom', from: 'hand', n: 1, basic: true };           // 손의 시작 카드 1장 소멸
 const drawBasic = (o = {}) => draw(1, { basic: true, ...o });                      // 시작 카드 드로우
+// u5(2026-10-08) — 비용 유틸: 손의 (거르개) 카드 1장 비용 -1
+const cheap = (o = { who: 'self', type: '공격' }) => ({ k: 'cardStatus', id: '비용', v: -1, to: 'hand', n: 1, ...o });
+const ATK = { who: 'self', type: '공격' }, SKL = { who: 'self', type: '스킬' };
 // 마무리(2026-10-08) 사도 몫 숫자 배율 — 고유 · 생성 카드의 기본형과 신탁 피해 · 실드 · 회복을 같은 비율로(신탁 값어치 비는 그대로)
 const scaleU = (j, m) => {
   const mul = fx => { for (const x of fx || []) { if (['dmg', 'shield', 'heal'].includes(x.k) && x.ratio) x.ratio = Math.round(x.ratio * m * 100) / 100; if (x.k === 'power') for (const r of x.rules) mul(r.fx); } };
   for (const c of j.cards) if (c.unique || c.token) { mul(c.fx); for (const o of c.oracles || []) mul(o.fx); }
 };
+// u5 한 장만 숫자 배율(혼자 완주율이 3%p 넘게 오른 사도) — 기본형 · 신탁 모두
+const scaleC = (j, id, m) => { const c = j.cards.find(x => x.id === id); const mul = fx => { for (const x of fx || []) { if (['dmg', 'shield', 'heal'].includes(x.k) && x.ratio) x.ratio = Math.round(x.ratio * m * 100) / 100; if (x.k === 'power') for (const r of x.rules) mul(r.fx); } }; mul(c.fx); for (const o of c.oracles || []) mul(o.fx); };
 const token = (j, c) => { const old = j.cards.find(x => x.id === c.id); const t = { hero: j.heroes[0].id, token: true, ...c }; if (old) Object.assign(old, t); else j.cards.push(t); };
 
 // ════════════════════════════════════════════════════════════════════
@@ -83,6 +88,14 @@ function gwin(j) {
       O('먼저 찜한 적', [per(K), dmg(0.4), per(K), sh(0.4), ifStack(K, 2), st('기절', 1, E1)]),
       O('인증샷 공유', [per(K), dmg(0.4), per(K), sh(0.4), draw(1, { who: 'other' })]),
     ], [B('동생을 등 뒤로', 'guard'), B('극지 귀가길', 'cost'), B('한 장 더 찰칵', [stk(K, 1, E1)])]),
+    // u5 유틸(0코 서치) — 어사이드 「전설의 나침반」: 원하는 것이 있는 쪽을 가리킨다
+    card(H, 5, '전설의 나침반', 0, '스킬', [stk(K, 1, E1), srch()], [
+      O('신탁 1', [stk(K, 2, E1), srch()]),
+      O('신탁 2', [stk(K, 1, E1), srch(SU, 2)]),                                       // 서치 둘
+      O('신탁 3', [stk(K, 1, E1), srch(), power(rule('stackReach', [draw(1)], { when: { id: K, n: 3 } }))], { power: true }),   // 강화화(BEST)
+      O('신탁 4', [discard(1), stk(K, 2, EA), draw(1)]),                                                // 대가 · 재설계 — 광역 깃발
+      O('신탁 5', [stk(K, 1, E1), srch(), ifStack(K, 2), draw(1)]),
+    ], [B('축복 1', 'ap'), B('축복 2', { tags: ['보존'] }), B('축복 3', [stk(K, 1, E1)])]),
   ]);
   starter(j, '그윈_u1');
 }
@@ -133,6 +146,14 @@ function delia(j) {
       O('설원의 아침', [discard(1), stk(K, 1, EA), each(K), dmg(0.3, EA)]),                      // 대가
       O('탐험 장비', [stk(K, 1, EA), each(K), dmg(0.18, EA), srch()]),                           // 서치
     ], [B('펭귄 탐험대 깃발', 'atkUp'), B('첫 미끄럼', { tags: ['개전'] }), B('탐험대 구호', 'draw')]),
+    // u5 굴리기(스킬) — 탐험대장 배지: 펭귄 탐험대를 불러 모아 열을 퍼뜨리고 막는다
+    card(H, 5, '탐험대 소집', 1, '스킬', [stk(K, 1, EA), sh(0.9), draw(1)], [
+      O('신탁 1', [stk(K, 1, EA), sh(1.2), draw(1)]),
+      O('신탁 2', [stk(K, 1, EA), each(K), dmg(0.15, EA), sh(0.6)]),                      // 재설계 — 막기 대신 펭귄
+      O('신탁 3', [stk(K, 1, EA), sh(0.9), srch(ATK, 2)]),                                     // 서치(BEST)
+      O('신탁 4', [discard(1), stk(K, 3, EA), sh(1.4)]),                                      // 대가
+      O('신탁 5', [stk(K, 2, EA), sh(1.0), ifStack(K, 3), heal(1.0)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1, EA)])]),
   ]);
   scaleU(j, 0.82);
   starter(j, '델리아_u1');
@@ -187,6 +208,14 @@ function dianaOld(j) {
       O('맨주먹의 나날', [dmg(0.6), stk(K, 1), power(rule('play', [per(K), dmg(0.15)], { when: { type: '공격' }, limit: 1 }))], { power: true }),  // 강화화(BEST)
       O('빈손의 기세', [dmg(0.6), per(K), dmg(0.2), ifHand(0), srch({ who: 'self', type: '공격' })]),
     ], [B('주먹에 힘', 'power'), B('멍 자국', [stk(K, 1)]), B('숨 고르기', 'draw')]),
+    // u5 굴리기(스킬) — 도끼 없이: 손을 비우며 기세를 모으고 버틴다
+    card(H, 5, '도끼 내려놓기', 1, '스킬', [discard(1), stk(K, 2), sh(1.0)], [
+      O('신탁 1', [discard(1), stk(K, 2), sh(1.4)]),
+      O('신탁 2', [discard(1), stk(K, 1), sh(0.8)], { cost: 0 }),
+      O('신탁 3', [stk(K, 2), sh(0.9), power(rule('turnEnd', [ifHand(1), stk(K, 1)]))], { power: true }),   // 강화화(BEST) — 빈손으로 턴을 넘기면 기세
+      O('신탁 4', [discard('all'), stk(K, 3), sh(1.3)]),                                  // 대가 — 손을 다 턴다
+      O('신탁 5', [stk(K, 2), sh(0.9), srch(ATK)]),                                         // 서치 · 재설계 — 버리지 않고 찾는다
+    ], [B('축복 1', 'guard'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '디아나_왕년_u3');
 }
@@ -237,6 +266,14 @@ function ran(j) {
       O('늑대 무리', [stk(K, 1, EA), gauge(15), power(rule('turnEnd', [each(K), dmg(0.2, EA)]), rule('kill', [stk(K, 2, LOW)]))]),
       O('깊은 상처', [stk(K, 1, EA), draw(1), power(rule('turnEnd', [each(K), dmg(0.2, EA)]))]),
     ], [B('날카로운 발톱', 'atkUp'), B('사냥의 숨', 'draw'), B('무리의 표적', [stk(K, 1, EA)])]),
+    // u5 유틸(0코) — 어사이드 「행복한 아기 늑대」: 근심 없는 기억이 무리를 깨운다
+    card(H, 5, '아기 늑대의 기억', 0, '스킬', [stk(K, 1, EA), draw(1)], [
+      O('신탁 1', [stk(K, 1, EA), draw(1), sh(0.6)]),
+      O('신탁 2', [stk(K, 1, EA), draw(2)]),
+      O('신탁 3', [stk(K, 2, EA), srch(ATK)]),                                                 // 서치(BEST) — 사랑니를 찾는다
+      O('신탁 4', [discard(1), stk(K, 2, EA), st('고통', 2, EA)]),                             // 대가
+      O('신탁 5', [stk(K, 1, EA), draw(1), ifStack(K, 2), heal(0.7)]),
+    ], [B('축복 1', 'ap'), B('축복 2', { tags: ['보존'] }), B('축복 3', [stk(K, 1, E1)])]),
   ]);
   starter(j, '란_u1');
 }
@@ -291,6 +328,14 @@ function rufo(j) {
       O('오의 여우불', [dmg(4.2), perTag(M), dmg(1.2), exileAll(M)], { tags: ['소멸'] }),          // 대가 · 재설계 — 쪽지를 태워 여우불
       O('최고의 전략가', [dmg(1.6), per(K), dmg(0.55), srch()]),                                  // 서치
     ], [B('매서운 꼬리', 'power'), B('틈 노리는 꼬리', 'weakSpot'), B('비상 쪽지', [make(M, 1)])]),
+    // u5 유틸(0코 비용) — 보드게임 룰은 루포 님 마음대로: 쪽지 한 장 · 다음 공격을 싸게
+    card(H, 5, '여우의 꼼수', 0, '스킬', [make(M, 1), cheap(ATK)], [
+      O('신탁 1', [stk(K, 1), make(M, 1), cheap(ATK)]),
+      O('신탁 2', [make(M, 1), cheap(ATK), inspire, stk(K, 2)]),
+      O('신탁 3', [stk(K, 2), make(M, 1), power(rule('stackReach', [cheap(ATK), draw(1)], { when: { id: K, n: 4 } }))], { power: true }),   // 강화화 — 계획대로마다 공격 하나를 싸게
+      O('신탁 4', [stk(K, 1), make(M, 1), srch(ATK, 2)]),                                         // 서치(BEST)
+      O('신탁 5', [discard(2), draw(3), stk(K, 2)]),                                               // 대가 · 재설계
+    ], [B('축복 1', 'ap'), B('축복 2', { tags: ['보존'] }), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.5);
   starter(j, '루포_u2');
@@ -342,7 +387,16 @@ function lion(j) {
       O('사자의 포효', [stk(K, 1, EA), draw(1), power(rule('hurt', [stk(K, 1, E1)], { limit: 2 }), reach(K, 3, [st('반격', 1)]))]),  // 재설계 — 결의 대신 판결
       O('사건 파일', [st('결의', 1), srch({ who: 'self', type: '공격' }), power(rule('hurt', [stk(K, 1, E1)], { limit: 2 }))]),
     ], [B('신호탄', 'draw'), B('히어로 자세', 'defUp'), B('히어로 꿈나무', [sh(0.5)])]),
+    // u5 굴리기(공격) — 히어로 펀치: 방어 기반 한 대 · 유죄 · 막기
+    card(H, 5, '히어로 펀치', 1, '공격', [ddef(0.75), stk(K, 1, E1), sh(0.7)], [
+      O('신탁 1', [ddef(0.95), stk(K, 1, E1), sh(0.9)]),
+      O('신탁 2', [ddef(0.5), stk(K, 1, E1), sh(0.5)], { cost: 0 }),
+      O('신탁 3', [ddef(0.75), stk(K, 1, E1), ifStack(K, 3), ddef(0.6)]),
+      O('신탁 4', [ddef(0.75), stk(K, 1, E1), srch(SKL)]),                                       // 서치(BEST)
+      O('신탁 5', [ddef(0.8, EA), stk(K, 1, EA)]),                                               // 재설계 — 광역
+    ], [B('축복 1', 'weakSpot'), B('축복 2', 'power'), B('축복 3', [stk(K, 1, E1)])]),
   ]);
+  scaleC(j, '리온_u5', 0.8);
   starter(j, '리온_u1');
 }
 
@@ -394,6 +448,14 @@ function mago(j) {
       O('총출동 준비', [st('결의', 1), per(K), heal(0.35), spendAll(K)]),                        // 대가 — 다 쓰는 쪽
       O('우유병', [st('결의', 1), per(K), heal(0.2), srch({ who: 'self', type: '스킬' })]),      // 서치
     ], [B('작은 손길', 'heal'), B('가축 목걸이', 'draw'), B('뿔 세우기', [stk(K, 1)])]),
+    // u5 굴리기(공격) — 양몰이: 들이받으며 친구를 모으고 사료를 챙긴다
+    card(H, 5, '양몰이 돌진', 1, '공격', [ddef(0.6), stk(K, 1), make(F, 1)], [
+      O('신탁 1', [ddef(0.8), stk(K, 1), make(F, 1)]),
+      O('신탁 2', [ddef(0.6, EA), stk(K, 1), make(F, 1)]),                                             // 재설계 — 광역
+      O('신탁 3', [ddef(0.6), make(F, 1), srch(SKL, 2)]),                                           // 서치(BEST)
+      O('신탁 4', [ddef(0.6), stk(K, 1), power(rule('turnStart', [make(F, 1)]))], { power: true }),   // 강화화
+      O('신탁 5', [stk(K, 2), perTag(F), ddef(0.7), exileAll(F)]),                       // 대가 — 사료를 다 쓴다
+    ], [B('축복 1', 'weakSpot'), B('축복 2', 'power'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '마고_u2');
 }
@@ -445,6 +507,14 @@ function momo(j) {
       O('닌자 두루마리', [dmg(0.6), perTag(S), dmg(0.3), srch({ who: 'self', type: '스킬' })]),   // 서치
       O('연기 구슬', [dmg(0.4), perTag(S), dmg(0.2), stk(K, 1)], { cost: 0 }),
     ], [B('닌자 호흡', 'atkUp'), B('비전서 한 장', 'draw'), B('수리검 한 자루', [make(S, 1)])]),
+    // u5 굴리기(스킬) — 나뭇잎 은신: 분신을 남기고 숨어 수리검을 챙긴다
+    card(H, 5, '나뭇잎 은신', 1, '스킬', [stk(K, 1), sh(0.9), make(S, 1)], [
+      O('신탁 1', [stk(K, 1), sh(1.2), make(S, 1)]),
+      O('신탁 2', [stk(K, 1), sh(0.6)], { cost: 0 }),
+      O('신탁 3', [stk(K, 2), sh(0.9), srch(ATK, 2)]),                                          // 서치(BEST)
+      O('신탁 4', [discard(1), stk(K, 2), make(S, 2)]),                                             // 대가
+      O('신탁 5', [make(S, 2), sh(0.6)]),                                                      // 재설계
+    ], [B('축복 1', 'guard'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '모모_u3');
 }
@@ -496,6 +566,14 @@ function mynx(j) {
       O('숙제 검사', [st('협공', 1), stk(K, 2), power(rule('turnStart', [stk(K, 1)]))]),         // 대가 — 개전을 뗌
       O('자습 과제', [st('협공', 1), draw(1, { who: 'other' }), power(rule('turnStart', [stk(K, 1)]))], { tags: ['개전'] }),
     ], [B('캔 사료 상자', 'atkUp'), B('숲속 별채', 'draw'), B('사료 선물', [stk(K, 1)])], { tags: ['개전'] }),
+    // u5 유틸(기본 카드 연료) — 보충 수업: 미룸 · 시작 카드를 다시 꺼내 가르친다
+    card(H, 5, '보충 수업', 1, '스킬', [stk(K, 2), drawBasic(), sh(0.7)], [
+      O('신탁 1', [stk(K, 2), drawBasic(), sh(1.0)]),
+      O('신탁 2', [stk(K, 1), drawBasic()], { cost: 0 }),
+      O('신탁 3', [stk(K, 2), srch(SU, 2), sh(0.6)]),                                               // 서치(BEST)
+      O('신탁 4', [stk(K, 2), drawBasic(), power(rule('play', [stk(K, 1)], { when: { type: '스킬', who: 'other' }, limit: 1 }))], { power: true }),   // 강화화
+      O('신탁 5', [discard(1), stk(K, 3), draw(2, { basic: true })]),                                             // 대가
+    ], [B('축복 1', 'ap'), B('축복 2', { tags: ['보존'] }), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '밍스_u4');
 }
@@ -550,6 +628,14 @@ function bana(j) {
       O('설계도', [per(K), sh(0.45), srch()]),                                                     // 서치
       O('풀무 한 번', [per(K), sh(0.38), perTag(BL), sh(0.2)], { cost: 0 }),
     ], [B('달군 쇠', 'draw'), B('첫 담금질', 'defUp'), B('한 자루 더', [make(BL, 1)])]),
+    // u5 굴리기(공격) — 시험 베기: 갓 벼린 검을 휘둘러 보고 단조를 잇는다
+    card(H, 5, '시험 베기', 1, '공격', [dmg(0.9), stk(K, 1), sh(0.5)], [
+      O('신탁 1', [dmg(1.15), stk(K, 1), sh(0.6)]),
+      O('신탁 2', [dmg(0.55), stk(K, 1), sh(0.3)], { cost: 0 }),
+      O('신탁 3', [dmg(0.9), stk(K, 1), srch(SKL)]),                                             // 서치(BEST)
+      O('신탁 4', [dmg(0.8), power(rule('turnStart', [make(BL, 1)]))], { power: true }),       // 강화화
+      O('신탁 5', [dmg(0.9), perTag(BL), dmg(0.5), exileAll(BL)]),                       // 대가 — 손의 검을 태운다
+    ], [B('축복 1', 'power'), B('축복 2', 'frost'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.3);
   starter(j, '바나_u3');
@@ -604,6 +690,14 @@ function butter(j) {
       O('레드카드 매그넘', [dmg(3.4), per(K), dmg(0.8), tough(2)], { tags: ['소멸'] }),             // 대가 · 재설계
       O('앞치마 펄럭', [dmg(1.6), per(K), dmg(0.35), srch()]),                                     // 서치
     ], [B('앞치마 꽉 매기', 'power'), B('골문 구석', 'weakSpot'), B('짧은 도움닫기', 'ap')]),
+    // u5 유틸(회수) — 공 물어 오기: 던진 고유 카드를 버린 더미에서 물어 온다
+    card(H, 5, '공 물어 오기', 1, '스킬', [stk(K, 1), sh(0.9), pull(SU)], [
+      O('신탁 1', [stk(K, 2), sh(1.1), pull(SU)]),
+      O('신탁 2', [stk(K, 1), sh(0.5), pull(SU)], { cost: 0 }),
+      O('신탁 3', [stk(K, 2), sh(1.0), power(rule('stackReach', [pull(SU)], { when: { id: K, n: 4 } }))], { power: true }),   // 강화화 — 레드카드마다 회수
+      O('신탁 4', [stk(K, 2), sh(0.6), srch(ATK, 2)]),                                                 // 서치(BEST) · 재설계
+      O('신탁 5', [discard(1), stk(K, 3), sh(1.3)]),                                               // 대가
+    ], [B('축복 1', 'draw'), B('축복 2', 'cost'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '버터_u2');
   // 애착 장비(전설 — 싸움당 1코 카드 1.5~2.5장): 범용 몫은 맞을 때 새총 반격, 애착 몫은 옐로카드
@@ -660,6 +754,14 @@ function beni(j) {
       O('곰의 사냥 본능', [dmg(1.4), power(rule('kill', [make(FI, 1)], { limit: 1 }))], { cost: 1, power: true }),   // 강화화
       O('한 입 거리', [dmg(2.0), notStack(K), dmg(1.0), srch()]),                                  // 서치
     ], [B('날 선 도끼날', 'power'), B('배고픈 눈빛', 'weakSpot'), B('나눠 먹는 생선', [heal(0.4)])]),
+    // u5 굴리기(스킬) — 어사이드 「나를 따르라 곰」: 앞장서서 막고 생선을 챙긴다
+    card(H, 5, '앞장서는 곰', 1, '스킬', [sh(1.0), stk(K, 1), make(FI, 1)], [
+      O('신탁 1', [sh(1.3), stk(K, 1), make(FI, 1)]),
+      O('신탁 2', [dmg(0.8), stk(K, 1), make(FI, 1)]),                                             // 재설계 — 막기 대신 들이받기
+      O('신탁 3', [sh(1.0), make(FI, 1), srch(ATK, 2)]),                                            // 서치(BEST)
+      O('신탁 4', [discard(1), sh(1.3), make(FI, 2)]),                                           // 대가
+      O('신탁 5', [sh(1.2), make(FI, 2), ifStack(K, 2), st('피해 감소', 2)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '베니_u1');
 }
@@ -711,6 +813,14 @@ function beniBeni(j) {
       O('꿀에 파묻기', [dmg(1.6), per(K), dmg(0.35), srch()]),                                       // 서치 · 재설계
       O('단지 깨뜨리기', [dmg(3.2), per(K), dmg(0.7), tough(2)], { tags: ['소멸'] }),                // 대가 · 재설계
     ], [B('꽉 찬 단지', 'power'), B('꿀 냄새 추적', 'weakSpot'), B('베니는 멋있어', 'ap')]),
+    // u5 유틸(0코 생성) — 비상 꿀단지: 던질 단지를 챙기고 한 장 뽑는다
+    card(H, 5, '비상 꿀단지', 0, '스킬', [make(JR, 1), draw(1)], [
+      O('신탁 1', [make(JR, 2), draw(1)]),
+      O('신탁 2', [make(JR, 1), draw(1), ifStack(K, 3), make(JR, 1)]),
+      O('신탁 3', [make(JR, 1), srch(SU, 2)]),                                                     // 서치(BEST)
+      O('신탁 4', [make(JR, 1), power(rule('turnStart', [make(JR, 1)]))], { power: true }),       // 강화화
+      O('신탁 5', [discard(1), make(JR, 3)]),                                                // 대가
+    ], [B('축복 1', { tags: ['보존'] }), B('축복 2', 'draw'), B('축복 3', [stk(K, 1, E1)])]),
   ]);
   starter(j, '베니_베니_u1');
 }
@@ -765,6 +875,14 @@ function shuro(j) {
       O('맞댄 칼날', [st('결의', 1), sh(0.6), power(rule('turnStart', [stk(K, 1)]), rule('blocked', [st('반격', 1)], { limit: 1 }))], { tags: ['개전'] }),
       O('우리를 기억해', [st('결의', 1), draw(1, { who: 'other' }), power(rule('turnStart', [stk(K, 1)]))]),   // 대가 — 개전을 뗌
     ], [B('단단한 꽃대', 'defUp'), B('투구꽃 향기', 'draw'), B('꽃잎 둘레', [stk(K, 1)])], { tags: ['개전'] }),
+    // u5 유틸(비용) — 어사이드 「우리를 기억해」: 옛 벗들의 검술을 동료에게 — 동료 카드 하나를 싸게
+    card(H, 5, '옛 벗의 검', 1, '스킬', [stk(K, 1), cheap({ who: 'other' }), draw(1)], [
+      O('신탁 1', [stk(K, 2), cheap({ who: 'other' }), draw(1)]),
+      O('신탁 2', [cheap({ who: 'other' }), draw(1)], { cost: 0 }),
+      O('신탁 3', [stk(K, 1), cheap({ who: 'other' }), draw(2, { who: 'other' })]),           // 서치(BEST)
+      O('신탁 4', [stk(K, 1), draw(1), power(rule('play', [stk(K, 1)], { when: { type: '공격', who: 'other' }, limit: 1 }))], { power: true }),   // 강화화
+      O('신탁 5', [discard(1), stk(K, 2), sh(1.2)]),                                     // 대가 · 재설계
+    ], [B('축복 1', 'ap'), B('축복 2', { tags: ['보존'] }), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '슈로_u4');
 }
@@ -822,6 +940,14 @@ function sparrot(j) {
       O('예비 포탄', [dmg(1.0, EA), perTag(T), dmg(0.5, EA), srch()], { tags: BR }),                    // 서치
       O('방패째 박살', [{ k: 'strip', target: EA }, dmg(1.0, EA), perTag(T), dmg(0.4, EA)], { tags: BR }),
     ], [B('출력 최대', 'power'), B('조준경 보정', 'weakSpot'), B('냉각 완료', 'ap')], { tags: BR }),
+    // u5 굴리기(스킬) — 노획물 장부: 쌓아 둔 몫을 적어 두고 한 입씩 나눈다
+    card(H, 5, '노획물 장부', 1, '스킬', [stk(K, 2), heal(0.7), draw(1)], [
+      O('신탁 1', [stk(K, 3), heal(0.9), draw(1)]),
+      O('신탁 2', [stk(K, 1), heal(0.5), draw(1)], { cost: 0 }),
+      O('신탁 3', [stk(K, 2), heal(0.7), srch(ATK, 2)]),                                            // 서치(BEST)
+      O('신탁 4', [stk(K, 2), draw(1), ifStack(K, 3), heal(1.5)]),
+      O('신탁 5', [discard(1), make(T, 2), heal(0.6)]),                                          // 대가 · 재설계 — 적지 않고 털어 온다
+    ], [B('축복 1', { tags: ['보존'] }), B('축복 2', [heal(0.3)]), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 0.8);
   starter(j, '스패럿_u1');
@@ -873,7 +999,16 @@ function epica(j) {
       O('커튼콜', [st('사기', 1), power(rule('play', [stk(K, 1)], { when: { type: '공격' }, limit: 1 }), rule('ult', [stk(K, 2)]))]),
       O('다음 악장', [st('사기', 1), srch(), power(rule('play', [stk(K, 1)], { when: { type: '공격' }, limit: 1 }))]),
     ], [B('흥겨운 박자', 'atkUp'), B('객석의 에피콘', [stk(K, 1)]), B('켈틱 하프', 'draw')]),
+    // u5 굴리기(공격) — 어사이드 「아군에게 바칩니다」: 에피콘을 불러 무대를 바친다
+    card(H, 5, '바치는 무대', 1, '공격', [dmg(1.0), stk(K, 1)], [
+      O('신탁 1', [dmg(1.25), stk(K, 1)]),
+      O('신탁 2', [dmg(0.6), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [dmg(0.9), stk(K, 1), srch(SKL)]),                                           // 서치(BEST)
+      O('신탁 4', [dmg(0.75, EA), stk(K, 1)]),                                            // 재설계 — 광역
+      O('신탁 5', [dmg(0.6), per(K), dmg(0.3), spendAll(K)]),                                  // 대가 — 극단을 다 쓴다
+    ], [B('축복 1', 'power'), B('축복 2', 'weakSpot'), B('축복 3', [stk(K, 1)])]),
   ]);
+  scaleC(j, '에피카_u5', 0.85);
   starter(j, '에피카_u3');
 }
 
@@ -929,6 +1064,14 @@ function uros(j) {
       O('꼬리 무는 뱀', [dmg(1.0, EA), per(K), dmg(0.3, EA), srch()]),                                // 서치 · 재설계
       O('잠든 뱀', [dmg(1.1, EA), per(K), dmg(0.33, EA)]),
     ], [B('거대한 독니', 'power'), B('비늘 긁힘', 'weakSpot'), B('압도', 'ap')]),
+    // u5 유틸(0코 거르기) — 똬리 틀기: 한 장 뽑고 한 장 버린다(순환)
+    card(H, 5, '똬리 틀기', 0, '스킬', [stk(K, 1), draw(1), discard(1)], [
+      O('신탁 1', [stk(K, 2), draw(1), discard(1)]),
+      O('신탁 2', [stk(K, 1), draw(2), discard(1)]),
+      O('신탁 3', [stk(K, 1), srch(SU, 2), discard(1)]),                                        // 서치(BEST)
+      O('신탁 4', [discard(2), stk(K, 3), sh(0.6)]),                                             // 대가 · 재설계
+      O('신탁 5', [stk(K, 1), draw(1), ifStack(K, 3), draw(1)]),
+    ], [B('축복 1', 'draw'), B('축복 2', { tags: ['보존'] }), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '우로스_u3');
 }
@@ -983,6 +1126,14 @@ function yumimi(j) {
       O('나른한 일격', [dmg(1.2), ifStack(K, 3), dmg(0.9), ifKill, ap(1)]),                             // 재설계
       O('다음 화살', [srch({ who: 'self', type: '공격' }), dmg(1.2), ifWounded_(E1), dmg(1.0)]),         // 서치
     ], [B('깔보는 눈빛', 'power'), B('약한 곳 찌르기', 'weakSpot'), B('잘난 척', 'ap')]),
+    // u5 유틸(0코 비용) — 귀찮아서 대충: 늘어지면서 다음 화살을 싸게
+    card(H, 5, '귀찮아서 대충', 0, '스킬', [stk(K, 1), cheap(ATK)], [
+      O('신탁 1', [stk(K, 2), cheap(ATK)]),
+      O('신탁 2', [stk(K, 1), cheap(ATK), sh(0.8)]),
+      O('신탁 3', [stk(K, 1), srch(ATK), cheap(ATK)]),                                         // 서치(BEST)
+      O('신탁 4', [cheap(ATK), power(rule('play', [stk(K, 1)], { when: { type: '스킬' }, limit: 1 }))], { power: true }),   // 강화화
+      O('신탁 5', [discard(1), cheap(ATK), draw(2)]),                                     // 대가 — 나른함 대신 손
+    ], [B('축복 1', { tags: ['보존'] }), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '유미미_u3');
 }
@@ -1039,6 +1190,14 @@ function chopi(j) {
       O('심부름 쪽지', [sh(0.9), stk(K, 2), drawBasic()]),                              // 서치(시작 공격 카드)
       O('장바구니 막기', [discard(1), sh(1.4), stk(K, 3)]),                                              // 대가
     ], [B('단단한 자세', 'guard'), B('지는 건 싫어', 'defUp'), B('한 걸음 수련', [stk(K, 1)])]),
+    // u5 굴리기(스킬) — 장작 지게: 장작을 지고 나르며 수련 · 막기
+    card(H, 5, '장작 지게', 1, '스킬', [make(LG, 1), stk(K, 1), sh(0.8)], [
+      O('신탁 1', [make(LG, 1), stk(K, 1), sh(1.1)]),
+      O('신탁 2', [make(LG, 1), sh(0.5)], { cost: 0 }),
+      O('신탁 3', [stk(K, 2), sh(0.8), srch(ATK, 2)]),                                            // 서치(BEST)
+      O('신탁 4', [perTag(LG), sh(1.0), exileAll(LG), stk(K, 2)]),                             // 대가 · 재설계 — 손의 장작을 태운다
+      O('신탁 5', [make(LG, 1), stk(K, 2), ifStack(K, 3), heal(1.0)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 1.35);
   starter(j, '쵸피_u4');
@@ -1090,6 +1249,14 @@ function komi(j) {
       O('배부른 오후', [stk(K, 1), sh(0.6), power(rule('turnStart', [stk(K, 1)]))], { tags: ['개전'] }),
       O('포근한 방석', [stk(K, 2), sh(0.8), power(rule('turnStart', [stk(K, 1)]))]),                    // 대가 — 개전을 뗌
     ], [B('배부른 코미', 'defUp'), B('그릇 핥기', 'draw'), B('식후 낮잠', [stk(K, 1)])], { tags: ['개전'] }),
+    // u5 굴리기(공격) — 잠꼬대 펀치: 자면서 휘두르고 낮잠 · 막기
+    card(H, 5, '잠꼬대 펀치', 1, '공격', [ddef(0.8), stk(K, 1), sh(0.5)], [
+      O('신탁 1', [ddef(1.0), stk(K, 1), sh(0.6)]),
+      O('신탁 2', [ddef(0.5), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [ddef(0.8), stk(K, 1), srch(SKL)]),                                            // 서치(BEST)
+      O('신탁 4', [ddef(0.75, EA), stk(K, 1)]),                                               // 재설계 — 광역
+      O('신탁 5', [ddef(0.6), per(K), ddef(0.4), spendAll(K)]),                                // 대가 — 낮잠을 다 쓴다
+    ], [B('축복 1', 'power'), B('축복 2', 'weakSpot'), B('축복 3', [stk(K, 1)])]),
   ]);
   scaleU(j, 0.75);
   starter(j, '코미_u4');
@@ -1150,6 +1317,14 @@ function komiSwim(j) {
       O('코사장 성공 신화', [stk(K, 2), srch(), power(rule('play', [heal(0.3)], { when: { type: '스킬' }, limit: 1 }))]),
       O('단골 확보', [st('사기', 1), power(rule('play', [heal(0.3)], { when: { type: '스킬' }, limit: 1 }))]),
     ], [B('주문서 뭉치', 'draw'), B('차양 모자', 'defUp'), B('첫 손님', [stk(K, 1)])]),
+    // u5 굴리기(공격) — 물총 세례: 뿌리면서 재고 · 손님 회복
+    card(H, 5, '물총 세례', 1, '공격', [hits(3, 0.35), stk(K, 1), heal(0.4)], [
+      O('신탁 1', [hits(3, 0.45), stk(K, 1), heal(0.5)]),
+      O('신탁 2', [hits(2, 0.3), stk(K, 1)], { cost: 0 }),
+      O('신탁 3', [hits(3, 0.35), heal(0.4), srch(SKL)]),                                        // 서치(BEST)
+      O('신탁 4', [hits(3, 0.35), stk(K, 1), power(rule('play', [stk(K, 1)], { when: { type: '공격' }, limit: 1 }))], { power: true }),   // 강화화
+      O('신탁 5', [per(K), hits(2, 0.3), spendAll(K), heal(0.6)]),                              // 대가 — 재고를 다 쓴다
+    ], [B('축복 1', 'frost'), B('축복 2', 'weakSpot'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '코미_수영복_u3');
 }
@@ -1204,6 +1379,14 @@ function tig(j) {
       O('도끼 손질', [dmg(0.6), per(K), dmg(0.4), spendAll(K)]),                                        // 대가
       O('백호의 기백', [dmg(0.4), per(K), dmg(0.2), drawBasic()], { cost: 0 }),
     ], [B('다음 장 넘기기', 'draw'), B('참스승 디아나', 'atkUp'), B('차기 촌장', [stk(K, 1)])]),
+    // u5 유틸(0코 서치) — 백호 자세: 손맛을 붙이고 공격 카드를 찾는다
+    card(H, 5, '백호 자세', 0, '스킬', [stk(K, 1), srch(ATK)], [
+      O('신탁 1', [stk(K, 2), srch(ATK)]),
+      O('신탁 2', [stk(K, 1), srch(ATK, 2)]),                                                   // 서치 둘
+      O('신탁 3', [stk(K, 1), srch(ATK), cheap(ATK)]),                                                      // 서치 · 재설계(BEST) — 찾아서 싸게
+      O('신탁 4', [discard(1), stk(K, 2), draw(1)]),                                             // 대가
+      O('신탁 5', [srch(ATK), inspire, stk(K, 2)]),
+    ], [B('축복 1', { tags: ['보존'] }), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '티그_u2');
 }
@@ -1258,6 +1441,14 @@ function tigHero(j) {
       O('영웅의 이름', [dmg(0.6), per(K), dmg(0.4), spendAll(K)]),                                       // 대가
       O('첫 무용담', [dmg(0.4), per(K), dmg(0.2), gauge(10)], { cost: 0 }),
     ], [B('길잡이', 'draw'), B('영웅의 기개', 'atkUp'), B('친구의 목걸이', [stk(K, 1)])]),
+    // u5 굴리기(스킬) — 영웅의 다짐: 영웅심 · 막기 · 한 장
+    card(H, 5, '영웅의 다짐', 1, '스킬', [stk(K, 1), sh(1.0), draw(1)], [
+      O('신탁 1', [stk(K, 1), sh(1.3), draw(1)]),
+      O('신탁 2', [stk(K, 1), sh(0.5)], { cost: 0 }),
+      O('신탁 3', [stk(K, 2), sh(0.9), srch(ATK, 2)]),                                          // 서치(BEST)
+      O('신탁 4', [stk(K, 2), sh(1.0), ifStack(K, 2), heal(1.2)]),
+      O('신탁 5', [discard(1), stk(K, 3), sh(1.4)]),                                          // 대가
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '티그_영웅_u2');
 }

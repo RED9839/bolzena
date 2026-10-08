@@ -11,12 +11,6 @@ namespace Bolzena.RunUI
     // 사도를 누르면 반응 동작 + 말풍선. 이어할 판이 있으면 「이어하기」 가 맨 위에, 「새 모험」 은 그 판을 버린다고 한 번 묻는다.
     public partial class Flow
     {
-        static readonly string[] LobbyLines =
-        {
-            "교주님, 오늘도 모험 가요?", "준비는 다 됐어요. 언제든지요!", "에르피엔 숲이 요즘 시끄럽대요.",
-            "헤헤, 간지러워요.", "교주님 손, 따뜻하네요.", "여왕이 직접 나섰다구! 다들 물러서!",
-        };
-
         public void Lobby()
         {
             Stage.SetBg("stage1_1", 0.1f);
@@ -48,15 +42,19 @@ namespace Bolzena.RunUI
                 SkeletonGraphic sg = LobbyStanding(standHost, hero);
                 var tap = Ui.Img(stage, Theme.White, new Color(0, 0, 0, 0), "tap", true);
                 tap.rectTransform.At(0.5f, 0, 40, 0, Stage.Size.y * 0.52f, Stage.Size.y * 0.89f);
+                // 사도 만지기(LobbyTouch) — 볼 당기기 · 간지럽히기 · 톡. 판정 자리는 사도 뼈에서 잡는다 — 이름판 · 바꾸기 단추 · 말풍선은 위에 있어 먼저 받는다
+                var touch = tap.gameObject.AddComponent<LobbyTouch>();
                 // 창 크기가 바뀌면(전체 화면 전환 · 창 늘이기) 스탠딩을 지금 캔버스 크기로 다시 세운다 — 칸 · 배율 · ClampInto 모두 Stage.Size 로 정하므로
                 Stage.WhenResized(standHost, () =>
                 {
                     foreach (Transform c in standHost) Destroy(c.gameObject);
                     sg = LobbyStanding(standHost, hero);
                     if (tap) tap.rectTransform.At(0.5f, 0, 40, 0, Stage.Size.y * 0.52f, Stage.Size.y * 0.89f);
+                    if (touch) touch.Bind(sg, hero);
                 });
                 var tb = tap.gameObject.AddComponent<Btn>();
                 tb.Bg = null;
+                tb.enabled = false;   // 손가락은 LobbyTouch 가 받는다 — Btn 은 자동 데모의 Press("hero")(가짜 톡)만
 
                 // 말풍선
                 var lines = LinesOf(hero);
@@ -77,11 +75,15 @@ namespace Bolzena.RunUI
                     }
                 };
                 Stage.Hot["hero"] = tb;
+                touch.Tap = () => tb.OnClick?.Invoke();
+                touch.Say = line => { if (!bubbleT) return; bubbleT.text = line; Tw.Pop(bubble, 0, 0.85f, 0.3f); };
+                touch.Bind(sg, hero);
+                LobbyTouchNow = touch;
 
                 // 이름판
                 var plate = Ui.Img(stage, Theme.S("pill_dark", 46), Color.white, "plate");
                 plate.rectTransform.At(0, 0, Theme.Gutter + 6, Theme.Gutter + 10, 430, 56);
-                var pt = Ui.Title(plate.transform, $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}   <size=60%><color={Theme.SubTag}>누르면 반응합니다</color></size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+                var pt = Ui.Title(plate.transform, $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
                 pt.rectTransform.Fill(26, 0, 10, 0);
                 pt.textWrappingMode = TextWrappingModes.NoWrap;
                 Tw.Rise(plate.rectTransform, 0.3f, 20, 0.4f, Vector2.down);
@@ -99,8 +101,9 @@ namespace Bolzena.RunUI
                     foreach (Transform c in standHost) if (c.name.StartsWith("still") || (c.name == "stand" && (old == null || !old.transform.IsChildOf(c)))) Destroy(c.gameObject);
                     sg = LobbyStanding(standHost, hero);   // 칸은 지금 캔버스 크기(Stage.Size)로 새로 만든다
                     if (tap) tap.rectTransform.At(0.5f, 0, 40, 0, Stage.Size.y * 0.52f, Stage.Size.y * 0.89f);
+                    if (touch) touch.Bind(sg, hero);
                     if (sg != null) { sg.color = new Color(1, 1, 1, 0); var ng = sg; Tw.Run(ng.rectTransform, 0.3f, t => { if (ng) ng.color = new Color(1, 1, 1, t); }, Tw.Linear, 0.12f); Tw.Rise(ng.rectTransform, 0.12f, 18, 0.35f); }
-                    pt.text = $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}   <size=60%><color={Theme.SubTag}>누르면 반응합니다</color></size>";
+                    pt.text = $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}";
                     if (bubble) Destroy(bubble.gameObject);
                     bubbleT = W.Bubble(stage, hero?.ko ?? "에르핀", lines[0], 360, out bubble);
                     bubble.At(0, 1, 70, -200, 360, 100);
@@ -122,6 +125,8 @@ namespace Bolzena.RunUI
                 if (hasSave)
                     Stage.Hot["new"] = MenuItem(menu, Theme.S("ic_spark"), "새 모험", "지금 모험을 버리고 사도 셋을 새로 고릅니다", new Color(0.95f, 0.75f, 0.35f), () =>
                         Confirm("지금 모험을 버릴까요?", "이어하던 모험은 사라집니다. 새 마을로 떠납니다.", "버리고 출발", () => { RunPort.ClearSave(); NewAdventure(); }, true));
+                { var cs = CrayonStore.Save; var ct = CrayonStore.Table;
+                  Stage.Hot["crayon"] = MenuItem(menu, Theme.S("ic_up"), "교주 능력치", $"크레파스 보드로 파티 영구 강화 · 칠한 단계 {ct.Cells.Where(x => !x.Blank).Sum(x => System.Math.Min(x.Levels, cs.LevelOf(x.Id)))}/{ct.Cells.Where(x => !x.Blank).Sum(x => x.Levels)}", Theme.Hex("FFB648"), CrayonScreen); }
                 Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", $"사도 {Roster.All.Count}명 · 적 · 장비 · 교주 카드", Theme.Hex("7FE0B4"), () => Dex(Lobby));
                 Stage.Hot["settings"] = MenuItem(menu, Theme.S("ic_cog"), "설정", "소리 · 움직임 · 글자 · 화면", Theme.Hex("B9A8FF"), () => SettingsPanel(false));
 

@@ -5,6 +5,7 @@
       "name": "쥬비",
       "nature": "활발",
       "role": "딜러",
+      "style": "소환형",
       "star": 2,
       "hp": 550,
       "atk": 115,
@@ -15,10 +16,10 @@
         "name": "벌",
         "desc": "따라다니며 쏘는 꿀벌 떼",
         "carrier": "self",
-        "cap": 8,
+        "cap": 6,
         "rules": [
           {
-            "name": "벌집 출발",
+            "name": "꿀벌 친구",
             "when": {
               "on": "fightStart"
             },
@@ -31,7 +32,7 @@
             ]
           },
           {
-            "name": "윙윙 집합",
+            "name": "꿀벌 친구",
             "when": {
               "on": "turnStart"
             },
@@ -42,46 +43,10 @@
                 "v": 1
               }
             ]
-          },
-          {
-            "name": "꿀 도둑 처단",
-            "when": {
-              "on": "kill",
-              "mine": true
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "stack",
-                "id": "벌",
-                "v": 2
-              }
-            ]
           }
         ]
       },
       "passives": [
-        {
-          "name": "친구왔쮸비",
-          "when": {
-            "on": "play",
-            "type": "공격"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 2
-          },
-          "fx": [
-            {
-              "k": "stack",
-              "id": "벌",
-              "v": 1
-            }
-          ]
-        },
         {
           "name": "벌떼 습격",
           "when": {
@@ -90,13 +55,29 @@
           },
           "fx": [
             {
-              "k": "perStack",
-              "id": "벌"
-            },
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.65,
+              "max": 5,
+              "target": "lowEnemy"
+            }
+          ]
+        },
+        {
+          "name": "흩어지는 벌",
+          "when": {
+            "on": "hurt",
+            "pct": 0.15
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "oneEnemy"
+              "k": "spend",
+              "id": "벌",
+              "v": 2
             }
           ]
         }
@@ -182,7 +163,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 1.17,
           "target": "oneEnemy"
         },
         {
@@ -193,11 +174,12 @@
       ],
       "oracles": [
         {
-          "name": "친구 꿀벌 떼",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.59,
               "target": "oneEnemy"
             },
             {
@@ -208,11 +190,13 @@
           ]
         },
         {
-          "name": "가장 약한 적부터",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.02,
+              "ratio": 0.83,
               "target": "oneEnemy"
             },
             {
@@ -221,21 +205,30 @@
               "v": 2
             },
             {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "벌",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "벌침 세례",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.79,
+              "ratio": 0.92,
               "target": "allEnemies"
             },
             {
@@ -246,59 +239,65 @@
           ]
         },
         {
-          "name": "꿀 재고 점검",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "벌",
-              "max": 4
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "벌떼 소환",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.51,
+              "ratio": 1.38,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "벌",
-              "v": 4
+              "v": 1
             },
             {
-              "k": "tough",
+              "k": "draw",
               "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.76,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "독침",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "따끔",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "날갯짓",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -317,11 +316,6 @@
           "k": "stack",
           "id": "벌",
           "v": 2
-        },
-        {
-          "k": "atkMod",
-          "v": 0.1,
-          "run": true
         },
         {
           "k": "power",
@@ -343,105 +337,10 @@
       ],
       "oracles": [
         {
-          "name": "89호와 210호",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "벌",
-              "v": 4
-            },
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "벌",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "행복했쮸비",
-          "tags": [
-            "개전"
-          ],
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "벌",
-              "v": 2
-            },
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "벌",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "perStack",
-                      "id": "벌",
-                      "max": 3
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.11,
-                      "target": "randomEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "꿀 재고 확인",
-          "tags": [
-            "개전"
-          ],
-          "power": true,
           "fx": [
             {
               "k": "stack",
@@ -449,11 +348,6 @@
               "v": 3
             },
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true
-            },
-            {
               "k": "power",
               "rules": [
                 {
@@ -467,61 +361,14 @@
                       "v": 1
                     }
                   ]
-                },
-                {
-                  "when": {
-                    "on": "kill"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
-                    }
-                  ]
                 }
               ]
             }
           ]
         },
         {
-          "name": "벌집 비상",
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "벌",
-              "v": 4
-            },
-            {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "벌",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "귀여움 뽐내기",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "개전"
           ],
@@ -529,38 +376,138 @@
             {
               "k": "stack",
               "id": "벌",
-              "v": 4
+              "v": 1
             },
             {
-              "k": "atkMod",
-              "v": 0.1,
-              "run": true
-            },
-            {
-              "k": "draw",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "꿀 한 숟갈",
-          "kind": "draw"
         },
         {
-          "name": "윙윙",
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
               "k": "stack",
               "id": "벌",
-              "v": 1
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "summonAct",
+                    "id": "벌",
+                    "kind": "atk"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "꿀단지",
-          "kind": "cost"
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ]
     },
@@ -574,17 +521,13 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.65,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "벌"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.09,
-          "target": "randomEnemy"
+          "k": "summon",
+          "id": "벌",
+          "ratio": 0.55
         },
         {
           "k": "spend",
@@ -594,21 +537,18 @@
       ],
       "oracles": [
         {
-          "name": "총공격",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.88,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "벌"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.11,
-              "target": "randomEnemy"
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.74
             },
             {
               "k": "spend",
@@ -618,32 +558,29 @@
           ]
         },
         {
-          "name": "복수와 유혈",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "perStack",
-              "id": "벌"
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "randomEnemy"
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.52
             },
             {
               "k": "spend",
               "id": "벌",
               "all": true
-            },
-            {
-              "k": "stack",
-              "id": "벌",
-              "v": 3
             }
           ]
         },
         {
-          "name": "일부만 출격",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
@@ -651,179 +588,266 @@
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
+              "k": "summon",
               "id": "벌",
-              "max": 4
+              "ratio": 0.52,
+              "target": "allEnemies",
+              "max": 3
             },
             {
-              "k": "dmg",
-              "ratio": 0.14,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "벌",
-              "v": 4
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "벌떼 포위",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
-              "target": "allEnemies"
+              "ratio": 0.68,
+              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "벌"
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.47
             },
             {
-              "k": "dmg",
-              "ratio": 0.06,
-              "target": "allEnemies"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "꿀 도둑 추격",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "perStack",
-              "id": "벌"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.18,
-              "target": "randomEnemy"
+              "ratio": 1.17,
+              "target": "oneEnemy"
             },
             {
-              "k": "spend",
+              "k": "summon",
               "id": "벌",
-              "all": true
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "벌",
-              "v": 3
+              "ratio": 0.99
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "성난 벌떼",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "벌집 쑤시기",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "가벼운 날개",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 1
+            }
+          ]
         }
       ]
     },
     {
       "id": "쥬비_u4",
-      "name": "밀랍 둥지",
+      "name": "복수의 벌떼",
       "hero": "쥬비",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "공격",
       "fx": [
         {
-          "k": "stack",
+          "k": "summon",
           "id": "벌",
-          "v": 1
-        },
-        {
-          "k": "perStack",
-          "id": "벌"
+          "ratio": 0.42,
+          "target": "oneEnemy"
         },
         {
           "k": "shield",
-          "ratio": 0.2
+          "ratio": 0.65
         }
       ],
       "oracles": [
         {
-          "name": "큰 벌집",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
+            {
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.56,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.88
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.39,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.62
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.39,
+              "target": "oneEnemy"
+            },
             {
               "k": "stack",
               "id": "벌",
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "벌"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.27
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "꽃밭 돌보기",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "summon",
+              "id": "벌",
+              "ratio": 0.62,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.98
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "벌",
               "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "벌"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.2
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "쥬비_u5",
+      "name": "꿀벌 훈련",
+      "hero": "쥬비",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "벌",
+          "v": 2
         },
         {
-          "name": "꿀벌 경호대",
-          "fx": [
+          "k": "power",
+          "rules": [
             {
-              "k": "perStack",
-              "id": "벌"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.53
-            },
-            {
-              "k": "spend",
-              "id": "벌",
-              "all": true
+              "when": {
+                "on": "summonAct",
+                "id": "벌",
+                "kind": "atk"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "벌",
+                  "v": 1
+                }
+              ]
             }
           ]
-        },
+        }
+      ],
+      "oracles": [
         {
-          "name": "온난화 걱정",
-          "power": true,
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "벌",
-              "v": 1
+              "v": 3
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "hurt"
+                    "on": "summonAct",
+                    "id": "벌",
+                    "kind": "atk"
                   },
                   "limit": {
                     "per": "turn",
@@ -842,7 +866,8 @@
           ]
         },
         {
-          "name": "행복한 꿀벌",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "stack",
@@ -850,12 +875,64 @@
               "v": 1
             },
             {
-              "k": "perStack",
-              "id": "벌"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "summonAct",
+                    "id": "벌",
+                    "kind": "atk"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 3
             },
             {
-              "k": "shield",
-              "ratio": 0.2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "summonAct",
+                    "id": "벌",
+                    "kind": "atk"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.39
+                    }
+                  ]
+                }
+              ]
             },
             {
               "k": "draw",
@@ -864,19 +941,95 @@
               "unique": true
             }
           ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "summonAct",
+                    "id": "벌",
+                    "kind": "atk"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "벌",
+              "v": 4
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "summonAct",
+                    "id": "벌",
+                    "kind": "atk"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "벌",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "꿀벌 군단",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "밀랍 벽",
-          "kind": "guard"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "꿀 냄새",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

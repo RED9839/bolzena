@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "수인",
       "role": "딜러",
+      "style": "성장형",
       "star": 1,
       "hp": 520,
       "atk": 104,
@@ -20,34 +21,8 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.1,
+            "v": 0.12,
             "who": "allies"
-          }
-        ],
-        "rules": [
-          {
-            "name": "졸업은 아직",
-            "when": {
-              "on": "stackReach",
-              "id": "졸업 미룸",
-              "n": 3
-            },
-            "limit": {
-              "per": "fight",
-              "n": 2
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "졸업 미룸",
-                "all": true
-              },
-              {
-                "k": "status",
-                "id": "사기",
-                "v": 1
-              }
-            ]
           }
         ]
       },
@@ -165,7 +140,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.75,
+          "ratio": 1.05,
           "target": "allEnemies"
         },
         {
@@ -182,11 +157,12 @@
       ],
       "oracles": [
         {
-          "name": "캬오오오오~!",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.97,
+              "ratio": 1.41,
               "target": "allEnemies"
             },
             {
@@ -203,12 +179,13 @@
           ]
         },
         {
-          "name": "캬오",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 1.12,
               "target": "allEnemies"
             },
             {
@@ -218,6 +195,38 @@
               "target": "allEnemies"
             },
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.96,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
               "k": "stack",
               "id": "졸업 미룸",
               "v": 1
@@ -225,69 +234,39 @@
           ]
         },
         {
-          "name": "교실 울림",
-          "cost": 2,
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.29,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1,
-              "basic": true
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "꾸중 한 마디",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.87,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "쉬는 시간 끝!",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.78,
+              "ratio": 1.89,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
               "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "졸업 미룸",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.42,
               "target": "allEnemies"
             }
           ]
@@ -295,15 +274,15 @@
       ],
       "blesses": [
         {
-          "name": "목청 높이기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "쩌렁쩌렁",
+          "name": "축복 2",
           "kind": "frost"
         },
         {
-          "name": "선생님의 위엄",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -324,7 +303,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 1.19,
           "target": "oneEnemy"
         },
         {
@@ -333,7 +312,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.25,
+          "ratio": 0.39,
           "target": "oneEnemy"
         },
         {
@@ -344,11 +323,12 @@
       ],
       "oracles": [
         {
-          "name": "확실한 시범",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.61,
               "target": "oneEnemy"
             },
             {
@@ -357,7 +337,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.53,
               "target": "oneEnemy"
             },
             {
@@ -368,12 +348,13 @@
           ]
         },
         {
-          "name": "대충 시범",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 1.13,
               "target": "oneEnemy"
             },
             {
@@ -382,7 +363,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.18,
+              "ratio": 0.38,
               "target": "oneEnemy"
             },
             {
@@ -393,35 +374,60 @@
           ]
         },
         {
-          "name": "매일 같은 수업",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.12,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "졸업 미룸"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.84,
+              "ratio": 1.39,
               "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "basic": true
+              "k": "perStack",
+              "id": "졸업 미룸"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "play",
+                    "who": "other",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "졸업 미룸"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.21,
-                      "target": "randomEnemy"
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
                     }
                   ]
                 }
@@ -430,11 +436,12 @@
           ]
         },
         {
-          "name": "졸업장 수여",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.04,
+              "ratio": 2.14,
               "target": "oneEnemy"
             },
             {
@@ -443,48 +450,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.7,
               "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "졸업 미룸",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "전원 따라 해",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.03,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "발톱 힘주기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "교과서 펼치기",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "출석부",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -504,13 +486,19 @@
       "type": "공격",
       "fx": [
         {
-          "k": "perStack",
-          "id": "졸업 미룸"
+          "k": "perCardSt",
+          "id": "졸업생",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.91,
           "target": "allEnemies"
+        },
+        {
+          "k": "ifStack",
+          "id": "졸업 미룸",
+          "n": 2
         },
         {
           "k": "spend",
@@ -518,22 +506,30 @@
           "all": true
         },
         {
-          "k": "draw",
-          "v": 1
+          "k": "cardStatus",
+          "id": "졸업생",
+          "v": 1,
+          "max": 6
         }
       ],
       "oracles": [
         {
-          "name": "깐깐한 졸업 시험",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "perStack",
-              "id": "졸업 미룸"
+              "k": "perCardSt",
+              "id": "졸업생",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 1.08,
               "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "졸업 미룸",
+              "n": 3
             },
             {
               "k": "spend",
@@ -541,122 +537,150 @@
               "all": true
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "cardStatus",
+              "id": "졸업생",
+              "v": 1,
+              "max": 6
             }
           ]
         },
         {
-          "name": "쪽지 시험",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
-              "k": "perStack",
-              "id": "졸업 미룸"
+              "k": "perCardSt",
+              "id": "졸업생",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.56,
               "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "졸업 미룸",
+              "n": 3
             },
             {
               "k": "spend",
               "id": "졸업 미룸",
               "all": true
+            },
+            {
+              "k": "cardStatus",
+              "id": "졸업생",
+              "v": 1,
+              "max": 6
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perCardSt",
+              "id": "졸업생",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.85,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "cardStatus",
+              "id": "졸업생",
+              "v": 1,
+              "max": 6
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perCardSt",
+              "id": "졸업생",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "졸업 미룸",
+              "n": 3
+            },
+            {
+              "k": "cardStatus",
+              "id": "졸업생",
+              "v": 1,
+              "max": 6
             },
             {
               "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "졸업식",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "졸업 미룸"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.83,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "졸업 미룸",
-              "all": true
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "졸업은 또 미룸",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "졸업 미룸"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.46,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "졸업 앨범",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "졸업 미룸"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "졸업 미룸",
-              "all": true
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "n": 1,
+              "v": 1,
               "who": "self",
               "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perCardSt",
+              "id": "졸업생",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.12,
+              "target": "allEnemies"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "졸업 미룸",
+              "n": 3
+            },
+            {
+              "k": "cardStatus",
+              "id": "졸업생",
+              "v": 1,
+              "max": 6
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "졸업장",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "열쇠 숨기기",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "종소리",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -696,7 +720,7 @@
       ],
       "oracles": [
         {
-          "name": "모범생 칭찬",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -704,7 +728,12 @@
             {
               "k": "status",
               "id": "협공",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 1
             },
             {
               "k": "power",
@@ -726,18 +755,13 @@
           ]
         },
         {
-          "name": "쉬는 시간",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
               "k": "power",
               "rules": [
                 {
@@ -757,44 +781,12 @@
           ]
         },
         {
-          "name": "조회 시간",
+          "name": "신탁 3",
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "stack",
-              "id": "졸업 미룸",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "basic": true
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "졸업 미룸",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "숙제 검사",
-          "fx": [
-            {
               "k": "status",
               "id": "협공",
               "v": 1
@@ -802,14 +794,19 @@
             {
               "k": "stack",
               "id": "졸업 미룸",
-              "v": 2
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -824,7 +821,7 @@
           ]
         },
         {
-          "name": "자습 과제",
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
@@ -837,7 +834,36 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
             },
             {
               "k": "power",
@@ -858,18 +884,159 @@
             }
           ]
         }
+      ]
+    },
+    {
+      "id": "밍스_u5",
+      "name": "보충 수업",
+      "hero": "밍스",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "졸업 미룸",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "basic": true
+        },
+        {
+          "k": "shield",
+          "ratio": 0.98
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
+            },
+            {
+              "k": "shield",
+              "ratio": 1.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "basic": true
+            },
+            {
+              "k": "shield",
+              "ratio": 0.92
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.12
+            },
+            {
+              "k": "cardStatus",
+              "id": "졸업생",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "max": 6
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.16
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "졸업 미룸",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "졸업 미룸",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 3,
+              "basic": true
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
       ],
       "blesses": [
         {
-          "name": "캔 사료 상자",
-          "kind": "atkUp"
-        },
-        {
-          "name": "숲속 별채",
+          "name": "축복 1",
           "kind": "draw"
         },
         {
-          "name": "사료 선물",
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

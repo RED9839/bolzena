@@ -1,8 +1,11 @@
 // 사도 리워크 구조 지표 — node metrics.mjs <데이터 폴더(heroes 가 든)> [--json]
 // 신탁 갈래 유형(자동 분류 · 한 갈래가 여럿에 걸림) · 얕은 갈래 · 대가 · 강화화 · 서치 · 생성 장치 · 시동 카드 · 축복 덤 · 기본 카드 연료
 import fs from 'fs'; import path from 'path';
-const ROOT = path.join(process.argv[2] || 'C:/projects/bolzena-content-v2', 'heroes');
-const files = fs.readdirSync(ROOT).flatMap(d => fs.readdirSync(path.join(ROOT, d)).map(f => path.join(ROOT, d, f)));
+const ARG = process.argv.slice(2).find(a => !a.startsWith('--') && !a.includes(',') && !/^[가-힣_A-Za-z0-9]+$/.test(a));
+const ROOT = path.join(ARG || 'C:/projects/bolzena-content-v2', 'heroes');
+// --heroes 파일이름,파일이름 — 그 사도들만(예: --heroes 네르,네르_빡침)
+const HI = process.argv.indexOf('--heroes'), ONLY = HI > 0 ? new Set(process.argv[HI + 1].split(',')) : null;
+const files = fs.readdirSync(ROOT).flatMap(d => fs.readdirSync(path.join(ROOT, d)).filter(f => !ONLY || ONLY.has(f.replace(/.json$/, ''))).map(f => path.join(ROOT, d, f)));
 const T = { heroes: 0, cards: 0, oracles: 0, type: {}, shallowPerCard: [], cardsWith: {}, bless: {}, blessKw: 0, heroBlessKw: [], gen: 0, openerPower: 0, openerOpen: 0, opener2: 0, basicFuel: 0, fin1: 0, finPower: 0, twoCost: 0 };
 const COND = new Set(['ifStack', 'ifKill', 'ifBreak', 'ifWounded', 'ifAllHeroes', 'ifFoe', 'when', 'ifHand', 'ifNth', 'ifStreak', 'ifShield', 'ifPrevSame', 'ifTypeNew', 'ifInHand', 'ifRandom', 'ifChoice']);
 const PER = new Set(['perStack', 'perTag', 'perPlayed', 'perPile', 'perEvent', 'perCardSt', 'perDebuff']);

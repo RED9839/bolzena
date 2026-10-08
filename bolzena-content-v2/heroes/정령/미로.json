@@ -5,12 +5,13 @@
       "name": "미로",
       "nature": "활발",
       "role": "탱커",
+      "style": "거드는 형",
       "star": 3,
       "hp": 1000,
       "atk": 75,
       "def": 76,
       "crit": 5,
-      "blurb": "거울 속에서 지켜보며 응원하는 정령. 파티를 친 적에게 시선을 꽂아 그 적의 공격을 무디게 합니다. 거울 속으로 숨으면 그동안 날아든 공격을 거울에 비춰 두었다가, 다음 턴 그 수만큼 광선으로 되돌려 보냅니다.",
+      "blurb": "거울 속에서 지켜보며 응원하는 정령. 동료가 무언가를 하면 좌우를 뒤집어 따라 해 — 공격엔 실드를, 스킬엔 반사를 — 돌려주고, 거울 속으로 숨으면 그동안 날아든 공격을 광선으로 되돌려 보냅니다.",
       "keyword": {
         "name": "시선",
         "desc": "파티를 친 적에게 꽂히는 눈",
@@ -32,7 +33,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
@@ -44,27 +45,40 @@
           ]
         },
         {
-          "name": "거울에 맺힌 공격",
+          "name": "좌우가 뒤집힌 응원",
           "when": {
-            "on": "hurt",
-            "guarded": true
+            "on": "play",
+            "who": "other",
+            "type": "공격"
           },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "거울 속",
-              "n": 1
-            }
-          ],
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
           "fx": [
             {
-              "k": "cue",
-              "id": "miro_flash"
-            },
+              "k": "shield",
+              "ratio": 0.14
+            }
+          ]
+        },
+        {
+          "name": "좌우가 뒤집힌 응원",
+          "when": {
+            "on": "play",
+            "who": "other",
+            "type": "스킬"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
             {
-              "k": "stack",
-              "id": "반사된 시선",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.14,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         }
@@ -141,7 +155,7 @@
                 },
                 {
                   "k": "dmg",
-                  "ratio": 0.4,
+                  "ratio": 0.28,
                   "target": "randomEnemy"
                 },
                 {
@@ -174,6 +188,31 @@
                   "k": "spend",
                   "id": "거울 속",
                   "all": true
+                }
+              ]
+            },
+            {
+              "name": "거울에 맺힌 공격",
+              "when": {
+                "on": "hurt",
+                "guarded": true
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "거울 속",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "miro_flash"
+                },
+                {
+                  "k": "stack",
+                  "id": "반사된 시선",
+                  "v": 1
                 }
               ]
             }
@@ -226,7 +265,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.32,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -238,16 +277,17 @@
         },
         {
           "k": "shield",
-          "ratio": 0.5
+          "ratio": 0.35
         }
       ],
       "oracles": [
         {
-          "name": "눈부신 빛",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.62,
+              "ratio": 0.43,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -259,90 +299,47 @@
             },
             {
               "k": "shield",
-              "ratio": 0.52
+              "ratio": 0.48
             }
           ]
         },
         {
-          "name": "세 갈래 빛",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.39,
+              "ratio": 0.3,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "시선",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "shield",
-              "ratio": 0.55
+              "ratio": 0.34
             }
           ]
         },
         {
-          "name": "반사각",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.28,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "시선",
               "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "시선",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "넘어지며 박치기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.86,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "시선",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "거울 너머",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "시선",
-              "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -351,19 +348,79 @@
               "unique": true
             }
           ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시선",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "눈부심",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "거울 파편",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "guard"
         },
         {
-          "name": "좌우 반전",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -385,7 +442,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.1
+          "ratio": 0.77
         },
         {
           "k": "stack",
@@ -396,11 +453,12 @@
       ],
       "oracles": [
         {
-          "name": "거울 사이로",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.4
+              "ratio": 1.04
             },
             {
               "k": "stack",
@@ -411,11 +469,28 @@
           ]
         },
         {
-          "name": "수면에 비친 동심",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.1
+              "ratio": 0.74
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.7
             },
             {
               "k": "stack",
@@ -426,93 +501,65 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "self",
-              "unique": true,
-              "type": "공격"
+              "who": "other"
             }
           ]
         },
         {
-          "name": "거울 깨뜨리기",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "shield",
-              "ratio": 1.68
+              "ratio": 0.5
             },
             {
               "k": "stack",
               "id": "시선",
               "v": 1,
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "겁쟁이 거울",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.97
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.74
-            }
-          ]
-        },
-        {
-          "name": "교주의 방 거울",
-          "power": true,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.8
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "시선",
-                      "v": 1,
-                      "target": "allEnemies"
+                      "k": "shield",
+                      "ratio": 0.14
                     }
                   ]
                 }
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "맑은 거울",
-          "kind": "guard"
         },
         {
-          "name": "헤헤",
-          "kind": "draw"
-        },
-        {
-          "name": "거울 너머 응원",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
             {
               "k": "stack",
               "id": "시선",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
+            },
+            {
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
@@ -536,12 +583,17 @@
           "rules": [
             {
               "when": {
-                "on": "turnEnd"
+                "on": "play",
+                "who": "other"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
                   "k": "shield",
-                  "ratio": 0.35
+                  "ratio": 0.18
                 }
               ]
             }
@@ -550,7 +602,65 @@
       ],
       "oracles": [
         {
-          "name": "사이드 미로",
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.18
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.18
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "status",
@@ -562,12 +672,20 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 0.47
+                      "k": "stack",
+                      "id": "시선",
+                      "v": 1,
+                      "target": "oneEnemy"
                     }
                   ]
                 }
@@ -576,98 +694,7 @@
           ]
         },
         {
-          "name": "지켜보기만 하는 건 싫어",
-          "fx": [
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.4
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.35
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "lowHp",
-                    "pct": 0.4
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 1.5
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "셋째 딸",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.35
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "민트초코",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "stack",
-              "id": "시선",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "상담사",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "status",
@@ -677,19 +704,60 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 0.35
+                      "ratio": 0.18
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.28
                     }
                   ]
                 }
@@ -700,16 +768,23 @@
       ],
       "blesses": [
         {
-          "name": "작은 응원",
+          "name": "축복 1",
           "kind": "defUp"
         },
         {
-          "name": "거울 닦기",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "혼잣말 대꾸",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -723,7 +798,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.28,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -733,7 +808,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.14,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -745,7 +820,138 @@
       ],
       "oracles": [
         {
-          "name": "산산조각",
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "시선"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "시선",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "시선"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "시선",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "시선",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.11,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "시선"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.14,
+                      "base": "def",
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -762,123 +968,189 @@
               "ratio": 0.25,
               "base": "def",
               "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "시선",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "파편 비",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.33,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "시선",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.13,
-              "base": "def",
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "금 간 거울",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "시선"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "거울 폭발",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "시선"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "시선",
-              "all": true
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "다시 맞추기",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "시선"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.66
-            },
-            {
-              "k": "spend",
-              "id": "시선",
-              "all": true
-            },
-            {
-              "k": "heal",
-              "ratio": 0.53
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "날카로운 조각",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "반짝이는 조각",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "작은 조각",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "미로_u5",
+      "name": "거울처럼 따라 하기",
+      "hero": "미로",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.28
+        },
+        {
+          "k": "stack",
+          "id": "시선",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.3,
+          "who": "any"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.35
+            },
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.29
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3,
+              "who": "any"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.21
+            },
+            {
+              "k": "empower",
+              "ratio": 0.2,
+              "who": "any"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시선",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6,
+              "who": "any"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시선",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
         }
       ]
     }

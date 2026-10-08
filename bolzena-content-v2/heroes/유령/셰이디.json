@@ -6,45 +6,37 @@
       "nature": "광기",
       "race": "유령",
       "role": "딜러",
+      "style": "예약형",
       "star": 3,
       "hp": 720,
       "atk": 135,
       "def": 35,
       "crit": 10,
-      "blurb": "역대 최고의 장난을 평생 소원으로 삼은 유령 우두머리. 공격할 때마다 적에게 「장난」 을 걸고, 셋이 다 걸린 적은 정신을 못 차리고 한 대 크게 얻어맞습니다.",
+      "blurb": "역대 최고의 장난을 평생 소원으로 삼은 유령 우두머리. 적에게 「장난」 을 떠벌려 걸어 두면 두 차례 뒤 그 적이 자세를 무너뜨리며 얻어맞습니다. 그 사이 적을 매달아 두거나 차례를 뒤로 미뤄 장난이 먼저 터지게 하고, 급하면 순간이동해 지금 터뜨립니다.",
       "keyword": {
         "name": "장난",
         "desc": "셰이디가 미리 떠벌려 둔 장난",
         "carrier": "enemy",
-        "cap": 3,
-        "per": [
-          {
-            "stat": "taken",
-            "v": 0.06
-          }
-        ],
+        "cap": 2,
+        "decay": 1,
+        "reserve": true,
         "rules": [
           {
             "name": "자세 붕괴",
             "when": {
-              "on": "stackReach",
+              "on": "stackGone",
               "id": "장난",
-              "n": 3
+              "decay": true
             },
             "fx": [
               {
-                "k": "spend",
-                "id": "장난",
-                "all": true
-              },
-              {
-                "k": "tough",
-                "v": 2
-              },
-              {
                 "k": "dmg",
-                "ratio": 0.5,
+                "ratio": 0.33,
                 "target": "oneEnemy"
+              },
+              {
+                "k": "empower",
+                "ratio": 0.1
               }
             ]
           }
@@ -59,9 +51,15 @@
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 1
           },
           "fx": [
+            {
+              "k": "ifStack",
+              "id": "장난",
+              "n": 1,
+              "not": true
+            },
             {
               "k": "stack",
               "id": "장난",
@@ -85,7 +83,7 @@
               "k": "stack",
               "id": "장난",
               "v": 1,
-              "target": "allEnemies"
+              "target": "randomEnemy"
             }
           ]
         }
@@ -110,7 +108,7 @@
       },
       "starter": [
         "셰이디_s1",
-        "셰이디_u1",
+        "셰이디_u5",
         "셰이디_s3",
         "셰이디_s2"
       ]
@@ -168,37 +166,20 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.22,
+          "ratio": 0.15,
           "target": "oneEnemy",
           "hits": 4
         },
         {
-          "k": "stack",
+          "k": "ripen",
           "id": "장난",
-          "v": 1,
-          "target": "oneEnemy"
+          "v": 0.3
         }
       ],
       "oracles": [
         {
-          "name": "불 좀 꺼줄래? Max!",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.28,
-              "target": "oneEnemy",
-              "hits": 4
-            },
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "차원 사슬낫",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -207,50 +188,44 @@
               "hits": 4
             },
             {
-              "k": "stack",
+              "k": "ripen",
               "id": "장난",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.64,
-              "target": "oneEnemy"
+              "v": 0.3
             }
           ]
         },
         {
-          "name": "가장 뒤의 적",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.14,
               "target": "oneEnemy",
               "hits": 4
             },
             {
-              "k": "stack",
+              "k": "ripen",
               "id": "장난",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 0.3
             }
           ]
         },
         {
-          "name": "불 끄기 장난",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.24,
-              "target": "oneEnemy",
-              "hits": 4
+              "ratio": 0.12,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "ripen",
+              "id": "장난",
+              "v": 0.3,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -261,20 +236,500 @@
           ]
         },
         {
-          "name": "장난 예고장",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.1,
               "target": "oneEnemy",
               "hits": 4
+            },
+            {
+              "k": "ripen",
+              "id": "장난",
+              "v": 0.3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "장난",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "ripen",
+              "id": "장난",
+              "v": 0.3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰이디_u2",
+      "name": "사슬낫 네 자루",
+      "hero": "셰이디",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.18,
+          "target": "randomEnemy",
+          "hits": 4
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 2,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.17,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰이디_u3",
+      "name": "대롱대롱 매달기",
+      "hero": "셰이디",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "기절",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "장난",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "장난",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "rushDown",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "rushDown",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰이디_u4",
+      "name": "차원 주머니",
+      "hero": "셰이디",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.21,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "ifStack",
+          "id": "장난",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.21,
+          "target": "oneEnemy",
+          "hits": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "장난",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "oneEnemy",
+              "hits": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "장난",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "power",
@@ -300,116 +755,87 @@
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "사슬낫 1호",
-          "kind": "power"
         },
         {
-          "name": "어둠 속",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "히히",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies",
+              "hits": 2
+            },
             {
               "k": "stack",
               "id": "장난",
               "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "셰이디_u2",
-      "name": "사슬낫 네 자루",
-      "hero": "셰이디",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.56,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "장난"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.32,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "장난",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "사슬낫 1~4호",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "장난"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "장난",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "네 방향 사슬낫",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.42,
               "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "장난",
-              "each": true
-            },
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
             {
               "k": "dmg",
               "ratio": 0.23,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "사슬 감기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.56,
               "target": "oneEnemy",
               "hits": 2
             },
             {
-              "k": "tough",
-              "v": 1
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
             },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "장난",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "payHp",
+              "v": 40
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
             {
               "k": "stack",
               "id": "장난",
@@ -417,162 +843,54 @@
               "target": "oneEnemy"
             }
           ]
-        },
-        {
-          "name": "장난의 끝",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "장난"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "장난",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "다음 계획",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "장난"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.48,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "장난",
-              "all": true
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "사슬낫 4호",
-          "kind": "power"
-        },
-        {
-          "name": "쓰라림",
-          "kind": "frost"
-        },
-        {
-          "name": "인동 딸기 향",
-          "kind": "draw"
         }
       ]
     },
     {
-      "id": "셰이디_u3",
-      "name": "대롱대롱 매달기",
+      "id": "셰이디_u5",
+      "name": "파인애플 피자 협박",
       "hero": "셰이디",
       "unique": true,
-      "cost": 1,
+      "cost": 0,
       "type": "스킬",
       "fx": [
         {
           "k": "stack",
           "id": "장난",
-          "v": 2,
+          "v": 1,
           "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "취약",
-          "v": 2,
-          "target": "oneEnemy"
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "type": "공격"
         }
       ],
       "oracles": [
         {
-          "name": "거꾸로 매달기",
+          "name": "신탁 1",
           "fx": [
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "줄줄이 매달기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
-            },
             {
               "k": "stack",
               "id": "장난",
               "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "한 달 미룬 날짜",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 3,
               "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "계획 떠벌리기",
+          "name": "신탁 2",
           "fx": [
             {
               "k": "stack",
               "id": "장난",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "취약",
               "v": 2,
               "target": "oneEnemy"
             },
@@ -581,123 +899,69 @@
               "v": 1,
               "who": "self",
               "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "교주도 매달아 봄",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 3,
-              "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "취약",
-              "v": 3,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "튼튼한 사슬",
-          "kind": "draw"
-        },
-        {
-          "name": "나이 얘기 금지",
-          "fx": [
-            {
-              "k": "status",
-              "id": "취약",
+              "id": "약화",
               "v": 1,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "빠른 매듭",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "셰이디_u4",
-      "name": "차원 주머니",
-      "hero": "셰이디",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.24,
-          "target": "oneEnemy",
-          "hits": 2
-        },
-        {
-          "k": "perDebuff"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.24,
-          "target": "oneEnemy"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "깊은 차원 주머니",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
-              "hits": 2
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "perDebuff"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             },
             {
-              "k": "dmg",
-              "ratio": 0.29,
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 0.36
             }
           ]
         },
         {
-          "name": "주머니 뒤적",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.24,
-              "target": "oneEnemy",
-              "hits": 2
+              "k": "stack",
+              "id": "장난",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "장난",
                       "v": 1,
-                      "target": "oneEnemy"
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -706,81 +970,21 @@
           ]
         },
         {
-          "name": "소악마의 대변인",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "장난",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "괴물 끌고 오기",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "perDebuff"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "주머니 털기",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "discard",
               "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "perDebuff"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "주머니 속 인형",
-          "kind": "draw"
-        },
-        {
-          "name": "소악마의 삼지창",
-          "kind": "atkUp"
-        },
-        {
-          "name": "차원 틈새",
-          "fx": [
-            {
               "k": "stack",
               "id": "장난",
               "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.73,
               "target": "oneEnemy"
             }
           ]

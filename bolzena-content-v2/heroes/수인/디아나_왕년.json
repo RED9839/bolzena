@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "수인",
       "role": "딜러",
+      "style": "두 얼굴형",
       "star": 3,
       "hp": 850,
       "atk": 156,
@@ -23,33 +24,10 @@
             "v": 0.1
           }
         ],
-        "rules": [
-          {
-            "name": "바위 던지기",
-            "when": {
-              "on": "stackReach",
-              "id": "백수공권",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "백수공권",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.7,
-                "target": "allEnemies"
-              },
-              {
-                "k": "tough",
-                "v": 1,
-                "target": "allEnemies"
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.4
+        }
       },
       "passives": [
         {
@@ -138,7 +116,25 @@
               "fx": [
                 {
                   "k": "heal",
-                  "ratio": 0.8
+                  "ratio": 0.15
+                }
+              ]
+            },
+            {
+              "name": "되찾는 숨",
+              "when": {
+                "on": "play",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "백수공권",
+                  "v": 1
                 }
               ]
             }
@@ -231,7 +227,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 0.75,
           "target": "allEnemies"
         },
         {
@@ -243,11 +239,12 @@
       ],
       "oracles": [
         {
-          "name": "갈가리 찢기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.01,
               "target": "allEnemies"
             },
             {
@@ -259,77 +256,13 @@
           ]
         },
         {
-          "name": "땅째로 찢기",
-          "cost": 2,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "균열",
-              "v": 3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "맨손 찢기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifHand",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "한 놈만 찢기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "균열",
-              "v": 3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "귀찮은 건 빼고",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.98,
+              "ratio": 0.51,
               "target": "allEnemies"
             },
             {
@@ -337,159 +270,272 @@
               "id": "균열",
               "v": 2,
               "target": "allEnemies"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "억센 손톱",
-          "kind": "power"
-        },
-        {
-          "name": "약한 데부터",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "한창때 근육",
-          "kind": "atkUp"
-        }
-      ]
-    },
-    {
-      "id": "디아나_왕년_u2",
-      "name": "복잡한 건 질색",
-      "hero": "디아나_왕년",
-      "unique": true,
-      "cost": 2,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "discard",
-          "all": true
-        },
-        {
-          "k": "dmg",
-          "ratio": 2.4,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "백수공권",
-          "v": 2
-        }
-      ],
-      "oracles": [
-        {
-          "name": "정말 질색",
-          "fx": [
-            {
-              "k": "discard",
-              "all": true
             },
             {
-              "k": "dmg",
-              "ratio": 2.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "균열",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "대충 한 방",
-          "cost": 1,
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "all": true
+              "k": "dmg",
+              "ratio": 0.85,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "백수공권"
             },
             {
               "k": "dmg",
-              "ratio": 1.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 2
+              "ratio": 0.21,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "도끼 없이 끝장",
-          "cost": 3,
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "discard",
-              "all": true
-            },
-            {
               "k": "dmg",
-              "ratio": 4.2,
-              "target": "oneEnemy"
+              "ratio": 0.65,
+              "target": "allEnemies"
             },
             {
-              "k": "tough",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "주먹만 남기기",
-          "fx": [
-            {
-              "k": "discard",
-              "all": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 3.07,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "균열",
+              "v": 2,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
+              "unique": true,
               "type": "공격"
             }
           ]
         },
         {
-          "name": "휩쓸기",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "all": true
-            },
-            {
               "k": "dmg",
-              "ratio": 1.87,
+              "ratio": 1.05,
               "target": "allEnemies"
             },
             {
-              "k": "tough",
-              "v": 1,
+              "k": "status",
+              "id": "균열",
+              "v": 2,
               "target": "allEnemies"
+            },
+            {
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "통째로 부수기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "얼얼한 주먹",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "생각 비우기",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u2",
+      "name": "도끼 부수기",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "백수공권",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "백수공권",
+          "all": true
+        },
+        {
+          "k": "form",
+          "id": "디아나_왕년_맨주먹"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "백수공권",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "백수공권",
+              "all": true
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "백수공권",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "백수공권",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "백수공권",
+              "all": true
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "백수공권",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "백수공권",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -529,7 +575,7 @@
       ],
       "oracles": [
         {
-          "name": "다시 붙은 근육",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -559,7 +605,7 @@
           ]
         },
         {
-          "name": "맨손 체조",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "개전"
@@ -590,69 +636,7 @@
           ]
         },
         {
-          "name": "새벽 단련",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "백수공권",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "전성기의 하루",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "백수공권",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "한창때 감각",
+          "name": "신탁 3",
           "tags": [
             "개전"
           ],
@@ -660,185 +644,11 @@
             {
               "k": "stack",
               "id": "백수공권",
-              "v": 2
-            },
-            {
-              "k": "ifHand",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "백수공권",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "몸이 기억함",
-          "kind": "draw"
-        },
-        {
-          "name": "나른한 오후",
-          "kind": "atkUp"
-        },
-        {
-          "name": "매듭 빵",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "백수공권",
               "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "디아나_왕년_u4",
-      "name": "맨주먹 한 방",
-      "hero": "디아나_왕년",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.6,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "백수공권"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.2,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifHand",
-          "n": 1
-        },
-        {
-          "k": "stack",
-          "id": "백수공권",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "묵직한 한 방",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "백수공권"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "잽",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "백수공권"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "끝내기 주먹",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "백수공권"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "백수공권",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "맨주먹의 나날",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "백수공권",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.8
             },
             {
               "k": "power",
@@ -850,17 +660,13 @@
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 1
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "백수공권"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.15,
-                      "target": "oneEnemy"
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 1
                     }
                   ]
                 }
@@ -869,42 +675,206 @@
           ]
         },
         {
-          "name": "빈손의 기세",
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "백수공권"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.23,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifHand",
-              "n": 0
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u4",
+      "name": "바위 던지기",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifHand",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "주먹에 힘",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "멍 자국",
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -912,10 +882,149 @@
               "v": 1
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u5",
+      "name": "도끼 내려놓기",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "discard",
+          "v": 1
         },
         {
-          "name": "숨 고르기",
+          "k": "stack",
+          "id": "백수공권",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            },
+            {
+              "k": "ifHand",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "백수공권",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
           "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "백수공권",
+              "v": 1
+            }
+          ]
         }
       ]
     }

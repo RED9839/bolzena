@@ -67,6 +67,22 @@ def audio(job):
     return 1
 
 
+def touch_voices(fs):
+    # 로비 사도 만지기(runui Flow/LobbyTouch) — 사도마다 한 줄씩만(웹 크기): 볼 당기기 touch1 · 간지럼 ticklestart1 · 화냄 anger1
+    #   기본 옷 것만(_skin 꼬리 제외). 없으면 비슷한 것(touch → tickleduring → no)
+    out = []
+    #   2026-10-09: 꿀밤 dutchrubend1 · 쓰다듬기 touch2 도(LobbyTouch 가 먼저 찾는다)
+    for want, alt in (("touch1.ogg", "touch"), ("ticklestart1.ogg", "tickleduring"), ("anger1.ogg", "no"),
+                      ("dutchrubend1.ogg", "dutchrub"), ("touch2.ogg", "touch")):
+        if want in fs:
+            out.append(want)
+        else:
+            c = sorted(f for f in fs if f.startswith(alt) and "_skin" not in f)
+            if c:
+                out.append(c[0])
+    return out
+
+
 def main():
     # 3-a) 사도 표 — 웹판 cardbook · artmap 에서(node)
     if not os.path.exists(ROSTER):
@@ -128,6 +144,9 @@ def main():
             fs = [f for f in os.listdir(vd) if f.endswith(".ogg")]
             # 고학년 목소리가 없는 사도(디아나) — 외침(shout)으로 대신(컷인이 ultimate → shout 순으로 찾는다)
             pick = [f for f in fs if f.startswith("ultimate")] or [f for f in fs if f.startswith("shout")]
+            # 편성에서 사도를 칸에 넣을 때의 말(runui Kit/HeroVoice — 웹판 party-screen 의 decksetting → greeting)
+            pick += [f for f in fs if f.startswith("decksetting")] or [f for f in fs if f.startswith("greeting")]
+            pick += touch_voices(fs)
             for f in pick:
                 ajobs.append((f"{vd}/{f}", f"{DST}/Voice/{art}/{f[:-4]}.wav"))
     with ProcessPoolExecutor(max_workers=24) as ex:

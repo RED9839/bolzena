@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "엘프",
       "role": "탱커",
+      "style": "버티형",
       "star": 3,
       "hp": 950,
       "atk": 84,
       "def": 70,
       "crit": 5,
-      "blurb": "망상에서 걸어 나와 진짜 전장을 지휘하는 헤일리. 적의 공격을 실드로 받아낼 때마다 훈장이 늘고, 훈장 하나로 다음 수를 앞당깁니다.",
+      "blurb": "망상에서 걸어 나와 진짜 전장을 지휘하는 헤일리. 공격을 다 막아 낼 때마다 훈장이 늘고, 훈장으로 동료의 족쇄를 끊거나 검을 휘두르며, 넷이 모이면 전함 보급이 파티의 다음 한 수를 받쳐 줍니다.",
       "keyword": {
         "name": "극복의 훈장",
         "desc": "마주 본 과거의 훈장",
@@ -20,11 +21,33 @@
         "per": [
           {
             "stat": "taken",
-            "v": -0.05
+            "v": -0.04
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.4,
+          "consume": true
+        }
       },
       "passives": [
+        {
+          "name": "다 막아 낸 전열",
+          "when": {
+            "on": "blocked"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        },
         {
           "name": "잊을 수 없는 기억",
           "when": {
@@ -39,18 +62,20 @@
           ]
         },
         {
-          "name": "다 막아 낸 전열",
+          "name": "잊을 수 없는 기억",
           "when": {
-            "on": "blocked"
+            "on": "turnStart"
           },
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "극복의 훈장",
+              "n": 1
+            }
+          ],
           "fx": [
             {
-              "k": "stack",
-              "id": "극복의 훈장",
+              "k": "cleanse",
               "v": 1
             }
           ]
@@ -142,17 +167,18 @@
       ],
       "oracles": [
         {
-          "name": "지면 강타",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.61,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "heal",
-              "ratio": 0.6
+              "ratio": 0.68
             },
             {
               "k": "stack",
@@ -162,104 +188,115 @@
           ]
         },
         {
-          "name": "지면 붕괴",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.43,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "heal",
-              "ratio": 0.9
+              "ratio": 0.48
             },
             {
               "k": "stack",
               "id": "극복의 훈장",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "훈장의 무게",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.63,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "heal",
-              "ratio": 0.54
+              "ratio": 0.67
             },
             {
-              "k": "ifStack",
-              "id": "극복의 훈장",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "base": "def",
-              "target": "allEnemies"
+              "k": "cleanse",
+              "v": 1
             }
           ]
         },
         {
-          "name": "전열 정비",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.49,
+              "ratio": 0.53,
               "base": "def",
               "target": "allEnemies"
             },
             {
               "k": "heal",
-              "ratio": 0.6
+              "ratio": 0.59
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.26,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "단독 강타",
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.83
+            },
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.65
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "지팡이",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "되찾은 언변",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "heal"
         },
         {
-          "name": "훈장 하나",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -290,7 +327,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.22,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -302,11 +339,12 @@
       ],
       "oracles": [
         {
-          "name": "정예 검법",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.68,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -316,7 +354,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.3,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -328,59 +366,13 @@
           ]
         },
         {
-          "name": "검집 치기",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "극복의 훈장"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.14,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "극복의 훈장",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "방어 검세",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.8
-            },
-            {
-              "k": "stack",
-              "id": "극복의 훈장",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "장교 검술 수련",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.47,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -390,7 +382,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.21,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -408,7 +400,7 @@
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.4,
+                      "ratio": 0.26,
                       "base": "def",
                       "target": "oneEnemy"
                     }
@@ -419,15 +411,37 @@
           ]
         },
         {
-          "name": "장교의 결단",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "극복의 훈장"
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.18,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "극복의 훈장",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -437,28 +451,64 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.27,
+              "ratio": 0.2,
               "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "극복의 훈장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "장교 검",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "검법 교범",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "검 끝 방어",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.5
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
             }
           ]
         }
@@ -488,16 +538,16 @@
       ],
       "oracles": [
         {
-          "name": "전술 재정비",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 1.21
             },
             {
               "k": "stack",
               "id": "극복의 훈장",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
@@ -506,15 +556,53 @@
           ]
         },
         {
-          "name": "함장의 지휘",
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.97
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 1.12
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "극복의 훈장",
               "v": 1
             },
             {
@@ -522,13 +610,21 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "blocked"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "극복의 훈장",
                       "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.28
                     }
                   ]
                 }
@@ -537,76 +633,19 @@
           ]
         },
         {
-          "name": "작전 지도 펼치기",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.8
-            },
-            {
-              "k": "stack",
-              "id": "극복의 훈장",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "과거 마주하기",
-          "fx": [
-            {
-              "k": "cleanse",
-              "v": 1
+              "ratio": 1.73
             },
             {
               "k": "stack",
               "id": "극복의 훈장",
               "v": 2
             },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "흑역사 모니터",
-          "fx": [
             {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.19
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "빵주 함교",
-          "kind": "guard"
-        },
-        {
-          "name": "하게체 명령",
-          "kind": "ap"
-        },
-        {
-          "name": "훈장 수여",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "극복의 훈장",
               "v": 1
             }
           ]
@@ -623,63 +662,81 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.7
+          "ratio": 0.75
         },
         {
-          "k": "perStack",
-          "id": "극복의 훈장"
+          "k": "perGuarded",
+          "per": 40
         },
         {
           "k": "shield",
-          "ratio": 0.22
+          "ratio": 0.15
+        },
+        {
+          "k": "cleanse",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "헤일리 다큐멘터리",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.85
+              "ratio": 1.01
             },
             {
-              "k": "perStack",
-              "id": "극복의 훈장"
+              "k": "perGuarded",
+              "per": 40
             },
             {
               "k": "shield",
-              "ratio": 0.28
+              "ratio": 0.2
+            },
+            {
+              "k": "cleanse",
+              "v": 1
             }
           ]
         },
         {
-          "name": "짧은 기록",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.45
+              "ratio": 0.71
             },
             {
-              "k": "perStack",
-              "id": "극복의 훈장"
+              "k": "perGuarded",
+              "per": 40
+            },
+            {
+              "k": "shield",
+              "ratio": 0.14
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.74
+            },
+            {
+              "k": "perGuarded",
+              "per": 40
             },
             {
               "k": "shield",
               "ratio": 0.15
-            }
-          ]
-        },
-        {
-          "name": "찬란한 한때",
-          "fx": [
-            {
-              "k": "cleanse",
-              "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 0.6
             },
             {
               "k": "stack",
@@ -689,29 +746,37 @@
           ]
         },
         {
-          "name": "기록 보관소",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.88
+            },
+            {
+              "k": "perGuarded",
+              "per": 40
+            },
+            {
+              "k": "shield",
+              "ratio": 0.18
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "guardSum"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "극복의 훈장"
-                    },
-                    {
                       "k": "shield",
-                      "ratio": 0.15
+                      "ratio": 0.65
                     }
                   ]
                 }
@@ -720,39 +785,196 @@
           ]
         },
         {
-          "name": "기록 공개",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "perStack",
-              "id": "극복의 훈장"
+              "k": "shield",
+              "ratio": 1.53
+            },
+            {
+              "k": "perGuarded",
+              "per": 40
             },
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 0.31
             },
             {
-              "k": "spend",
-              "id": "극복의 훈장",
-              "all": true
-            },
-            {
-              "k": "heal",
-              "ratio": 0.52
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "낯선 과거",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "느긋한 산책",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "민트초코 사절",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_u5",
+      "name": "무릎 꿇는 교섭",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.55
+        },
+        {
+          "k": "stack",
+          "id": "극복의 훈장",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.84
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.63
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.68
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.47
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.98
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

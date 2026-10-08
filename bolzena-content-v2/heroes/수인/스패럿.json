@@ -6,6 +6,7 @@
       "nature": "순수",
       "race": "수인",
       "role": "서포터",
+      "style": "표적형",
       "star": 3,
       "hp": 580,
       "atk": 86,
@@ -16,55 +17,35 @@
         "name": "노획물",
         "desc": "배에 쌓아 두고 나눠 먹는 노획물",
         "carrier": "self",
-        "cap": 4,
+        "cap": 5,
         "per": [
           {
             "stat": "hot",
             "ratio": 0.12
           }
         ],
-        "rules": [
-          {
-            "name": "통 큰 분배",
-            "when": {
-              "on": "stackReach",
-              "id": "노획물",
-              "n": 4
-            },
-            "limit": {
-              "per": "fight",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "노획물",
-                "all": true
-              },
-              {
-                "k": "ap",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "스패럿_gold",
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "해적의 약탈",
           "when": {
-            "on": "kill",
-            "mine": true
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "huntDown"
           },
           "fx": [
             {
               "k": "make",
               "id": "스패럿_t1",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1,
+              "target": "topEnemy"
             }
           ]
         },
@@ -92,6 +73,12 @@
             "on": "fightStart"
           },
           "fx": [
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1,
+              "target": "topEnemy"
+            },
             {
               "k": "make",
               "id": "스패럿_t1",
@@ -131,6 +118,21 @@
         "스패럿_s1",
         "스패럿_s2",
         "스패럿_u1"
+      ],
+      "keywords": [
+        {
+          "name": "해적의 낙인",
+          "desc": "오늘 털기로 정한 놈의 표시",
+          "carrier": "enemy",
+          "cap": 1,
+          "hunt": true,
+          "per": [
+            {
+              "stat": "taken",
+              "v": 0.08
+            }
+          ]
+        }
       ]
     }
   ],
@@ -175,7 +177,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.4
+          "ratio": 0.32
         },
         {
           "k": "stack",
@@ -187,6 +189,24 @@
           "v": 1
         }
       ]
+    },
+    {
+      "id": "스패럿_gold",
+      "name": "찬란한 금은보화",
+      "hero": "스패럿",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "blurb": "배에 그득 쌓인 보물 — 선장은 통 크게 나눠 줍니다"
     },
     {
       "id": "스패럿_u1",
@@ -201,7 +221,13 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.64,
+          "ratio": 0.56,
+          "target": "topEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "해적의 낙인",
+          "v": 1,
           "target": "topEnemy"
         },
         {
@@ -212,99 +238,124 @@
       ],
       "oracles": [
         {
-          "name": "저녀석 확정!",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 1",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
-              "target": "topEnemy"
-            },
-            {
-              "k": "make",
-              "id": "스패럿_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "손가락 지목",
-          "cost": 0,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "topEnemy"
-            },
-            {
-              "k": "make",
-              "id": "스패럿_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "집중 포화 신호",
-          "cost": 2,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "topEnemy",
-              "hits": 4
-            },
-            {
-              "k": "make",
-              "id": "스패럿_t1",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "표식",
-              "v": 1,
-              "target": "topEnemy"
-            }
-          ]
-        },
-        {
-          "name": "해적의 낙인",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.66,
+              "ratio": 0.84,
               "target": "topEnemy"
             },
             {
               "k": "stack",
-              "id": "노획물",
+              "id": "해적의 낙인",
+              "v": 1,
+              "target": "topEnemy"
+            },
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            }
+          ],
+          "tags": [
+            "분쇄"
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "topEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1,
+              "target": "topEnemy"
+            },
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            }
+          ],
+          "tags": [
+            "분쇄"
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1,
+              "target": "topEnemy"
+            },
+            {
+              "k": "make",
+              "id": "스패럿_t1",
               "v": 2
             },
             {
               "k": "draw",
               "v": 1
             }
+          ],
+          "tags": [
+            "분쇄"
           ]
         },
         {
-          "name": "전리품 찜",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.64,
+              "target": "topEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1,
+              "target": "topEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "스패럿_t1",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": [
+            "분쇄"
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
               "target": "topEnemy"
             },
             {
@@ -316,23 +367,12 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
             }
+          ],
+          "tags": [
+            "분쇄"
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "겨눈 총구",
-          "kind": "power"
-        },
-        {
-          "name": "깃털의 후예",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "금화 한 닢",
-          "kind": "ap"
         }
       ]
     },
@@ -349,56 +389,52 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.32,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perTag",
-          "id": "스패럿_t1"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.16,
+          "ratio": 0.64,
           "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "약화",
-          "v": 2,
-          "target": "oneEnemy"
+          "v": 2
+        },
+        {
+          "k": "ifHunted"
+        },
+        {
+          "k": "make",
+          "id": "스패럿_t1",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "거친 욕설",
+          "name": "신탁 1",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "스패럿_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.29,
+              "ratio": 0.94,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
+            },
+            {
+              "k": "ifHunted"
+            },
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
             }
           ]
         },
         {
-          "name": "짧은 욕",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "분쇄"
@@ -406,31 +442,26 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "스패럿_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
+              "ratio": 0.61,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
+            },
+            {
+              "k": "ifHunted"
+            },
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
             }
           ]
         },
         {
-          "name": "뱃노래",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
@@ -444,27 +475,27 @@
               "target": "allEnemies"
             },
             {
-              "k": "heal",
-              "ratio": 0.48
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
             }
+          ],
+          "tags": [
+            "분쇄"
           ]
         },
         {
-          "name": "알아듣게 협박",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "draw",
@@ -472,36 +503,63 @@
               "who": "self",
               "unique": true
             }
+          ],
+          "tags": [
+            "분쇄"
           ]
         },
         {
-          "name": "해적식 흥정",
+          "name": "신탁 5",
+          "power": true,
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "make",
-              "id": "스패럿_t1",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.56,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "스패럿_t1",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
+          ],
+          "tags": [
+            "분쇄"
           ]
         }
       ],
       "blesses": [
         {
-          "name": "목청 높이기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "전리품 자랑",
+          "name": "축복 2",
+          "kind": "frost"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
@@ -509,10 +567,6 @@
               "v": 1
             }
           ]
-        },
-        {
-          "name": "해적 사전",
-          "kind": "draw"
         }
       ]
     },
@@ -528,27 +582,58 @@
           "k": "make",
           "id": "스패럿_t1",
           "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "노획물",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "대약탈",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "make",
               "id": "스패럿_t1",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 2
             }
           ]
         },
         {
-          "name": "주머니 털기",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "make",
               "id": "스패럿_t1",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.64
             },
             {
               "k": "draw",
@@ -557,26 +642,26 @@
           ]
         },
         {
-          "name": "보물 지도",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "make",
               "id": "스패럿_t1",
-              "v": 1
+              "v": 2
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "huntDown"
                   },
                   "fx": [
                     {
                       "k": "make",
                       "id": "스패럿_t1",
-                      "v": 1
+                      "v": 2
                     }
                   ]
                 }
@@ -585,50 +670,31 @@
           ]
         },
         {
-          "name": "한몫씩 나누기",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "make",
               "id": "스패럿_t1",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "노획물 정리",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "노획물",
               "v": 3
             },
             {
-              "k": "heal",
-              "ratio": 0.72
-            },
-            {
-              "k": "draw",
-              "v": 2
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "쌍안경",
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "챙긴 금붙이",
-          "kind": "ap"
-        },
-        {
-          "name": "찬란한 금은보화",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -652,7 +718,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 0.64,
           "target": "allEnemies"
         },
         {
@@ -661,7 +727,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.32,
+          "ratio": 0.26,
           "target": "allEnemies"
         },
         {
@@ -673,128 +739,11 @@
       ],
       "oracles": [
         {
-          "name": "과충전 포격",
+          "name": "신탁 1",
           "tags": [
             "분쇄"
           ],
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.96,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "스패럿_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.36,
-              "target": "allEnemies"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "스패럿_t1"
-            }
-          ]
-        },
-        {
-          "name": "소형 플라즈마",
-          "cost": 1,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.58,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "스패럿_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.21,
-              "target": "allEnemies"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "스패럿_t1"
-            }
-          ]
-        },
-        {
-          "name": "주포 전탄 발사",
-          "cost": 3,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "스패럿_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "allEnemies"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "예비 포탄",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "스패럿_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            }
-          ]
-        },
-        {
-          "name": "방패째 박살",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "strip",
-              "target": "allEnemies"
-            },
             {
               "k": "dmg",
               "ratio": 0.86,
@@ -806,24 +755,329 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.34,
               "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "스패럿_t1"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 1,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "스패럿_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "스패럿_t1"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.12,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "스패럿_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ],
+          "tags": [
+            "분쇄"
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "스패럿_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifHunted"
+            },
+            {
+              "k": "strip"
+            }
+          ],
+          "tags": [
+            "분쇄"
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "스패럿_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.37,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": [
+            "분쇄"
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스패럿_u5",
+      "name": "노획물 장부",
+      "hero": "스패럿",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "해적의 낙인",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "노획물",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.48
+            },
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "노획물",
+                      "v": 1
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.16
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "해적의 낙인",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "스패럿_t1",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "출력 최대",
-          "kind": "power"
+          "name": "축복 1",
+          "kind": "cost"
         },
         {
-          "name": "조준경 보정",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "냉각 완료",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "노획물",
+              "v": 1
+            }
+          ]
         }
       ]
     }

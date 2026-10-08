@@ -6,12 +6,13 @@
       "nature": "냉정",
       "race": "유령",
       "role": "딜러",
+      "style": "돈형",
       "star": 3,
       "hp": 700,
       "atk": 125,
       "def": 35,
       "crit": 10,
-      "blurb": "토끼 인형을 꿰매며 거짓말과 이간질을 즐기는 착각의 유령. 눈여겨본 적에게 뒷담을 쌓을수록 바롱의 손길이 더 아프게 박히고, 저주받은 못이 따라 꽂힙니다. 뒷담이 가득 차면 그 적은 엉뚱한 동료를 치게 됩니다.",
+      "blurb": "토끼 인형을 꿰매며 거짓말과 이간질을 즐기는 착각의 유령. 뒷담 건 적을 칠 때마다 장난 밑천을 벌고, 모은 밑천은 한 번에 털어 큰 장난을 사 들입니다. 저주받은 못이 따라 꽂힙니다.",
       "keyword": {
         "name": "뒷담",
         "desc": "인형 속 주인님이 퍼뜨린 거짓말",
@@ -21,32 +22,6 @@
           {
             "stat": "taken",
             "v": 0.12
-          }
-        ],
-        "rules": [
-          {
-            "name": "소문 확산",
-            "when": {
-              "on": "stackReach",
-              "id": "뒷담",
-              "n": 3
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "뒷담",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.6,
-                "target": "allEnemies"
-              }
-            ]
           }
         ]
       },
@@ -71,9 +46,14 @@
           "fx": [
             {
               "k": "extra",
-              "ratio": 0.35,
+              "ratio": 0.47,
               "hits": 2,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 1
             }
           ]
         },
@@ -85,7 +65,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 1.35
             }
           ]
         }
@@ -113,9 +93,17 @@
       },
       "starter": [
         "바롱_s1",
-        "바롱_u1",
+        "바롱_u5",
         "바롱_s3",
         "바롱_s2"
+      ],
+      "keywords": [
+        {
+          "name": "장난 밑천",
+          "desc": "인형 주인님 명의로 굴리는 장난 밑천",
+          "carrier": "self",
+          "cap": 6
+        }
       ]
     }
   ],
@@ -162,6 +150,31 @@
       ]
     },
     {
+      "id": "바롱_prank",
+      "name": "전 재산 장난",
+      "hero": "바롱",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.76,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "뒷담",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "모은 밑천을 장난 한 번에 몽땅 털어 넣습니다"
+    },
+    {
       "id": "바롱_u1",
       "name": "뒷담까기 인형",
       "hero": "바롱",
@@ -171,7 +184,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.13,
+          "ratio": 1.35,
           "target": "oneEnemy"
         },
         {
@@ -179,15 +192,21 @@
           "id": "뒷담",
           "v": 1,
           "target": "oneEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.47,
+          "target": "otherEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "인형의 속삭임",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.44,
+              "ratio": 1.82,
               "target": "oneEnemy"
             },
             {
@@ -195,18 +214,22 @@
               "id": "뒷담",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "otherEnemy"
             }
           ]
         },
         {
-          "name": "단추 안대",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.27,
+              "ratio": 1.28,
               "target": "oneEnemy"
             },
             {
@@ -214,15 +237,81 @@
               "id": "뒷담",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "otherEnemy"
             }
           ]
         },
         {
-          "name": "주인님 탓",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.07,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.47,
+                      "target": "otherEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.43,
               "target": "oneEnemy"
             },
             {
@@ -235,65 +324,27 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "인형 뒤에 숨기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "뒷담",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 2.09
-            }
-          ]
-        },
-        {
-          "name": "새로운 큰손",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.88,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "뒷담",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "꿰맨 토끼",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "초점 없는 눈",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "웅얼웅얼",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "뒷담",
-              "v": 1,
-              "target": "oneEnemy"
+              "id": "장난 밑천",
+              "v": 1
             }
           ]
         }
@@ -320,58 +371,19 @@
           "target": "oneEnemy"
         },
         {
-          "k": "draw",
+          "k": "stack",
+          "id": "장난 밑천",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "철저한 이간질",
+          "name": "신탁 1",
           "fx": [
-            {
-              "k": "stack",
-              "id": "뒷담",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "허언증",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "뒷담",
               "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "편 가르기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "뒷담",
-              "v": 2,
               "target": "oneEnemy"
             },
             {
@@ -381,14 +393,14 @@
               "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 0.63,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 1
             }
           ]
         },
         {
-          "name": "엇갈린 말",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -402,11 +414,37 @@
               "id": "약화",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 1
             }
           ]
         },
         {
-          "name": "거짓말 장부",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "otherEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -416,7 +454,8 @@
               "target": "oneEnemy"
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "장난 밑천",
               "v": 1
             },
             {
@@ -429,36 +468,56 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "뒷담",
-                      "v": 1,
-                      "target": "oneEnemy"
+                      "id": "장난 밑천",
+                      "v": 1
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "혀 꼬임",
+          "name": "축복 1",
           "kind": "draw"
         },
         {
-          "name": "나쁜 소문",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "빠른 입",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -472,7 +531,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.56,
+          "ratio": 0.68,
           "target": "oneEnemy",
           "hits": 2
         },
@@ -482,7 +541,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.44,
+          "ratio": 0.54,
           "target": "oneEnemy"
         },
         {
@@ -493,11 +552,12 @@
       ],
       "oracles": [
         {
-          "name": "굵은 못",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.69,
+              "ratio": 0.92,
               "target": "oneEnemy",
               "hits": 2
             },
@@ -507,7 +567,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.53,
+              "ratio": 0.73,
               "target": "oneEnemy"
             },
             {
@@ -518,173 +578,24 @@
           ]
         },
         {
-          "name": "못 박아 두기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.69,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "perStack",
-              "id": "뒷담"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.48,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "못 비",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.43,
-              "target": "randomEnemy",
-              "hits": 4
-            },
-            {
-              "k": "perStack",
-              "id": "뒷담"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.48,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "뒷담",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "저주 폭발",
-          "cost": 2,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.81,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "뒷담"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "눈속임 못질",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.61,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "뒷담",
-              "n": 2
-            },
-            {
-              "k": "perStack",
-              "id": "뒷담"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "녹슨 못",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "으흐흐 못질",
-          "kind": "power"
-        },
-        {
-          "name": "실리콘은 못 지나감",
-          "kind": "draw"
-        }
-      ]
-    },
-    {
-      "id": "바롱_u4",
-      "name": "토끼 인형 꿰매기",
-      "hero": "바롱",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.44,
-          "target": "allEnemies"
-        },
-        {
-          "k": "perStack",
-          "id": "뒷담",
-          "each": true
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.25,
-          "target": "allEnemies"
-        }
-      ],
-      "oracles": [
-        {
-          "name": "정성껏 꿰매기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "뒷담",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "사랑받는 유령",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
+              "ratio": 0.68,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
-              "k": "status",
-              "id": "협공",
-              "v": 1
+              "k": "perStack",
+              "id": "뒷담"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
@@ -701,9 +612,8 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "뒷담",
-                      "v": 1,
-                      "target": "oneEnemy"
+                      "id": "장난 밑천",
+                      "v": 1
                     }
                   ]
                 }
@@ -712,53 +622,38 @@
           ]
         },
         {
-          "name": "바늘 한 땀",
-          "cost": 0,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
-              "target": "allEnemies"
+              "ratio": 0.76,
+              "target": "oneEnemy",
+              "hits": 2
             },
             {
               "k": "perStack",
-              "id": "뒷담",
-              "each": true
+              "id": "뒷담"
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "주식 대주주",
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
+              "ratio": 0.53,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
-              "id": "뒷담",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "장난 밑천",
+              "v": 1
             }
           ]
         },
         {
-          "name": "인형 대수선",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.56,
-              "target": "allEnemies"
+              "ratio": 0.57,
+              "target": "allEnemies",
+              "hits": 2
             },
             {
               "k": "perStack",
@@ -769,27 +664,379 @@
               "k": "dmg",
               "ratio": 0.35,
               "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "뒷담",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.22,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "perStack",
+              "id": "뒷담"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.97,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "단추 눈",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "토끼 귀",
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바롱_u4",
+      "name": "사재기",
+      "hero": "바롱",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.95
+        },
+        {
+          "k": "ifStack",
+          "id": "장난 밑천",
+          "n": 3
+        },
+        {
+          "k": "spend",
+          "id": "장난 밑천",
+          "v": 3
+        },
+        {
+          "k": "make",
+          "id": "바롱_prank",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 1.4
+            },
+            {
+              "k": "ifStack",
+              "id": "장난 밑천",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "장난 밑천",
+              "v": 3
+            },
+            {
+              "k": "make",
+              "id": "바롱_prank",
+              "v": 1
             }
           ]
         },
         {
-          "name": "실밥",
-          "kind": "cost"
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.44
+            },
+            {
+              "k": "ifStack",
+              "id": "장난 밑천",
+              "n": 2
+            },
+            {
+              "k": "spend",
+              "id": "장난 밑천",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "바롱_prank",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "ifStack",
+              "id": "장난 밑천",
+              "n": 5
+            },
+            {
+              "k": "spend",
+              "id": "장난 밑천",
+              "v": 5
+            },
+            {
+              "k": "make",
+              "id": "바롱_prank",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "장난 밑천",
+                    "n": 3
+                  },
+                  "fx": [
+                    {
+                      "k": "spend",
+                      "id": "장난 밑천",
+                      "v": 3
+                    },
+                    {
+                      "k": "make",
+                      "id": "바롱_prank",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "ifStack",
+              "id": "장난 밑천",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "장난 밑천",
+              "v": 3
+            },
+            {
+              "k": "make",
+              "id": "바롱_prank",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "바롱_u5",
+      "name": "주식 단타",
+      "hero": "바롱",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "뒷담",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "장난 밑천",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 2
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "뒷담",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "장난 밑천",
+              "v": 4
+            }
+          ]
         }
       ]
     }

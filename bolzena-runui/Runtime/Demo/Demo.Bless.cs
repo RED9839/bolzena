@@ -28,22 +28,30 @@ namespace Bolzena.RunUI
             foreach (var u in d.UniquesOf(S.Party[0]).Take(2)) if (!S.Deck.Contains(u)) S.Deck.Add(u);
             f.Camp("camp");
             yield return Screen_("camp", 1.0f);
-            var tr = S.Camp?.Train;
-            if (tr == null || tr.Picks.Count < 2) { Debug.LogError("[Demo] 수련 후보가 없습니다"); Application.Quit(5); yield break; }
-            var c = d.Card(tr.CardId);
-            var ks = c.Blesses.Count > 0 ? new List<string> { "own" } : Core.Run.DivineKindsFor(run.ViewOf(tr.CardId));
-            string kind = ks.Count > 0 ? ks[0] : "draw";
-            tr.Shins = Enumerable.Range(0, tr.Picks.Count).Select(i => i == 1 ? kind : null).ToList();
-            Debug.Log($"[Demo] 수련 「{c.Name}」 둘째 후보에 축복 {kind}{(BlessFx.Old ? " (예전 연출)" : "")}");
+            yield return Shot("camp_menu");
+            var targets = run.FlashTargets();
+            if (targets.Count == 0) { Debug.LogError("[Demo] 수련 대상 카드가 없습니다"); Application.Quit(5); yield break; }
             yield return Press("camp.trainopen", 0.1f);
-            yield return Until(() => OracleReveal.Phase == "choose", 5); yield return Wait(0.35f);
-            yield return Shot("bless_camp_choose");
-            var frames = StartCoroutine(Frames("camp_pick", 2.6f));
+            yield return Wait(0.8f);
+            yield return Shot("camp_cardpick");
+            { var off = run.CampOffer(run.FlashTargets()[0]); var ks0 = Core.Run.DivineKindsFor(run.ViewOf(off.CardId)); off.Shins = Enumerable.Range(0, off.Picks.Count).Select(i => i == 0 ? (ks0.Count > 0 ? ks0[0] : "draw") : null).ToList(); }
+            yield return Press("camp.card0", 0.1f);
+            yield return Until(() => OracleReveal.Phase == "choose", 6); yield return Wait(0.5f);
+            var tr = S.Camp?.Train;
+            if (tr == null) { Debug.LogError("[Demo] 신탁 후보가 없습니다"); Application.Quit(5); yield break; }
+            // 한 번 닫았다 다시 열어도 같은 셋인지(리롤 방지)
+            var firstSet = string.Join(",", tr.Picks);
+            yield return Shot("camp_oracles");
+            yield return Press("camp.train.close", 0.2f);
+            yield return Until(() => !OracleReveal.IsOpen, 4);
+            yield return Press("camp.trainopen", 0.1f); yield return Wait(0.6f);
+            yield return Press("camp.card0", 0.1f);
+            yield return Until(() => OracleReveal.Phase == "choose", 6); yield return Wait(0.4f);
+            Expect(string.Join(",", S.Camp.Train.Picks) == firstSet, "다시 열어도 같은 신탁 셋 " + firstSet);
             yield return Press("camp.train1", 0.05f);
-            yield return frames;
             yield return Until(() => !OracleReveal.IsOpen, 8); yield return Wait(0.8f);
-            yield return Shot("bless_camp_after");
-            Expect(S.Shin.ContainsKey(tr.CardId), $"수련으로 축복이 얹혔다 — {tr.CardId}");
+            yield return Shot("camp_after");
+            Expect(S.Flash.ContainsKey(tr.CardId), $"수련으로 신탁이 붙었다 — {tr.CardId}");
             f.DeckView();
             yield return Wait(1.6f);
             yield return Shot("bless_deck");

@@ -5,53 +5,33 @@
       "name": "우이",
       "nature": "활발",
       "role": "서포터",
+      "style": "손 만들기형",
       "star": 3,
       "hp": 660,
       "atk": 86,
       "def": 63,
       "crit": 5,
-      "blurb": "견디기 힘든 걸 덮어 주는 이슬비 정령. 손에 든 싫은 카드를 비에 씻어 내고 개굴비를 남깁니다 — 셋을 덮으면 파티의 아픔이 씻겨 갑니다.",
+      "blurb": "바라는 것을 현실로 만드는 이슬비 정령. 개굴비를 손에 지어 하나씩 내리거나 쌓아 두었다 합창으로 쏟고, 지을 때마다 차오른 행복이 다섯이면 동료의 다음 한 수에 웃음을 실어 줍니다.",
       "keyword": {
         "name": "행복 지수",
-        "desc": "덮어 둔 만큼 차오르는 웃음",
+        "desc": "바라는 걸 지을 때마다 차오르는 웃음",
         "carrier": "self",
         "cap": 5,
-        "rules": [
-          {
-            "name": "긍정왕",
-            "when": {
-              "on": "stackReach",
-              "id": "행복 지수",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "행복 지수",
-                "all": true
-              },
-              {
-                "k": "heal",
-                "ratio": 1
-              },
-              {
-                "k": "status",
-                "id": "사기",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.4,
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "에루의 우산",
           "when": {
-            "on": "exhaust"
+            "on": "make"
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
@@ -74,7 +54,7 @@
             },
             {
               "k": "heal",
-              "ratio": 1.2
+              "ratio": 1
             },
             {
               "k": "make",
@@ -183,7 +163,7 @@
       ],
       "oracles": [
         {
-          "name": "장대비",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "make",
@@ -197,23 +177,22 @@
           ]
         },
         {
-          "name": "보슬보슬",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "make",
               "id": "우이_t1",
-              "v": 2
+              "v": 1
             },
             {
               "k": "heal",
-              "ratio": 0.45
+              "ratio": 0.4
             }
           ]
         },
         {
-          "name": "에루가 부르는 비",
-          "power": true,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "make",
@@ -222,7 +201,22 @@
             },
             {
               "k": "heal",
-              "ratio": 0.54
+              "ratio": 0.7
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
             },
             {
               "k": "power",
@@ -231,10 +225,15 @@
                   "when": {
                     "on": "turnStart"
                   },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.43
+                      "k": "make",
+                      "id": "우이_t1",
+                      "v": 1
                     }
                   ]
                 }
@@ -243,69 +242,19 @@
           ]
         },
         {
-          "name": "비 온 뒤 무지개",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "make",
               "id": "우이_t1",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "행복 지수",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "make",
-              "id": "우이_t1",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "친구 상담",
-          "fx": [
-            {
-              "k": "make",
-              "id": "우이_t1",
-              "v": 2
+              "v": 3
             },
             {
               "k": "heal",
               "ratio": 0.5
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "네잎클로버",
-          "kind": "draw"
-        },
-        {
-          "name": "비옷",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.5
-            }
-          ]
-        },
-        {
-          "name": "개구리 모자",
-          "fx": [
-            {
-              "k": "make",
-              "id": "우이_t1",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -333,7 +282,8 @@
       ],
       "oracles": [
         {
-          "name": "한여름 소나기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -348,29 +298,28 @@
           ]
         },
         {
-          "name": "에루의 혓바닥",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.71,
-              "target": "oneEnemy"
+              "ratio": 0.57,
+              "target": "allEnemies"
             },
             {
-              "k": "cleanse",
+              "k": "make",
+              "id": "우이_t1",
               "v": 1
-            },
-            {
-              "k": "heal",
-              "ratio": 0.85
             }
           ]
         },
         {
-          "name": "천둥 개굴",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.55,
               "target": "allEnemies"
             },
             {
@@ -379,70 +328,90 @@
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "행복 지수",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
+              "k": "status",
+              "id": "약화",
+              "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "행복한 빗소리",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.51,
               "target": "allEnemies"
             },
             {
               "k": "make",
               "id": "우이_t1",
-              "v": 3
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.26,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
             },
             {
               "k": "discard",
               "v": 1
             }
           ]
-        },
-        {
-          "name": "폭우",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "우이_t1",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "행복 지수",
-              "v": 2
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "굵은 빗방울",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "젖은 땅",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "가랑비",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -456,7 +425,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.45,
           "target": "allEnemies"
         },
         {
@@ -477,11 +446,39 @@
       ],
       "oracles": [
         {
-          "name": "떼창",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.61,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "우이_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.34,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "우이_t1"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.54,
               "target": "allEnemies"
             },
             {
@@ -494,89 +491,33 @@
               "target": "allEnemies"
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "우이_t1"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.26
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "한 마리씩",
-          "fx": [
-            {
-              "k": "make",
-              "id": "우이_t1",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "행복 지수",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "대합창",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "perTag",
-              "id": "우이_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.67,
-              "target": "allEnemies"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "우이_t1"
-            },
-            {
-              "k": "stack",
-              "id": "행복 지수",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "개구리 독창",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.97,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "우이_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.46,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "우이_t1"
-            }
-          ]
-        },
-        {
-          "name": "행복 전파",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.45,
               "target": "allEnemies"
             },
             {
@@ -584,30 +525,82 @@
               "id": "우이_t1"
             },
             {
-              "k": "heal",
-              "ratio": 0.74
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "allEnemies"
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "우이_t1"
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "우이_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "우이_t1"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "목청 큰 에루",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "개굴 박자",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "지퍼 입",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -626,7 +619,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.5
+          "ratio": 0.45
         },
         {
           "k": "perTag",
@@ -639,7 +632,54 @@
       ],
       "oracles": [
         {
-          "name": "에루는 개굴개굴",
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.77
+            },
+            {
+              "k": "perTag",
+              "id": "우이_t1"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.43
+            },
+            {
+              "k": "perTag",
+              "id": "우이_t1"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.11
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "make",
@@ -648,25 +688,29 @@
             },
             {
               "k": "heal",
-              "ratio": 0.5
+              "ratio": 0.4
             },
             {
-              "k": "perTag",
-              "id": "우이_t1"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.12
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "긍정왕 우이",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
               "k": "heal",
-              "ratio": 0.4
+              "ratio": 0.55
             },
             {
               "k": "power",
@@ -677,27 +721,8 @@
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "우이_t1",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "행복 지수",
-                    "n": 5
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "사기",
-                      "v": 1
+                      "k": "heal",
+                      "ratio": 0.34
                     }
                   ]
                 }
@@ -706,10 +731,7 @@
           ]
         },
         {
-          "name": "장화신은 우이",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 5",
           "fx": [
             {
               "k": "make",
@@ -718,52 +740,7 @@
             },
             {
               "k": "heal",
-              "ratio": 0.54
-            },
-            {
-              "k": "perTag",
-              "id": "우이_t1"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.13
-            }
-          ]
-        },
-        {
-          "name": "언해피 우이",
-          "fx": [
-            {
-              "k": "payHpPct",
-              "v": 0.03
-            },
-            {
-              "k": "make",
-              "id": "우이_t1",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "행복 지수",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "행복하기를 빌어",
-          "fx": [
-            {
-              "k": "make",
-              "id": "우이_t1",
-              "v": 1
-            },
-            {
-              "k": "perTag",
-              "id": "우이_t1"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.15
+              "ratio": 0.4
             },
             {
               "k": "draw",
@@ -776,15 +753,163 @@
       ],
       "blesses": [
         {
-          "name": "에루 쓰다듬기",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "작은 개구리",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "우산",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우이_u5",
+      "name": "선생님한테 고자질",
+      "hero": "우이",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "우이_t1",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "otherAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1,
+                      "who": "other"
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.42
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

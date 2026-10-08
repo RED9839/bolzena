@@ -20,7 +20,7 @@ namespace Bolzena.RunUI
         {
             var o = new List<RevealPick>();
             foreach (var x in opts)
-                o.Add(new RevealPick { CardId = cardId, View = d.View(cardId, x.N), Label = "신탁 " + x.N, BlessName = x.Blessed ? x.BlessName : null, BlessText = x.Blessed ? x.BlessText : null });
+                o.Add(new RevealPick { CardId = cardId, View = d.View(cardId, x.N), Label = null, BlessName = x.Blessed ? x.BlessName : null, BlessText = x.Blessed ? x.BlessText : null });
             return o;
         }
     }
@@ -76,13 +76,13 @@ namespace Bolzena.RunUI
             Phase = "enter";
             bool compact = Theme.Compact;
             var size = st.Size;
-            float cw = Mathf.Min(Theme.C(236, 168), (size.x - 80) / (n * 1.18f)), ch = cw * 1.4f, gap = cw * 1.22f;
+            float cw = Mathf.Min(0.58f * size.y / 1.4f, (size.x - 80) / (n * 1.18f)), ch = cw * 1.4f, gap = cw * 1.22f;   // 카드 높이 = 화면의 약 58%
             float cy = compact ? -18 : -6;
 
             var root = Ui.Rect("reveal", st.ModalLayer).Fill();
             var back = root.gameObject.AddComponent<BackClose>();
             back.Locked = true;
-            var dim = Ui.Img(root, Theme.White, new Color(0.03f, 0.02f, 0.06f, 0), "dim", true);   // 밑 화면 누르기를 막는다
+            var dim = Ui.Img(root, Theme.White, new Color(0f, 0f, 0f, 0), "dim", true);   // 밑 화면 누르기를 막는다
             dim.rectTransform.Fill();
             var rays = new GameObject("rays", typeof(RectTransform)).AddComponent<RawImage>();
             rays.transform.SetParent(root, false);
@@ -94,13 +94,31 @@ namespace Bolzena.RunUI
             var core = Ui.Img(root, Theme.S("soft"), new Color(1f, 0.85f, 0.45f, 0), "core");
             core.rectTransform.At(0.5f, 0.5f, 0, cy, cw * 3.2f, cw * 3.2f);
 
-            var title = Ui.Title(root, o.Title, compact ? 64 : 84, new Color(1f, 0.95f, 0.75f), TextAlignmentOptions.Center);
-            title.rectTransform.At(0.5f, 1, 0, compact ? -42 : -60, 900, compact ? 80 : 100);
-            title.colorGradient = new VertexGradient(Color.white, Color.white, new Color(1f, 0.78f, 0.3f), new Color(1f, 0.78f, 0.3f));
-            title.Outline(0.22f, new Color(0.35f, 0.15f, 0));
+            // 단순한 신탁 창(2026-10-08 카제나 번뜩임) — 검정 덮개 · 위 제목 + 금빛 줄 · 아래 안내
+            bool simple = o.Awake == "신탁";
+            bool anyBless = !BlessFx.Old && o.Picks.Exists(pk0 => !string.IsNullOrEmpty(pk0.BlessName));
+            Spine.Unity.SkeletonGraphic noone = null;
+            if (anyBless)
+            {   // 겨우살이(웃는 Happy_3) — 카드 묶음 왼쪽에 크게
+                var spot = Ui.Rect("noone", root).At(0.5f, 0, -size.x * 0.42f, -size.y * 0.04f, 10, 10);
+                noone = SpineUi.Make(spot, "st_noone", null, size.y * 0.6f, "Happy_3", "Idle_1");
+                if (noone != null) noone.color = new Color(1, 1, 1, 0);
+                var bl = Ui.Title(root, "겨우살이 축복", compact ? 24 : 32, Color.white, TextAlignmentOptions.Center);
+                bl.rectTransform.At(0.5f, 0, 0, compact ? 76 : 102, 700, 50); bl.Outline(0.3f, Color.black);
+            }
+            var title = Ui.Title(root, simple ? "<color=#FFD76A>신탁 효과</color>를 결정하세요." : o.Title, simple ? (compact ? 34 : 46) : compact ? 64 : 84, new Color(1f, 0.95f, 0.75f), TextAlignmentOptions.Center);
+            title.rectTransform.At(0.5f, 1, 0, compact ? -42 : -60, 1100, compact ? 80 : 100);
+            if (!simple) title.colorGradient = new VertexGradient(Color.white, Color.white, new Color(1f, 0.78f, 0.3f), new Color(1f, 0.78f, 0.3f));
+            title.Outline(0.22f, simple ? Color.black : new Color(0.35f, 0.15f, 0));
+            if (simple)
+            {
+                var ln = Ui.Img(root, Theme.White, new Color(1f, 0.84f, 0.45f, 0.8f), "titleline"); ln.rectTransform.At(0.5f, 1, 0, compact ? -118 : -158, compact ? 360 : 520, 2);
+                var stl = Ui.Img(root, Theme.S("ic_spark"), new Color(1f, 0.88f, 0.5f), "titlestar"); stl.rectTransform.At(0.5f, 1, 0, compact ? -118 : -158, 20, 20); stl.preserveAspect = true;
+            }
             title.alpha = 0;
             var subBg = Ui.Img(root, Theme.S("pill_dark", 46), new Color(1, 1, 1, 0), "subbg");
-            subBg.rectTransform.At(0.5f, 1, 0, compact ? -116 : -158, Mathf.Min(size.x - 40, compact ? 900 : 1100), compact ? 40 : 46);
+            if (simple) subBg.rectTransform.At(0.5f, 0, 0, compact ? 16 : 28, Mathf.Min(size.x - 40, 900), compact ? 36 : 42);
+            else subBg.rectTransform.At(0.5f, 1, 0, compact ? -116 : -158, Mathf.Min(size.x - 40, compact ? 900 : 1100), compact ? 40 : 46);
             var sub = Ui.Text(subBg.transform, o.Sub ?? "", Theme.FsMd, new Color(1f, 0.92f, 0.8f), TextAlignmentOptions.Center);
             sub.rectTransform.Fill(20, 0, 20, 0); sub.alpha = 0;
             sub.enableAutoSizing = true; sub.fontSizeMin = 12; sub.fontSizeMax = Theme.FsMd;
@@ -151,15 +169,16 @@ namespace Bolzena.RunUI
             Sfx.Play("reveal_open", 0.6f);
             yield return Lerp(root, 0.35f, t =>
             {
-                dim.color = dim.color.A(0.8f * t);
-                rays.color = rays.color.A(0.32f * K * t);   // 판 화면은 어두운 막 위라 빛살이 더 세 보여 전투 창보다 옅게
-                core.color = core.color.A(0.55f * K * t);
-                title.alpha = t; sub.alpha = t; subBg.color = subBg.color.A(t);
+                dim.color = dim.color.A((simple ? 0.99f : 0.8f) * t);
+                if (!simple) rays.color = rays.color.A(0.32f * K * t);
+                if (noone != null) noone.color = new Color(1, 1, 1, 0.92f * t);   // 판 화면은 어두운 막 위라 빛살이 더 세 보여 전투 창보다 옅게
+                if (!simple) core.color = core.color.A(0.55f * K * t);
+                title.alpha = t; sub.alpha = t; if (!simple) subBg.color = subBg.color.A(t);
                 title.rectTransform.localScale = Vector3.one * (Calm ? 1f : Mathf.LerpUnclamped(1.35f, 1f, Tw.OutBack(t)));
                 if (baseCard) baseCard.parent.localScale = Vector3.one * Mathf.Lerp(0.8f, 1.15f, Tw.OutCubic(t));
             });
             if (!root) { Phase = null; yield break; }
-            Tw.Pulse(core, 0.35f * K, 0.6f * K, 2.2f);
+            if (!simple) Tw.Pulse(core, 0.35f * K, 0.6f * K, 2.2f);
             Sfx.Play("reveal", 0.5f);
 
             // 후보 — 가운데에서 겹쳐 나와 펼쳐진다
@@ -172,7 +191,9 @@ namespace Bolzena.RunUI
                 int idx = i;
                 var p = o.Picks[i];
                 var h = Ui.Rect("pick" + i, root).At(0.5f, 0.5f, 0, cy, cw, ch);
-                var face = W.Card(h, f, p.CardId, cw, "card", p.View, noFace: true);   // 신탁 창은 주인 얼굴 핀 없이
+                W.BlessOverride = anyBless && !string.IsNullOrEmpty(p.BlessName) ? p.BlessText : null;
+                var face = W.Card(h, f, p.CardId, cw, "oraclepick", p.View, noFace: true);
+                W.BlessOverride = null;   // 신탁 창은 주인 얼굴 핀 없이
                 face.At(0.5f, 0.5f, 0, 0, cw, ch);
                 // 이름표(번호 없이)
                 if (!string.IsNullOrEmpty(p.Label))
@@ -188,21 +209,12 @@ namespace Bolzena.RunUI
                 // 축복이 얹힌 후보 — 카드 뒤 금빛 · 아래 「축복!」 띠와 축복 글
                 if (!string.IsNullOrEmpty(p.BlessName))
                 {
-                    var gl = Ui.Img(h, Theme.S("soft"), new Color(1f, 0.8f, 0.3f, 0.75f), "blessglow");
+                    var gl = Ui.Img(h, Theme.S("soft"), new Color(0.72f, 0.58f, 1f, 0.75f), "blessglow");
                     gl.rectTransform.At(0.5f, 0.5f, 0, 0, cw * 1.6f, ch * 1.45f); gl.transform.SetAsFirstSibling();
                     Tw.Pulse(gl, 0.45f, 0.85f, 1.6f);
-                    var band = Ui.Img(h, Theme.S("pill_gold", 46), Color.white, "blessband");
-                    band.rectTransform.At(0.5f, 0, 0, compact ? -30 : -36, cw * 1.05f, compact ? 26 : 30);
-                    var bt = Ui.Title(band.transform, "축복!", compact ? 13 : 16, Theme.Brown, TextAlignmentOptions.Center);
-                    bt.rectTransform.Fill(8, 0, 8, 0); bt.enableAutoSizing = true; bt.fontSizeMin = 9; bt.fontSizeMax = compact ? 13 : 16;
-                    if (!string.IsNullOrEmpty(p.BlessText))
-                    {
-                        var tx = Ui.Text(h, p.BlessText, compact ? 11 : 13, new Color(1f, 0.92f, 0.7f), TextAlignmentOptions.Top);
-                        tx.rectTransform.At(0.5f, 0, 0, compact ? -70 : -84, cw * 1.15f, compact ? 40 : 46);
-                        tx.enableAutoSizing = true; tx.fontSizeMin = 9; tx.fontSizeMax = compact ? 11 : 13;
-                    }
                 }
                 var b = face.gameObject.AddComponent<Btn>();
+                b.OnHold = () => { if (Phase == "choose" && chosen < 0) f.CardZoom(p.CardId); };   // 길게 누르면 카드 상세
                 b.OnClick = () =>
                 {
                     if (Phase != "choose" || chosen >= 0) return;

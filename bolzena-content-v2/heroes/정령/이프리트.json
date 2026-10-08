@@ -5,6 +5,7 @@
       "name": "이프리트",
       "nature": "광기",
       "role": "딜러",
+      "style": "소멸형",
       "star": 2,
       "hp": 700,
       "atk": 109,
@@ -19,37 +20,14 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.1
+            "v": 0.08
           }
         ],
-        "rules": [
-          {
-            "name": "캠프파이어 불꽃",
-            "when": {
-              "on": "stackReach",
-              "id": "장작",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "장작",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 1,
-                "target": "allEnemies"
-              },
-              {
-                "k": "status",
-                "id": "고통",
-                "v": 3,
-                "target": "allEnemies"
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -176,7 +154,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.54,
           "target": "oneEnemy"
         },
         {
@@ -195,10 +173,15 @@
       "unique": true,
       "cost": 0,
       "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
       "fx": [
         {
-          "k": "burn",
-          "v": 1
+          "k": "exileFrom",
+          "from": "discard",
+          "n": 1,
+          "who": "other"
         },
         {
           "k": "stack",
@@ -212,120 +195,121 @@
       ],
       "oracles": [
         {
-          "name": "장작 한 아름",
-          "fx": [
-            {
-              "k": "burn",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "장작",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "쓰레기 정화",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "장작",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "불씨만 살려 줘",
+          "name": "신탁 1",
           "tags": [
-            "보존"
+            "소멸"
           ],
           "fx": [
             {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
               "k": "stack",
               "id": "장작",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "라떼 정령",
-          "power": true,
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "장작",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "불씨 나누기",
-          "fx": [
-            {
-              "k": "burn",
-              "v": 1
-            },
-            {
-              "k": "make",
-              "id": "이프리트_ember",
               "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "마른 장작",
-          "kind": "draw"
-        },
-        {
-          "name": "시꺼먼 숯",
-          "fx": [
+            },
             {
-              "k": "stack",
-              "id": "장작",
+              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "불쏘시개 마이크",
-          "kind": "ap"
+          "name": "신탁 2",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2
+            },
+            {
+              "k": "stack",
+              "id": "장작",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "장작",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "장작",
+              "v": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "장작",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.96
+            }
+          ]
         }
       ]
     },
@@ -339,7 +323,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.85,
+          "ratio": 1.08,
           "target": "oneEnemy"
         },
         {
@@ -348,7 +332,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.22,
+          "ratio": 0.3,
           "target": "oneEnemy"
         },
         {
@@ -359,11 +343,103 @@
       ],
       "oracles": [
         {
-          "name": "다 태울 기세",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.05,
+              "ratio": 1.46,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장작"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "장작",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.09,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "장작"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.46,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "장작"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "장작",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.08,
               "target": "oneEnemy"
             },
             {
@@ -376,68 +452,20 @@
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "장작",
-              "all": true
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "불의 의지",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "장작"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.81,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "장작",
-              "all": true
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "잿더미",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.63,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "장작"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "장작",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "하얗게 탄 재",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.99,
+              "ratio": 1.94,
               "target": "oneEnemy"
             },
             {
@@ -446,51 +474,30 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.54,
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "웰던",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "장작"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.46,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "장작",
-              "all": true
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "장작",
-              "v": 3
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "시뻘건 날",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "그을린 칼등",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "가벼운 검",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -499,116 +506,96 @@
       "name": "모닥불 피우기",
       "hero": "이프리트",
       "unique": true,
-      "cost": 1,
+      "cost": 2,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 1.22,
           "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "장작"
+          "k": "perGone"
         },
         {
           "k": "dmg",
-          "ratio": 0.12,
+          "ratio": 0.14,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2,
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "캠프파이어",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 1.65,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "장작"
+              "k": "perGone"
             },
             {
               "k": "dmg",
-              "ratio": 0.15,
+              "ratio": 0.19,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "밤 산책",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 1.16,
               "target": "allEnemies"
             },
             {
-              "k": "make",
-              "id": "이프리트_ember",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "exhaust"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.35,
-                      "target": "randomEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "불씨 보관",
-          "fx": [
-            {
-              "k": "make",
-              "id": "이프리트_ember",
-              "v": 2
-            },
-            {
-              "k": "perStack",
-              "id": "장작"
+              "k": "perGone"
             },
             {
               "k": "dmg",
-              "ratio": 0.12,
+              "ratio": 0.14,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "히어로 수행",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
+              "ratio": 2.31,
+              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "장작"
+              "k": "perGone"
             },
             {
               "k": "dmg",
-              "ratio": 0.12,
-              "target": "allEnemies"
+              "ratio": 0.28,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
@@ -619,26 +606,61 @@
           ]
         },
         {
-          "name": "불로 지지기",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "perStack",
-              "id": "장작"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 1.61,
               "target": "allEnemies"
             },
             {
-              "k": "spend",
-              "id": "장작",
-              "all": true
+              "k": "perGone"
             },
             {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.42,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.19,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perGone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
               "target": "allEnemies"
             }
           ]
@@ -646,19 +668,19 @@
       ],
       "blesses": [
         {
-          "name": "뜨거운 몸",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "장작 패기",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "불길",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "이프리트_ember",
+              "k": "stack",
+              "id": "장작",
               "v": 1
             }
           ]
@@ -667,106 +689,62 @@
     },
     {
       "id": "이프리트_u4",
-      "name": "지글짝 보글짝",
+      "name": "애완 돌 데우기",
       "hero": "이프리트",
       "unique": true,
       "cost": 1,
-      "type": "공격",
+      "type": "스킬",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.9,
-          "target": "oneEnemy"
+          "k": "make",
+          "id": "이프리트_ember",
+          "v": 2
         },
         {
-          "k": "status",
-          "id": "고통",
-          "v": 2,
-          "target": "oneEnemy"
+          "k": "stack",
+          "id": "장작",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "화염 지대",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "이프리트_ember",
+              "v": 3
             },
             {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "보글보글",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.73,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "탄 냄새",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
+              "k": "stack",
               "id": "장작",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         },
         {
-          "name": "불씨 남기기",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
-              "k": "burn",
+              "k": "make",
+              "id": "이프리트_ember",
               "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 1.33,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "장작",
+              "v": 1
             }
           ]
         },
         {
-          "name": "겁쟁이 불꽃",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
             {
               "k": "make",
               "id": "이프리트_ember",
@@ -775,22 +753,215 @@
             {
               "k": "stack",
               "id": "장작",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "이프리트_ember",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "이프리트_ember",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "이프리트_ember",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "장작",
+              "v": 2
+            },
+            {
+              "k": "nextAp",
+              "v": -1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "화상",
-          "kind": "power"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "불티",
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "이프리트_u5",
+      "name": "쓰레기 정화",
+      "hero": "이프리트",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "exileFrom",
+          "from": "discard",
+          "all": true,
+          "type": "상태"
+        },
+        {
+          "k": "exileFrom",
+          "from": "discard",
+          "all": true,
+          "type": "저주"
+        },
+        {
+          "k": "shield",
+          "ratio": 1.22
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "all": true,
+              "type": "상태"
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "all": true,
+              "type": "저주"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.62
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "all": true,
+              "type": "상태"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.95
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "all": true,
+              "type": "상태"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "type": "상태"
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "all": true,
+              "type": "상태"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "지글지글",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

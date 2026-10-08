@@ -5,12 +5,13 @@
       "name": "빅우드",
       "nature": "순수",
       "role": "탱커",
+      "style": "회복형",
       "star": 2,
       "hp": 930,
       "atk": 66,
       "def": 61,
       "crit": 5,
-      "blurb": "얻어맞으면서도 웃는 나무 정령. 맞을 때마다 나이테가 늘고, 나이테가 두꺼울수록 그가 거는 실드도 두꺼워집니다.",
+      "blurb": "얻어맞으면서도 웃는 나무 정령. 맞거나 넘치게 회복할 때마다 나이테가 늘어 실드가 두꺼워지고, 나이테가 다 차면 황금 사과 두 알이 열립니다 — 따서 나눌까, 통나무로 굴려 버릴까.",
       "keyword": {
         "name": "나이테",
         "desc": "맞으며 늘어난 나이테",
@@ -24,26 +25,24 @@
         ],
         "rules": [
           {
-            "name": "현자 모드",
+            "name": "피톤치드",
             "when": {
-              "on": "stackReach",
-              "id": "나이테",
-              "n": 5
+              "on": "fightStart"
             },
             "fx": [
               {
-                "k": "spend",
-                "id": "나이테",
-                "all": true
-              },
-              {
-                "k": "make",
-                "id": "빅우드_apple",
-                "v": 2
+                "k": "status",
+                "id": "피해 감소",
+                "v": 1
               }
             ]
           }
-        ]
+        ],
+        "onMax": {
+          "make": "빅우드_apple",
+          "n": 2,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -54,7 +53,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
@@ -65,14 +64,19 @@
           ]
         },
         {
-          "name": "피톤치드",
+          "name": "아낌없이 주는 나무",
           "when": {
-            "on": "fightStart"
+            "on": "overheal",
+            "pct": 0.8
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "stack",
+              "id": "나이테",
               "v": 1
             }
           ]
@@ -148,11 +152,11 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.6
+          "ratio": 0.69
         },
         {
           "k": "shield",
-          "ratio": 0.6
+          "ratio": 0.69
         }
       ],
       "blurb": "빅우드가 기꺼이 뜯겨 주는 황금빛 열매입니다."
@@ -167,7 +171,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.3
+          "ratio": 1.5
         },
         {
           "k": "stack",
@@ -177,11 +181,12 @@
       ],
       "oracles": [
         {
-          "name": "나무껍질 갑옷",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.65
+              "ratio": 2.02
             },
             {
               "k": "stack",
@@ -191,134 +196,13 @@
           ]
         },
         {
-          "name": "세계수 큰형님",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.4
-            },
-            {
-              "k": "stack",
-              "id": "나이테",
-              "v": 2
-            },
-            {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "뿌리 깊은 나무",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.14
-            },
-            {
-              "k": "stack",
-              "id": "나이테",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.16
-            }
-          ]
-        },
-        {
-          "name": "불도 물도 싫어",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.35
-            },
-            {
-              "k": "stack",
-              "id": "나이테",
-              "v": 1
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "heal",
-              "ratio": 1.04
-            }
-          ]
-        },
-        {
-          "name": "후욱",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.4
-            },
-            {
-              "k": "stack",
-              "id": "나이테",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "두꺼운 껍질",
-          "kind": "guard"
-        },
-        {
-          "name": "나뭇잎 하나",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나이테",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "뿌리 박기",
-          "kind": "defUp"
-        }
-      ]
-    },
-    {
-      "id": "빅우드_u2",
-      "name": "열매 나눠 주기",
-      "hero": "빅우드",
-      "unique": true,
-      "cost": 0,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "make",
-          "id": "빅우드_apple",
-          "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "나이테",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "주렁주렁",
-          "fx": [
-            {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 2
+              "ratio": 1.41
             },
             {
               "k": "stack",
@@ -328,347 +212,18 @@
           ]
         },
         {
-          "name": "베이커리 납품",
-          "fx": [
-            {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "나이테",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "요정들의 관심",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "나이테",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.4
-            }
-          ]
-        },
-        {
-          "name": "무보수 봉사",
+          "name": "신탁 3",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "나이테",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "열매 맺기",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 1
-            },
-            {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 2
+              "k": "shield",
+              "ratio": 0.98
             },
             {
               "k": "stack",
               "id": "나이테",
               "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "탄수화물",
-          "kind": "draw"
-        },
-        {
-          "name": "잘 익은 열매",
-          "fx": [
-            {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "가지 흔들기",
-          "tags": [
-            "보존"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "빅우드_u3",
-      "name": "통나무 굴리기",
-      "hero": "빅우드",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.45,
-          "base": "def",
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "나이테"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.13,
-          "base": "def",
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "나이테",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "굴러간다~",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "나이테",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "숲 정리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.1,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "나이테",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "나 잡아 봐라~",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.59,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.17,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "큰 나무 쓰러뜨리기",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "맞은 만큼",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.13,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "묵직한 통나무",
-          "kind": "power"
-        },
-        {
-          "name": "나뭇결",
-          "kind": "frost"
-        },
-        {
-          "name": "가벼운 가지",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "빅우드_u4",
-      "name": "숲의 품",
-      "hero": "빅우드",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "status",
-          "id": "결정화",
-          "v": 1
-        },
-        {
-          "k": "perStack",
-          "id": "나이테"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.3
-        }
-      ],
-      "oracles": [
-        {
-          "name": "오래된 숲",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.42
-            }
-          ]
-        },
-        {
-          "name": "현자의 말씀",
-          "power": true,
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
             },
             {
               "k": "power",
@@ -695,84 +250,682 @@
           ]
         },
         {
-          "name": "가을 수확",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "spend",
+              "k": "shield",
+              "ratio": 1.38
+            },
+            {
+              "k": "stack",
               "id": "나이테",
-              "all": true
-            },
-            {
-              "k": "make",
-              "id": "빅우드_apple",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "요정 왕국에 뿌리",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
               "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.3
-            }
-          ]
-        },
-        {
-          "name": "메이드장",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "나이테"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.3
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.09
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 2
+            },
+            {
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "나무 그늘",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "새싹",
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "빅우드_u2",
+      "name": "열매 나눠 주기",
+      "hero": "빅우드",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "빅우드_apple",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "나이테",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "빅우드_apple",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "make",
+              "id": "빅우드_apple",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "빅우드_apple",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "make",
+              "id": "빅우드_apple",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.69
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "빅우드_apple",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "빅우드_u3",
+      "name": "통나무 굴리기",
+      "hero": "빅우드",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.52,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "나이테"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.15,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "나이테",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "나이테"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "나이테",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.49,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "나이테"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.14,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "나이테",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "나이테"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "나이테"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.14,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "빅우드_apple",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "나이테"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "맑은 공기",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "빅우드_u4",
+      "name": "숲의 품",
+      "hero": "빅우드",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.92
+        },
+        {
+          "k": "perOverheal",
+          "pct": 0.8,
+          "per": 25
+        },
+        {
+          "k": "shield",
+          "ratio": 0.35
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.24
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "shield",
+              "ratio": 0.47
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.87
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "shield",
+              "ratio": 0.32
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.84
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "shield",
+              "ratio": 0.28
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.56
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.81
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "shield",
+              "ratio": 0.29
+            },
+            {
+              "k": "make",
+              "id": "빅우드_apple",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.38
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "shield",
+              "ratio": 0.52
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "빅우드_apple",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "빅우드_u5",
+      "name": "메이드장의 채찍",
+      "hero": "빅우드",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.69,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "나이테",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.57
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.78
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.39
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.48
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.24,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "나이테",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "나이테",
               "v": 1
             }
           ]

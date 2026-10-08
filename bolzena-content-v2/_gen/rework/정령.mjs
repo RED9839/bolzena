@@ -28,6 +28,8 @@ const pullD = (o = {}) => ({ k: 'pull', from: 'discard', n: 1, ...o });         
 const exB = { k: 'exileFrom', from: 'hand', basic: true, n: 1 };                  // 손의 기본 카드 1장 소멸
 const toBasic = id => ({ k: 'transform', id, from: 'hand', basic: true, n: 1 });  // 손의 기본 카드 1장을 생성물로(이 전투)
 const KAI = ['개전'];
+// u5(2026-10-08) — 손의 자신의 카드 1장 비용 -1(거르개)
+const csOwn = (o = {}) => ({ k: 'cardStatus', id: '비용', v: -1, to: 'hand', n: 1, who: 'self', ...o });
 const setCards = (j, cards) => { j.cards = [...j.cards.filter(c => !c.unique), ...cards]; };
 const renameUlt = (h, from, to, extra = {}) => {
   for (const f of h.ult.fx) if (['stack', 'spend', 'perStack', 'ifStack'].includes(f.k) && f.id === from) { f.id = to; Object.assign(f, extra); for (const k of Object.keys(extra)) if (extra[k] === undefined) delete f[k]; }
@@ -83,6 +85,14 @@ function gabia(j) {
       O('최애 응원 준비', [st('결정화', 1), per(K), sh(0.3), srch()]),                         // F 서치
       O('조각 취미', [st('결정화', 1), per(K), sh(0.25)], { cost: 0 }),                       // B
     ], [B('푹신한 흙', 'defUp'), B('곰팡이 없는 동굴', 'cost'), B('조각 하나 더', [make(ST, 1)])]),
+    // u5 굴리기(2026-10-08 u5) — 위층 쿵쿵 금지: 땅을 울려 치고 고함 · 조각상
+    card(H, 5, '위층 쿵쿵 금지', 1, '공격', [ddef(0.6), stk(K, 1), make(ST, 1)], [
+      O('신탁 1', [ddef(0.75), stk(K, 1), make(ST, 1)]),
+      O('신탁 2', [ddef(0.4, EA), stk(K, 1), make(ST, 1)]),
+      O('신탁 3', [ddef(0.5), stk(K, 1), power(rule('turnEnd', [make(ST, 1)]))], { power: true }),
+      O('신탁 4', [ddef(0.75), make(ST, 1), ifStack(K, 3), sh(1.0)]),
+      O('신탁 5', [ddef(1.25), stk(K, 3)]),
+    ], [B('축복 1', 'power'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '가비아_u1');
 }
@@ -136,6 +146,14 @@ function naia(j) {
       O('잔소리의 용족', [st('사기', 1), per(K), heal(0.2), srch()]),                          // F 서치
       O('수문장의 물벼락', [per(K), dmg(0.3, EA), spendAll(K)]),                               // 재설계 · 대가
     ], [B('수문장의 긍지', 'atkUp'), B('호수의 품', 'defUp'), B('폐품 공작', 'cost')]),
+    // u5 굴리기 — 인사 대신 물총: 두 발 · 물탱크 · 회복
+    card(H, 5, '인사 대신 물총', 1, '공격', [hitsT(2, 0.42, E1), stk(K, 1), heal(0.4)], [
+      O('신탁 1', [hitsT(2, 0.55, E1), stk(K, 1), heal(0.5)]),
+      O('신탁 2', [dmg(0.45, EA), stk(K, 1), heal(0.4)]),
+      O('신탁 3', [hitsT(2, 0.35, E1), stk(K, 1), power(rule('turnStart', [heal(0.3)]))], { power: true }),
+      O('신탁 4', [hitsT(2, 0.42, E1), stk(K, 1), per(K), heal(0.15)]),
+      O('신탁 5', [discard(1), hitsT(3, 0.45, E1), stk(K, 2)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '나이아_u1');
 }
@@ -192,6 +210,14 @@ function nicole(j) {
       O('저예산 단편', [st('취약', 1, EA), hitsT(4, 0.28, ER), dmg(0.45)], { cost: 1 }),      // B
       O('블록버스터', [hitsT(8, 0.34, ER), per(K), dmg(0.3, EA), spendAll(K)], { cost: 3 }), // 재설계 · 대가
     ], [B('크헤헷', 'power'), B('팝콘 리필', 'draw'), B('촬영 일정 당기기', 'cost')]),
+    // u5 유틸(0코 비용) — 캬라멜 팝콘 한 줌: 테이크 + 손의 공격 카드 비용 -1
+    card(H, 5, '캬라멜 팝콘 한 줌', 0, '스킬', [stk(K, 1), csOwn({ type: '공격' })], [
+      O('신탁 1', [stk(K, 2), csOwn({ type: '공격' })]),
+      O('신탁 2', [stk(K, 1), srch({ type: '공격' })]),
+      O('신탁 3', [dmg(0.4), stk(K, 1), power(rule('stackReach', [draw(1)], { when: { id: K, n: 3 } }))], { power: true }),
+      O('신탁 4', [stk(K, 1), csOwn({ type: '공격' }), inspire, stk(K, 2)]),
+      O('신탁 5', [payPct(0.03), stk(K, 2), csOwn({ type: '공격' })]),
+    ], [B('축복 1', 'atkUp'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '니콜_u1');
 }
@@ -242,6 +268,14 @@ function laika(j) {
       O('번트', [dmg(0.5), per(K), dmg(0.25)], { cost: 0 }),                                 // B
       O('지니어스 분석', [dmg(0.6), per(K), dmg(0.3), ifStack(K, 3), srch()]),               // F 서치 · 조건
     ], [B('최첨단 배터리', 'power'), B('절연 장갑', 'defUp'), B('충전 케이블', [stk(K, 1)])]),
+    // u5 유틸(0코 회수) — 전기 지짐이: 과충전 + 버린 공격 카드 한 장
+    card(H, 5, '전기 지짐이', 0, '스킬', [stk(K, 1), pullD({ type: '공격' })], [
+      O('신탁 1', [stk(K, 2), pullD({ type: '공격' })]),
+      O('신탁 2', [stk(K, 1), srch({ type: '공격' }), draw(1)]),
+      O('신탁 3', [stk(K, 1), pullD({ type: '공격' }), power(rule('stackReach', [draw(1), sh(0.5)], { when: { id: K, n: 3 } }))], { power: true }),
+      O('신탁 4', [stk(K, 1), pullD({ type: '공격' }), ifStack(K, 3), draw(1)]),
+      O('신탁 5', [payPct(0.03), stk(K, 2), pullD({ type: '공격' })]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'atkUp'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '라이카_u1');
 }
@@ -294,6 +328,14 @@ function mute(j) {
       O('한 시간 연설', [st('사기', 1), stk(K, 3, E1), ap(1)]),                              // 재설계 — 한 번에
       O('교단 쪽 첩보', [st('사기', 1), draw(1, { who: 'other' }), power(rule('turnStart', [stk(K, 1, TOP)]))]), // F 서치
     ], [B('엘레나와 함께', 'atkUp'), B('산들바람', 'defUp'), B('규칙 준수', 'ap')]),
+    // u5 유틸(0코 동료 서치) — 옆집 반찬 돌리기: 홀로그램 둘 + 동료 카드
+    card(H, 5, '옆집 반찬 돌리기', 0, '스킬', [stk(K, 2, E1), draw(1, { who: 'other' })], [
+      O('신탁 1', [stk(K, 3, E1), draw(1, { who: 'other' })]),
+      O('신탁 2', [stk(K, 2, E1), draw(2, { who: 'other' })]),
+      O('신탁 3', [dmg(0.4), stk(K, 1, E1), power(rule('stackReach', [ap(1)], { when: { id: K, n: 6 }, limit: 1 }))], { power: true }),
+      O('신탁 4', [stk(K, 2, E1), draw(1, { who: 'other' }), ifStack(K, 4), dmg(0.6)]),
+      O('신탁 5', [payPct(0.03), stk(K, 3, E1), draw(1, { who: 'other' })]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1, E1)])]),
   ]);
   starter(j, '뮤트_u1');
 }
@@ -340,6 +382,14 @@ function miro(j) {
       O('거울 폭발', [per(K), ddef(0.5), spendAll(K), st('기절', 1, E1)], { cost: 2 }),      // C 기절
       O('다시 맞추기', [per(K), sh(0.5), spendAll(K), heal(0.4)]),                           // 재설계 — 공격 ↔ 방어
     ], [B('날카로운 조각', 'power'), B('반짝이는 조각', 'weakSpot'), B('작은 조각', 'cost')]),
+    // u5 유틸(0코 동료 서치) — 거울처럼 따라 하기: 작은 실드 · 시선 · 동료 카드
+    card(H, 5, '거울처럼 따라 하기', 0, '스킬', [sh(0.5), stk(K, 1, EA), draw(1, { who: 'other' })], [
+      O('신탁 1', [sh(0.7), stk(K, 1, EA), draw(1, { who: 'other' })]),
+      O('신탁 2', [sh(0.5), draw(2, { who: 'other' })]),
+      O('신탁 3', [sh(0.5), stk(K, 1, EA), power(rule('hurt', [draw(1)], { when: { guarded: true }, limit: 1 }))], { power: true }),
+      O('신탁 4', [sh(0.5), draw(1, { who: 'other' }), inspire, sh(1.0)]),
+      O('신탁 5', [discard(1), sh(1.1), stk(K, 2, EA)]),
+    ], [B('축복 1', 'heal'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1, EA)])]),
   ]);
   starter(j, '미로_u2');
 }
@@ -395,6 +445,14 @@ function blanchet(j) {
       O('배역 몰입', [{ k: 'critMod', v: 0.15, run: true }, stk(K, 3, E1), hitsT(2, 0.4, E1)]),                                    // 재설계 — 한 번에
       O('백만송이 푸른장미', [{ k: 'critMod', v: 0.15, run: true }, stk(K, 1, E1), power(rule('play', [stk(K, 1, E1)], { when: { type: '공격' }, limit: 2 }))]),
     ], [B('검은 드레스', 'atkUp'), B('스포트라이트', 'ap'), B('파랑새 날개', [stk(K, 1, EA)])]),
+    // u5 유틸(0코 비용) — 모노레일 출퇴근: 장미 + 손의 공격 카드 비용 -1
+    card(H, 5, '모노레일 출퇴근', 0, '스킬', [stk(K, 1, E1), csOwn({ type: '공격' })], [
+      O('신탁 1', [stk(K, 2, E1), csOwn({ type: '공격' })]),
+      O('신탁 2', [stk(K, 1, E1), srch({ type: '공격' })]),
+      O('신탁 3', [dmg(0.4), stk(K, 1, E1), power(rule('stackReach', [csOwn({ type: '공격' })], { when: { id: K, n: 4 } }))], { power: true }),
+      O('신탁 4', [stk(K, 1, E1), csOwn({ type: '공격' }), inspire, stk(K, 2, E1)]),
+      O('신탁 5', [payPct(0.03), stk(K, 2, EA), draw(1)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'frost'), B('축복 3', [stk(K, 1, E1)])]),
   ]);
   starter(j, '블랑셰_u3');
   for (const e of j.equips || []) e.affinityEffect = [P('파랑새의 표식', 'fightStart', [stk(K, 1, EA)])];
@@ -449,6 +507,14 @@ function bigwood(j) {
       O('요정 왕국에 뿌리', [st('결정화', 1), per(K), sh(0.3)], { tags: KAI }),               // G
       O('메이드장', [st('결정화', 1), per(K), sh(0.3), draw(1, { who: 'other' })]),           // F 서치
     ], [B('나무 그늘', 'defUp'), B('새싹', 'cost'), B('맑은 공기', [st('피해 감소', 1)])]),
+    // u5 굴리기 — 메이드장의 채찍: 치고 막고 나이테
+    card(H, 5, '메이드장의 채찍', 1, '공격', [ddef(0.6), stk(K, 1), sh(0.5)], [
+      O('신탁 1', [ddef(0.75), stk(K, 1), sh(0.6)]),
+      O('신탁 2', [ddef(0.4, EA), stk(K, 1), sh(0.5)]),
+      O('신탁 3', [ddef(0.5), sh(0.5), power(rule('turnEnd', [stk(K, 1)]))], { power: true }),
+      O('신탁 4', [ddef(0.45), per(K), ddef(0.12), stk(K, 1)]),
+      O('신탁 5', [discard(1), ddef(0.9), make(APL, 1)]),
+    ], [B('축복 1', 'ap'), B('축복 2', 'heal'), B('축복 3', [make(APL, 1)])]),
   ]);
   starter(j, '빅우드_u2');
 }
@@ -500,6 +566,14 @@ function scizor(j) {
       O('남 탓하기', [per(K), heal(0.35), spendAll(K), draw(1)]),                            // 재설계 · 대가
       O('빌런 연합', [dmg(0.6), per(K), heal(0.2), draw(1, { who: 'other' })]),               // F 서치
     ], [B('악어 잠옷', 'heal'), B('천연 미용실', 'cost'), B('찍어 둔 표적', [stk(K, 1, E1)])]),
+    // u5 굴리기(회복) — 화단 물 주기: 파티 회복 · 방해꾼 · 작은 실드
+    card(H, 5, '화단 물 주기', 1, '스킬', [heal(0.8), stk(K, 1, E1), sh(0.4)], [
+      O('신탁 1', [heal(1.0), stk(K, 1, E1), sh(0.5)]),
+      O('신탁 2', [heal(0.6), stk(K, 1, E1)], { cost: 0 }),
+      O('신탁 3', [heal(0.6), stk(K, 1, E1), power(rule('turnEnd', [heal(0.2), stk(K, 1, TOP)]))], { power: true }),
+      O('신탁 4', [heal(0.8), stk(K, 1, E1), per(K), heal(0.15)]),
+      O('신탁 5', [discard(1), heal(1.1), stk(K, 2, E1)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1, E1)])]),
   ]);
   starter(j, '시저_u1');
 }
@@ -556,6 +630,14 @@ function sylla(j) {
       O('웃는 연습', [{ k: 'critMod', v: 0.1, run: true }, stk(K, 2, E1), hitsT(3, 0.3, E1)]),                                   // 재설계 — 한 번에
       O('전투력 측정기', [payPct(0.03), stk(K, 1, E1), power(whirl(), rule('turnStart', [stk(K, 1, TOP)]))]), // H HP · 엔진 한 단계
     ], [B('우정의 증표', 'atkUp'), B('추억 속의 정령들', 'ap'), B('바람막이', 'defUp')]),
+    // u5 유틸(0코 비용) — 하늬바람: 승부 + 손의 공격 카드 비용 -1
+    card(H, 5, '하늬바람', 0, '스킬', [stk(K, 1, E1), csOwn({ type: '공격' })], [
+      O('신탁 1', [stk(K, 2, E1), csOwn({ type: '공격' })]),
+      O('신탁 2', [stk(K, 1, E1), srch({ type: '공격' })]),
+      O('신탁 3', [dmg(0.4), stk(K, 1, E1), power(rule('stackReach', [csOwn({ type: '공격' })], { when: { id: K, n: 3 } }))], { power: true }),
+      O('신탁 4', [stk(K, 1, E1), sh(0.8)]),
+      O('신탁 5', [payPct(0.03), stk(K, 2, E1), csOwn({ type: '공격' })]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'frost'), B('축복 3', [stk(K, 1, E1)])]),
   ]);
   starter(j, '실라_u3');
   for (const e of j.equips || []) e.affinityEffect = [P('맞바람 한 발', 'fightStart', [stk(K, 1, TOP)])];
@@ -607,6 +689,14 @@ function arco(j) {
       O('병상에서도 춤', [st('협공', 1), stk(K, 2), { k: 'dealtMod', v: 0.1, run: true }]),                     // 재설계 — 한 번에
       O('크루 결성', [st('협공', 1), draw(1, { who: 'other' }), power(brk())]),             // F 서치
     ], [B('심각한 댄스 중독', 'atkUp'), B('박자 감각', 'cost'), B('무대 의상', [stk(K, 1)])]),
+    // u5 유틸(1코 동료 서치) — 엇박 스텝: 스텝 + 동료 카드 둘
+    card(H, 5, '엇박 스텝', 1, '스킬', [stk(K, 1), draw(2, { who: 'other' })], [
+      O('신탁 1', [stk(K, 2), draw(2, { who: 'other' })]),
+      O('신탁 2', [stk(K, 1), draw(1, { who: 'other' })], { cost: 0 }),
+      O('신탁 3', [hitsT(2, 0.3, ER), stk(K, 1), power(rule('play', [stk(K, 1)], { when: { who: 'other' }, limit: 1 }))], { power: true }),
+      O('신탁 4', [stk(K, 1), draw(2, { who: 'other' }), ifStack(K, 2), hitsT(2, 0.3, ER)]),
+      O('신탁 5', [payPct(0.03), stk(K, 2), draw(3, { who: 'other' })]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'frost'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '아르코_u3');
 }
@@ -659,6 +749,14 @@ function ayla(j) {
       O('평화 박살 해파리', [st('결의', 2), per(K), dmg(0.55, EA), spendAll(K)]),                                                          // 재설계 · 대가 — 한 번에
       O('그윈과 델리아', [st('결의', 2), draw(1, { who: 'other' }), power(rule('stackReach', [sh(1.0)], { when: { id: K, n: 4 } }))]),       // F 서치
     ], [B('꿀렁 해파리', 'defUp'), B('짱킹갓', [stk(K, 1)]), B('섬 순찰', 'cost')]),
+    // u5 굴리기 — 영구 추방령: 화의 원인을 섬 밖으로(피해 · 빠직 · 실드)
+    card(H, 5, '영구 추방령', 1, '공격', [dmg(0.8), stk(K, 1), sh(0.6)], [
+      O('신탁 1', [dmg(1.0), stk(K, 1), sh(0.7)]),
+      O('신탁 2', [dmg(0.5, EA), stk(K, 1), sh(0.6)]),
+      O('신탁 3', [dmg(0.7), stk(K, 1), power(rule('shieldBreak', [stk(K, 1), dmg(0.4)], { limit: 1 }))], { power: true }),
+      O('신탁 4', [dmg(0.8), stk(K, 1), ifStack(K, 3), dmg(0.6, EA)]),
+      O('신탁 5', [discard(1), dmg(1.2), stk(K, 2)]),
+    ], [B('축복 1', 'power'), B('축복 2', 'frost'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '아일라_u1');
 }
@@ -711,6 +809,14 @@ function aurora(j) {
       O('깜짝 파티', [st('불굴', 1), per(K), ddef(0.25, EA), spendAll(K)]),                                 // 재설계 · 대가
       O('마녀 왕국 생활', [st('불굴', 1), per(K), heal(0.2), draw(1, { who: 'other' })]),     // F 서치
     ], [B('밤하늘 바라보기', 'defUp'), B('따뜻한 담요', 'cost'), B('작은 별', [sh(0.4)])]),
+    // u5 굴리기 — 꺼지지 않는 불꽃: 플라즈마로 치고 빛울림 · 회복
+    card(H, 5, '꺼지지 않는 불꽃', 1, '공격', [ddef(0.6), stk(K, 1), heal(0.4)], [
+      O('신탁 1', [ddef(0.75), stk(K, 1), heal(0.5)]),
+      O('신탁 2', [ddef(0.4, EA), stk(K, 1), heal(0.4)]),
+      O('신탁 3', [ddef(0.5), heal(0.3), power(rule('turnEnd', [stk(K, 1)]))], { power: true }),
+      O('신탁 4', [ddef(0.6), stk(K, 1), ifStack(K, 4), st('취약', 1, E1)]),
+      O('신탁 5', [discard(1), ddef(0.9), stk(K, 2)]),
+    ], [B('축복 1', 'heal'), B('축복 2', 'atkUp'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '오로라_u2');
 }
@@ -764,6 +870,14 @@ function ui(j) {
       O('언해피 우이', [payPct(0.03), make(RAIN, 3), stk(K, 1)]),                           // 재설계 · 대가
       O('행복하기를 빌어', [make(RAIN, 1), perTag(RAIN), heal(0.15), srch()]),               // F 서치
     ], [B('에루 쓰다듬기', 'heal'), B('작은 개구리', 'cost'), B('우산', [stk(K, 1)])]),
+    // u5 유틸(1코 동료 서치) — 선생님한테 고자질: 개굴비 · 동료 카드
+    card(H, 5, '선생님한테 고자질', 1, '스킬', [make(RAIN, 1), draw(1, { who: 'other' })], [
+      O('신탁 1', [make(RAIN, 2), draw(1, { who: 'other' })]),
+      O('신탁 2', [make(RAIN, 1), draw(1, { who: 'other' })], { cost: 0 }),
+      O('신탁 3', [make(RAIN, 1), draw(1, { who: 'other' }), power(rule('stackReach', [make(RAIN, 2)], { when: { id: K, n: 5 } }))], { power: true }),
+      O('신탁 4', [make(RAIN, 1), draw(1, { who: 'other' }), inspire, make(RAIN, 2)]),
+      O('신탁 5', [payPct(0.03), make(RAIN, 2), draw(2, { who: 'other' })]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '우이_u1');
 }
@@ -814,6 +928,14 @@ function uiMemory(j) {
       O('슬픔도 기억', [burn(1), stk(K, 2), draw(2)]),                                      // 재설계 · 대가
       O('연못의 에루', [per(K), sh(0.25), pullD({ who: 'self' })]),                          // 재설계 · 서치
     ], [B('기억의 온기', 'guard'), B('맑은 마음', 'cost'), B('에루 타기', [stk(K, 1)])]),
+    // u5 굴리기 — 끝없는 클로버 밭: 덩굴로 덮어 광역 · 기억(클로버는 신탁 갈래에서)
+    card(H, 5, '끝없는 클로버 밭', 1, '공격', [dmg(0.4, EA), stk(K, 1)], [
+      O('신탁 1', [dmg(0.55, EA), stk(K, 1)]),
+      O('신탁 2', [dmg(0.8), stk(K, 1)]),
+      O('신탁 3', [dmg(0.4, EA), make(CL, 1), power(rule('exhaust', [dmg(0.3, ER)], { when: { who: 'any' }, limit: 2 }))], { power: true }),
+      O('신탁 4', [dmg(0.4, EA), make(CL, 1), perTag(CL), dmg(0.15, EA)]),
+      O('신탁 5', [burn(1), dmg(0.6, EA), stk(K, 3)]),
+    ], [B('축복 1', 'atkUp'), B('축복 2', 'draw'), B('축복 3', [make(CL, 1)])]),
   ]);
   starter(j, '우이_기억_u2');
 }
@@ -868,6 +990,14 @@ function ifrit(j) {
       O('불씨 남기기', [burn(1), dmg(1.1), st('고통', 2, E1)]),                              // H 태우기
       O('겁쟁이 불꽃', [make(EM, 2), stk(K, 1)]),                                           // 재설계 — 불씨 생성
     ], [B('화상', 'power'), B('불티', 'ap'), B('지글지글', [stk(K, 1)])]),
+    // u5 유틸(1코 생성) — 애완 돌 데우기: 불씨 · 장작
+    card(H, 5, '애완 돌 데우기', 1, '스킬', [make(EM, 2), stk(K, 1)], [
+      O('신탁 1', [make(EM, 3), stk(K, 1)]),
+      O('신탁 2', [make(EM, 2), stk(K, 1), srch()]),
+      O('신탁 3', [make(EM, 1), stk(K, 1), power(rule('turnStart', [make(EM, 1)]))], { power: true }),
+      O('신탁 4', [make(EM, 2), stk(K, 1), inspire, draw(1)]),
+      O('신탁 5', [burn(1), make(EM, 3), stk(K, 2)]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'frost'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '이프리트_u1');
 }
@@ -923,6 +1053,14 @@ function inkle(j) {
       O('미니 셰럼', [dmg(0.5, EA), perEach(K), dmg(0.2, EA), srch()]),                      // F 서치
       O('먹물 정령의 꿈', [perEach(K), dmg(0.3, EA), spendEA(K), draw(1)]),                  // 재설계 · 대가
     ], [B('먹 가는 소리', 'atkUp'), B('명상', 'cost'), B('잉크병', [stk(K, 1, EA)])]),
+    // u5 유틸(0코 서치) — 먹물 파스타: 먹빛 · 작은 실드 · 공격 카드 한 장
+    card(H, 5, '먹물 파스타', 0, '스킬', [stk(K, 1, EA), sh(0.4), draw(1, { type: '공격' })], [
+      O('신탁 1', [stk(K, 1, EA), sh(0.6), draw(1, { type: '공격' })]),
+      O('신탁 2', [sh(0.4), draw(2, { type: '공격' })]),
+      O('신탁 3', [sh(0.6), draw(1, { type: '공격' }), power(rule('turnEnd', [sh(0.45)]))], { power: true }),
+      O('신탁 4', [stk(K, 1, EA), sh(0.4), ifStack(K, 3), draw(2)]),
+      O('신탁 5', [discard(1), stk(K, 2, EA), draw(2, { type: '공격' })]),
+    ], [B('축복 1', 'guard'), B('축복 2', 'ap'), B('축복 3', [stk(K, 1, EA)])]),
   ]);
   starter(j, '잉클_u1');
 }
@@ -981,6 +1119,14 @@ function jubee(j) {
       O('온난화 걱정', [stk(K, 1), power(rule('hurt', [stk(K, 1)], { limit: 1 }))], { power: true }), // D
       O('행복한 꿀벌', [stk(K, 1), per(K), sh(0.2), srch()]),                                // F 서치
     ], [B('꿀벌 군단', 'atkUp'), B('밀랍 벽', 'guard'), B('꿀 냄새', [stk(K, 1)])]),
+    // u5 굴리기 — 만우벌 협박: 거칠어진 꿀벌 떼가 광역으로 쏘고 벌 둘
+    card(H, 5, '만우벌 협박', 1, '공격', [dmg(0.55, EA), stk(K, 2)], [
+      O('신탁 1', [dmg(0.7, EA), stk(K, 2)]),
+      O('신탁 2', [dmg(1.0), stk(K, 2), heal(0.3)]),
+      O('신탁 3', [dmg(0.45, EA), stk(K, 1), power(rule('turnStart', [dmg(0.35, ER)]))], { power: true }),
+      O('신탁 4', [dmg(0.55, EA), stk(K, 2), ifStack(K, 6), dmg(0.4, EA)]),
+      O('신탁 5', [payPct(0.03), dmg(0.75, EA), stk(K, 3)]),
+    ], [B('축복 1', 'power'), B('축복 2', 'draw'), B('축복 3', [stk(K, 1)])]),
   ]);
   starter(j, '쥬비_u2');
 }
@@ -991,8 +1137,10 @@ function scaleM(j, m) {
   for (const c of j.cards) { if (!c.unique && !c.token) continue; mul(c.fx); for (const o of c.oracles || []) mul(o.fx); for (const b of c.blesses || []) mul(b.fx); }
 }
 const SM = (fn, m) => j => { fn(j); scaleM(j, m); };
+// u5(2026-10-08) — 새 카드 몫만 배율(혼자 완주율이 u5 로 튄 사도)
+const U5 = (fn, m) => j => { fn(j); const mul = fx => { for (const f of fx || []) { if (['dmg', 'shield', 'heal'].includes(f.k) && f.ratio) f.ratio = Math.round(f.ratio * m * 100) / 100; if (f.k === 'power') for (const r of f.rules) mul(r.fx); } }; for (const c of j.cards) if (/_u5$/.test(c.id)) { mul(c.fx); for (const o of c.oracles || []) mul(o.fx); } };
 run([
-  ['정령/가비아', gabia], ['정령/나이아', naia], ['정령/니콜', nicole], ['정령/라이카', laika], ['정령/뮤트', mute], ['정령/미로', miro],
-  ['정령/블랑셰', blanchet], ['정령/빅우드', bigwood], ['정령/시저', scizor], ['정령/실라', sylla], ['정령/아르코', arco], ['정령/아일라', ayla],
+  ['정령/가비아', U5(gabia, 1.3)], ['정령/나이아', naia], ['정령/니콜', nicole], ['정령/라이카', laika], ['정령/뮤트', mute], ['정령/미로', miro],
+  ['정령/블랑셰', blanchet], ['정령/빅우드', bigwood], ['정령/시저', scizor], ['정령/실라', sylla], ['정령/아르코', arco], ['정령/아일라', U5(ayla, 1.3)],
   ['정령/오로라', SM(aurora, 0.7)], ['정령/우이', ui], ['정령/우이_기억', uiMemory], ['정령/이프리트', ifrit], ['정령/잉클', inkle], ['정령/쥬비', jubee],
 ], new URL('./boost_정령.json', import.meta.url));

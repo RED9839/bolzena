@@ -17,7 +17,7 @@ namespace Bolzena.UI
     {
         public static Modal Show(Transform parent, BattleSnapshot s, int tab, int hero)
         {
-            var m = Modal.Create(parent, "party", new Vector2(60, 30), Vector3.zero, false, 0.965f);   // 선형 색 공간이라 알파가 덜 어둡게 보인다 — 0.96 이 눈으로 0.85 쯤
+            var m = Modal.Create(parent, "party", new Vector2(60, 30), Vector3.zero, false, 0.997f);   // 선형 색 공간이라 알파가 덜 어둡게 보인다 — 0.96 이 눈으로 0.85 쯤
             m.Panel.enabled = false;
             m.gameObject.AddComponent<PartyUi>().Init(m, s, tab, hero);
             return m;
@@ -219,7 +219,10 @@ namespace Bolzena.UI
         {
             bool hot = idx == focus;
             // 가로 초상 판 — 얼굴을 가로로 오려 성격 빛 바탕 위에
-            float ph = w * 0.48f;
+            float szg = Mathf.Min(0.95f * k, (w - 0.3f) / 3);
+            // 아래에 꼭 들어가야 하는 줄들(이름 · 능력치 · 고유 효과 · 장비)을 빼고 남는 높이만 초상에 준다 — 작은 화면에서 줄이 겹치지 않게(2026-10-08)
+            float fixedNeed = 0.12f * k + 0.44f * k + 0.08f * k + 3 * 0.36f * k + 0.14f * k + (0.34f + 0.06f) * k + 0.42f * k + 0.1f + (0.25f + szg + 0.05f + 0.4f * k + 0.34f * k + 0.1f);
+            float ph = Mathf.Max(w * 0.2f, Mathf.Min(w * 0.48f, (y + Tone.HalfH) - fixedNeed));
             var pc = new Vector3(x + w / 2, y - ph / 2, 0);
             var tint = Tone.Nature(h.Nature);
             Make.Sliced("pbg", R, Res.UI("bar_fill_9s"), pc, new Vector2(w, ph), OC, new Color(tint.r * 0.55f, tint.g * 0.5f, tint.b * 0.45f, 1f));
@@ -276,12 +279,15 @@ namespace Bolzena.UI
             else T("kn", R, "없음", new Vector3(x + 0.1f, y - 0.18f * k, 0), Tone.Body * k, Tone.Dim, TextAlignmentOptions.Left, true);
             y -= 0.42f * k;
             float floor = -Tone.HalfH + 0.25f + sz0(w, k) + 0.05f + 0.4f * k + 0.1f;
-            if (opened.Contains(idx))
+            // 고학년 줄 — 띠 + 글 한 줄이 장비 칸 위에 들어갈 때만(폰 가로 화면은 높이가 모자라 글이 장비 띠에 겹쳤다 · 2026-10-09). 못 들어가면 돋보기 정보 창에서 본다
+            if (opened.Contains(idx) && y - (0.34f + 0.06f) * k - 0.3f >= floor)
             {
                 Band(R, x, w, ref y, k, "고학년 · " + h.UltName);
                 var u = T("ut", R, h.UltText, new Vector3(x + 0.1f, y - 0.04f, 0), Tone.Sm * k, Tone.Ink, TextAlignmentOptions.TopLeft, true, w - 0.2f);
                 u.textWrappingMode = TextWrappingModes.Normal; u.rectTransform.sizeDelta = new Vector2(w - 0.2f, 2); u.ForceMeshUpdate();
-                y -= u.preferredHeight + 0.12f;
+                float room = Mathf.Max(0.3f, y - 0.04f - floor);   // 장비 칸 위까지만 — 넘치면 글자를 줄이고 말줄임
+                if (u.preferredHeight > room) { u.enableAutoSizing = true; u.fontSizeMax = u.fontSize; u.fontSizeMin = u.fontSize * 0.6f; u.overflowMode = TextOverflowModes.Ellipsis; u.rectTransform.sizeDelta = new Vector2(w - 0.2f, room); u.ForceMeshUpdate(); y -= Mathf.Min(room, u.GetRenderedValues(true).y) + 0.12f; }
+                else y -= u.preferredHeight + 0.12f;
                 // 고유 효과 · 패시브 글 전부는 돋보기 → 사도 정보 창(InfoPanel.Hero — core CardText.Traits, 길면 판 안에서 내린다). 여기서 줄을 자르지 않는다
                 if (y - 0.3f * k >= floor)
                 {
@@ -303,7 +309,9 @@ namespace Bolzena.UI
                 var gc = has ? Bolzena.RunUI.Theme.GradeOf(g.Grade) : new Color(1, 1, 1, 0.2f);
                 Make.Sliced("gs", R, Res.UI(has ? "cell_on_9s" : "cell_9s"), at, new Vector2(sz, sz), OC, has ? gc : new Color(1, 1, 1, 0.8f));
                 var si = Bolzena.RunUI.Theme.S(g.Slot == "무기" ? "ic_sword" : g.Slot == "방어구" ? "ic_shield" : "ic_ring_slot");
-                if (si != null) Make.Box("gi", R, si, at, new Vector2(sz * 0.5f, sz * 0.5f), OC + 1, has ? gc : new Color(0.6f, 0.62f, 0.7f, 0.6f));
+                var pic = has ? Bolzena.RunUI.CardArt.Equip(g.Id) : null;   // 끼운 장비의 원작 그림(없으면 칸 무늬)
+                if (pic != null) Make.Box("gp", R, pic, at + new Vector3(0, 0.05f, 0), new Vector2(sz * 0.72f, sz * 0.72f), OC + 1);
+                else if (si != null) Make.Box("gi", R, si, at, new Vector2(sz * 0.5f, sz * 0.5f), OC + 1, has ? gc : new Color(0.6f, 0.62f, 0.7f, 0.6f));
                 if (has)
                 {
                     var gt = T("gn", R, g.Name, at + new Vector3(0, -sz / 2 + 0.12f, 0), 0.11f * k, Color.white, TextAlignmentOptions.Center, true, sz);
@@ -340,7 +348,7 @@ namespace Bolzena.UI
         void Deck(Transform R, float l, float r, float y, float k)
         {
             var list = new List<CardInfo>();
-            list.AddRange(s.Hand); list.AddRange(s.DrawPile); list.AddRange(s.DiscardPile); list.AddRange(s.GonePile);
+            list.AddRange(s.Hand); list.AddRange(PileUi.Unlit(s.DrawPile)); list.AddRange(s.DiscardPile); list.AddRange(s.GonePile);   // 뽑을 더미의 빛은 감춤
 
             T("dn", R, $"이 전투의 덱 {list.Count}장  ·  사도별 기본 → 고유, 맨 끝 교주 · 상태  ·  누르면 크게", new Vector3(l, y - 0.1f, 0), Tone.Sm * k, Tone.Sub, TextAlignmentOptions.Left, true);
             y -= 0.4f * k;

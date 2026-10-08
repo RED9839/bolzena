@@ -6,40 +6,24 @@
       "nature": "순수",
       "race": "엘프",
       "role": "딜러",
+      "style": "박자형",
       "star": 3,
       "hp": 500,
       "atk": 155,
       "def": 25,
       "crit": 10,
-      "blurb": "모든 것에 「히익」 떠는 겁쟁이. 적이 움직일 때마다 놀라 전기가 차오르고, 다음 한 방에 몽땅 지져 버립니다. 비명에 놀란 적들은 걸음까지 늦어집니다.",
+      "blurb": "모든 것에 「히익」 떠는 겁쟁이 정찰병. 동료가 먼저 공격하면 깜짝 놀라 전기가 차오르고, 그 전기로 곧장 지져 버립니다 — 놀람은 턴이 끝나면 가라앉습니다. 세 번째 공격마다 과충전 테이저가 터집니다.",
       "keyword": {
         "name": "히익 전류",
-        "desc": "겁먹을 때마다 차오르는 전기",
+        "desc": "동료 공격에 깜짝 놀라 차오르는 전기",
         "carrier": "self",
         "cap": 3,
-        "rules": [
-          {
-            "name": "과충전",
-            "when": {
-              "on": "stackReach",
-              "id": "히익 전류",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "히익 전류",
-                "all": true
-              },
-              {
-                "k": "status",
-                "id": "약화",
-                "v": 1,
-                "target": "randomEnemy"
-              }
-            ]
-          }
-        ]
+        "endClear": true,
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -51,7 +35,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
@@ -62,20 +46,17 @@
           ]
         },
         {
-          "name": "유령 잡는 엘프",
+          "name": "과충전 테이저",
           "when": {
-            "on": "kill",
-            "mine": true
-          },
-          "limit": {
-            "per": "fight",
-            "n": 2
+            "on": "play",
+            "type": "공격",
+            "every": 3
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "히익 전류",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
             }
           ]
         }
@@ -167,7 +148,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.5,
           "target": "oneEnemy"
         },
         {
@@ -176,7 +157,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.24,
+          "ratio": 0.32,
           "target": "oneEnemy"
         },
         {
@@ -187,11 +168,12 @@
       ],
       "oracles": [
         {
-          "name": "풀파워 지짐이",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.87,
+              "ratio": 0.68,
               "target": "oneEnemy"
             },
             {
@@ -200,7 +182,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.37,
+              "ratio": 0.43,
               "target": "oneEnemy"
             },
             {
@@ -211,56 +193,13 @@
           ]
         },
         {
-          "name": "찌릿",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.48,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "히익 전류"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "히익 전류",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "정전기 충전",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "히익 전류",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "상시 테이저",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.45,
               "target": "oneEnemy"
             },
             {
@@ -269,7 +208,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.29,
               "target": "oneEnemy"
             },
             {
@@ -277,15 +216,19 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "히익 전류",
-                    "n": 3
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.6,
-                      "target": "oneEnemy"
+                      "k": "stack",
+                      "id": "히익 전류",
+                      "v": 1
                     }
                   ]
                 }
@@ -294,15 +237,36 @@
           ]
         },
         {
-          "name": "바삭바삭바삭",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perStack",
+              "id": "히익 전류"
             },
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.2,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "히익 전류",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
               "target": "oneEnemy"
             },
             {
@@ -311,23 +275,56 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.31,
               "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "히익 전류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.67,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "테이저 건",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "정전기",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "찌릿 충전",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -362,16 +359,16 @@
       ],
       "oracles": [
         {
-          "name": "가방 깊숙이",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.95
+              "ratio": 1.14
             },
             {
               "k": "stack",
               "id": "히익 전류",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
@@ -380,15 +377,53 @@
           ]
         },
         {
-          "name": "노숙 동굴",
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.75
+              "ratio": 0.78
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "히익 전류",
               "v": 1
             },
             {
@@ -411,78 +446,20 @@
           ]
         },
         {
-          "name": "무전 호출",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.75
+              "ratio": 1.68
             },
             {
               "k": "stack",
               "id": "히익 전류",
-              "v": 1
+              "v": 2
             },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "깜짝 반격",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.8
-            },
-            {
-              "k": "ifStack",
-              "id": "히익 전류",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.02,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "누, 누구야!",
-          "fx": [
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "해골 가면",
-          "kind": "draw"
-        },
-        {
-          "name": "하얀 분칠",
-          "kind": "cost"
-        },
-        {
-          "name": "긴 귀 숨기기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.4
             }
           ]
         }
@@ -498,124 +475,165 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.78,
-          "target": "oneEnemy"
+          "ratio": 0.55,
+          "target": "allEnemies"
         },
         {
-          "k": "stack",
-          "id": "히익 전류",
-          "v": 1
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifNth",
+          "n": 3
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "공포의 유령",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.26,
-              "target": "oneEnemy"
+              "ratio": 0.74,
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "히익 전류",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "작은 현상",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "히익 전류",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "비명의 메아리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.78,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "히익 전류"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.24,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "유령 수사 수첩",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "히익 전류",
-              "v": 1
-            },
-            {
-              "k": "draw",
+              "k": "status",
+              "id": "둔화",
               "v": 1,
-              "who": "self",
-              "unique": true
-            }
-          ]
-        },
-        {
-          "name": "심령 사진 소각",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.4,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "히익 전류",
-              "v": 1
+              "k": "ifNth",
+              "n": 3
             },
             {
               "k": "status",
               "id": "약화",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifNth",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
+            },
+            {
+              "k": "ifNth",
+              "n": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "으스스한 기운",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "비명 한 번",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "겁먹은 손",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -629,7 +647,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.5,
           "target": "oneEnemy"
         },
         {
@@ -638,72 +656,18 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.18,
+          "ratio": 0.22,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "동굴 생활 달인",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "히익 전류"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "동굴 입구",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "히익 전류"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "동굴 메아리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "히익 전류",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "동굴 생활",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.68,
               "target": "oneEnemy"
             },
             {
@@ -714,17 +678,79 @@
               "k": "dmg",
               "ratio": 0.3,
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "히익 전류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "히익 전류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "히익 전류"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.14,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "hurt"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
@@ -739,41 +765,214 @@
           ]
         },
         {
-          "name": "동굴 탈출",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
             {
               "k": "perStack",
               "id": "히익 전류"
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.33,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "히익 전류",
-              "all": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "내면의 초자아",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "숨기 명수",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "겁 많은 책임감",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "캐시_u5",
+      "name": "무서워 보이는 꿀팁",
+      "hero": "캐시",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.8
+        },
+        {
+          "k": "stack",
+          "id": "히익 전류",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.76
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.07
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 2
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.72
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "히익 전류",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.25
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.73
+            },
+            {
+              "k": "stack",
+              "id": "히익 전류",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

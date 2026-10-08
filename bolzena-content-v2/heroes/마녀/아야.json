@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "마녀",
       "role": "딜러",
+      "style": "거드는 형",
       "star": 3,
       "hp": 720,
       "atk": 146,
@@ -20,7 +21,7 @@
         "per": [
           {
             "stat": "taken",
-            "v": 0.04
+            "v": 0.05
           },
           {
             "stat": "dealt",
@@ -29,42 +30,16 @@
         ],
         "rules": [
           {
-            "name": "눈꽃 개화",
+            "name": "싸락나비",
             "when": {
-              "on": "stackReach",
-              "id": "서리",
-              "n": 5
-            },
-            "limit": {
-              "per": "turn",
-              "n": 1
+              "on": "play",
+              "type": "공격"
             },
             "fx": [
               {
-                "k": "dmg",
-                "ratio": 0.5,
-                "target": "allEnemies"
-              }
-            ]
-          },
-          {
-            "name": "얼어 터지는 서리",
-            "when": {
-              "on": "stackOver",
-              "id": "서리"
-            },
-            "limit": {
-              "per": "turn",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "perEvent"
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.3,
-                "target": "oneEnemy"
+                "k": "stack",
+                "id": "서리",
+                "v": 1
               }
             ]
           }
@@ -72,17 +47,38 @@
       },
       "passives": [
         {
-          "name": "싸락나비",
+          "name": "시련 속의 눈꽃",
           "when": {
-            "on": "play",
-            "type": "공격"
+            "on": "hit",
+            "who": "other"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
               "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "시련 속의 눈꽃",
+          "when": {
+            "on": "kill"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "randomEnemy"
             }
           ]
         },
@@ -105,6 +101,12 @@
               "k": "status",
               "id": "피해 감소",
               "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "allEnemies"
             }
           ]
         }
@@ -191,7 +193,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.33,
+          "ratio": 0.3,
           "target": "randomEnemy",
           "hits": 3
         },
@@ -200,15 +202,28 @@
           "id": "서리",
           "v": 1,
           "target": "allEnemies"
+        },
+        {
+          "k": "later",
+          "n": 1,
+          "then": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "randomEnemy",
+              "hits": 2
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "겹눈송이",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.41,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -217,35 +232,66 @@
               "id": "서리",
               "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.34,
+                  "target": "randomEnemy",
+                  "hits": 2
+                }
+              ]
             }
           ]
         },
         {
-          "name": "작은 나비",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.28,
               "target": "randomEnemy",
-              "hits": 2
+              "hits": 3
             },
             {
               "k": "stack",
               "id": "서리",
               "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.24,
+                  "target": "randomEnemy",
+                  "hits": 2
+                }
+              ]
             }
           ]
         },
         {
-          "name": "나비 길잡이",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.34,
               "target": "randomEnemy",
               "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -256,42 +302,56 @@
           ]
         },
         {
-          "name": "서리 꽃봉오리",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.27,
               "target": "randomEnemy",
               "hits": 3
             },
             {
-              "k": "perStack",
-              "id": "서리"
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
-              "k": "dmg",
-              "ratio": 0.16,
-              "target": "randomEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.22,
+                      "target": "randomEnemy",
+                      "hits": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "눈보라 나비",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.54,
               "target": "randomEnemy",
-              "hits": 4
+              "hits": 3
             },
             {
               "k": "stack",
               "id": "서리",
-              "v": 2,
+              "v": 1,
               "target": "allEnemies"
             }
           ]
@@ -299,21 +359,21 @@
       ],
       "blesses": [
         {
-          "name": "얼음 날개",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "냉차 한 모금",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "눈꽃 가루",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "서리",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             }
           ]
         }
@@ -349,11 +409,12 @@
       ],
       "oracles": [
         {
-          "name": "한겨울 발도",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.87,
+              "ratio": 0.95,
               "target": "oneEnemy"
             },
             {
@@ -362,7 +423,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.33,
+              "ratio": 0.35,
               "target": "oneEnemy"
             },
             {
@@ -373,12 +434,14 @@
           ]
         },
         {
-          "name": "휘몰아치는 눈",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.54,
-              "target": "allEnemies"
+              "ratio": 0.66,
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -386,8 +449,8 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.19,
-              "target": "allEnemies"
+              "ratio": 0.25,
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
@@ -397,11 +460,11 @@
           ]
         },
         {
-          "name": "양산 발도",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
@@ -410,26 +473,25 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.22,
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 3,
-              "target": "topEnemy"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "얼음 박차",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.87,
+              "ratio": 0.63,
               "target": "oneEnemy"
             },
             {
@@ -438,21 +500,40 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.28,
+              "ratio": 0.23,
               "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 2,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "끝없는 겨울",
-          "tags": [
-            "분쇄",
-            "소멸"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.65,
+              "ratio": 1.26,
               "target": "oneEnemy"
             },
             {
@@ -461,7 +542,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.61,
+              "ratio": 0.47,
               "target": "oneEnemy"
             }
           ]
@@ -469,21 +550,20 @@
       ],
       "blesses": [
         {
-          "name": "빙설화도",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "맑은 칼날",
-          "kind": "draw"
-        },
-        {
-          "name": "눈사람",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         }
@@ -500,8 +580,7 @@
         {
           "k": "stack",
           "id": "서리",
-          "v": 2,
-          "target": "oneEnemy"
+          "v": 2
         },
         {
           "k": "draw",
@@ -510,13 +589,12 @@
       ],
       "oracles": [
         {
-          "name": "깊은 동상",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "서리",
-              "v": 3,
-              "target": "oneEnemy"
+              "v": 3
             },
             {
               "k": "draw",
@@ -525,35 +603,49 @@
           ]
         },
         {
-          "name": "겨울 시야",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "stack",
               "id": "서리",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2
             },
             {
               "k": "draw",
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
+              "k": "empower",
+              "ratio": 0.3,
+              "who": "any"
             }
           ]
         },
         {
-          "name": "첫눈",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "stack",
               "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "draw",
@@ -570,8 +662,7 @@
                     {
                       "k": "stack",
                       "id": "서리",
-                      "v": 1,
-                      "target": "topEnemy"
+                      "v": 1
                     }
                   ]
                 }
@@ -580,55 +671,22 @@
           ]
         },
         {
-          "name": "얼음 눈금",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.69,
-              "target": "oneEnemy"
-            },
             {
               "k": "stack",
               "id": "서리",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "눈 감고 조준",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 3,
-              "target": "oneEnemy"
+              "v": 4
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "레몬차",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "하늘이 탁 트인 곳",
-          "kind": "draw"
-        },
-        {
-          "name": "눈꽃 한 송이",
-          "kind": "atkUp"
         }
       ]
     },
@@ -661,210 +719,14 @@
                   "target": "allEnemies"
                 }
               ]
-            },
-            {
-              "when": {
-                "on": "stackReach",
-                "id": "서리",
-                "n": 5
-              },
-              "fx": [
-                {
-                  "k": "dmg",
-                  "ratio": 0.29,
-                  "target": "allEnemies"
-                }
-              ]
             }
           ]
         }
       ],
       "oracles": [
         {
-          "name": "만개의 예감",
+          "name": "신탁 1",
           "fx": [
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "서리",
-                      "v": 1,
-                      "target": "allEnemies"
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "서리",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.48,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "작은 다짐",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "서리",
-                      "v": 1,
-                      "target": "allEnemies"
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "서리",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.3,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "동생들 생각",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            },
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "서리",
-                      "v": 1,
-                      "target": "allEnemies"
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "서리",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.39,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "희망의 눈꽃",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.39,
-              "target": "allEnemies"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "서리",
-                      "v": 1,
-                      "target": "allEnemies"
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "서리",
-                    "n": 5
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.35,
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "맏이의 각오",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "서리",
@@ -886,17 +748,27 @@
                       "target": "allEnemies"
                     }
                   ]
-                },
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "서리",
-                    "n": 5
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.39,
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
                       "target": "allEnemies"
                     }
                   ]
@@ -904,22 +776,287 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hit",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "서리",
+                      "v": 1,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.2,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "새하얀 눈송이",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "defUp"
         },
         {
-          "name": "눈보라 권능",
-          "tags": [
-            "개전"
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아야_u5",
+      "name": "마당 쓸기",
+      "hero": "아야",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "서리",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.25,
+          "who": "any"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.25,
+              "who": "any"
+            }
           ]
         },
         {
-          "name": "겨울 지킴이",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.25,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.25,
+              "who": "any"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.2,
+              "who": "any"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.15,
+                      "who": "any"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "any"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
           "kind": "cost"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "서리",
+              "v": 1
+            }
+          ]
         }
       ]
     }

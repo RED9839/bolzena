@@ -6,44 +6,22 @@
       "nature": "순수",
       "race": "유령",
       "role": "서포터",
+      "style": "손 만들기형",
       "star": 2,
       "hp": 450,
       "atk": 64,
       "def": 55,
       "crit": 5,
-      "blurb": "남을 흉내 내 보는 이의 인식을 비트는 따라쟁이 유령. 다른 아군이 카드를 낼 때마다 「변장」 이 쌓이고, 변장을 써서 파티에 AP 를 붓거나 손에 든 아군 카드를 대신 꺼내며, 그때마다 고학년 게이지가 찹니다.",
+      "blurb": "남을 흉내 내 보는 이의 인식을 비트는 따라쟁이 유령. 다른 아군이 카드를 낼 때마다 「변장」 이 쌓이고, 손에 든 아군 카드를 그 사도인 척 대신 꺼내 씁니다. 변장 셋이 다 차면 「완벽한 흉내」 가 손에 와, 아군 카드 한 장을 그대로 따라 하고 AP 까지 붓습니다.",
       "keyword": {
         "name": "변장",
         "desc": "아군을 흉내 낸 어설픈 분장",
         "carrier": "self",
         "cap": 3,
-        "rules": [
-          {
-            "name": "완벽한 흉내",
-            "when": {
-              "on": "stackReach",
-              "id": "변장",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "변장",
-                "all": true
-              },
-              {
-                "k": "draw",
-                "v": 1,
-                "who": "other"
-              },
-              {
-                "k": "make",
-                "id": "스피키_candy",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "스피키_mimic",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -54,7 +32,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 3
           },
           "fx": [
             {
@@ -160,6 +138,28 @@
       "blurb": "호박밭에서 주운 알사탕. 계피 맛이 난다고 우깁니다."
     },
     {
+      "id": "스피키_mimic",
+      "name": "완벽한 흉내",
+      "hero": "스피키",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "castOther",
+          "ratio": 1
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "blurb": "보는 이의 인식까지 비틀어 그 아군 그대로 — 호박 사탕 한 알은 덤"
+    },
+    {
       "id": "스피키_u1",
       "name": "펌킨 매직",
       "hero": "스피키",
@@ -184,7 +184,7 @@
       ],
       "oracles": [
         {
-          "name": "계피맛 알사탕",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "ap",
@@ -193,42 +193,40 @@
             {
               "k": "stack",
               "id": "변장",
-              "v": 1
+              "v": 2
             },
             {
               "k": "draw",
-              "v": 2,
+              "v": 1,
               "who": "other"
             }
           ]
         },
         {
-          "name": "늙은 호박만",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
-              "k": "stack",
-              "id": "변장",
+              "k": "ap",
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "k": "stack",
+              "id": "변장",
+              "v": 1
             }
           ]
         },
         {
-          "name": "펌킨 매직 대성공",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "ap",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "make",
-              "id": "스피키_candy",
+              "k": "stack",
+              "id": "변장",
               "v": 1
             },
             {
@@ -239,80 +237,39 @@
           ]
         },
         {
-          "name": "기운내라!",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "ap",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            },
-            {
-              "k": "when",
-              "on": "draw"
             },
             {
               "k": "stack",
               "id": "변장",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.92
             }
           ]
         },
         {
-          "name": "호박 친구 산책",
-          "power": true,
+          "name": "신탁 5",
           "fx": [
             {
               "k": "ap",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "변장",
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "변장",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "호박밭",
-          "kind": "draw"
-        },
-        {
-          "name": "알사탕",
-          "fx": [
-            {
-              "k": "make",
-              "id": "스피키_candy",
+              "k": "discard",
               "v": 1
             }
-          ]
-        },
-        {
-          "name": "흐에엥",
-          "tags": [
-            "보존"
           ]
         }
       ]
@@ -323,157 +280,95 @@
       "hero": "스피키",
       "unique": true,
       "cost": 1,
-      "type": "강화",
+      "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "사기",
-          "v": 1
+          "k": "castOther",
+          "ratio": 1
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "변장",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "stack",
+          "id": "변장",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "제사장 자칭",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "castOther",
+              "ratio": 1
+            },
+            {
+              "k": "stack",
+              "id": "변장",
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "변장",
-                      "v": 1
-                    },
-                    {
-                      "k": "heal",
-                      "ratio": 0.41
-                    }
-                  ]
-                }
-              ]
+              "k": "shield",
+              "ratio": 1.08
             }
           ]
         },
         {
-          "name": "네르 흉내",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "castOther",
+              "ratio": 0.8
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "변장",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "변장",
-                    "n": 3
-                  },
-                  "fx": [
-                    {
-                      "k": "heal",
-                      "ratio": 1.22
-                    }
-                  ]
-                }
-              ]
+              "k": "stack",
+              "id": "변장",
+              "v": 1
             }
           ]
         },
         {
-          "name": "메소드 연기",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "castOther",
+              "ratio": 1
+            },
+            {
+              "k": "stack",
+              "id": "변장",
               "v": 1
             },
             {
               "k": "draw",
               "v": 1,
               "who": "other"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "변장",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
-          "name": "마요가 둘",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "castOther",
+              "ratio": 0.8
             },
             {
               "k": "stack",
               "id": "변장",
-              "v": 2
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -488,50 +383,39 @@
           ]
         },
         {
-          "name": "어설픈 분장",
-          "cost": 0,
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "make",
-              "id": "스피키_candy",
-              "v": 1
+              "k": "castOther",
+              "ratio": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "변장",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "castOther",
+              "ratio": 0.8
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "최면",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "제사장 모자",
+          "name": "축복 2",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.4
+              "ratio": 0.48
             }
           ]
         },
         {
-          "name": "분장 도구",
+          "name": "축복 3",
           "kind": "cost"
         }
       ]
@@ -560,7 +444,29 @@
       ],
       "oracles": [
         {
-          "name": "큰 호박 바구니",
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
           "fx": [
             {
               "k": "cardStatus",
@@ -574,15 +480,11 @@
               "k": "stack",
               "id": "변장",
               "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
-          "name": "호박 나눠 주기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "cardStatus",
@@ -591,6 +493,323 @@
               "to": "hand",
               "n": 1,
               "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "비용",
+                      "v": -1,
+                      "to": "hand",
+                      "n": 1,
+                      "who": "other"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "make",
+              "id": "스피키_candy",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스피키_u4",
+      "name": "한 번 맞아보실래요오?",
+      "hero": "스피키",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.82,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "변장"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.41,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "변장",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "변장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.79,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "변장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "변장",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "변장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "변장",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.46,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "변장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.46,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "변장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스피키_u5",
+      "name": "주말농장 막말",
+      "hero": "스피키",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "변장",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.75,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -605,38 +824,62 @@
           ]
         },
         {
-          "name": "호박 괴롭히지 마",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "cardStatus",
-              "id": "비용",
-              "v": -1,
-              "to": "hand",
-              "n": 2,
-              "who": "other"
+              "k": "dmg",
+              "ratio": 1.24,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "변장",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
             }
           ]
         },
         {
-          "name": "호박밭 가꾸기",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.04,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "cardStatus",
-              "id": "비용",
-              "v": -1,
-              "to": "hand",
-              "n": 1,
-              "who": "other"
+              "k": "dmg",
+              "ratio": 1.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
             },
             {
               "k": "power",
@@ -658,219 +901,40 @@
           ]
         },
         {
-          "name": "바구니 속 사탕",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "cardStatus",
-              "id": "비용",
-              "v": -1,
-              "to": "hand",
-              "n": 1,
-              "who": "other"
+              "k": "dmg",
+              "ratio": 2.33,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "변장",
               "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "호박 리본",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "사탕 하나",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.3
-            }
-          ]
-        },
-        {
-          "name": "바구니 들기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "변장",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "스피키_u4",
-      "name": "한 번 맞아보실래요오?",
-      "hero": "스피키",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.68,
-          "target": "allEnemies"
-        },
-        {
-          "k": "perStack",
-          "id": "변장"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.34,
-          "target": "allEnemies"
-        },
-        {
-          "k": "spend",
-          "id": "변장",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "정말 맞아보실래요오?",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.81,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "변장"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "변장",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "한 명만 맞아요오",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.27,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "변장"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.64,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "변장",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "교주님은 빼고",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.84,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "변장"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "흐에엥 펀치",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "변장"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "스피키_candy",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "험한 입",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.73,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "변장"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.36,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "변장",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "호박 펀치",
-          "kind": "power"
-        },
-        {
-          "name": "막말",
-          "kind": "frost"
-        },
-        {
-          "name": "눈치 빠른 녀석",
+          "name": "축복 2",
           "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "변장",
+              "v": 1
+            }
+          ]
         }
       ]
     }

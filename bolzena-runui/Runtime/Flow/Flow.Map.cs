@@ -37,7 +37,7 @@ namespace Bolzena.RunUI
             MapFoeNature(root);
 
             // 지도 칸 — 머리 띠(위 96) 와 범례(아래 64) 사이. 높이는 캔버스에 맞춘다(폰 720 · PC 900)
-            float top = 104, bottom = 64;
+            float top = 120, bottom = 64;   // 위 120 — 파티 알약 밑 학년 알약(Flow.Grade.cs)까지
             var area = Ui.Rect("map", root);
             area.anchorMin = Vector2.zero; area.anchorMax = Vector2.one;
             area.offsetMin = new Vector2(0, bottom); area.offsetMax = new Vector2(0, -top);
@@ -147,6 +147,11 @@ namespace Bolzena.RunUI
                 lt.Pref(lt.preferredWidth + 8, 30);
             }
             Tw.Rise(legend.rectTransform, 0.3f, 14, 0.4f);
+
+            MapGrade(root);   // 학점제 학년(Flow.Grade.cs) — 지도 위에 그린다(파티 말이 알약을 덮지 않게)
+            // 진급 소식 — 싸움에서 돌아와 지도가 선 뒤 짧은 진급 연출(배지가 바뀌고 그 학년의 몫)
+            var news = P.Run.PopGradeNews();
+            if (news.Count > 0) { P.Save("map"); Tw.After(0.7f, () => { if (Stage.Current == "map") GradeUp(news); }); }
         }
 
         /// <summary>지도 머리 아래 작은 알약 — 「이번 모험의 적 속성 ○○」(마을 공개 · 편성과 같은 말 · 같은 색 · 같은 아이콘).</summary>

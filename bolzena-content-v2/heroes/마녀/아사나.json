@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "마녀",
       "role": "탱커",
+      "style": "박자형",
       "star": 3,
       "hp": 1000,
       "atk": 90,
@@ -20,37 +21,15 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.08,
+            "v": 0.06,
             "who": "allies"
           }
         ],
-        "rules": [
-          {
-            "name": "세 번째 분출",
-            "when": {
-              "on": "stackReach",
-              "id": "마력 호흡",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "마력 호흡",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.8,
-                "base": "def",
-                "target": "oneEnemy"
-              },
-              {
-                "k": "shield",
-                "ratio": 0.5
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -58,11 +37,37 @@
           "when": {
             "on": "play"
           },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시범 자세",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "심마체",
+          "when": {
+            "on": "play",
+            "who": "other"
+          },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "시범 자세",
+              "n": 1
+            }
+          ],
           "limit": {
             "per": "turn",
-            "n": 2
+            "n": 3
           },
           "fx": [
+            {
+              "k": "spend",
+              "id": "시범 자세",
+              "v": 1
+            },
             {
               "k": "stack",
               "id": "마력 호흡",
@@ -120,6 +125,15 @@
         "아사나_s1",
         "아사나_s2",
         "아사나_u1"
+      ],
+      "keywords": [
+        {
+          "name": "시범 자세",
+          "desc": "바로 다음 동료가 따라 하는 요가 자세",
+          "carrier": "self",
+          "cap": 1,
+          "endClear": true
+        }
       ]
     }
   ],
@@ -182,7 +196,7 @@
               "fx": [
                 {
                   "k": "stack",
-                  "id": "마력 호흡",
+                  "id": "시범 자세",
                   "v": 1
                 }
               ]
@@ -192,21 +206,151 @@
       ],
       "oracles": [
         {
-          "name": "깊은 들숨",
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시범 자세",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
           "tags": [
             "개전"
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시범 자세",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
           ],
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.69
+            },
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시범 자세",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.29
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시범 자세",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.2
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": [
+            "개전"
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
               "ratio": 0.9
             },
             {
-              "k": "stack",
-              "id": "마력 호흡",
-              "v": 2
-            },
-            {
               "k": "power",
               "rules": [
                 {
@@ -216,35 +360,9 @@
                   "fx": [
                     {
                       "k": "stack",
-                      "id": "마력 호흡",
+                      "id": "시범 자세",
                       "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "요가 매트",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
-            },
-            {
-              "k": "stack",
-              "id": "마력 호흡",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
+                    },
                     {
                       "k": "stack",
                       "id": "마력 호흡",
@@ -253,122 +371,12 @@
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "name": "아침 요가",
-          "cost": 0,
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "마력 호흡",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "마력 호흡",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "단체 요가",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.8
             },
             {
               "k": "draw",
-              "v": 2,
-              "who": "other"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "마력 호흡",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "붙잡고 시키기",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.96,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "마력 호흡",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "엘튜브 방송",
-          "kind": "defUp"
-        },
-        {
-          "name": "스트레칭",
-          "kind": "cost"
-        },
-        {
-          "name": "호흡 교정",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "마력 호흡",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -388,71 +396,87 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.6,
           "base": "def",
           "target": "oneEnemy"
         },
         {
-          "k": "stack",
+          "k": "ifStack",
           "id": "마력 호흡",
+          "n": 2
+        },
+        {
+          "k": "status",
+          "id": "기절",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "강한 분출",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 0.68
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.81,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "ifStack",
               "id": "마력 호흡",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "기절",
               "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 분출",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 0.48
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.57,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "ifStack",
               "id": "마력 호흡",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "기절",
               "v": 1
             }
           ]
         },
         {
-          "name": "마력 탐지",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.75,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 0.78
             },
             {
-              "k": "stack",
-              "id": "마력 호흡",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.78,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -463,17 +487,35 @@
           ]
         },
         {
-          "name": "세 번째 분출",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.5
-            },
-            {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.82,
               "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.34
+                    }
+                  ]
+                }
+              ]
             },
             {
               "k": "ifStack",
@@ -481,46 +523,56 @@
               "n": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "기절",
+              "v": 1
             }
           ]
         },
         {
-          "name": "과호흡",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.9
-            },
-            {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 1.28,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
               "id": "마력 호흡",
-              "v": 2
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "마력 집중",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "들숨",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "불가능 없는 몸",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -534,7 +586,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.45,
+          "ratio": 0.5,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -544,7 +596,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.25,
+          "ratio": 0.3,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -556,11 +608,40 @@
       ],
       "oracles": [
         {
-          "name": "천천히, 깊게",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.56,
+              "ratio": 0.68,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "마력 호흡",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -582,10 +663,34 @@
           ]
         },
         {
-          "name": "균형의 일격",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "마력 호흡"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
@@ -599,59 +704,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.28,
+              "ratio": 0.29,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "마력 호흡",
-              "all": true
+              "k": "shield",
+              "ratio": 0.56
             }
           ]
         },
         {
-          "name": "명상 자세",
-          "power": true,
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "마력 호흡",
-                    "n": 3
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.6
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.35,
-                      "base": "def",
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "기다린 일격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.57,
+              "ratio": 0.9,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -661,46 +730,24 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.28,
+              "ratio": 0.54,
               "base": "def",
               "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "긴 날숨",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.38
-            },
-            {
-              "k": "perStack",
-              "id": "마력 호흡"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.52
-            },
-            {
-              "k": "spend",
-              "id": "마력 호흡",
-              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "명상을 깨는 동작",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "맑은 정신",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "허리 삐끗",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -720,76 +767,122 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "heal",
-          "ratio": 0.8
+          "k": "shield",
+          "ratio": 0.6
         },
         {
-          "k": "perStack",
-          "id": "마력 호흡"
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "other"
         },
         {
-          "k": "heal",
-          "ratio": 0.3
+          "k": "draw",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "요가 교실",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1
+              "k": "shield",
+              "ratio": 0.9
             },
             {
-              "k": "perStack",
-              "id": "마력 호흡"
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
             },
             {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "혼자 요가",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.6
+              "k": "shield",
+              "ratio": 0.57
             },
             {
-              "k": "perStack",
-              "id": "마력 호흡"
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
             },
             {
-              "k": "heal",
-              "ratio": 0.24
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "평정심",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.16
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "마력 호흡",
-                    "n": 3
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.45
+                      "k": "shield",
+                      "ratio": 0.32
                     }
                   ]
                 }
@@ -798,61 +891,190 @@
           ]
         },
         {
-          "name": "굳건한 자세",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 2.18
             },
             {
-              "k": "perStack",
-              "id": "마력 호흡"
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "other"
             },
             {
-              "k": "dmg",
-              "ratio": 0.2,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "심마체 이론",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.2
-            },
-            {
-              "k": "perStack",
-              "id": "마력 호흡"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.5
-            },
-            {
-              "k": "spend",
-              "id": "마력 호흡",
-              "all": true
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "건강 잔소리",
-          "kind": "heal"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "불주사 협박",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "요가복",
-          "kind": "guard"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아사나_u5",
+      "name": "자세 교정",
+      "hero": "아사나",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.5
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.74
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.57
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "마력 호흡",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1,
+                      "who": "other"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시범 자세",
+              "v": 1
+            }
+          ]
         }
       ]
     }

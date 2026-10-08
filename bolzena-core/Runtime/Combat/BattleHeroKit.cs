@@ -23,7 +23,79 @@ namespace Bolzena.Core
             if (id.StartsWith(PILE_PER, StringComparison.Ordinal)) return PileOf(id.Substring(PILE_PER.Length)).Count;
             if (id.StartsWith(CARDST_PER, StringComparison.Ordinal)) return CardStOf(ctx.CardId, id.Substring(CARDST_PER.Length));
             if (id.StartsWith(EVENT_PER, StringComparison.Ordinal)) return ctx.EventV / Math.Max(1, int.Parse(id.Substring(EVENT_PER.Length)));
+            if (id.StartsWith(GONE_PER, StringComparison.Ordinal)) { var hk = id.Substring(GONE_PER.Length); return hk.Length == 0 ? GoneN : GoneOf(hk); }
             return -1;
+        }
+
+        // ── 시범 16(2026-10-08 2단계) ────────────────────────────────
+        const string GONE_PER = "\u0000소멸";
+        /// <summary>소환물이 한 카드(한 번의 일)에 따라 치는 대 수의 상한 — 다타 × 소환 × 추가 공격이 곱해지지 않게.</summary>
+        public const int SUMMON_CAP = 5;
+
+        /// <summary>이번 전투에 소멸한 그 사도의 카드 수(니콜 「내 카드」) — 소멸 계기마다 센다.</summary>
+        public int GoneOf(string heroKey) => heroKey != null && Counts.TryGetValue("gone|" + heroKey, out var v) ? v : 0;
+        /// <summary>이번 전투에 그 사도가 그 고유 효과를 쌓은 양(소모해도 줄지 않는다).</summary>
+        public int GainedOf(string heroKey, string id) => heroKey != null && Counts.TryGetValue("gain|" + heroKey + "|" + id, out var v) ? v : 0;
+        void GainCount(string heroKey, string id, int v) { if (heroKey == null || v <= 0) return; string k = "gain|" + heroKey + "|" + id; Counts[k] = (Counts.TryGetValue(k, out var x) ? x : 0) + v; }
+
+        /// <summary>예약 당겨 쓰기의 효과 배율 — 그 동안만 규칙 효과에 곱한다(FireRule).</summary>
+        double ripenScale = 1;
+
+        /// <summary>
+        /// 예약 당겨 쓰기(캬롯 일찍 캐기 · 마카샤 적혀 있던 결말) — 예약 키워드를 지금 다 닳게 한다. 그 키워드의 「다 닳으면」 규칙이 돌되
+        /// 남은 칸 1당 효과가 v(기본 0.25)씩 준다(최소 25%). 그 뒤 예약이 터진 것으로(reserveFire).
+        /// </summary>
+        void RipenFx(Fx f, FxCtx ctx)
+        {
+            if (!Kw.TryGetValue(f.Id ?? "", out var kw)) return;
+            double per = f.V > 0 ? f.V : 0.25;
+            var holders = new List<Unit>();
+            if (kw.Carrier == "enemy") holders.AddRange(Resolve(ctx, f.Target ?? "oneEnemy").Where(u => u.Side == Side.Enemy && St(u, kw.Id) > 0));
+            else if (kw.Carrier == "hero") holders.AddRange(Resolve(ctx, f.Target ?? "allAllies").Where(u => u.Side == Side.Party && StackOf(u.Key, kw.Id) > 0));
+            else if (kw.Carrier == "self") { var o = HeroUnit(kw.Owner); if (o != null && StackOf(o.Key, kw.Id) > 0) holders.Add(o); }
+            else if (St(Pool, kw.Id) > 0) holders.Add(PartyRep());
+            foreach (var u in holders)
+            {
+                if (Over != null) return;
+                int left = kw.Carrier == "enemy" || kw.Carrier == "ally" ? St(u, kw.Id) : StackOf(u.Key, kw.Id);
+                double sc = Math.Max(0.25, 1 - left * per);
+                if (kw.Carrier == "enemy" || kw.Carrier == "ally") SetStRaw(u, kw.Id, 0); else AddStack(u.Key, kw.Id, -left);
+                MeterSpend(kw.Id, left);
+                Say($"「{kw.Id}」 — 당겨 쓴다(남은 {left}칸, 효과 {Num.Round(sc * 100)}%)"); StatusCue(u, $"{kw.Id} 당김", true);
+                double s0 = ripenScale; ripenScale = s0 * sc;
+                try { KwGone(kw.Id, kw.Owner, u, true); }
+                finally { ripenScale = s0; }
+                if (Over == null) Emit("reserveFire", new EmitInfo { Owner = kw.Owner, Id = kw.Id, Target = u.Side == Side.Enemy && !u.Dead ? u : null });
+            }
+        }
+
+        /// <summary>
+        /// 소환물 행동(쥬비 벌 · 모모 분신) — 그 소환물 겹 수만큼(max · 한 카드에 SUMMON_CAP 대까지) 추가 공격.
+        /// 추가 공격 계기(extra)는 한 번만 깨우고, 「소환물이 행동하면」(summonAct, kind atk · 일의 값 = 친 대 수)을 낸다.
+        /// </summary>
+        void SummonFx(Fx f, FxCtx ctx)
+        {
+            var owner = ctx.Owner;
+            if (owner == null || !Kw.TryGetValue(f.Id ?? "", out var kw)) return;
+            var who = HeroUnit(kw.Owner) ?? owner;
+            int have = kw.Carrier == "self" ? StackOf(kw.Owner, kw.Id) : kw.Carrier == "hero" ? StackOf(owner.Key, kw.Id) : St(Pool, kw.Id);
+            // 한 카드 몫 — 그 카드가 깨운 패시브(따라 치기)까지 한 묶음으로 센다(패시브는 ActSeq 가 새로 서므로 낸 카드 수로 묶는다)
+            string ck = $"summon@{Turn}@{PlaysTotal}";
+            int used = Counts.TryGetValue(ck, out var u0) ? u0 : 0;
+            int hits = Math.Min(have, Math.Min(f.Max > 0 ? f.Max : SUMMON_CAP, SUMMON_CAP - used));
+            if (hits <= 0) { if (have > 0) Say($"「{kw.Id}」 — 이 카드에는 더 따라 치지 않는다(한 카드에 {SUMMON_CAP}대)"); return; }
+            Counts[ck] = used + hits;
+            for (int i = 0; i < hits && Over == null; i++)
+                foreach (var t in Resolve(ctx, f.Target ?? "randomEnemy"))
+                {
+                    if (t.Dead || Over != null) continue;
+                    int v = HitAmount(who, f.Ratio + Morale(), bas: f.Base);
+                    Hurt(t, v, new HurtOpts { From = who, Card = true });
+                }
+            Say($"「{kw.Id}」 {hits}대 — 따라 친다"); StatusCue(who, $"{kw.Id} ×{hits}", true);
+            if (Over != null) return;
+            AfterExtra(who);
+            if (Over == null) Emit("summonAct", new EmitInfo { Owner = kw.Owner, Id = kw.Id, Kind = "atk", V = hits, N = hits, By = who.Key, Seq = ActSeq });
         }
 
         /// <summary>효과 조각 하나(사도 고유 효과 틀) — 처리했으면 true.</summary>
@@ -41,7 +113,8 @@ namespace Bolzena.Core
                 case FxK.IfStreak:
                     {
                         int k = 0;
-                        for (int i = PlayLog.Count - 1; i >= 0 && owner != null && PlayLog[i].hero == owner.Key; i--) k++;
+                        // type(시범 16 — 티그) — 그 종류의 제 카드만 잇달아 센다(제 스킬 · 남의 카드가 끼면 끊긴다)
+                        for (int i = PlayLog.Count - 1; i >= 0 && owner != null && PlayLog[i].hero == owner.Key && (f.Type == null || PlayLog[i].type == f.Type); i--) k++;
                         gate = k >= Math.Max(2, f.N); return true;
                     }
                 case FxK.IfAllHeroes: gate = AliveParty().All(u => PlayLog.Any(p => p.hero == u.Key) || (ctx.Card && owner == u)); return true;
@@ -65,10 +138,18 @@ namespace Bolzena.Core
                         return true;
                     }
                 case FxK.IfCardSt: gate = CardStOf(ctx.CardId, f.Id) >= Math.Max(1, f.N); if (f.Not) gate = !gate; return true;
+                // ── 시범 16(2026-10-08 2단계) ──
+                // 직전보다 비싼가(리코타 코스 순서) — 이번 턴 바로 앞 카드보다 이 카드의 비용이 크면(턴 첫 카드는 아니다)
+                case FxK.IfPricier: gate = ctx.Card ? ctx.Pricier : Counts.TryGetValue("pricier", out var pv) && pv > 0; if (f.Not) gate = !gate; return true;
+                // 이번 전투에 그 고유 효과를 n 이상 쌓았으면(레비(졸업) 노력 결산 — 소모해도 줄지 않는 누적)
+                case FxK.IfGained: gate = owner != null && GainedOf(owner.Key, f.Id) >= Math.Max(1, f.N); if (f.Not) gate = !gate; return true;
+                case FxK.PerGone: ctx.PerStack = GONE_PER + (f.Who == "self" && owner != null ? owner.Key : ""); return true;
+                case FxK.Ripen: RipenFx(f, ctx); return true;
+                case FxK.Summon: SummonFx(f, ctx); return true;
                 // ── 비례 ──
                 case FxK.PerPlayed: ctx.PerStack = PLAYED_PER + (f.Id ?? ""); return true;
                 case FxK.PerPile: ctx.PerStack = PILE_PER + (f.From ?? "discard"); return true;
-                case FxK.PerCardSt: ctx.PerStack = CARDST_PER + f.Id; return true;
+                case FxK.PerCardSt: ctx.PerStack = CARDST_PER + f.Id; ctx.PerMin = f.N; ctx.PerMax = f.Max; return true;   // n · max — 최소 · 최대(시범 16 쵸피 「배움」 최소 3)
                 case FxK.PerEvent: ctx.PerStack = EVENT_PER + (f.Per > 0 ? f.Per : 1); return true;
                 // ── 예약 · 함정 ──
                 case FxK.Later:
@@ -100,7 +181,7 @@ namespace Bolzena.Core
                     return true;
                 case FxK.CastOther:
                     {   // 손의 다른 사도 카드 하나의 효과를 대신 돌린다(카드는 손에 남는다 · 그 카드 주인의 능력치로)
-                        var ok = Hand.Where(id => { var c = CardOf(id); return c != null && c.Hero != null && (owner == null || c.Hero != owner.Key) && HeroUnit(c.Hero) is Unit h && !h.Dead && (f.Id == null || c.Type == f.Id); }).ToList();
+                        var ok = Hand.Where(id => { var c = CardOf(id); return c != null && c.Hero != null && (owner == null || c.Hero != owner.Key) && HeroUnit(c.Hero) is Unit h && !h.Dead && (f.Id == null || c.Type == f.Id) && !c.Fx.Any(x => x.K == FxK.CastOther); }).ToList();   // 연쇄 상한(3단계) — 대신 발동 카드는 대신 발동하지 않는다(두 사도가 서로를 끝없이 부르던 것)
                         if (ok.Count == 0) return true;
                         var id = ok[Rng.Int(ok.Count)]; var cv = CardOf(id); var who = HeroUnit(cv.Hero);
                         Say($"「{cv.Name}」 — 대신 발동");
@@ -110,7 +191,15 @@ namespace Bolzena.Core
                     }
                 case FxK.Pull:
                     {   // 더미에서 n 장 → 손(기본) · 뽑을 더미 맨 위(to top)
+                        // 연쇄 상한(1단계) — 소멸 더미 되살리기는 사도마다 턴에 한 번(0코 태우기 · 뽑기와 도는 순환을 끊는다)
+                        string gk = null;
+                        if (f.From == "gone")
+                        {
+                            gk = $"gonePull|{owner?.Key ?? Acting}|{Turn}";
+                            if (Counts.ContainsKey(gk)) { Say("소멸 더미 되살리기 — 이번 턴은 이미 했다(사도마다 턴에 한 번)"); return true; }
+                        }
                         var src = PileOf(f.From ?? "discard");
+                        if (gk != null && src.Count > 0) Counts[gk] = 1;
                         for (int k = 0; k < f.NOr1 && src.Count > 0; k++)
                         {
                             var okIdx = Enumerable.Range(0, src.Count).Where(i => FxMatch(f, src[i], owner)).ToList();
@@ -189,6 +278,8 @@ namespace Bolzena.Core
             try { RunFx(r.Fx, new FxCtx { Owner = owner, TargetIdx = t, Passive = r.Name ?? "예약" }); }
             finally { Acting = prev; ModSrc = src0; ActSeq = seq0; }
             CheckOver();
+            // 예약형 공용 계기 — 예약(later · afterCards · 덫)이 터지면. 고른 적은 그 예약의 표적.
+            if (Over == null) Emit("reserveFire", new EmitInfo { Owner = r.Owner, Id = r.Name, Target = Enemies.FirstOrDefault(x => x.Idx == t && !x.Dead) });
         }
 
         void LaterTurn()
@@ -223,13 +314,33 @@ namespace Bolzena.Core
             if (kwCut != null)
             {
                 var hk = Party.First(u => StackOf(u.Key, kwCut.Id) > 0);
-                int n = StackOf(hk.Key, kwCut.Id);
-                AddStack(hk.Key, kwCut.Id, -1); StackChanged(kwCut.Owner, kwCut.Id, n, n - 1, hk);
                 d = Num.Round(d * (1 - kwCut.Def.Cut));
-                Say($"「{kwCut.Id}」 — 한 대를 -{Num.Round(kwCut.Def.Cut * 100)}% 깎고 하나가 사라졌다");
+                bool lost = MinionUse(kwCut, hk);
+                Say($"「{kwCut.Id}」 — 한 대를 -{Num.Round(kwCut.Def.Cut * 100)}% 깎았다{(lost ? " · 하나가 사라졌다" : "")}");
                 return false;
             }
             return MinionBlocks();
+        }
+
+        /// <summary>
+        /// 소환물 하나가 한 대를 받았다 — uses(기본 1) 대를 받으면 하나가 사라진다(시범 16 모모 분신). 「소환물이 행동하면」 kind guard, 사라지면 kind lost.
+        /// 사라졌으면 true.
+        /// </summary>
+        bool MinionUse(KwRt kw, Unit hu)
+        {
+            string uk = "uses|" + hu.Key + "|" + kw.Id;
+            int took = (Counts.TryGetValue(uk, out var u0) ? u0 : 0) + 1;
+            bool lost = took >= Math.Max(1, kw.Def.Uses);
+            int n = StackOf(hu.Key, kw.Id);
+            if (lost) { Counts.Remove(uk); AddStack(hu.Key, kw.Id, -1); }
+            else Counts[uk] = took;
+            Emit("summonAct", new EmitInfo { Owner = kw.Owner, Id = kw.Id, Kind = "guard", V = 1, N = 1, By = hu.Key });
+            if (lost && Over == null)
+            {
+                Emit("summonAct", new EmitInfo { Owner = kw.Owner, Id = kw.Id, Kind = "lost", V = 1, N = 1, By = hu.Key });
+                StackChanged(kw.Owner, kw.Id, n, n - 1, hu);
+            }
+            return lost;
         }
 
         /// <summary>적 표식의 「건 사도가 칠 때만」(per from owner) — 표식이 있으면 겹 × v, 없으면 else.</summary>
@@ -258,9 +369,8 @@ namespace Bolzena.Core
                     int n = StackOf(hk, kw.Id);
                     if (n <= 0) continue;
                     var hu = HeroUnit(hk); if (hu == null || hu.Dead) continue;
-                    AddStack(hk, kw.Id, -1);
-                    Say($"「{kw.Id}」 — 공격을 대신 받고 하나가 사라졌다"); StatusCue(hu, $"{kw.Id} -1");
-                    StackChanged(kw.Owner, kw.Id, n, n - 1, hu);
+                    bool lost = MinionUse(kw, hu);
+                    Say($"「{kw.Id}」 — 공격을 대신 받았다{(lost ? " · 하나가 사라졌다" : "")}"); if (lost) StatusCue(hu, $"{kw.Id} -1");
                     return true;
                 }
             }

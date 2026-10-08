@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "마녀",
       "role": "탱커",
+      "style": "격파형",
       "star": 3,
       "hp": 980,
       "atk": 84,
@@ -44,20 +45,22 @@
           ]
         },
         {
-          "name": "배신하지 않는 근육",
+          "name": "진영을 흔드는 근육",
           "when": {
-            "on": "stackReach",
-            "id": "근력 강화",
-            "n": 5
+            "on": "break"
           },
           "limit": {
-            "per": "fight",
+            "per": "turn",
             "n": 1
           },
           "fx": [
             {
-              "k": "status",
-              "id": "불굴",
+              "k": "gauge",
+              "v": 20
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
               "v": 1
             }
           ]
@@ -164,7 +167,7 @@
       ],
       "oracles": [
         {
-          "name": "삼두근까지",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -172,11 +175,11 @@
             {
               "k": "stack",
               "id": "근력 강화",
-              "v": 2
+              "v": 1
             },
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 1.11
             },
             {
               "k": "power",
@@ -198,38 +201,7 @@
           ]
         },
         {
-          "name": "근육교 집회",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "근력 강화",
-              "v": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 0.9
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "근력 강화",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "아침 운동",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "개전"
@@ -260,7 +232,7 @@
           ]
         },
         {
-          "name": "기본기 단련",
+          "name": "신탁 3",
           "tags": [
             "개전"
           ],
@@ -269,12 +241,50 @@
               "k": "stack",
               "id": "근력 강화",
               "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guard",
+                    "kind": "shield"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "근력 강화",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.83
             },
             {
               "k": "draw",
-              "v": 2,
-              "basic": true,
-              "type": "공격"
+              "v": 1,
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
@@ -296,53 +306,36 @@
           ]
         },
         {
-          "name": "근육 시범",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.88,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "근력 강화",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "정복 계획",
-          "kind": "defUp"
-        },
-        {
-          "name": "흠~",
-          "kind": "cost"
-        },
-        {
-          "name": "생딸기",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
               "id": "근력 강화",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "근력 강화",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -373,7 +366,8 @@
       ],
       "oracles": [
         {
-          "name": "왕좌에 앉은 벨벳",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
@@ -392,32 +386,13 @@
           ]
         },
         {
-          "name": "캬하",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.75
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "근력 강화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "마녀 여왕 벨벳",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 0.94
             },
             {
               "k": "status",
@@ -429,12 +404,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "반격",
+                      "k": "stack",
+                      "id": "근력 강화",
                       "v": 1
                     }
                   ]
@@ -444,58 +424,72 @@
           ]
         },
         {
-          "name": "나를 지키는 근육",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.32
+              "ratio": 1.78
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.32
             },
             {
               "k": "status",
               "id": "반격",
               "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "근력 강화"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.33
-            }
-          ]
-        },
-        {
-          "name": "민심을 잡아라",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.5
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "spend",
-              "id": "근력 강화",
-              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "도끼 방패",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "엿 날리기",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "아이쒸",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -518,20 +512,20 @@
       ],
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.45,
-          "base": "def",
-          "target": "oneEnemy"
-        },
-        {
           "k": "perStack",
-          "id": "근력 강화"
+          "id": "근력 강화",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.24,
           "base": "def",
-          "target": "oneEnemy"
+          "target": "allEnemies"
+        },
+        {
+          "k": "tough",
+          "v": 1,
+          "target": "allEnemies"
         },
         {
           "k": "spend",
@@ -541,26 +535,26 @@
       ],
       "oracles": [
         {
-          "name": "풀스윙",
+          "name": "신탁 1",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
               "k": "perStack",
-              "id": "근력 강화"
+              "id": "근력 강화",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.32,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "spend",
@@ -570,27 +564,46 @@
           ]
         },
         {
-          "name": "어퍼컷",
+          "name": "신탁 2",
           "tags": [
-            "분쇄",
-            "약점 공격"
+            "분쇄"
           ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.48,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "perStack",
+              "id": "근력 강화",
+              "n": 1
             },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
             {
               "k": "perStack",
-              "id": "근력 강화"
+              "id": "근력 강화",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.21,
+              "ratio": 0.46,
               "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 2
             },
             {
               "k": "spend",
@@ -600,26 +613,200 @@
           ]
         },
         {
-          "name": "회전 가속",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "근력 강화",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "근력 강화",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨벳_u4",
+      "name": "진영 붕괴",
+      "hero": "벨벳",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifFoe",
+          "id": "broken"
+        },
+        {
+          "k": "tough",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.95,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "근력 강화"
+              "k": "ifFoe",
+              "id": "broken"
             },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.66,
               "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifFoe",
+              "id": "tough",
+              "pct": 0.5
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.79,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -630,235 +817,162 @@
           ]
         },
         {
-          "name": "근육 자랑",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 1.26,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "근력 강화"
+              "k": "ifFoe",
+              "id": "broken"
             },
             {
-              "k": "dmg",
-              "ratio": 0.22,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "배신은 빛보다 빠르게",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "근력 강화"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "근력 강화",
-              "all": true
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "stack",
-              "id": "근력 강화",
-              "v": 3
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "도끼 마법",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "끝에 욕심",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "뚝배기 수집",
-          "kind": "weakSpot"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
         }
       ]
     },
     {
-      "id": "벨벳_u4",
-      "name": "고위 마녀의 단련법",
+      "id": "벨벳_u5",
+      "name": "솔즙 무료 나눔",
       "hero": "벨벳",
       "unique": true,
-      "cost": 1,
-      "type": "공격",
+      "cost": 0,
+      "type": "스킬",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.6,
-          "base": "def",
-          "target": "oneEnemy"
+          "k": "heal",
+          "ratio": 0.5
         },
         {
-          "k": "ifStack",
+          "k": "stack",
           "id": "근력 강화",
-          "n": 5
-        },
-        {
-          "k": "dmg",
-          "ratio": 1.1,
-          "base": "def",
-          "target": "oneEnemy"
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "지옥 훈련",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.75,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "heal",
+              "ratio": 0.71
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "근력 강화",
-              "n": 5
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.4,
-              "base": "def",
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         },
         {
-          "name": "가벼운 단련",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.45,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "heal",
+              "ratio": 0.57
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "근력 강화",
-              "n": 5
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "base": "def",
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         },
         {
-          "name": "맞으면서 단련",
-          "power": true,
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.76
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.75
+            },
             {
               "k": "stack",
               "id": "근력 강화",
               "v": 2
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "hurt",
-                    "guarded": true
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 2
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.75,
-                      "base": "def",
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "버티는 단련",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.55
-            },
-            {
-              "k": "perStack",
-              "id": "근력 강화"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.52
-            }
-          ]
-        },
-        {
-          "name": "새벽 단련",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "근력 강화",
-              "n": 5
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.6,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "근력 강화",
-              "all": true
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "근력 강화 마법",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "heal"
         },
         {
-          "name": "코코넛 솔잎 볶음",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "근육 펌프",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

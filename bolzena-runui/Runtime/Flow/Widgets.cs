@@ -333,12 +333,12 @@ namespace Bolzena.RunUI
         //   아래: 장식 선(가운데 마름모) · 금빛 키워드 태그 「[ 유일 / 소멸 ]」 · 효과 글 — 그림 위 어둠 그라데이션에 얹는다
         //   왼쪽 가장자리 띠 · 테 = 카드 주인 사도의 성격 색(Theme.NatureCard) · 교주 카드는 넣은 사도의 성격(없으면 금) · 상태 · 저주 어두운 보라. 종류는 아이콘 · 글로만.
         //   그림(CardArt — Docs/카드그림.md): 시작 카드 = 사도 스탠딩 상반신 · 고유 · 생성 카드 = 고른 원작 그림(없으면 스킬 아이콘 — 흐린 확대 바탕 + 가운데 선명) · 교주 · 상태 = 종류 무늬
-        public static Sprite TypeIcon(string type) => Theme.S(type == "공격" ? "ic_swords" : type == "강화" ? "ic_spark" : type == "상태" || type == "저주" ? "ic_skull" : "ic_moon");
+        public static Sprite TypeIcon(string type) => Theme.S(type == "공격" ? "ic_swords" : type == "강화" ? "ic_up" : type == "상태" || type == "저주" ? "ic_skull" : "ic_skill");
 
         /// <summary>종류 글 색 — 공격 붉게 · 스킬 푸르게 · 강화 보라 · 상태 잿빛(전투 CardView.TypeColor 와 같은 값).</summary>
         public static Color TypeColor(string type) =>
             type == "공격" ? new Color(1f, 0.55f, 0.58f) : type == "강화" ? new Color(0.8f, 0.68f, 1f)
-            : type == "상태" || type == "저주" ? new Color(0.7f, 0.7f, 0.78f) : new Color(0.55f, 0.8f, 1f);
+            : type == "상태" || type == "저주" ? new Color(0.7f, 0.7f, 0.78f) : new Color(0.38f, 0.9f, 0.82f);
 
         /// <summary>종류 글 — 모든 카드가 「공격」 · 「스킬」 · 「강화」 셋 가운데 하나(「기본 」 · 「교주 · 」 따위 머리말 없이). 상태 · 저주만 제 이름.</summary>
         public static string TypeLabel(string type) => string.IsNullOrEmpty(type) ? "스킬" : type;
@@ -357,6 +357,8 @@ namespace Bolzena.RunUI
 
         /// <summary>view 를 주면 그 모습(신탁을 얹은 후보 따위)으로 그린다. owner = 교주 카드를 넣은 사도(core 키) — 안 주면 판(RunPort.LeaderOwner)에 묻는다.
         /// noFace — 오른쪽 위 주인 얼굴 핀을 숨긴다(신탁 고르기 창만 — 2026-10-06 사용자). 틀 색은 그대로 주인 성격.</summary>
+        /// <summary>신탁 고르기 창 후보 카드에 축복 효과 줄을 얹을 때(그 한 장 만드는 동안만) 쓴다.</summary>
+        public static string BlessOverride;
         public static RectTransform Card(Transform parent, Flow f, string id, float w = 200, string name = "card", CardView view = null, string owner = null, bool noFace = false)
         {
             var P = f.P;
@@ -448,6 +450,7 @@ namespace Bolzena.RunUI
             // ── 아래 글 자리 재기(효과 글 길이만큼 어둠을 올린다) ──
             string full = v != null ? P.Text.Card(v) : "";
             var mark = view == null ? f.P.Mark(id) : CardMark.Of(P.Data, id, 0, null);
+            if (BlessOverride != null) { mark.Bless = "축복"; mark.BlessText = BlessOverride; }
             bool blessOn = mark.Blessed && !BlessFx.Old && !string.IsNullOrEmpty(mark.BlessText);
             string baseFull = v != null && v.Oracle != null ? P.Text.Card(v.Def) : null;
             bool hasTags = v != null && v.Tags != null && v.Tags.Count > 0;
@@ -557,7 +560,7 @@ namespace Bolzena.RunUI
             //   신탁 = 장식 선의 별 줄(DecoLine, 이름은 안 보임 — 2026-10-07) + 테 바깥 금빛 · 축복 = 그 위 겨우살이(초록) 띠(후광 아이콘 + 이름) · 복제 = 오른쪽 위 셋째 줄 겹친 카드 표(「복제 — 신탁 · 축복 불가」)
             //   view 를 준 미리보기(신탁 고르기 후보 따위)는 신탁만 view 에서 — 축복은 고르기 창이 따로 그린다
             float chipY = decoY + 8 * k;
-            bool oraOn = v != null && v.Oracle != null && !name.StartsWith("oracle");   // 신탁 미리보기 후보는 받은 카드가 아니라 마크 없음
+            bool oraOn = v != null && v.Oracle != null && (name == "oraclepick" || !name.StartsWith("oracle"));   // 신탁 미리보기 후보는 받은 카드가 아니라 마크 없음
             if (oraOn || mark.Blessed)
             {
                 var og = Ui.Img(rt, Theme.S("frame_thick", 24), (mark.Blessed ? new Color(0.72f, 0.58f, 1f) : Theme.Gold).A(0.95f), "oracleglow");

@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "마녀",
       "role": "딜러",
+      "style": "소환형",
       "star": 3,
       "hp": 640,
       "atk": 135,
@@ -14,41 +15,82 @@
       "blurb": "마녀 왕궁의 참모. 적 앞에 가시 덫을 깔아 두고, 계획이 어긋나도 덫은 거두지 않습니다 — 다음 공격까지 기다릴 뿐.",
       "keyword": {
         "name": "가시 촉수",
-        "desc": "덩굴에서 돋아나 턴 끝마다 찌르는 촉수",
+        "desc": "덩굴에서 돋아나 적의 움직임을 노리는 촉수",
         "carrier": "self",
-        "cap": 4,
-        "decay": 1,
-        "per": [
+        "cap": 5,
+        "rules": [
           {
-            "stat": "dot",
-            "ratio": 0.6
+            "name": "문지기 소환",
+            "when": {
+              "on": "play",
+              "type": "공격"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "가시 촉수",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "찌르는 촉수",
+            "when": {
+              "on": "turnEnd"
+            },
+            "fx": [
+              {
+                "k": "summon",
+                "id": "가시 촉수",
+                "ratio": 0.4,
+                "max": 5
+              }
+            ]
+          },
+          {
+            "name": "미리 세운 계획",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "가시 촉수",
+                "v": 2
+              }
+            ]
           }
         ]
       },
       "passives": [
         {
-          "name": "문지기 소환",
+          "name": "이미 손을 써 두었습니다",
           "when": {
-            "on": "play",
+            "on": "foeActBefore",
             "type": "공격"
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
-              "k": "stack",
+              "k": "summon",
               "id": "가시 촉수",
-              "v": 1
+              "ratio": 0.4,
+              "max": 3
             }
           ]
         },
         {
           "name": "계획은 그 자리에서",
           "when": {
-            "on": "stackOver",
-            "id": "가시 촉수"
+            "on": "kill",
+            "mine": true
           },
           "limit": {
             "per": "turn",
@@ -188,7 +230,7 @@
         {
           "k": "stack",
           "id": "가시 촉수",
-          "v": 3
+          "v": 2
         },
         {
           "k": "draw",
@@ -197,12 +239,12 @@
       ],
       "oracles": [
         {
-          "name": "겹겹이 덫",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "가시 촉수",
-              "v": 4
+              "v": 3
             },
             {
               "k": "draw",
@@ -211,8 +253,22 @@
           ]
         },
         {
-          "name": "급조한 덫",
+          "name": "신탁 2",
           "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -220,13 +276,17 @@
               "v": 2
             },
             {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
               "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "덫밭",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -243,7 +303,12 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "foeActBefore",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -258,61 +323,19 @@
           ]
         },
         {
-          "name": "미리 짠 작전",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "stack",
-              "id": "가시 촉수",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.06
-            }
-          ]
-        },
-        {
-          "name": "덩굴 올가미",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "가시 촉수",
               "v": 4
             },
             {
-              "k": "shield",
-              "ratio": 1.36
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "여왕 대리",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "가시 반지",
-          "kind": "draw"
-        },
-        {
-          "name": "꽃꽂이",
-          "fx": [
+              "k": "draw",
+              "v": 1
+            },
             {
-              "k": "stack",
-              "id": "가시 촉수",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -329,42 +352,26 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.53,
+          "ratio": 0.45,
           "target": "randomEnemy",
           "hits": 3
         },
         {
           "k": "stack",
           "id": "가시 촉수",
-          "v": 2
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "굵은 작살",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.61,
               "target": "randomEnemy",
               "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "가시 촉수",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "가시 한 줌",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.53,
-              "target": "randomEnemy",
-              "hits": 2
             },
             {
               "k": "stack",
@@ -374,75 +381,114 @@
           ]
         },
         {
-          "name": "제자 부르기",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.82,
+              "ratio": 0.43,
               "target": "randomEnemy",
               "hits": 3
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "관통 작살",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "randomEnemy",
-              "hits": 3
-            },
-            {
-              "k": "ifStack",
+              "k": "stack",
               "id": "가시 촉수",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.71,
-              "target": "randomEnemy",
-              "hits": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "작살 폭풍",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "summon",
+              "id": "가시 촉수",
+              "ratio": 0.28,
+              "max": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "summonAct",
+                    "id": "가시 촉수",
+                    "kind": "atk"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.31,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            },
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.56,
-              "target": "randomEnemy",
-              "hits": 4
-            },
-            {
-              "k": "stack",
-              "id": "가시 촉수",
-              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "날 선 가시",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "튀김 열두 봉지",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "찔린 자리",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -463,7 +509,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 0.6,
           "target": "allEnemies"
         },
         {
@@ -472,7 +518,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.3,
           "target": "allEnemies"
         },
         {
@@ -483,11 +529,12 @@
       ],
       "oracles": [
         {
-          "name": "조이는 문지기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.81,
               "target": "allEnemies"
             },
             {
@@ -496,7 +543,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.51,
+              "ratio": 0.41,
               "target": "allEnemies"
             },
             {
@@ -507,12 +554,14 @@
           ]
         },
         {
-          "name": "한 놈만 조이기",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.58,
-              "target": "oneEnemy"
+              "ratio": 0.57,
+              "target": "allEnemies"
             },
             {
               "k": "perStack",
@@ -520,8 +569,8 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.71,
-              "target": "oneEnemy"
+              "ratio": 0.28,
+              "target": "allEnemies"
             },
             {
               "k": "spend",
@@ -531,12 +580,12 @@
           ]
         },
         {
-          "name": "나의 애제자 피코라",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.96,
-              "target": "allEnemies"
+              "ratio": 0.94,
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -544,22 +593,25 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.48,
-              "target": "allEnemies"
+              "ratio": 0.47,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "잠복 경비",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.06,
+              "ratio": 0.54,
               "target": "allEnemies"
             },
             {
@@ -568,20 +620,36 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.27,
               "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "summon",
+                      "id": "가시 촉수",
+                      "ratio": 0.2,
+                      "max": 3
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "엄한 스승",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2,
+              "ratio": 1.08,
               "target": "allEnemies"
             },
             {
@@ -590,7 +658,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.93,
+              "ratio": 0.54,
               "target": "allEnemies"
             }
           ]
@@ -598,16 +666,22 @@
       ],
       "blesses": [
         {
-          "name": "멸망의 전조",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "미숫가루",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "발저림",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -633,13 +707,10 @@
               },
               "fx": [
                 {
-                  "k": "perStack",
-                  "id": "가시 촉수"
-                },
-                {
-                  "k": "dmg",
-                  "ratio": 0.24,
-                  "target": "randomEnemy"
+                  "k": "summon",
+                  "id": "가시 촉수",
+                  "ratio": 0.25,
+                  "max": 5
                 }
               ]
             }
@@ -648,38 +719,7 @@
       ],
       "oracles": [
         {
-          "name": "완벽한 수정안",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "가시 촉수",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "perStack",
-                      "id": "가시 촉수"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.33,
-                      "target": "randomEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "두 번째 계획",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -695,13 +735,10 @@
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "가시 촉수"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.24,
-                      "target": "randomEnemy"
+                      "k": "summon",
+                      "id": "가시 촉수",
+                      "ratio": 0.25,
+                      "max": 5
                     }
                   ]
                 }
@@ -710,39 +747,7 @@
           ]
         },
         {
-          "name": "사전 작전",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "perStack",
-                      "id": "가시 촉수"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.4,
-                      "target": "randomEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "메모 한 줄",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -754,12 +759,51 @@
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "가시 촉수"
+                      "k": "summon",
+                      "id": "가시 촉수",
+                      "ratio": 0.22,
+                      "max": 5
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "summonAct",
+                    "id": "가시 촉수",
+                    "kind": "atk"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "가시 촉수",
+                      "v": 1
                     },
                     {
                       "k": "dmg",
-                      "ratio": 0.2,
+                      "ratio": 0.15,
                       "target": "randomEnemy"
                     }
                   ]
@@ -769,11 +813,171 @@
           ]
         },
         {
-          "name": "예비 계획",
+          "name": "신탁 4",
           "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "summon",
+                      "id": "가시 촉수",
+                      "ratio": 0.25,
+                      "max": 5
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "summon",
+                      "id": "가시 촉수",
+                      "ratio": 0.25,
+                      "max": 5
+                    }
+                  ]
+                }
+              ]
+            },
             {
               "k": "discard",
               "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "defUp"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "프리클_u5",
+      "name": "가시 울타리",
+      "hero": "프리클",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "stack",
+          "id": "가시 촉수",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.62
+            },
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.14
+            },
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.13
+            },
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            },
+            {
+              "k": "summon",
+              "id": "가시 촉수",
+              "ratio": 0.28,
+              "max": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.78
             },
             {
               "k": "stack",
@@ -785,39 +989,64 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "foeActBefore",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "가시 촉수"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.27,
-                      "target": "randomEnemy"
+                      "k": "summon",
+                      "id": "가시 촉수",
+                      "ratio": 0.15,
+                      "max": 2
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "이인자의 위엄",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "거창한 등장",
-          "tags": [
-            "개전"
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            }
           ]
-        },
-        {
-          "name": "제자 몰래 도와주기",
-          "kind": "draw"
         }
       ]
     }

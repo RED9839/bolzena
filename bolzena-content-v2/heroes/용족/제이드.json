@@ -6,12 +6,13 @@
       "nature": "냉정",
       "race": "용족",
       "role": "딜러",
+      "style": "손 만들기형",
       "star": 3,
       "hp": 700,
       "atk": 125,
       "def": 28,
       "crit": 10,
-      "blurb": "절판 도서를 모으고 누구에게도 빌려주지 않는 비취의 용족 책벌레. 아끼는 책은 손에 쥔 채 넘길수록 값이 오르고, 꺼내 휘두를 때 그 값을 다 씁니다.",
+      "blurb": "절판 도서를 모으고 누구에게도 빌려주지 않는 비취의 용족 책벌레. 아끼는 책은 손에 쥔 채 베껴 쓴 필사본만 내놓고, 비취옥이 셋 차오르면 다음 한 수에 마법서가 펼쳐집니다.",
       "keyword": {
         "name": "비취옥",
         "desc": "씹어 삼킨 옥돌의 마력",
@@ -20,15 +21,18 @@
         "per": [
           {
             "stat": "atk",
-            "v": 0.15
+            "v": 0.12
           }
         ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.4
+        },
         "rules": [
           {
-            "name": "마법서 펼치기",
+            "name": "사본은 돌려주고",
             "when": {
-              "on": "stackOver",
-              "id": "비취옥"
+              "on": "make"
             },
             "limit": {
               "per": "turn",
@@ -36,9 +40,9 @@
             },
             "fx": [
               {
-                "k": "dmg",
-                "ratio": 0.8,
-                "target": "allEnemies"
+                "k": "stack",
+                "id": "비취옥",
+                "v": 1
               }
             ]
           }
@@ -144,6 +148,30 @@
       ]
     },
     {
+      "id": "제이드_copy",
+      "name": "필사본",
+      "hero": "제이드",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "비취옥",
+          "v": 1
+        }
+      ],
+      "blurb": "원본은 챙기고 돌려주는 사본"
+    },
+    {
       "id": "제이드_u1",
       "name": "게르마늄 옥장판",
       "hero": "제이드",
@@ -153,7 +181,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.22,
+          "ratio": 1.1,
           "target": "allEnemies"
         },
         {
@@ -162,7 +190,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.41,
+          "ratio": 0.38,
           "target": "allEnemies"
         },
         {
@@ -173,7 +201,8 @@
       ],
       "oracles": [
         {
-          "name": "프리미엄 옥장판",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -186,7 +215,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.47,
+              "ratio": 0.51,
               "target": "allEnemies"
             },
             {
@@ -197,12 +226,13 @@
           ]
         },
         {
-          "name": "휴대용 옥장판",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.86,
+              "ratio": 1.05,
               "target": "allEnemies"
             },
             {
@@ -211,7 +241,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.29,
+              "ratio": 0.36,
               "target": "allEnemies"
             },
             {
@@ -222,31 +252,12 @@
           ]
         },
         {
-          "name": "옥은 남겨 두기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.43,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "비취옥",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.43,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "책까지 데우기",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
+              "ratio": 1.89,
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -254,23 +265,25 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.98,
-              "target": "allEnemies"
+              "ratio": 0.59,
+              "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "비취옥",
-              "all": true
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "게르마늄 수면법",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.33,
+              "ratio": 1.15,
               "target": "allEnemies"
             },
             {
@@ -279,7 +292,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.39,
               "target": "allEnemies"
             },
             {
@@ -287,8 +300,7 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackOver",
-                    "id": "비취옥"
+                    "on": "make"
                   },
                   "limit": {
                     "per": "turn",
@@ -297,7 +309,7 @@
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.5,
+                      "ratio": 0.29,
                       "target": "allEnemies"
                     }
                   ]
@@ -305,19 +317,47 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "비취옥"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "게르마늄 열기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "옥의 소공녀",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "완벽",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -360,7 +400,7 @@
       ],
       "oracles": [
         {
-          "name": "백과사전",
+          "name": "신탁 1",
           "tags": [
             "보존"
           ],
@@ -368,7 +408,60 @@
             {
               "k": "stack",
               "id": "비취옥",
+              "v": 1
+            },
+            {
+              "k": "draw",
               "v": 2
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "제이드_copy",
+              "v": 1
             },
             {
               "k": "draw",
@@ -386,65 +479,8 @@
           ]
         },
         {
-          "name": "밑줄 긋기",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.28,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "비취옥",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "마법서 찾기",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "비취옥",
-              "v": 2
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "who": "self",
-              "unique": true
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "절판 도서",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "비취옥",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "독서 습관",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
@@ -461,18 +497,20 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "make"
                   },
-                  "conds": [
-                    {
-                      "c": "held",
-                      "n": 1
-                    }
-                  ],
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "비취옥",
+                      "v": 1
+                    },
+                    {
+                      "k": "draw",
                       "v": 1
                     }
                   ]
@@ -480,23 +518,24 @@
               ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "도수 없는 안경",
-          "kind": "guard"
         },
         {
-          "name": "책갈피",
-          "kind": "cost"
-        },
-        {
-          "name": "만년필",
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "비취옥",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -516,7 +555,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.35,
+          "ratio": 1.2,
           "target": "oneEnemy"
         },
         {
@@ -536,14 +575,14 @@
       ],
       "oracles": [
         {
-          "name": "옥구슬 연사",
+          "name": "신탁 1",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.76,
+              "ratio": 1.62,
               "target": "oneEnemy"
             },
             {
@@ -563,15 +602,16 @@
           ]
         },
         {
-          "name": "구슬 흩뿌리기",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.06,
-              "target": "allEnemies"
+              "ratio": 1.14,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -590,14 +630,42 @@
           ]
         },
         {
-          "name": "꽉 찬 비취",
+          "name": "신탁 3",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "제이드_copy",
+              "v": 1
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.23,
               "target": "oneEnemy"
             },
             {
@@ -606,72 +674,64 @@
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "비취옥",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.81,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "비취옥",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "포도맛 사탕",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.89,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "비취옥",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "책갈피 탄",
+          "name": "신탁 5",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.22,
+              "ratio": 1.39,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
-            },
-            {
-              "k": "when",
-              "on": "handEnd"
-            },
-            {
-              "k": "stack",
-              "id": "비취옥",
-              "v": 2
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "비취 광택",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "작은 녹색 현자",
-          "kind": "draw"
-        },
-        {
-          "name": "사탕 한 알",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -692,7 +752,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.81,
+          "ratio": 0.6,
           "target": "oneEnemy"
         },
         {
@@ -701,17 +761,23 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.41,
+          "ratio": 0.2,
           "target": "oneEnemy"
+        },
+        {
+          "k": "make",
+          "id": "제이드_copy",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "수양록 완독",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.08,
+              "ratio": 0.81,
               "target": "oneEnemy"
             },
             {
@@ -720,13 +786,249 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.51,
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "제이드_copy",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "비취옥"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "서점털이 계획",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "제이드_copy",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "제이드_copy",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "비취옥",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.19,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "비취옥"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "atkUp"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "제이드_copy",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "제이드_u5",
+      "name": "지식 독점",
+      "hero": "제이드",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "비취옥",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "unique": true
+        },
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "stack",
+          "id": "비취옥",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "비취옥",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "제이드_copy",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
           "power": true,
           "fx": [
             {
@@ -735,9 +1037,10 @@
               "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "oneEnemy"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
@@ -745,6 +1048,10 @@
                 {
                   "when": {
                     "on": "turnStart"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -759,83 +1066,38 @@
           ]
         },
         {
-          "name": "실내용 제이드",
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "allEnemies"
-            },
             {
               "k": "stack",
               "id": "비취옥",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "베낀 사본",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.81,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "비취옥"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.68,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "비취옥",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "서고 정리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.81,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "비취옥"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "target": "oneEnemy"
+              "v": 2
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "초대 교주의 필체",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "ap"
         },
         {
-          "name": "기록소",
-          "tags": [
-            "보존"
-          ]
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "밀린 만화책",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

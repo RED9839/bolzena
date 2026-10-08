@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "수인",
       "role": "딜러",
+      "style": "소환형",
       "star": 3,
       "hp": 580,
       "atk": 145,
@@ -16,11 +17,33 @@
         "name": "분신",
         "desc": "따라 던지고 대신 맞는 람쥐 분신",
         "carrier": "self",
-        "cap": 2,
+        "cap": 3,
         "guard": true,
-        "cut": 0.3
+        "cut": 0.2,
+        "uses": 2
       },
       "passives": [
+        {
+          "name": "분신 자폭",
+          "when": {
+            "on": "summonAct",
+            "id": "분신",
+            "kind": "lost"
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.51,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "randomEnemy"
+            }
+          ]
+        },
         {
           "name": "분신술",
           "when": {
@@ -33,26 +56,10 @@
           },
           "fx": [
             {
-              "k": "perStack",
-              "id": "분신"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "통나무 바꿔치기",
-          "when": {
-            "on": "fightStart"
-          },
-          "fx": [
-            {
-              "k": "stack",
+              "k": "summon",
               "id": "분신",
-              "v": 1
+              "ratio": 0.21,
+              "max": 3
             }
           ]
         }
@@ -143,7 +150,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.26,
           "target": "oneEnemy"
         },
         {
@@ -161,177 +168,133 @@
       "hero": "모모",
       "unique": true,
       "cost": 1,
-      "type": "공격",
+      "type": "스킬",
       "fx": [
         {
-          "k": "perStack",
-          "id": "분신"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.3,
-          "target": "allEnemies"
-        },
-        {
-          "k": "spend",
+          "k": "stack",
           "id": "분신",
-          "all": true
+          "v": 2
         },
         {
-          "k": "status",
-          "id": "충격",
-          "v": 1,
-          "target": "allEnemies"
+          "k": "shield",
+          "ratio": 0.43
         }
       ],
       "oracles": [
         {
-          "name": "세배로 안아준닷",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "perStack",
-              "id": "분신"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "분신",
-              "all": true
+              "v": 2
             },
             {
-              "k": "status",
-              "id": "충격",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "shield",
+              "ratio": 0.73
             }
           ]
         },
         {
-          "name": "살짝 안아준닷",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "perStack",
-              "id": "분신"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "분신",
-              "all": true
+              "v": 2
             },
             {
-              "k": "status",
-              "id": "충격",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "shield",
+              "ratio": 0.41
             }
           ]
         },
         {
-          "name": "찌릿 포옹",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "perStack",
-              "id": "분신"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.63,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "분신",
-              "all": true
-            },
-            {
-              "k": "perTag",
-              "id": "모모_shuriken"
+              "v": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "모모_shuriken",
+              "v": 1
             }
           ]
         },
         {
-          "name": "다시 안아준닷",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "perStack",
-              "id": "분신"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.42,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "분신",
-              "all": true
+              "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "k": "shield",
+              "ratio": 0.43
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "분신",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "꽃꿀 포옹",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "status",
-              "id": "충격",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
+              "k": "stack",
               "id": "분신",
-              "n": 2
+              "v": 3
             },
             {
-              "k": "perStack",
-              "id": "분신"
+              "k": "shield",
+              "ratio": 0.6
             },
             {
-              "k": "dmg",
-              "ratio": 0.37,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "분신",
-              "all": true
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "힘껏 포옹",
-          "kind": "power"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "빈틈 포옹",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "신난 람쥐",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -352,15 +315,14 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.43,
           "target": "oneEnemy",
           "hits": 2
         },
         {
           "k": "status",
           "id": "충격",
-          "v": 1,
-          "target": "oneEnemy"
+          "v": 1
         },
         {
           "k": "stack",
@@ -370,19 +332,19 @@
       ],
       "oracles": [
         {
-          "name": "고압 수리검",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.64,
+              "ratio": 0.58,
               "target": "oneEnemy",
               "hits": 2
             },
             {
               "k": "status",
               "id": "충격",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             },
             {
               "k": "stack",
@@ -392,98 +354,37 @@
           ]
         },
         {
-          "name": "정전기 수리검",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "status",
-              "id": "충격",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "번개 흩뿌리기",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "randomEnemy",
-              "hits": 4
-            },
-            {
-              "k": "status",
-              "id": "충격",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "모모_shuriken",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "번개로 콩 볶기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "status",
-              "id": "충격",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "람쥐썬더",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.49,
               "target": "oneEnemy",
               "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "make",
-                      "id": "모모_shuriken",
+                      "k": "stack",
+                      "id": "분신",
                       "v": 1
                     }
                   ]
@@ -491,20 +392,81 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "찌릿찌릿",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "감전",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "손목 스냅",
-          "kind": "draw"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -533,7 +495,7 @@
       ],
       "oracles": [
         {
-          "name": "다중 환영술",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -552,7 +514,7 @@
           ]
         },
         {
-          "name": "잔상",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -568,26 +530,7 @@
           ]
         },
         {
-          "name": "연막탄",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 3
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "통나무 진법",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -597,51 +540,46 @@
             {
               "k": "make",
               "id": "모모_shuriken",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
+              "v": 2
             }
           ]
         },
         {
-          "name": "그림자 수련",
+          "name": "신탁 4",
           "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "모모_shuriken",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "분신",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "모모_shuriken",
+              "v": 2
+            },
             {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "분신",
-              "v": 2
-            },
-            {
-              "k": "make",
-              "id": "모모_shuriken",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "손가락 인",
-          "kind": "draw"
-        },
-        {
-          "name": "두루마리",
-          "kind": "ap"
-        },
-        {
-          "name": "통나무 하나 더",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "분신",
               "v": 1
             }
           ]
@@ -658,7 +596,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.51,
           "target": "oneEnemy"
         },
         {
@@ -667,7 +605,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.26,
           "target": "oneEnemy"
         },
         {
@@ -678,11 +616,12 @@
       ],
       "oracles": [
         {
-          "name": "그림자 분신술",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.69,
               "target": "oneEnemy"
             },
             {
@@ -702,48 +641,56 @@
           ]
         },
         {
-          "name": "카게의 비전",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "모모_shuriken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "분신",
               "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "분신",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
-          "name": "수리검 비",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.57,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "모모_shuriken"
             },
             {
               "k": "dmg",
-              "ratio": 0.93,
+              "ratio": 0.23,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
               "target": "oneEnemy"
             },
             {
@@ -752,43 +699,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.52,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "닌자 두루마리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.67,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "모모_shuriken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.34,
+              "ratio": 0.26,
               "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
+              "unique": true
             }
           ]
         },
         {
-          "name": "연기 구슬",
-          "cost": 0,
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.77,
               "target": "oneEnemy"
             },
             {
@@ -797,9 +724,30 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.38,
               "target": "oneEnemy"
             },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "모모_shuriken"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
             {
               "k": "stack",
               "id": "분신",
@@ -807,22 +755,169 @@
             }
           ]
         }
+      ]
+    },
+    {
+      "id": "모모_u5",
+      "name": "분신 폭발",
+      "hero": "모모",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "분신",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.32,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "분신",
+          "all": true
+        },
+        {
+          "k": "status",
+          "id": "충격",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "분신",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "분신",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "분신",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "분신",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "분신",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "분신",
+              "all": true
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "분신",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "분신",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "분신",
+              "all": true
+            }
+          ]
+        }
       ],
       "blesses": [
         {
-          "name": "닌자 호흡",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "비전서 한 장",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "수리검 한 자루",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "모모_shuriken",
+              "k": "stack",
+              "id": "분신",
               "v": 1
             }
           ]

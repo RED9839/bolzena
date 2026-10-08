@@ -79,13 +79,13 @@ namespace Bolzena.RunUI
             if (used == "rest") W.Select(rest, true);
             Stage.Hot["camp.rest"] = rest;
 
-            var train = P.S.Camp?.Train;
-            var tcard = train != null ? P.Data.Card(train.CardId) : null;
+            var targets = P.Run.FlashTargets();
+            bool anyT = targets.Count > 0;
             bool mind = P.Run.MindBroken;
             string noTrain = mind ? "정신 붕괴 — 수련할 수 없습니다 · 쉬기만 고를 수 있습니다" : "신탁을 붙일 고유 카드가 없습니다 — 쉬기만 고를 수 있습니다";
-            var tr = W.Option(bottom, "수련", used == "train" ? "<color=#6EE0A0>손을 익혔습니다</color>" : tcard != null && !mind ? $"「{tcard.Name}」 에 신탁 하나를 붙입니다 — 셋 가운데 고릅니다" : noTrain, () => TrainPick(root, kind, withShop), optH, Theme.S("ic_spark"), "train");
+            var tr = W.Option(bottom, "수련", used == "train" ? "<color=#6EE0A0>손을 익혔습니다</color>" : anyT && !mind ? "강화할 카드를 고르면 신탁 셋이 나옵니다 — 하나를 붙입니다" : noTrain, () => TrainPick(root, kind, withShop), optH, Theme.S("ic_spark"), "train");
             tr.Pref(300, -1, 1);
-            tr.Interactable = used == "" && tcard != null && !mind;
+            tr.Interactable = used == "" && anyT && !mind;
             tr.Why = used != "" ? "이번 휴식에서는 이미 골랐습니다" : noTrain;
             if (used == "train") W.Select(tr, true);
             Stage.Hot["camp.trainopen"] = tr;
@@ -115,21 +115,42 @@ namespace Bolzena.RunUI
             if (used == "") Stage.Hot.Remove("camp.leave");   // 다시 세울 때 옛 출발 단추가 남지 않게
         }
 
-        /// <summary>수련 — 신탁 고르기 연출(OracleReveal). 취소 없음 · 반드시 한 장(2026-10-06 사용자).</summary>
+        /// <summary>수련(강화하기) — 먼저 강화할 카드를 고르고, 그 카드의 신탁 무작위 셋 가운데 하나를 고른다(전투 신탁 창과 같은 모양). 고른 뒤 연출 없음.</summary>
         void TrainPick(RectTransform root, string kind, bool withShop)
         {
-            var train = P.S.Camp?.Train;
-            var tcard = train != null ? P.Data.Card(train.CardId) : null;
-            if (tcard == null || OracleReveal.IsOpen) return;
+            if (OracleReveal.IsOpen || P.S.Camp == null) return;
+            var ids = P.Run.FlashTargets();
+            if (ids.Count == 0) return;
+            float mw = Mathf.Min(Theme.Compact ? 1240 : Mathf.Max(1240, 8 * (170 + 12) + 80), Stage.Size.x - 40);
+            var (right, closeM, _) = Stage.ModalBox("trainpick", mw, Mathf.Min(680, Stage.Size.y - 24), "강화할 카드를 고릅니다", "신탁을 붙일 수 있는 카드 — 고르면 신탁 셋이 나옵니다", true, null, 0, false);
+            Ui.Col(right, Theme.Gap, TextAnchor.UpperLeft, new RectOffset(4, 4, 0, 4));
+            var area = Ui.Rect("pick", right); area.Pref(-1, 200, -1, 1);
+            var content = Ui.Scroll(area, out _);
+            CardGroups(content, ids, 170, GridCols(mw - 80, 170, 12, Theme.Compact ? 3 : 6, 8), (c, id, i) =>
+            {
+                var b = c.gameObject.AddComponent<Btn>();
+                b.OnClick = () =>
+                {
+                    var offer = P.Run.CampOffer(id);
+                    if (offer == null) return;
+                    closeM();
+                    OpenTrainOracles(root, kind, withShop, offer);
+                };
+                Stage.Hot["camp.card" + i] = b;
+            });
+        }
+
+        void OpenTrainOracles(RectTransform root, string kind, bool withShop, Core.FlashOffer train)
+        {
+            var tcard = P.Data.Card(train.CardId);
             var opts = P.Run.FlashOptions(train);
             OracleReveal.Show(this, new RevealOpts
             {
-                Title = "수련!", Sub = $"<color=#ffd76a>{tcard.Name}</color>에 신탁 — 카드를 눌러 하나를 고르세요",
-                BaseCardId = train.CardId, Picks = RevealPick.Of(P.Data, train.CardId, opts), Cancel = false, Hot = "camp.train",
+                Title = "신탁!", Sub = "정보를 확인하려면 카드를 길게 누르세요.",
+                BaseCardId = null, Picks = RevealPick.Of(P.Data, train.CardId, opts), Cancel = true, Hot = "camp.train",
                 Try = i => P.CampTrain(opts[i].N),
                 Done = i =>
                 {
-                    Toast.Show($"「{tcard.Name}」 — 신탁 {opts[i].N}" + (opts[i].Blessed ? " · 축복" : ""));
                     P.Save("camp", kind);
                     if (root) BuildCamp(root, kind, withShop);
                 },

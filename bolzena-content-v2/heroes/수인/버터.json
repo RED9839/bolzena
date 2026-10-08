@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "수인",
       "role": "딜러",
+      "style": "쌓고 고르기",
       "star": 3,
       "hp": 550,
       "atk": 135,
@@ -23,32 +24,10 @@
             "v": 0.08
           }
         ],
-        "rules": [
-          {
-            "name": "레드카드",
-            "when": {
-              "on": "stackReach",
-              "id": "옐로카드",
-              "n": 4
-            },
-            "limit": {
-              "per": "fight",
-              "n": 2
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "옐로카드",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 1.4,
-                "target": "allEnemies"
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "make": "버터_red",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -161,6 +140,31 @@
       ]
     },
     {
+      "id": "버터_red",
+      "name": "레드카드",
+      "hero": "버터",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 2
+        }
+      ],
+      "blurb": "참고 참던 골든 리트리버가 웃음기를 거둡니다 — 앞치마 속 총이 불을 뿜고, 다시 처음부터"
+    },
+    {
       "id": "버터_u1",
       "name": "버터 플라이!",
       "hero": "버터",
@@ -182,11 +186,12 @@
       ],
       "oracles": [
         {
-          "name": "버터 플라이 킥!",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.47,
               "target": "randomEnemy",
               "hits": 4
             },
@@ -198,66 +203,47 @@
           ]
         },
         {
-          "name": "살짝 플라이",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "다이빙 헤딩",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "randomEnemy",
-              "hits": 6
-            },
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 2
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "경고 누적",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.24,
               "target": "randomEnemy",
               "hits": 4
             },
             {
-              "k": "ifStack",
+              "k": "stack",
               "id": "옐로카드",
-              "n": 2
+              "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 0.7,
-              "target": "randomEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "옐로카드",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "버터 회오리",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
@@ -274,22 +260,58 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "한껏 날아오르기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "옐로 받은 녀석",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "신나는 꼬리",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -324,11 +346,11 @@
       ],
       "oracles": [
         {
-          "name": "뭐든 맡겨 줘",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.53
+              "ratio": 1.56
             },
             {
               "k": "stack",
@@ -342,12 +364,12 @@
           ]
         },
         {
-          "name": "잠깐만 도와줄게",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 0.7
             },
             {
               "k": "stack",
@@ -361,11 +383,27 @@
           ]
         },
         {
-          "name": "대신 맞아 줄게",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.87,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 1.18
             },
             {
               "k": "stack",
@@ -373,15 +411,37 @@
               "v": 2
             },
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "옐로카드",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "심부름 갔다 올게",
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.3
+            },
             {
               "k": "stack",
               "id": "옐로카드",
@@ -392,49 +452,7 @@
               "from": "discard",
               "n": 1,
               "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.3
-            }
-          ]
-        },
-        {
-          "name": "착한 강아지",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 2.03
-            },
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 3
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "두 발로 버티기",
-          "kind": "guard"
-        },
-        {
-          "name": "부탁 쪽지",
-          "kind": "draw"
-        },
-        {
-          "name": "든든한 등",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 1
+              "unique": true
             }
           ]
         }
@@ -453,7 +471,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 0.75,
           "target": "oneEnemy"
         },
         {
@@ -462,20 +480,20 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.22,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "깊은 구덩이",
+          "name": "신탁 1",
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 1.01,
               "target": "oneEnemy"
             },
             {
@@ -484,13 +502,13 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.24,
+              "ratio": 0.3,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "얕은 구덩이",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "보존"
@@ -498,7 +516,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.71,
               "target": "oneEnemy"
             },
             {
@@ -507,44 +525,13 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.12,
+              "ratio": 0.21,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "간식 묻어 두기",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.73,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "옐로카드"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "when",
-              "on": "handEnd"
-            },
-            {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "구덩이 밭",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
@@ -562,20 +549,28 @@
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "땅파기 습관",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.89,
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
               "target": "oneEnemy"
             },
             {
@@ -583,7 +578,11 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "turnEnd"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -596,19 +595,45 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.98,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "삽질 한 번 더",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "흙투성이",
+          "name": "축복 2",
           "kind": "frost"
         },
         {
-          "name": "신나게 파기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -629,7 +654,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.6,
+          "ratio": 1.7,
           "target": "oneEnemy"
         },
         {
@@ -638,7 +663,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.4,
           "target": "oneEnemy"
         },
         {
@@ -649,11 +674,12 @@
       ],
       "oracles": [
         {
-          "name": "풀파워 매그넘",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
+              "ratio": 2.3,
               "target": "oneEnemy"
             },
             {
@@ -662,7 +688,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.54,
               "target": "oneEnemy"
             },
             {
@@ -673,12 +699,13 @@
           ]
         },
         {
-          "name": "에이프런 슛",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 1.62,
               "target": "oneEnemy"
             },
             {
@@ -687,7 +714,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.38,
               "target": "oneEnemy"
             },
             {
@@ -698,50 +725,36 @@
           ]
         },
         {
-          "name": "레드카드 각오",
-          "cost": 1,
-          "power": true,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
+              "ratio": 1.2,
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "옐로카드",
-              "v": 2
+              "k": "perStack",
+              "id": "옐로카드"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "옐로카드",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.8,
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "레드카드 매그넘",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.4,
+              "ratio": 1.7,
               "target": "oneEnemy"
             },
             {
@@ -750,30 +763,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "앞치마 펄럭",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "옐로카드"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.4,
               "target": "oneEnemy"
             },
             {
@@ -783,20 +773,211 @@
               "unique": true
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.06,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "앞치마 꽉 매기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "골문 구석",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "짧은 도움닫기",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "버터_u5",
+      "name": "공 물어 오기",
+      "hero": "버터",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "옐로카드",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.9
+        },
+        {
+          "k": "pull",
+          "from": "discard",
+          "n": 1,
+          "who": "self",
+          "unique": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.35
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.86
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.25
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "옐로카드",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.5
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
         }
       ]
     }

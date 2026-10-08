@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "마녀",
       "role": "탱커",
+      "style": "성장형",
       "star": 3,
       "hp": 1000,
       "atk": 75,
@@ -17,27 +18,10 @@
         "desc": "정규직 첫날의 넘치는 의욕",
         "carrier": "self",
         "cap": 4,
-        "rules": [
-          {
-            "name": "각성 드링크",
-            "when": {
-              "on": "stackReach",
-              "id": "신입의 패기",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "신입의 패기",
-                "all": true
-              },
-              {
-                "k": "heal",
-                "ratio": 0.35
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.4
+        }
       },
       "keywords": [
         {
@@ -216,29 +200,13 @@
         },
         {
           "k": "shield",
-          "ratio": 0.62
+          "ratio": 0.7
         }
       ],
       "oracles": [
         {
-          "name": "당당한 출근",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "신입의 패기",
-              "v": 3
-            },
-            {
-              "k": "shield",
-              "ratio": 0.97
-            }
-          ]
-        },
-        {
-          "name": "첫 출근",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -247,13 +215,28 @@
             },
             {
               "k": "shield",
-              "ratio": 0.79
+              "ratio": 1.05
             }
           ]
         },
         {
-          "name": "매일 아침 출근 도장",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "신입의 패기",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.66
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -261,82 +244,52 @@
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 0.7
+              "k": "dmg",
+              "ratio": 0.62,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "신입의 패기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "shield",
+              "ratio": 0.5
             }
           ]
         },
         {
-          "name": "선배 따라 하기",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "stack",
               "id": "신입의 패기",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
             },
             {
               "k": "draw",
-              "v": 2,
-              "who": "other",
-              "type": "공격"
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "미리 결재",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
               "id": "신입의 패기",
-              "v": 2
+              "v": 3
             },
             {
               "k": "shield",
-              "ratio": 0.79
+              "ratio": 1
             },
             {
-              "k": "ifWounded"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.79
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "사원증",
-          "kind": "guard"
-        },
-        {
-          "name": "커피 한 잔",
-          "kind": "draw"
-        },
-        {
-          "name": "출근 카드",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "신입의 패기",
-              "v": 1
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
@@ -352,7 +305,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.11,
+          "ratio": 0.12,
           "base": "def",
           "target": "allEnemies",
           "hits": 3
@@ -371,11 +324,12 @@
       ],
       "oracles": [
         {
-          "name": "신입의 기합",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.18,
+              "ratio": 0.17,
               "base": "def",
               "target": "allEnemies",
               "hits": 3
@@ -394,8 +348,9 @@
           ]
         },
         {
-          "name": "작은 패기",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
@@ -411,6 +366,45 @@
               "target": "allEnemies"
             },
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "신입의 패기",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.67,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            },
+            {
               "k": "stack",
               "id": "신입의 패기",
               "v": 1
@@ -418,11 +412,11 @@
           ]
         },
         {
-          "name": "서류 뭉치",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.12,
+              "ratio": 0.14,
               "base": "def",
               "target": "allEnemies",
               "hits": 3
@@ -434,21 +428,20 @@
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "신입의 패기"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "각성 드링크 원샷",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.16,
+              "ratio": 0.24,
               "base": "def",
               "target": "allEnemies",
               "hits": 3
@@ -458,56 +451,25 @@
               "id": "약화",
               "v": 1,
               "target": "allEnemies"
-            },
-            {
-              "k": "ifStack",
-              "id": "신입의 패기",
-              "n": 3
-            },
-            {
-              "k": "heal",
-              "ratio": 0.95
-            }
-          ]
-        },
-        {
-          "name": "패기 과잉",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "base": "def",
-              "target": "allEnemies",
-              "hits": 3
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "신입의 패기",
-              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "신입의 열정",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "서류 정리",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "면역 드링크",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "cleanse",
+              "k": "stack",
+              "id": "신입의 패기",
               "v": 1
             }
           ]
@@ -542,11 +504,12 @@
       ],
       "oracles": [
         {
-          "name": "칼퇴",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.88
+              "ratio": 0.95
             },
             {
               "k": "perStack",
@@ -554,7 +517,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 0.42
             },
             {
               "k": "spend",
@@ -564,12 +527,13 @@
           ]
         },
         {
-          "name": "반차 신청",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.53
+              "ratio": 0.66
             },
             {
               "k": "perStack",
@@ -577,7 +541,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.26
+              "ratio": 0.29
             },
             {
               "k": "spend",
@@ -587,28 +551,59 @@
           ]
         },
         {
-          "name": "주 4일제",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.02
+            },
+            {
+              "k": "perStack",
+              "id": "신입의 패기"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.43
+            },
+            {
+              "k": "spend",
+              "id": "신입의 패기",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.06
+              "ratio": 0.6
+            },
+            {
+              "k": "perStack",
+              "id": "신입의 패기"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "spend",
+                    "id": "신입의 패기"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "신입의 패기"
-                    },
-                    {
                       "k": "shield",
-                      "ratio": 0.31
+                      "ratio": 0.3
                     }
                   ]
                 }
@@ -617,11 +612,12 @@
           ]
         },
         {
-          "name": "야근 각오",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.84
+              "ratio": 1.26
             },
             {
               "k": "perStack",
@@ -629,48 +625,22 @@
             },
             {
               "k": "shield",
-              "ratio": 0.35
-            }
-          ]
-        },
-        {
-          "name": "퇴근길 서류 폭탄",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "신입의 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.13,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "신입의 패기",
-              "all": true
+              "ratio": 0.56
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "퇴근 준비 완료",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "칼같은 시계",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "퇴근길 간식",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -683,122 +653,41 @@
     },
     {
       "id": "레비_졸업_u4",
-      "name": "정규직 계약서",
+      "name": "롤모델 찾기",
       "hero": "레비_졸업",
       "unique": true,
       "cost": 1,
-      "type": "공격",
+      "type": "스킬",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.33,
-          "base": "def",
-          "target": "oneEnemy"
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
         },
         {
-          "k": "perStack",
-          "id": "신입의 패기"
+          "k": "empower",
+          "ratio": 0.4,
+          "who": "any"
         },
         {
-          "k": "dmg",
-          "ratio": 0.14,
-          "base": "def",
-          "target": "oneEnemy"
+          "k": "stack",
+          "id": "신입의 패기",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "연봉 협상",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.53,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "신입의 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.23,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "수습 계약",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.31,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "신입의 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.13,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "정규직",
-          "power": true,
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
-              "id": "결의",
+              "id": "피해 감소",
               "v": 1
             },
             {
-              "k": "stack",
-              "id": "신입의 패기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "신입의 패기",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.4,
-                      "base": "def",
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "팀장 승진",
-          "fx": [
-            {
-              "k": "ifStack",
-              "id": "신입의 패기",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.06,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "empower",
+              "ratio": 0.55,
+              "who": "any"
             },
             {
               "k": "stack",
@@ -808,48 +697,293 @@
           ]
         },
         {
-          "name": "계약 해지",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.48,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "empower",
+              "ratio": 0.35,
+              "who": "any"
             },
             {
-              "k": "perStack",
-              "id": "신입의 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.26,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
+              "k": "stack",
               "id": "신입의 패기",
-              "all": true
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "strongestAlly"
+            },
+            {
+              "k": "stack",
+              "id": "신입의 패기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.55,
+              "who": "any"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.8,
+              "who": "any"
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "정규직의 무게",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "defUp"
         },
         {
-          "name": "명함",
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "신입의 패기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레비_졸업_u5",
+      "name": "논문 초안",
+      "hero": "레비_졸업",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.7
+        },
+        {
+          "k": "perCardSt",
+          "id": "게재"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.3
+        },
+        {
+          "k": "ifGained",
+          "id": "신입의 패기",
+          "n": 6
+        },
+        {
+          "k": "cardStatus",
+          "id": "게재",
+          "v": 1,
+          "max": 5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "perCardSt",
+              "id": "게재"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.35
+            },
+            {
+              "k": "ifGained",
+              "id": "신입의 패기",
+              "n": 6
+            },
+            {
+              "k": "cardStatus",
+              "id": "게재",
+              "v": 1,
+              "max": 5
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "perCardSt",
+              "id": "게재"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.25
+            },
+            {
+              "k": "ifGained",
+              "id": "신입의 패기",
+              "n": 6
+            },
+            {
+              "k": "cardStatus",
+              "id": "게재",
+              "v": 1,
+              "max": 5
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perCardSt",
+              "id": "게재"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifGained",
+              "id": "신입의 패기",
+              "n": 5
+            },
+            {
+              "k": "cardStatus",
+              "id": "게재",
+              "v": 1,
+              "max": 5
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.73
+            },
+            {
+              "k": "perCardSt",
+              "id": "게재"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.37
+            },
+            {
+              "k": "ifGained",
+              "id": "신입의 패기",
+              "n": 6
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "perCardSt",
+              "id": "게재"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "사내 복지",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "stack",
+              "id": "신입의 패기",
+              "v": 2
             }
           ]
         }

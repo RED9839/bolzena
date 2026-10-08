@@ -6,12 +6,13 @@
       "nature": "냉정",
       "race": "엘프",
       "role": "딜러",
+      "style": "예약형",
       "star": 3,
       "hp": 620,
       "atk": 135,
       "def": 28,
       "crit": 10,
-      "blurb": "모든 발명품에 자폭 기능을 다는 괴짜 시장. 스킬을 낼 때마다 드론이 뜨고, 턴 끝마다 드론이 쏘고, 공격할 때 한 기씩 날려 버립니다.",
+      "blurb": "모든 발명품에 자폭 기능을 다는 괴짜 시장. 띄워 둔 냥이 드론이 턴 끝마다 펄스를 쏘고, 자폭 타이머가 다 닳으면 드론이 한꺼번에 터집니다.",
       "keyword": {
         "name": "냥이 드론",
         "desc": "자폭 기능이 달린 고양이 드론",
@@ -43,14 +44,18 @@
           ]
         },
         {
-          "name": "엘프의 자존심",
+          "name": "다른 버그로 고치기",
           "when": {
-            "on": "fightStart"
+            "on": "reserveFire",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "냥이 드론",
+              "k": "draw",
               "v": 1
             }
           ]
@@ -78,6 +83,49 @@
         "엘레나_u2",
         "엘레나_s2",
         "엘레나_s3"
+      ],
+      "keywords": [
+        {
+          "name": "자폭 타이머",
+          "desc": "드론이 터지기까지 남은 시간",
+          "carrier": "self",
+          "cap": 2,
+          "reserve": true,
+          "decay": 1,
+          "rules": [
+            {
+              "name": "쓸데없는 자폭",
+              "when": {
+                "on": "stackGone",
+                "id": "자폭 타이머",
+                "decay": true
+              },
+              "fx": [
+                {
+                  "k": "perStack",
+                  "id": "냥이 드론",
+                  "n": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.63,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "spend",
+                  "id": "냥이 드론",
+                  "all": true
+                },
+                {
+                  "k": "status",
+                  "id": "충격",
+                  "v": 1,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   ],
@@ -133,121 +181,140 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
+          "ratio": 1.12,
           "target": "allEnemies"
         },
         {
-          "k": "stack",
-          "id": "냥이 드론",
-          "v": 1
+          "k": "status",
+          "id": "충격",
+          "v": 1,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "펄스파 증폭",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.07,
+              "ratio": 1.51,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "냥이 드론",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "코드 기능 개선",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.46,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "냥이 드론",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "드론 편대",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.78,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "냥이 드론"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.18,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "아멜리아 호출",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.78,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "냥이 드론",
-              "v": 1
-            },
-            {
-              "k": "draw",
+              "k": "status",
+              "id": "충격",
               "v": 1,
-              "who": "other"
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "과부하 펄스",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.06,
+              "target": "allEnemies"
             },
             {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 1.58,
               "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "냥이 드론",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "충격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.57,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "펄스 출력",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "커피 수혈",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "예비 드론",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -294,7 +361,7 @@
       ],
       "oracles": [
         {
-          "name": "냥이 두 마리",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -324,41 +391,16 @@
           ]
         },
         {
-          "name": "즉석 출격",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "냥이 드론",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "출격 신호탄",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "냥이 드론",
+              "v": 1
             },
             {
               "k": "power",
@@ -380,7 +422,47 @@
           ]
         },
         {
-          "name": "발명품 서랍",
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "냥이 드론",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "냥이 드론",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
@@ -394,7 +476,7 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
             },
             {
               "k": "power",
@@ -416,58 +498,36 @@
           ]
         },
         {
-          "name": "쉬는 날 출격",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
               "id": "냥이 드론",
-              "v": 2
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "냥이 드론",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "냥이 드론",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "작업대 방패",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.4
-            }
-          ]
-        },
-        {
-          "name": "랩코트 주머니",
-          "kind": "cost"
-        },
-        {
-          "name": "드론 정비",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "냥이 드론",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -483,138 +543,94 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.77,
           "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "냥이 드론"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.35,
-          "target": "allEnemies"
-        },
-        {
-          "k": "spend",
-          "id": "냥이 드론",
-          "all": true
+          "k": "stack",
+          "id": "자폭 타이머",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "대형 자폭",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.71,
+              "ratio": 1.04,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "냥이 드론"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.41,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "냥이 드론",
-              "all": true
+              "k": "stack",
+              "id": "자폭 타이머",
+              "v": 2
             }
           ]
         },
         {
-          "name": "소형 자폭",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.73,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "냥이 드론"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "냥이 드론",
-              "all": true
+              "k": "stack",
+              "id": "자폭 타이머",
+              "v": 2
             }
           ]
         },
         {
-          "name": "자폭 취소",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.73,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "냥이 드론"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.34,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "ripen",
+              "id": "자폭 타이머",
+              "v": 0.25
             }
           ]
         },
         {
-          "name": "자폭 프로토콜",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.77,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "냥이 드론"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "allEnemies"
+              "k": "stack",
+              "id": "자폭 타이머",
+              "v": 2
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "냥이 드론",
-                    "n": 3
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "냥이 드론"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.25,
-                      "target": "allEnemies"
-                    },
-                    {
-                      "k": "spend",
+                      "k": "stack",
                       "id": "냥이 드론",
-                      "all": true
+                      "v": 1
                     }
                   ]
                 }
@@ -623,27 +639,21 @@
           ]
         },
         {
-          "name": "연쇄 자폭",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.16,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "냥이 드론"
+              "k": "stack",
+              "id": "자폭 타이머",
+              "v": 3
             },
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -651,16 +661,22 @@
       ],
       "blesses": [
         {
-          "name": "버터 바른 토스트",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "연구동 두 채",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "영구동력",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "냥이 드론",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -674,7 +690,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.84,
           "target": "oneEnemy"
         },
         {
@@ -683,17 +699,18 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.42,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "엘프의 긍지",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 1.13,
               "target": "oneEnemy"
             },
             {
@@ -702,18 +719,19 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.57,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "즉석 기술명",
-          "cost": 0,
+          "name": "신탁 2",
+          "cost": 2,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 1.5,
               "target": "oneEnemy"
             },
             {
@@ -722,39 +740,43 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "60년 막내의 공구함",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.74,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "냥이 드론",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
             }
           ]
         },
         {
-          "name": "시장 연설",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "냥이 드론"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.71,
               "target": "oneEnemy"
             },
             {
@@ -763,7 +785,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.36,
               "target": "oneEnemy"
             },
             {
@@ -786,11 +808,11 @@
           ]
         },
         {
-          "name": "3초 이상은 못 참아",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.77,
               "target": "oneEnemy"
             },
             {
@@ -799,28 +821,183 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "allEnemies"
+              "ratio": 0.39,
+              "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "냥이 드론",
-              "all": true
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기계마법 공학",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "지름길",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "드론 한 대 더",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자폭 타이머",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "엘레나_u5",
+      "name": "아메리카노 주말농장 에디션",
+      "hero": "엘레나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.98
+        },
+        {
+          "k": "hasten",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "냥이 드론",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.39
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "냥이 드론",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.92
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "냥이 드론",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.84
+            },
+            {
+              "k": "ripen",
+              "id": "자폭 타이머",
+              "v": 0.3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.88
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "hasten",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.61
+            },
+            {
+              "k": "hasten",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

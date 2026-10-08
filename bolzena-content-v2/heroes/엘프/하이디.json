@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "엘프",
       "role": "딜러",
+      "style": "두 얼굴형",
       "star": 3,
       "hp": 520,
       "atk": 145,
       "def": 25,
       "crit": 10,
-      "blurb": "세상 최고의 특종은 자기 자신인 기자. 상자 속에 잠복해 한 컷을 노리다가, 특종감으로 찍은 적에게 셔터를 몰아칩니다. 특종감이 쓰러지면 셀카 한 장이 1면 기사가 됩니다.",
+      "blurb": "세상 최고의 특종은 자기 자신인 기자. 상자 속에 숨어 셔터를 모으다가, 특종감을 찍으면 그 적만 쫓으며 셔터를 몰아칩니다. 특종감이 쓰러지면 셀카 한 장이 1면 기사가 됩니다.",
       "keyword": {
         "name": "특종감",
         "desc": "쫓는 특종 표시",
@@ -21,7 +22,7 @@
         "per": [
           {
             "stat": "taken",
-            "v": 0.3,
+            "v": 0.2,
             "from": "owner"
           }
         ]
@@ -31,46 +32,11 @@
           "name": "잠복",
           "desc": "상자 속에서 노리는 한 컷",
           "carrier": "self",
-          "cap": 3,
-          "consumeAll": true,
+          "cap": 4,
           "per": [
             {
               "stat": "dealt",
-              "v": 0.25
-            }
-          ]
-        },
-        {
-          "name": "초 집중 취재",
-          "desc": "특종만 쫓는 취재 모드",
-          "carrier": "self",
-          "cap": 2,
-          "decay": 1,
-          "rules": [
-            {
-              "name": "다음 특종",
-              "when": {
-                "on": "huntDown",
-                "id": "특종감"
-              },
-              "conds": [
-                {
-                  "c": "stack",
-                  "id": "초 집중 취재",
-                  "n": 1
-                }
-              ],
-              "fx": [
-                {
-                  "k": "cue",
-                  "id": "heidi_next_scoop"
-                },
-                {
-                  "k": "stack",
-                  "id": "잠복",
-                  "v": 2
-                }
-              ]
+              "v": 0.05
             }
           ]
         }
@@ -86,7 +52,7 @@
               "k": "stack",
               "id": "특종감",
               "v": 1,
-              "target": "topEnemy"
+              "target": "lowEnemy"
             }
           ]
         },
@@ -129,7 +95,7 @@
               "k": "stack",
               "id": "특종감",
               "v": 1,
-              "target": "topEnemy"
+              "target": "lowEnemy"
             }
           ]
         }
@@ -145,15 +111,14 @@
             "target": "lowEnemy"
           },
           {
-            "k": "stack",
-            "id": "초 집중 취재",
-            "v": 2
+            "k": "form",
+            "id": "하이디_집중"
           },
           {
             "k": "dmg",
-            "ratio": 0.45,
-            "hits": 6,
-            "target": "lowEnemy"
+            "ratio": 0.5,
+            "target": "lowEnemy",
+            "hits": 6
           },
           {
             "k": "status",
@@ -167,6 +132,98 @@
         "하이디_u1",
         "하이디_s2",
         "하이디_s3"
+      ],
+      "forms": [
+        {
+          "id": "하이디_잠입",
+          "name": "잠입 취재 중",
+          "desc": "상자에 숨어 셔터를 모으고 플래시로 눈을 가리는 얼굴",
+          "turns": 2,
+          "mods": {
+            "taken": -0.1
+          },
+          "passives": [
+            {
+              "name": "상자 속 대기",
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "잠복",
+                  "v": 1
+                },
+                {
+                  "k": "gauge",
+                  "v": -5
+                }
+              ]
+            },
+            {
+              "name": "눈가림",
+              "when": {
+                "on": "play",
+                "type": "공격"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "약화",
+                  "v": 1
+                }
+              ]
+            }
+          ],
+          "replace": false,
+          "skin": null,
+          "anim": null
+        },
+        {
+          "id": "하이디_집중",
+          "name": "초 집중 취재",
+          "desc": "셔터를 모두 특종감에게 모는 얼굴",
+          "turns": 2,
+          "bonus": [
+            {
+              "type": "공격",
+              "fx": [
+                {
+                  "k": "extra",
+                  "ratio": 0.15,
+                  "target": "markedEnemy"
+                }
+              ]
+            }
+          ],
+          "passives": [
+            {
+              "name": "다음 특종",
+              "when": {
+                "on": "huntDown",
+                "id": "특종감"
+              },
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "heidi_next_scoop"
+                },
+                {
+                  "k": "stack",
+                  "id": "잠복",
+                  "v": 2
+                }
+              ]
+            }
+          ],
+          "replace": false,
+          "skin": null,
+          "anim": null
+        }
       ]
     }
   ],
@@ -251,11 +308,15 @@
           "k": "status",
           "id": "회피",
           "v": 1
+        },
+        {
+          "k": "form",
+          "id": "하이디_잠입"
         }
       ],
       "oracles": [
         {
-          "name": "상자 속 잠입",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -265,55 +326,59 @@
             {
               "k": "status",
               "id": "회피",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "장기 잠입",
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "잠복",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "회피",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "잠복",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "제보 검색",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "잠복",
               "v": 2
             },
             {
-              "k": "status",
-              "id": "회피",
+              "k": "form",
+              "id": "하이디_잠입"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잠복",
               "v": 1
+            },
+            {
+              "k": "form",
+              "id": "하이디_잠입"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 3
+            },
+            {
+              "k": "form",
+              "id": "하이디_잠입"
+            },
+            {
+              "k": "make",
+              "id": "하이디_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 4
+            },
+            {
+              "k": "form",
+              "id": "하이디_잠입"
             },
             {
               "k": "draw",
@@ -324,57 +389,21 @@
           ]
         },
         {
-          "name": "위장 취재",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "stack",
-              "id": "특종감",
-              "v": 1,
-              "target": "topEnemy"
-            },
-            {
-              "k": "make",
-              "id": "하이디_t1",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "상자째 돌진",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "잠복",
-              "v": 3
+              "v": 4
             },
             {
               "k": "status",
               "id": "회피",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "프리 기자 패스",
-          "kind": "draw"
-        },
-        {
-          "name": "골판지 상자",
-          "kind": "cost"
-        },
-        {
-          "name": "숨죽이기",
-          "fx": [
+              "v": 2
+            },
             {
-              "k": "stack",
-              "id": "잠복",
-              "v": 1
+              "k": "form",
+              "id": "하이디_잠입"
             }
           ]
         }
@@ -390,83 +419,62 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 0.65,
           "target": "oneEnemy"
         },
         {
           "k": "status",
           "id": "약화",
-          "v": 1,
-          "target": "oneEnemy"
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "풀 플래시",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 0.88,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         },
         {
-          "name": "찰칵",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.62,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         },
         {
-          "name": "특종의 순간",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "특종감",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "사진첩 뒤지기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
+              "ratio": 0.29,
+              "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약화",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -477,38 +485,83 @@
           ]
         },
         {
-          "name": "플래시 과열",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 0.42,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "약화",
-              "v": 1,
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "잠복",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.98,
               "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "대형 플래시",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "셔터 연사",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "눈부심",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -528,13 +581,18 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.9,
+          "ratio": 0.52,
           "target": "oneEnemy"
+        },
+        {
+          "k": "form",
+          "id": "하이디_집중"
         }
       ],
       "oracles": [
         {
-          "name": "1면 특종",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -544,14 +602,19 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.35,
+              "ratio": 0.84,
               "target": "oneEnemy"
+            },
+            {
+              "k": "form",
+              "id": "하이디_집중"
             }
           ]
         },
         {
-          "name": "속보",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -561,38 +624,17 @@
             },
             {
               "k": "dmg",
-              "ratio": 2.2,
+              "ratio": 0.49,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "잠복",
-              "v": 1
+              "k": "form",
+              "id": "하이디_집중"
             }
           ]
         },
         {
-          "name": "이미 특종감이면",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "특종감",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "취재 수첩",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -601,25 +643,19 @@
               "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
+              "k": "extra",
+              "ratio": 0.84
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "k": "form",
+              "id": "하이디_집중"
             }
           ]
         },
         {
-          "name": "독점 보도",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "특종감",
@@ -627,24 +663,68 @@
               "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 1.35,
+              "k": "form",
+              "id": "하이디_집중"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.46,
+                      "target": "markedEnemy"
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "특종감",
+              "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "form",
+              "id": "하이디_집중"
+            },
+            {
+              "k": "make",
+              "id": "하이디_t1",
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "망원 렌즈",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "자극적인 제목",
-          "kind": "draw"
-        },
-        {
-          "name": "잠복 준비",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -665,88 +745,296 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
-          "target": "oneEnemy"
+          "ratio": 0.26,
+          "target": "markedEnemy"
         },
         {
           "k": "perStack",
-          "id": "잠복"
+          "id": "잠복",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.16,
-          "target": "oneEnemy"
+          "ratio": 0.2,
+          "target": "markedEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "잠복",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "셀카 각도 완벽",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
-              "target": "oneEnemy"
+              "ratio": 0.35,
+              "target": "markedEnemy"
             },
             {
               "k": "perStack",
-              "id": "잠복"
+              "id": "잠복",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
+              "ratio": 0.27,
+              "target": "markedEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "잠복",
+              "all": true
             }
           ]
         },
         {
-          "name": "대충 한 장",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "잠복"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.14,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "아핫!",
-          "fx": [
-            {
-              "k": "make",
-              "id": "하이디_t1",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "특종감",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "셀카 연재",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 0.23,
+              "target": "markedEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "잠복",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "markedEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "잠복",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.23,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "잠복",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "잠복",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "markedEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "잠복",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "markedEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "markedEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "잠복",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "markedEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "하이디_u5",
+      "name": "음모론 완성",
+      "hero": "하이디",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.45
+        },
+        {
+          "k": "stack",
+          "id": "잠복",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.62
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.43
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.45
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 2
+            },
+            {
               "k": "make",
               "id": "하이디_t1",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.55
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 2
             },
             {
               "k": "power",
@@ -768,44 +1056,39 @@
           ]
         },
         {
-          "name": "블로그 리뷰",
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.85
+            },
+            {
+              "k": "stack",
+              "id": "잠복",
+              "v": 4
+            },
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "잠복"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "셀카봉",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "식당 평점",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "한 장 더",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "하이디_t1",
+              "k": "stack",
+              "id": "잠복",
               "v": 1
             }
           ]

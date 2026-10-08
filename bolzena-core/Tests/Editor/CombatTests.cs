@@ -275,8 +275,8 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(10, K.E(b).Block, "아픔 — 턴당 한 번");
             Assert.AreEqual(1, b.St(K.E(b), "취약"), "푹 꺼짐");
             K.Play(b, "smash");
-            Assert.AreEqual(1, b.St(K.E(b), "사기"), "반토막");
-            Assert.AreEqual(5, K.E(b).Block, "방어 10 은 두 번째 한 방에 벗겨지고, 공격 카드 두 장째라 감시 +5(아픔은 이번 턴 이미 돌았다)");
+            Assert.AreEqual(0, b.St(K.E(b), "사기"), "격파 중 — 반토막도 멈춘다(2026-10-08 사용자: 격파된 적은 반응도 모두 멈춘다)");
+            Assert.AreEqual(0, K.E(b).Block, "방어 10 은 두 번째 한 방에 벗겨지고, 격파 중이라 감시 +5 도 없다");
             b.EndTurn();
             Assert.AreEqual(1, b.St(K.E(b), "불굴"), "일어서면 성난다");
         }
@@ -423,6 +423,8 @@ namespace Bolzena.Core.Tests
  {id:'h_coolA', name:'냉정 쓸기', hero:'cool', cost:1, type:'공격', fx:[{k:'dmg', ratio:0.1, target:'allEnemies'}]},
  {id:'h_pure', name:'순수 치기', hero:'pure', cost:1, type:'공격', fx:[{k:'dmg', ratio:0.1, target:'oneEnemy'}]},
  {id:'h_pure0', name:'순수 콕', hero:'pure', cost:0, type:'공격', fx:[{k:'dmg', ratio:0.01, target:'oneEnemy'}]},
+ {id:'h_cool0', name:'냉정 콕', hero:'cool', cost:0, type:'공격', fx:[{k:'dmg', ratio:0.01, target:'oneEnemy'}]},
+ {id:'h_pureA', name:'순수 쓸기', hero:'pure', cost:1, type:'공격', fx:[{k:'dmg', ratio:0.01, target:'allEnemies'}]},
  {id:'h_res', name:'공명 치기', hero:'res', cost:1, type:'공격', fx:[{k:'dmg', ratio:0.1, target:'oneEnemy'}]}]";
         const string NATURE_FOES = @"[
  {id:'mad', name:'광기 적', hp:5000, nature:'광기', tough:6, intents:[{t:'jam', v:0, rush:0}]},
@@ -447,16 +449,56 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(2, b.ToughHits); Assert.AreEqual(1, b.ToughWeakHits);
         }
 
-        [Test] public void 약점_2코는_2_광역은_대상마다_절반_0코_비약점은_6분의1()
+        [Test] public void 약점_2코는_2_광역은_적마다_단일과_같고_0코_비약점은_3분의1()
         {
             var b = F("mad", "mad"); K.Hand(b, "h_cool2", "h_coolA", "h_pure0");
             K.Play(b, "h_cool2");
             Assert.AreEqual(4, K.E(b, 0).Tough, 1e-9, "2코 약점 = 2");
             K.Play(b, "h_coolA");
-            Assert.AreEqual(3.5, K.E(b, 0).Tough, 1e-9, "광역 1코 약점 = 대상마다 1/2");
-            Assert.AreEqual(5.5, K.E(b, 1).Tough, 1e-9);
+            Assert.AreEqual(3, K.E(b, 0).Tough, 1e-9, "광역 1코 약점 = 적마다 1(2026-10-08 — 옛 1/2)");
+            Assert.AreEqual(5, K.E(b, 1).Tough, 1e-9);
             K.Play(b, "h_pure0", 1);
-            Assert.AreEqual(5.5 - 1.0 / 6, K.E(b, 1).Tough, 1e-9, "0코 비약점 = 1/6");
+            Assert.AreEqual(5 - 1.0 / 3, K.E(b, 1).Tough, 1e-9, "0코 비약점 = 1코처럼 1/3(옛 1/6)");
+        }
+
+        // 2026-10-08 사용자 — 「1코 광역이 강인도 1칸을 못 깎는다」 · 0코도 1코처럼
+        [Test] public void 광역_1코_약점은_적_둘셋_모두_1칸씩([Values(2, 3)] int n)
+        {
+            var b = F(Enumerable.Repeat("mad", n).ToArray()); K.Hand(b, "h_coolA");
+            K.Play(b, "h_coolA");
+            for (int i = 0; i < n; i++) Assert.AreEqual(5, K.E(b, i).Tough, 1e-9, $"적 {i}: 앞 적에 쓴 몫이 줄지 않는다");
+            Assert.AreEqual(n, b.ToughWeakHits);
+        }
+
+        [Test] public void 광역_1코_비약점은_적마다_3분의1([Values(2, 3)] int n)
+        {
+            var b = F(Enumerable.Repeat("mad", n).ToArray()); K.Hand(b, "h_pureA");
+            K.Play(b, "h_pureA");
+            for (int i = 0; i < n; i++) Assert.AreEqual(6 - 1.0 / 3, K.E(b, i).Tough, 1e-9, $"적 {i}");
+            Assert.AreEqual(0, b.ToughWeakHits);
+        }
+
+        [Test] public void 영코_단일은_1코와_같다_약점_1_비약점_3분의1()
+        {
+            var b = F("mad"); K.Hand(b, "h_cool0", "h_pure0");
+            K.Play(b, "h_cool0");
+            Assert.AreEqual(5, K.E(b).Tough, 1e-9, "0코 약점 = 1");
+            K.Play(b, "h_pure0");
+            Assert.AreEqual(5 - 1.0 / 3, K.E(b).Tough, 1e-9, "0코 비약점 = 1/3");
+            Assert.AreEqual(3, b.Ap, "0코 둘 — AP 그대로");
+        }
+
+        [Test] public void 남은_칸보다_큰_깎기는_0에서_멈추고_다른_적은_제_몫()
+        {
+            var b = F("mad", "mad"); K.Hand(b, "h_cool2", "h_coolA");
+            K.E(b, 0).Tough = 0.5;
+            K.Play(b, "h_cool2", 0);
+            Assert.AreEqual(0, K.E(b, 0).Tough, 1e-9); Assert.IsTrue(K.E(b, 0).Broken, "2 를 깎아 남은 1/2 칸 — 격파");
+            K.E(b, 0).Broken = false; K.E(b, 0).Sealed = false; K.E(b, 0).Tough = 0.5;
+            K.Play(b, "h_coolA");
+            Assert.IsTrue(K.E(b, 0).Broken, "남은 1/2 칸 적은 격파");
+            Assert.AreEqual(5, K.E(b, 1).Tough, 1e-9, "옆 적은 남은 칸과 상관없이 1칸");
+            Assert.AreEqual(2, b.Breaks);
         }
 
         [Test] public void 공명은_어느_적이든_늘_약점()

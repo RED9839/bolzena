@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "수인",
       "role": "탱커",
+      "style": "두 얼굴형",
       "star": 3,
       "hp": 1100,
       "atk": 84,
@@ -69,7 +70,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.3
+              "ratio": 0.32
             }
           ]
         }
@@ -109,6 +110,45 @@
             {
               "card": "코미_u2",
               "ratio": 1.5
+            }
+          ],
+          "skin": null,
+          "anim": null
+        },
+        {
+          "id": "코미_잠",
+          "name": "쿨쿨 코미",
+          "desc": "어디서든 몸을 말고 잠든 얼굴 — 자는 동안 상처가 아물고 나쁜 기운도 비켜 가는 꿀잠",
+          "turns": 2,
+          "until": {
+            "on": "play",
+            "type": "공격"
+          },
+          "mods": {
+            "def": 0.2
+          },
+          "passives": [
+            {
+              "name": "꿀잠",
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "heal",
+                  "ratio": 0.4
+                },
+                {
+                  "k": "stack",
+                  "id": "낮잠",
+                  "v": 1
+                },
+                {
+                  "k": "status",
+                  "id": "면역",
+                  "v": 1
+                }
+              ]
             }
           ],
           "skin": null,
@@ -160,12 +200,8 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "perStack",
-          "id": "낮잠"
-        },
-        {
           "k": "shield",
-          "ratio": 0.38
+          "ratio": 0.95
         },
         {
           "k": "status",
@@ -173,22 +209,18 @@
           "v": 1
         },
         {
-          "k": "spend",
-          "id": "낮잠",
-          "all": true
+          "k": "form",
+          "id": "코미_잠"
         }
       ],
       "oracles": [
         {
-          "name": "푹신푹신 이불",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "perStack",
-              "id": "낮잠"
-            },
-            {
               "k": "shield",
-              "ratio": 0.54
+              "ratio": 1.79
             },
             {
               "k": "status",
@@ -196,23 +228,19 @@
               "v": 1
             },
             {
-              "k": "spend",
-              "id": "낮잠",
-              "all": true
+              "k": "form",
+              "id": "코미_잠"
             }
           ]
         },
         {
-          "name": "쪽잠 타임",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "perStack",
-              "id": "낮잠"
-            },
-            {
               "k": "shield",
-              "ratio": 0.26
+              "ratio": 0.9
             },
             {
               "k": "status",
@@ -220,23 +248,17 @@
               "v": 1
             },
             {
-              "k": "spend",
-              "id": "낮잠",
-              "all": true
+              "k": "form",
+              "id": "코미_잠"
             }
           ]
         },
         {
-          "name": "겨울잠",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "perStack",
-              "id": "낮잠"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
+              "k": "heal",
+              "ratio": 0.95
             },
             {
               "k": "status",
@@ -244,74 +266,66 @@
               "v": 2
             },
             {
-              "k": "heal",
-              "ratio": 0.75
+              "k": "form",
+              "id": "코미_잠"
             }
           ]
         },
         {
-          "name": "이불 속 뒹굴기",
+          "name": "신탁 4",
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.05
-            },
             {
               "k": "status",
               "id": "불굴",
-              "v": 1
+              "v": 2
+            },
+            {
+              "k": "form",
+              "id": "코미_잠"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "불굴",
+              "v": 2
+            },
+            {
+              "k": "form",
+              "id": "코미_잠"
             },
             {
               "k": "stack",
               "id": "낮잠",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "개운한 기상",
-          "fx": [
-            {
-              "k": "status",
-              "id": "불굴",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "낮잠",
-              "n": 3
-            },
-            {
-              "k": "perStack",
-              "id": "낮잠"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.56
-            },
-            {
-              "k": "spend",
-              "id": "낮잠",
-              "all": true
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "두툼한 이불",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "뒹굴 자리",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "포근한 털",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "면역",
+              "k": "stack",
+              "id": "낮잠",
               "v": 1
             }
           ]
@@ -328,7 +342,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.52,
+          "ratio": 0.63,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -344,17 +358,17 @@
         {
           "k": "status",
           "id": "기절",
-          "v": 1,
-          "target": "oneEnemy"
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "솜 꽉 찬 베개",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.71,
+              "ratio": 0.85,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -370,18 +384,18 @@
             {
               "k": "status",
               "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         },
         {
-          "name": "베개 톡",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.34,
+              "ratio": 0.68,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -391,27 +405,29 @@
               "v": 1
             },
             {
-              "k": "ifRandom",
-              "pct": 0.2
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.38
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "베개 싸움",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.63,
               "base": "def",
               "target": "allEnemies"
             },
@@ -423,11 +439,11 @@
           ]
         },
         {
-          "name": "졸린 베개질",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.52,
+              "ratio": 0.58,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -437,52 +453,43 @@
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "낮잠",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "기절",
+              "k": "draw",
               "v": 1,
-              "target": "oneEnemy"
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
             }
           ]
         },
         {
-          "name": "베개 베고 한숨",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 1.13,
               "base": "def",
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "낮잠",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "묵직한 베개",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "솜뭉치 범벅",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "하품",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -510,7 +517,11 @@
         },
         {
           "k": "shield",
-          "ratio": 0.22
+          "ratio": 0.23
+        },
+        {
+          "k": "shield",
+          "ratio": 0.42
         },
         {
           "k": "exileFrom",
@@ -521,7 +532,7 @@
       ],
       "oracles": [
         {
-          "name": "오늘은 쉬는 날",
+          "name": "신탁 1",
           "tags": [
             "보존"
           ],
@@ -532,7 +543,11 @@
             },
             {
               "k": "shield",
-              "ratio": 0.3
+              "ratio": 0.32
+            },
+            {
+              "k": "shield",
+              "ratio": 0.57
             },
             {
               "k": "exileFrom",
@@ -543,7 +558,7 @@
           ]
         },
         {
-          "name": "잠깐 쉬기",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "보존"
@@ -555,7 +570,11 @@
             },
             {
               "k": "shield",
-              "ratio": 0.15
+              "ratio": 0.22
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
             },
             {
               "k": "exileFrom",
@@ -566,63 +585,25 @@
           ]
         },
         {
-          "name": "다들 쉬어도 돼",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.68
+              "k": "perStack",
+              "id": "낮잠"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.45
             },
             {
               "k": "stack",
               "id": "낮잠",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "낮잠 시간표",
-          "tags": [
-            "보존"
-          ],
-          "power": true,
-          "fx": [
-            {
-              "k": "status",
-              "id": "저장",
               "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "perStack",
-                      "id": "낮잠"
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.09
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
-          "name": "오늘 일 끝",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "perStack",
@@ -630,32 +611,56 @@
             },
             {
               "k": "shield",
-              "ratio": 0.34
+              "ratio": 0.21
             },
             {
-              "k": "spend",
-              "id": "낮잠",
-              "all": true
+              "k": "shield",
+              "ratio": 0.32
             },
             {
-              "k": "status",
-              "id": "저장",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            },
+            {
+              "k": "shield",
+              "ratio": 0.55
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "폭신한 쿠션",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "느긋한 손길",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "종이 상자",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -702,7 +707,7 @@
       ],
       "oracles": [
         {
-          "name": "두 그릇째",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -732,7 +737,7 @@
           ]
         },
         {
-          "name": "사료 한 알",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "개전"
@@ -763,22 +768,31 @@
           ]
         },
         {
-          "name": "확 돌아가는 머리",
+          "name": "신탁 3",
           "tags": [
             "개전"
           ],
           "fx": [
             {
-              "k": "draw",
-              "v": 2,
-              "basic": true
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.74
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "keepAp",
+                    "kind": "ap"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -793,7 +807,7 @@
           ]
         },
         {
-          "name": "배부른 오후",
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
@@ -804,8 +818,10 @@
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 0.45
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
@@ -827,7 +843,8 @@
           ]
         },
         {
-          "name": "포근한 방석",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -835,10 +852,6 @@
               "v": 2
             },
             {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
               "k": "power",
               "rules": [
                 {
@@ -854,21 +867,184 @@
                   ]
                 }
               ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_u5",
+      "name": "사료 한 그릇 더",
+      "hero": "코미",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.58,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "낮잠",
+          "n": 3
+        },
+        {
+          "k": "spend",
+          "id": "낮잠",
+          "all": true
+        },
+        {
+          "k": "form",
+          "id": "코미_거대화"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "낮잠",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "all": true
+            },
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "낮잠",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "all": true
+            },
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "낮잠",
+              "n": 2
+            },
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.53,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "낮잠",
+              "n": 3
+            },
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.49,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "배부른 코미",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "그릇 핥기",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "식후 낮잠",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

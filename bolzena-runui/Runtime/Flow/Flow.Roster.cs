@@ -109,50 +109,77 @@ namespace Bolzena.RunUI
         {
             Ui.Clear(root);
             RosterBg(root, 0.8f);
+            PartySlotsNow = st.Slots;
             int count = st.Slots.Count(s => s != null);
             RosterHead(root, "팀 편성", () => VillageReveal(st.Village, () => Party(st.Village)));
             var size = Stage.Size;
             float side = Theme.C(440, 400);
-            float top = 96, bottom = Theme.C(104, 92);
+            float top = 96, bottom = Theme.C(176, 150);   // 아래: 시작 덱 · 성격 줄 + 보드 요약 줄
             float leftW = size.x - side - Theme.Gutter * 3;
             float plateH = Theme.C(78, 66);
             float cardH = size.y - top - bottom - plateH - 10;
             float gap = Theme.C(22, 14);
             float cw = Mathf.Min((leftW - gap * 2) / 3f, cardH * 0.74f);
             float x0 = Theme.Gutter + (leftW - (cw * 3 + gap * 2)) / 2f;
+            var slotRts = new RectTransform[3];
             for (int i = 0; i < 3; i++)
             {
                 var slot = Ui.Rect("slot" + i, root).At(0, 1, x0 + i * (cw + gap), -top, cw, cardH + plateH + 6);
                 PartyCard(slot, st, i, cw, cardH, plateH, root);
-                Tw.Rise(slot, 0.05f + i * 0.07f, 30, 0.45f);
+                slotRts[i] = slot;
+                if (!st.Quiet) Tw.Rise(slot, 0.05f + i * 0.07f, 30, 0.45f);
             }
+            // 끌어서 자리 바꾸기 — 사도가 있는 칸만 끌 수 있다(빈 칸은 놓을 곳)
+            for (int i = 0; i < 3; i++)
+            {
+                if (st.Slots[i] == null || !Stage.Hot.TryGetValue("slot" + i, out var cb) || cb == null) continue;
+                var dg = cb.gameObject.AddComponent<PartySlotDrag>();
+                dg.Slot = slotRts[i]; dg.Slots = slotRts; dg.Root = root; dg.Index = i;
+                dg.OnSwap = (a, b) => SwapPartySlots(st, a, b, root);
+            }
+            st.Quiet = false;
+            // 위 오른쪽 — 무작위 편성 · 프리셋 · 최근 편성
+            var tools = Ui.Rect("partytools", root).At(1, 1, -Theme.Gutter, -20, 520, 52);
+            Ui.Row(tools, 10, TextAnchor.MiddleRight, null, false, true);
+            Stage.Hot["party.random"] = NavyPill(tools, "ic_refresh", "무작위 편성", () => PartyRandom(st, root), "random", 170);
+            Stage.Hot["party.presets"] = NavyPill(tools, "ic_copy", "프리셋 · 최근 편성", () => PartyPresets(st, root), "presets", 230);
+            var dragHint = Ui.Text(root, count > 0 ? "칸을 끌어 자리를 바꿀 수 있습니다" : "칸을 눌러 사도를 고릅니다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineLeft);
+            dragHint.rectTransform.At(0, 1, Theme.Gutter + 72 + 250, -34, 460, 24); dragHint.textWrappingMode = TextWrappingModes.NoWrap;
 
-            // 아래 왼쪽 — 시작 덱 평균 비용 · 성격 점(추천 편성 · 자리 안내는 없앴다 — 사용자 2026-10-06)
-            var row = Ui.Rect("tools", root).At(0, 0, Theme.Gutter, Theme.C(24, 18), leftW, 58);
+            // 아래 왼쪽 — 위 줄: 시작 덱(누르면 목록) · 성격 점 / 아래 줄: 크레파스 보드 요약 · 학년 안내(추천 편성 · 자리 안내는 없앴다 — 사용자 2026-10-06)
+            float rowH = Theme.C(58, 52), boardH = Theme.C(52, 46), low = Theme.C(24, 18);
+            PartyBoardRow(Ui.Rect("boardrow", root).At(0, 0, Theme.Gutter, low, leftW, boardH), leftW, boardH);
+            var row = Ui.Rect("tools", root).At(0, 0, Theme.Gutter, low + boardH + 12, leftW, rowH);
             Ui.Row(row, 12, TextAnchor.MiddleLeft, null, false, true);
             var picked = st.Slots.Where(k => k != null).Select(Roster.ByKey).Where(h => h != null && h.Playable).ToList();
-            var starter = picked.SelectMany(h => P.Data.Hero(h.CoreId)?.Starter ?? new List<string>()).Select(id => P.Data.Card(id)).Where(c => c != null && !c.X).ToList();
-            var deckChip = Ui.Img(row, Theme.S("pill_dark", 46), Color.white.A(0.94f), "deck"); deckChip.Pref(340, 58);
-            var dic = Ui.Img(deckChip.transform, Theme.S("ic_deck"), Theme.Gold, "ic"); dic.rectTransform.At(0, 0.5f, 18, 0, 26, 26); dic.preserveAspect = true;
-            var dtt = Ui.Title(deckChip.transform, $"<size=70%><color={Theme.SubTag}>시작 덱 {starter.Count}장 · 평균 비용</color></size>  <color={Theme.GoldTag}>{(starter.Count > 0 ? starter.Average(c => c.Cost).ToString("0.0") : "—")}</color>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
-            dtt.rectTransform.Fill(54, 0, 12, 0); dtt.textWrappingMode = TextWrappingModes.NoWrap;
+            var starter = picked.SelectMany(h => P.Data.Hero(h.CoreId)?.Starter ?? new List<string>()).Select(id => P.Data.Card(id)).Where(c => c != null).ToList();
+            var costed = starter.Where(c => !c.X).ToList();
+            var deckBtn = Btn.Make(row, null, BtnStyle.PillDark, () => PartyDeck(st), 0, "deck"); deckBtn.Pref(Theme.C(400, 360), rowH);
+            deckBtn.Why = "사도를 먼저 편성하세요"; deckBtn.Interactable = starter.Count > 0;
+            var deckChip = deckBtn.GetComponent<RectTransform>();
+            var dic = Ui.Img(deckChip, Theme.S("ic_deck"), Theme.Gold, "ic"); dic.rectTransform.At(0, 0.5f, 18, 0, 26, 26); dic.preserveAspect = true;
+            var dtt = Ui.Title(deckChip, $"<size=70%><color={Theme.SubTag}>시작 덱 {starter.Count}장 · 평균 비용</color></size>  <color={Theme.GoldTag}>{(costed.Count > 0 ? costed.Average(c => c.Cost).ToString("0.0") : "—")}</color>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+            dtt.rectTransform.Fill(54, 0, 40, 0); dtt.textWrappingMode = TextWrappingModes.NoWrap;
+            var dar = Ui.Title(deckChip, "›", Theme.FsXl, Theme.Gold, TextAlignmentOptions.MidlineRight); dar.rectTransform.Fill(0, 0, 16, 0);
+            Stage.Hot["party.deck"] = deckBtn;
             foreach (var g in picked.GroupBy(h => h.nature))
             {
-                var nc = Ui.Img(row, Theme.S("pill_dark", 46), Color.white.A(0.94f), "nat"); nc.Pref(96, 58);
+                var nc = Ui.Img(row, Theme.S("pill_dark", 46), Color.white.A(0.94f), "nat"); nc.Pref(96, rowH);
                 var ni = Ui.Img(nc.transform, Icon("성격_" + g.Key), Color.white, "ic"); ni.rectTransform.At(0, 0.5f, 14, 0, 28, 28); ni.preserveAspect = true;
                 var nt = Ui.Title(nc.transform, "×" + g.Count(), Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); nt.rectTransform.Fill(50, 0, 6, 0);
             }
 
             // 오른쪽 — 이번 층
             var right = NavyBox(root, "floor");
-            right.At(1, 1, -Theme.Gutter, -top + 4, side, size.y - top - bottom - 2);
+            right.At(1, 1, -Theme.Gutter, -top + 4, side, size.y - top - Theme.C(104, 92) - 2);   // 오른쪽 판은 예전 높이 그대로(아래 보드 줄은 왼쪽 몫)
             FloorPanelLight(right, st.Village, side);
             Tw.Rise(right, 0.1f, 30, 0.45f, Vector2.right);
 
             // 「모험 시작」 — 주 동작(금 알약), 왼쪽 동그라미 아이콘
             var go = Btn.Make(root, null, BtnStyle.PillGold, () =>
             {
-                var party = st.Slots.Select(k => Roster.ByKey(k).CoreId).ToList();   // 편성 순서 = 자리 1 · 2 · 3
+                var party = st.Slots.Select(k => Roster.ByKey(k).CoreId).Reverse().ToList();   // 화면 왼쪽(후열) → 오른쪽(전열). 코어 파티 목록은 전열(맨 오른쪽)이 첫째
+                PartyStore.SetRecent(st.Slots);   // 「최근 편성」
                 RunPort.ClearSave();
                 P.NewRun(party, st.Village, FoeNature != null ? FoeSeed : DateTime.Now.Ticks & 0x7fffffff, FoeNature);
                 MapStep();
@@ -189,7 +216,7 @@ namespace Bolzena.RunUI
                 var pi = Ui.Img(plus.transform, Theme.S("ic_plus"), Theme.Brown, "ic"); pi.rectTransform.Fill(20, 20, 20, 20);
                 Tw.Breathe(plus.transform, 0.05f, 1.5f, i * 0.3f);
                 var t0 = Ui.Title(rt, "사도 넣기", Theme.FsLg, Theme.Ink, TextAlignmentOptions.Center); t0.rectTransform.At(0.5f, 0.5f, 0, -36, 300, 34);
-                var r0 = Ui.Title(rt, $"자리 {i + 1}", Theme.Fs2xl, Theme.Dim, TextAlignmentOptions.BottomLeft); r0.rectTransform.At(0, 0, 18, 12, 200, 56);
+                var r0 = Ui.Title(rt, RowNames[i], Theme.Fs2xl, Theme.Dim, TextAlignmentOptions.BottomLeft); r0.rectTransform.At(0, 0, 18, 12, 200, 56);
                 var plate0 = NavyBox(slot, "plate", 0.75f); plate0.At(0, 1, 0, -(h + 6), w, plateH);
                 var pt0 = Ui.Text(plate0, "눌러서 사도 목록에서 고릅니다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); pt0.rectTransform.Fill(10, 0, 10, 0);
                 HoverRim();
@@ -224,7 +251,7 @@ namespace Bolzena.RunUI
                 Stage.Hot["party.traits" + i] = tc;
             }
             // 왼쪽 아래 자리 번호(편성 순서) · 오른쪽 아래 장비 칸(빈 칸)
-            var rowT = Ui.Title(rt, $"자리 {i + 1}", Theme.Fs2xl, Color.white, TextAlignmentOptions.BottomLeft);
+            var rowT = Ui.Title(rt, RowNames[i], Theme.Fs2xl, Color.white, TextAlignmentOptions.BottomLeft);
             rowT.rectTransform.At(0, 0, 16, 10, 160, 56); rowT.Outline(0.22f);
             for (int s = 0; s < RunPort.Slots.Length; s++)
             {
@@ -237,8 +264,9 @@ namespace Bolzena.RunUI
             var plate = NavyBox(slot, "plate"); plate.At(0, 1, 0, -(h + 6), w, plateH);
             var stripe = Ui.Img(plate, Theme.Round, nc, "stripe"); stripe.rectTransform.At(0, 0.5f, 10, 0, 5, plateH - 24);
             var d = P.Data.Hero(hero.CoreId);
-            var nm = Ui.Title(plate, $"{hero.ko}  <size=70%><color={Theme.GoldTag}>{new string('★', Mathf.Clamp(hero.star, 1, 5))}</color></size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.TopLeft); nm.rectTransform.Fill(24, plateH * 0.45f, 10, 9);
+            var nm = Ui.Title(plate, $"{hero.ko}  <size=70%><color={Theme.GoldTag}>{new string('★', Mathf.Clamp(hero.star, 1, 5))}</color></size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.TopLeft); nm.rectTransform.Fill(24, plateH * 0.45f, PartyStore.Cleared(hero.key) > 0 ? 84 : 10, 9);
             nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 14; nm.fontSizeMax = Theme.FsLg;
+            ClearBadge(plate, hero.key, -10, -10);
             var stt = Ui.Text(plate, $"HP <b>{d?.Hp ?? hero.hp:N0}</b>   공격 <b>{d?.Atk ?? hero.atk}</b>   방어 <b>{d?.Def ?? hero.def}</b>", Theme.FsSm, Theme.Sub, TextAlignmentOptions.BottomLeft);
             stt.rectTransform.Fill(24, 9, 10, plateH * 0.5f); stt.textWrappingMode = TextWrappingModes.NoWrap; stt.enableAutoSizing = true; stt.fontSizeMin = 11; stt.fontSizeMax = Theme.FsSm;
         }
@@ -518,7 +546,12 @@ namespace Bolzena.RunUI
             if (!h.Playable) { Toast.Show($"{h.ko} — 아직 판에 데려갈 수 없습니다(코어 데이터 준비 중)"); return; }
             int slot = target >= 0 && st.Slots[target] == null ? target : Array.IndexOf(st.Slots, null);
             if (slot < 0 && target >= 0) slot = target;   // 칸을 눌러 열었으면 그 칸을 바꾼다
-            if (slot >= 0) st.Slots[slot] = h.key;
+            if (slot >= 0)
+            {
+                st.Slots[slot] = h.key;
+                HeroVoice.Speak(h);   // 칸에 넣을 때 그 사도의 목소리 한 번(앞 소리는 끊긴다)
+                Toast.Show($"<color={Theme.GoldTag}>{h.ko}</color>  {HeroLines.Pick(h, "party")}");   // 그 사도 말투로 한마디(hero_lines.json)
+            }
             else Toast.Show("세 칸이 다 찼습니다 — 넣은 사도를 눌러 빼세요");
         }
 
@@ -572,6 +605,7 @@ namespace Bolzena.RunUI
             nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 11; nm.fontSizeMax = Theme.FsBody; nm.Outline(0.25f);
             var rim = Ui.Img(rt, Theme.Frame, (locked ? Theme.Dim : nc).A(0.85f), "rim"); rim.rectTransform.Fill();
             if (locked) { var lk = Ui.Img(rt, Theme.S("ic_lock"), Color.white.A(0.8f), "lock"); lk.rectTransform.At(1, 1, -8, -8, 22 * k, 22 * k); lk.preserveAspect = true; }
+            if (!dex && !locked) ClearBadge(rt, h.key, -6, at >= 0 ? -6 - 38 * k : -6, 0.92f * k);
             if (at >= 0)
             {
                 var veil = Ui.Img(rt, Theme.Round, Theme.Gold.A(0.12f), "veil"); veil.rectTransform.Fill();
@@ -774,7 +808,8 @@ namespace Bolzena.RunUI
             ScrollBar(left, sr);
             Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(4, 14, 0, 10), true, false);
             // 카드 상세의 이전 · 다음 — 시작 카드 → 고유 카드 순 그대로
-            var allCards = CardOrder.Sort(d.Starter, P.Data, new[] { d.Id }).Concat(CardOrder.Sort(P.Data.UniquesOf(d.Id), P.Data, new[] { d.Id })).ToList();
+            var graceIds = P.Data.UniquesOf(d.Id).Where(u => !d.Starter.Contains(u)).ToList();   // 시동 카드(시작 카드 가운데 고유 카드)는 시작 카드 줄에만 — 은총으로 얻는 것만
+            var allCards = CardOrder.Sort(d.Starter, P.Data, new[] { d.Id }).Concat(CardOrder.Sort(graceIds, P.Data, new[] { d.Id })).ToList();
             void Row(string title, string sub, List<string> ids)
             {
                 var s = W.Section(content, title, sub, 40);
@@ -788,11 +823,16 @@ namespace Bolzena.RunUI
                     var c = W.Card(holder, this, id, cw); c.At(0, 1, (i % cols) * (cw + 12), -(i / cols) * (ch + 12), cw, ch);
                     var b = c.gameObject.AddComponent<Btn>(); int at = allCards.IndexOf(id); b.OnClick = () => CardZoom(id, allCards, at);
                     Stage.Hot["detail.card" + title + i] = b;
+                    if (title == "시작 카드" && P.Data.Card(id)?.Unique == true)
+                    {   // 시동 카드 표식
+                        var tg = Ui.Img(c, Theme.Pill, new Color(0.35f, 0.2f, 0.02f, 0.95f), "ignition"); tg.rectTransform.At(1, 0, -6, 70 * cw / 200f, 46 * cw / 200f + 14, 22);
+                        var tt = Ui.Title(tg.transform, "시동", 13, new Color(1f, 0.88f, 0.5f), TextAlignmentOptions.Center); tt.rectTransform.Fill();
+                    }
                     Tw.Pop(c, 0.03f * i, 0.85f, 0.3f);
                 }
             }
             Row("시작 카드", $"{d.Starter.Count}장 · 모험을 시작할 때 덱에", d.Starter);
-            Row("고유 카드", "은총으로 얻습니다 · 신탁이 나올 수 있습니다", P.Data.UniquesOf(d.Id));
+            Row("고유 카드", $"{graceIds.Count}장 · 은총으로 얻습니다 · 신탁이 나올 수 있습니다", graceIds);
 
             // 오른쪽 — 고학년 → 고유 효과 → 패시브(2026-10 사용자: 「고유 효과 탭을 없애고 카드 목록 옆에, 자세히 없이 다 보이게」)
             var side = Ui.Rect("side", stage); side.anchorMin = new Vector2(0, 0); side.anchorMax = new Vector2(0, 1); side.pivot = new Vector2(0, 0.5f);

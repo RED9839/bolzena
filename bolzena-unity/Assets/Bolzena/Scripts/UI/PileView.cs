@@ -21,7 +21,7 @@ namespace Bolzena.UI
 
         public static Modal Show(Transform parent, BattleSnapshot s, int tab)
         {
-            var m = Modal.Create(parent, "pile", new Vector2(60, 30), Vector3.zero, false, 0.99f);
+            var m = Modal.Create(parent, "pile", new Vector2(60, 30), Vector3.zero, false, 0.997f);
             m.Panel.enabled = false;
             var ui = m.gameObject.AddComponent<PileUi>();
             ui.Init(m, s, tab);
@@ -62,9 +62,13 @@ namespace Bolzena.UI
             Draw(t);
         }
 
+        /// <summary>뽑을 더미의 카드는 은총 · 신탁 빛을 감춘다 — 손에 들어올 때까지 어느 카드가 빛나는지 모르게(2026-10-09 사용자).</summary>
+        public static List<CardInfo> Unlit(List<CardInfo> pile)
+            => pile.ConvertAll(c => { if (!c.Epiphany && !c.Grace) return c; var u = c.Clone(); u.Epiphany = false; u.Grace = false; return u; });
+
         List<CardInfo> Pile(int t)
         {
-            var l = new List<CardInfo>(t == 0 ? snap.DrawPile : t == 1 ? snap.DiscardPile : snap.GonePile);
+            var l = new List<CardInfo>(t == 0 ? Unlit(snap.DrawPile) : t == 1 ? snap.DiscardPile : snap.GonePile);
             Order(l);
             return l;
         }

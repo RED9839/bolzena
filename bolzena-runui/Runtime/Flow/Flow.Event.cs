@@ -572,7 +572,7 @@ namespace Bolzena.RunUI
                 string name = v?.Name ?? c?.Name ?? id;
                 var bits = new List<string>();
                 if (c?.Grade != null) bits.Add($"<color=#{ColorUtility.ToHtmlStringRGB(Theme.GradeOf(c.Grade))}>{c.Grade}</color>");
-                if (P.S.Flash.TryGetValue(id, out var fl) && fl > 0) bits.Add($"신탁 {fl}");
+                if (P.S.Flash.TryGetValue(id, out var fl) && fl > 0) 
                 if (P.S.Shin.ContainsKey(id)) bits.Add("축복");
                 var own = Core.GameData.OwnerOf(id); if (own != null) bits.Add($"{Roster.OfCore(own)?.ko ?? own} 덱");
                 return $"「{name}」" + (bits.Count > 0 ? $" <size=80%><color={Theme.SubTag}>({string.Join(" · ", bits)})</color></size>" : "") + tail;
@@ -673,6 +673,23 @@ namespace Bolzena.RunUI
 
         void PendingPick(RectTransform root, Pending p)
         {
+            if (p.K == "flash" && p.Offer != null && !OracleReveal.IsOpen)
+            {   // 이벤트 신탁 — 전투와 같은 새 신탁 창(카드 셋 · 연두 · 길게 눌러 상세)
+                var fo = P.Run.FlashOptions(p.Offer);
+                OracleReveal.Show(this, new RevealOpts
+                {
+                    Title = "신탁!", Sub = "정보를 확인하려면 카드를 길게 누르세요.", Picks = RevealPick.Of(P.Data, p.Offer.CardId, fo), Cancel = false, Hot = "pending",
+                    Try = i => null,
+                    Done = i =>
+                    {
+                        var cs = CardSnap();
+                        var why = P.Resolve(fo[i].N);
+                        if (why != null) { Toast.Show(why); return; }
+                        GainCards(NewCards(cs), () => { P.Save("event"); BuildEvent(root, -1); });
+                    },
+                });
+                return;
+            }
             if (p.K != "remove") removeTotal = 0;
             string title = p.K switch
             {

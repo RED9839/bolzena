@@ -5,12 +5,13 @@
       "name": "우이(기억)",
       "nature": "냉정",
       "role": "서포터",
+      "style": "소멸형",
       "star": 3,
       "hp": 580,
       "atk": 95,
       "def": 61,
       "crit": 5,
-      "blurb": "지웠던 불행한 기억을 안고 돌아온 본체. 카드가 소멸할 때마다 되찾은 기억이 쌓여 파티의 손끝이 날카로워지고, 고학년에 그 기억을 모두 쏟아 연못을 엽니다.",
+      "blurb": "지웠던 불행한 기억을 안고 돌아온 본체. 누구의 카드든 소멸할 때마다 기억을 되찾고, 셋이 모이면 세잎클로버 잎 하나가 손에 돋습니다. 되찾은 기억으로 사라진 카드를 다시 받아들이고, 고학년에 모두 쏟아 연못을 엽니다.",
       "keyword": {
         "name": "되찾은 기억",
         "desc": "사라진 카드에서 건진 기억",
@@ -70,6 +71,44 @@
                 "v": 1
               }
             ]
+          },
+          {
+            "name": "세잎클로버",
+            "when": {
+              "on": "stackReach",
+              "id": "되찾은 기억",
+              "n": 3
+            },
+            "fx": [
+              {
+                "k": "make",
+                "id": "우이_기억_clover",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "에루의 손길",
+            "when": {
+              "on": "turnStart"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "되찾은 기억",
+                "n": 3
+              }
+            ],
+            "fx": [
+              {
+                "k": "cleanse",
+                "v": 1
+              },
+              {
+                "k": "shield",
+                "ratio": 0.22
+              }
+            ]
           }
         ]
       },
@@ -106,7 +145,7 @@
             },
             {
               "k": "heal",
-              "ratio": 1
+              "ratio": 0.75
             }
           ]
         }
@@ -184,7 +223,7 @@
                 },
                 {
                   "k": "dmg",
-                  "ratio": 0.2,
+                  "ratio": 0.15,
                   "target": "allEnemies"
                 },
                 {
@@ -193,7 +232,7 @@
                 },
                 {
                   "k": "dmg",
-                  "ratio": 0.1,
+                  "ratio": 0.08,
                   "target": "allEnemies"
                 }
               ]
@@ -257,7 +296,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.5
+          "ratio": 0.38
         },
         {
           "k": "cutHit",
@@ -284,7 +323,72 @@
       ],
       "oracles": [
         {
-          "name": "떠오르는 얼굴",
+          "name": "신탁 1",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "되찾은 기억",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "소멸",
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "우이_기억_clover",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
           "tags": [
             "소멸"
           ],
@@ -292,95 +396,25 @@
             {
               "k": "draw",
               "v": 3
-            }
-          ]
-        },
-        {
-          "name": "자매들의 기억",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 3,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "지워진 기억",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2
             },
             {
-              "k": "stack",
-              "id": "되찾은 기억",
+              "k": "discard",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "마주하는 용기",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "heal",
-              "ratio": 0.5
-            }
-          ]
-        },
-        {
-          "name": "흐려진 기억",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "basic": true,
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "되찾은 기억",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "맑은 연못",
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "에루의 노래",
-          "fx": [
-            {
-              "k": "cleanse",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "물빛 기억",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -401,7 +435,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.6
+          "ratio": 0.45
         },
         {
           "k": "make",
@@ -411,11 +445,11 @@
       ],
       "oracles": [
         {
-          "name": "세 장의 잎",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.6
+              "ratio": 0.52
             },
             {
               "k": "make",
@@ -425,327 +459,51 @@
           ]
         },
         {
-          "name": "행복을 기도해",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.6
-            },
-            {
-              "k": "make",
-              "id": "우이_기억_clover",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "되찾은 기억",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "기도 마치기",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.6
+              "ratio": 0.3
             },
             {
               "k": "make",
               "id": "우이_기억_clover",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "에루 리턴즈",
-          "power": true,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.4
-            },
-            {
-              "k": "make",
-              "id": "우이_기억_clover",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "make",
-                      "id": "우이_기억_clover",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "행운 나누기",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
+              "ratio": 0.45
             },
             {
               "k": "make",
               "id": "우이_기억_clover",
               "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "네잎 하나 더",
-          "kind": "draw"
-        },
-        {
-          "name": "따뜻한 기억",
-          "kind": "heal"
-        },
-        {
-          "name": "연못가",
-          "fx": [
-            {
-              "k": "make",
-              "id": "우이_기억_clover",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "우이_기억_u3",
-      "name": "떠나보내기",
-      "hero": "우이_기억",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.8,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "되찾은 기억"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.25,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "되찾은 기억",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "흘려보내기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "되찾은 기억"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "되찾은 기억",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "기억의 물결",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.59,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "되찾은 기억"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.18,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "되찾은 기억",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "간직하기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.94,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "되찾은 기억"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.29,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "다시 떠오른 이름",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "되찾은 기억"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "되찾은 기억",
-              "all": true
-            },
-            {
-              "k": "ifKill"
             },
             {
               "k": "stack",
               "id": "되찾은 기억",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "일렁이는 파동",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "되찾은 기억"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "되찾은 기억",
-              "all": true
-            },
-            {
-              "k": "make",
-              "id": "우이_기억_clover",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "파문",
-          "kind": "power"
-        },
-        {
-          "name": "젖은 발",
-          "kind": "frost"
-        },
-        {
-          "name": "잔물결",
-          "kind": "cost"
-        }
-      ]
-    },
-    {
-      "id": "우이_기억_u4",
-      "name": "다시 마주한 기억",
-      "hero": "우이_기억",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "perStack",
-          "id": "되찾은 기억"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.25
-        },
-        {
-          "k": "draw",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "다시 마주한 얼굴",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "되찾은 기억"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.34
-            },
-            {
-              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "이젠 피하지 않아",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.5
+              "ratio": 0.89
             },
             {
               "k": "make",
               "id": "우이_기억_clover",
-              "v": 1
+              "v": 2
             },
             {
               "k": "power",
@@ -762,7 +520,7 @@
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 0.4
+                      "ratio": 0.44
                     }
                   ]
                 }
@@ -771,29 +529,512 @@
           ]
         },
         {
-          "name": "세잎클로버 화분",
-          "cost": 0,
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.68
+            },
+            {
+              "k": "make",
+              "id": "우이_기억_clover",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우이_기억_u3",
+      "name": "떠나보내기",
+      "hero": "우이_기억",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.56,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "되찾은 기억"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.19,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "되찾은 기억",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "되찾은 기억",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.21,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.14,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "되찾은 기억",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.19,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "되찾은 기억",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우이_기억_u4",
+      "name": "다시 마주한 기억",
+      "hero": "우이_기억",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "pull",
+          "from": "gone",
+          "n": 1,
+          "to": "top"
+        },
+        {
+          "k": "perStack",
+          "id": "되찾은 기억"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.19
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "to": "top"
+            },
             {
               "k": "perStack",
               "id": "되찾은 기억"
             },
             {
               "k": "shield",
-              "ratio": 0.25
+              "ratio": 0.29
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "to": "top"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.18
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "to": "top"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.34
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "to": "top"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.17
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.52
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "to": "top"
+            },
+            {
+              "k": "perStack",
+              "id": "되찾은 기억"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.17
             },
             {
               "k": "draw",
               "v": 1
             }
           ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "슬픔도 기억",
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
-              "k": "burn",
+              "k": "stack",
+              "id": "되찾은 기억",
               "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우이_기억_u5",
+      "name": "끝없는 클로버 밭",
+      "hero": "우이_기억",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.34,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "되찾은 기억",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "되찾은 기억",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "되찾은 기억",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "우이_기억_clover",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "되찾은 기억",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "되찾은 기억",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.12,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.51,
+              "target": "allEnemies"
             },
             {
               "k": "stack",
@@ -801,42 +1042,23 @@
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "연못의 에루",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "되찾은 기억"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.26
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "n": 1,
-              "who": "self"
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기억의 온기",
-          "kind": "guard"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "맑은 마음",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "에루 타기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

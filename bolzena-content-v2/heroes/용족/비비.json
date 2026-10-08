@@ -6,12 +6,13 @@
       "nature": "순수",
       "race": "용족",
       "role": "탱커",
+      "style": "대가형",
       "star": 3,
       "hp": 990,
       "atk": 84,
       "def": 79,
       "crit": 5,
-      "blurb": "은의 용족 행세를 하는 수은의 용족 귀족. 실드를 든 채 재채기를 참아 두었다가, 누가 막을 깨면 그 적에게 수은을 뿜습니다.",
+      "blurb": "은의 용족 행세를 하는 수은의 용족. 제 몸을 수은에 내주며 버티는 만성 몸살 환자라, HP 를 치를 때마다 은빛 맹세가 쌓여 넷이면 파티의 다음 한 수를 감쌉니다. 재채기 한 번에 적이 중독됩니다.",
       "keyword": {
         "name": "수은 중독",
         "desc": "스며드는 은빛 독",
@@ -22,34 +23,25 @@
             "stat": "dot",
             "ratio": 0.25
           }
-        ],
-        "rules": [
-          {
-            "name": "녹아내린 갑옷",
-            "when": {
-              "on": "stackReach",
-              "id": "수은 중독",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "수은 중독",
-                "all": true
-              },
-              {
-                "k": "status",
-                "id": "취약",
-                "v": 2,
-                "target": "oneEnemy"
-              }
-            ]
-          }
         ]
       },
       "passives": [
         {
-          "name": "수은 장막",
+          "name": "수은 몸살",
+          "when": {
+            "on": "turnStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "수은 몸살",
           "when": {
             "on": "shieldBreak"
           },
@@ -69,13 +61,43 @@
         {
           "name": "소녀가 보호하겠사와요",
           "when": {
+            "on": "pay"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "은빛 맹세",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "소녀가 보호하겠사와요",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "은빛 맹세",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "소녀가 보호하겠사와요",
+          "when": {
             "on": "lowHp",
             "pct": 0.4
           },
           "fx": [
             {
               "k": "shield",
-              "ratio": 3
+              "ratio": 2.85
             },
             {
               "k": "status",
@@ -112,6 +134,25 @@
         "비비_s1",
         "비비_s2",
         "비비_u1"
+      ],
+      "keywords": [
+        {
+          "name": "은빛 맹세",
+          "desc": "제 몸을 내준 사랑의 맹세",
+          "carrier": "self",
+          "cap": 4,
+          "per": [
+            {
+              "stat": "guard",
+              "v": 0.05
+            }
+          ],
+          "onMax": {
+            "empower": "any",
+            "ratio": 0.4,
+            "consume": true
+          }
+        }
       ]
     }
   ],
@@ -153,7 +194,15 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.63
+          "ratio": 1.23
+        },
+        {
+          "k": "perPaid",
+          "per": 40
+        },
+        {
+          "k": "shield",
+          "ratio": 0.14
         },
         {
           "k": "stack",
@@ -164,11 +213,19 @@
       ],
       "oracles": [
         {
-          "name": "오호호",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2
+              "ratio": 1.6
+            },
+            {
+              "k": "perPaid",
+              "per": 40
+            },
+            {
+              "k": "shield",
+              "ratio": 0.16
             },
             {
               "k": "stack",
@@ -179,14 +236,12 @@
           ]
         },
         {
-          "name": "명예로운 비비",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.75
+              "ratio": 0.76
             },
             {
               "k": "stack",
@@ -197,55 +252,70 @@
           ]
         },
         {
-          "name": "귀족의 품격",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.63,
-              "base": "def",
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "shield",
+              "ratio": 2.02
+            },
+            {
+              "k": "stack",
+              "id": "은빛 맹세",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.46
+            },
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "pay"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.36
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.33
             },
             {
               "k": "stack",
               "id": "수은 중독",
               "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "궁지의 사와요",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.63
-            },
-            {
-              "k": "stack",
-              "id": "수은 중독",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.25
-            }
-          ]
-        },
-        {
-          "name": "쇠사슬로 잠긴 상자",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.5
-            },
-            {
-              "k": "stack",
-              "id": "수은 중독",
-              "v": 1,
               "target": "oneEnemy"
             },
             {
@@ -253,27 +323,6 @@
               "v": 1,
               "who": "self",
               "unique": true
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "보석 목걸이",
-          "kind": "guard"
-        },
-        {
-          "name": "세탁의 용족",
-          "kind": "draw"
-        },
-        {
-          "name": "은 위장",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "수은 중독",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         }
@@ -288,8 +337,12 @@
       "type": "공격",
       "fx": [
         {
+          "k": "payHpPct",
+          "v": 0.03
+        },
+        {
           "k": "dmg",
-          "ratio": 0.44,
+          "ratio": 0.43,
           "base": "def",
           "target": "allEnemies"
         },
@@ -302,11 +355,16 @@
       ],
       "oracles": [
         {
-          "name": "대형 재채기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
               "k": "dmg",
-              "ratio": 0.56,
+              "ratio": 0.58,
               "base": "def",
               "target": "allEnemies"
             },
@@ -319,41 +377,19 @@
           ]
         },
         {
-          "name": "연쇄 재채기",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.94,
-              "base": "def",
-              "target": "allEnemies"
+              "k": "payHpPct",
+              "v": 0.03
             },
-            {
-              "k": "stack",
-              "id": "수은 중독",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "먼지 알레르기",
-          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.41,
               "base": "def",
               "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "수은 중독",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "when",
-              "on": "draw"
             },
             {
               "k": "stack",
@@ -364,12 +400,37 @@
           ]
         },
         {
-          "name": "알레르기 체질",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.56,
               "base": "def",
               "target": "allEnemies"
             },
@@ -378,7 +439,11 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "pay"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -394,43 +459,44 @@
           ]
         },
         {
-          "name": "콜록콜록",
+          "name": "신탁 5",
           "fx": [
             {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
               "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.45,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "수은 중독",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.13,
-              "base": "def",
-              "target": "allEnemies"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "에취",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "수은 안개",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "손수건",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         }
@@ -449,7 +515,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.48,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -471,14 +537,14 @@
       ],
       "oracles": [
         {
-          "name": "퀵실버 창",
+          "name": "신탁 1",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.63,
+              "ratio": 0.65,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -488,7 +554,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.22,
+              "ratio": 0.26,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -500,62 +566,7 @@
           ]
         },
         {
-          "name": "창 한 자루",
-          "cost": 0,
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "수은 중독"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.15,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "수은 중독",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "녹아내리는 갑옷",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.69,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "수은 중독",
-              "n": 3
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "사와요체 창술",
+          "name": "신탁 2",
           "tags": [
             "분쇄"
           ],
@@ -563,7 +574,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.47,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -573,7 +584,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.16,
+              "ratio": 0.18,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -582,14 +593,16 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "수은 중독",
-                    "n": 4
+                    "on": "pay"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.41,
+                      "ratio": 0.26,
                       "base": "def",
                       "target": "oneEnemy"
                     }
@@ -600,18 +613,78 @@
           ]
         },
         {
-          "name": "창 회수",
-          "tags": [
-            "분쇄"
-          ],
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "base": "def",
+              "target": "oneEnemy"
+            },
             {
               "k": "perStack",
               "id": "수은 중독"
             },
             {
               "k": "dmg",
-              "ratio": 0.63,
+              "ratio": 0.18,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "분쇄",
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -619,27 +692,21 @@
               "k": "spend",
               "id": "수은 중독",
               "all": true
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "who": "self",
-              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "은빛 창날",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "창 자루 밀기",
-          "kind": "cost"
-        },
-        {
-          "name": "창끝 독",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -666,7 +733,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.31,
+          "ratio": 0.28,
           "base": "def",
           "target": "allEnemies"
         },
@@ -677,14 +744,15 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.15,
+          "ratio": 0.14,
           "base": "def",
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "뿌리 깊이",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -693,7 +761,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.39,
               "base": "def",
               "target": "allEnemies"
             },
@@ -704,14 +772,69 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.19,
               "base": "def",
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "우로스 강림 계획",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "수은 중독",
+              "each": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -721,7 +844,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.49,
               "base": "def",
               "target": "allEnemies"
             },
@@ -730,15 +853,13 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "수은 중독",
-                    "n": 4
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.62,
-                      "base": "def",
+                      "k": "stack",
+                      "id": "수은 중독",
+                      "v": 1,
                       "target": "allEnemies"
                     }
                   ]
@@ -748,37 +869,11 @@
           ]
         },
         {
-          "name": "엄마라고 부른 날",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.56,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "수은 중독",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "수은 범람",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.72,
+              "ratio": 0.48,
               "base": "def",
               "target": "allEnemies"
             },
@@ -789,28 +884,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.32,
-              "base": "def",
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "작은 복수",
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "수은 중독",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.25,
               "base": "def",
               "target": "allEnemies"
             },
@@ -825,21 +899,181 @@
       ],
       "blesses": [
         {
-          "name": "세계수의 원한",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "수은 양동이",
-          "tags": [
-            "개전"
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "은빛 맹세",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_u5",
+      "name": "수은 주스 대접",
+      "hero": "비비",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.95
+        },
+        {
+          "k": "stack",
+          "id": "수은 중독",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
           ]
         },
         {
-          "name": "은빛 독",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.25
+            },
+            {
+              "k": "stack",
+              "id": "은빛 맹세",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.02
+            },
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수은 중독",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.91
+            },
+            {
+              "k": "stack",
+              "id": "수은 중독",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "은빛 맹세",
               "v": 1
             }
           ]

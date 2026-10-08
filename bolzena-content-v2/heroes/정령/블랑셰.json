@@ -5,12 +5,13 @@
       "name": "블랑셰",
       "nature": "우울",
       "role": "딜러",
+      "style": "쌓고 고르기",
       "star": 3,
       "hp": 650,
       "atk": 125,
       "def": 28,
       "crit": 15,
-      "blurb": "감정 대신 머리의 장미가 빛나는 배우. 공격할 때마다 푸른 장미가, 약점을 찌를 때마다 붉은 장미가 피고, 두 빛깔이 다 피면 커튼콜이 올라옵니다.",
+      "blurb": "감정 대신 머리의 장미가 빛나는 배우. 공격할 때마다 적에게 푸른 장미가 피어 아프게 하고, 장미를 다 꺾어 한 번에 칠지 넷까지 피워 커튼콜을 받을지 고릅니다.",
       "passives": [
         {
           "name": "싱크로즈",
@@ -88,34 +89,7 @@
         "per": [
           {
             "stat": "taken",
-            "v": 0.06
-          }
-        ],
-        "rules": [
-          {
-            "name": "만개",
-            "when": {
-              "on": "stackReach",
-              "id": "푸른 장미",
-              "n": 4
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "푸른 장미",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 1.3,
-                "target": "oneEnemy"
-              },
-              {
-                "k": "tough",
-                "v": 1,
-                "target": "oneEnemy"
-              }
-            ]
+            "v": 0.08
           }
         ]
       }
@@ -174,7 +148,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 1.04,
           "target": "allEnemies"
         },
         {
@@ -197,29 +171,30 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.42,
+          "ratio": 0.55,
           "target": "randomEnemy",
           "hits": 3
         }
       ],
       "oracles": [
         {
-          "name": "기적의 꽃말",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.52,
+              "ratio": 0.74,
               "target": "randomEnemy",
               "hits": 3
             }
           ]
         },
         {
-          "name": "확정 치명",
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.49,
               "target": "oneEnemy",
               "hits": 3
             },
@@ -230,13 +205,13 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.78,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "장미 넝쿨",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -246,62 +221,90 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.45,
               "target": "randomEnemy",
               "hits": 3
             },
             {
               "k": "draw",
               "v": 1,
+              "who": "self",
               "type": "공격"
             }
           ]
         },
         {
-          "name": "흩날리는 파랑새",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.42,
-              "target": "randomEnemy",
-              "hits": 5
-            },
-            {
-              "k": "stack",
-              "id": "푸른 장미",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "무대 인사",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.45,
               "target": "randomEnemy",
               "hits": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "푸른 장미",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.82,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "푸른 가시",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "파랑새의 눈",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "가벼운 줄기",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -315,7 +318,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 1.04,
           "target": "oneEnemy"
         },
         {
@@ -324,7 +327,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.26,
           "target": "oneEnemy"
         },
         {
@@ -335,11 +338,12 @@
       ],
       "oracles": [
         {
-          "name": "만개한 정원",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.4,
               "target": "oneEnemy"
             },
             {
@@ -348,7 +352,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.35,
               "target": "oneEnemy"
             },
             {
@@ -359,29 +363,32 @@
           ]
         },
         {
-          "name": "정원 손질",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.86,
-              "target": "oneEnemy"
+              "ratio": 0.72,
+              "target": "allEnemies"
             },
             {
               "k": "perStack",
-              "id": "푸른 장미"
+              "id": "푸른 장미",
+              "each": true
             },
             {
               "k": "dmg",
               "ratio": 0.21,
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "푸른 장미",
+              "all": true
             }
           ]
         },
         {
-          "name": "붉어진 장미",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "perStack",
@@ -389,7 +396,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.46,
+              "ratio": 0.62,
               "target": "oneEnemy"
             },
             {
@@ -409,63 +416,87 @@
           ]
         },
         {
-          "name": "가시 줄기",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.57,
-              "target": "allEnemies"
+              "ratio": 0.94,
+              "target": "oneEnemy"
             },
-            {
-              "k": "perStack",
-              "id": "푸른 장미",
-              "each": true
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "시상식의 액트리스",
-          "cost": 2,
-          "fx": [
             {
               "k": "perStack",
               "id": "푸른 장미"
             },
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.23,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "푸른 장미",
-              "all": true
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "푸른 장미"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.87,
+              "target": "oneEnemy"
             },
             {
-              "k": "make",
-              "id": "블랑셰_t1",
-              "v": 1
+              "k": "perStack",
+              "id": "푸른 장미"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "장미 향",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "새벽 산책",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "정원 지름길",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -490,7 +521,7 @@
       ],
       "oracles": [
         {
-          "name": "커튼 뒤",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -505,7 +536,7 @@
           ]
         },
         {
-          "name": "대본 읽기",
+          "name": "신탁 2",
           "fx": [
             {
               "k": "stack",
@@ -522,25 +553,7 @@
           ]
         },
         {
-          "name": "처음 연기한 대본",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "푸른 장미",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "파랑새 돌보기",
+          "name": "신탁 3",
           "power": true,
           "fx": [
             {
@@ -574,12 +587,8 @@
           ]
         },
         {
-          "name": "표정 연습",
+          "name": "신탁 4",
           "fx": [
-            {
-              "k": "payHpPct",
-              "v": 0.03
-            },
             {
               "k": "stack",
               "id": "푸른 장미",
@@ -588,31 +597,30 @@
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "푸른 꽃향기",
-          "kind": "draw"
         },
         {
-          "name": "후후",
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
             {
               "k": "stack",
               "id": "푸른 장미",
-              "v": 1,
+              "v": 4,
               "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
-          ]
-        },
-        {
-          "name": "조명 아래",
-          "tags": [
-            "보존"
           ]
         }
       ]
@@ -651,7 +659,7 @@
       ],
       "oracles": [
         {
-          "name": "주연 배우",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "critMod",
@@ -679,57 +687,13 @@
           ]
         },
         {
-          "name": "성대모사",
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "critMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true
-            },
-            {
-              "k": "payHpPct",
-              "v": 0.03
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "푸른 장미",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
-                    },
-                    {
-                      "k": "ap",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "응원단 비주얼",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "critMod",
-              "v": 0.15,
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "푸른 장미",
-              "v": 2,
-              "target": "oneEnemy"
             },
             {
               "k": "power",
@@ -752,40 +716,12 @@
           ]
         },
         {
-          "name": "배역 몰입",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "critMod",
               "v": 0.15,
               "run": true
-            },
-            {
-              "k": "stack",
-              "id": "푸른 장미",
-              "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy",
-              "hits": 2
-            }
-          ]
-        },
-        {
-          "name": "백만송이 푸른장미",
-          "fx": [
-            {
-              "k": "critMod",
-              "v": 0.15,
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "푸른 장미",
-              "v": 1,
-              "target": "oneEnemy"
             },
             {
               "k": "power",
@@ -809,27 +745,259 @@
                   ]
                 }
               ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 0.15,
+              "run": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "푸른 장미",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 0.25,
+              "run": true
+            },
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "푸른 장미",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "검은 드레스",
+          "name": "축복 1",
           "kind": "atkUp"
         },
         {
-          "name": "스포트라이트",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "파랑새 날개",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "푸른 장미",
               "v": 1,
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "블랑셰_u5",
+      "name": "모노레일 출퇴근",
+      "hero": "블랑셰",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "푸른 장미",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "비용",
+                      "v": -1,
+                      "to": "hand",
+                      "n": 1,
+                      "who": "self",
+                      "type": "공격"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "푸른 장미",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }

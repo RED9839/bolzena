@@ -61,7 +61,7 @@ namespace Bolzena.RunUI
                     var face = W.Face(row, h, 68); face.At(0, 0.5f, 0, 0, 68, 68);
                     var t = Ui.Title(row, h.ko, 24, Theme.Ink); t.rectTransform.At(0, 1, 84, -6, 220, 32);
                     var d = P.Data.Hero(k);
-                    var s = Ui.Text(row, $"자리 {P.S.Party.IndexOf(k) + 1} · 공격 {d?.Atk} · 방어 {d?.Def}", 15, Theme.Sub);
+                    var s = Ui.Text(row, $"{RowOfParty(P.S.Party.IndexOf(k))} · 공격 {d?.Atk} · 방어 {d?.Def}", 15, Theme.Sub);
                     s.rectTransform.At(0, 1, 86, -40, 240, 24);
                 }
                 var (hpRt, setHp) = W.HpBar(partyBox, 300, 28);
@@ -180,6 +180,7 @@ namespace Bolzena.RunUI
             var ct = Ui.Title(chip, $"<size=62%><color={Theme.SubTag}>{o.Turns}턴 · 승리</color></size>\n전투 끝", Theme.FsLg, Theme.Gold, TextAlignmentOptions.Center);
             ct.rectTransform.Fill(8, 4, 8, 4); ct.lineSpacing = -18;
             Tw.Rise(chip, 0.1f, 20, 0.4f, Vector2.left);
+            RewardCredit(root, chip);   // 학점(Flow.Grade.cs)
 
             // 오른쪽 보상 줄
             float rowH = Theme.C(78, 70), gap = Theme.C(14, 10), listW = 380;
@@ -365,7 +366,7 @@ namespace Bolzena.RunUI
                 Done = k =>
                 {
                     var o = card ? opts[order[k]] : null;
-                    Toast.Show($"{picks[k].Label} — 받았습니다" + (o != null && o.Blessed ? " · 축복" : ""));
+                    Toast.Show($"{(string.IsNullOrEmpty(picks[k].Label) ? baseCard?.Name : picks[k].Label)} — 받았습니다" + (o != null && o.Blessed ? " · 축복" : ""));
                     GainCards(gcs != null ? NewCards(gcs) : null, picked);   // 은총 고유 카드 — 다시 태어난 뒤 가운데에서 덱으로(신탁은 새 카드가 없어 그대로)
                 },
             });

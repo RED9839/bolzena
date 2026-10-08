@@ -5,12 +5,13 @@
       "name": "실라",
       "nature": "냉정",
       "role": "딜러",
+      "style": "표적형",
       "star": 3,
       "hp": 550,
       "atk": 145,
       "def": 25,
       "crit": 10,
-      "blurb": "정면 승부엔 강하고 기습엔 약한 바람의 맏언니. 한 적을 정면으로 마주 보고 쏠수록 그 적은 바람에 깎여 무너집니다.",
+      "blurb": "정면 승부엔 강하고 기습엔 약한 바람의 맏언니. 늘 가장 멀리 있는 적 1명을 찍어 마주 서고, 끼어드는 이 없이 혼자 쏠수록 그 적은 바람에 깎여 무너집니다.",
       "keyword": {
         "name": "정면 승부",
         "desc": "한 적과 마주 선 승부",
@@ -20,25 +21,10 @@
         "per": [
           {
             "stat": "taken",
-            "v": 0.13
+            "v": 0.12
           }
         ],
         "rules": [
-          {
-            "name": "바람의 정령",
-            "when": {
-              "on": "stackReach",
-              "id": "정면 승부",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "tough",
-                "v": 1,
-                "target": "oneEnemy"
-              }
-            ]
-          },
           {
             "name": "끼어들기",
             "when": {
@@ -76,8 +62,21 @@
             {
               "k": "stack",
               "id": "정면 승부",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "정령의 수호자",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "slowestEnemy"
             }
           ]
         },
@@ -88,10 +87,14 @@
           },
           "fx": [
             {
+              "k": "draw",
+              "v": 1
+            },
+            {
               "k": "stack",
               "id": "정면 승부",
               "v": 2,
-              "target": "topEnemy"
+              "target": "slowestEnemy"
             }
           ]
         }
@@ -178,56 +181,53 @@
       "type": "공격",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.85,
-          "target": "oneEnemy"
-        },
-        {
           "k": "perStack",
-          "id": "정면 승부"
+          "id": "정면 승부",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.25,
+          "ratio": 0.69,
           "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "정면 승부",
+          "n": 3
+        },
+        {
+          "k": "tough",
+          "v": 1
+        },
+        {
+          "k": "spend",
+          "id": "정면 승부",
+          "all": true
         }
       ],
       "oracles": [
         {
-          "name": "명중",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy"
-            },
-            {
               "k": "perStack",
-              "id": "정면 승부"
+              "id": "정면 승부",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "헥토파스칼",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.93,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "정면 승부"
+              "k": "ifStack",
+              "id": "정면 승부",
+              "n": 3
             },
             {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "oneEnemy"
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "spend",
@@ -237,91 +237,148 @@
           ]
         },
         {
-          "name": "정면 돌파",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
+              "k": "perStack",
+              "id": "정면 승부",
+              "n": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 0.93,
+              "ratio": 0.66,
               "target": "oneEnemy"
             },
+            {
+              "k": "ifStack",
+              "id": "정면 승부",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.61,
+                      "target": "slowestEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
             {
               "k": "perStack",
-              "id": "정면 승부"
+              "id": "정면 승부",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.27,
+              "ratio": 0.78,
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
+              "k": "status",
+              "id": "둔화",
+              "v": 1
             },
             {
-              "k": "draw",
+              "k": "ifStack",
+              "id": "정면 승부",
+              "n": 3
+            },
+            {
+              "k": "tough",
               "v": 1
             }
           ]
         },
         {
-          "name": "바람 정령 날리기",
-          "cost": 2,
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 2,
-              "target": "oneEnemy"
-            },
-            {
               "k": "perStack",
-              "id": "정면 승부"
+              "id": "정면 승부",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.79,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
+              "k": "draw",
               "v": 1,
-              "target": "oneEnemy"
+              "who": "self",
+              "unique": true,
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "셰이디 저격",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
-            },
-            {
               "k": "perStack",
-              "id": "정면 승부"
+              "id": "정면 승부",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.27,
+              "ratio": 1.24,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "정면 승부",
+              "n": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "팽팽한 시위",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "질서의 눈",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "꼿꼿한 자세",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     },
@@ -335,25 +392,93 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.25,
+          "ratio": 0.28,
           "target": "oneEnemy",
           "hits": 5
+        },
+        {
+          "k": "ifStack",
+          "id": "정면 승부",
+          "n": 2
+        },
+        {
+          "k": "extra",
+          "ratio": 0.57
         }
       ],
       "oracles": [
         {
-          "name": "보이지도 않는 화살",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.31,
+              "ratio": 0.37,
               "target": "oneEnemy",
               "hits": 5
+            },
+            {
+              "k": "ifStack",
+              "id": "정면 승부",
+              "n": 2
+            },
+            {
+              "k": "extra",
+              "ratio": 0.78
             }
           ]
         },
         {
-          "name": "바람살",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "ifStack",
+              "id": "정면 승부",
+              "n": 2
+            },
+            {
+              "k": "extra",
+              "ratio": 0.55
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "정면 승부",
+              "n": 2
+            },
+            {
+              "k": "extra",
+              "ratio": 0.67
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
@@ -364,71 +489,65 @@
             {
               "k": "ifStack",
               "id": "정면 승부",
-              "n": 3
+              "n": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
-              "hits": 2
+              "k": "extra",
+              "ratio": 0.52
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "정면 승부",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "회오리 화살",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.91,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "연사 연습",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.24,
-              "target": "oneEnemy",
-              "hits": 5
-            },
-            {
-              "k": "stack",
-              "id": "정면 승부",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "discard",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "질서의 화살",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.36,
               "target": "oneEnemy",
               "hits": 5
             },
             {
               "k": "draw",
               "v": 1,
-              "type": "공격"
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "북서부 고기압",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "난기류",
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -437,10 +556,6 @@
               "target": "oneEnemy"
             }
           ]
-        },
-        {
-          "name": "가벼운 시위",
-          "kind": "cost"
         }
       ]
     },
@@ -465,7 +580,7 @@
       ],
       "oracles": [
         {
-          "name": "바람의 흐름",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -480,7 +595,10 @@
           ]
         },
         {
-          "name": "돌멩이 하나까지",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -490,15 +608,39 @@
             },
             {
               "k": "draw",
-              "v": 2,
-              "type": "공격"
+              "v": 1
             }
           ]
         },
         {
-          "name": "기후 관리",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "slowestEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
             {
               "k": "draw",
               "v": 1
@@ -508,14 +650,20 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "정면 승부",
-                      "v": 1,
-                      "target": "topEnemy"
+                      "k": "draw",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.46
                     }
                   ]
                 }
@@ -524,25 +672,7 @@
           ]
         },
         {
-          "name": "정령산 정상",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "정면 승부",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "밀린 만화책",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
@@ -552,41 +682,14 @@
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "정면 승부",
-              "v": 2,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "손풍기",
-          "kind": "draw"
-        },
-        {
-          "name": "민들레 씨앗",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "정면 승부",
               "v": 1,
-              "target": "oneEnemy"
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.46
             }
-          ]
-        },
-        {
-          "name": "맏언니의 눈",
-          "tags": [
-            "보존"
           ]
         }
       ]
@@ -620,7 +723,7 @@
               "fx": [
                 {
                   "k": "extra",
-                  "ratio": 0.3
+                  "ratio": 0.35
                 }
               ]
             }
@@ -629,12 +732,12 @@
       ],
       "oracles": [
         {
-          "name": "회오리 바람",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "정면 승부",
-              "v": 1,
+              "v": 2,
               "target": "oneEnemy"
             },
             {
@@ -661,7 +764,34 @@
           ]
         },
         {
-          "name": "정령의 수장",
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "extra",
+                      "ratio": 0.35
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "stack",
@@ -670,8 +800,41 @@
               "target": "oneEnemy"
             },
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "huntDown"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "정면 승부",
+                      "v": 2,
+                      "target": "slowestEnemy"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.69
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
               "k": "draw",
               "v": 1,
+              "who": "self",
+              "unique": true,
               "type": "공격"
             },
             {
@@ -689,18 +852,7 @@
                   "fx": [
                     {
                       "k": "extra",
-                      "ratio": 0.3
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "huntDown"
-                  },
-                  "fx": [
-                    {
-                      "k": "draw",
-                      "v": 1
+                      "ratio": 0.36
                     }
                   ]
                 }
@@ -709,16 +861,17 @@
           ]
         },
         {
-          "name": "공사 구분",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
               "id": "정면 승부",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "power",
@@ -730,83 +883,12 @@
                   },
                   "limit": {
                     "per": "turn",
-                    "n": 1
+                    "n": 2
                   },
                   "fx": [
                     {
                       "k": "extra",
-                      "ratio": 0.3
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "웃는 연습",
-          "fx": [
-            {
-              "k": "critMod",
-              "v": 0.1,
-              "run": true
-            },
-            {
-              "k": "stack",
-              "id": "정면 승부",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy",
-              "hits": 3
-            }
-          ]
-        },
-        {
-          "name": "전투력 측정기",
-          "fx": [
-            {
-              "k": "payHpPct",
-              "v": 0.03
-            },
-            {
-              "k": "stack",
-              "id": "정면 승부",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "extra",
-                      "ratio": 0.3
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "정면 승부",
-                      "v": 1,
-                      "target": "topEnemy"
+                      "ratio": 0.54
                     }
                   ]
                 }
@@ -817,16 +899,195 @@
       ],
       "blesses": [
         {
-          "name": "우정의 증표",
+          "name": "축복 1",
           "kind": "atkUp"
         },
         {
-          "name": "추억 속의 정령들",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "바람막이",
-          "kind": "defUp"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "실라_u5",
+      "name": "하늬바람",
+      "hero": "실라",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "정면 승부",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "cardStatus",
+          "id": "비용",
+          "v": -1,
+          "to": "hand",
+          "n": 1,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "정면 승부",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정면 승부",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
         }
       ]
     }

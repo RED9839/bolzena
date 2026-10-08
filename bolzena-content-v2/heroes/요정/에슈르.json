@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "요정",
       "role": "딜러",
+      "style": "손 만들기형",
       "star": 3,
       "hp": 550,
       "atk": 145,
@@ -34,7 +35,7 @@
             "fx": [
               {
                 "k": "extra",
-                "ratio": 0.5
+                "ratio": 0.6
               },
               {
                 "k": "status",
@@ -172,7 +173,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.25
+          "ratio": 0.3
         }
       ]
     },
@@ -186,14 +187,14 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.36,
           "target": "oneEnemy",
           "hits": 3
         },
         {
           "k": "stack",
           "id": "빵 센디오",
-          "v": 2
+          "v": 1
         },
         {
           "k": "make",
@@ -203,18 +204,18 @@
       ],
       "oracles": [
         {
-          "name": "빵 여섯 개",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.43,
+              "ratio": 0.5,
               "target": "oneEnemy",
               "hits": 3
             },
             {
               "k": "stack",
               "id": "빵 센디오",
-              "v": 2
+              "v": 1
             },
             {
               "k": "make",
@@ -224,41 +225,14 @@
           ]
         },
         {
-          "name": "대-빵템피드",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.32,
               "target": "oneEnemy",
-              "hits": 6
-            },
-            {
-              "k": "stack",
-              "id": "빵 센디오",
-              "v": 4
-            },
-            {
-              "k": "make",
-              "id": "에슈르_bread",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "흩어지는 빵",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.49,
-              "target": "allEnemies",
-              "hits": 2
-            },
-            {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
-              "target": "allEnemies"
+              "hits": 3
             },
             {
               "k": "make",
@@ -268,68 +242,64 @@
           ]
         },
         {
-          "name": "빵 몽땅 굽기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "빵 센디오"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.31,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "빵 센디오",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "신상 빵 줄",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 0.41,
+              "target": "randomEnemy",
+              "hits": 4
             },
             {
               "k": "stack",
               "id": "빵 센디오",
-              "v": 2
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "버터 듬뿍",
-          "kind": "power"
         },
         {
-          "name": "단골손님",
-          "kind": "draw"
-        },
-        {
-          "name": "오븐 예열",
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "oneEnemy",
+              "hits": 3
+            },
             {
               "k": "make",
               "id": "에슈르_bread",
+              "v": 2
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -346,7 +316,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.65,
+          "ratio": 0.72,
           "target": "oneEnemy"
         },
         {
@@ -361,11 +331,12 @@
       ],
       "oracles": [
         {
-          "name": "입자 가속",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 0.97,
               "target": "oneEnemy"
             },
             {
@@ -380,8 +351,10 @@
           ]
         },
         {
-          "name": "이론 강의",
-          "power": true,
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "dmg",
@@ -389,12 +362,57 @@
               "target": "oneEnemy"
             },
             {
+              "k": "ifStack",
+              "id": "빵 센디오",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "빵 센디오",
+              "n": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
                     "on": "play",
-                    "type": "스킬"
+                    "type": "공격"
                   },
                   "limit": {
                     "per": "turn",
@@ -413,86 +431,36 @@
           ]
         },
         {
-          "name": "입자 관측",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.74,
               "target": "oneEnemy"
             },
             {
-              "k": "ifStack",
-              "id": "빵 센디오",
-              "n": 2
+              "k": "perTag",
+              "id": "에슈르_bread"
             },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "stack",
-              "id": "빵 센디오",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "불확정 이론",
-          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.34,
               "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "빵 센디오",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "입자 폭주",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "빵 센디오",
-              "n": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "이론 수업",
-          "kind": "frost"
+          "name": "축복 1",
+          "kind": "weakSpot"
         },
         {
-          "name": "엘레나와 협업",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "수강생 0명",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -513,7 +481,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2,
+          "ratio": 2.28,
           "target": "oneEnemy"
         },
         {
@@ -522,7 +490,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.34,
           "target": "oneEnemy"
         },
         {
@@ -533,11 +501,12 @@
       ],
       "oracles": [
         {
-          "name": "대화염 주문",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.5,
+              "ratio": 3.08,
               "target": "oneEnemy"
             },
             {
@@ -546,7 +515,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.46,
               "target": "oneEnemy"
             },
             {
@@ -557,12 +526,13 @@
           ]
         },
         {
-          "name": "작은 불씨",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 2.17,
               "target": "oneEnemy"
             },
             {
@@ -571,7 +541,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.32,
               "target": "oneEnemy"
             },
             {
@@ -582,28 +552,37 @@
           ]
         },
         {
-          "name": "불바다",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.83,
+              "ratio": 1.56,
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "고통",
-              "v": 2,
+              "k": "perStack",
+              "id": "빵 센디오"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
               "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "궁극의 마법 이론",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.05,
+              "ratio": 2.2,
               "target": "oneEnemy"
             },
             {
@@ -612,7 +591,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.37,
               "target": "oneEnemy"
             },
             {
@@ -620,7 +599,12 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -635,42 +619,42 @@
           ]
         },
         {
-          "name": "세금 고지서",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.08,
+              "ratio": 2.27,
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "고통",
-              "v": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "빵 센디오",
-              "n": 4
+              "k": "perStack",
+              "id": "빵 센디오"
             },
             {
               "k": "dmg",
-              "ratio": 1.04,
+              "ratio": 0.4,
               "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "화상",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "월세 걱정",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "빵테오",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -691,7 +675,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.72,
           "target": "oneEnemy"
         },
         {
@@ -700,7 +684,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.42,
           "target": "oneEnemy"
         },
         {
@@ -712,11 +696,12 @@
       ],
       "oracles": [
         {
-          "name": "궁극의 마법서",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.97,
               "target": "oneEnemy"
             },
             {
@@ -725,7 +710,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.56,
               "target": "oneEnemy"
             },
             {
@@ -737,13 +722,12 @@
           ]
         },
         {
-          "name": "요약본",
-          "cost": 0,
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
+              "ratio": 0.54,
+              "target": "allEnemies"
             },
             {
               "k": "perTag",
@@ -751,8 +735,8 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
+              "ratio": 0.3,
+              "target": "allEnemies"
             },
             {
               "k": "exileFrom",
@@ -763,20 +747,189 @@
           ]
         },
         {
-          "name": "마법책빵",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.91,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "에슈르_bread"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.53,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "stack",
-              "id": "빵 센디오",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "oneEnemy"
             },
+            {
+              "k": "perTag",
+              "id": "에슈르_bread"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.36,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "에슈르_bread"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
             {
               "k": "make",
               "id": "에슈르_bread",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에슈르_u5",
+      "name": "제빵 수업",
+      "hero": "에슈르",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "에슈르_bread",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "빵 센디오",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.08
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "빵 센디오",
               "v": 1
             },
             {
@@ -799,67 +952,43 @@
           ]
         },
         {
-          "name": "풀리지 않는 난제",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.87,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 3
             },
             {
-              "k": "perStack",
-              "id": "빵 센디오"
+              "k": "stack",
+              "id": "빵 센디오",
+              "v": 2
             },
             {
-              "k": "dmg",
-              "ratio": 0.27,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "고대 마법 서적",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "에슈르_bread"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
+              "k": "nextAp",
+              "v": -1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "빵 모자",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "에심당 간판",
+          "name": "축복 2",
           "tags": [
             "보존"
           ]
         },
         {
-          "name": "시식 코너",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.3
+              "k": "make",
+              "id": "에슈르_bread",
+              "v": 1
             }
           ]
         }

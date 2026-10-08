@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "용족",
       "role": "서포터",
+      "style": "회복형",
       "star": 3,
       "hp": 600,
       "atk": 75,
       "def": 60,
       "crit": 5,
-      "blurb": "마법 소녀로 변신한 다야. 변신이 부끄러워 누구보다 빨리 끝내고 싶습니다. 파티가 바쁘게 카드를 낼수록 반짝이는 빛이 상처를 아물게 하고, 마무리 빔이 손에 들어옵니다.",
+      "blurb": "마법 소녀로 변신한 다야. 변신이 부끄러워 누구보다 빨리 끝내고 싶습니다. 발밑의 영역이 파티를 아물리고, 넘친 빛은 반짝임으로 모여 파티의 다음 한 수를 빛냅니다.",
       "keyword": {
         "name": "퓨어☆영역",
         "desc": "발밑에 펼친 반짝이는 마법진",
@@ -45,7 +46,26 @@
             },
             {
               "k": "heal",
-              "ratio": 0.3
+              "ratio": 0.15
+            }
+          ]
+        },
+        {
+          "name": "마법 소녀는 편지 쓰는 중",
+          "when": {
+            "on": "overheal",
+            "pct": 0.8
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반짝임",
+              "v": 1,
+              "ofEvent": 0.04
             }
           ]
         },
@@ -99,6 +119,19 @@
         "다야_퓨어샤인_s1",
         "다야_퓨어샤인_s2",
         "다야_퓨어샤인_u4"
+      ],
+      "keywords": [
+        {
+          "name": "반짝임",
+          "desc": "넘친 빛이 모인 반짝이",
+          "carrier": "self",
+          "cap": 4,
+          "onMax": {
+            "empower": "any",
+            "ratio": 0.4,
+            "consume": true
+          }
+        }
       ]
     }
   ],
@@ -159,7 +192,11 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.7
+          "ratio": 1.2
+        },
+        {
+          "k": "heal",
+          "ratio": 0.5
         },
         {
           "k": "stack",
@@ -169,11 +206,16 @@
       ],
       "oracles": [
         {
-          "name": "매지컬☆샤인 MAX",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.3
+              "ratio": 1.62
+            },
+            {
+              "k": "heal",
+              "ratio": 0.68
             },
             {
               "k": "stack",
@@ -183,11 +225,31 @@
           ]
         },
         {
-          "name": "서둘러 끝내자",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.84
+              "ratio": 1.14
+            },
+            {
+              "k": "heal",
+              "ratio": 0.48
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
             },
             {
               "k": "stack",
@@ -195,340 +257,23 @@
               "v": 2
             },
             {
-              "k": "ifNth",
-              "n": 1
-            },
-            {
-              "k": "draw",
+              "k": "status",
+              "id": "사기",
               "v": 1
             }
           ]
         },
         {
-          "name": "반짝 반창고",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 2.69
-            },
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "나의 아름다운 장미꽃에게",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.53
-            },
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "매지컬☆변신",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.89
-            },
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.75
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "매지컬☆스태프",
-          "kind": "guard"
-        },
-        {
-          "name": "별빛 리본",
-          "kind": "draw"
-        },
-        {
-          "name": "하트 스티커",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "다야_퓨어샤인_u2",
-      "name": "매지컬☆에너지",
-      "hero": "다야_퓨어샤인",
-      "unique": true,
-      "cost": 0,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.02,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "퓨어☆영역",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "에너지 충전",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.36,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "에너지 파동",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "얼른 끝내자!",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.11,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 1
-            },
-            {
-              "k": "ifNth",
-              "n": 1
-            },
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "샤이닝 피니시",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "make",
-              "id": "다야_퓨어샤인_finish",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "영역 해방",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.85,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "퓨어☆영역"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "퓨어☆영역",
-              "all": true
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "반짝 별",
-          "kind": "power"
-        },
-        {
-          "name": "매지컬☆윙크",
-          "kind": "ap"
-        },
-        {
-          "name": "한 번 더 변신",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "퓨어☆영역",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "다야_퓨어샤인_u3",
-      "name": "스타☆샤인",
-      "hero": "다야_퓨어샤인",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "shield",
-          "ratio": 1.02
-        },
-        {
-          "k": "perStack",
-          "id": "퓨어☆영역"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.77
-        },
-        {
-          "k": "spend",
-          "id": "퓨어☆영역",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "스타☆샤인 MAX",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.36
-            },
-            {
-              "k": "perStack",
-              "id": "퓨어☆영역"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.85
-            },
-            {
-              "k": "spend",
-              "id": "퓨어☆영역",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "편지 한 장 더",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.91
-            },
-            {
-              "k": "perStack",
-              "id": "퓨어☆영역"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.64
-            }
-          ]
-        },
-        {
-          "name": "기다림 끝의 답장",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.39
-            },
-            {
-              "k": "perStack",
-              "id": "퓨어☆영역"
+              "ratio": 1.67
             },
             {
               "k": "heal",
-              "ratio": 1.1
-            },
-            {
-              "k": "spend",
-              "id": "퓨어☆영역",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "영원한 팬레터",
-          "power": true,
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "퓨어☆영역"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.94
-            },
-            {
-              "k": "spend",
-              "id": "퓨어☆영역",
-              "all": true
+              "ratio": 0.68
             },
             {
               "k": "power",
@@ -550,7 +295,283 @@
           ]
         },
         {
-          "name": "팬레터 답장",
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.7
+            },
+            {
+              "k": "heal",
+              "ratio": 1.13
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_u2",
+      "name": "매지컬☆에너지",
+      "hero": "다야_퓨어샤인",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.95,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "퓨어☆영역",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.28,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.09,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "퓨어☆영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_u3",
+      "name": "스타☆샤인",
+      "hero": "다야_퓨어샤인",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "퓨어☆영역"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.55
+        },
+        {
+          "k": "spend",
+          "id": "퓨어☆영역",
+          "all": true
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "퓨어☆영역"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.74
+            },
+            {
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "퓨어☆영역"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.66
+            },
+            {
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.46
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "perStack",
@@ -558,7 +579,29 @@
             },
             {
               "k": "shield",
-              "ratio": 1.02
+              "ratio": 0.65
+            },
+            {
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
+            },
+            {
+              "k": "heal",
+              "ratio": 0.44
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "퓨어☆영역"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.52
             },
             {
               "k": "spend",
@@ -572,25 +615,42 @@
               "unique": true
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "퓨어☆영역"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.99
+            },
+            {
+              "k": "spend",
+              "id": "퓨어☆영역",
+              "all": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "하트 편지지",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "우체통",
-          "tags": [
-            "보존"
-          ]
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "답장 기다림",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "반짝임",
               "v": 1
             }
           ]
@@ -633,7 +693,7 @@
       ],
       "oracles": [
         {
-          "name": "반짝 영역 확장",
+          "name": "신탁 1",
           "tags": [
             "개전"
           ],
@@ -644,38 +704,9 @@
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "퓨어☆영역",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "반짝이 가루",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "결의",
+              "k": "stack",
+              "id": "퓨어☆영역",
               "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.02
             },
             {
               "k": "power",
@@ -697,19 +728,12 @@
           ]
         },
         {
-          "name": "위기의 마법 소녀",
+          "name": "신탁 2",
+          "cost": 0,
           "tags": [
             "개전"
           ],
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 2.04
-            },
-            {
-              "k": "heal",
-              "ratio": 0.68
-            },
             {
               "k": "power",
               "rules": [
@@ -724,10 +748,34 @@
                       "v": 1
                     }
                   ]
-                },
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
                 {
                   "when": {
-                    "on": "hurt"
+                    "on": "overheal",
+                    "pct": 0.8
                   },
                   "limit": {
                     "per": "turn",
@@ -735,8 +783,9 @@
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.6
+                      "k": "stack",
+                      "id": "반짝임",
+                      "v": 1
                     }
                   ]
                 }
@@ -745,7 +794,7 @@
           ]
         },
         {
-          "name": "응원 편지",
+          "name": "신탁 4",
           "tags": [
             "개전"
           ],
@@ -758,7 +807,8 @@
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
             },
             {
               "k": "power",
@@ -780,7 +830,8 @@
           ]
         },
         {
-          "name": "늦은 등장",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -806,22 +857,193 @@
             }
           ]
         }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_u5",
+      "name": "1초 컷",
+      "hero": "다야_퓨어샤인",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.75,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perOverheal",
+          "pct": 0.8,
+          "per": 25
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.18,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "반짝임",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.01,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반짝임",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반짝임",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.49,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "oneEnemy"
+            }
+          ]
+        }
       ],
       "blesses": [
         {
-          "name": "마법진",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "공연 준비",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "반짝 왕관",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "반짝임",
+              "v": 1
             }
           ]
         }

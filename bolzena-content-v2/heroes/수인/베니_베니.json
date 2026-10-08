@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "수인",
       "role": "딜러",
+      "style": "쌓고 고르기",
       "star": 3,
       "hp": 620,
       "atk": 135,
@@ -20,21 +21,7 @@
         "per": [
           {
             "stat": "dealt",
-            "v": -0.05
-          }
-        ],
-        "rules": [
-          {
-            "name": "꿀 나눔",
-            "when": {
-              "on": "ult"
-            },
-            "fx": [
-              {
-                "k": "heal",
-                "ratio": 2
-              }
-            ]
+            "v": -0.04
           }
         ]
       },
@@ -50,6 +37,24 @@
               "k": "make",
               "id": "베니_베니_jar",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "베니는 베니야",
+          "when": {
+            "on": "spend",
+            "id": "꿀범벅",
+            "n": 3
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.4
             }
           ]
         }
@@ -157,7 +162,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.16,
           "target": "allEnemies"
         },
         {
@@ -179,7 +184,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.36,
           "target": "allEnemies"
         },
         {
@@ -190,17 +195,17 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.36,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "꿀 폭탄",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.48,
               "target": "allEnemies"
             },
             {
@@ -211,18 +216,18 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.48,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "작은 꿀단지",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.28,
               "target": "allEnemies"
             },
             {
@@ -233,40 +238,17 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.28,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "꿀비",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.27,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "꿀범벅",
-              "v": 2,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "꿀 굳히기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.32,
               "target": "allEnemies"
             },
             {
@@ -276,24 +258,58 @@
               "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "꿀범벅",
-              "n": 4
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 1
             }
           ]
         },
         {
-          "name": "끈적 급소",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.67,
+              "ratio": 0.39,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "꿀범벅"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꿀범벅",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.41,
               "target": "allEnemies"
             },
             {
@@ -306,28 +322,8 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "unique": true
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "진한 꿀",
-          "kind": "power"
-        },
-        {
-          "name": "꿀 냄새",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "덧바르기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "꿀범벅",
-              "v": 1,
-              "target": "oneEnemy"
+              "unique": true,
+              "type": "공격"
             }
           ]
         }
@@ -360,7 +356,8 @@
       ],
       "oracles": [
         {
-          "name": "꿀 장마",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "stack",
@@ -381,13 +378,14 @@
           ]
         },
         {
-          "name": "꿀 한 방울",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 1,
+              "v": 2,
               "target": "allEnemies"
             },
             {
@@ -403,7 +401,29 @@
           ]
         },
         {
-          "name": "거대 꿀 웅덩이",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -439,28 +459,8 @@
           ]
         },
         {
-          "name": "꿀 수확",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.79,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "꿀범벅",
-              "v": 2,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "끈끈이 바닥",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "꿀범벅",
@@ -472,17 +472,25 @@
               "id": "약화",
               "v": 2,
               "target": "allEnemies"
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "손가락 핥기",
+          "name": "축복 1",
           "kind": "draw"
         },
         {
-          "name": "한 바가지",
+          "name": "축복 2",
+          "kind": "frost"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
@@ -490,10 +498,6 @@
               "v": 1
             }
           ]
-        },
-        {
-          "name": "느릿느릿 꿀",
-          "kind": "ap"
         }
       ]
     },
@@ -513,8 +517,7 @@
         {
           "k": "stack",
           "id": "꿀범벅",
-          "v": 1,
-          "target": "oneEnemy"
+          "v": 1
         },
         {
           "k": "perStack",
@@ -522,24 +525,24 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.15,
+          "ratio": 0.12,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "꿀단지 투척",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.81,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             },
             {
               "k": "perStack",
@@ -547,25 +550,25 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.18,
+              "ratio": 0.16,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "꿀 튕기기",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.57,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             },
             {
               "k": "perStack",
@@ -573,113 +576,110 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.1,
+              "ratio": 0.11,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "두 번 바르기",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "allEnemies"
+            },
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "꿀범벅",
-              "n": 4
-            },
-            {
-              "k": "status",
-              "id": "기절",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "꿀벌 친구들",
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.67,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "perStack",
+                      "k": "stack",
                       "id": "꿀범벅",
-                      "each": true
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.08,
-                      "target": "allEnemies"
+                      "v": 1
                     }
                   ]
                 }
               ]
             }
           ]
-        },
-        {
-          "name": "단지째 비우기",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.93,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "꿀범벅"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.29,
-              "target": "oneEnemy"
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "묵직한 단지",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "끈적한 자국",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "한 숟갈 더",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
               "id": "꿀범벅",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         }
@@ -694,18 +694,24 @@
       "type": "공격",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 1.6,
-          "target": "oneEnemy"
-        },
-        {
           "k": "perStack",
-          "id": "꿀범벅"
+          "id": "꿀범벅",
+          "n": 2
         },
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.4,
           "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "꿀범벅",
+          "n": 4
+        },
+        {
+          "k": "status",
+          "id": "기절",
+          "v": 1
         },
         {
           "k": "spend",
@@ -715,21 +721,28 @@
       ],
       "oracles": [
         {
-          "name": "꿀단지 박살",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.9,
-              "target": "oneEnemy"
-            },
-            {
               "k": "perStack",
-              "id": "꿀범벅"
+              "id": "꿀범벅",
+              "n": 2
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.54,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "꿀범벅",
+              "n": 4
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
             },
             {
               "k": "spend",
@@ -739,22 +752,29 @@
           ]
         },
         {
-          "name": "꿀통 내리치기",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
               "k": "perStack",
-              "id": "꿀범벅"
+              "id": "꿀범벅",
+              "n": 2
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.38,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "꿀범벅",
+              "n": 4
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
             },
             {
               "k": "spend",
@@ -764,42 +784,29 @@
           ]
         },
         {
-          "name": "꿀 해일",
-          "cost": 3,
+          "name": "신탁 3",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2,
-              "target": "allEnemies"
-            },
             {
               "k": "perStack",
               "id": "꿀범벅",
+              "n": 2,
               "each": true
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.29,
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "꿀에 파묻기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.6,
-              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "꿀범벅"
+              "k": "ifStack",
+              "id": "꿀범벅",
+              "n": 4
             },
             {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -810,44 +817,227 @@
           ]
         },
         {
-          "name": "단지 깨뜨리기",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 4",
           "fx": [
             {
+              "k": "perStack",
+              "id": "꿀범벅",
+              "n": 2
+            },
+            {
               "k": "dmg",
-              "ratio": 3.2,
+              "ratio": 0.44,
               "target": "oneEnemy"
             },
+            {
+              "k": "heal",
+              "ratio": 0.72
+            },
+            {
+              "k": "ifStack",
+              "id": "꿀범벅",
+              "n": 4
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
             {
               "k": "perStack",
-              "id": "꿀범벅"
+              "id": "꿀범벅",
+              "n": 2
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.72,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 2
+              "k": "ifStack",
+              "id": "꿀범벅",
+              "n": 4
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "꽉 찬 단지",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "꿀 냄새 추적",
-          "kind": "weakSpot"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "베니는 멋있어",
-          "kind": "ap"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "베니_베니_u5",
+      "name": "비상 꿀단지",
+      "hero": "베니_베니",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "베니_베니_jar",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "꿀범벅"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "베니_베니_jar",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "베니_베니_jar",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꿀범벅",
+              "v": 1
+            }
+          ]
         }
       ]
     }

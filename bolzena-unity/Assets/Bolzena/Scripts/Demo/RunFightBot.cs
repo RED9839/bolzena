@@ -137,11 +137,37 @@ namespace Bolzena.Demo
             return pick;
         }
 
+        static IEnumerator LeaveAfter(Bolzena.RunUI.Flow fl)
+        {
+            yield return new WaitForSecondsRealtime(3f);
+            if (RunDemo.Me != null) RunDemo.Me.Snap("left_lobby");
+            yield return new WaitForSecondsRealtime(1.5f);
+            if (fl.Stage.Hot.TryGetValue("start", out var b) && b != null) b.OnClick?.Invoke();
+            yield return new WaitForSecondsRealtime(5f);
+            if (RunDemo.Me != null) RunDemo.Me.Snap("continued");
+            yield return new WaitForSecondsRealtime(3f);
+            Debug.Log("[Demo] 나가기 · 이어하기 점검 끝");
+            Application.Quit(0);
+        }
+
         IEnumerator Run()
         {
             yield return WaitInput();
             yield return Wait(0.3f);
             Snap("start");
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-demo-leave") >= 0 && fightNo == 1)
+            {   // 일시정지 → 메인 화면으로(확인) → 로비 → 이어하기
+                PointerInput.Simulated = false;
+                yield return Wait(0.5f);
+                d.OpenPause(); yield return Wait(0.7f); Snap("pause_menu");
+                var pu = Modal.Open != null ? Modal.Open.GetComponent<PauseUi>() : null;
+                if (pu != null) { pu.DemoAskExit(); yield return Wait(0.6f); Snap("pause_confirm"); }
+                Modal.Open?.Close();
+                var fl = Bolzena.RunUI.Flow.Me;
+                fl.StartCoroutine(LeaveAfter(fl));
+                BattleBridge.LeaveToLobby();
+                yield break;
+            }
             int acts = 0, played = 0;   // played = 이 싸움에서 낸 카드(판 전체는 playedAll)
             while (!d.Over && acts++ < 200)
             {

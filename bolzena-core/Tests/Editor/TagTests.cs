@@ -183,7 +183,7 @@ namespace Bolzena.Core.Tests
             var b = K.Fight(d, new[] { "a" }, new[] { "dummy" }); K.Hand(b, "weak");
             K.Play(b, "weak");
             Assert.AreEqual(875, K.Hp(b), "약점 피해 +25%");
-            Assert.AreEqual(3.5, K.E(b).Tough, 1e-9, "약점 공격 — 0코는 1/2칸");
+            Assert.AreEqual(3, K.E(b).Tough, 1e-9, "약점 공격 — 0코도 1코처럼 1칸");
         }
 
         // ── 조건 ──

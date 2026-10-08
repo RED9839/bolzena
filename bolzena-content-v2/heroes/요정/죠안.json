@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "요정",
       "role": "서포터",
+      "style": "두 얼굴형",
       "star": 3,
       "hp": 720,
       "atk": 86,
@@ -14,126 +15,29 @@
       "blurb": "꿈속 계시를 받고 깨어나 옛 교리대로 세상을 되돌리려 교단을 장악했던 고대 요정 사제. 계시를 내린 쪽에게 버려져 무너졌고, 교주에게 용서받은 뒤 신앙의 과녁을 교주 한 명으로 옮기고 세계수를 등졌습니다. 권능은 거의 잃었지만 빵만은 여전히 무에서 짓고, 새벽마다 말장난을 적습니다.",
       "keyword": {
         "name": "형상",
-        "desc": "꿈 계시를 받던 사제의 모습",
+        "desc": "꿈 계시를 받던 사제의 모습이 차오르는 정도",
         "carrier": "self",
         "cap": 3,
-        "wrap": true,
-        "stages": [
-          "꿈결",
-          "심판",
-          "축복"
-        ]
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
-          "name": "형상의 교리",
+          "name": "빵 짓는 사제",
           "when": {
-            "on": "fightStart"
+            "on": "make"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
               "id": "형상",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "형상의 교리",
-          "when": {
-            "on": "play"
-          },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "형상",
-              "n": 1,
-              "max": 1
-            }
-          ],
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "형상의 교리",
-          "when": {
-            "on": "play",
-            "type": "공격"
-          },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "형상",
-              "n": 2,
-              "max": 2
-            }
-          ],
-          "limit": {
-            "per": "turn",
-            "n": 2
-          },
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "base": "def",
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "형상의 교리",
-          "when": {
-            "on": "play"
-          },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "형상",
-              "n": 3,
-              "max": 3
-            }
-          ],
-          "limit": {
-            "per": "turn",
-            "n": 2
-          },
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "형상의 교리",
-          "when": {
-            "on": "play"
-          },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "형상",
-              "n": 2,
-              "max": 2
-            }
-          ],
-          "limit": {
-            "per": "fight",
-            "n": 1
-          },
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
               "v": 1
             }
           ]
@@ -152,7 +56,7 @@
             },
             {
               "k": "heal",
-              "ratio": 1
+              "ratio": 2.1
             }
           ]
         }
@@ -185,48 +89,44 @@
         {
           "id": "죠안_꿈결",
           "name": "꿈결 형상",
-          "desc": "꿈속 계시를 받던 때의 모습 — 어느 형상이든 세 교리를 한꺼번에 행해 파티를 받침",
-          "turns": 2,
+          "desc": "꿈속 계시를 받던 때의 모습 — 휘두르는 사슬이 그대로 파티를 감싸는 형상",
+          "turns": 3,
           "cards": {
             "죠안_s1": "죠안_f1"
           },
-          "replace": true,
-          "passives": [
-            {
-              "name": "꿈결의 교리",
-              "when": {
-                "on": "play"
-              },
-              "limit": {
-                "per": "turn",
-                "n": 1
-              },
-              "fx": [
-                {
-                  "k": "shield",
-                  "ratio": 1.1
-                },
-                {
-                  "k": "draw",
-                  "v": 1
-                },
-                {
-                  "k": "status",
-                  "id": "사기",
-                  "v": 1
-                }
-              ]
-            }
-          ],
+          "replace": false,
+          "passives": [],
           "off": [
             {
-              "k": "status",
-              "id": "불굴",
+              "k": "stack",
+              "id": "형상",
               "v": 1
             }
           ],
           "skin": null,
-          "anim": "Idle_DreamForm"
+          "anim": "Idle_DreamForm",
+          "bonus": [
+            {
+              "card": "죠안_u1",
+              "fx": [
+                {
+                  "k": "exileFrom",
+                  "from": "hand",
+                  "all": true,
+                  "tag": "죠안_dizzy"
+                }
+              ]
+            },
+            {
+              "type": "공격",
+              "fx": [
+                {
+                  "k": "heal",
+                  "ratio": 0.25
+                }
+              ]
+            }
+          ]
         }
       ],
       "starter": [
@@ -234,6 +134,15 @@
         "죠안_s1",
         "죠안_s2",
         "죠안_u1"
+      ],
+      "keywords": [
+        {
+          "name": "반죽",
+          "desc": "이번 턴 빵을 지은 횟수",
+          "carrier": "self",
+          "cap": 9,
+          "endClear": true
+        }
       ]
     }
   ],
@@ -254,21 +163,21 @@
     },
     {
       "id": "죠안_f1",
-      "name": "꿈결의 가호",
+      "name": "꿈결의 사슬",
       "hero": "죠안",
       "token": true,
       "cost": 1,
-      "type": "스킬",
-      "blurb": "꿈결 형상의 사슬이 파티를 감싸 지킵니다 — 때리는 손이 아니라 받치는 손",
+      "type": "공격",
+      "blurb": "꿈결 형상의 사슬이 적을 휘감고 파티를 감싸 줍니다",
       "fx": [
         {
-          "k": "shield",
-          "ratio": 0.8
+          "k": "dmg",
+          "ratio": 0.65,
+          "target": "allEnemies"
         },
         {
-          "k": "status",
-          "id": "결의",
-          "v": 1
+          "k": "heal",
+          "ratio": 0.45
         }
       ]
     },
@@ -286,31 +195,118 @@
       ]
     },
     {
+      "id": "죠안_bread",
+      "name": "빵",
+      "hero": "죠안",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.84
+        },
+        {
+          "k": "shield",
+          "ratio": 0.98
+        }
+      ],
+      "blurb": "말 한마디로 지어 낸 빵 — 받은 아군의 손으로 나갑니다"
+    },
+    {
+      "id": "죠안_dizzy",
+      "name": "현기증",
+      "hero": "죠안",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "사용 불가",
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "nextAp",
+          "v": -1
+        }
+      ],
+      "blurb": "빵을 지을수록 핑 도는 머리"
+    },
+    {
       "id": "죠안_u1",
-      "name": "계시의 기도",
+      "name": "빵이 있으라",
       "hero": "죠안",
       "unique": true,
       "cost": 0,
       "type": "스킬",
       "fx": [
         {
+          "k": "make",
+          "id": "죠안_bread",
+          "v": 1,
+          "owner": "other"
+        },
+        {
           "k": "stack",
-          "id": "형상",
+          "id": "반죽",
           "v": 1
         },
         {
-          "k": "draw",
+          "k": "ifStack",
+          "id": "반죽",
+          "n": 3
+        },
+        {
+          "k": "make",
+          "id": "죠안_dizzy",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "연이은 계시",
+          "name": "신탁 1",
           "fx": [
             {
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 2,
+              "owner": "other"
+            },
+            {
               "k": "stack",
-              "id": "형상",
+              "id": "반죽",
               "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "반죽",
+              "n": 3
+            },
+            {
+              "k": "make",
+              "id": "죠안_dizzy",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 2,
+              "owner": "other"
             },
             {
               "k": "draw",
@@ -319,50 +315,37 @@
           ]
         },
         {
-          "name": "축복의 계시",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
             {
               "k": "stack",
               "id": "형상",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 3,
-              "max": 3
-            },
-            {
-              "k": "heal",
-              "ratio": 0.5
             }
           ]
         },
         {
-          "name": "교주일지",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "형상",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "교주님 가라사대",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "draw",
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 2,
+              "owner": "other"
+            },
+            {
+              "k": "stack",
+              "id": "형상",
               "v": 1
             },
             {
@@ -385,42 +368,18 @@
           ]
         },
         {
-          "name": "흩어진 계시",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "stack",
-              "id": "형상",
-              "v": 2
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 2,
+              "owner": "other"
             },
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "draw",
+              "k": "make",
+              "id": "죠안_dizzy",
               "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "세라핌의 눈",
-          "kind": "draw"
-        },
-        {
-          "name": "경건한 아침",
-          "tags": [
-            "개전"
-          ]
-        },
-        {
-          "name": "베일의 날개",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "형상",
-              "v": 1
             }
           ]
         }
@@ -428,166 +387,131 @@
     },
     {
       "id": "죠안_u2",
-      "name": "사슬 심판",
+      "name": "꿈결의 계시",
       "hero": "죠안",
       "unique": true,
       "cost": 1,
-      "type": "공격",
+      "type": "스킬",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
-          "base": "def",
-          "target": "oneEnemy"
-        },
-        {
-          "k": "ifStack",
-          "id": "형상",
-          "n": 2,
-          "max": 2
-        },
-        {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
+          "ratio": 0.98,
           "target": "allEnemies"
+        },
+        {
+          "k": "shield",
+          "ratio": 1.54
+        },
+        {
+          "k": "form",
+          "id": "죠안_꿈결"
         }
       ],
       "oracles": [
         {
-          "name": "무거운 사슬",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 2,
-              "max": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 1.33,
               "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 2.09
+            },
+            {
+              "k": "form",
+              "id": "죠안_꿈결"
             }
           ]
         },
         {
-          "name": "사슬 휘감기",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.57,
-              "base": "def",
+              "ratio": 0.92,
               "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 2,
-              "max": 2
+              "k": "shield",
+              "ratio": 1.47
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "form",
+              "id": "죠안_꿈결"
             }
           ]
         },
         {
-          "name": "사슬 끌어오기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 2,
-              "max": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 1.69,
               "target": "allEnemies"
+            },
+            {
+              "k": "form",
+              "id": "죠안_꿈결"
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other"
+              "who": "self",
+              "unique": true
             }
           ]
         },
         {
-          "name": "심판의 형상",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 2,
-              "max": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "ratio": 1.43,
               "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 3,
-              "max": 3
+              "k": "form",
+              "id": "죠안_꿈결"
             },
             {
-              "k": "heal",
-              "ratio": 0.6
+              "k": "draw",
+              "v": 2
             }
           ]
         },
         {
-          "name": "사슬 방벽",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1
+              "k": "dmg",
+              "ratio": 2.02,
+              "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "allEnemies"
+              "k": "form",
+              "id": "죠안_꿈결"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "맨주먹",
-          "kind": "power"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "사슬 손질",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "비 오는 날 먼지",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -600,173 +524,154 @@
     },
     {
       "id": "죠안_u3",
-      "name": "무에서 빵을",
+      "name": "오병이어",
       "hero": "죠안",
       "unique": true,
       "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "heal",
-          "ratio": 1
+          "k": "make",
+          "id": "죠안_bread",
+          "v": 2,
+          "owner": "other"
         },
         {
-          "k": "ifStack",
-          "id": "형상",
-          "n": 3,
-          "max": 3
-        },
-        {
-          "k": "heal",
-          "ratio": 0.6
+          "k": "exileFrom",
+          "from": "hand",
+          "all": true,
+          "tag": "죠안_dizzy"
         }
       ],
       "oracles": [
         {
-          "name": "빵! 빵! 빵!",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.3
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 3,
+              "owner": "other"
             },
             {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 3,
-              "max": 3
-            },
-            {
-              "k": "heal",
-              "ratio": 0.7
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "죠안_dizzy"
             }
           ]
         },
         {
-          "name": "한 입 빵",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.6
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 1,
+              "owner": "other"
             },
             {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 3,
-              "max": 3
-            },
-            {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "죠안_dizzy"
             }
           ]
         },
         {
-          "name": "여러 맛 빵",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.8
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 2,
+              "owner": "other"
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "형상",
               "v": 1
             },
             {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 3,
-              "max": 3
-            },
-            {
-              "k": "heal",
-              "ratio": 0.6
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "죠안_dizzy"
             }
           ]
         },
         {
-          "name": "생크림 빵",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.2
-            },
-            {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 3,
-              "max": 3
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            }
-          ]
-        },
-        {
-          "name": "금욕의 빵",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 1,
+              "owner": "other"
             },
             {
-              "k": "ifStack",
-              "id": "형상",
-              "n": 3,
-              "max": 3
-            },
-            {
-              "k": "heal",
-              "ratio": 0.5
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "죠안_dizzy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play"
-                  },
-                  "conds": [
-                    {
-                      "c": "stack",
-                      "id": "형상",
-                      "n": 3,
-                      "max": 3
-                    }
-                  ],
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.3
+                      "k": "make",
+                      "id": "죠안_bread",
+                      "v": 1,
+                      "owner": "other"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 3,
+              "owner": "other"
+            },
+            {
+              "k": "make",
+              "id": "죠안_dizzy",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "생크림",
-          "kind": "heal"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "갓 구운 향",
-          "kind": "cost"
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "딸기 케이크 금욕",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "형상",
+              "v": 1
             }
           ]
         }
@@ -790,16 +695,8 @@
           "rules": [
             {
               "when": {
-                "on": "play"
+                "on": "make"
               },
-              "conds": [
-                {
-                  "c": "stack",
-                  "id": "형상",
-                  "n": 3,
-                  "max": 3
-                }
-              ],
               "limit": {
                 "per": "turn",
                 "n": 1
@@ -807,12 +704,7 @@
               "fx": [
                 {
                   "k": "shield",
-                  "ratio": 0.6
-                },
-                {
-                  "k": "status",
-                  "id": "피해 감소",
-                  "v": 1
+                  "ratio": 0.7
                 }
               ]
             }
@@ -821,7 +713,7 @@
       ],
       "oracles": [
         {
-          "name": "깊은 교리",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "status",
@@ -829,24 +721,154 @@
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 0.6
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1.19
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play"
+                    "on": "make"
                   },
-                  "conds": [
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
                     {
-                      "c": "stack",
-                      "id": "형상",
-                      "n": 3,
-                      "max": 3
+                      "k": "shield",
+                      "ratio": 0.42
                     }
-                  ],
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "형상",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.42
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 1,
+              "owner": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.56
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
                   "limit": {
                     "per": "turn",
                     "n": 1
@@ -855,217 +877,6 @@
                     {
                       "k": "shield",
                       "ratio": 0.7
-                    },
-                    {
-                      "k": "status",
-                      "id": "피해 감소",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "아침 기도",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play"
-                  },
-                  "conds": [
-                    {
-                      "c": "stack",
-                      "id": "형상",
-                      "n": 3,
-                      "max": 3
-                    }
-                  ],
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.8
-                    },
-                    {
-                      "k": "status",
-                      "id": "피해 감소",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "분산",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play"
-                  },
-                  "conds": [
-                    {
-                      "c": "stack",
-                      "id": "형상",
-                      "n": 3,
-                      "max": 3
-                    }
-                  ],
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.6
-                    },
-                    {
-                      "k": "status",
-                      "id": "피해 감소",
-                      "v": 1
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "play",
-                    "type": "공격"
-                  },
-                  "conds": [
-                    {
-                      "c": "stack",
-                      "id": "형상",
-                      "n": 2,
-                      "max": 2
-                    }
-                  ],
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.3,
-                      "base": "def",
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "교주를 향한 헌신",
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play"
-                  },
-                  "conds": [
-                    {
-                      "c": "stack",
-                      "id": "형상",
-                      "n": 3,
-                      "max": 3
-                    }
-                  ],
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.6
-                    },
-                    {
-                      "k": "status",
-                      "id": "피해 감소",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "짧은 교리",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play"
-                  },
-                  "conds": [
-                    {
-                      "c": "stack",
-                      "id": "형상",
-                      "n": 3,
-                      "max": 3
-                    }
-                  ],
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.6
-                    },
-                    {
-                      "k": "status",
-                      "id": "피해 감소",
-                      "v": 1
                     }
                   ]
                 }
@@ -1076,15 +887,181 @@
       ],
       "blesses": [
         {
-          "name": "주교의 경전",
+          "name": "축복 1",
           "kind": "defUp"
         },
         {
-          "name": "교주 기록",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "형상의 기도",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "형상",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "죠안_u5",
+      "name": "사슬 심판",
+      "hero": "죠안",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.05,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "형상",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "형상",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "형상",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.43,
+                      "base": "def",
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "형상",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "죠안_bread",
+              "v": 1,
+              "owner": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "형상",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.58,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "형상",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

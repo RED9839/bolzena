@@ -76,7 +76,7 @@ namespace Bolzena.Core.Tests
             K.Play(b, "h_coolA");
             Assert.IsTrue(K.E(b, 0).Dead && K.E(b, 1).Dead);
             Assert.AreEqual(3 - 1 + 2 * R.TOUGH.Ap, b.Ap, "보통 격파처럼 적마다");
-            Assert.AreEqual(2.5, K.E(b, 2).Tough, 1e-9, "살아 있는 적은 그대로 1/2");
+            Assert.AreEqual(2, K.E(b, 2).Tough, 1e-9, "살아 있는 적은 그대로 1칸(광역도 적마다 단일과 같다)");
         }
 
         [Test] public void 근면과_겹치면_둘_다_받는다()

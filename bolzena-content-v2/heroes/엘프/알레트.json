@@ -6,12 +6,13 @@
       "nature": "순수",
       "race": "엘프",
       "role": "탱커",
+      "style": "거드는 형",
       "star": 1,
       "hp": 720,
       "atk": 66,
       "def": 57,
       "crit": 5,
-      "blurb": "칸나 반장 말만 듣는 충견형 하사. 반장님이 공격하면 그 앞을 방패로 막고, 명령을 셋 받으면 반격으로 되갚습니다.",
+      "blurb": "칸나 반장 말만 듣는 충견형 하사. 반장님이 카드를 낼 때마다 그 앞을 방패로 막으며 명령을 받고, 명령 셋을 완수하면 파티의 다음 한 수에 힘을 싣습니다.",
       "keyword": {
         "name": "반장님",
         "desc": "알레트가 따르는 아군 표시",
@@ -25,32 +26,17 @@
           "desc": "반장님 명령으로 쌓는 임무",
           "carrier": "self",
           "cap": 3,
-          "rules": [
+          "per": [
             {
-              "name": "명령 완수",
-              "when": {
-                "on": "stackReach",
-                "id": "명령 수행",
-                "n": 3
-              },
-              "fx": [
-                {
-                  "k": "spend",
-                  "id": "명령 수행",
-                  "all": true
-                },
-                {
-                  "k": "status",
-                  "id": "반격",
-                  "v": 2
-                },
-                {
-                  "k": "shield",
-                  "ratio": 1
-                }
-              ]
+              "stat": "taken",
+              "v": -0.04
             }
-          ]
+          ],
+          "onMax": {
+            "empower": "any",
+            "ratio": 0.4,
+            "consume": true
+          }
         }
       ],
       "passives": [
@@ -81,7 +67,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.5
+              "ratio": 0.65
             },
             {
               "k": "stack",
@@ -158,7 +144,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 0.91,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -166,15 +152,26 @@
           "k": "stack",
           "id": "명령 수행",
           "v": 1
+        },
+        {
+          "k": "ifStack",
+          "id": "명령 수행",
+          "n": 3
+        },
+        {
+          "k": "status",
+          "id": "기절",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "힘찬 삽질",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.29,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -182,46 +179,27 @@
               "k": "stack",
               "id": "명령 수행",
               "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "명령 수행",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
             }
           ]
         },
         {
-          "name": "삽 끝으로",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "명령 수행",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "방패로 막고 삽",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.82
-            },
-            {
-              "k": "stack",
-              "id": "명령 수행",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "삽 찾아오기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.86,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -231,23 +209,82 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
+              "k": "ifStack",
+              "id": "명령 수행",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
             }
           ]
         },
         {
-          "name": "삽자루 부러뜨리기",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
+              "k": "dmg",
+              "ratio": 2.03,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.59,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "명령 수행",
               "v": 1
             },
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "반장님"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "명령 수행",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.31
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.99,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -255,25 +292,30 @@
               "k": "stack",
               "id": "명령 수행",
               "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "군용 삽",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "몰래 배달",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "방패 받침",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "명령 수행",
+              "v": 1
             }
           ]
         }
@@ -295,7 +337,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.8
+          "ratio": 1.04
         },
         {
           "k": "stack",
@@ -305,7 +347,7 @@
       ],
       "oracles": [
         {
-          "name": "경례!",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -315,7 +357,7 @@
             },
             {
               "k": "shield",
-              "ratio": 1.19
+              "ratio": 1.43
             },
             {
               "k": "stack",
@@ -325,7 +367,44 @@
           ]
         },
         {
-          "name": "충성 맹세",
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반장님",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.65
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반장님",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "stack",
+              "id": "명령 수행",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -336,24 +415,25 @@
             },
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 1.26
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "marked": "반장님"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "명령 수행",
                       "v": 1
-                    },
-                    {
-                      "k": "shield",
-                      "ratio": 0.4
                     }
                   ]
                 }
@@ -362,7 +442,7 @@
           ]
         },
         {
-          "name": "진압반 소집",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
@@ -372,70 +452,10 @@
             },
             {
               "k": "shield",
-              "ratio": 0.9
+              "ratio": 2.43
             },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "반장님 호위",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "반장님",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.6
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "군장 정리",
-          "fx": [
             {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "반장님",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "shield",
-              "ratio": 2.2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "흐트러짐 없는 자세",
-          "kind": "guard"
-        },
-        {
-          "name": "제 이름은 알레트",
-          "kind": "draw"
-        },
-        {
-          "name": "경례 대기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "명령 수행",
               "v": 1
             }
           ]
@@ -452,7 +472,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 0.65,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -462,7 +482,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.39,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -474,11 +494,40 @@
       ],
       "oracles": [
         {
-          "name": "전력 돌파",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.88,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "명령 수행"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.53,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "명령 수행",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.64,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -493,88 +542,21 @@
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "명령 수행",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "방패 툭",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "명령 수행"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "명령 수행",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "진압 대형",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "명령 수행",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "방패 벽",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "명령 수행"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "명령 수행",
-                    "n": 3
+                    "on": "play",
+                    "marked": "반장님"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.6,
+                      "ratio": 0.29,
                       "base": "def",
                       "target": "oneEnemy"
                     }
@@ -585,15 +567,37 @@
           ]
         },
         {
-          "name": "진압 돌격",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.59,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "명령 수행"
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.29,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "명령 수행",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -603,24 +607,60 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.39,
               "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반장님",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.37,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "명령 수행"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.82,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "큰 방패",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "기상 나팔",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "밀어붙인 자리",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -641,7 +681,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.7
+          "ratio": 0.91
         },
         {
           "k": "perStack",
@@ -649,16 +689,17 @@
         },
         {
           "k": "shield",
-          "ratio": 0.3
+          "ratio": 0.39
         }
       ],
       "oracles": [
         {
-          "name": "야간 자율 훈련",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.9
+              "ratio": 1.23
             },
             {
               "k": "perStack",
@@ -666,17 +707,18 @@
             },
             {
               "k": "shield",
-              "ratio": 0.38
+              "ratio": 0.53
             }
           ]
         },
         {
-          "name": "짧은 훈련",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.5
+              "ratio": 0.86
             },
             {
               "k": "perStack",
@@ -684,50 +726,66 @@
             },
             {
               "k": "shield",
-              "ratio": 0.2
+              "ratio": 0.36
             }
           ]
         },
         {
-          "name": "기본기 훈련",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "pull",
-              "from": "discard",
-              "basic": true
+              "k": "shield",
+              "ratio": 0.78
+            },
+            {
+              "k": "perStack",
+              "id": "명령 수행"
             },
             {
               "k": "shield",
-              "ratio": 0.6
+              "ratio": 0.33
             },
             {
               "k": "stack",
-              "id": "명령 수행",
-              "v": 1
+              "id": "반장님",
+              "v": 1,
+              "target": "oneAlly"
             }
           ]
         },
         {
-          "name": "자율 훈련 일과",
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.73
+            },
+            {
+              "k": "perStack",
+              "id": "명령 수행"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.33
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "turnEnd"
                   },
+                  "conds": [
+                    {
+                      "c": "ownNone"
+                    }
+                  ],
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "명령 수행",
-                      "v": 1
+                      "k": "shield",
+                      "ratio": 0.65
                     }
                   ]
                 }
@@ -736,24 +794,183 @@
           ]
         },
         {
-          "name": "훈련 일지 제출",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.27
+            },
             {
               "k": "perStack",
               "id": "명령 수행"
             },
             {
               "k": "shield",
-              "ratio": 0.42
+              "ratio": 0.55
             },
             {
-              "k": "spend",
+              "k": "payHp",
+              "v": 40
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
               "id": "명령 수행",
-              "all": true
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "알레트_u5",
+      "name": "반장님 주스 빼돌리기",
+      "hero": "알레트",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.17
+        },
+        {
+          "k": "stack",
+          "id": "명령 수행",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.65
             },
             {
-              "k": "status",
-              "id": "결의",
+              "k": "stack",
+              "id": "명령 수행",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.12
+            },
+            {
+              "k": "stack",
+              "id": "명령 수행",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.99
+            },
+            {
+              "k": "stack",
+              "id": "명령 수행",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.11
+            },
+            {
+              "k": "stack",
+              "id": "명령 수행",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "반장님"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.42
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.18
+            },
+            {
+              "k": "stack",
+              "id": "명령 수행",
+              "v": 2
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -761,17 +978,15 @@
       ],
       "blesses": [
         {
-          "name": "군기",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "heal"
         },
         {
-          "name": "훈련 교본",
-          "tags": [
-            "보존"
-          ]
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "훈련 일지",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

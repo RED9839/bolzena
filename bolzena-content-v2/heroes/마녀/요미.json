@@ -6,6 +6,7 @@
       "nature": "우울",
       "race": "미스틱",
       "role": "딜러",
+      "style": "예약형",
       "star": 3,
       "hp": 720,
       "atk": 146,
@@ -14,37 +15,54 @@
       "blurb": "달을 섬기는 무녀. 달이 차오를수록 달바라기 꽃밭이 파티를 감싸 덜 다치게 하고, 보름이 뜨면 달빛이 적 전체에 스며들어 밤새 상처를 벌립니다.",
       "keyword": {
         "name": "달바라기",
-        "desc": "달을 향해 피어나는 꽃밭",
+        "desc": "보름달을 기다리며 피는 꽃밭",
         "carrier": "self",
-        "cap": 4,
+        "cap": 2,
+        "decay": 1,
+        "reserve": true,
         "per": [
           {
             "stat": "taken",
-            "v": -0.03,
+            "v": -0.04,
             "who": "allies"
-          },
-          {
-            "stat": "dealt",
-            "v": 0.05
           }
         ],
         "rules": [
           {
+            "name": "달빛 꽃밭",
+            "when": {
+              "on": "turnEnd"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "달바라기",
+                "n": 1
+              }
+            ],
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 0.22,
+                "target": "allEnemies"
+              }
+            ]
+          },
+          {
             "name": "보름달",
             "when": {
-              "on": "stackReach",
+              "on": "stackGone",
               "id": "달바라기",
-              "n": 4
+              "decay": true
             },
             "fx": [
               {
-                "k": "spend",
-                "id": "달바라기",
-                "all": true
+                "k": "cue",
+                "id": "yomi_moonlight"
               },
               {
                 "k": "dmg",
-                "ratio": 0.8,
+                "ratio": 1,
                 "target": "allEnemies"
               },
               {
@@ -54,19 +72,52 @@
                 "target": "allEnemies"
               }
             ]
+          },
+          {
+            "name": "별빛",
+            "when": {
+              "on": "play",
+              "type": "공격"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "달바라기",
+                "n": 1
+              }
+            ],
+            "limit": {
+              "per": "turn",
+              "n": 2
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 0.25,
+                "target": "randomEnemy"
+              }
+            ]
           }
         ]
       },
       "passives": [
         {
-          "name": "달의 순환",
+          "name": "지극정성의 마중",
           "when": {
-            "on": "turnStart"
+            "on": "stackGone",
+            "id": "달바라기"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "달바라기",
+              "k": "gauge",
+              "v": 15
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
@@ -219,118 +270,142 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.75,
+          "ratio": 0.6,
           "target": "allEnemies"
         },
         {
           "k": "stack",
           "id": "달바라기",
-          "v": 1
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "은빛 꽃밭",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 0.81,
               "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "달바라기",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "달 아래 대기",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.84,
+              "ratio": 0.57,
               "target": "allEnemies"
             },
             {
               "k": "stack",
               "id": "달바라기",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "달빛 길잡이",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            }
-          ]
-        },
-        {
-          "name": "희미한 달빛",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "달바라기",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "달바라기",
-              "n": 3
+              "ratio": 1.08,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
+              "id": "둔화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 2
             }
           ]
         },
         {
-          "name": "달무리",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.14,
+              "ratio": 0.55,
               "target": "allEnemies"
             },
             {
-              "k": "spend",
+              "k": "stack",
               "id": "달바라기",
               "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "stack",
+                      "id": "달바라기",
+                      "n": 1
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.21,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "달님의 빛",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "시조 한 수",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "달바라기 씨앗",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -351,152 +426,140 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.7,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "달바라기"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.3,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
+          "k": "ripen",
           "id": "달바라기",
-          "all": true
+          "v": 0.25
         }
       ],
       "oracles": [
         {
-          "name": "칠흑의 별빛",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.99,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "달바라기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.38,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
+              "k": "ripen",
               "id": "달바라기",
-              "all": true
+              "v": 0.25
             }
           ]
         },
         {
-          "name": "흩어지는 별",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.47,
-              "target": "allEnemies"
+              "ratio": 0.66,
+              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "달바라기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.21,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
+              "k": "ripen",
               "id": "달바라기",
-              "all": true
+              "v": 0.25
             }
           ]
         },
         {
-          "name": "별자리 읽기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.72,
+              "ratio": 0.65,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "달바라기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
+              "k": "ripen",
+              "id": "달바라기",
+              "v": 0.25
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "스킬"
+              "unique": true
             }
           ]
         },
         {
-          "name": "기다린 밤",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.74,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "달바라기"
+              "k": "ripen",
+              "id": "달바라기",
+              "v": 0.25
             },
             {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "oneEnemy"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackGone",
+                    "id": "달바라기"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.37,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "별똥별 부르기",
-          "cost": 2,
-          "tags": [
-            "종극"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.8,
+              "ratio": 1.09,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "달바라기"
+              "k": "ripen",
+              "id": "달바라기",
+              "v": 0.25
             },
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "배고픈 검은 별",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "달떡",
-          "kind": "draw"
-        },
-        {
-          "name": "반짝이는 불빛",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -527,7 +590,7 @@
       ],
       "oracles": [
         {
-          "name": "간절한 기도",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
@@ -541,7 +604,10 @@
           ]
         },
         {
-          "name": "교주님을 위해서라면",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -550,17 +616,30 @@
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "other"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.4
+              "v": 1
             }
           ]
         },
         {
-          "name": "소망을 머금은 꽃",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -577,12 +656,16 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "stackGone",
+                    "id": "달바라기"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "달바라기",
+                      "k": "draw",
                       "v": 1
                     }
                   ]
@@ -592,26 +675,8 @@
           ]
         },
         {
-          "name": "묵상",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.53
-            },
-            {
-              "k": "stack",
-              "id": "달바라기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "밤샘 기도",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "달바라기",
@@ -620,22 +685,12 @@
             {
               "k": "draw",
               "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "슴슴한 국물",
-          "kind": "heal"
-        },
-        {
-          "name": "긴 소매",
-          "kind": "draw"
-        },
-        {
-          "name": "은은히 빛나는",
-          "kind": "atkUp"
         }
       ]
     },
@@ -657,19 +712,22 @@
           "rules": [
             {
               "when": {
-                "on": "stackReach",
-                "id": "달바라기",
-                "n": 4
+                "on": "stackGone",
+                "id": "달바라기"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
-                  "k": "dmg",
-                  "ratio": 0.5,
-                  "target": "allEnemies"
+                  "k": "stack",
+                  "id": "달바라기",
+                  "v": 1
                 },
                 {
                   "k": "gauge",
-                  "v": 15
+                  "v": 10
                 }
               ]
             }
@@ -678,143 +736,8 @@
       ],
       "oracles": [
         {
-          "name": "만월의 서약",
+          "name": "신탁 1",
           "fx": [
-            {
-              "k": "stack",
-              "id": "달바라기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "달바라기",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.7,
-                      "target": "allEnemies"
-                    },
-                    {
-                      "k": "gauge",
-                      "v": 15
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "첫 기도",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "달바라기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "달바라기",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "target": "allEnemies"
-                    },
-                    {
-                      "k": "gauge",
-                      "v": 15
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "갸륵한 정성으로",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "달바라기",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "target": "allEnemies"
-                    },
-                    {
-                      "k": "gauge",
-                      "v": 15
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "작은 서약",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "달바라기",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.45,
-                      "target": "allEnemies"
-                    },
-                    {
-                      "k": "gauge",
-                      "v": 15
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "달의 가호",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
               "id": "달바라기",
@@ -825,41 +748,368 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "달바라기",
-                    "n": 4
+                    "on": "stackGone",
+                    "id": "달바라기"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "target": "allEnemies"
+                      "k": "stack",
+                      "id": "달바라기",
+                      "v": 1
                     },
                     {
                       "k": "gauge",
-                      "v": 15
+                      "v": 10
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackGone",
+                    "id": "달바라기"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "달바라기",
+                      "v": 1
+                    },
+                    {
+                      "k": "gauge",
+                      "v": 10
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackGone",
+                    "id": "달바라기"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "달바라기",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.3,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackGone",
+                    "id": "달바라기"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "달바라기",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackGone",
+                    "id": "달바라기"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "달바라기",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "달의 사제",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "defUp"
         },
         {
-          "name": "먼지 털어 주기",
-          "tags": [
-            "개전"
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "요미_u5",
+      "name": "달밤의 춤",
+      "hero": "요미",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.9
+        },
+        {
+          "k": "stack",
+          "id": "달바라기",
+          "v": 1
+        },
+        {
+          "k": "ifStack",
+          "id": "달바라기",
+          "n": 2
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.22
+            },
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "달바라기",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "allEnemies"
+            }
           ]
         },
         {
-          "name": "구름 걷기",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.86
+            },
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "달바라기",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.49
+            },
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.06
+            },
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "stack",
+                      "id": "달바라기",
+                      "n": 1
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.4,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.03
+            },
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
           "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "달바라기",
+              "v": 1
+            }
+          ]
         }
       ]
     }

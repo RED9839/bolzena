@@ -6,39 +6,22 @@
       "nature": "우울",
       "race": "엘프",
       "role": "서포터",
+      "style": "예약형",
       "star": 3,
       "hp": 630,
       "atk": 75,
       "def": 58,
       "crit": 5,
-      "blurb": "자재난 속에서도 우주선을 띄운 노력파 발명가. 어떤 카드든 소멸하면 자재로 주워 모으고, 스킬을 낼 때 자재 셋으로 발명품을 뚝딱 만듭니다.",
+      "blurb": "자재난 속에서도 우주선을 띄운 노력파 발명가. 적에게 붙인 기상 드론은 두 차례 뒤 요란하게 터지고, 사라진 카드에서 주운 고물이 셋 모이면 발명품을 뚝딱 만듭니다.",
       "keyword": {
         "name": "고물 부품",
         "desc": "사라진 카드에서 주운 부품",
         "carrier": "self",
-        "cap": 6,
-        "rules": [
-          {
-            "name": "발명품 조립",
-            "when": {
-              "on": "stackReach",
-              "id": "고물 부품",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "고물 부품",
-                "v": 3
-              },
-              {
-                "k": "make",
-                "id": "오르_t1",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "cap": 3,
+        "onMax": {
+          "make": "오르_t1",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -49,7 +32,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
@@ -62,13 +45,41 @@
         {
           "name": "응원의 녹음기",
           "when": {
+            "on": "reserveFire"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "고물 부품",
+              "v": 1
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "응원의 녹음기",
+          "when": {
             "on": "fightStart"
           },
           "fx": [
             {
               "k": "stack",
               "id": "고물 부품",
-              "v": 3
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "기상 드론",
+              "v": 1,
+              "target": "topEnemy"
             }
           ]
         }
@@ -91,7 +102,7 @@
           {
             "k": "stack",
             "id": "고물 부품",
-            "v": 3
+            "v": 2
           }
         ]
       },
@@ -100,6 +111,38 @@
         "오르_s1",
         "오르_s2",
         "오르_u2"
+      ],
+      "keywords": [
+        {
+          "name": "기상 드론",
+          "desc": "적에게 붙어 울리다 터지는 자명종 드론",
+          "carrier": "enemy",
+          "cap": 2,
+          "reserve": true,
+          "decay": 1,
+          "rules": [
+            {
+              "name": "강제 기상",
+              "when": {
+                "on": "stackGone",
+                "id": "기상 드론",
+                "decay": true
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 1.88,
+                  "target": "oneEnemy"
+                },
+                {
+                  "k": "status",
+                  "id": "약화",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   ],
@@ -151,7 +194,7 @@
         },
         {
           "k": "shield",
-          "ratio": 1.4
+          "ratio": 1.63
         },
         {
           "k": "ifChoice",
@@ -159,8 +202,13 @@
         },
         {
           "k": "dmg",
-          "ratio": 1.6,
+          "ratio": 1.25,
           "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "기상 드론",
+          "v": 1
         }
       ],
       "hero": "오르",
@@ -175,86 +223,67 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "약화",
+          "k": "stack",
+          "id": "기상 드론",
           "v": 2,
           "target": "oneEnemy"
         },
         {
-          "k": "later",
-          "n": 1,
-          "then": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "randomEnemy"
-            }
-          ]
+          "k": "status",
+          "id": "약화",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "강제 기상 2호",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
+              "k": "stack",
+              "id": "기상 드론",
+              "v": 3,
               "target": "oneEnemy"
             },
             {
-              "k": "dmg",
-              "ratio": 0.95,
-              "target": "randomEnemy"
+              "k": "status",
+              "id": "약화",
+              "v": 1
             }
           ]
         },
         {
-          "name": "알람 시계",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
+            {
+              "k": "stack",
+              "id": "기상 드론",
+              "v": 2,
+              "target": "oneEnemy"
+            },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 1
             }
           ]
         },
         {
-          "name": "부품 장착 기상기",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "stack",
+              "id": "기상 드론",
+              "v": 1,
+              "target": "allEnemies"
+            },
             {
               "k": "status",
               "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "고물 부품",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "설계 메모",
-          "fx": [
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "randomEnemy"
+              "v": 1,
+              "target": "allEnemies"
             },
             {
               "k": "draw",
@@ -265,38 +294,78 @@
           ]
         },
         {
-          "name": "부품 재활용",
+          "name": "신탁 4",
+          "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "약화",
+              "k": "stack",
+              "id": "기상 드론",
               "v": 2,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "고물 부품",
-              "v": 2
+              "k": "status",
+              "id": "약화",
+              "v": 1
             },
             {
-              "k": "make",
-              "id": "오르_t1",
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "약화",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기상 드론",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "집중 방해",
-          "kind": "frost"
+          "name": "축복 1",
+          "kind": "guard"
         },
         {
-          "name": "늘어난 메리야스",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "나사 하나",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -327,21 +396,56 @@
       ],
       "oracles": [
         {
-          "name": "로켓 두 대",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "make",
               "id": "오르_t1",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.88
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "오르_t1",
               "v": 1
             }
           ]
         },
         {
-          "name": "로켓 정비소",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "오르_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "기상 드론",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -358,13 +462,16 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "고물 부품",
-                      "v": 1
+                      "k": "shield",
+                      "ratio": 0.5
                     }
                   ]
                 }
@@ -373,75 +480,19 @@
           ]
         },
         {
-          "name": "설계도 뒤적이기",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "make",
               "id": "오르_t1",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "고물상 순회",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
-            },
-            {
-              "k": "stack",
-              "id": "고물 부품",
               "v": 2
             },
             {
-              "k": "make",
-              "id": "오르_t1",
+              "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "리어카 과적",
-          "fx": [
+            },
             {
               "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "make",
-              "id": "오르_t1",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "비행선 빵주",
-          "kind": "draw"
-        },
-        {
-          "name": "지원 물자",
-          "kind": "ap"
-        },
-        {
-          "name": "부품 한 봉지",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "고물 부품",
               "v": 1
             }
           ]
@@ -458,121 +509,174 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.3
+          "ratio": 1.25
         },
         {
-          "k": "stack",
-          "id": "고물 부품",
-          "v": 1
+          "k": "later",
+          "n": 1,
+          "then": [
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "randomEnemy",
+              "hits": 4
+            }
+          ]
         }
       ],
       "oracles": [
         {
-          "name": "자기장 확장",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.7
+              "ratio": 1.69
             },
             {
-              "k": "stack",
-              "id": "고물 부품",
-              "v": 1
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.38,
+                  "target": "randomEnemy",
+                  "hits": 4
+                }
+              ]
             }
           ]
         },
         {
-          "name": "휴대용 돔 전개",
-          "cost": 2,
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.5
+              "ratio": 1.19
             },
             {
-              "k": "stack",
-              "id": "고물 부품",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.26,
+                  "target": "randomEnemy",
+                  "hits": 4
+                }
+              ]
             }
           ]
         },
         {
-          "name": "부품이 넉넉하면",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.43
+              "ratio": 1.29
             },
             {
-              "k": "ifStack",
-              "id": "고물 부품",
-              "n": 4
+              "k": "heal",
+              "ratio": 0.71
             },
             {
-              "k": "shield",
-              "ratio": 0.95
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.25,
+                  "target": "randomEnemy",
+                  "hits": 4
+                }
+              ]
             }
           ]
         },
         {
-          "name": "자기장 설계도",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.15
+              "ratio": 1.13
             },
             {
-              "k": "stack",
-              "id": "고물 부품",
-              "v": 1
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.18,
+                  "target": "randomEnemy",
+                  "hits": 4
+                }
+              ]
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "스킬"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.69
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "부품 태우기",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "burn",
-              "v": 1
-            },
-            {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 1.75
             },
             {
-              "k": "stack",
-              "id": "고물 부품",
-              "v": 3
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.39,
+                  "target": "randomEnemy",
+                  "hits": 4
+                }
+              ]
+            },
+            {
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "기계팔",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "작업복",
+          "name": "축복 2",
           "kind": "defUp"
         },
         {
-          "name": "응원 녹음",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.4
+              "k": "stack",
+              "id": "고물 부품",
+              "v": 1
             }
           ]
         }
@@ -587,62 +691,95 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "shield",
-          "ratio": 0.6
+          "k": "ripen",
+          "id": "기상 드론",
+          "v": 0.3
         },
         {
-          "k": "perStack",
-          "id": "고물 부품"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.2
+          "k": "stack",
+          "id": "고물 부품",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "밤샘 발명",
+          "name": "신탁 1",
           "fx": [
+            {
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.3
+            },
+            {
+              "k": "stack",
+              "id": "고물 부품",
+              "v": 1
+            },
             {
               "k": "shield",
               "ratio": 0.75
-            },
-            {
-              "k": "perStack",
-              "id": "고물 부품"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.25
             }
           ]
         },
         {
-          "name": "작은 발명",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.4
-            },
-            {
-              "k": "perStack",
-              "id": "고물 부품"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.14
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.3
             }
           ]
         },
         {
-          "name": "고물 재조립",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "고물 부품",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.63
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "stack",
+              "id": "고물 부품",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.3
             },
             {
               "k": "stack",
@@ -650,18 +787,118 @@
               "v": 2
             },
             {
-              "k": "shield",
-              "ratio": 0.8
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기상 드론",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오르_u5",
+      "name": "기계팔 크앙",
+      "hero": "오르",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "hasten",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "hasten",
+              "v": 1
             }
           ]
         },
         {
-          "name": "발명 공방",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.88,
+              "target": "allEnemies"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "make",
-              "id": "오르_t1",
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "hasten",
               "v": 1
             },
             {
@@ -671,10 +908,13 @@
                   "when": {
                     "on": "turnStart"
                   },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "고물 부품",
+                      "k": "hasten",
                       "v": 1
                     }
                   ]
@@ -684,40 +924,37 @@
           ]
         },
         {
-          "name": "부품 몽땅 투입",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "perStack",
-              "id": "고물 부품"
+              "k": "dmg",
+              "ratio": 0.94,
+              "target": "oneEnemy"
             },
             {
-              "k": "shield",
-              "ratio": 0.35
-            },
-            {
-              "k": "spend",
-              "id": "고물 부품",
-              "all": true
-            },
-            {
-              "k": "make",
-              "id": "오르_t1",
+              "k": "hasten",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "오르나르도 엘빈치",
-          "kind": "guard"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "자재 창고",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "부품 상자",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

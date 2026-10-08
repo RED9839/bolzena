@@ -170,6 +170,8 @@ namespace Bolzena.RunUI
         public void End(string kind)
         {
             RunPort.ClearSave();
+            LastCrayons = CrayonStore.EarnRun(P.S, kind == "clear");   // 크레파스 — 판이 끝날 때마다(Flow.Crayon.cs)
+            if (kind == "clear") PartyStore.CountClear(P.S);   // 사도별 완주 횟수(편성 화면 · 사도 목록에 「완주 N」)
             EndScreen(kind);
         }
 

@@ -6,25 +6,30 @@
       "nature": "냉정",
       "race": "유령",
       "role": "서포터",
+      "style": "손 만들기형",
       "star": 2,
       "hp": 480,
       "atk": 78,
       "def": 55,
       "crit": 5,
-      "blurb": "남의 꿈을 훔쳐보며 대리만족하는 유령. 카드가 뽑힐 때마다 「꿈 일기」 를 적고, 가득 찬 일기로 촛불을 비추면 적을 잠재웁니다. 일기가 넘치면 적이 꿈에 홀려 굼떠집니다.",
+      "blurb": "남의 꿈을 훔쳐보며 대리만족하는 유령. 새 꿈은 못 꾸지만 이미 꾼 꿈은 다시 볼 수 있어, 버린 더미의 카드를 손으로 불러오며 「꿈 일기」 를 적습니다. 일기가 가득 차면 파티의 다음 한 수가 꿈처럼 커지고, 촛불로 적을 잠재웁니다.",
       "keyword": {
         "name": "꿈 일기",
         "desc": "몰래 훔쳐본 꿈을 적은 일기장",
         "carrier": "self",
         "cap": 4,
-        "decay": 1,
         "per": [
           {
             "stat": "dealt",
             "v": 0.05,
             "who": "allies"
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -135,7 +140,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.57,
+          "ratio": 0.77,
           "target": "oneEnemy",
           "hits": 2
         },
@@ -159,11 +164,12 @@
       ],
       "oracles": [
         {
-          "name": "헤롱헤롱 대촛불",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.08,
               "target": "oneEnemy",
               "hits": 2
             },
@@ -187,11 +193,13 @@
           ]
         },
         {
-          "name": "깊은 잠",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.79,
+              "ratio": 0.73,
               "target": "oneEnemy",
               "hits": 2
             },
@@ -204,7 +212,7 @@
             {
               "k": "ifStack",
               "id": "꿈 일기",
-              "n": 2
+              "n": 3
             },
             {
               "k": "status",
@@ -215,35 +223,11 @@
           ]
         },
         {
-          "name": "촛불 하나 더",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.68,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "꿈속 촛불",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.03,
+              "ratio": 1.34,
               "target": "oneEnemy",
               "hits": 2
             },
@@ -252,6 +236,149 @@
               "id": "약화",
               "v": 2,
               "target": "oneEnemy"
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.26,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.74,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에스피_u2",
+      "name": "개꿈 발사!",
+      "hero": "에스피",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.41,
+          "target": "randomEnemy",
+          "hits": 5
+        },
+        {
+          "k": "stack",
+          "id": "꿈 일기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "randomEnemy",
+              "hits": 5
+            },
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 1
             },
             {
               "k": "power",
@@ -277,202 +404,43 @@
           ]
         },
         {
-          "name": "악몽의 촛불",
-          "cost": 2,
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.71,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "밝은 심지",
-          "kind": "power"
-        },
-        {
-          "name": "꿈의 모래",
-          "kind": "frost"
-        },
-        {
-          "name": "흐흐",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "꿈 일기",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "에스피_u2",
-      "name": "개꿈 발사!",
-      "hero": "에스피",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.3,
-          "target": "randomEnemy",
-          "hits": 5
-        },
-        {
-          "k": "stack",
-          "id": "꿈 일기",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "개꿈 대방출",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.38,
+              "ratio": 0.61,
               "target": "randomEnemy",
               "hits": 5
-            },
-            {
-              "k": "stack",
-              "id": "꿈 일기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "한 놈만 개꿈",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.36,
-              "target": "randomEnemy",
-              "hits": 6
             },
             {
               "k": "stack",
               "id": "꿈 일기",
               "v": 2
-            }
-          ]
-        },
-        {
-          "name": "일기장 넘기기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.31,
-              "target": "randomEnemy",
-              "hits": 5
             },
             {
-              "k": "perStack",
-              "id": "꿈 일기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.23,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "먹기만 하는 꿈",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "randomEnemy",
-              "hits": 5
-            },
-            {
-              "k": "stack",
-              "id": "꿈 일기",
+              "k": "discard",
               "v": 1
-            },
-            {
-              "k": "ifKill"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "꿈꾸는 모든 자에게!",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "target": "randomEnemy",
-              "hits": 5
-            },
-            {
-              "k": "stack",
-              "id": "꿈 일기",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "꿈 일기",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "촛불 다섯 개",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "카라멜 팝콘",
+          "name": "축복 2",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.3
+              "ratio": 0.41
             }
           ]
         },
         {
-          "name": "흐흐흐",
+          "name": "축복 3",
           "kind": "draw"
         }
       ]
@@ -498,7 +466,7 @@
       ],
       "oracles": [
         {
-          "name": "교주의 꿈 정주행",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "pull",
@@ -513,22 +481,22 @@
           ]
         },
         {
-          "name": "남의 꿈 엿보기",
+          "name": "신탁 2",
           "fx": [
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "k": "pull",
+              "from": "discard",
+              "n": 2
             },
             {
               "k": "stack",
               "id": "꿈 일기",
-              "v": 2
+              "v": 1
             }
           ]
         },
         {
-          "name": "꿈 일기 쓰기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "pull",
@@ -541,18 +509,13 @@
               "v": 1
             },
             {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "꿈 일기",
-              "v": 2
+              "k": "heal",
+              "ratio": 0.68
             }
           ]
         },
         {
-          "name": "가면 제작",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -580,35 +543,32 @@
           ]
         },
         {
-          "name": "몰래 보관",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 5",
           "fx": [
             {
               "k": "pull",
               "from": "discard",
-              "n": 1
+              "n": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
             },
             {
               "k": "stack",
               "id": "꿈 일기",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "꿈 일기장",
+          "name": "축복 1",
           "kind": "draw"
         },
         {
-          "name": "몰래 보기",
+          "name": "축복 2",
           "fx": [
             {
               "k": "stack",
@@ -618,11 +578,11 @@
           ]
         },
         {
-          "name": "가면 벗기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.3
+              "ratio": 0.41
             }
           ]
         }
@@ -638,7 +598,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.08,
+          "ratio": 1.46,
           "target": "oneEnemy"
         },
         {
@@ -647,7 +607,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.41,
+          "ratio": 0.55,
           "target": "oneEnemy"
         },
         {
@@ -658,11 +618,12 @@
       ],
       "oracles": [
         {
-          "name": "독한 막말",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.28,
+              "ratio": 1.97,
               "target": "oneEnemy"
             },
             {
@@ -671,7 +632,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.49,
+              "ratio": 0.74,
               "target": "oneEnemy"
             },
             {
@@ -682,7 +643,9 @@
           ]
         },
         {
-          "name": "가면 쓴 채로",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
@@ -695,17 +658,38 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.47,
+              "ratio": 0.5,
               "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "pull",
+                      "from": "discard",
+                      "n": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "모두에게 막말",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.81,
+              "ratio": 1.08,
               "target": "allEnemies"
             },
             {
@@ -714,7 +698,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.29,
+              "ratio": 0.41,
               "target": "allEnemies"
             },
             {
@@ -725,47 +709,188 @@
           ]
         },
         {
-          "name": "악몽 선물",
+          "name": "신탁 4",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.62,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "꿈 일기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.62,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "꿈 일기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에스피_u5",
+      "name": "꿈 다시 보기",
+      "hero": "에스피",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "pull",
+          "from": "discard",
+          "n": 1,
+          "who": "other"
+        },
+        {
+          "k": "stack",
+          "id": "꿈 일기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "꿈 일기",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "other"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꿈 일기",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
           "fx": [
             {
               "k": "discard",
               "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 1.49,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "꿈 일기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.54,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "시시해",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.13,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "꿈 일기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.43,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
+              "k": "pull",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
             },
             {
               "k": "stack",
@@ -777,20 +902,21 @@
       ],
       "blesses": [
         {
-          "name": "가면 디자인",
-          "kind": "power"
+          "name": "축복 1",
+          "kind": "draw"
         },
         {
-          "name": "소심한 존댓말",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "큭큭",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "stack",
-              "id": "꿈 일기",
-              "v": 1
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }

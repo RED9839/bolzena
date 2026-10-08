@@ -29,7 +29,7 @@ namespace Bolzena.RunUI
         Dictionary<string, Vector2> evHeads = new Dictionary<string, Vector2>();
 
         /// <summary>글 → 대화창 줄. 서술은 문장마다 한 줄, 대사(따옴표 안)는 한 덩어리 한 줄. 따옴표 짝이 안 맞으면 통째로 서술.</summary>
-        public static List<EvLine> EventLines(string text, string speaker, IEnumerable<string> partyNames = null)
+        public static List<EvLine> EventLines(string text, string speaker, IEnumerable<string> partyNames = null, IList<string> by = null)
         {
             var outs = new List<EvLine>();
             if (string.IsNullOrWhiteSpace(text)) return outs;
@@ -40,7 +40,7 @@ namespace Bolzena.RunUI
                     if (!string.IsNullOrWhiteSpace(sen)) outs.Add(new EvLine { Text = sen.Trim() });
             }
             if (!ok) { Narr(text); return outs; }
-            var cur = new System.Text.StringBuilder(); bool inQ = false;
+            var cur = new System.Text.StringBuilder(); bool inQ = false; int qi = 0;
             foreach (char ch in text)
             {
                 bool open = ch == '“' || (ch == '"' && !inQ), close = ch == '”' || (ch == '"' && inQ);
@@ -50,8 +50,9 @@ namespace Bolzena.RunUI
                     inQ = false;
                     var sp = cur.ToString().Trim(); cur.Clear();
                     if (sp.Length == 0) continue;
-                    // 말하는 이 — 장면 대상이 없으면 이 대사 바로 앞 서술에 이름이 나오는 파티 사도
-                    string who = speaker;
+                    // 말하는 이 — 데이터의 by(대사 순서대로 · 동행 사도 · 「경비대」 따위)가 먼저. 없으면 장면 대상, 그것도 없으면 이 대사 바로 앞 서술에 이름이 나오는 파티 사도
+                    string who = by != null && qi < by.Count && !string.IsNullOrEmpty(by[qi]) ? by[qi] : speaker;
+                    qi++;
                     if (who == null && partyNames != null)
                     {
                         string before = outs.Count > 0 && outs[outs.Count - 1].Who == null ? outs[outs.Count - 1].Text : "";
@@ -73,7 +74,9 @@ namespace Bolzena.RunUI
             if (key != evStepKey) { evStepKey = key; EventStep = E.Phase == "choose" ? "dialog" : "resultDialog"; EventLineIdx = 0; }
             string text = E.Phase == "choose" ? evd.Scene : E.Say;
             var party = P.S.Party.Select(k => Roster.OfCore(k)?.ko).Where(n => n != null).ToList();
-            EventLinesNow = EventLines(text, speaker, party);
+            // 결과 대사의 말하는 이(엔진이 선택지 by 를 풀어 둔 것) — 사도 이름은 화면 이름(로스터 ko)으로
+            var by = E.Phase == "choose" ? null : E.SayBy?.Select(n => n == null ? null : Roster.All.FirstOrDefault(h => h.ko == n || h.key == n || h.ko.Replace(" ", "") == n.Replace(" ", ""))?.ko ?? n).ToList();
+            EventLinesNow = EventLines(text, speaker, party, by);
             if (EventStep == "dialog" && (EventLinesNow.Count == 0 || DialogAuto)) EventStep = "choose";
             if (EventStep == "resultDialog" && (EventLinesNow.Count == 0 || DialogAuto)) EventStep = "result";
 

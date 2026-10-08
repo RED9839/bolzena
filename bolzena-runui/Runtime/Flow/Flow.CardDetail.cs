@@ -51,7 +51,7 @@ namespace Bolzena.RunUI
 
             float topH = Theme.C(78, 66), botH = Theme.C(100, 86), arrowW = list != null ? Theme.C(88, 80) : 24;
             float midH = size.y - topH - botH - 16;
-            float cw = Mathf.Min(Theme.C(400, 340), (midH - 8) / 1.4f), ch = cw * 1.4f;
+            float cw = Mathf.Min(Theme.C(560, 400), (midH - 8) / 1.4f), ch = cw * 1.4f;   // 화면 높이의 약 65% (2026-10-08 사용자: 카드가 작다)
             float midY = (botH - topH) / 2;   // 가운데 칸의 가운데(화면 가운데에서)
             halo.rectTransform.At(0.5f, 0.5f, 0, midY, cw * 2.4f, cw * 2.4f);
             halo.color = W.CardTint(this, v, null).A(0.22f);
@@ -119,11 +119,12 @@ namespace Bolzena.RunUI
             ra.sizeDelta = new Vector2(bw + 12, sideTop - sideBot); ra.anchoredPosition = new Vector2(cw / 2 + 26, (sideTop + sideBot) / 2);
             var rc = Ui.Scroll(ra, out _);
             Ui.Col(rc, 10, TextAnchor.UpperLeft, new RectOffset(0, 8, 4, 8), true, false);
+            float boxTotal = 0;
             void Box(CardTerms.Term t)
             {
                 var holder = Ui.Rect("term " + t.Name, rc);
                 var bx = TermPop.Box(holder, t, bw);
-                holder.Pref(-1, bx.sizeDelta.y);
+                holder.Pref(-1, bx.sizeDelta.y); boxTotal += bx.sizeDelta.y + 10;
             }
             foreach (var t in boxes) Box(t);
             var mark = P.Mark(id);
@@ -142,6 +143,9 @@ namespace Bolzena.RunUI
             {
                 var none = Ui.Text(rc, "설명할 낱말이 없는 카드입니다.", Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft); none.Pref(-1, 40);
             }
+
+            // 풀이 상자 묶음은 카드 세로 가운데에 — 칸보다 짧으면 위 여백을 늘려 가운데로(넘치면 스크롤)
+            { float areaH = sideTop - sideBot; if (boxTotal > 0 && boxTotal < areaH) rc.GetComponent<VerticalLayoutGroup>().padding.top = (int)((areaH - boxTotal) / 2); }
 
             // ── 양옆 화살표 — 같은 목록의 이전 · 다음 ──
             if (list != null)

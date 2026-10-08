@@ -6,6 +6,7 @@
       "nature": "냉정",
       "race": "마녀",
       "role": "서포터",
+      "style": "회복형",
       "star": 3,
       "hp": 580,
       "atk": 75,
@@ -14,50 +15,35 @@
       "blurb": "스티커 만들기가 낙인 패셔니스타 마녀. 반짝 · 하트 · 별 · 해골 넷을 다 모으면 한정판 세트가 됩니다.",
       "keyword": {
         "name": "스티커",
-        "desc": "지상에서 모은 반짝이는 한정 스티커",
+        "desc": "붙은 동안 조금씩 낫게 하는 한정 스티커",
         "carrier": "self",
         "cap": 4,
-        "rules": [
+        "per": [
           {
-            "name": "첫 세트",
-            "when": {
-              "on": "stackReach",
-              "id": "스티커",
-              "n": 4
-            },
-            "limit": {
-              "per": "fight",
-              "n": 1
-            },
-            "fx": [
-              {
-                "k": "status",
-                "id": "사기",
-                "v": 1
-              }
-            ]
+            "stat": "hot",
+            "ratio": 0.1
           },
           {
-            "name": "한정판 세트",
+            "stat": "taken",
+            "v": -0.03,
+            "who": "allies"
+          }
+        ],
+        "rules": [
+          {
+            "name": "스티커 붙이기",
             "when": {
-              "on": "stackReach",
-              "id": "스티커",
-              "n": 4
+              "on": "play"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 2
             },
             "fx": [
               {
-                "k": "spend",
+                "k": "stack",
                 "id": "스티커",
-                "all": true
-              },
-              {
-                "k": "heal",
-                "ratio": 0.8
-              },
-              {
-                "k": "status",
-                "id": "피해 감소",
-                "v": 2
+                "v": 1
               }
             ]
           }
@@ -65,19 +51,21 @@
       },
       "passives": [
         {
-          "name": "스티커 붙이기",
+          "name": "인증 완료",
           "when": {
-            "on": "play"
+            "on": "overheal",
+            "pct": 0.8
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
               "k": "stack",
-              "id": "스티커",
-              "v": 1
+              "id": "인증 스티커",
+              "v": 1,
+              "target": "strongestAlly"
             }
           ]
         },
@@ -129,6 +117,20 @@
         "피코라_s1",
         "피코라_s2",
         "피코라_u1"
+      ],
+      "keywords": [
+        {
+          "name": "인증 스티커",
+          "desc": "멋진 것에만 붙여 주는 피코라의 인증 스티커",
+          "carrier": "hero",
+          "cap": 3,
+          "per": [
+            {
+              "stat": "dealt",
+              "v": 0.08
+            }
+          ]
+        }
       ]
     }
   ],
@@ -174,7 +176,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.3
+          "ratio": 0.35
         },
         {
           "k": "stack",
@@ -194,7 +196,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.7
+          "ratio": 0.69
         },
         {
           "k": "stack",
@@ -204,28 +206,11 @@
       ],
       "oracles": [
         {
-          "name": "홀로그램 반짝이",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.9
-            },
-            {
-              "k": "stack",
-              "id": "스티커",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "마음에 든 장",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.78
+              "ratio": 1.09
             },
             {
               "k": "stack",
@@ -235,16 +220,196 @@
           ]
         },
         {
-          "name": "반짝이 코팅",
-          "power": true,
+          "name": "신탁 2",
+          "cost": 0,
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.5
+              "ratio": 0.52
             },
             {
               "k": "stack",
               "id": "스티커",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.57
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "피코라_sticker",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.57
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "인증 스티커",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.69
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "피코라_u2",
+      "name": "한정 스티커",
+      "hero": "피코라",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.92
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "스티커",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.35
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.87
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.81
+            },
+            {
+              "k": "stack",
+              "id": "인증 스티커",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "make",
+              "id": "피코라_sticker",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.83
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
               "v": 1
             },
             {
@@ -267,35 +432,19 @@
           ]
         },
         {
-          "name": "두 장 겹쳐 붙이기",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.85
+              "ratio": 1.82
             },
             {
-              "k": "stack",
-              "id": "스티커",
+              "k": "status",
+              "id": "피해 감소",
               "v": 2
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "반짝 별빛 마녀",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.49
-            },
-            {
-              "k": "make",
-              "id": "피코라_sticker",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -303,167 +452,19 @@
       ],
       "blesses": [
         {
-          "name": "캔디콘 뿔",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "패션 잡지",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "작은 반짝이",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
               "id": "피코라_sticker",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "피코라_u2",
-      "name": "한정 스티커",
-      "hero": "피코라",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "heal",
-          "ratio": 0.9
-        },
-        {
-          "k": "status",
-          "id": "피해 감소",
-          "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "스티커",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "초한정 스티커",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.31
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "스티커",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "미니 스티커",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.65
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "스티커",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "피코라 스티커는 덤!",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.8
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "make",
-              "id": "피코라_sticker",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "천재 영재 마녀",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.23
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "스티커"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.34
-            }
-          ]
-        },
-        {
-          "name": "기본 코디",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.75
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            },
-            {
-              "k": "cardStatus",
-              "id": "비용",
-              "v": -1,
-              "to": "hand",
-              "n": 1,
-              "basic": true
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "지상의 밝은 빛",
-          "kind": "heal"
-        },
-        {
-          "name": "쇼핑 봉투",
-          "kind": "ap"
-        },
-        {
-          "name": "트윙클 스윗 리본",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "스티커",
               "v": 1
             }
           ]
@@ -480,7 +481,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.46,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -490,7 +491,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.23,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -502,11 +503,12 @@
       ],
       "oracles": [
         {
-          "name": "큼직한 해골",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.55,
+              "ratio": 0.62,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -516,7 +518,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.31,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -528,13 +530,15 @@
           ]
         },
         {
-          "name": "오싹 해골 도배",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.29,
+              "ratio": 0.44,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
@@ -542,9 +546,9 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.15,
+              "ratio": 0.22,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "spend",
@@ -554,60 +558,7 @@
           ]
         },
         {
-          "name": "귀여운 해골",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.57,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "stackReach",
-                    "id": "스티커",
-                    "n": 4
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.52,
-                      "base": "def",
-                      "target": "allEnemies"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "해골 한 쌍",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.53,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "스티커"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.21,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "사고 치고 도망",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
@@ -621,30 +572,103 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.21,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
+              "k": "status",
+              "id": "약화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "스티커"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "스티커",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "스티커"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "찐득한 풀",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "울면서 인정",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "반짝 주문",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -658,7 +682,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.7
+          "ratio": 0.57
         },
         {
           "k": "perStack",
@@ -666,16 +690,23 @@
         },
         {
           "k": "heal",
-          "ratio": 0.28
+          "ratio": 0.23
+        },
+        {
+          "k": "stack",
+          "id": "인증 스티커",
+          "v": 1,
+          "target": "oneAlly"
         }
       ],
       "oracles": [
         {
-          "name": "완성된 앨범",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.9
+              "ratio": 0.78
             },
             {
               "k": "perStack",
@@ -683,13 +714,20 @@
             },
             {
               "k": "heal",
-              "ratio": 0.36
+              "ratio": 0.31
+            },
+            {
+              "k": "stack",
+              "id": "인증 스티커",
+              "v": 1,
+              "target": "oneAlly"
             }
           ]
         },
         {
-          "name": "얇은 앨범",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "heal",
@@ -702,31 +740,76 @@
             {
               "k": "heal",
               "ratio": 0.22
+            },
+            {
+              "k": "stack",
+              "id": "인증 스티커",
+              "v": 1,
+              "target": "oneAlly"
             }
           ]
         },
         {
-          "name": "첫 페이지",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.57
+            },
+            {
+              "k": "perStack",
+              "id": "스티커"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.23
+            },
+            {
+              "k": "make",
+              "id": "피코라_sticker",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.57
+            },
+            {
+              "k": "perStack",
+              "id": "스티커"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.23
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "스티커",
-                    "n": 4
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.45
+                      "k": "stack",
+                      "id": "인증 스티커",
+                      "v": 1,
+                      "target": "strongestAlly"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "스티커",
+                      "v": 1
                     }
                   ]
                 }
@@ -735,34 +818,12 @@
           ]
         },
         {
-          "name": "덤 스티커 앨범",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.53
-            },
-            {
-              "k": "perTag",
-              "id": "피코라_sticker"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.48
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "피코라_sticker"
-            }
-          ]
-        },
-        {
-          "name": "패션 화보",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.05
+              "ratio": 1.16
             },
             {
               "k": "perStack",
@@ -770,27 +831,182 @@
             },
             {
               "k": "heal",
-              "ratio": 0.4
-            },
-            {
-              "k": "spend",
-              "id": "스티커",
-              "all": true
+              "ratio": 0.46
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "솔잎죽 두 그릇",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "지상 쇼핑",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "언젠가 옷차림 전문가",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "피코라_u5",
+      "name": "반짝 구속 마법",
+      "hero": "피코라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.86,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "스티커",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.16,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.82,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "스티커",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "스티커",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

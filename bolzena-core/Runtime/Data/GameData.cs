@@ -270,6 +270,12 @@ namespace Bolzena.Core
         public List<string> UniquesOf(string heroId) =>
             Cards.Values.Where(c => c.Hero == heroId && c.Unique).Select(c => c.Id).OrderBy(x => x, StringComparer.Ordinal).ToList();
 
+        /// <summary>시동 카드인가 — 고유 카드이면서 그 사도의 시작 덱(starter)에 든 카드(2026-10-08 카제나식: 시작 덱 = 기본 3 + 시동 1). 화면은 이것으로 사도 상세의 고유 카드 줄에서 뺀다.</summary>
+        public bool IsOpener(string cardId) { var c = Card(BaseId(cardId)); return c != null && c.Unique && c.Hero != null && (Hero(c.Hero)?.Starter?.Contains(c.Id) ?? false); }
+
+        /// <summary>은총으로 얻을 수 있는 고유 카드 — 시동 카드를 뺀 고유 카드(id 차례).</summary>
+        public List<string> GraceUniquesOf(string heroId) => UniquesOf(heroId).Where(id => !IsOpener(id)).ToList();
+
         public List<string> NeutralIds() => Cards.Values.Where(c => c.Neutral).Select(c => c.Id).OrderBy(x => x, StringComparer.Ordinal).ToList();
 
         /// <summary>시작 덱 — 사도마다 시작 카드.</summary>
@@ -329,7 +335,7 @@ namespace Bolzena.Core
                 var c = Card(id);
                 if (c == null) return null;
                 var v = new CardView(id, c, flash > 0 && flash <= c.Oracles.Count ? c.Oracles[flash - 1] : null, flash,
-                    c.Neutral ? OwnerOf(id) ?? owner : null);
+                    c.Neutral ? OwnerOf(id) ?? owner : c.Hero != null ? OwnerOf(id) : null);   // 사도 카드도 id 에 주인을 적었으면(만든 카드의 주인 지정 — make owner) 그 사도의 카드로
                 v.Target = TargetOf(v.Fx);
                 var na = new (int, string, CardView)[(arr?.Length ?? 0) + 1];
                 arr?.CopyTo(na, 0);

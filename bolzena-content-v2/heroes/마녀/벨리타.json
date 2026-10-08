@@ -6,6 +6,7 @@
       "nature": "광기",
       "race": "마녀",
       "role": "딜러",
+      "style": "쌓고 고르기",
       "star": 3,
       "hp": 550,
       "atk": 145,
@@ -20,30 +21,33 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.1
+            "v": 0.12
           }
         ],
         "rules": [
           {
-            "name": "당쇼크",
+            "name": "여왕의 당 충전",
             "when": {
-              "on": "stackReach",
-              "id": "당 수치",
-              "n": 5
+              "on": "spend",
+              "id": "당 수치"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
             },
             "fx": [
               {
-                "k": "spend",
-                "id": "당 수치",
-                "all": true
-              },
-              {
                 "k": "gauge",
-                "v": 40
+                "v": 25
               }
             ]
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -67,7 +71,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.75,
               "target": "allEnemies"
             }
           ]
@@ -173,7 +177,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.01,
+          "ratio": 1.26,
           "target": "allEnemies"
         },
         {
@@ -182,17 +186,18 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.29,
+          "ratio": 0.36,
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "블랙홀 오브 위치",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.31,
+              "ratio": 1.7,
               "target": "allEnemies"
             },
             {
@@ -201,18 +206,19 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.49,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "작은 차원",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.08,
               "target": "allEnemies"
             },
             {
@@ -221,17 +227,38 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.31,
               "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.59,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "차원 문 열기",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.09,
+              "ratio": 1.3,
               "target": "allEnemies"
             },
             {
@@ -240,24 +267,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.38,
               "target": "allEnemies"
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "unique": true,
-              "type": "스킬"
+              "unique": true
             }
           ]
         },
         {
-          "name": "당 충전 차원",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.16,
+              "ratio": 1.15,
               "target": "allEnemies"
             },
             {
@@ -266,17 +292,23 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.29,
+              "ratio": 0.41,
               "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "당 수치",
+              "all": true
             }
           ]
         },
         {
-          "name": "간식 털어 넣기",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.09,
+              "ratio": 1.9,
               "target": "allEnemies"
             },
             {
@@ -285,30 +317,34 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.46,
+              "ratio": 0.54,
               "target": "allEnemies"
             },
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "벨리타_t1"
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "여왕의 마력",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "후으",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "뿌리의 가시",
-          "kind": "weakSpot"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -328,7 +364,7 @@
       ],
       "oracles": [
         {
-          "name": "창고 대방출",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "make",
@@ -338,8 +374,7 @@
           ]
         },
         {
-          "name": "몽유병 창고털이",
-          "power": true,
+          "name": "신탁 2",
           "fx": [
             {
               "k": "make",
@@ -347,26 +382,27 @@
               "v": 2
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "make",
-                      "id": "벨리타_t1",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
-          "name": "시스트 암거래",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "fx": [
             {
               "k": "make",
@@ -377,67 +413,27 @@
               "k": "draw",
               "v": 1,
               "who": "self",
+              "unique": true,
               "type": "공격"
-            },
-            {
-              "k": "stack",
-              "id": "당 수치",
-              "v": 2
             }
           ]
         },
         {
-          "name": "건강식 먹는 척",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "make",
-              "id": "벨리타_t1",
-              "v": 2
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "make",
-              "id": "벨리타_t1",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "창고 정리",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "make",
               "id": "벨리타_t1",
               "v": 3
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "목각 인형",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "서마터펀 주문",
-          "kind": "draw"
-        },
-        {
-          "name": "로켓 목걸이",
-          "fx": [
+            },
             {
               "k": "stack",
               "id": "당 수치",
               "v": 1
+            },
+            {
+              "k": "nextAp",
+              "v": -1
             }
           ]
         }
@@ -453,7 +449,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.36,
+          "ratio": 0.45,
           "target": "randomEnemy",
           "hits": 5
         },
@@ -465,11 +461,12 @@
       ],
       "oracles": [
         {
-          "name": "크림슨 소나기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.61,
               "target": "randomEnemy",
               "hits": 5
             },
@@ -481,14 +478,15 @@
           ]
         },
         {
-          "name": "보슬비",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.43,
               "target": "randomEnemy",
-              "hits": 3
+              "hits": 5
             },
             {
               "k": "make",
@@ -498,78 +496,93 @@
           ]
         },
         {
-          "name": "당 떨어진 짜증",
+          "name": "신탁 3",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.39,
               "target": "randomEnemy",
               "hits": 5
             },
             {
-              "k": "ifStack",
-              "id": "당 수치",
-              "n": 3
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 1
             },
             {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "ult"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.51,
               "target": "randomEnemy",
-              "hits": 4
+              "hits": 5
+            },
+            {
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 1
+            },
+            {
+              "k": "gauge",
+              "v": 15
             }
           ]
         },
         {
-          "name": "집중 호우",
-          "tags": [
-            "약점 공격"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.57,
-              "target": "oneEnemy",
-              "hits": 4
+              "ratio": 0.68,
+              "target": "randomEnemy",
+              "hits": 5
             },
             {
-              "k": "stack",
-              "id": "당 수치",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "엘리아스의 수호자들",
-          "fx": [
+              "k": "make",
+              "id": "벨리타_t1",
+              "v": 1
+            },
             {
               "k": "discard",
               "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "target": "randomEnemy",
-              "hits": 6
-            },
-            {
-              "k": "make",
-              "id": "벨리타_t1",
-              "v": 2
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "핏빛 마력",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "굵은 빗방울",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "초콜릿 한 입",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
@@ -590,26 +603,77 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.87,
+          "ratio": 1,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "당 수치"
+          "k": "spend",
+          "id": "당 수치",
+          "pick": true
+        },
+        {
+          "k": "perEvent"
         },
         {
           "k": "dmg",
-          "ratio": 0.32,
+          "ratio": 0.38,
           "target": "randomEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "성대한 간식",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.13,
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "당 수치",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.51,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "당 수치",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
               "target": "oneEnemy"
             },
             {
@@ -618,54 +682,42 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.41,
+              "ratio": 0.38,
               "target": "randomEnemy"
             }
           ]
         },
         {
-          "name": "한 입만",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "당 수치"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "티타임",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "make",
-              "id": "벨리타_t1",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "당 수치",
+              "pick": true
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "당 수치",
-                    "n": 5
+                    "on": "spend",
+                    "id": "당 수치"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 1.23,
-                      "target": "allEnemies"
+                      "ratio": 0.48,
+                      "target": "randomEnemy"
                     }
                   ]
                 }
@@ -674,70 +726,193 @@
           ]
         },
         {
-          "name": "초콜릿 폭식",
-          "fx": [
-            {
-              "k": "perTag",
-              "id": "벨리타_t1"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.64,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "벨리타_t1"
-            },
-            {
-              "k": "stack",
-              "id": "당 수치",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "당쇼크 직전",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.23,
+              "ratio": 1.8,
               "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "당 수치"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.46,
-              "target": "randomEnemy"
             },
             {
               "k": "spend",
               "id": "당 수치",
-              "all": true
+              "pick": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "뿌리의 수호자",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "민트초코 질색",
-          "kind": "draw"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨리타_u5",
+      "name": "엘프깡 한 봉지",
+      "hero": "벨리타",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.91
         },
         {
-          "name": "비밀 창고",
+          "k": "stack",
+          "id": "당 수치",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "unique": true,
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.31
+            },
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.75
+            },
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 1
+            },
             {
               "k": "make",
               "id": "벨리타_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.63
+            },
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "당 수치",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.63
+            },
+            {
+              "k": "stack",
+              "id": "당 수치",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "당 수치",
               "v": 1
             }
           ]

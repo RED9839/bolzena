@@ -72,8 +72,17 @@ namespace Bolzena.Core
         {
             var ids = f.To == "hand" || f.To == "draw" ? PickCards(f.To, f.N, f, ctx.Owner) : f.To == "pulled" ? new List<string> { ctx.Pulled } : new List<string> { ctx.CardId };
             if (f.Battle) BattleVals.Add(f.Id);
-            foreach (var id in ids) if (id != null) AddCardSt(id, f.Id, f.IV == 0 ? 1 : f.IV, f.Max);
+            foreach (var id in ids)
+            {
+                if (id == null) continue;
+                int before = CardStOf(id, f.Id);
+                AddCardSt(id, f.Id, f.IV == 0 ? 1 : f.IV, f.Max);
+                // 성장형 공용 계기 — 카드의 값이 실제로 올랐으면 「카드가 자라면」(비용 · 빙결 · 침체는 자람이 아니다)
+                if (CardStOf(id, f.Id) > before && !NOT_GROWTH.Contains(f.Id) && Over == null)
+                    Emit("grow", new EmitInfo { Id = id, Hero = CardOf(id)?.Hero, By = ctx.Owner?.Key, Kind = f.Id, V = CardStOf(id, f.Id) - before });
+            }
         }
+        static readonly HashSet<string> NOT_GROWTH = new() { "비용", "빙결", "침체", "독" };
 
         // ── 행동 카운트 ───────────────────────────────────────────────
         /// <summary>행동까지 필요한 카드 수 — 수의 즉시 행동 장수 + 둔화 - 급속(최소 1). 0 이면 당겨지지 않는다.</summary>

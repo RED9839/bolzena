@@ -6,67 +6,25 @@
       "nature": "냉정",
       "race": "엘프",
       "role": "딜러",
+      "style": "돈형",
       "star": 3,
       "hp": 550,
       "atk": 145,
       "def": 25,
       "crit": 10,
-      "blurb": "악덕 CEO 행세가 번번이 남 좋은 일로 끝나는 회장님. 적을 쓰러뜨리고 넘친 피해가 파티를 회복시키고, 그 선행이 장부에 쌓입니다.",
+      "blurb": "악덕 CEO 행세가 번번이 남 좋은 일로 끝나는 회장님. 치고 쓰러뜨려 회사 금고를 채우고, 금고를 털어 신상 냉장고를 찍어 내면 — 어째선지 파티가 낫습니다.",
       "keyword": {
-        "name": "선행 장부",
-        "desc": "본의 아니게 쌓인 선행 기록",
+        "name": "회사 금고",
+        "desc": "손해 보기 싫어 꽉 채워 두는 회사 금고",
         "carrier": "self",
-        "cap": 5,
-        "per": [
-          {
-            "stat": "dealt",
-            "v": 0.1
-          }
-        ],
-        "rules": [
-          {
-            "name": "기부천사 아이시아",
-            "when": {
-              "on": "stackReach",
-              "id": "선행 장부",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "선행 장부",
-                "all": true
-              },
-              {
-                "k": "heal",
-                "ratio": 0.9
-              },
-              {
-                "k": "shield",
-                "ratio": 1
-              }
-            ]
-          }
-        ]
+        "cap": 6,
+        "onMax": {
+          "make": "아이시아_fridge",
+          "n": 2,
+          "consume": true
+        }
       },
       "passives": [
-        {
-          "name": "의도치 않은 선행",
-          "when": {
-            "on": "play"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 3
-          },
-          "fx": [
-            {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 1
-            }
-          ]
-        },
         {
           "name": "냉혹한 경영",
           "when": {
@@ -80,8 +38,42 @@
           "fx": [
             {
               "k": "stack",
-              "id": "선행 장부",
+              "id": "회사 금고",
               "v": 2
+            }
+          ]
+        },
+        {
+          "name": "냉혹한 경영",
+          "when": {
+            "on": "play",
+            "type": "공격"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "회사 금고",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "의도치 않은 선행",
+          "when": {
+            "on": "make"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.49
             }
           ]
         }
@@ -103,7 +95,7 @@
           },
           {
             "k": "stack",
-            "id": "선행 장부",
+            "id": "회사 금고",
             "v": 2
           }
         ]
@@ -169,13 +161,9 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.35,
-          "target": "allEnemies"
-        },
-        {
-          "k": "stack",
-          "id": "선행 장부",
-          "v": 1
+          "ratio": 0.17,
+          "target": "allEnemies",
+          "hits": 4
         }
       ],
       "hero": "아이시아",
@@ -191,95 +179,160 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.2,
-          "hits": 4,
-          "target": "allEnemies"
+          "ratio": 0.25,
+          "target": "allEnemies",
+          "hits": 3
+        },
+        {
+          "k": "ifStack",
+          "id": "회사 금고",
+          "n": 3
+        },
+        {
+          "k": "spend",
+          "id": "회사 금고",
+          "v": 3
         },
         {
           "k": "make",
           "id": "아이시아_fridge",
-          "v": 1
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "대형 냉장고",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.26,
-              "hits": 4,
-              "target": "allEnemies"
+              "ratio": 0.35,
+              "target": "allEnemies",
+              "hits": 3
             },
             {
-              "k": "make",
-              "id": "아이시아_fridge",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "아이스박스 폭발",
-          "cost": 2,
-          "fx": [
+              "k": "ifStack",
+              "id": "회사 금고",
+              "n": 3
+            },
             {
-              "k": "dmg",
-              "ratio": 0.3,
-              "hits": 4,
-              "target": "allEnemies"
+              "k": "spend",
+              "id": "회사 금고",
+              "v": 3
             },
             {
               "k": "make",
               "id": "아이시아_fridge",
               "v": 2
-            },
-            {
-              "k": "status",
-              "id": "기절",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "재고 처리",
+          "name": "신탁 2",
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.24,
-              "hits": 4,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perTag",
-              "id": "아이시아_fridge"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "allEnemies"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "아이시아_fridge"
-            }
-          ]
-        },
-        {
-          "name": "신제품 카탈로그",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.18,
-              "hits": 4,
-              "target": "allEnemies"
+              "ratio": 0.45,
+              "target": "allEnemies",
+              "hits": 3
             },
             {
               "k": "make",
               "id": "아이시아_fridge",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.34,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "회사 금고",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "회사 금고",
+              "v": 3
+            },
+            {
+              "k": "make",
+              "id": "아이시아_fridge",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.5
+            },
+            {
+              "k": "ifStack",
+              "id": "회사 금고",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "회사 금고",
+              "v": 3
+            },
+            {
+              "k": "make",
+              "id": "아이시아_fridge",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.69,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "ifStack",
+              "id": "회사 금고",
+              "n": 2
+            },
+            {
+              "k": "spend",
+              "id": "회사 금고",
+              "v": 2
             },
             {
               "k": "draw",
@@ -288,43 +341,23 @@
               "unique": true
             }
           ]
-        },
-        {
-          "name": "반품 처리",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "hits": 4,
-              "target": "allEnemies"
-            },
-            {
-              "k": "make",
-              "id": "아이시아_fridge",
-              "v": 2
-            }
-          ]
         }
       ],
       "blesses": [
         {
-          "name": "액체 질소",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "우주식량",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "신상 하나 더",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "make",
-              "id": "아이시아_fridge",
+              "k": "stack",
+              "id": "회사 금고",
               "v": 1
             }
           ]
@@ -341,7 +374,7 @@
       "fx": [
         {
           "k": "stack",
-          "id": "선행 장부",
+          "id": "회사 금고",
           "v": 2
         },
         {
@@ -351,11 +384,11 @@
       ],
       "oracles": [
         {
-          "name": "회장님 등장",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
-              "id": "선행 장부",
+              "id": "회사 금고",
               "v": 3
             },
             {
@@ -365,117 +398,65 @@
           ]
         },
         {
-          "name": "주주 총회",
-          "power": true,
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "stack",
-              "id": "선행 장부",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "선행 장부",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "인사 기록 검색",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "선행 장부",
+              "id": "회사 금고",
               "v": 2
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "신제품 발표",
+          "name": "신탁 3",
           "fx": [
+            {
+              "k": "stack",
+              "id": "회사 금고",
+              "v": 2
+            },
             {
               "k": "make",
               "id": "아이시아_fridge",
-              "v": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "선행 장부",
-              "n": 3
-            },
-            {
-              "k": "draw",
               "v": 1
             }
           ]
         },
         {
-          "name": "갑질 회의",
+          "name": "신탁 4",
           "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "stack",
-              "id": "선행 장부",
-              "v": 3
-            },
-            {
-              "k": "draw",
+              "id": "회사 금고",
               "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "유급 휴가",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "법무팀 방패",
-          "fx": [
+            },
             {
               "k": "shield",
-              "ratio": 0.4
+              "ratio": 1.54
             }
           ]
         },
         {
-          "name": "장부 한 줄",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
-              "id": "선행 장부",
+              "id": "회사 금고",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -492,115 +473,67 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 1.19,
           "target": "oneEnemy"
         },
         {
           "k": "perStack",
-          "id": "선행 장부"
+          "id": "회사 금고"
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.25,
           "target": "oneEnemy"
         },
         {
           "k": "spend",
-          "id": "선행 장부",
+          "id": "회사 금고",
           "all": true
         }
       ],
       "oracles": [
         {
-          "name": "즉시 해고",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.61,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "선행 장부"
+              "id": "회사 금고"
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.34,
               "target": "oneEnemy"
             },
             {
               "k": "spend",
-              "id": "선행 장부",
+              "id": "회사 금고",
               "all": true
             }
           ]
         },
         {
-          "name": "구두 해고",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "선행 장부"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.16,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "선행 장부",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "냉동 창고행",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.86,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "아이시아_fridge"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "아이시아_fridge"
-            }
-          ]
-        },
-        {
-          "name": "상시 구조 조정",
+          "name": "신탁 2",
+          "tags": [],
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.29,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "선행 장부"
+              "id": "회사 금고"
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.27,
               "target": "oneEnemy"
             },
             {
@@ -608,15 +541,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "선행 장부",
-                    "n": 5
+                    "on": "kill"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.8,
-                      "target": "oneEnemy"
+                      "k": "stack",
+                      "id": "회사 금고",
+                      "v": 1
                     }
                   ]
                 }
@@ -625,44 +560,100 @@
           ]
         },
         {
-          "name": "전원 해고",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.19,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "회사 금고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.12,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "회사 금고"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
           "tags": [
             "소멸"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.8,
+              "ratio": 2.51,
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "선행 장부"
+              "id": "회사 금고"
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.53,
               "target": "oneEnemy"
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "spend",
+              "id": "회사 금고",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "해고 통지서",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "퇴직금 정산",
-          "kind": "ap"
-        },
-        {
-          "name": "찬바람",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "회사 금고",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -676,65 +667,67 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 1.05,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "선행 장부"
+          "k": "perTag",
+          "id": "아이시아_fridge"
         },
         {
           "k": "dmg",
-          "ratio": 0.2,
+          "ratio": 0.42,
           "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "131전 끝의 승리",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.41,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "선행 장부"
+              "k": "perTag",
+              "id": "아이시아_fridge"
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.57,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "승리 선언",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.99,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "선행 장부"
+              "k": "perTag",
+              "id": "아이시아_fridge"
             },
             {
               "k": "dmg",
-              "ratio": 0.14,
+              "ratio": 0.39,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "멜론 혐오",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.27,
+              "ratio": 1.82,
               "target": "oneEnemy"
             },
             {
@@ -742,36 +735,45 @@
             },
             {
               "k": "stack",
-              "id": "선행 장부",
-              "v": 2
+              "id": "회사 금고",
+              "v": 3
             }
           ]
         },
         {
-          "name": "정복 계획서",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "stack",
-              "id": "선행 장부",
-              "v": 2
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "아이시아_fridge"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "선행 장부"
-                    },
-                    {
-                      "k": "dmg",
-                      "ratio": 0.16,
-                      "target": "randomEnemy"
+                      "k": "stack",
+                      "id": "회사 금고",
+                      "v": 1
                     }
                   ]
                 }
@@ -780,45 +782,205 @@
           ]
         },
         {
-          "name": "정복 자금 탕진",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.58,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "선행 장부"
+              "k": "perTag",
+              "id": "아이시아_fridge"
             },
             {
               "k": "dmg",
-              "ratio": 0.3,
+              "ratio": 0.63,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "선행 장부",
-              "all": true
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "프로스트 노바",
+          "name": "축복 1",
           "kind": "atkUp"
         },
         {
-          "name": "경영 효율화",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "선행 기록",
+          "name": "축복 3",
           "fx": [
             {
+              "k": "make",
+              "id": "아이시아_fridge",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아이시아_u5",
+      "name": "아이스크림 수레",
+      "hero": "아이시아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.12
+        },
+        {
+          "k": "stack",
+          "id": "회사 금고",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.75
+            },
+            {
               "k": "stack",
-              "id": "선행 장부",
+              "id": "회사 금고",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.06
+            },
+            {
+              "k": "stack",
+              "id": "회사 금고",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.84
+            },
+            {
+              "k": "stack",
+              "id": "회사 금고",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "아이시아_fridge",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.34
+            },
+            {
+              "k": "stack",
+              "id": "회사 금고",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "회사 금고",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.3
+            },
+            {
+              "k": "stack",
+              "id": "회사 금고",
+              "v": 3
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "아이시아_fridge",
               "v": 1
             }
           ]

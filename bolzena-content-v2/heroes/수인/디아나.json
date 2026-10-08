@@ -6,6 +6,7 @@
       "nature": "광기",
       "race": "수인",
       "role": "서포터",
+      "style": "회복형",
       "star": 3,
       "hp": 620,
       "atk": 86,
@@ -20,26 +21,42 @@
         "per": [
           {
             "stat": "hot",
-            "ratio": 0.15
+            "ratio": 0.1
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "진짜 치료법",
           "when": {
-            "on": "overheal"
+            "on": "overheal",
+            "pct": 0.8
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
           },
           "fx": [
+            {
+              "k": "stack",
+              "id": "기혈",
+              "v": 1,
+              "ofEvent": 0.05
+            },
             {
               "k": "perEvent",
               "per": 20
             },
             {
               "k": "dmg",
-              "ratio": 0.23,
-              "fixed": true,
-              "target": "randomEnemy"
+              "ratio": 0.26,
+              "target": "randomEnemy",
+              "fixed": true
             }
           ]
         },
@@ -55,9 +72,8 @@
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "기혈",
-              "v": 1
+              "k": "heal",
+              "ratio": 0.33
             }
           ]
         }
@@ -153,78 +169,136 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "heal",
-          "ratio": 1
-        },
-        {
           "k": "perStack",
-          "id": "기혈"
+          "id": "기혈",
+          "n": 1
         },
         {
           "k": "heal",
-          "ratio": 0.2
+          "ratio": 0.49
+        },
+        {
+          "k": "spend",
+          "id": "기혈",
+          "all": true
+        },
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "깊은 호흡",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.3
-            },
-            {
               "k": "perStack",
-              "id": "기혈"
+              "id": "기혈",
+              "n": 1
             },
             {
               "k": "heal",
-              "ratio": 0.25
-            }
-          ]
-        },
-        {
-          "name": "백년 약탕",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 2.2
+              "ratio": 0.69
             },
             {
-              "k": "perStack",
-              "id": "기혈"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.35
+              "k": "spend",
+              "id": "기혈",
+              "all": true
             },
             {
               "k": "status",
-              "id": "초재생",
+              "id": "결의",
               "v": 1
             }
           ]
         },
         {
-          "name": "약손",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "기혈",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.47
+            },
+            {
+              "k": "spend",
+              "id": "기혈",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "기혈",
+              "n": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.65
+            },
+            {
+              "k": "spend",
+              "id": "기혈",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
+              "k": "perStack",
+              "id": "기혈",
+              "n": 1
+            },
+            {
               "k": "heal",
-              "ratio": 0.74
+              "ratio": 0.47
+            },
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.62
+                      "k": "stack",
+                      "id": "기혈",
+                      "v": 1
                     }
                   ]
                 }
@@ -233,35 +307,16 @@
           ]
         },
         {
-          "name": "꼬마 디아나",
+          "name": "신탁 5",
           "fx": [
-            {
-              "k": "heal",
-              "ratio": 0.94
-            },
-            {
-              "k": "perStack",
-              "id": "기혈"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.21
-            },
-            {
-              "k": "ifWounded"
-            },
             {
               "k": "heal",
               "ratio": 1.04
-            }
-          ]
-        },
-        {
-          "name": "자연의 힘",
-          "fx": [
+            },
             {
-              "k": "heal",
-              "ratio": 0.9
+              "k": "status",
+              "id": "결의",
+              "v": 1
             },
             {
               "k": "stack",
@@ -273,15 +328,15 @@
       ],
       "blesses": [
         {
-          "name": "따스한 손",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "단전 호흡",
+          "name": "축복 2",
           "kind": "defUp"
         },
         {
-          "name": "기 모으기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -302,7 +357,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 1.3,
           "target": "oneEnemy"
         },
         {
@@ -317,35 +372,16 @@
       ],
       "oracles": [
         {
-          "name": "기공탄",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.38,
+              "ratio": 1.43,
               "target": "oneEnemy"
             },
             {
               "k": "drain",
               "ratio": 0.6
-            },
-            {
-              "k": "stack",
-              "id": "기혈",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "기공 파동",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.75,
-              "target": "allEnemies"
-            },
-            {
-              "k": "drain",
-              "ratio": 0.5
             },
             {
               "k": "stack",
@@ -355,79 +391,100 @@
           ]
         },
         {
-          "name": "경혈 찌르기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.31,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "drain",
-              "ratio": 0.6
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.18,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "지팡이 톡",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.04,
               "target": "oneEnemy"
             },
             {
               "k": "drain",
               "ratio": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "기혈",
+              "v": 1
             }
           ]
         },
         {
-          "name": "고라니 아니다",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "perStack",
-              "id": "기혈"
+              "k": "dmg",
+              "ratio": 1.51,
+              "target": "allEnemies"
             },
+            {
+              "k": "heal",
+              "ratio": 1.05
+            },
+            {
+              "k": "stack",
+              "id": "기혈",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 1.82,
               "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "기혈",
-              "all": true
             },
             {
               "k": "drain",
               "ratio": 0.6
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.49
+                    }
+                  ]
+                }
+              ]
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "노련한 손목",
-          "kind": "power"
         },
         {
-          "name": "경혈 짚기",
-          "kind": "frost"
-        },
-        {
-          "name": "지팡이 내려놓기",
-          "kind": "cost"
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.63,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.6
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "스킬"
+            }
+          ]
         }
       ]
     },
@@ -441,71 +498,77 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 1.2
+          "ratio": 1.69
         },
         {
           "k": "make",
           "id": "디아나_rice",
           "v": 2
-        },
-        {
-          "k": "status",
-          "id": "결의",
-          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "푸짐한 상차림",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.8
-            },
-            {
-              "k": "make",
-              "id": "디아나_rice",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "간단한 한 끼",
-          "cost": 1,
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1.03
-            },
-            {
-              "k": "make",
-              "id": "디아나_rice",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "더 먹고 가렴",
-          "power": true,
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 1
+              "ratio": 2.72
             },
             {
               "k": "make",
               "id": "디아나_rice",
               "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 1,
+          "tags": [],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "make",
+              "id": "디아나_rice",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.3
+            },
+            {
+              "k": "make",
+              "id": "디아나_rice",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "기혈",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.3
+            },
+            {
+              "k": "make",
+              "id": "디아나_rice",
+              "v": 1
             },
             {
               "k": "power",
@@ -527,42 +590,20 @@
           ]
         },
         {
-          "name": "잔칫날 아침",
-          "tags": [
-            "개전"
-          ],
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.83
+              "ratio": 3.04
             },
             {
               "k": "make",
               "id": "디아나_rice",
-              "v": 3
+              "v": 2
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "온 마을 잔치",
-          "fx": [
-            {
-              "k": "heal",
-              "ratio": 2.27
-            },
-            {
-              "k": "status",
-              "id": "다음 턴 드로우",
-              "v": 3
-            },
-            {
-              "k": "status",
-              "id": "결의",
+              "k": "discard",
               "v": 1
             }
           ]
@@ -570,16 +611,22 @@
       ],
       "blesses": [
         {
-          "name": "할머니 손맛",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "배부른 기운",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "한 그릇 더",
-          "kind": "draw"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "디아나_rice",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -593,11 +640,12 @@
       "fx": [
         {
           "k": "perStack",
-          "id": "기혈"
+          "id": "기혈",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.49,
           "target": "oneEnemy"
         },
         {
@@ -613,13 +661,89 @@
       ],
       "oracles": [
         {
-          "name": "사부의 비기",
-          "power": true,
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
-              "k": "stack",
+              "k": "perStack",
               "id": "기혈",
-              "v": 2
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.66,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "기혈",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "기혈",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "기혈",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "기혈",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "기혈",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "기혈",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
@@ -627,20 +751,182 @@
               "v": 1
             },
             {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "기혈",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.78,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 1
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "기혈",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_u5",
+      "name": "해바라기 톡톡",
+      "hero": "디아나",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.52,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perOverheal",
+          "pct": 0.8,
+          "per": 20
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.16,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 20
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 20
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.45,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "기혈",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 20
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.13,
+              "target": "oneEnemy"
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnEnd"
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "perStack",
-                      "id": "기혈"
-                    },
-                    {
                       "k": "dmg",
-                      "ratio": 0.2,
+                      "ratio": 0.34,
                       "target": "randomEnemy"
                     }
                   ]
@@ -650,117 +936,43 @@
           ]
         },
         {
-          "name": "붉은 눈",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "perStack",
-              "id": "기혈"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.52,
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "기혈",
-              "all": true
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 20
             },
             {
-              "k": "status",
-              "id": "결정화",
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
               "v": 1
-            }
-          ]
-        },
-        {
-          "name": "기혈 타통",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "기혈",
-              "v": 2
-            },
-            {
-              "k": "perStack",
-              "id": "기혈"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.35
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "무인의 마지막 일격",
-          "tags": [
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "기혈"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "기혈",
-              "all": true
-            },
-            {
-              "k": "status",
-              "id": "결정화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "경혈 타격",
-          "fx": [
-            {
-              "k": "perStack",
-              "id": "기혈"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.63,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "기혈",
-              "all": true
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "heal",
-              "ratio": 2.09
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "새벽 수련",
-          "kind": "ap"
+          "name": "축복 1",
+          "kind": "weakSpot"
         },
         {
-          "name": "굳은살",
-          "kind": "defUp"
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
         },
         {
-          "name": "약수 한 모금",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

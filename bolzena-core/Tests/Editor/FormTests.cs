@@ -228,36 +228,38 @@ namespace Bolzena.Core.Tests
 
         [Test] public void 콘텐츠_라이카_과충전_최대_출력()
         {
+            // 18갈래 3단계(2026-10-08): 과충전이 다 차면 저절로 변신하지 않고 다음 카드 강화 — 최대 출력은 고학년(원격 충전!!)으로만
             string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
             if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
             var d = GameData.FromFolder(dir);
             var b = Battle.Start(d, new BattleSetup { Party = new List<string> { "라이카" }, Enemies = new List<string> { d.Enemies.Keys.First() }, Deck = d.Hero("라이카").Starter.ToList(), Seed = 3, EnemyHp = 50 });
-            for (int i = 0; i < 6 && !b.InForm("라이카") && b.Over == null; i++)
-            {
-                K.Hand(b, "라이카_s1"); b.Ap = 3; K.Play(b, "라이카_s1");
-                if (i % 2 == 1 && !b.InForm("라이카")) b.EndTurn();
-            }
-            Assert.IsTrue(b.InForm("라이카"), "과충전 셋 — 최대 출력");
-            Assert.AreEqual("최대 출력 펀치", b.CardOf("라이카_s1").Name);
+            K.Hand(b, "라이카_u1", "라이카_s1"); b.Ap = 3;
+            K.Play(b, "라이카_u1");   // 과충전 2 + HP 를 치르면 220V 콘센트 +1
+            if (b.StackOf("라이카", "과충전") < 3) K.Play(b, "라이카_s1");
+            Assert.AreEqual(3, b.StackOf("라이카", "과충전"), "다 찼다");
+            Assert.IsFalse(b.InForm("라이카"), "다 차도 저절로 변신하지 않는다");
+            Assert.Greater(b.EmpowerOf("라이카"), 0, "다 차면 다음 카드 강화");
+            Assert.IsTrue(d.Hero("라이카").Ult.Fx.Any(x => x.K == FxK.Form && x.Id == "라이카_최대출력"), "최대 출력은 고학년이 연다");
         }
 
-        [Test] public void 콘텐츠_죠안_꿈결_형상은_버퍼()
+        [Test] public void 콘텐츠_죠안_꿈결_형상은_공격이_파티_회복()
         {
+            // 시범 16(2026-10-08) — 꿈결 형상(원작 고학년): 평타가 범위 사슬 + 파티 회복. 옛 「버퍼」 형상(사기 · 결의)을 바꿨다
             string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
             if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
             var d = GameData.FromFolder(dir);
             var b = Battle.Start(d, new BattleSetup { Party = new List<string> { "죠안" }, Enemies = new List<string> { d.Enemies.Keys.First() }, Deck = d.Hero("죠안").Starter.ToList(), Gauge = 300, Seed = 3, EnemyHp = 50 });
             Assert.IsTrue(b.UseUlt("죠안").Ok);
             Assert.AreEqual(2, b.St(b.Pool, "사기"), "고학년 — 파티 사기 2");
-            Assert.AreEqual("스킬", b.CardOf("죠안_s1").Type, "변신판은 공격이 아니라 보호 카드");
-            int sh = b.Pool.Shield + b.Pool.Block;
-            K.Hand(b, "죠안_s1", "죠안_s2"); K.Play(b, "죠안_s1");
-            Assert.AreEqual(3, b.St(b.Pool, "사기"), "꿈결의 교리 — 열과 상관없이 사기 +1");
-            Assert.AreEqual(1, b.St(b.Pool, "결의"));
-            Assert.Greater(b.Pool.Shield + b.Pool.Block, sh);
+            Assert.AreEqual("공격", b.CardOf("죠안_s1").Type, "변신판은 범위 사슬(공격)");
+            b.Pool.Hp = b.Pool.MaxHp / 2; int hp0 = b.Pool.Hp;
+            K.Hand(b, "죠안_s1"); K.Play(b, "죠안_s1");
+            Assert.Greater(b.Pool.Hp, hp0, "공격이 파티 회복");
             b.EndTurn(); b.EndTurn();
+            Assert.IsTrue(b.InForm("죠안"), "꿈결은 3턴(3단계 손질 2026-10-09 — 옛 2턴)");
+            b.EndTurn();
             Assert.IsFalse(b.InForm("죠안"));
-            Assert.GreaterOrEqual(b.St(b.Pool, "불굴"), 1, "풀릴 때 불굴");
+            Assert.GreaterOrEqual(b.StackOf("죠안", "형상"), 1, "풀릴 때 형상");
         }
 
         [Test] public void 콘텐츠_세_사도_변신()

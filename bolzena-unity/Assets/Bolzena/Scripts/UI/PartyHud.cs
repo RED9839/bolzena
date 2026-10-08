@@ -146,6 +146,7 @@ namespace Bolzena.UI
                 p.OnTap = () => OnHero?.Invoke(ii);
                 portraits.Add(p);
             }
+            GradeBadge(tl, new Vector3(BarX0 + StripW + (s.Heroes.Count - 1) * StripDx + 0.36f, StripY, 0));   // 학점제 학년(파티 전체)
             chips = ChipRow.Create(tl, new Vector3(BarX0, 3.4f, 0), O + 3, 0.24f);
 
             // ── 위 오른쪽 — 자동 전투 · 배속 · 메뉴(≡), 배속과 메뉴 사이에 얇은 선 ──
@@ -394,6 +395,27 @@ namespace Bolzena.UI
             Make.Box("bar", chip, Res.UI("white"), new Vector3(-0.9f, 0, 0), new Vector2(0.05f, 0.36f), O + 2, won ? Tone.Gold : Tone.Bad);
             Txt("t", chip, won ? "BATTLE END" : "DEFEAT", new Vector3(0.05f, -0.01f, 0), Tone.Md, O + 2, won ? Tone.Gold : Tone.Bad, TextAlignmentOptions.Center, 0.2f);
         }
+        // 학점제 학년 배지 — 판(BattleBridge.Fight)의 학년. 갈색 테 · 크림 속 동그라미에 숫자, 졸업(6학년)은 금빛 테 + 숨쉬는 오라. 전투 시범(판 없음)은 안 단다
+        static readonly Color GradeCream = new Color(1f, 0.957f, 0.863f), GradeBrown = new Color(0.478f, 0.306f, 0.165f), GradeBrownDeep = new Color(0.29f, 0.173f, 0.078f);
+        SpriteRenderer gradeAura;
+        void GradeBadge(Transform p, Vector3 at)
+        {
+            var run = Bolzena.BattleBridge.Fight?.Port?.Run;
+            if (run == null) return;
+            int g = run.Grade;
+            bool grad = g >= Bolzena.Core.Grades.GRAD;
+            const float d = 0.5f;
+            if (grad) gradeAura = Make.Box("grade_aura", p, Res.UI("soft"), at, new Vector2(d * 2.2f, d * 2.2f), O + 1, new Color(1f, 0.85f, 0.45f, 0.6f), Res.SpriteMat(true, 1.4f));
+            var rim = Make.Box("grade_rim", p, Res.UI("circle"), at, new Vector2(d, d), O + 3, grad ? Tone.GoldDeep : GradeBrown);
+            Make.Box("grade_in", p, Res.UI("circle"), at, new Vector2(d * 0.82f, d * 0.82f), O + 4, GradeCream);
+            Txt("grade_n", p, grad ? "졸업" : g.ToString(), at + new Vector3(0, grad ? 0 : 0.045f, 0), grad ? 0.13f : 0.24f, O + 5, grad ? Tone.GoldDeep : GradeBrownDeep, TextAlignmentOptions.Center, 0);
+            if (!grad) Txt("grade_c", p, "학년", at + new Vector3(0, -0.12f, 0), 0.085f, O + 5, GradeBrown, TextAlignmentOptions.Center, 0);
+            var (from, to) = run.GradeSpan;
+            TipZone.Add(rim, new Vector2(d, d) / rim.transform.localScale.x, () => Tip.Head(Bolzena.Core.Grades.Name(g)) +
+                $"  학점 {run.S.Credits}{(grad ? "" : $" / {to}")}\n파티 공격 · 방어 · 최대 HP +{Mathf.RoundToInt((float)(Bolzena.Core.Grades.STAT_PCT * (g - 1) * 100))}%" +
+                Tip.Dim($"\n이긴 싸움마다 학점 — 일반 {Bolzena.Core.Grades.CreditOf("fight")} · 엘리트 {Bolzena.Core.Grades.CreditOf("elite")} · 층 보스 {Bolzena.Core.Grades.CreditOf("boss")}. 파티 전체가 함께 진급합니다."), 2);
+        }
+
         bool endPose;
         Transform endChip;
 
@@ -403,6 +425,7 @@ namespace Bolzena.UI
         void Update()
         {
             Anchor();
+            if (gradeAura != null) { var ac = gradeAura.color; ac.a = 0.35f + 0.3f * Mathf.Sin(Clock.Now * 2.4f); gradeAura.color = ac; }
             if (endChip != null) { float k = Tone.K; endChip.localScale = new Vector3(k, k, 1); endChip.localPosition = new Vector3(-Tone.HalfW + (0.15f + 0.95f) * k, 0.6f * k, 0); }
             float dt = Time.deltaTime;
             if (lagHold > 0) lagHold -= dt; else lagF = Mathf.MoveTowards(lagF, fillF, dt * 0.9f);

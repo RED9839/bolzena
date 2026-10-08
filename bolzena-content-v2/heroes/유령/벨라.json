@@ -6,12 +6,13 @@
       "nature": "활발",
       "race": "유령",
       "role": "탱커",
+      "style": "버티형",
       "star": 3,
       "hp": 990,
       "atk": 84,
       "def": 79,
       "crit": 5,
-      "blurb": "소설 속 주인공이 현실로 걸어 나온 유령 소녀. 쌓이는 존재감이 실드를 두껍게 하고 파티 모두의 공격까지 끌어올리며, 존재가 또렷해지면 쓰러질 한 대를 버텨 내 자신을 증명합니다.",
+      "blurb": "소설 속 주인공이 현실로 걸어 나온 유령 소녀. 막아 낸 공격이 작은 불꽃 「존속」 으로 바뀌어 모이고, 다 차면 그 불꽃을 파티의 다음 한 수에 나눠 줍니다. 쓰러질 한 대를 한 번 버텨 내 자신을 증명합니다.",
       "keyword": {
         "name": "존속",
         "desc": "벨라가 나눠 준 작은 불꽃",
@@ -24,50 +25,24 @@
             "who": "allies"
           }
         ],
-        "rules": [
-          {
-            "name": "존재의 불꽃",
-            "when": {
-              "on": "stackReach",
-              "id": "존속",
-              "n": 5
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "존속",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.45,
-                "base": "def",
-                "target": "allEnemies"
-              },
-              {
-                "k": "heal",
-                "ratio": 0.6
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "다시금 타오르는 존재",
           "when": {
-            "on": "hurt",
-            "guarded": true
-          },
-          "limit": {
-            "per": "turn",
-            "n": 2
+            "on": "guardSum"
           },
           "fx": [
             {
               "k": "stack",
               "id": "존속",
-              "v": 1
+              "v": 1,
+              "ofEvent": 0.02
             }
           ]
         },
@@ -85,7 +60,7 @@
             },
             {
               "k": "shield",
-              "ratio": 2.4
+              "ratio": 1.92
             }
           ]
         }
@@ -157,45 +132,24 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.24,
           "base": "def",
           "target": "allEnemies"
         },
         {
-          "k": "stack",
-          "id": "존속",
-          "v": 2
+          "k": "shield",
+          "ratio": 0.72
         },
         {
-          "k": "status",
-          "id": "피해 감소",
+          "k": "stack",
+          "id": "존속",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "불꽃길",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.46,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "존재의 증명",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -204,101 +158,92 @@
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "존속",
-              "v": 3
-            },
-            {
               "k": "shield",
-              "ratio": 0.48
-            }
-          ]
-        },
-        {
-          "name": "도발의 불꽃",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "base": "def",
-              "target": "allEnemies"
+              "ratio": 0.98
             },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "불꽃 다 태우기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.59,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "존속"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.18,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "존속",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "질문 폭격",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "other"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "오드아이",
-          "kind": "power"
-        },
-        {
-          "name": "존재감 표출",
-          "kind": "draw"
-        },
-        {
-          "name": "작은 불씨",
-          "fx": [
             {
               "k": "stack",
               "id": "존속",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.69
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.74
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.3
             }
           ]
         }
@@ -314,7 +259,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.09
+          "ratio": 1.68
         },
         {
           "k": "perStack",
@@ -322,7 +267,7 @@
         },
         {
           "k": "shield",
-          "ratio": 0.19
+          "ratio": 0.15
         },
         {
           "k": "status",
@@ -332,11 +277,12 @@
       ],
       "oracles": [
         {
-          "name": "또렷한 존재감",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.57
+              "ratio": 2.27
             },
             {
               "k": "perStack",
@@ -344,7 +290,7 @@
             },
             {
               "k": "shield",
-              "ratio": 0.25
+              "ratio": 0.21
             },
             {
               "k": "status",
@@ -354,12 +300,13 @@
           ]
         },
         {
-          "name": "작은 존재감",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.14
+              "ratio": 1.6
             },
             {
               "k": "perStack",
@@ -377,11 +324,11 @@
           ]
         },
         {
-          "name": "불꽃 장막",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.92
+              "ratio": 1.74
             },
             {
               "k": "perStack",
@@ -389,22 +336,22 @@
             },
             {
               "k": "shield",
-              "ratio": 0.49
+              "ratio": 0.17
             },
             {
-              "k": "spend",
+              "k": "stack",
               "id": "존속",
-              "all": true
+              "v": 2
             }
           ]
         },
         {
-          "name": "잊히지 않는 존재",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.24
+              "ratio": 2.03
             },
             {
               "k": "perStack",
@@ -412,20 +359,24 @@
             },
             {
               "k": "shield",
-              "ratio": 0.22
+              "ratio": 0.18
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "guardSum"
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "존속",
                       "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.41
                     }
                   ]
                 }
@@ -434,11 +385,12 @@
           ]
         },
         {
-          "name": "위기의 존재감",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.96
+              "ratio": 3.02
             },
             {
               "k": "perStack",
@@ -447,29 +399,28 @@
             {
               "k": "shield",
               "ratio": 0.27
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "heal",
-              "ratio": 1.98
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "단단한 랜턴",
+          "name": "축복 1",
           "kind": "guard"
         },
         {
-          "name": "다크넷 지식",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "ap"
         },
         {
-          "name": "촛대",
-          "kind": "cost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -483,7 +434,7 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 0.57
+          "ratio": 0.4
         },
         {
           "k": "perStack",
@@ -491,7 +442,7 @@
         },
         {
           "k": "heal",
-          "ratio": 0.24
+          "ratio": 0.19
         },
         {
           "k": "spend",
@@ -501,11 +452,12 @@
       ],
       "oracles": [
         {
-          "name": "정성 어린 챙김",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.71
+              "ratio": 0.54
             },
             {
               "k": "perStack",
@@ -513,7 +465,7 @@
             },
             {
               "k": "heal",
-              "ratio": 0.28
+              "ratio": 0.26
             },
             {
               "k": "spend",
@@ -523,19 +475,16 @@
           ]
         },
         {
-          "name": "나눠 준 불꽃",
+          "name": "신탁 2",
           "fx": [
             {
-              "k": "heal",
-              "ratio": 0.57
-            },
-            {
               "k": "perStack",
-              "id": "존속"
+              "id": "존속",
+              "n": 1
             },
             {
               "k": "shield",
-              "ratio": 0.33
+              "ratio": 0.36
             },
             {
               "k": "spend",
@@ -545,11 +494,13 @@
           ]
         },
         {
-          "name": "조금만 챙김",
+          "name": "신탁 3",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.7
+              "ratio": 0.4
             },
             {
               "k": "perStack",
@@ -557,16 +508,32 @@
             },
             {
               "k": "heal",
-              "ratio": 0.27
+              "ratio": 0.19
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guardSum"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.18
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "해파리 친구 부르기",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.57
+              "ratio": 0.4
             },
             {
               "k": "perStack",
@@ -574,7 +541,7 @@
             },
             {
               "k": "heal",
-              "ratio": 0.21
+              "ratio": 0.18
             },
             {
               "k": "draw",
@@ -585,11 +552,12 @@
           ]
         },
         {
-          "name": "해파리 친구",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.57
+              "ratio": 0.72
             },
             {
               "k": "perStack",
@@ -597,29 +565,22 @@
             },
             {
               "k": "heal",
-              "ratio": 0.24
-            },
-            {
-              "k": "ifWounded"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.86
+              "ratio": 0.34
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "따뜻한 손",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "서툰 손길",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "불씨 나눔",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -636,21 +597,271 @@
       "hero": "벨라",
       "unique": true,
       "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.48
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "hurt",
+                "guarded": true
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.2,
+                  "base": "def",
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "heal",
+                  "ratio": 0.12
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.69
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.22,
+                      "base": "def",
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.13
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.2,
+                      "base": "def",
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.12
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guardSum"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.28,
+                      "base": "def",
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "존속",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.4
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.2,
+                      "base": "def",
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.12
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "종극"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.96
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.24,
+                      "base": "def",
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.14
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨라_u5",
+      "name": "둥실둥실 한 바퀴",
+      "hero": "벨라",
+      "unique": true,
+      "cost": 1,
       "type": "공격",
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.52,
+          "ratio": 0.24,
           "base": "def",
-          "target": "oneEnemy"
+          "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "존속"
+          "k": "perGuarded",
+          "per": 60
         },
         {
           "k": "dmg",
-          "ratio": 0.11,
+          "ratio": 0.1,
           "base": "def",
           "target": "oneEnemy"
         },
@@ -662,17 +873,18 @@
       ],
       "oracles": [
         {
-          "name": "푸른 도깨비불",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.66,
+              "ratio": 0.33,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "존속"
+              "k": "perGuarded",
+              "per": 60
             },
             {
               "k": "dmg",
@@ -688,52 +900,21 @@
           ]
         },
         {
-          "name": "구미호 도깨비불",
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.43,
+              "ratio": 0.24,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "존속"
+              "k": "perGuarded",
+              "per": 40
             },
             {
-              "k": "dmg",
-              "ratio": 0.09,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "존속",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "랜턴으로 빼앗기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.76,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "존속"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.15,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifKill"
+              "k": "shield",
+              "ratio": 0.24
             },
             {
               "k": "stack",
@@ -743,87 +924,96 @@
           ]
         },
         {
-          "name": "교주 저금통",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.84,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "존속"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.21,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "존속",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "불꽃 휘두르기",
+          "name": "신탁 3",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.26,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "존속"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.13,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "존속",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "type": "공격"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 1
+                    "on": "guardSum"
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "존속",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 0.22,
+                      "base": "def",
+                      "target": "allEnemies"
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perGuarded",
+              "per": 60
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perGuarded",
+              "per": 60
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "도깨비불 강화",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "불꽃 냄새",
-          "kind": "frost"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "히힛",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

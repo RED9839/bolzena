@@ -6,40 +6,43 @@
       "nature": "광기",
       "race": "엘프",
       "role": "딜러",
+      "style": "예약형",
       "star": 3,
       "hp": 720,
       "atk": 146,
       "def": 29,
       "crit": 10,
-      "blurb": "규격에 딱 맞는 1초를 사랑하는 시간 여행자. 남은 AP 를 딱 맞춰 쓸 때 카드가 한 번 더 울리고, 초침이 세 번 돌면 다음 턴이 길어집니다.",
+      "blurb": "규격에 딱 맞는 1초를 사랑하는 시간 여행자. 멈춰 버린 둠스데이 시계가 다 돌 때마다 정각에 적 전체를 치고 다시 감기며, 남은 AP 를 딱 맞춰 쓰면 시계가 빨리 돕니다.",
       "keyword": {
         "name": "초침",
-        "desc": "규격에 맞춰 도는 초침",
+        "desc": "멈춘 둠스데이 시계가 정각까지 남긴 칸",
         "carrier": "self",
-        "cap": 4,
+        "cap": 2,
+        "reserve": true,
+        "decay": 1,
         "rules": [
           {
             "name": "정각",
             "when": {
-              "on": "stackReach",
+              "on": "stackGone",
               "id": "초침",
-              "n": 4
+              "decay": true
             },
             "fx": [
               {
-                "k": "spend",
-                "id": "초침",
-                "all": true
-              },
-              {
                 "k": "dmg",
-                "ratio": 0.6,
+                "ratio": 0.96,
                 "target": "allEnemies"
               },
               {
                 "k": "dealtMod",
                 "v": 0.15,
                 "target": "self"
+              },
+              {
+                "k": "stack",
+                "id": "초침",
+                "v": 2
               }
             ]
           }
@@ -49,16 +52,16 @@
         {
           "name": "째깍",
           "when": {
-            "on": "play"
+            "on": "hurt",
+            "pct": 0.08
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 1
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "초침",
+              "k": "hasten",
               "v": 1
             }
           ]
@@ -66,22 +69,12 @@
         {
           "name": "시공간, 저 너머로!",
           "when": {
-            "on": "hurt",
-            "pct": 0.08
-          },
-          "limit": {
-            "per": "fight",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "stack",
+              "id": "초침",
               "v": 1
             }
           ]
@@ -170,100 +163,96 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.16,
-          "hits": 5,
-          "target": "allEnemies"
+          "ratio": 0.2,
+          "target": "allEnemies",
+          "hits": 5
         },
         {
           "k": "dispel",
           "n": 1
-        },
-        {
-          "k": "stack",
-          "id": "초침",
-          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "다섯 번의 메아리",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.21,
-              "hits": 5,
-              "target": "allEnemies"
+              "ratio": 0.28,
+              "target": "allEnemies",
+              "hits": 5
+            },
+            {
+              "k": "dispel",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "allEnemies",
+              "hits": 5
             },
             {
               "k": "dispel",
               "n": 1
             },
             {
-              "k": "stack",
-              "id": "초침",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.4,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "무한 회귀",
-          "cost": 2,
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "hits": 5,
-              "target": "allEnemies"
+              "ratio": 0.24,
+              "target": "allEnemies",
+              "hits": 5
+            },
+            {
+              "k": "strip"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.19,
+              "target": "allEnemies",
+              "hits": 5
             },
             {
               "k": "dispel",
-              "n": 2
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "딱 맞는 메아리",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.19,
-              "hits": 5,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 1
-            },
-            {
-              "k": "ifTune"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.14,
-              "hits": 5,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "시간선 추적",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.19,
-              "hits": 5,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 1
+              "n": 1
             },
             {
               "k": "draw",
@@ -274,41 +263,40 @@
           ]
         },
         {
-          "name": "메아리 과부하",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 0.24,
-              "hits": 5,
-              "target": "allEnemies"
+              "ratio": 0.29,
+              "target": "allEnemies",
+              "hits": 5
             },
             {
-              "k": "stack",
-              "id": "초침",
-              "v": 2
+              "k": "dispel",
+              "n": 1
+            },
+            {
+              "k": "payHp",
+              "v": 40
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "마도 공학 포탄",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "계산 끝",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "메아리 한 번 더",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "stack",
-              "id": "초침",
+              "k": "hasten",
               "v": 1
             }
           ]
@@ -324,11 +312,6 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "stack",
-          "id": "초침",
-          "v": 1
-        },
-        {
           "k": "draw",
           "v": 1
         },
@@ -336,20 +319,63 @@
           "k": "ifTune"
         },
         {
-          "k": "stack",
-          "id": "초침",
-          "v": 2
+          "k": "hasten",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "1초의 오차도 없이",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "stack",
-              "id": "초침",
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "draw",
               "v": 2
             },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.54
+            },
+            {
+              "k": "ifTune"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
             {
               "k": "draw",
               "v": 1
@@ -358,23 +384,25 @@
               "k": "ifTune"
             },
             {
-              "k": "stack",
+              "k": "ripen",
               "id": "초침",
-              "v": 2
+              "v": 0.3
             }
           ]
         },
         {
-          "name": "째깍째깍",
+          "name": "신탁 5",
           "power": true,
           "fx": [
             {
-              "k": "stack",
-              "id": "초침",
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "draw",
+              "k": "ifTune"
+            },
+            {
+              "k": "hasten",
               "v": 1
             },
             {
@@ -382,97 +410,20 @@
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "초침",
+                      "k": "draw",
                       "v": 1
                     }
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "name": "시간선 검색",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "정각 맞추기",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "초침",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "오차 수정",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "비밀 기지",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "호버보드",
-          "kind": "ap"
-        },
-        {
-          "name": "바코드 스캔",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 1
             }
           ]
         }
@@ -488,108 +439,61 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1,
+          "ratio": 0.9,
           "target": "oneEnemy"
         },
         {
-          "k": "stack",
+          "k": "ripen",
           "id": "초침",
-          "v": 1
-        },
-        {
-          "k": "ifTune"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.7,
-          "target": "oneEnemy"
+          "v": 0.25
         }
       ],
       "oracles": [
         {
-          "name": "겹친 시간선",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 1.21,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "ripen",
               "id": "초침",
-              "v": 1
-            },
-            {
-              "k": "ifTune"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.9,
-              "target": "oneEnemy"
+              "v": 0.25
             }
           ]
         },
         {
-          "name": "짧은 시간선",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.85,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "ripen",
               "id": "초침",
-              "v": 1
-            },
-            {
-              "k": "ifTune"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy"
+              "v": 0.25
             }
           ]
         },
         {
-          "name": "실패한 시간선",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
+              "ratio": 0.72,
+              "target": "allEnemies"
             },
             {
-              "k": "stack",
+              "k": "ripen",
               "id": "초침",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "초침",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "평행 세계 탐색",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 1
+              "v": 0.2
             },
             {
               "k": "draw",
@@ -600,37 +504,64 @@
           ]
         },
         {
-          "name": "시간선 정리",
+          "name": "신탁 4",
           "fx": [
             {
-              "k": "discard",
-              "v": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 0.84,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "ripen",
               "id": "초침",
-              "v": 2
+              "v": 0.25
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.36,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ripen",
+              "id": "초침",
+              "v": 0.25
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "실드 파괴",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "평행 이동",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "마도 공학 에너지",
-          "kind": "atkUp"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -643,25 +574,26 @@
       "type": "강화",
       "fx": [
         {
-          "k": "stack",
-          "id": "초침",
-          "v": 2
+          "k": "hasten",
+          "v": 1
         },
         {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "stackReach",
-                "id": "초침",
-                "n": 4
+                "on": "reserveFire",
+                "who": "any"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
                   "k": "dmg",
-                  "ratio": 0.35,
-                  "target": "randomEnemy",
-                  "hits": 3
+                  "ratio": 0.36,
+                  "target": "allEnemies"
                 }
               ]
             }
@@ -670,28 +602,29 @@
       ],
       "oracles": [
         {
-          "name": "긴 편지",
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "stack",
-              "id": "초침",
-              "v": 2
+              "k": "hasten",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "초침",
-                    "n": 4
+                    "on": "reserveFire",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
                       "ratio": 0.48,
-                      "target": "randomEnemy",
-                      "hits": 3
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -700,7 +633,7 @@
           ]
         },
         {
-          "name": "짧은 편지",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
@@ -708,16 +641,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "초침",
-                    "n": 4
+                    "on": "reserveFire",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.35,
-                      "target": "randomEnemy",
-                      "hits": 3
+                      "ratio": 0.36,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -726,15 +661,10 @@
           ]
         },
         {
-          "name": "답장 요청",
+          "name": "신탁 3",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
+              "k": "hasten",
               "v": 1
             },
             {
@@ -742,16 +672,21 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "초침",
-                    "n": 4
+                    "on": "reserveFire",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.3,
-                      "target": "randomEnemy",
-                      "hits": 3
+                      "k": "draw",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.54
                     }
                   ]
                 }
@@ -760,34 +695,31 @@
           ]
         },
         {
-          "name": "편지 배달 추적",
+          "name": "신탁 4",
           "fx": [
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 1
-            },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
+              "unique": true
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "초침",
-                    "n": 4
+                    "on": "reserveFire",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.4,
-                      "target": "randomEnemy",
-                      "hits": 3
+                      "ratio": 0.37,
+                      "target": "allEnemies"
                     }
                   ]
                 }
@@ -796,55 +728,206 @@
           ]
         },
         {
-          "name": "시간 여행 비용",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "payHpPct",
-              "v": 0.05
-            },
-            {
-              "k": "stack",
-              "id": "초침",
-              "v": 3
+              "k": "hasten",
+              "v": 2
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "초침",
-                    "n": 4
+                    "on": "reserveFire",
+                    "who": "any"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.45,
-                      "target": "randomEnemy",
-                      "hits": 3
+                      "ratio": 0.54,
+                      "target": "allEnemies"
                     }
                   ]
                 }
               ]
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "엘레나의 서명",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "ap"
         },
         {
-          "name": "시공 우편",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "멈춘 시계",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "stack",
-              "id": "초침",
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u5",
+      "name": "즐거웠던 기억",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.08
+        },
+        {
+          "k": "pull",
+          "from": "discard",
+          "n": 1,
+          "who": "self",
+          "unique": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.46
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.03
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.73
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.08
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.48
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.7
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "hasten",
               "v": 1
             }
           ]

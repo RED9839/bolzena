@@ -20,6 +20,8 @@ namespace Bolzena.RunUI
 
         /// <summary>점검용(데모) — 저장(PlayerPrefs)을 건드리지 않고 로비 메인 사도를 바꿔 세운다.</summary>
         public static string DemoLobbyHero;
+        /// <summary>점검용(데모) — 지금 로비의 사도 만지기 부품.</summary>
+        public static LobbyTouch LobbyTouchNow;
 
         /// <summary>저장된 메인 사도 — 없거나 스탠딩 스파인이 없으면 에르핀.</summary>
         public static HeroInfo LobbyHeroInfo()
@@ -32,9 +34,8 @@ namespace Bolzena.RunUI
         /// <summary>그 사도를 메인 사도로 둘 수 있나(로스터 · 스탠딩 스파인).</summary>
         public static bool CanLobby(HeroInfo h) => h != null && h.art != null && SpineUi.Data("st_" + h.art) != null;
 
-        static string[] LinesOf(HeroInfo h)
-            => h == null || h.key == DefaultLobbyHero ? LobbyLines
-             : new[] { "교주님, 오늘도 모험 가요?", "준비는 다 됐어요. 언제든지요!", "헤헤, 간지러워요.", "교주님 손, 따뜻하네요." };
+        /// <summary>로비 말풍선 대사 — 사도마다 원작 말투로(HeroLines · hero_lines.json). 없으면 존댓말 / 반말 공통 문구.</summary>
+        static string[] LinesOf(HeroInfo h) => HeroLines.Of(h, "lobby");
 
         /// <summary>로비 스탠딩 — host(로비 왼쪽 62% 칸을 꽉 채운 것) 안에 전신으로. 스파인이 없으면 정지 그림.</summary>
         SkeletonGraphic LobbyStanding(RectTransform host, HeroInfo h)

@@ -30,6 +30,7 @@ namespace Bolzena
         public event Action<string> Moment;                 // 「hit」 · 「crit」 · 「break」 … 연출의 고비(자동 데모가 캡처)
         public int DemoEpiphanyPick = -1;
         public int DemoBranchPick = -1;
+        public int DemoSpendPick = -1;                      // 소모량 고르기 창 — 자동 데모가 이 번째(0~) 후보를 고른다
         public bool Auto;                                   // 자동 전투(위 오른쪽 토글)
         public int UltSel { get; private set; } = -1;       // 고른 고학년(사도 번호)
         public int UltAim { get; private set; } = -1;
@@ -40,6 +41,35 @@ namespace Bolzena
 
         // 사도 · 적 자리(싸움터 좌표 — 발)
         static readonly Vector3[] HeroPos = { new Vector3(-1.55f, -0.72f, 0), new Vector3(-3.2f, -0.32f, 0), new Vector3(-4.85f, -0.78f, 0) };
+        // 사도 셋 간격 고르기(2026-10-09) — 그려진 몸 너비(ArtBounds)로 셋 사이 빈 간격을 같게 · y 는 좌우 대칭 엇갈림. 앞(첫째)은 제자리, 뒤는 왼쪽으로
+        IEnumerator HeroSpread()
+        {
+            for (int k = 0; k < 4; k++) yield return null;
+            if (Heroes.Count < 2) yield break;
+            var ws = Heroes.ConvertAll(h => h != null ? Mathf.Clamp(h.ArtBounds.size.x, 0.8f, 3.2f) : 1.2f);
+            float left = -7.0f, gap = 0.3f;
+            float x0 = HeroPos[0].x;
+            for (int pass = 0; pass < 2; pass++)
+            {
+                float edge = x0 + ws[0] / 2;
+                float x = x0;
+                for (int i = 1; i < ws.Count; i++) x -= ws[i - 1] / 2 + gap + ws[i] / 2;
+                float lastLeft = x - ws[ws.Count - 1] / 2;
+                if (lastLeft < left) gap = Mathf.Max(0.02f, gap - (left - lastLeft) / (ws.Count - 1)); else break;
+            }
+            float cx = x0;
+            for (int i = 0; i < Heroes.Count; i++)
+            {
+                if (i > 0) cx -= ws[i - 1] / 2 + gap + ws[i] / 2;
+                float y = (i == 1 ? -0.5f : -0.74f);
+                var pos = new Vector3(cx, y, 0);
+                var u = Heroes[i]; if (u == null) continue;
+                u.Home = u.Slot = pos;
+                u.transform.localPosition = pos;
+            }
+            ResetHeroOrder();
+        }
+
         static readonly Vector3[][] EnemyPosN =
         {
             new[] { new Vector3(3.2f, -0.75f, 0) },
@@ -56,6 +86,8 @@ namespace Bolzena
             return new Vector3(x, i % 2 == 0 ? -0.85f : -0.3f, 0);
         }
         const float UnitScale = 0.3f;
+        /// <summary>적 크기 — 사도보다 살짝 작게(2026-10-09 사용자 「적군 크기 살짝 줄여줘」).</summary>
+        const float EnemyShrink = 0.9f;
 
         void Awake()
         {
@@ -264,6 +296,7 @@ namespace Bolzena
             else
             {
                 var data = CoreBattle.LoadData();
+                Bolzena.Demo.EngineDemo.Install();   // -enginedemo: 소모량 고르기 · 다음 카드 강화 시험 카드(메모리에서만)
                 var cb = new CoreBattle(data, CoreBattle.Fixture.Override?.Invoke(data) ?? CoreBattle.Fixture.FromArgs(data) ?? CoreBattle.Fixture.Pilot(data));
                 Battle = cb;
                 if (cb.Fx.Note != null) Debug.Log("[Pilot] " + cb.Fx.Note);
@@ -285,6 +318,7 @@ namespace Bolzena
             }
             // 앞줄이 위에 오게(발이 낮을수록 앞)
             ResetHeroOrder();
+            StartCoroutine(HeroSpread());
 
             CardView.HeroOf = i => { var hs = Battle.Snapshot.Heroes; return i >= 0 && i < hs.Count ? hs[i] : null; };
             using (Bolzena.RunUI.Hitch.Span("손패 세우기")) Hand = HandView.Create(UiRoot);
@@ -786,7 +820,7 @@ namespace Bolzena
                     foreach (var en in Enemies) if (en != null && en.gameObject.activeSelf) d = Mathf.Min(d, Vector2.Distance(cand, en.Home));
                     if (d > bestD) { bestD = d; pos = cand; }
                 }
-                var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, UnitScale * 1.0f, pos, 34 - i * 2, Look.EnemyIconAs(es.Id, es.Nature), es.Name, Look.IsStandIn(es.Id));
+                var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, UnitScale * EnemyShrink, pos, 34 - i * 2, Look.EnemyIconAs(es.Id, es.Nature), es.Name, Look.IsStandIn(es.Id));
                 u.Ref = UnitRef.Enemy(i);
                 u.Mood = (es.Skin ?? "").Replace("Skin_", "").Replace("Joly", "Jolly");   // 판 성격 애니(Attack1_1_Cool …) — 오리카 오타 스킨도
                 Enemies.Add(u);
@@ -1172,7 +1206,7 @@ namespace Bolzena
                 if (es.Boss) pos = n == 1 ? BossPos : new Vector3(3.3f, -1.45f, 0);
                 else if (bossI >= 0) { pos = k == 0 ? new Vector3(6.3f, -0.95f, 0) : k == 1 ? new Vector3(6.7f, -1.6f, 0) : new Vector3(1.5f + (k - 2) * 0.9f, -1.6f + (k % 2) * 0.5f, 0); k++; }
                 else pos = EnemySlot(n, i);
-                float sc = es.Boss ? UnitScale * 1.0f : UnitScale * 1.1f;
+                float sc = (es.Boss ? UnitScale * 1.0f : UnitScale * 1.1f) * EnemyShrink;
                 using var _h = Bolzena.RunUI.Hitch.Span("적 유닛 세우기");
                 var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, sc, pos, es.Boss ? 30 : 36 - i * 2, Look.EnemyIconAs(es.Id, es.Nature), es.Name, Look.IsStandIn(es.Id));
                 u.Ref = UnitRef.Enemy(i);
@@ -1244,8 +1278,22 @@ namespace Bolzena
                 yield return ChoiceWindow.Run(UiRoot, info, b => branch = b, DemoBranchPick);
                 if (branch <= 0) { Hand.Cards.Insert(Mathf.Min(handIndex, Hand.Cards.Count), cv); Hand.Layout(); yield break; }   // 물렀다
             }
+            int spend = 0;
+            var spendPrompt = Battle.SpendPromptOf(handIndex);   // 소모량을 고르는 카드(spend pick) — 자동 전투는 창 없이 가장 많이(전부), 사람은 창에서
+            if (spendPrompt != null && spendPrompt.Options.Count > 0)
+            {
+                if (Auto) spend = spendPrompt.Options[spendPrompt.Options.Count - 1].N;
+                else
+                {
+                    bool handOn = Hand.gameObject.activeSelf;
+                    Hand.gameObject.SetActive(false);   // 창 뒤로 손패 글이 비치지 않게(폰은 올려 둔 카드의 글이 밝게 비쳤다)
+                    yield return SpendWindow.Run(UiRoot, info, spendPrompt, v => spend = v, DemoSpendPick);
+                    Hand.gameObject.SetActive(handOn);
+                    if (spend <= 0) { Hand.Cards.Insert(Mathf.Min(handIndex, Hand.Cards.Count), cv); Hand.Layout(); yield break; }   // 물렀다
+                }
+            }
             skipPlayed = info.Id;
-            var evs = Battle.PlayCard(handIndex, target, choice, branch);
+            var evs = Battle.PlayCard(handIndex, target, choice, branch, spend);
             if (choice >= 0) Bolzena.Fx.BolzenaFx.Common("oracle", Heroes[Mathf.Clamp(info.Hero >= 0 ? info.Hero : info.Owner, 0, Heroes.Count - 1)].Fx);   // 신탁을 골랐다
             StartCoroutine(CardUse(cv, Heroes[Mathf.Clamp(info.Hero >= 0 ? info.Hero : info.Owner, 0, Heroes.Count - 1)]));
             Sfx.Play("card_play", 0.5f);

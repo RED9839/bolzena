@@ -6,12 +6,13 @@
       "nature": "광기",
       "race": "마녀",
       "role": "딜러",
+      "style": "손 만들기형",
       "star": 3,
       "hp": 550,
       "atk": 145,
       "def": 25,
       "crit": 10,
-      "blurb": "판을 슬쩍 굴리는 트릭스터 마녀. 흘려 보낸 카드는 다음 마술봉을 세게 만들고, 사라진 비둘기는 동료의 어깨 위에서 되살아나 고학년을 앞당깁니다.",
+      "blurb": "판을 슬쩍 굴리는 트릭스터 마녀. 모자에서 매 턴 비둘기를 꺼내 날리거나 흘려 보내고, 박수가 다 차면 마지막 상자를 엽니다.",
       "keyword": {
         "name": "갈채",
         "desc": "봉봉한 트릭에 쏟아지는 박수",
@@ -25,26 +26,28 @@
         ],
         "rules": [
           {
-            "name": "피날레",
+            "name": "관객의 환호",
             "when": {
-              "on": "stackReach",
-              "id": "갈채",
-              "n": 5
+              "on": "play",
+              "who": "other"
+            },
+            "limit": {
+              "per": "turn",
+              "n": 1
             },
             "fx": [
               {
-                "k": "spend",
+                "k": "stack",
                 "id": "갈채",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 1.2,
-                "target": "allEnemies"
+                "v": 1
               }
             ]
           }
-        ]
+        ],
+        "onMax": {
+          "make": "롤렛_finale",
+          "consume": true
+        }
       },
       "passives": [
         {
@@ -65,19 +68,14 @@
           ]
         },
         {
-          "name": "관객의 환호",
+          "name": "모자 속 비둘기",
           "when": {
-            "on": "play",
-            "who": "other"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 2
+            "on": "turnStart"
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "갈채",
+              "k": "make",
+              "id": "롤렛_dove",
               "v": 1
             }
           ]
@@ -174,7 +172,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.28,
           "target": "randomEnemy"
         },
         {
@@ -188,6 +186,31 @@
         }
       ],
       "blurb": "모자에서 나와 관객 머리 위를 한 바퀴. 사라질 때 박수가 더 큽니다"
+    },
+    {
+      "id": "롤렛_finale",
+      "name": "봉봉한 피날레",
+      "hero": "롤렛",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.96,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "박수가 최고조에 이르면 모자에서 마지막 상자가 나옵니다"
     },
     {
       "id": "롤렛_u1",
@@ -208,7 +231,25 @@
       ],
       "oracles": [
         {
-          "name": "비둘기 떼",
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "롤렛_dove",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
           "fx": [
             {
               "k": "discard",
@@ -221,10 +262,7 @@
           ]
         },
         {
-          "name": "박수 유도",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 3",
           "fx": [
             {
               "k": "discard",
@@ -232,91 +270,48 @@
             },
             {
               "k": "draw",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "다시 부활",
-          "power": true,
-          "fx": [
-            {
-              "k": "discard",
               "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "갈채",
-                      "v": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "두 번 접은 카드",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self"
             },
             {
               "k": "stack",
               "id": "갈채",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
-          "name": "모자 속 비둘기",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "discard",
               "v": 1
             },
             {
-              "k": "make",
-              "id": "롤렛_dove",
+              "k": "draw",
               "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "모나미",
-          "kind": "atkUp"
         },
         {
-          "name": "소매 속 카드",
-          "kind": "draw"
-        },
-        {
-          "name": "비둘기 모자",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "make",
-              "id": "롤렛_dove",
+              "k": "discard",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 15
             }
           ]
         }
@@ -332,7 +327,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
+          "ratio": 0.72,
           "target": "allEnemies"
         },
         {
@@ -352,11 +347,12 @@
       ],
       "oracles": [
         {
-          "name": "앙코르 무대",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 0.98,
               "target": "allEnemies"
             },
             {
@@ -376,12 +372,13 @@
           ]
         },
         {
-          "name": "울랄라",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.9,
               "target": "allEnemies"
             },
             {
@@ -390,79 +387,105 @@
               "v": 1
             },
             {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "stack",
-              "id": "갈채",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.28,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "호기심 상자",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "갈채",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "비둘기 쇼",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.94,
+              "ratio": 0.64,
               "target": "allEnemies"
             },
             {
               "k": "make",
               "id": "롤렛_dove",
               "v": 1
+            },
+            {
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 2
             }
           ]
         },
         {
-          "name": "앙코르 강요",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 0.82,
               "target": "allEnemies"
             },
             {
-              "k": "spend",
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            },
+            {
+              "k": "when",
+              "on": "discard"
+            },
+            {
+              "k": "stack",
               "id": "갈채",
               "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "스포트라이트",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "봉봉하게",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "박수 부대",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -483,7 +506,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 0.64,
           "target": "oneEnemy"
         },
         {
@@ -492,7 +515,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.28,
           "target": "oneEnemy"
         },
         {
@@ -503,11 +526,12 @@
       ],
       "oracles": [
         {
-          "name": "날 선 트릭 카드",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.86,
               "target": "oneEnemy"
             },
             {
@@ -516,7 +540,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.42,
+              "ratio": 0.38,
               "target": "oneEnemy"
             },
             {
@@ -527,61 +551,36 @@
           ]
         },
         {
-          "name": "가벼운 트릭",
-          "cost": 0,
+          "name": "신탁 2",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "갈채"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "갈채",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "조커",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "갈채",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "discard"
-            },
-            {
-              "k": "stack",
-              "id": "갈채",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "카드 부채",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.46,
               "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "갈채"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "갈채",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.79,
+              "target": "oneEnemy"
             },
             {
               "k": "perTag",
@@ -590,7 +589,7 @@
             {
               "k": "dmg",
               "ratio": 0.4,
-              "target": "allEnemies"
+              "target": "oneEnemy"
             },
             {
               "k": "exileFrom",
@@ -601,14 +600,13 @@
           ]
         },
         {
-          "name": "비장의 카드",
-          "tags": [
-            "소멸"
-          ],
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.7,
+              "ratio": 0.58,
               "target": "oneEnemy"
             },
             {
@@ -617,7 +615,48 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.26,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "갈채",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.15,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "갈채"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
               "target": "oneEnemy"
             }
           ]
@@ -625,16 +664,22 @@
       ],
       "blesses": [
         {
-          "name": "트럼프 한 벌",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "숨긴 카드",
+          "name": "축복 2",
           "kind": "cost"
         },
         {
-          "name": "파흐돈",
-          "kind": "weakSpot"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -648,7 +693,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 0.48,
           "target": "oneEnemy"
         },
         {
@@ -657,17 +702,18 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.22,
+          "ratio": 0.18,
           "target": "randomEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "기립 박수",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.78,
+              "ratio": 0.65,
               "target": "oneEnemy"
             },
             {
@@ -676,18 +722,19 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.28,
+              "ratio": 0.24,
               "target": "randomEnemy"
             }
           ]
         },
         {
-          "name": "작은 박수",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.46,
               "target": "oneEnemy"
             },
             {
@@ -702,62 +749,13 @@
           ]
         },
         {
-          "name": "환호성",
+          "name": "신탁 3",
+          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "stack",
-              "id": "갈채",
-              "v": 3
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "discard"
-                  },
-                  "limit": {
-                    "per": "turn",
-                    "n": 3
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "target": "randomEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "비둘기 커튼콜",
-          "fx": [
-            {
               "k": "dmg",
-              "ratio": 0.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "롤렛_dove"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
-              "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "마지막 박수",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.31,
               "target": "oneEnemy"
             },
             {
@@ -766,32 +764,264 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.32,
+              "ratio": 0.11,
               "target": "randomEnemy"
             },
             {
-              "k": "spend",
-              "id": "갈채",
-              "all": true
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "갈채",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "갈채"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.16,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "갈채"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.26,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "최고의 엔터테인먼트",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "지팡이 돌리기",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "앙코르",
+          "name": "축복 3",
           "fx": [
+            {
+              "k": "make",
+              "id": "롤렛_dove",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "롤렛_u5",
+      "name": "투명 의자",
+      "hero": "롤렛",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.64
+        },
+        {
+          "k": "perTag",
+          "id": "롤렛_dove"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.24
+        },
+        {
+          "k": "stack",
+          "id": "갈채",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.86
+            },
+            {
+              "k": "perTag",
+              "id": "롤렛_dove"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.33
+            },
             {
               "k": "stack",
               "id": "갈채",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.56
+            },
+            {
+              "k": "make",
+              "id": "롤렛_dove",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "갈채",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "perTag",
+              "id": "롤렛_dove"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.25
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.81
+            },
+            {
+              "k": "perTag",
+              "id": "롤렛_dove"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 2
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.73
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.26
+            },
+            {
+              "k": "perTag",
+              "id": "롤렛_dove"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "롤렛_dove",
               "v": 1
             }
           ]

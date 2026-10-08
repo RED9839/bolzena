@@ -5,7 +5,8 @@
       "name": "카렌",
       "nature": "활발",
       "race": "요정",
-      "role": "딜러",
+      "role": "서포터",
+      "style": "회복형",
       "star": 1,
       "hp": 440,
       "atk": 93,
@@ -20,33 +21,15 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.1
+            "v": 0.12
           }
         ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.6,
+          "consume": true
+        },
         "rules": [
-          {
-            "name": "떡상 방송",
-            "when": {
-              "on": "stackReach",
-              "id": "시청자 수",
-              "n": 5
-            },
-            "limit": {
-              "per": "fight",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "status",
-                "id": "사기",
-                "v": 1
-              },
-              {
-                "k": "ap",
-                "v": 1
-              }
-            ]
-          },
           {
             "name": "합방",
             "when": {
@@ -78,7 +61,30 @@
             {
               "k": "stack",
               "id": "시청자 수",
-              "v": 2
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "켜진 방송",
+          "when": {
+            "on": "overheal",
+            "pct": 0.8
+          },
+          "limit": {
+            "per": "turn",
+            "n": 2
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1,
+              "ofEvent": 1
             }
           ]
         },
@@ -90,7 +96,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 3
+            "n": 2
           },
           "fx": [
             {
@@ -121,18 +127,22 @@
         {
           "name": "떡상",
           "when": {
-            "on": "break",
-            "mine": true
+            "on": "spend",
+            "id": "시청자 수"
           },
           "limit": {
-            "per": "turn",
-            "n": 1
+            "per": "fight",
+            "n": 3
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 2
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "ap",
+              "v": 1
             }
           ]
         }
@@ -225,7 +235,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.6,
+          "ratio": 1.89,
           "target": "oneEnemy"
         },
         {
@@ -241,11 +251,12 @@
       ],
       "oracles": [
         {
-          "name": "범인 검거",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.08,
+              "ratio": 2.55,
               "target": "oneEnemy"
             },
             {
@@ -261,107 +272,115 @@
           ]
         },
         {
-          "name": "UFC 알바생 추적",
-          "cost": 2,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.52,
+              "ratio": 2.18,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 2
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "시청자 수",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "악플 박제",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.57,
+              "ratio": 1.33,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.18,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
-              "v": 2
+              "v": 1
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "other",
+              "who": "self",
+              "unique": true,
               "type": "스킬"
             }
           ]
         },
         {
-          "name": "방송 종료",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.58,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "시청자 수"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "시청자 수",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "실시간 댓글",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.71,
+              "ratio": 3.4,
               "target": "oneEnemy"
             },
             {
               "k": "status",
               "id": "취약",
               "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "시청자 수"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.2,
-              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "셀카봉",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "조회수",
-          "kind": "draw"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "알고리즘의 선택",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -382,19 +401,25 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.61,
+          "ratio": 0.59,
           "target": "randomEnemy",
           "hits": 3
         },
         {
-          "k": "stack",
-          "id": "시청자 수",
-          "v": 1
+          "k": "perOverheal",
+          "pct": 0.8,
+          "per": 25
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.28,
+          "target": "randomEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "구독 좋아요",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
@@ -403,35 +428,68 @@
               "hits": 3
             },
             {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "쇼츠",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.61,
-              "target": "randomEnemy",
-              "hits": 2
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
             },
             {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "randomEnemy"
             }
           ]
         },
         {
-          "name": "협찬 광고",
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.61,
+              "ratio": 0.49,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.01,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.59,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -439,6 +497,37 @@
               "k": "stack",
               "id": "시청자 수",
               "v": 1
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "randomEnemy"
             },
             {
               "k": "draw",
@@ -449,66 +538,43 @@
           ]
         },
         {
-          "name": "합방 무대",
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.65,
+              "ratio": 0.88,
               "target": "randomEnemy",
               "hits": 3
             },
             {
-              "k": "perStack",
-              "id": "시청자 수"
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
             },
             {
               "k": "dmg",
-              "ratio": 0.22,
+              "ratio": 0.42,
               "target": "randomEnemy"
-            }
-          ]
-        },
-        {
-          "name": "정기 방송",
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.62,
-              "target": "randomEnemy",
-              "hits": 3
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "시청자 수",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "discard",
+              "v": 1
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "화려한 조명",
-          "kind": "atkUp"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "협찬",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "알림 설정",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -529,97 +595,119 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 1.28
-        },
-        {
-          "k": "perStack",
-          "id": "시청자 수"
-        },
-        {
-          "k": "heal",
-          "ratio": 0.32
+          "ratio": 1.75
         },
         {
           "k": "spend",
           "id": "시청자 수",
-          "all": true
+          "pick": true
+        },
+        {
+          "k": "perEvent"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.45
         }
       ],
       "oracles": [
         {
-          "name": "당근 듬뿍 회복",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.6
-            },
-            {
-              "k": "perStack",
-              "id": "시청자 수"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.4
+              "ratio": 2.31
             },
             {
               "k": "spend",
               "id": "시청자 수",
-              "all": true
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.59
             }
           ]
         },
         {
-          "name": "생당근 한 입",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.8
-            },
-            {
-              "k": "perStack",
-              "id": "시청자 수"
-            },
-            {
-              "k": "heal",
-              "ratio": 0.24
+              "ratio": 1.68
             },
             {
               "k": "spend",
               "id": "시청자 수",
-              "all": true
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.42
             }
           ]
         },
         {
-          "name": "당근 텃밭 방송",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.1
+            },
+            {
+              "k": "spend",
+              "id": "시청자 수",
+              "pick": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.53
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.17
+              "ratio": 1.37
             },
             {
-              "k": "perStack",
-              "id": "시청자 수"
+              "k": "perOverheal",
+              "pct": 0.8,
+              "per": 25
             },
             {
-              "k": "heal",
-              "ratio": 0.29
+              "k": "shield",
+              "ratio": 0.46
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "시청자 수",
-                    "n": 5
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "heal",
-                      "ratio": 0.78
+                      "k": "shield",
+                      "ratio": 0.46
                     }
                   ]
                 }
@@ -628,33 +716,11 @@
           ]
         },
         {
-          "name": "당근 방패",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.44
-            },
-            {
-              "k": "perStack",
-              "id": "시청자 수"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.4
-            },
-            {
-              "k": "spend",
-              "id": "시청자 수",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "기적의 회복 방송",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.28
+              "ratio": 1.68
             },
             {
               "k": "perStack",
@@ -662,30 +728,28 @@
             },
             {
               "k": "heal",
-              "ratio": 0.32
+              "ratio": 0.42
             },
             {
-              "k": "ifWounded"
-            },
-            {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 3
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "특 플러스 당근",
+          "name": "축복 1",
           "kind": "heal"
         },
         {
-          "name": "생방송 후원",
-          "kind": "cost"
+          "name": "축복 2",
+          "kind": "draw"
         },
         {
-          "name": "언니의 텃밭",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -710,18 +774,26 @@
           "v": 1
         },
         {
+          "k": "heal",
+          "ratio": 0.42
+        },
+        {
           "k": "draw",
           "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "챌린지 2탄",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "stack",
               "id": "시청자 수",
               "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.49
             },
             {
               "k": "draw",
@@ -730,12 +802,176 @@
           ]
         },
         {
-          "name": "구독 이벤트",
-          "power": true,
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.42
+            },
             {
               "k": "draw",
               "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.4
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.7
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "카렌_u5",
+      "name": "100캐럿 당근",
+      "hero": "카렌",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.05,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "drain",
+          "ratio": 0.5
+        },
+        {
+          "k": "stack",
+          "id": "시청자 수",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.41,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.4
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.11,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
             },
             {
               "k": "power",
@@ -746,9 +982,8 @@
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "시청자 수",
-                      "v": 1
+                      "k": "heal",
+                      "ratio": 0.94
                     }
                   ]
                 }
@@ -757,71 +992,44 @@
           ]
         },
         {
-          "name": "합방 섭외",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 1
+              "k": "dmg",
+              "ratio": 1.32,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
             },
             {
               "k": "draw",
-              "v": 2,
-              "who": "other"
-            }
-          ]
-        },
-        {
-          "name": "떡상 각",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "예약 방송",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "시청자 수",
-              "v": 3
-            },
-            {
-              "k": "discard",
-              "v": 1
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "썸네일",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "weakSpot"
         },
         {
-          "name": "해시태그",
-          "tags": [
-            "보존"
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시청자 수",
+              "v": 1
+            }
           ]
-        },
-        {
-          "name": "생당근 공포증",
-          "kind": "defUp"
         }
       ]
     }

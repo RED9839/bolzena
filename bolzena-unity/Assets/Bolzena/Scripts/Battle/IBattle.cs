@@ -19,7 +19,11 @@ namespace Bolzena.Battle
 
         // 카드를 낸다. 신탁 카드면 epiphanyChoice 로 고른 것(0~)으로 바뀌어 나간다
         // branch — 두 갈래 카드(CardInfo.Choices)에서 고른 갈래 1 · 2(0 이면 없음)
-        IReadOnlyList<BattleEvent> PlayCard(int handIndex, int targetEnemy, int epiphanyChoice = -1, int branch = 0);
+        // spend — 소모량을 고르는 카드(SpendPromptOf 가 null 이 아닌 카드)에서 고른 수(0 이면 전부)
+        IReadOnlyList<BattleEvent> PlayCard(int handIndex, int targetEnemy, int epiphanyChoice = -1, int branch = 0, int spend = 0);
+
+        // 소모량을 고르는 카드(spend pick)면 후보 · 결과 미리보기. 아니면 null
+        SpendPrompt SpendPromptOf(int handIndex);
 
         // 신탁 선택지 — 그 카드가 바뀔 수 있는 모습들(빛나는 카드가 아니면 빈 목록)
         IReadOnlyList<CardInfo> EpiphanyOptions(int handIndex);

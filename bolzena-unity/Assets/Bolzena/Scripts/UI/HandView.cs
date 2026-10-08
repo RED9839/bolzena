@@ -141,7 +141,7 @@ namespace Bolzena.UI
             for (int i = 0; i < Cards.Count && i < hand.Count; i++)
             {
                 if (Cards[i].Info.Id != hand[i].Id) continue;
-                bool changed = Cards[i].Info.Cost != hand[i].Cost || Cards[i].Info.Epiphany != hand[i].Epiphany || Cards[i].Info.Text != hand[i].Text;
+                bool changed = Cards[i].Info.Cost != hand[i].Cost || Cards[i].Info.Epiphany != hand[i].Epiphany || Cards[i].Info.Text != hand[i].Text || Cards[i].Info.EmpowerMul != hand[i].EmpowerMul;
                 Cards[i].Info = hand[i];
                 if (changed) Cards[i].Refresh();
             }

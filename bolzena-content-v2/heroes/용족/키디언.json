@@ -6,12 +6,13 @@
       "nature": "우울",
       "race": "용족",
       "role": "딜러",
+      "style": "격파형",
       "star": 3,
       "hp": 750,
       "atk": 144,
       "def": 35,
       "crit": 10,
-      "blurb": "흑요석의 용족 닌자. 적이 격파되어 무너진 틈에 그림자처럼 파고들어 마무리하고, 쓰러진 적을 딛고 다음 칼을 바로 꺼냅니다.",
+      "blurb": "흑요석의 용족 닌자. 무너진 적의 틈에서, 가장 약한 적에게 그림자처럼 나타나 끊어 내고 — 끊을 때마다 별빛이 쌓여 다음 칼이 더 날카로워집니다.",
       "keyword": {
         "name": "별빛 조각",
         "desc": "깨진 흑요석으로 그린 별자리",
@@ -20,33 +21,24 @@
         "per": [
           {
             "stat": "crit",
-            "v": 0.1
+            "v": 0.08
           },
           {
             "stat": "dealt",
-            "v": 0.06
+            "v": 0.05
           }
-        ]
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "그림자 추적",
           "when": {
             "on": "break"
-          },
-          "fx": [
-            {
-              "k": "stack",
-              "id": "별빛 조각",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "그림자 추적",
-          "when": {
-            "on": "kill",
-            "mine": true
           },
           "limit": {
             "per": "turn",
@@ -56,7 +48,7 @@
             {
               "k": "stack",
               "id": "별빛 조각",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -72,9 +64,14 @@
           },
           "fx": [
             {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            },
+            {
               "k": "dmg",
               "ratio": 0.6,
-              "target": "randomEnemy"
+              "target": "lowEnemy"
             }
           ]
         }
@@ -108,7 +105,7 @@
           {
             "k": "dmg",
             "ratio": 2,
-            "target": "randomEnemy"
+            "target": "lowEnemy"
           }
         ]
       },
@@ -158,9 +155,13 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.46,
+          "ratio": 0.4,
           "target": "oneEnemy",
           "hits": 3
+        },
+        {
+          "k": "tough",
+          "v": 1
         },
         {
           "k": "stack",
@@ -170,52 +171,59 @@
       ],
       "oracles": [
         {
-          "name": "아웃사이더 헤딩",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.46,
+              "ratio": 0.54,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
               "target": "oneEnemy",
               "hits": 4
             },
             {
-              "k": "stack",
-              "id": "별빛 조각",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "급소 베기",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "별빛 조각",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "격파 틈",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.46,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "stack",
-              "id": "별빛 조각",
+              "k": "tough",
               "v": 1
             },
             {
@@ -223,73 +231,77 @@
               "id": "broken"
             },
             {
-              "k": "dmg",
-              "ratio": 0.69,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 2
             }
           ]
         },
         {
-          "name": "별자리 긋기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "target": "oneEnemy",
-              "hits": 3
-            },
-            {
-              "k": "perStack",
-              "id": "별빛 조각"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "그림자 수련",
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.48,
+              "ratio": 0.49,
               "target": "oneEnemy",
               "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "break"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "별빛 조각",
-                      "v": 1
+                      "v": 2
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "흑요석 날",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "그림자 발걸음",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "조각 녹여 먹기",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -310,8 +322,16 @@
       "fx": [
         {
           "k": "tough",
-          "v": 1,
-          "target": "oneEnemy"
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "별빛 조각",
+          "v": 1
+        },
+        {
+          "k": "ifFoe",
+          "id": "broken"
         },
         {
           "k": "stack",
@@ -321,12 +341,11 @@
       ],
       "oracles": [
         {
-          "name": "정확한 급소",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
             },
             {
               "k": "stack",
@@ -336,12 +355,60 @@
           ]
         },
         {
-          "name": "그림자 숨기",
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "tough",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "stack",
@@ -350,89 +417,44 @@
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
+              "v": 1
             }
           ]
         },
         {
-          "name": "깨진 흑요석",
+          "name": "신탁 5",
+          "power": true,
           "fx": [
             {
-              "k": "payHp",
-              "v": 40
-            },
-            {
               "k": "tough",
-              "v": 2,
-              "target": "oneEnemy"
+              "v": 1
             },
             {
               "k": "stack",
               "id": "별빛 조각",
               "v": 2
-            }
-          ]
-        },
-        {
-          "name": "밤눈",
-          "fx": [
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "별빛 조각",
-              "v": 1
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "별빛 조각",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "break"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "별빛 조각",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
-          ]
-        },
-        {
-          "name": "쿠나이 표시",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.69,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "반창고",
-          "kind": "draw"
-        },
-        {
-          "name": "붕대",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.3
-            }
-          ]
-        },
-        {
-          "name": "어둠 속",
-          "tags": [
-            "보존"
           ]
         }
       ]
@@ -446,128 +468,43 @@
       "type": "공격",
       "fx": [
         {
-          "k": "dmg",
-          "ratio": 0.92,
-          "target": "oneEnemy"
-        },
-        {
           "k": "perStack",
-          "id": "별빛 조각"
+          "id": "별빛 조각",
+          "n": 1
         },
         {
           "k": "dmg",
-          "ratio": 0.35,
-          "target": "oneEnemy"
+          "ratio": 0.42,
+          "target": "lowEnemy"
         },
         {
           "k": "spend",
           "id": "별빛 조각",
           "all": true
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "lowEnemy"
         }
       ],
       "oracles": [
         {
-          "name": "쉐도우 커터",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.15,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "별빛 조각"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "별빛 조각",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "별똥별",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.67,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "별빛 조각"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.25,
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "별빛 조각",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "별 하나는 남겨",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.21,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifStack",
-              "id": "별빛 조각",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.08,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "마지막 다이브",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "별빛 조각"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.82,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "별빛 조각",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "다시 뛰어들기",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "perStack",
-              "id": "별빛 조각"
+              "id": "별빛 조각",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.69,
-              "target": "oneEnemy"
+              "ratio": 0.57,
+              "target": "lowEnemy"
             },
             {
               "k": "spend",
@@ -578,29 +515,142 @@
               "k": "ifKill"
             },
             {
-              "k": "pull",
-              "from": "discard",
+              "k": "dmg",
+              "ratio": 1.22,
+              "target": "lowEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "별빛 조각",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.51,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "별빛 조각",
+              "all": true
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill",
+                    "mine": true
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.53,
+                      "target": "lowEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "별빛 조각",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "별빛 조각",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "별빛 조각",
+              "all": true
+            },
+            {
+              "k": "draw",
+              "v": 1,
               "who": "self",
               "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "별빛 조각",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.76,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "별빛 조각",
+              "all": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "별빛 쿠나이",
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "그림자 틈",
-          "kind": "cost"
-        },
-        {
-          "name": "친구따라 지상 나들이",
+          "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "별빛 조각",
               "v": 1
             }
           ]
@@ -622,22 +672,23 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.57,
+          "ratio": 0.55,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "별빛 조각"
+          "k": "ifFoe",
+          "id": "broken"
         },
         {
-          "k": "dmg",
-          "ratio": 0.29,
-          "target": "oneEnemy"
+          "k": "stack",
+          "id": "별빛 조각",
+          "v": 2
         }
       ],
       "oracles": [
         {
-          "name": "마음속의 은하수",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "status",
@@ -646,22 +697,72 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.74,
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "별빛 조각"
+              "k": "ifFoe",
+              "id": "broken"
             },
             {
-              "k": "dmg",
-              "ratio": 0.37,
-              "target": "oneEnemy"
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 2
             }
           ]
         },
         {
-          "name": "밤하늘의 별자리",
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "잔광",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "tough",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
@@ -671,24 +772,12 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.03,
+              "ratio": 0.62,
               "target": "oneEnemy"
             },
             {
               "k": "power",
               "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "별빛 조각",
-                      "v": 1
-                    }
-                  ]
-                },
                 {
                   "when": {
                     "on": "break"
@@ -699,7 +788,13 @@
                   },
                   "fx": [
                     {
-                      "k": "draw",
+                      "k": "dmg",
+                      "ratio": 0.42,
+                      "target": "lowEnemy"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "별빛 조각",
                       "v": 1
                     }
                   ]
@@ -709,7 +804,7 @@
           ]
         },
         {
-          "name": "동굴 밖으로",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "status",
@@ -718,55 +813,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.63,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "별빛 조각",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "별 하나",
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "별빛 조각"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.59,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "별빛 조각",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "내가 빛내줄게…",
-          "fx": [
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
-            },
-            {
-              "k": "perStack",
-              "id": "별빛 조각"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.56,
               "target": "oneEnemy"
             },
             {
@@ -780,15 +827,179 @@
       ],
       "blesses": [
         {
-          "name": "교주의 별자리",
+          "name": "축복 1",
           "kind": "atkUp"
         },
         {
-          "name": "별 관찰 노트",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "흑요석 조각",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "키디언_u5",
+      "name": "그늘에서 내다보기",
+      "hero": "키디언",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.75
+        },
+        {
+          "k": "stack",
+          "id": "별빛 조각",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.13
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.71
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.9
+            },
+            {
+              "k": "tough",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.78
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "별빛 조각",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.64
+            },
+            {
+              "k": "stack",
+              "id": "별빛 조각",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

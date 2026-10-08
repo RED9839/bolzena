@@ -62,6 +62,9 @@ for f in os.listdir(f"{SRC}/uiicons"):
     if f.endswith(".png"):
         cp(f"{SRC}/uiicons/{f}", f"{DST}/RunArt/Icons/{f}")
 cp(f"{SRC}/currency/CurrencyIcon_0008.png", f"{DST}/RunArt/Icons/gold.png")
+# 크레파스 4등급(하급 · 중급 · 상급 · 최상급) — 교주 능력치 보드(Flow.Crayon.cs PastelIcon)
+for i in range(1, 5):
+    cp(f"{SRC}/currency/Item_Crayon{i}.png", f"{DST}/RunArt/Item/Item_Crayon{i}.png")
 # 원작 상태 아이콘(iconsrc/stateicons/StateIcon_N, 64) — 전투 상태 칩이 뜻이 확실한 것만 쓴다(Docs/상태칩.md · bolzena-unity ChipRow.Original)
 for f in os.listdir(f"{SRC}/iconsrc/stateicons"):
     if f.startswith("StateIcon_") and f[10:-4].isdigit():

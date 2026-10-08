@@ -96,7 +96,7 @@ for hid, h in sorted(heroes.items()):
         if c["id"] in table:
             uses[table[c["id"]]] = uses.get(table[c["id"]], 0) + 1
 
-# 고른 원작 그림(사도마다 대조 시트로 골랐다 — Tools~/cardpic_picks.json · cardpic_sheet.py) — 고유 · 생성 카드만, 시작 카드는 늘 스탠딩
+# 고른 원작 그림(사도마다 대조 시트로 골랐다 — Tools~/cardpic_picks.json · cardpic_sheet.py) — 고유 · 생성 카드, 그리고 기본 카드(cardart_fill.py 의 fill 줄 — 표에 없는 기본 카드는 스탠딩 상반신)
 #   "file" = 장면 · SD · 물건 그림 → "pics"(copy_assets.py 가 RunArt/CardPic 으로 굽는다) · "icon" = 내용이 맞는 원작 스킬 아이콘 → "cards" 를 덮는다
 #   "keep" = 어울리는 그림이 없어 위 규칙의 스킬 아이콘 그대로
 import sys
@@ -116,7 +116,7 @@ for cid, p in cardpic.load().items():
 
 out = {
     "_meta": {
-        "what": "cards = 고유 카드 → 원작 스킬 아이콘 · pics = 고유 · 생성 카드 → 고른 원작 그림(RunArt/CardPic, 있으면 이것이 먼저). 시작 카드는 사도 스탠딩, 교주 · 상태 카드는 무늬 그대로 — 이 표에 없다.",
+        "what": "cards = 카드 → 원작 스킬 아이콘 · pics = 카드 → 고른 원작 그림(RunArt/CardPic · CardObj, 있으면 이것이 먼저). 고유 · 생성 · 기본 카드(2026-10-08 cardart_fill.py — 사도마다 카드 그림이 모두 다르게). 기본 카드가 표에 없으면 사도 스탠딩 상반신, 교주 · 상태 카드는 itemart.json.",
         "tool": "Tools~/build_cardart.py", "doc": "Docs/카드그림.md",
         "count": len(table), "no_art_heroes": missing, "pic_count": len(pics),
     },

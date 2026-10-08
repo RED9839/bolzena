@@ -157,6 +157,8 @@ namespace Bolzena.UI
             Draw();
         }
 
+        bool askExit;
+        public void DemoAskExit() { askExit = true; Draw(); }
         bool dirty;
         void OnChanged() => dirty = true;
         // 창을 닫지 않은 채 전투가 끝나 장면째 지워져도 정적 이벤트에 남지 않게
@@ -182,11 +184,25 @@ namespace Bolzena.UI
             float y = -Pad;
             // 제목 · 주 동작
             Make.Text("title", T, "일시정지", new Vector3(Wd / 2, y - 0.24f, 0), Tone.Xl, OC, Tone.Gold);
-            y -= 0.66f;
-            Pill(T, "resume", new Vector3(Wd / 2 - 1.42f, y - 0.33f, 0), 2.6f, "계속하기", true, m.Close);
+            y -= 0.76f;
+            Pill(T, "resume", new Vector3(Wd / 2 - 1.42f, y - 0.38f, 0), 2.6f, "계속하기", true, m.Close);
             TextMeshPro st = null;
-            st = Pill(T, "speed", new Vector3(Wd / 2 + 1.5f, y - 0.33f, 0), 2.3f, "배속 " + Clock.Speed + "×", false, () => { onSpeed?.Invoke(); st.text = "배속 " + Clock.Speed + "×"; });
-            y -= 0.66f + 0.2f;
+            st = Pill(T, "speed", new Vector3(Wd / 2 + 1.5f, y - 0.38f, 0), 2.3f, "배속 " + Clock.Speed + "×", false, () => { onSpeed?.Invoke(); st.text = "배속 " + Clock.Speed + "×"; });
+            y -= 0.74f + 0.12f;
+            // 메인 화면으로 — 확인을 한 번 묻는다(전투 중에는 저장되지 않아 그 전투 시작(지도)에서 이어집니다)
+            if (!askExit)
+            {
+                Pill(T, "tomain", new Vector3(Wd / 2, y - 0.35f, 0), 3.4f, "메인 화면으로", false, () => { askExit = true; Draw(); }, 0.7f);
+                y -= 0.7f + 0.2f;
+            }
+            else
+            {
+                Make.Sliced("xbar", T, Res.UI("cell_on_9s"), new Vector3(Wd / 2, y - 0.65f, 0), new Vector2(Wd - Pad * 2, 1.3f), OC - 1);
+                Tone.Text("xt", T, "진행은 저장됩니다. 메인 화면으로 나갈까요?\n<size=80%><color=" + Tone.SubTag + ">전투 중에는 저장되지 않아, 이 전투가 시작되기 전(지도)에서 이어집니다.</color></size>", new Vector3(Wd / 2, y - 0.3f, 0), Tone.Body, OC, Tone.Ink, TextAlignmentOptions.Center, true, Wd - Pad * 2 - 0.2f);
+                Pill(T, "xyes", new Vector3(Wd / 2 - 1.1f, y - 0.92f, 0), 1.9f, "나가기", true, () => { m.Close(); Bolzena.BattleBridge.LeaveToLobby(); }, 0.62f);
+                Pill(T, "xno", new Vector3(Wd / 2 + 1.1f, y - 0.92f, 0), 1.9f, "취소", false, () => { askExit = false; Draw(); }, 0.62f);
+                y -= 1.3f + 0.2f;
+            }
             Make.Box("rule", T, Res.UI("white"), new Vector3(Wd / 2, y, 0), new Vector2(Wd - Pad * 2, 0.012f), OC, Tone.Line);
             y -= 0.18f;
 
@@ -205,7 +221,7 @@ namespace Bolzena.UI
                 float cw = (rowW - gap) / 2;
                 Chip(T, Pad, y, "브라우저 창", null, !full, true, null, () => Bolzena.RunUI.DisplayOptions.SetWebFullScreen(false), cw);
                 Chip(T, Pad + cw + gap, y, "전체 화면", null, full, true, null, () => Bolzena.RunUI.DisplayOptions.SetWebFullScreen(true), cw);
-                y -= 0.52f + 0.12f;
+                y -= 0.64f + 0.12f;
             }
             else
             {
@@ -218,7 +234,7 @@ namespace Bolzena.UI
                 float cw = (rowW - gap * (nm - 1)) / nm;
                 Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.Modes[i].Name, null, i == curMode, ok, ok ? null : "이 기기에서는 쓸 수 없습니다", () => Pick(k, -1, curMode, curPreset), cw);
             }
-            y -= 0.52f + 0.06f;
+            y -= 0.64f + 0.06f;
             Tone.Text("mh", T, "· " + Bolzena.RunUI.DisplayOptions.ModeHint(curMode), new Vector3(Pad, y - 0.12f, 0), Tone.Cap, OC, Tone.Sub, TextAlignmentOptions.Left, true);
             y -= 0.3f;
 
@@ -233,7 +249,7 @@ namespace Bolzena.UI
                 float cw = (rowW - gap * (np - 1)) / np;
                 Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.Presets[i].Name, $"{sz.x}×{sz.y}", i == curPreset, ok, ok ? null : $"이 모니터({mon.x}×{mon.y})보다 큽니다", () => Pick(-1, k, curMode, curPreset), cw);
             }
-            y -= 0.66f + 0.12f;
+            y -= 0.74f + 0.12f;
             }
 
             bool low = Bolzena.RunUI.DisplayOptions.LowSpec;   // 저사양 모드 — 프레임 30 · 수직동기 쉼(판 화면 설정 창에서 바꾼다)
@@ -247,10 +263,28 @@ namespace Bolzena.UI
                 Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.FrameCapName(i), null, !vs && i == Bolzena.RunUI.DisplayOptions.FpsIndexOn, !vs && !low, low ? "저사양 모드를 끄면 고를 수 있습니다" : vs ? "수직동기를 끄면 고를 수 있습니다" : null,
                     () => Bolzena.RunUI.DisplayOptions.SetFrameCap(k), cw);
             }
-            y -= 0.52f + 0.12f;
+            y -= 0.64f + 0.12f;
+            // 저사양 모드 — 판 화면 설정 창과 같은 스위치(같은 DisplayOptions · 바로 적용 · 저장)
+            {
+                float rh = 0.66f;
+                var rc = new Vector3(Wd / 2, y - rh / 2, 0);
+                var row = Make.Sliced("lrow", T, Res.UI("cell_9s"), rc, new Vector2(rowW, rh), OC);
+                var hl = Make.Sliced("lrowhl", T, Res.UI("cell_on_9s"), rc, new Vector2(rowW, rh), OC, new Color(1, 1, 1, 0));
+                var lt = Tone.Text("ll", T, "저사양 모드", new Vector3(Pad + 0.2f, rc.y, 0), Tone.Body, OC + 1, Tone.Ink, TextAlignmentOptions.Left, false);
+                lt.ForceMeshUpdate();
+                Tone.Text("ls", T, "효과 · 프레임을 줄입니다(밝기 · 모양은 그대로)", new Vector3(Pad + 0.32f + lt.preferredWidth, rc.y - 0.01f, 0), Tone.Cap, OC + 1, Tone.Sub, TextAlignmentOptions.Left, false);
+                var track = new Vector3(Wd - Pad - 0.5f, rc.y, 0);
+                Make.Sliced("ltrack", T, Res.UI("bar_fill_9s"), track, new Vector2(0.64f, 0.3f), OC + 1, low ? Tone.Gold : new Color(0.1f, 0.13f, 0.24f));
+                Make.Box("lknob", T, Res.UI("circle"), track + new Vector3(low ? 0.17f : -0.17f, 0, 0), new Vector2(0.26f, 0.26f), OC + 2, Color.white);
+                var lb = row.gameObject.AddComponent<Button>();
+                lb.Size = new Vector2(rowW, rh);
+                lb.Highlight = hl;
+                lb.OnClick = () => Bolzena.RunUI.DisplayOptions.SetLowSpec(!low);
+                y -= rh + 0.1f;
+            }
             // 수직동기 — 칸 줄 하나에 이름 · 풀이 · 스위치(누르면 켬/끔)
             {
-                float rh = 0.54f;
+                float rh = 0.66f;
                 var rc = new Vector3(Wd / 2, y - rh / 2, 0);
                 var row = Make.Sliced("vrow", T, Res.UI("cell_9s"), rc, new Vector2(rowW, rh), OC);
                 var hl = Make.Sliced("vrowhl", T, Res.UI("cell_on_9s"), rc, new Vector2(rowW, rh), OC, new Color(1, 1, 1, 0));
@@ -309,7 +343,7 @@ namespace Bolzena.UI
         // 고르는 칸 — 고르면 금 테(cell_on), 잠기면 흐리게 + 누르면 까닭
         float Chip(Transform T, float x, float y, string label, string sub, bool on, bool ok, string why, Action click, float minW = 0)
         {
-            float h = sub != null ? 0.66f : 0.52f;
+            float h = sub != null ? 0.74f : 0.64f;
             var t = Tone.Text("c", T, label, Vector3.zero, Tone.Body, OC + 1, on ? Tone.Gold : ok ? Tone.Ink : Tone.Dim, TextAlignmentOptions.Center, true);
             t.ForceMeshUpdate();
             float w = minW > 0 ? minW : Mathf.Max(t.preferredWidth + 0.4f, sub != null ? 1.18f : 0.8f);
@@ -330,7 +364,7 @@ namespace Bolzena.UI
             return w;
         }
 
-        static TextMeshPro Pill(Transform T, string name, Vector3 at, float w, string label, bool gold, Action click, float h = 0.62f)
+        static TextMeshPro Pill(Transform T, string name, Vector3 at, float w, string label, bool gold, Action click, float h = 0.72f)
         {
             var size = new Vector2(w, h);
             var bg = Make.Sliced(name, T, Res.UI(gold ? "pill_gold_9s" : "pill_dark_9s"), at, size, OC);

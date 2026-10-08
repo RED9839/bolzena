@@ -6,12 +6,13 @@
       "nature": "활발",
       "race": "엘프",
       "role": "딜러",
+      "style": "예약형",
       "star": 3,
       "hp": 550,
       "atk": 155,
       "def": 25,
       "crit": 10,
-      "blurb": "명령엔 칼 같고 휴가 신청서는 늘 반려되는 진압반장. 아군이 적을 격파할 때마다 양자폭탄 충전이 빨라지고, 가장 먼저 움직이려는 녀석부터 포격하며, 쏘고 나면 반려 도장이 하나 더 쌓입니다.",
+      "blurb": "명령엔 칼 같고 휴가 신청서는 늘 반려되는 진압반장. 위험한 적에게 포격을 조준해 두면 두 차례 뒤 포탄이 떨어지고, 명령이 떨어지면 기다리지 않고 바로 쏩니다. 쏠 때마다 반려 도장이 늘어 화풀이 한 방이 됩니다.",
       "keyword": {
         "name": "반려 도장",
         "desc": "휴가 신청서마다 찍히는 반려 도장",
@@ -20,38 +21,40 @@
         "per": [
           {
             "stat": "dealt",
-            "v": 0.12
+            "v": 0.06
           }
         ],
-        "rules": [
-          {
-            "name": "휴가 신청서 반려",
-            "when": {
-              "on": "stackReach",
-              "id": "반려 도장",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "반려 도장",
-                "all": true
-              },
-              {
-                "k": "gauge",
-                "v": 25
-              },
-              {
-                "k": "draw",
-                "v": 1
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        }
       },
       "passives": [
         {
           "name": "즉시 출동",
+          "when": {
+            "on": "reserveFire",
+            "who": "any"
+          },
+          "limit": {
+            "per": "turn",
+            "n": 1
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "양자폭탄 결재",
           "when": {
             "on": "play",
             "type": "공격",
@@ -68,17 +71,14 @@
         {
           "name": "양자폭탄 결재",
           "when": {
-            "on": "break"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "stack",
-              "id": "반려 도장",
-              "v": 1
+              "id": "포격 조준",
+              "v": 1,
+              "target": "topEnemy"
             }
           ]
         }
@@ -112,9 +112,45 @@
       },
       "starter": [
         "칸나_s1",
-        "칸나_u1",
+        "칸나_u5",
         "칸나_s2",
         "칸나_s3"
+      ],
+      "keywords": [
+        {
+          "name": "포격 조준",
+          "desc": "포격을 요청해 둔 좌표",
+          "carrier": "enemy",
+          "cap": 2,
+          "reserve": true,
+          "decay": 1,
+          "rules": [
+            {
+              "name": "포탄 낙하",
+              "when": {
+                "on": "stackGone",
+                "id": "포격 조준",
+                "decay": true
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 1.62,
+                  "target": "oneEnemy"
+                },
+                {
+                  "k": "tough",
+                  "v": 1
+                },
+                {
+                  "k": "stack",
+                  "id": "반려 도장",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   ],
@@ -171,7 +207,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.75,
+          "ratio": 0.63,
           "target": "oneEnemy"
         },
         {
@@ -193,7 +229,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 2.2,
+          "ratio": 1.71,
           "target": "oneEnemy"
         },
         {
@@ -204,11 +240,12 @@
       ],
       "oracles": [
         {
-          "name": "대구경 포탄",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.75,
+              "ratio": 2.31,
               "target": "oneEnemy"
             },
             {
@@ -219,12 +256,13 @@
           ]
         },
         {
-          "name": "작은 포탄",
+          "name": "신탁 2",
           "cost": 1,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 1.63,
               "target": "oneEnemy"
             },
             {
@@ -235,30 +273,69 @@
           ]
         },
         {
-          "name": "격파 확인 사격",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.06,
+              "ratio": 1.77,
               "target": "oneEnemy"
             },
             {
-              "k": "ifFoe",
-              "id": "broken"
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 1
             },
             {
-              "k": "dmg",
-              "ratio": 1.6,
-              "target": "oneEnemy"
+              "k": "make",
+              "id": "칸나_shell",
+              "v": 1
             }
           ]
         },
         {
-          "name": "탄약고 확인",
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.24,
+              "ratio": 1.48,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "칸나_shell",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.72,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.68,
               "target": "oneEnemy"
             },
             {
@@ -270,46 +347,23 @@
               "k": "draw",
               "v": 1,
               "who": "self",
-              "unique": true
-            }
-          ]
-        },
-        {
-          "name": "도장째 발사",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.11,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "반려 도장"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.53,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "반려 도장",
-              "all": true
+              "unique": true,
+              "type": "공격"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "고성능 포신",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "출동 대기",
+          "name": "축복 2",
           "kind": "ap"
         },
         {
-          "name": "포탄 하나 더",
+          "name": "축복 3",
           "fx": [
             {
               "k": "make",
@@ -329,8 +383,7 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "stack",
-          "id": "반려 도장",
+          "k": "hasten",
           "v": 1
         },
         {
@@ -342,12 +395,34 @@
       ],
       "oracles": [
         {
-          "name": "복창!",
+          "name": "신탁 1",
           "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
             {
               "k": "stack",
               "id": "반려 도장",
-              "v": 2
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
             },
             {
               "k": "draw",
@@ -358,12 +433,205 @@
           ]
         },
         {
-          "name": "상명하복",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "칸나_shell",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "draw",
+              "k": "hasten",
               "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "칸나_shell",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸나_u3",
+      "name": "오락실 패왕",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.81,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "반려 도장"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.27,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "반려 도장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.37,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 2,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "반려 도장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.43,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "반려 도장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "반려 도장"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.21,
+              "target": "oneEnemy"
             },
             {
               "k": "power",
@@ -385,220 +653,49 @@
           ]
         },
         {
-          "name": "출동 준비",
+          "name": "신탁 5",
           "fx": [
             {
-              "k": "make",
-              "id": "칸나_shell",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "oneEnemy"
             },
             {
-              "k": "cardStatus",
-              "id": "비용",
-              "v": -1,
-              "to": "hand",
-              "n": 1,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "규칙대로",
-          "fx": [
+              "k": "perStack",
+              "id": "반려 도장"
+            },
             {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.25,
+              "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 1,
               "who": "self",
-              "type": "공격"
-            },
-            {
-              "k": "when",
-              "on": "draw"
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "휴가 반납",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "type": "공격"
+              "unique": true
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "반묶음 포니테일",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "레몬차 거절",
-          "tags": [
-            "보존"
-          ]
-        },
-        {
-          "name": "도장 쾅",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "칸나_u3",
-      "name": "오락실 패왕",
-      "hero": "칸나",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 1.3,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "반려 도장",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "펀칭머신 신기록",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.7,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "로데오 완주",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 2.55,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 1
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "격파 콤보",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.47,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.21,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "다음 판 대기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.09,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "type": "공격"
-            }
-          ]
-        },
-        {
-          "name": "동전 탕진",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.67,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "반려 도장",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "펀치 글러브",
+          "name": "축복 2",
           "kind": "weakSpot"
         },
         {
-          "name": "한 판 더",
-          "kind": "cost"
-        },
-        {
-          "name": "오락실 동전",
-          "kind": "frost"
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -612,130 +709,233 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.75,
+          "ratio": 0.54,
           "target": "oneEnemy"
         },
         {
-          "k": "perTag",
-          "id": "칸나_shell"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.55,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "exileFrom",
-          "from": "hand",
-          "all": true,
-          "tag": "칸나_shell"
+          "k": "ripen",
+          "id": "포격 조준",
+          "v": 0.25
         }
       ],
       "oracles": [
         {
-          "name": "포탄 전부 장전",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.79,
               "target": "oneEnemy"
             },
             {
-              "k": "perTag",
-              "id": "칸나_shell"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.65,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "칸나_shell"
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.25
             }
           ]
         },
         {
-          "name": "한 발만",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.51,
               "target": "oneEnemy"
             },
             {
-              "k": "perTag",
-              "id": "칸나_shell"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
-              "tag": "칸나_shell"
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.25
             }
           ]
         },
         {
-          "name": "도장 찍고 발사",
+          "name": "신탁 3",
           "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "반려 도장"
-            },
             {
               "k": "dmg",
               "ratio": 0.45,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.25
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.92,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.25
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸나_u5",
+      "name": "포격 요청",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "포격 조준",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
               "target": "oneEnemy"
             }
           ]
         },
         {
-          "name": "휴가 신청서",
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "칸나_shell",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
           "power": true,
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.73,
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
               "target": "oneEnemy"
             },
             {
-              "k": "perTag",
-              "id": "칸나_shell"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy"
+              "k": "draw",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "ult"
+                    "on": "reserveFire"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "피해 감소",
-                      "v": 2
-                    },
-                    {
-                      "k": "draw",
-                      "v": 1
+                      "k": "dmg",
+                      "ratio": 0.27,
+                      "target": "topEnemy"
                     }
                   ]
                 }
@@ -744,44 +944,20 @@
           ]
         },
         {
-          "name": "탄약 낭비",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.03,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perTag",
-              "id": "칸나_shell"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.71,
-              "target": "oneEnemy"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "충격 포탄",
-          "kind": "power"
-        },
-        {
-          "name": "휴가 계획표",
-          "kind": "draw"
-        },
-        {
-          "name": "결재 도장 쾅",
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
-              "id": "반려 도장",
+              "id": "포격 조준",
+              "v": 2,
+              "target": "topEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]

@@ -6,12 +6,13 @@
       "nature": "우울",
       "race": "마녀",
       "role": "딜러",
+      "style": "아껴 두기형",
       "star": 2,
       "hp": 590,
       "atk": 125,
       "def": 27,
       "crit": 10,
-      "blurb": "약화 포션으로 괴력을 눌러 두고 사는 인턴 마녀. 스킬로 봉인을 하나씩 풀다 보면, 다 풀린 단도가 적 전체를 벱니다.",
+      "blurb": "약화 포션으로 괴력을 눌러 두고 사는 인턴 마녀. 일을 미루고 힘을 아낀 턴마다 괴력이 차오르고, 비장의 장도를 뽑는 순간 한꺼번에 풀립니다.",
       "keyword": {
         "name": "괴력",
         "desc": "포션으로 눌러 둔 진짜 힘",
@@ -23,43 +24,23 @@
             "v": 0.12
           }
         ],
-        "rules": [
-          {
-            "name": "참을 수 없는 힘",
-            "when": {
-              "on": "stackOver",
-              "id": "괴력"
-            },
-            "fx": [
-              {
-                "k": "perEvent"
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.5,
-                "target": "randomEnemy"
-              }
-            ]
-          }
-        ]
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5
+        }
       },
       "passives": [
         {
           "name": "몰래 쉬는 시간",
           "when": {
-            "on": "turnEnd"
+            "on": "keepAp"
           },
-          "conds": [
-            {
-              "c": "apLeft",
-              "n": 1
-            }
-          ],
           "fx": [
             {
               "k": "stack",
               "id": "괴력",
-              "v": 1
+              "v": 1,
+              "ofEvent": 1
             }
           ]
         },
@@ -72,7 +53,7 @@
           },
           "limit": {
             "per": "turn",
-            "n": 1
+            "n": 2
           },
           "fx": [
             {
@@ -101,7 +82,7 @@
       },
       "starter": [
         "레비_s1",
-        "레비_u4",
+        "레비_u1",
         "레비_s2",
         "레비_s3"
       ]
@@ -156,6 +137,9 @@
       "unique": true,
       "cost": 0,
       "type": "스킬",
+      "tags": [
+        "보존"
+      ],
       "fx": [
         {
           "k": "stack",
@@ -169,7 +153,10 @@
       ],
       "oracles": [
         {
-          "name": "연차를 몰라",
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -183,34 +170,10 @@
           ]
         },
         {
-          "name": "사장님 몰래",
-          "fx": [
-            {
-              "k": "draw",
-              "v": 2,
-              "who": "self",
-              "unique": true,
-              "type": "공격"
-            },
-            {
-              "k": "costMod",
-              "v": -1,
-              "turns": 1,
-              "n": 1,
-              "who": "self",
-              "unique": true,
-              "type": "공격"
-            },
-            {
-              "k": "stack",
-              "id": "괴력",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "숨어서 쉬는 시간",
-          "power": true,
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "stack",
@@ -219,34 +182,55 @@
             },
             {
               "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "괴력",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "v": 2
             }
           ]
         },
         {
-          "name": "피로회복제 원샷",
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
-              "k": "discard",
-              "v": 1
+              "k": "stack",
+              "id": "괴력",
+              "v": 2
             },
+            {
+              "k": "shield",
+              "ratio": 1.82
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "괴력",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
             {
               "k": "stack",
               "id": "괴력",
@@ -255,42 +239,10 @@
             {
               "k": "draw",
               "v": 2
-            }
-          ]
-        },
-        {
-          "name": "일 떠넘기기",
-          "fx": [
-            {
-              "k": "exileFrom",
-              "from": "hand",
-              "n": 1,
-              "basic": true
             },
             {
-              "k": "stack",
-              "id": "괴력",
-              "v": 4
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "말 걸면 일단 경계",
-          "kind": "atkUp"
-        },
-        {
-          "name": "월급통장",
-          "kind": "draw"
-        },
-        {
-          "name": "새벽 배달",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "괴력",
-              "v": 1
+              "k": "gauge",
+              "v": 15
             }
           ]
         }
@@ -306,13 +258,13 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.35,
+          "ratio": 0.49,
           "target": "oneEnemy",
           "hits": 2
         },
         {
           "k": "dmg",
-          "ratio": 0.57,
+          "ratio": 0.8,
           "target": "oneEnemy"
         },
         {
@@ -323,17 +275,18 @@
       ],
       "oracles": [
         {
-          "name": "잔상이 보일 만큼",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.44,
+              "ratio": 0.66,
               "target": "oneEnemy",
               "hits": 2
             },
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 1.08,
               "target": "oneEnemy"
             },
             {
@@ -344,105 +297,116 @@
           ]
         },
         {
-          "name": "단도라 부르기엔 큰 칼",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 0.59,
               "target": "oneEnemy",
               "hits": 2
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.92,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "괴력",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.55,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "깊은 마지막 타격",
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "stack",
-              "id": "괴력",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "괴력",
-              "n": 3
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.88,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "대충 네 번",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.47,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "perStack",
-              "id": "괴력"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.33,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "땡땡이 칼질",
-          "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.49,
               "target": "oneEnemy",
               "hits": 3
             },
             {
-              "k": "stack",
-              "id": "괴력",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.92,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.88,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.44,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "대충 휘두르기",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "노점 계산대",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "weakSpot"
         },
         {
-          "name": "잔상",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
@@ -463,27 +427,30 @@
       "fx": [
         {
           "k": "atkMod",
-          "v": 0.15,
+          "v": 0.1,
           "run": true,
           "target": "self"
         },
         {
           "k": "stack",
           "id": "괴력",
-          "v": 2
+          "v": 1
         },
         {
           "k": "power",
           "rules": [
             {
               "when": {
-                "on": "spend",
-                "id": "괴력"
+                "on": "keepAp"
+              },
+              "limit": {
+                "per": "turn",
+                "n": 1
               },
               "fx": [
                 {
                   "k": "dmg",
-                  "ratio": 0.44,
+                  "ratio": 0.63,
                   "target": "randomEnemy"
                 }
               ]
@@ -493,11 +460,11 @@
       ],
       "oracles": [
         {
-          "name": "밤샘 초고",
+          "name": "신탁 1",
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.15,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
@@ -511,8 +478,11 @@
               "rules": [
                 {
                   "when": {
-                    "on": "spend",
-                    "id": "괴력"
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -527,12 +497,43 @@
           ]
         },
         {
-          "name": "한 줄만 쓰기",
+          "name": "신탁 2",
           "cost": 0,
           "fx": [
             {
+              "k": "stack",
+              "id": "괴력",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.63,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
               "k": "atkMod",
-              "v": 0.12,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
@@ -546,14 +547,21 @@
               "rules": [
                 {
                   "when": {
-                    "on": "spend",
-                    "id": "괴력"
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.35,
-                      "target": "randomEnemy"
+                      "k": "stack",
+                      "id": "괴력",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 1.09
                     }
                   ]
                 }
@@ -562,11 +570,11 @@
           ]
         },
         {
-          "name": "셰럼의 조언",
+          "name": "신탁 4",
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.2,
+              "v": 0.1,
               "run": true,
               "target": "self"
             },
@@ -582,13 +590,16 @@
               "rules": [
                 {
                   "when": {
-                    "on": "spend",
-                    "id": "괴력"
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.7,
+                      "ratio": 0.83,
                       "target": "randomEnemy"
                     }
                   ]
@@ -598,74 +609,34 @@
           ]
         },
         {
-          "name": "반려된 초고",
+          "name": "신탁 5",
           "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
             {
               "k": "discard",
               "v": 1
             },
             {
-              "k": "atkMod",
-              "v": 0.25,
-              "run": true,
-              "target": "self"
-            },
-            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "spend",
-                    "id": "괴력"
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.69,
+                      "ratio": 0.99,
                       "target": "randomEnemy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "출근 전 초고",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "괴력",
-              "v": 3
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "spend",
-                    "id": "괴력"
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.97,
-                      "target": "randomEnemy"
-                    }
-                  ]
-                },
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "괴력",
-                      "v": 1
                     }
                   ]
                 }
@@ -676,18 +647,22 @@
       ],
       "blesses": [
         {
-          "name": "수당 없는 야근",
-          "kind": "defUp"
+          "name": "축복 1",
+          "kind": "atkUp"
         },
         {
-          "name": "극장 매표소",
-          "tags": [
-            "개전"
-          ]
-        },
-        {
-          "name": "논문 반려",
+          "name": "축복 2",
           "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "괴력",
+              "v": 1
+            }
+          ]
         }
       ]
     },
@@ -704,7 +679,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.41,
+          "ratio": 1.97,
           "target": "oneEnemy"
         },
         {
@@ -713,7 +688,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.32,
+          "ratio": 0.45,
           "target": "oneEnemy"
         },
         {
@@ -724,14 +699,98 @@
       ],
       "oracles": [
         {
-          "name": "이중 계약",
+          "name": "신탁 1",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.11,
+              "ratio": 2.66,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "괴력"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "괴력",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 1,
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.88,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "괴력"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "괴력",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "괴력"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "분쇄"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.14,
               "target": "oneEnemy"
             },
             {
@@ -744,22 +803,37 @@
               "target": "oneEnemy"
             },
             {
-              "k": "spend",
-              "id": "괴력",
-              "all": true
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "괴력",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
-          "name": "반쯤 뽑기",
-          "cost": 1,
+          "name": "신탁 5",
           "tags": [
             "분쇄"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.06,
+              "ratio": 3.56,
               "target": "oneEnemy"
             },
             {
@@ -768,116 +842,190 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.81,
               "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "괴력",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "괴력 해방",
-          "tags": [
-            "분쇄",
-            "소멸"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 4.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "괴력"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.88,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "교도소의 환대",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.76,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "괴력"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "ifFoe",
-              "id": "broken"
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.32,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "레비드 더 섀도우",
-          "tags": [
-            "분쇄"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.5,
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "괴력"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "allEnemies"
-            },
-            {
-              "k": "pull",
-              "from": "discard",
-              "n": 1,
-              "who": "self",
-              "type": "스킬"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "비장의 장도",
-          "kind": "weakSpot"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "UFC 알바",
-          "kind": "ap"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "휴가를 모름",
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "괴력",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "레비_u5",
+      "name": "평균치 포션",
+      "hero": "레비",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.98
+        },
+        {
+          "k": "stack",
+          "id": "괴력",
+          "v": 1
+        },
+        {
+          "k": "nextAp",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.54
+            },
+            {
+              "k": "stack",
+              "id": "괴력",
+              "v": 1
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.98
+            },
+            {
+              "k": "stack",
+              "id": "괴력",
+              "v": 2
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.06
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "괴력",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.62
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.26
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
           "fx": [
             {
               "k": "stack",
               "id": "괴력",
               "v": 2
+            },
+            {
+              "k": "nextAp",
+              "v": 2
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "괴력",
+              "v": 1
             }
           ]
         }

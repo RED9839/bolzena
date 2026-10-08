@@ -6,6 +6,7 @@
       "nature": "활발",
       "race": "수인",
       "role": "딜러",
+      "style": "박자형",
       "star": 3,
       "hp": 820,
       "atk": 115,
@@ -18,42 +19,17 @@
         "carrier": "self",
         "cap": 3,
         "endClear": true,
+        "wipe": true,
         "per": [
           {
             "stat": "dealt",
-            "v": 0.1
-          }
-        ],
-        "rules": [
-          {
-            "name": "내려치고 휘두르기",
-            "when": {
-              "on": "stackReach",
-              "id": "장작 패기",
-              "n": 3
-            },
-            "fx": [
-              {
-                "k": "spend",
-                "id": "장작 패기",
-                "all": true
-              },
-              {
-                "k": "dmg",
-                "ratio": 0.8,
-                "target": "allEnemies"
-              },
-              {
-                "k": "ap",
-                "v": 1
-              }
-            ]
+            "v": 0.05
           }
         ]
       },
       "passives": [
         {
-          "name": "장작 패기 반복",
+          "name": "마이웨이",
           "when": {
             "on": "play",
             "type": "공격"
@@ -67,19 +43,46 @@
           ]
         },
         {
-          "name": "허접 처리",
+          "name": "마이웨이",
           "when": {
-            "on": "kill"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "play",
+            "type": "스킬"
           },
           "fx": [
             {
-              "k": "stack",
+              "k": "spend",
               "id": "장작 패기",
-              "v": 1
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "공격 일변도",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "ownNone",
+              "type": "스킬"
+            },
+            {
+              "c": "playedMin",
+              "n": 2
+            }
+          ],
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "draw",
+                  "v": 1,
+                  "who": "self",
+                  "type": "공격"
+                }
+              ]
             }
           ]
         }
@@ -169,7 +172,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.8,
+          "ratio": 0.56,
           "target": "allEnemies"
         },
         {
@@ -179,20 +182,20 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.28,
           "target": "allEnemies"
         }
       ],
       "oracles": [
         {
-          "name": "음속 돌파",
+          "name": "신탁 1",
           "tags": [
             "신속"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 0.76,
               "target": "allEnemies"
             },
             {
@@ -202,13 +205,13 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 0.38,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "짧은 칼바람",
+          "name": "신탁 2",
           "cost": 0,
           "tags": [
             "신속"
@@ -216,7 +219,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.53,
               "target": "allEnemies"
             },
             {
@@ -226,62 +229,40 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.25,
+              "ratio": 0.27,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "바람 가르는 칼",
-          "cost": 2,
+          "name": "신탁 3",
           "tags": [
             "신속"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 0.7,
               "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "장작 패기",
-              "n": 2
+              "k": "ifStreak",
+              "n": 3,
+              "type": "공격"
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.35,
               "target": "allEnemies"
             },
             {
-              "k": "tough",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "ap",
+              "v": 1
             }
           ]
         },
         {
-          "name": "장작 쌓아 두기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.8,
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "장작 패기",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "basic": true
-            }
-          ]
-        },
-        {
-          "name": "백호의 바람",
+          "name": "신탁 4",
           "tags": [
             "신속"
           ],
@@ -289,7 +270,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.95,
+              "ratio": 0.78,
               "target": "allEnemies"
             },
             {
@@ -297,14 +278,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "stackReach",
-                    "id": "장작 패기",
-                    "n": 3
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.64,
+                      "ratio": 0.15,
                       "target": "allEnemies"
                     }
                   ]
@@ -312,19 +296,46 @@
               ]
             }
           ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStack",
+              "id": "장작 패기",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
+            }
+          ]
         }
       ],
       "blesses": [
         {
-          "name": "백호의 눈",
+          "name": "축복 1",
           "kind": "power"
         },
         {
-          "name": "몸이 먼저",
+          "name": "축복 2",
           "kind": "draw"
         },
         {
-          "name": "틈새 가르기",
+          "name": "축복 3",
           "kind": "weakSpot"
         }
       ]
@@ -339,85 +350,69 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.55,
+          "ratio": 0.39,
           "target": "oneEnemy",
           "hits": 2
         },
         {
-          "k": "stack",
-          "id": "장작 패기",
-          "v": 1
+          "k": "costMod",
+          "v": -1,
+          "turns": 1,
+          "n": 1,
+          "who": "self",
+          "type": "공격"
         }
       ],
       "oracles": [
         {
-          "name": "쌍검 난무",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.68,
+              "ratio": 0.52,
               "target": "oneEnemy",
               "hits": 2
             },
             {
-              "k": "stack",
-              "id": "장작 패기",
-              "v": 1
+              "k": "costMod",
+              "v": -1,
+              "turns": 1,
+              "n": 1,
+              "who": "self",
+              "type": "공격"
             }
           ]
         },
         {
-          "name": "한 손 베기",
+          "name": "신탁 2",
           "cost": 0,
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "turns": 1,
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.35,
               "target": "oneEnemy",
               "hits": 2
-            },
-            {
-              "k": "stack",
-              "id": "장작 패기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "쌍검 폭풍",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.5,
-              "target": "oneEnemy",
-              "hits": 5
-            },
-            {
-              "k": "stack",
-              "id": "장작 패기",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "basic": true
-            }
-          ]
-        },
-        {
-          "name": "장작 쌓기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy",
-              "hits": 2
-            },
-            {
-              "k": "stack",
-              "id": "장작 패기",
-              "v": 1
             },
             {
               "k": "draw",
@@ -428,36 +423,46 @@
           ]
         },
         {
-          "name": "쌍검 회전",
+          "name": "신탁 4",
           "fx": [
-            {
-              "k": "discard",
-              "v": 1
-            },
             {
               "k": "dmg",
-              "ratio": 0.59,
-              "target": "allEnemies",
+              "ratio": 0.39,
+              "target": "oneEnemy",
               "hits": 2
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "손목 스냅",
-          "kind": "power"
-        },
-        {
-          "name": "엇갈린 상처",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "검집 돌리기",
-          "fx": [
+            },
+            {
+              "k": "ifStreak",
+              "n": 2,
+              "type": "공격"
+            },
             {
               "k": "stack",
               "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.58,
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "turns": 1,
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "discard",
               "v": 1
             }
           ]
@@ -466,169 +471,7 @@
     },
     {
       "id": "티그_u3",
-      "name": "통나무 두 동강",
-      "hero": "티그",
-      "unique": true,
-      "cost": 1,
-      "type": "공격",
-      "fx": [
-        {
-          "k": "dmg",
-          "ratio": 0.9,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "장작 패기"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.35,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "spend",
-          "id": "장작 패기",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "통나무 패기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "장작 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.42,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "장작 패기",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "손도끼 패기",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.55,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "장작 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.22,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "장작 패기",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "통째로 두 동강",
-          "cost": 2,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "장작 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.6,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "장작 산더미",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.05,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "장작 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.42,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "장작더미 무너뜨리기",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "장작 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.42,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "도끼 같은 쌍검",
-          "kind": "power"
-        },
-        {
-          "name": "갈라진 틈",
-          "kind": "weakSpot"
-        },
-        {
-          "name": "팔 걷어붙이기",
-          "kind": "ap"
-        }
-      ]
-    },
-    {
-      "id": "티그_u4",
-      "name": "백호 비전서",
+      "name": "내려치고 휘두르기",
       "hero": "티그",
       "unique": true,
       "cost": 1,
@@ -640,28 +483,38 @@
           "target": "oneEnemy"
         },
         {
+          "k": "ifStreak",
+          "n": 3,
+          "type": "공격"
+        },
+        {
           "k": "perStack",
           "id": "장작 패기"
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
-          "target": "oneEnemy"
+          "ratio": 0.21,
+          "target": "allEnemies"
         },
         {
-          "k": "draw",
-          "v": 1,
-          "basic": true
+          "k": "ap",
+          "v": 1
         }
       ],
       "oracles": [
         {
-          "name": "백호의 일격",
+          "name": "신탁 1",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.75,
+              "ratio": 0.81,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifStreak",
+              "n": 3,
+              "type": "공격"
             },
             {
               "k": "perStack",
@@ -669,25 +522,216 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.36,
+              "ratio": 0.29,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStreak",
+              "n": 3,
+              "type": "공격"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.49,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifStreak",
+              "n": 3,
+              "type": "공격"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 1,
-              "basic": true
+              "who": "self",
+              "unique": true,
+              "type": "공격"
+            },
+            {
+              "k": "ifStreak",
+              "n": 3,
+              "type": "공격"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.28,
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "비전서 첫 장",
-          "power": true,
+          "name": "신탁 5",
+          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.07,
               "target": "oneEnemy"
             },
+            {
+              "k": "ifStreak",
+              "n": 3,
+              "type": "공격"
+            },
+            {
+              "k": "perStack",
+              "id": "장작 패기"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "티그_u4",
+      "name": "백호 비전서",
+      "hero": "티그",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.12,
+          "run": true,
+          "target": "self"
+        },
+        {
+          "k": "costMod",
+          "v": -1,
+          "turns": 1,
+          "n": 2,
+          "who": "self",
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.16,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "turns": 1,
+              "n": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
             {
               "k": "atkMod",
               "v": 0.1,
@@ -695,11 +739,43 @@
               "target": "self"
             },
             {
+              "k": "costMod",
+              "v": -1,
+              "turns": 1,
+              "n": 2,
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.12,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "turns": 1,
+              "n": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "limit": {
+                    "per": "turn",
+                    "n": 1
                   },
                   "fx": [
                     {
@@ -714,51 +790,130 @@
           ]
         },
         {
-          "name": "비전서 속독",
+          "name": "신탁 4",
           "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "run": true,
+              "target": "self"
+            },
             {
               "k": "draw",
               "v": 2,
-              "basic": true
+              "who": "self",
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.2,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "turns": 1,
+              "n": 2,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "discard",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "atkUp"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "티그_u5",
+      "name": "백호 자세",
+      "hero": "티그",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "self",
+          "type": "공격"
+        },
+        {
+          "k": "ifStreak",
+          "n": 2,
+          "type": "공격"
+        },
+        {
+          "k": "stack",
+          "id": "장작 패기",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "ifStreak",
+              "n": 2,
+              "type": "공격"
             },
             {
               "k": "stack",
               "id": "장작 패기",
               "v": 1
-            },
-            {
-              "k": "ap",
-              "v": 1
             }
           ]
         },
         {
-          "name": "도끼 손질",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.78,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "장작 패기"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.52,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "장작 패기",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "백호의 기백",
-          "cost": 0,
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
           "fx": [
             {
               "k": "dmg",
@@ -766,33 +921,99 @@
               "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "장작 패기"
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
             },
             {
+              "k": "ifStreak",
+              "n": 2,
+              "type": "공격"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
               "k": "dmg",
-              "ratio": 0.2,
+              "ratio": 0.28,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.39,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "who": "self",
+              "type": "공격"
+            },
+            {
+              "k": "ifStreak",
+              "n": 2,
+              "type": "공격"
+            },
+            {
+              "k": "stack",
+              "id": "장작 패기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.63,
               "target": "oneEnemy"
             },
             {
               "k": "draw",
               "v": 1,
-              "basic": true
+              "who": "self",
+              "type": "공격"
             }
           ]
         }
       ],
       "blesses": [
         {
-          "name": "다음 장 넘기기",
-          "kind": "draw"
+          "name": "축복 1",
+          "kind": "power"
         },
         {
-          "name": "참스승 디아나",
-          "kind": "atkUp"
+          "name": "축복 2",
+          "kind": "cost"
         },
         {
-          "name": "차기 촌장",
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",

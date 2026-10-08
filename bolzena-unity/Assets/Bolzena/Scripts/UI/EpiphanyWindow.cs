@@ -44,8 +44,8 @@ namespace Bolzena.UI
             rays.gameObject.SetActive(false);   // 단순한 창(2026-10-08 시안) — 빛살 없음
             var title = Make.Text("title", root, "<color=#ffd76a>신탁 효과</color>를 결정하세요.", new Vector3(0, 3.45f, 0), 0.5f, O + 40, Color.white);
             Make.Outline(title, 0.22f, Color.black);
-            // 아래 안내(회색 작은 글) — 길게 누르면 카드 상세
-            var sub = Make.Text("sub", root, "정보를 확인하려면 카드를 길게 누르세요.(우클릭)", new Vector3(0, -4.05f, 0), 0.2f, O + 40, new Color(0.82f, 0.84f, 0.9f));
+            // 아래 안내(회색 작은 글) — 길게 누르면 카드 상세. 폰엔 오른쪽 단추가 없어 「(우클릭)」을 뺀다
+            var sub = Make.Text("sub", root, Application.isMobilePlatform ? "정보를 확인하려면 카드를 길게 누르세요." : "정보를 확인하려면 카드를 길게 누르세요.(우클릭)", new Vector3(0, -4.05f, 0), 0.2f, O + 40, new Color(0.82f, 0.84f, 0.9f));
             Make.Outline(sub, 0.3f, Color.black);
             // 제목 아래 가는 금빛 줄 + 가운데 별 하나
             var subBg = Make.Box("titleline", root, Res.UI("band_line"), new Vector3(0, 3.0f, 0), new Vector2(5.2f, 0.03f), O + 40, new Color(1f, 0.84f, 0.45f, 0));
@@ -108,8 +108,7 @@ namespace Bolzena.UI
             for (int i = 0; i < options.Count; i++)
             {
                 var c = CardView.Create(root, options[i]);
-                c.NoOracleMark = true; c.Refresh();
-                c.ShowPin = false;   // 신탁 창은 오른쪽 위 주인 얼굴 없이(2026-10-06 사용자)
+                                c.ShowPin = false;   // 신탁 창은 오른쪽 위 주인 얼굴 없이(2026-10-06 사용자)
                 c.transform.localPosition = new Vector3(0, 0.1f, 0);
                 c.transform.localScale = Vector3.one * 1.3f;
                 c.Follow = 9f;
