@@ -15,6 +15,10 @@ namespace Bolzena.RunUI
     public partial class Flow
     {
         const float ColW = 196, MapPad = 150;
+        /// <summary>지도 영역 맨 위에서 맨 위 줄 칸 가운데까지 — 칸 위에 서는 파티 미니미(칸 위 14 + 몸 74 + 머리 장식 · 걸음 튐 8)와 갈 수 있는 칸의 빛(40)이 잘리지 않을 높이.</summary>
+        const float MapTopRoom = 122;
+        /// <summary>맨 아래 줄 칸 가운데에서 지도 영역 끝까지 — 칸 반 높이(보스 47) + 이름 글(24 아래 24 높이).</summary>
+        const float MapBottomRoom = 84;
         bool walking;
 
         public void Map()
@@ -36,8 +40,12 @@ namespace Bolzena.RunUI
                 $"{v.Name} · {(here2 != null ? P.StageName(here2) : P.S.Floor + 1 + "-0")} / {P.S.Floor + 1}-10 · 빛나는 칸을 눌러 나아갑니다");
             MapFoeNature(root);
 
-            // 지도 칸 — 머리 띠(위 96) 와 범례(아래 64) 사이. 높이는 캔버스에 맞춘다(폰 720 · PC 900)
-            float top = 120, bottom = 64;   // 위 120 — 파티 알약 밑 학년 알약(Flow.Grade.cs)까지
+            // 지도 칸 — 머리 띠(파티 알약 · 학년 카드 · 적 속성 알약, Theme.HudBottom) 와 범례(아래 64) 사이. 높이는 캔버스에 맞춘다(폰 720 · PC 900)
+            //   지도 영역은 가려 자르는 창(RectMask2D)이라, 위 여백 MapTopRoom 안에 칸 위로 서는 파티 미니미(몸 74 + 걸음 튐)가 다 들어가야 한다
+            //   (2026-10-09 사용자 캡처 3440×1392: 맨 위 줄 칸에 서면 미니미가 학년 카드 밑에서 잘렸다 — 영역이 위 120 에서 시작하고 칸 위 여백이 72 뿐이었다)
+            float top = Theme.HudBottom, bottom = 64;
+            // 학년 공책 밑 진급 보상 쪽지(예습 노트 · 전술 교본 — Flow.Grade.MapGrade, 한 줄 Theme.GradeBuffStep)가 걸려 있으면 그만큼 더 내린다
+            if (Core.R.GRADE_ON) top += Theme.GradeBuffStep * ((P.S.PrepLeft > 0 ? 1 : 0) + (P.S.MockLeft > 0 ? 1 : 0));
             var area = Ui.Rect("map", root);
             area.anchorMin = Vector2.zero; area.anchorMax = Vector2.one;
             area.offsetMin = new Vector2(0, bottom); area.offsetMax = new Vector2(0, -top);
@@ -59,12 +67,13 @@ namespace Bolzena.RunUI
             var seen = new HashSet<string>(m.Seen);
             var pos = new Dictionary<string, Vector2>();
             float h = Mathf.Max(360, Stage.Size.y - top - bottom);   // 내용 높이
-            float padY = Theme.C(72, 62);
+            // 위 = 미니미 자리(MapTopRoom) · 아래 = 칸 이름 글(-24 아래 24) 자리
+            float padTop = MapTopRoom, padBot = MapBottomRoom;
             foreach (var row in m.Rows)
                 foreach (var n in row)
                 {
                     float y = row.Count == 1 ? 0.5f : (float)n.X;
-                    pos[n.Id] = new Vector2(MapPad + n.Row * colW, -(padY + y * (h - padY * 2 - 20)));
+                    pos[n.Id] = new Vector2(MapPad + n.Row * colW, -(padTop + y * (h - padTop - padBot)));
                 }
 
             // 길
@@ -148,10 +157,12 @@ namespace Bolzena.RunUI
             }
             Tw.Rise(legend.rectTransform, 0.3f, 14, 0.4f);
 
+            if (!Core.R.GRADE_ON) return;   // 학년 꺼짐(2026-10-09) — 공책 · 진급 연출 · 보상 고르기 없음
             MapGrade(root);   // 학점제 학년(Flow.Grade.cs) — 지도 위에 그린다(파티 말이 알약을 덮지 않게)
             // 진급 소식 — 싸움에서 돌아와 지도가 선 뒤 짧은 진급 연출(배지가 바뀌고 그 학년의 몫)
             var news = P.Run.PopGradeNews();
-            if (news.Count > 0) { P.Save("map"); Tw.After(0.7f, () => { if (Stage.Current == "map") GradeUp(news); }); }
+            // 진급 도장 → 보상 고르기(이어하기로 남은 보상도). 다 고르면 지도를 다시 — 받은 골드 · HP · 덱 수가 머리 띠에 보이고, 주인 없는 교주 카드는 Map 이 묻는다
+            if (news.Count > 0 || P.Run.GradeOfferNow != null) { P.Save("map"); Tw.After(0.7f, () => { if (Stage.Current == "map") GradeUp(news, () => { if (Stage.Current == "map") Map(); }); }); }
         }
 
         /// <summary>지도 머리 아래 작은 알약 — 「이번 모험의 적 속성 ○○」(마을 공개 · 편성과 같은 말 · 같은 색 · 같은 아이콘).</summary>

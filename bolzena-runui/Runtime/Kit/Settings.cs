@@ -14,6 +14,8 @@ namespace Bolzena.RunUI
         public static bool SkipCutin { get => PlayerPrefs.GetInt("bz.skipCutin", 0) == 1; set => PlayerPrefs.SetInt("bz.skipCutin", value ? 1 : 0); }
         public static bool UltShort { get => PlayerPrefs.GetInt("bz.ultShort", 0) == 1; set => PlayerPrefs.SetInt("bz.ultShort", value ? 1 : 0); }
         public static bool NoShake { get => PlayerPrefs.GetInt("bz.noShake", 0) == 1; set => PlayerPrefs.SetInt("bz.noShake", value ? 1 : 0); }
+        // 사도 말풍선 — 판 진행 중(휴식 · 상점 · 보상 · 이벤트 · 전투 승리 · 엘리트/보스 시작 · 위기) 사도 한마디(2026-10-09, 기본 켬)
+        public static bool HeroTalk { get => PlayerPrefs.GetInt("bz.heroTalk", 1) == 1; set => PlayerPrefs.SetInt("bz.heroTalk", value ? 1 : 0); }
         public static string LobbyHero { get => PlayerPrefs.GetString("bz.lobbyHero", "에르핀"); set => PlayerPrefs.SetString("bz.lobbyHero", value); }
         public static float TextScale => BigText ? 1.12f : 1f;
 

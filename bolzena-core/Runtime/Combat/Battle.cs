@@ -174,6 +174,9 @@ namespace Bolzena.Core
         public List<LaterRec> Later = new();
         /// <summary>이 전투에서 낸 카드 수(저절로 포함) — 예약 효과가 「걸린 카드」 를 가린다.</summary>
         public int PlaysTotal;
+        /// <summary>이 전투에서 쓴 고학년 수 · 플레이 기록 녹화(Run.OpenFight 가 붙인다 — 복사한 판에는 없다).</summary>
+        public int UltsUsed;
+        public BattleTape Tape;
         /// <summary>이 전투에서 소멸한 카드 수(소멸 계기마다 +1) — 조건 goneMin(소멸형).</summary>
         public int GoneN;
         /// <summary>전투 끝 계기(fightEnd)를 이미 냈다 — 한 번만.</summary>
@@ -186,6 +189,10 @@ namespace Bolzena.Core
         int reserveIn;
         /// <summary>한 번의 일(Emit 한 번)에 갈래마다 한 사도만 — who any · other 공용 계기 반응(인원 세기 시너지 없음, 1단계). 「갈래|계기」.</summary>
         Dictionary<string, string> sharedOnce;
+        /// <summary>멈춤 방지 상한의 이번 턴 셈 — 규칙 id → 이 턴에 돈 수(턴이 바뀌면 비운다). capMeter — 실제 판인가(봇 미리보기 복사본은 걸림을 세지 않는다).</summary>
+        Dictionary<string, int> capN = new();
+        int capTurn = -1;
+        bool capMeter = true;
         /// <summary>이 전투에서 생긴 판 단위 성장(판이 AfterFight 에서 RunState.Growth 에 더한다).</summary>
         public Dictionary<string, Stats> GrowthGain = new();
         /// <summary>치명 피해 배율에 더하는 몫(BattleSetup.CritDmg — 크레파스 보드).</summary>
@@ -333,7 +340,7 @@ namespace Bolzena.Core
         public Battle Clone(Rng rng = null)
         {
             var s = (Battle)MemberwiseClone();
-            s.OnCue = null; s.OnLog = null; s.Cues = null; s.Meter = null;
+            s.OnCue = null; s.OnLog = null; s.Cues = null; s.Meter = null; s.Tape = null;
             s.Log = new List<string>();
             s.Rng = rng ?? Rng.Clone();
             s.Pool = Pool.Clone();
@@ -360,7 +367,7 @@ namespace Bolzena.Core
             s.PlayTags = PlayTags.Select(x => x.ToList()).ToList();
             s.CostMods = CostMods.Select(x => x.Copy()).ToList(); s.PlayedPrev = new(PlayedPrev); s.BattleVals = new(BattleVals);
             s.Later = Later.Select(x => x.Copy()).ToList();
-            s.HealLog = HealLog.ToList(); s.sharedOnce = null; s.reserveIn = 0;
+            s.HealLog = HealLog.ToList(); s.sharedOnce = null; s.reserveIn = 0; s.capN = new(capN); s.capMeter = false;
             s.GrowthGain = GrowthGain.ToDictionary(kv => kv.Key, kv => kv.Value + new Stats());
             s.Forms = Forms.ToDictionary(kv => kv.Key, kv => kv.Value.Copy());
             s.Powers = Powers.Select(p => p.Copy()).ToList();   // 규칙 캐시(powerRules)는 나눠 쓴다 — 같은 강화면 규칙이 같다   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다

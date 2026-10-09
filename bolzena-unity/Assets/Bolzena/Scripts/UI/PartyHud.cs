@@ -146,7 +146,7 @@ namespace Bolzena.UI
                 p.OnTap = () => OnHero?.Invoke(ii);
                 portraits.Add(p);
             }
-            GradeBadge(tl, new Vector3(BarX0 + StripW + (s.Heroes.Count - 1) * StripDx + 0.36f, StripY, 0));   // 학점제 학년(파티 전체)
+            GradeBadge(tl, new Vector3(BarX0 + StripW + (s.Heroes.Count - 1) * StripDx + 0.3f, StripY, 0));   // 학점제 학년(파티 전체)
             chips = ChipRow.Create(tl, new Vector3(BarX0, 3.4f, 0), O + 3, 0.24f);
 
             // ── 위 오른쪽 — 자동 전투 · 배속 · 메뉴(≡), 배속과 메뉴 사이에 얇은 선 ──
@@ -387,33 +387,159 @@ namespace Bolzena.UI
         // 끝 자세 — 전투가 끝나면 위 파티 HP 띠만 남기고 걷고, 왼쪽에 작은 「BATTLE END」 칩(싸움터는 그대로)
         public void EndPose(bool won)
         {
+            if (won) StartCoroutine(GradeWin());   // 학년 공책 — 이번 싸움 학점 스티커 「착」(TL 무리는 남는다)
             foreach (var g in new[] { TR, ML, MR, BL, BR, BC }) g.Node.gameObject.SetActive(false);
             endPose = true;
             var chip = Make.Node("battleEnd", ML.Node.parent, Vector3.zero);
             endChip = chip;
             Make.Sliced("bg", chip, Res.UI("cell_9s"), Vector3.zero, new Vector2(1.9f, 0.5f), O + 1, new Color(1, 1, 1, 0.9f));
             Make.Box("bar", chip, Res.UI("white"), new Vector3(-0.9f, 0, 0), new Vector2(0.05f, 0.36f), O + 2, won ? Tone.Gold : Tone.Bad);
-            Txt("t", chip, won ? "BATTLE END" : "DEFEAT", new Vector3(0.05f, -0.01f, 0), Tone.Md, O + 2, won ? Tone.Gold : Tone.Bad, TextAlignmentOptions.Center, 0.2f);
+            Txt("t", chip, won ? "전투 끝" : "패배", new Vector3(0.05f, -0.01f, 0), Tone.Md, O + 2, won ? Tone.Gold : Tone.Bad, TextAlignmentOptions.Center, 0.2f);
         }
-        // 학점제 학년 배지 — 판(BattleBridge.Fight)의 학년. 갈색 테 · 크림 속 동그라미에 숫자, 졸업(6학년)은 금빛 테 + 숨쉬는 오라. 전투 시범(판 없음)은 안 단다
-        static readonly Color GradeCream = new Color(1f, 0.957f, 0.863f), GradeBrown = new Color(0.478f, 0.306f, 0.165f), GradeBrownDeep = new Color(0.29f, 0.173f, 0.078f);
-        SpriteRenderer gradeAura;
+        // 학점제 학년 — 칭찬 스티커 공책 한 줄(2026-10-09 사용자 「전투 화면에서 학년 아이콘 개선」 — 판 화면 G2 공책과 같은 원작 조각).
+        //   초상 셋 오른쪽에 원작 메모 조각(InkleLobby_Book_Memo) 위로 「N학년」 · 학점 스티커 칸(원작 미션 도장 NewMission_Stamp 축소 / 빈 칸 NewMission_BodyItem)
+        //   · 끝 칸 선물 상자(Album_Record_Icon_Present) · 교단 증명서(작게). 누르거나 올리면 툴팁(진급까지 · 이번 전투 학점 · 걸린 진급 보상).
+        //   이기면(EndPose) 이번 싸움 학점만큼 스티커가 「착」 — 움직임 줄이기면 바로 붙고, 저사양이면 반짝이 없이. 그림은 원작(RunArt/Ui — runui Tools~/copy_assets.py)만, 없으면 경고만.
+        //   전투 시범(판 없음)은 안 단다
+        static readonly Color GradeBrownDeep = new Color(0.29f, 0.173f, 0.078f), GradeRed = new Color(0.878f, 0.267f, 0.306f);
+        SpriteRenderer gradeAura;   // (옛 졸업 오라 — 지금은 쓰지 않는다)
+        static Sprite memoSprite;
+        static bool gradeArtWarned;
+        readonly List<(SpriteRenderer slot, Vector3 at, Vector2 size)> gradeSlots = new List<(SpriteRenderer, Vector3, Vector2)>();
+        SpriteRenderer gradeGift;
+        Transform gradeParent;
+        int gradeHave, gradeSpan, gradeGain;
+        bool gradeGrad;
+
+        static Sprite GArt(string name)
+        {
+            var sp = Bolzena.RunUI.Theme.Art("Ui/" + name);
+            if (sp == null && !gradeArtWarned) { gradeArtWarned = true; Debug.LogWarning($"[PartyHud] 학년 공책 원작 그림 없음(RunArt/Ui/{name} — runui Tools~/copy_assets.py)"); }
+            return sp;
+        }
+        static Sprite GSticker(int i) => GArt($"grade/sticker{((i % 12) + 12) % 12 + 1:00}");
+        /// <summary>원작 메모 종이를 싸움터 크기에 맞춘 9칸 스프라이트(말린 모서리 84px → 0.17 월드).</summary>
+        static Sprite Memo()
+        {
+            if (memoSprite != null) return memoSprite;
+            var a = GArt("grade/memo");
+            if (a == null) return null;
+            var tex = a.texture;
+            memoSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 500, 0, SpriteMeshType.FullRect, new Vector4(84, 84, 84, 84));
+            return memoSprite;
+        }
+
         void GradeBadge(Transform p, Vector3 at)
         {
             var run = Bolzena.BattleBridge.Fight?.Port?.Run;
-            if (run == null) return;
+            if (run == null || !Bolzena.Core.R.GRADE_ON) return;   // 학년 꺼짐(2026-10-09) — 공책 · 스티커 없음
             int g = run.Grade;
             bool grad = g >= Bolzena.Core.Grades.GRAD;
-            const float d = 0.5f;
-            if (grad) gradeAura = Make.Box("grade_aura", p, Res.UI("soft"), at, new Vector2(d * 2.2f, d * 2.2f), O + 1, new Color(1f, 0.85f, 0.45f, 0.6f), Res.SpriteMat(true, 1.4f));
-            var rim = Make.Box("grade_rim", p, Res.UI("circle"), at, new Vector2(d, d), O + 3, grad ? Tone.GoldDeep : GradeBrown);
-            Make.Box("grade_in", p, Res.UI("circle"), at, new Vector2(d * 0.82f, d * 0.82f), O + 4, GradeCream);
-            Txt("grade_n", p, grad ? "졸업" : g.ToString(), at + new Vector3(0, grad ? 0 : 0.045f, 0), grad ? 0.13f : 0.24f, O + 5, grad ? Tone.GoldDeep : GradeBrownDeep, TextAlignmentOptions.Center, 0);
-            if (!grad) Txt("grade_c", p, "학년", at + new Vector3(0, -0.12f, 0), 0.085f, O + 5, GradeBrown, TextAlignmentOptions.Center, 0);
-            var (from, to) = run.GradeSpan;
-            TipZone.Add(rim, new Vector2(d, d) / rim.transform.localScale.x, () => Tip.Head(Bolzena.Core.Grades.Name(g)) +
-                $"  학점 {run.S.Credits}{(grad ? "" : $" / {to}")}\n파티 공격 · 방어 · 최대 HP +{Mathf.RoundToInt((float)(Bolzena.Core.Grades.STAT_PCT * (g - 1) * 100))}%" +
-                Tip.Dim($"\n이긴 싸움마다 학점 — 일반 {Bolzena.Core.Grades.CreditOf("fight")} · 엘리트 {Bolzena.Core.Grades.CreditOf("elite")} · 층 보스 {Bolzena.Core.Grades.CreditOf("boss")}. 파티 전체가 함께 진급합니다."), 2);
+            int credits = run.S.Credits;
+            int from = Bolzena.Core.Grades.Need(g), to = Bolzena.Core.Grades.Need(g + 1);
+            int span = grad ? Bolzena.Core.Grades.Need(Bolzena.Core.Grades.GRAD) - Bolzena.Core.Grades.Need(Bolzena.Core.Grades.GRAD - 1) : Mathf.Max(1, to - from);
+            int have = grad ? span : Mathf.Clamp(credits - from, 0, span);
+            string kind = run.S.EventFight != null ? (run.S.EventFight.Elite ? "eventElite" : "event") : run.IsBoss ? "boss" : run.S.Elite ? "elite" : "fight";
+            gradeGain = Bolzena.Core.Grades.CreditOf(kind); gradeHave = have; gradeSpan = span; gradeGrad = grad; gradeParent = p; gradeSlots.Clear();
+
+            const float H = 0.42f, S = 0.3f, Step = 0.33f, Head = 0.72f;
+            var cert = GArt("order_cert");
+            float w = Head + span * Step + 0.38f + (cert != null ? 0.34f : 0) + 0.06f;
+            float x0 = at.x - 0.15f;
+            var memo = Memo();
+            var bg = memo != null ? Make.Sliced("grade_memo", p, memo, new Vector3(x0 + w / 2, at.y, 0), new Vector2(w, H), O + 3) : null;
+            Txt("grade_n", p, grad ? "졸업" : $"{g}학년", new Vector3(x0 + 0.13f, at.y + 0.005f, 0), 0.17f, O + 5, grad ? GradeRed : GradeBrownDeep, TextAlignmentOptions.Left, 0);
+            for (int i = 0; i < span; i++)
+            {
+                bool on = i < have;
+                var pos = new Vector3(x0 + Head + S / 2 + i * Step, at.y, 0);
+                var size = on ? new Vector2(S, S) : new Vector2(S * 0.86f, S * 0.86f);
+                var sr = Make.Box("grade_s" + i, p, on ? GSticker(i) : GArt("grade/slot"), pos, size, O + 5);
+                if (on) sr.transform.localRotation = Quaternion.Euler(0, 0, i % 2 == 0 ? -10 : 8);
+                gradeSlots.Add((sr, pos, new Vector2(S, S)));
+            }
+            float gx = x0 + Head + span * Step + 0.18f;
+            gradeGift = Make.Box("grade_gift", p, GArt("grade/gift"), new Vector3(gx, at.y, 0), new Vector2(0.32f, 0.32f), O + 5);
+            if (grad) GradeSparkle(false);
+            if (cert != null) { var c = Make.Box("grade_cert", p, cert, new Vector3(gx + 0.36f, at.y, 0), new Vector2(0.28f, 0.28f), O + 5); c.transform.localRotation = Quaternion.Euler(0, 0, 8); }
+
+            string TipText()
+            {
+                string t = Tip.Head(Bolzena.Core.Grades.Name(g)) + (grad ? $"  ·  학점 {credits}" : $"  ·  진급까지 {Mathf.Max(0, to - credits)}학점") + $"  ·  이번 전투 이기면 +{gradeGain}학점";
+                if (run.S.PrepLeft > 0) t += $"\n예습 노트 — 첫 손패 +{run.S.PrepHand} · 남은 {run.S.PrepLeft}전투";
+                if (run.S.MockLeft > 0) t += $"\n전술 교본 — 사기 {run.S.MockMorale} · 다음 엘리트 · 보스 {run.S.MockLeft}번";
+                t += Tip.Dim($"\n파티 공격 · 방어 · 최대 HP +{Mathf.RoundToInt((float)(Bolzena.Core.Grades.STAT_PCT * (g - 1) * 100))}% · 이긴 싸움마다 학점(일반 {Bolzena.Core.Grades.CreditOf("fight")} · 엘리트 {Bolzena.Core.Grades.CreditOf("elite")} · 층 보스 {Bolzena.Core.Grades.CreditOf("boss")})");
+                return t;
+            }
+            if (bg != null)
+            {
+                var zone = TipZone.Add(bg, new Vector2(w, H), TipText, 2);   // 툴팁은 누를 때 뜬다(판 전체 규칙 — Tooltip.Update)
+                // 시범 캡처용 — 이 자리를 누른 것처럼 툴팁을 띄우고 닫는다(runui Demo 가 부른다)
+                Bolzena.RunUI.Flow.BattleGradeTip = pin => { if (Tooltip.I != null) Tooltip.I.PinZone(pin ? zone : null); };
+            }
+        }
+
+        /// <summary>선물 상자 위 원작 반짝이(감정표현 Sparkle) — 졸업이거나 이번 싸움으로 진급.</summary>
+        SpriteRenderer GradeSparkle(bool pop)
+        {
+            if (gradeGift == null || gradeParent == null || Bolzena.RunUI.DisplayOptions.LowSpec && pop) return null;
+            var sp = GArt("grade/sparkle");
+            if (sp == null) return null;
+            var at = gradeGift.transform.localPosition + new Vector3(0.14f, 0.15f, 0);
+            var r = Make.Box("grade_sparkle", gradeParent, sp, at, new Vector2(0.24f, 0.24f), O + 6);
+            if (pop && !Bolzena.RunUI.Settings.ReduceMotion) StartCoroutine(PopScale(r.transform, 0.3f, 0.4f));
+            return r;
+        }
+
+        /// <summary>이겼다 — 이번 싸움 학점만큼 빈 칸에 스티커가 「착」(칸마다 조금씩 늦게). 다 차면 선물 상자가 톡 · 반짝.</summary>
+        IEnumerator GradeWin()
+        {
+            if (gradeGrad || gradeParent == null || gradeGain <= 0) yield break;
+            Bolzena.RunUI.Flow.BattleGradeSlapAt = Time.unscaledTime;
+            bool calm = Bolzena.RunUI.Settings.ReduceMotion;
+            int upto = Mathf.Min(gradeSpan, gradeHave + gradeGain);
+            for (int i = gradeHave; i < upto; i++)
+            {
+                if (!calm) yield return Wait(0.25f);
+                var (slot, pos, size) = gradeSlots[i];
+                var st = Make.Box("grade_new" + i, gradeParent, GSticker(i), pos, size, O + 6);
+                var tr = st.transform; var home = tr.localScale; float rot = i % 2 == 0 ? -10 : 8;
+                if (!calm)
+                {
+                    for (float t = 0; t < 0.2f && tr != null; t += Time.unscaledDeltaTime)
+                    {
+                        float k = t / 0.2f, sc = Mathf.Lerp(2.2f, 1f, 1 - (1 - k) * (1 - k));
+                        tr.localScale = home * sc; tr.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(28, rot, k));
+                        yield return null;
+                    }
+                }
+                if (tr == null) yield break;
+                tr.localScale = home; tr.localRotation = Quaternion.Euler(0, 0, rot);
+                if (slot != null) slot.enabled = false;
+                Bolzena.RunUI.Sfx.Play("step", 0.6f);
+            }
+            if (gradeHave + gradeGain >= gradeSpan && gradeGift != null)
+            {
+                if (!calm) yield return Wait(0.15f);
+                if (!calm) StartCoroutine(PopScale(gradeGift.transform, 0.3f, 1.3f));
+                GradeSparkle(true);
+            }
+        }
+
+        static IEnumerator Wait(float sec) { for (float t = 0; t < sec; t += Time.unscaledDeltaTime) yield return null; }
+
+        /// <summary>제자리에서 톡(크기 from 배 → 1 넘었다 돌아옴).</summary>
+        static IEnumerator PopScale(Transform tr, float dur, float from)
+        {
+            if (tr == null) yield break;
+            var home = tr.localScale;
+            for (float t = 0; t < dur && tr != null; t += Time.unscaledDeltaTime)
+            {
+                float k = t / dur, s = k < 0.6f ? Mathf.Lerp(from, 1.12f, k / 0.6f) : Mathf.Lerp(1.12f, 1f, (k - 0.6f) / 0.4f);
+                tr.localScale = home * s;
+                yield return null;
+            }
+            if (tr != null) tr.localScale = home;
         }
 
         bool endPose;

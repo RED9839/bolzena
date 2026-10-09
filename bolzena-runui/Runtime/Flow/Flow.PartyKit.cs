@@ -110,11 +110,11 @@ namespace Bolzena.RunUI
             int n = PartyStore.Cleared(heroKey);
             if (n <= 0) return;
             float w = (n >= 10 ? 74 : 66) * scale, h = 24 * scale;
-            var rim = Ui.Img(parent, Theme.S("pill", 46), GradeBrown, "clears");
+            var rim = Ui.Img(parent, Theme.S("pill", 46), Theme.CreamRim, "clears");
             rim.raycastTarget = false;
             rim.rectTransform.At(1, 1, x, y, w, h);
-            var body = Ui.Img(rim.transform, Theme.S("pill", 46), GradeCream, "body"); body.raycastTarget = false; body.rectTransform.Fill(2, 2, 2, 2);
-            var t = Ui.Title(rim.transform, $"완주 {n}", Mathf.Max(11, Theme.FsCap - 1) * scale, GradeBrown, TextAlignmentOptions.Center);
+            var body = Ui.Img(rim.transform, Theme.S("pill", 46), Theme.Cream, "body"); body.raycastTarget = false; body.rectTransform.Fill(2, 2, 2, 2);
+            var t = Ui.Title(rim.transform, $"완주 {n}", Mathf.Max(11, Theme.FsCap - 1) * scale, Theme.CreamRim, TextAlignmentOptions.Center);
             t.raycastTarget = false;
             t.rectTransform.Fill(); t.textWrappingMode = TextWrappingModes.NoWrap; t.overflowMode = TextOverflowModes.Overflow;
         }
@@ -254,15 +254,10 @@ namespace Bolzena.RunUI
                 for (int i = 0; i < ids.Count; i++)
                 {
                     var id = ids[i];
-                    var c = W.Card(row, this, id, cw); c.At(0, 0.5f, labelW + 12 + i * (cw + 12), 0, cw, ch);
+                    var c = W.Card(row, this, id, cw, "card", P.Data.View(id)); c.At(0, 0.5f, labelW + 12 + i * (cw + 12), 0, cw, ch);
                     int at = all.IndexOf(id), idx = flat++;
-                    var b = c.gameObject.AddComponent<Btn>(); b.OnClick = () => CardZoom(id, all, at);
+                    var b = c.gameObject.AddComponent<Btn>(); b.OnClick = () => CardZoomPlain(id, all, at);
                     Stage.Hot["deck.card" + idx] = b;
-                    if (P.Data.IsOpener(id))
-                    {
-                        var tg = Ui.Img(c, Theme.Pill, new Color(0.35f, 0.2f, 0.02f, 0.95f), "ignition"); tg.rectTransform.At(1, 0, -6, 70 * cw / 200f, 46 * cw / 200f + 14, 22);
-                        var tt = Ui.Title(tg.transform, "시동", 13, new Color(1f, 0.88f, 0.5f), TextAlignmentOptions.Center); tt.rectTransform.Fill();
-                    }
                     Tw.Pop(c, 0.02f * idx, 0.88f, 0.28f);
                 }
             }
@@ -284,11 +279,13 @@ namespace Bolzena.RunUI
             if (V("critDmg") > 0) stat.Add($"치명 피해 +{V("critDmg") * 100:0.#}%");
             var perk = new List<string>();
             if (V("gold") > 0) perk.Add($"시작 골드 +{V("gold"):0}");
-            if (V("credits") > 0) perk.Add($"시작 학점 +{V("credits"):0}");
+            if (V("startOracle") > 0) perk.Add(V("startOracle") < 1 ? $"시작 신탁 {V("startOracle") * 100:0}%" : $"시작 신탁 {V("startOracle"):0}장");
+            if (Core.R.GRADE_ON && V("credits") > 0) perk.Add(V("credits") < 1 ? $"시작 학점 +1 {V("credits") * 100:0}%" : $"시작 학점 +{V("credits"):0}");
             if (V("oracleChance") > 0) perk.Add($"신탁 확률 +{V("oracleChance") * 100:0.#}%p");
-            if (V("oraclePick") > 0) perk.Add($"신탁 후보 +{V("oraclePick"):0}");
+            if (V("oraclePick") > 0) perk.Add(V("oraclePick") < 1 ? $"신탁 후보 +1 {V("oraclePick") * 100:0}%" : $"신탁 후보 +{V("oraclePick"):0}");
             if (V("removeCost") > 0) perk.Add($"빼기 -{V("removeCost"):0}골드");
-            if (V("eliteUp") > 0) perk.Add($"엘리트 장비 상향 {V("eliteUp") * 100:0}%");
+            if (V("shopDiscount") > 0) perk.Add($"상점 -{V("shopDiscount") * 100:0.#}%");
+            if (V("eliteUp") > 0) perk.Add($"엘리트 아티팩트 상향 {V("eliteUp") * 100:0}%");
             if (stat.Count == 0 && perk.Count == 0) return null;
             string sep = "   <color=" + Theme.GoldTag + ">|</color>   ";
             return string.Join(" · ", stat) + (stat.Count > 0 && perk.Count > 0 ? sep : "")
@@ -309,14 +306,14 @@ namespace Bolzena.RunUI
         {
             var summary = BoardSummary(out int painted, out int cells);
             string gradeText = StartGradeText();
-            float gradeW = Theme.C(250, 230);
+            float gradeW = Core.R.GRADE_ON ? Theme.C(250, 230) : -10;   // 학년 꺼짐(2026-10-09) — 학년 알약 없이 보드 줄이 끝까지
             var board = Btn.Make(parent, null, BtnStyle.PillDark, CrayonScreen, 0, "board");
             var brt = board.GetComponent<RectTransform>();
             brt.At(0, 0, 0, 0, w - gradeW - 10, h);
-            var ic = PastelIcon(brt, 1, h - 14, "ic"); ic.At(0, 0.5f, 16, 0, h - 14, h - 14);
+            var ic = Ui.Img(brt, Theme.BoardIcon, Color.white, "ic"); ic.preserveAspect = true; ic.rectTransform.At(0, 0.5f, 16, 0, h - 14, h - 14);   // 「교주 보드」 대표 아이콘(Theme.BoardIcon)
             var lab = Ui.Title(brt, "교주 보드", Theme.FsMd, Theme.Gold, TextAlignmentOptions.MidlineLeft);
             lab.rectTransform.At(0, 0.5f, h + 6, 0, 110, h); lab.textWrappingMode = TextWrappingModes.NoWrap;
-            var tx = Ui.Text(brt, summary ?? $"<color={Theme.SubTag}>아직 칠한 칸이 없습니다 — 크레파스를 칠하면 모험 시작에 혜택</color>", Theme.FsSm, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+            var tx = Ui.Text(brt, summary ?? $"<color={Theme.SubTag}>아직 칠한 칸이 없습니다 — 크레파스를 칠하면 모험 시작에 혜택이 붙습니다</color>", Theme.FsSm, Theme.Ink, TextAlignmentOptions.MidlineLeft);
             tx.rectTransform.Fill(h + 122, 0, 150, 0); tx.textWrappingMode = TextWrappingModes.NoWrap;
             tx.enableAutoSizing = true; tx.fontSizeMin = 11; tx.fontSizeMax = Theme.FsSm; tx.overflowMode = TextOverflowModes.Ellipsis;
             var go = Ui.Title(brt, $"<color={Theme.SubTag}>{painted}/{cells}</color>  보드 ›", Theme.FsSm, Theme.Gold, TextAlignmentOptions.MidlineRight);
@@ -324,10 +321,11 @@ namespace Bolzena.RunUI
             Stage.Hot["party.board"] = board;
 
             // 학년 안내 — 크림 알약(갈색 테), 작게
-            var rim = Ui.Img(parent, Theme.S("pill", 46), GradeBrown, "grade");
+            if (!Core.R.GRADE_ON) return;
+            var rim = Ui.Img(parent, Theme.S("pill", 46), Theme.CreamRim, "grade");
             rim.rectTransform.At(1, 0, 0, 0, gradeW, h);
-            var inner = Ui.Img(rim.transform, Theme.S("pill", 46), GradeCream, "body"); inner.rectTransform.Fill(3, 3, 3, 3);
-            var gt = Ui.Title(rim.transform, gradeText, Theme.FsSm, GradeBrown, TextAlignmentOptions.Center);
+            var inner = Ui.Img(rim.transform, Theme.S("pill", 46), Theme.Cream, "body"); inner.rectTransform.Fill(3, 3, 3, 3);
+            var gt = Ui.Title(rim.transform, gradeText, Theme.FsSm, Theme.CreamRim, TextAlignmentOptions.Center);
             gt.rectTransform.Fill(10, 0, 10, 0); gt.textWrappingMode = TextWrappingModes.NoWrap;
             gt.enableAutoSizing = true; gt.fontSizeMin = 11; gt.fontSizeMax = Theme.FsSm;
         }

@@ -62,7 +62,7 @@ namespace Bolzena.Core.Tests
                     run.AfterFight(b);
                     if (b.Over != "win") { Assert.IsTrue(run.PartyWiped || b.Turn >= 40); return; }
                     run.TakeGold();
-                    if (loot?.Equip != null) { run.TakeEquip(loot.Equip[0]); var e = d.Equip(loot.Equip[0]); run.Equip(PARTY.First(k => !run.GearOf(k).ContainsKey(e.Slot)) ?? PARTY[0], e.Id, replace: true); }
+                    if (loot?.Equip != null) { run.TakeEquip(loot.Equip[0]); var e = d.Equip(loot.Equip[0]); run.Equip(PARTY.FirstOrDefault(k => !run.GearOf(k).ContainsKey(e.Slot)) ?? PARTY[0], e.Id, replace: true); }
                     if (run.IsBoss) { var off = run.BossCopyOffer(); if (off.Count > 0) run.BossCopy(off[0]); run.Advance(); }
                 }
                 else if (node.Type == "event")

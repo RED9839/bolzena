@@ -133,8 +133,8 @@ namespace Bolzena.RunUI
                     var g = root.Group();
                     Tw.Run(root, 0.2f, t => { if (g) g.alpha = 1 - t; }, Tw.Linear, 0, () => { if (root) UnityEngine.Object.Destroy(root.gameObject); Phase = null; o.Cancelled?.Invoke(); });
                 };
-                close = Btn.Icon(root, Theme.S("ic_x"), cancel, 52, "close");
-                close.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -Theme.Gutter, 52, 52);
+                close = Btn.Icon(root, Theme.S("ic_x"), cancel, Theme.IconBtn, "close");
+                close.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -18, Theme.IconBtn, Theme.IconBtn);
                 close.Interactable = false;
                 st.Hot["modal.x"] = close;
                 st.Hot[o.Hot + ".close"] = close;

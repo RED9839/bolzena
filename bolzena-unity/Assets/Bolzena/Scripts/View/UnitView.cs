@@ -174,6 +174,7 @@ namespace Bolzena.View
         public float Play(string anim, float speed = 1f, bool thenIdle = true)
         {
             if (anim == null) return 0;
+            StopCut();
             var e = Sa.AnimationState.SetAnimation(0, F(anim), false);
             e.TimeScale = speed;
             e.MixDuration = 0.08f;
@@ -192,6 +193,7 @@ namespace Bolzena.View
         public float PlayChain(string first, IList<string> chain, float speed = 1f)
         {
             if (first == null) return 0;
+            StopCut();
             var e = Sa.AnimationState.SetAnimation(0, F(first), false);
             e.TimeScale = speed; e.MixDuration = 0.08f;
             float total = e.Animation.Duration;
@@ -215,8 +217,13 @@ namespace Bolzena.View
             var names = new List<string> { first }; if (chain != null) names.AddRange(chain);
             var offs = new List<float>(); float o = 0;
             foreach (var n in names) { offs.Add(o); var a = data.GetSkeletonData(true).FindAnimation(F(n)); o += a != null ? a.Duration : 0; }
-            StartCoroutine(CutCo(names, offs, skips, endAt));
+            StopCut();
+            cutCo = StartCoroutine(CutCo(names, offs, skips, endAt));
         }
+
+        // 앞 몸짓의 줄이기(CutCo)가 아직 돌면 멈춘다 — 다음 수가 뒷정리 전에 오면(템포 2026-10-09) 새 몸짓을 앞 몸짓의 조각으로 잘못 세어 끊었다
+        Coroutine cutCo;
+        void StopCut() { if (cutCo != null) { StopCoroutine(cutCo); cutCo = null; } }
 
         IEnumerator CutCo(List<string> names, List<float> offs, List<(float from, float to)> skips, float endAt)
         {
@@ -268,6 +275,7 @@ namespace Bolzena.View
         {
             var a = anim == null ? null : data.GetSkeletonData(true).FindAnimation(F(anim));
             if (a == null) return 0;
+            StopCut();
             from = Mathf.Clamp(from, 0, a.Duration);
             var e = Sa.AnimationState.SetAnimation(0, a, false);
             e.TimeScale = speed; e.MixDuration = 0.12f;

@@ -34,7 +34,7 @@ def load():
 def name_of(p):
     """그림 이름(Resources 경로) — 파일 + 자르기 값이 바뀌면 이름도 바뀌어 다시 굽는다."""
     stem = re.sub(r"[^A-Za-z0-9]+", "_", p["file"].replace("Character_", "").replace("ScheduleStory_", "S_").replace("MainLobby_", ""))
-    h = hashlib.md5(json.dumps([p["file"], p.get("c"), p.get("nature")]).encode()).hexdigest()[:6]
+    h = hashlib.md5(json.dumps([p["file"], p.get("c"), p.get("nature")] + ([1, SD_BODY, SD_FEET] if p.get("sd") else [])).encode()).hexdigest()[:6]
     return f"{stem[:48]}_{h}"
 
 
@@ -185,10 +185,45 @@ def bake_obj(p, dst):
     return [px, pt, w, h, W, H, sw, sh, nature_index(p.get("nature"))]
 
 
+# 기본 스킬 카드의 SD 꼬마 전신(2026-10-09 사용자 결정 「미니미가 너무 크다 — 줄이고 아래로」): p["sd"] 이면
+#   몸 상자(Tools~/cardart_sdbox.json — cardart_sdbox.py 가 잰다)의 높이를 창 높이의 SD_BODY 로, 몸 아래 끝(발 · 그림자)을 SD_FEET 에 둔다.
+#   창 위 SD_TOP(이름 · 종류 알약) ~ 아래 SD_TEXT(효과 글 상자) 사이 칸 — 몸이 그 칸의 7할 남짓. 원본 밖으로는 나가지 않는다(cover — 원본이 모자라면 몸이 그만큼 커진다).
+SD_BODY, SD_FEET = 0.34, 0.585
+SD_FRAME = 0.025   # 원작 SD 일정 그림의 초록 테두리(가로 몫) — 잘라 낸다
+_sdbox = None
+
+
+def _sd_fit(p):
+    global _sdbox
+    if _sdbox is None:
+        f = os.path.join(HERE, "cardart_sdbox.json")
+        _sdbox = json.load(open(f, encoding="utf-8")) if os.path.exists(f) else {}
+    im = Image.open(src_of(p)).convert("RGB")
+    W, H = im.size
+    fr = round(W * SD_FRAME)
+    inner = im.crop((fr, fr, W - fr, H - fr))   # 테두리를 뗀 그림(좌표는 이 판 기준)
+    iw, ih = inner.size
+    x0, y0, x1, y1 = _sdbox.get(p["file"], [0.3, 0.38, 0.7, 0.8])
+    bh = (y1 - y0) * H
+    # 2026-10-09 「흐리게 늘린 띠 없이 꽉 차게」: 창은 원본(테두리 뺀) 안에서만 자른다(cover). 몸 SD_BODY · 발 SD_FEET 는 목표 —
+    #   원본이 모자라면 창을 원본 크기로 줄이고(몸이 그만큼 커진다) 자리를 안쪽으로 민다. 흐린 연장은 하지 않는다.
+    ch = min(bh / SD_BODY, ih, iw / RATIO)
+    cw = ch * RATIO
+    cx = (x0 + x1) / 2 * W - fr
+    left = min(max(0, cx - cw / 2), iw - cw)
+    top = min(max(0, y1 * H - fr - SD_FEET * ch), ih - ch)
+    return inner.crop((round(left), round(top), round(left + cw), round(top + ch))).resize((OUT_W, OUT_H), Image.LANCZOS)
+
+
 def bake(p, dst):
     src = src_of(p)
     if not os.path.exists(src):
         return False
+    if p.get("sd"):
+        out = _sd_fit(p)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        out.save(dst, optimize=True)
+        return True
     if is_stand(p):
         # 얼굴 확대 — 투명 바깥은 성격 바탕(그림 창 밖으로 나가는 자리도 바탕으로 채운다)
         im = _stand_image(p)

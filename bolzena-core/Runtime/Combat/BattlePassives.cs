@@ -277,6 +277,11 @@ namespace Bolzena.Core
             }
         }
 
+        /// <summary>멈춤 방지 상한 — 한 규칙이 한 턴에 돌 수 있는 최대 수(보이지 않는 안전 장치, 게임 규칙 아님).</summary>
+        public const int SAFETY_CAP = 30;
+        /// <summary>상한에 걸린 횟수 — 「사도|규칙 이름」 → 걸린 턴 수(실제 판만 · 시뮬 보고용). 필요하면 Clear 로 비운다.</summary>
+        public static readonly System.Collections.Concurrent.ConcurrentDictionary<string, int> CapHits = new();
+
         /// <summary>일이 났다 — 맞는 규칙을 모두 돌린다. 패시브가 패시브를 부르는 고리는 다섯 겹에서 끊는다.</summary>
         void Emit(string ev, EmitInfo info)
         {
@@ -365,6 +370,16 @@ namespace Bolzena.Core
                 Fired[key] = 1;
             }
             if (r.Fx.Count == 0) return;
+            // 멈춤 방지 상한(게임 규칙 아님 · 카드 글에 안 나옴) — 같은 규칙은 한 턴에 SAFETY_CAP 번까지만 돈다. 2026-10-09 턴당 제한(limit per turn)을 전부 없앤 뒤 계기끼리 끝없이 도는 것을 막는다.
+            if (capTurn != Turn) { capN.Clear(); capTurn = Turn; }
+            int cn = capN.TryGetValue(id, out var cv0) ? cv0 : 0;
+            if (cn >= SAFETY_CAP)
+            {
+                if (cn == SAFETY_CAP && capMeter) CapHits.AddOrUpdate(owner.Key + "|" + (r.Name ?? rt.Power ?? id), 1, (_, x) => x + 1);   // 턴마다 처음 걸릴 때 한 번 센다
+                capN[id] = SAFETY_CAP + 1;
+                return;
+            }
+            capN[id] = cn + 1;
             // 일을 당한 적 — 대상 적 · 없으면 때린 적(공격받음 · 막음 · 실드 깨짐)
             var target = info.Target != null && info.Target.Side == Side.Enemy ? info.Target : info.From != null && info.From.Side == Side.Enemy && !info.From.Dead ? info.From : null;
             Unit holder = ((ev == "stackReach" || ev == "stackGone" || ev == "stackOver") && info.Target != null && info.Target != owner)

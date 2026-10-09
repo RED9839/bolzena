@@ -37,6 +37,14 @@ data = P.load_picks()
 picks = data["cards"]
 for k in [k for k, v in picks.items() if v.get("fill")]:
     del picks[k]
+# 기본 카드 규칙(2026-10-09 사용자 결정 — 135명 통일): 기본 공격 = 그 사도 스탠딩 일러(상반신 자르기 — 표에 안 적는다),
+#   기본 스킬(방어 · 실드 · 회복) = 그 사도의 SD 꼬마 전신 그림(원작 SD 일정 그림 ScheduleStory — 135명 모두 있다 · 같은 자르기).
+#   기본 카드끼리는 같은 그림이어도 된다. 기본 카드 줄은 늘 이 규칙으로 다시 쓴다(손 줄도 지운다).
+BASIC_IDS = {cid for h in P.heroes().values() for cid in h["basic"]}
+for k in [k for k in picks if k in BASIC_IDS]:
+    del picks[k]
+SCHED_C = [5, 5.6, 0.6]
+overlap = []
 json.dump(data, open(P.PICKS, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 subprocess.run([sys.executable, os.path.join(HERE, "build_cardart.py")], check=True, stdout=subprocess.DEVNULL)
 cardart = json.load(open(P.CARDART, encoding="utf-8"))
@@ -73,11 +81,27 @@ for hid, h in sorted(P.heroes().items()):
     keep, need = {}, []
     used = set()
     # 1) 그대로 두는 것(고유 · 생성) — 순위가 높은 것이 먼저 자리를 잡는다
-    for cid in [c for c in h["basic"] if picks.get(c) and not picks[c].get("fill")]:
-        keep[cid] = res[cid]
-        used.add(P.ident(res[cid]))
+    sched = next((it["key"] for it in P.stock(art) if it["cat"] == "schedule"), None)
+    used.add(P.ident(f"@stand/{art}/card"))
+    for cid in h["basic"]:
+        c = h["cards"][cid]
+        if c.get("type") == "공격":
+            stats["기본 공격 = 스탠딩"] += 1
+            continue
+        if sched:
+            picks[cid] = {"file": sched, "nature": h["hero"].get("nature"), "c": SCHED_C, "sd": True, "basic": True,
+                          "why": f"기본 스킬 = SD 꼬마 전신(SD 일정 그림) — {c.get('type')} 「{c.get('name')}」"}
+            stats["기본 스킬 = SD"] += 1
+        else:
+            short.append(f"{hid} {cid} (SD 일정 그림 없음)")
+    if sched:
+        used.add(P.ident(sched))
     for cid in sorted(h["unique"] + h["token"], key=lambda c: (rank(c), order(c))):
         k = res[cid]
+        if k is not None and sched and P.ident(k) == P.ident(sched) and rank(cid) <= 1:
+            keep[cid] = k   # 손으로 고른 고유 짝은 바꾸지 않는다 — 기본 스킬과 같은 그림이 된다(보고)
+            overlap.append(cid)
+            continue
         if k is None or k.startswith("pic:") or (k in P.AVOID and cid not in P.LOW) or P.ident(k) in used or (k.endswith("/card") and cid in h["token"]):
             need.append(cid)
             continue
@@ -100,12 +124,6 @@ for hid, h in sorted(P.heroes().items()):
     fills = []
     for cid in sorted([c for c in need if c in h["unique"]], key=order):
         fills.append((cid, PREF.get(h["cards"][cid].get("type"), PREF["스킬"]), False))
-    for cid in h["basic"]:
-        c = h["cards"][cid]
-        if picks.get(cid) and not picks[cid].get("fill"):
-            continue   # 손으로 고른 기본 카드(점검에서 고친 것) — 위에서 자리를 잡았다
-        attack = c.get("type") == "공격" and any(f.get("k") == "dmg" for f in c.get("fx", []))
-        fills.append((cid, BASIC["공격" if attack else "방어"], True))
     for cid in sorted([c for c in need if c in h["token"]], key=order):
         fills.append((cid, TOKEN, True))
     for cid, prefs, allow_card in fills:
@@ -145,3 +163,4 @@ json.dump(data, open(P.PICKS, "w", encoding="utf-8"), ensure_ascii=False, indent
 subprocess.run([sys.executable, os.path.join(HERE, "build_cardart.py")], check=True)
 print("채움", sum(stats.values()), dict(stats.most_common()))
 print("후보가 모자라 못 채운 카드", len(short), short[:30])
+print("손으로 고른 고유 짝이 기본 스킬(SD 일정)과 같은 그림", len(overlap), overlap)

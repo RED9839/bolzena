@@ -248,6 +248,7 @@ namespace Bolzena.Core
         /// <summary>
         /// 빌린 몸 클론 — 몸(원래 클론)의 체력 · 수 · 판 · 패시브 · 강인도는 그대로, 이름 · 성격 · clone 은 그 사도. 약점(weak)은 지운다(성격에서).
         /// 그림(Art)은 비운다 — 화면은 Clone(사도 키)으로 그 사도 그림을 찾는다.
+        /// 그 사도의 클론 데이터가 다른 층에 있으면(캬롯 1층 키트가 2층 자리에 뽑힘 등) 남의 몸 대신 제 키트를 쓰고, 체력 · 수치(때리기 · 회복 · 방어)만 몸의 체력 비율로 맞춘다(2026-10-09 — 이름 · 수가 섞이지 않게).
         /// </summary>
         EnemyDef MakeClone(string id)
         {
@@ -255,10 +256,35 @@ namespace Bolzena.Core
             if (p.Length != 2) return null;
             var h = Hero(p[0]);
             if (h == null || !Enemies.TryGetValue(p[1], out var body)) return null;
+            var own = Enemies.Values.Where(x => x.Clone == h.Id && x.Id != body.Id && x.Hp > 0).OrderBy(x => x.Id, StringComparer.Ordinal).FirstOrDefault();
+            if (own != null)
+            {
+                var o = FromJson<EnemyDef>(ToJson(own));
+                double r = (double)body.Hp / own.Hp;
+                o.Id = id; o.Hp = body.Hp; o.Tough = body.Tough; o.Boss = body.Boss; o.Weak = null; o.Art = null;
+                foreach (var it in new[] { o.Open }.Concat(o.Intents).Concat(o.Phase?.Intents ?? new List<Intent>()).Concat(o.Phase2?.Intents ?? new List<Intent>())
+                             .Concat(o.Counters.Select(c => c.Act)).Concat(o.Passives.Select(x => x.Do)))
+                    ScaleIntent(it, r);
+                // 머리 「1층 보스 · 」 를 그 자리 층으로
+                string head = body.Blurb != null && body.Blurb.Contains(" · ") ? body.Blurb.Substring(0, body.Blurb.IndexOf(" · ", StringComparison.Ordinal)) : null;
+                if (o.Blurb != null && head != null && o.Blurb.Contains(" · ") && o.Blurb.IndexOf("보스", StringComparison.Ordinal) < o.Blurb.IndexOf(" · ", StringComparison.Ordinal))
+                    o.Blurb = head + o.Blurb.Substring(o.Blurb.IndexOf(" · ", StringComparison.Ordinal));
+                return o;
+            }
             var e = FromJson<EnemyDef>(ToJson(body));
             e.Id = id; e.Name = h.Name + " (클론)"; e.Nature = h.Nature; e.Clone = h.Id; e.Weak = null; e.Art = null;
             e.Blurb = h.Name + "(클론) — " + body.Name + " 의 수를 빌려 쓰는 클론. " + body.Blurb;
             return e;
+        }
+
+        /// <summary>제 키트 클론의 수치 맞춤 — 때리기 · 회복 · 방어 값(V)을 비율 r 로(뒤따르는 수 · 이어지는 수까지).</summary>
+        static void ScaleIntent(Intent it, double r)
+        {
+            if (it == null) return;
+            if (it.V > 0 && (it.T == "attack" || it.T == "back" || it.T == "multi" || it.T == "attackAll" || it.T == "thorns" || it.T == "heal" || it.T == "selfHeal" || it.T == "block"))
+                it.V = Math.Max(1, (int)Math.Round(it.V * r));
+            ScaleIntent(it.Next, r);
+            foreach (var t in it.Then ?? new List<Intent>()) ScaleIntent(t, r);
         }
         /// <summary>변신 정의(id 는 사도 사이에서 겹치지 않는다) — 없으면 null. HeroOfForm 은 그 변신을 가진 사도.</summary>
         public FormDef Form(string id) => id == null ? null : Heroes.Values.SelectMany(h => h.Forms ?? new List<FormDef>()).FirstOrDefault(f => f.Id == id);

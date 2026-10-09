@@ -79,8 +79,42 @@ namespace Bolzena.Core
         public int Credits, Grade = Grades.FIRST, LastCredit;
         /// <summary>진급 소식 — 화면이 아직 안 보인 새 학년(Run.PopGradeNews 로 꺼낸다).</summary>
         public List<int> GradeNews = new();
-        /// <summary>교주 능력치(크레파스 — RunCrayon.cs, 판을 열 때 Run.ApplyPerks 가 적는다, atk · def · hp → 사도 기본치 비율). null = 없음.</summary>
+        /// <summary>아직 안 고른 진급 보상(진급마다 후보 셋 — Run.GradeOfferNow · TakeGrade).</summary>
+        public List<GradeOffer> GradeOffers = new();
+        /// <summary>졸업 선물로 받은 고유 카드(화면이 졸업장에 보인다). null = 아직 · 없음.</summary>
+        public string GradeGift;
+        /// <summary>진급 보상 효과 남은 것 — 예습 노트(남은 전투 · 첫 손패 +) · 전술 교본(남은 엘리트 · 보스 전투 · 시작 사기).</summary>
+        public int PrepLeft, PrepHand, MockLeft, MockMorale;
+        /// <summary>교주 보드(크레파스 — RunCrayon.cs, 판을 열 때 Run.ApplyPerks 가 적는다, atk · def · hp → 사도 기본치 비율). null = 없음.</summary>
         public Dictionary<string, double> Perks;
+        /// <summary>플레이 기록용(RunRecord.cs) — 판 시작 시각 · 전투 시간과 그 가운데 배속 시간(화면이 채운다) · 선택 기록(Run 이 적는다). 판 규칙에는 안 쓴다.</summary>
+        public RecState Rec = new();
+    }
+
+    /// <summary>플레이 기록용 판 상태 — 판 저장에 같이 남는다(이어해도 이어진다).</summary>
+    public sealed class RecState
+    {
+        /// <summary>판을 연 시각(UTC, 「yyyy-MM-ddTHH:mmZ」 — 분까지). 화면이 판을 열 때 적는다. null = 모름(봇 · 옛 저장).</summary>
+        public string Began;
+        /// <summary>전투 화면에 있던 시간 · 그 가운데 2배속이던 시간(초).</summary>
+        public double FightSec, FastSec;
+        /// <summary>제시된 것과 고른 것 — 차례대로.</summary>
+        public List<PickLog> Picks = new();
+    }
+
+    /// <summary>
+    /// 선택 하나 — K 갈래 · F 층(1 · 2) · S 걸음(RunState.Step) · Card 대상(카드 · 사도 — 신탁 · 은총 · 수련) · Offer 제시된 것 · Pick 고른 것(null = 넘김 · 아직).
+    /// 갈래: oracle(신탁 — Offer · Pick 은 신탁 번호) · grace(은총 — 카드 id) · equip(전리품 아티팩트) · grade(진급 보상 — 종류) · shop(진열 — Offer 만) · buy · remove(상점 빼기) · gradeRemove ·
+    /// train(휴식 수련 — 강화) · rest · copy(보스 복제) · event(Offer = 이벤트 id, Pick = 선택지 차례) · ev.card · ev.flash · ev.remove · ev.grace · ev.dupe · ev.shinPick · ev.gambleChoice.
+    /// At — 전투 중에 고른 빛이면 "fight", 끝난 뒤 보상이면 null.
+    /// </summary>
+    public sealed class PickLog
+    {
+        public string K;
+        public int F, S;
+        public string Card, At;
+        public List<string> Offer;
+        public string Pick;
     }
 
     public sealed class MapNode
@@ -120,6 +154,8 @@ namespace Bolzena.Core
         /// <summary>neutral · equip.</summary>
         public string Kind;
         public int Price;
+        /// <summary>할인 전 값(교주 보드 「골디 할인권」) — 할인이 없으면 0. 화면이 취소선으로 보인다.</summary>
+        public int Base;
         public bool Sold;
         public bool Delivery;
     }
@@ -204,5 +240,10 @@ namespace Bolzena.Core
         public string Result;
         public int Turns;
         public int HpBefore, HpAfter, HpMax;
+        /// <summary>낸 카드 수 · 쓴 고학년 수 · 턴별 녹화(BattleTape — 플레이 기록용, 없을 수 있다).</summary>
+        public int Plays, Ults;
+        public List<TurnRec> Log;
+        /// <summary>싸움을 열 때 덱의 카드 종류(BaseId, 겹치지 않게) — 카드 사용률의 분모(플레이 기록용).</summary>
+        public List<string> Deck;
     }
 }

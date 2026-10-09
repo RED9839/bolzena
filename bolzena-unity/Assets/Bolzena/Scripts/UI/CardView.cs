@@ -57,6 +57,7 @@ namespace Bolzena.UI
         // 그림 창 — 카드 전체(테 안쪽)
         public const float Bd = 0.03f;   // 테두리 두께(양쪽 합) — 2026-10-08 사용자 「너무 두껍다」 0.07 → 0.04
         const float ArtW = W - Bd, ArtH = H - Bd;
+        const float Px = W / 200f, TypeY = 44 * Px;   // 판 화면 W.Card(폭 200) 한 px · 종류 알약 가운데(위에서)
         const float ArtY = 0f;
         const float IconS = 1.06f, IconY = 0.27f;   // 고유 카드 아이콘(가운데 · 살짝 위)
         /// <summary>카드 주인 사도(초상 핀 · 빛깔) — 감독이 단다.</summary>
@@ -109,18 +110,18 @@ namespace Bolzena.UI
             // 효과 글 뒤 어둠 판 — 그림이 카드 전체라 흰 옷 · 밝은 그림 위에서도 글이 읽히게(올렸을 때 짙게)
             descBg = Make.Box("descbg", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W - 0.14f, 0.6f), 0, new Color(0.01f, 0.02f, 0.06f, 0.78f));
             descBg.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            // 위 — 큰 코스트 · 이름 · 종류
-            float x0 = -W / 2 + 0.12f, y0 = H / 2 - 0.1f;
-            costText = Make.Text("cost", t, "", new Vector3(x0 + 0.17f, y0 - 0.27f, 0), 0.5f, 0, Color.white);
+            // 위 — 큰 코스트 · 이름 · 종류(2026-10-09 판 화면 W.Card 와 같은 자리 · 크기 — 카드 폭 200 px = W, Px 한 칸)
+            float x0 = -W / 2, y0 = H / 2;
+            costText = Make.Text("cost", t, "", new Vector3(x0 + 27 * Px, y0 - 27 * Px, 0), 44 * Px, 0, Color.white);
             Make.Outline(costText, 0.22f, Tone.Outline);
-            nameText = Make.Text("name", t, "", new Vector3(x0 + 0.4f, y0 - 0.16f, 0), 0.21f, 0, Color.white, TextAlignmentOptions.Left, W - 0.56f);
+            nameText = Make.Text("name", t, "", new Vector3(x0 + 47 * Px, y0 - 20.5f * Px, 0), 19 * Px, 0, Color.white, TextAlignmentOptions.Left, W - 0.73f);
             nameText.rectTransform.pivot = new Vector2(0, 0.5f);
-            nameText.enableAutoSizing = true; nameText.fontSizeMax = 2.1f; nameText.fontSizeMin = 1.3f;
-            nameText.rectTransform.sizeDelta = new Vector2(W - 0.58f, 0.3f);
+            nameText.enableAutoSizing = true; nameText.fontSizeMax = 190 * Px; nameText.fontSizeMin = 110 * Px;
+            nameText.rectTransform.sizeDelta = new Vector2(W - 0.73f, 25 * Px);
             Make.Outline(nameText, 0.25f, Tone.Outline);
-            typeBg = Make.Sliced("typebg", t, Res.UI("bar_fill_9s"), new Vector3(x0 + 0.75f, y0 - 0.47f, 0), new Vector2(0.8f, 0.24f), 0, new Color(0.02f, 0.03f, 0.08f, 0.7f));
-            typeIcon = Make.Box("typei", t, Res.UI("ic_sword"), new Vector3(x0 + 0.5f, y0 - 0.47f, 0), new Vector2(0.18f, 0.18f), 0);
-            typeText = Make.Text("type", t, "", new Vector3(x0 + 0.62f, y0 - 0.475f, 0), 0.16f, 0, Color.white, TextAlignmentOptions.Left, 1.2f);
+            typeBg = Make.Sliced("typebg", t, Res.UI("bar_fill_9s"), new Vector3(x0 + 45 * Px + 0.4f, y0 - TypeY, 0), new Vector2(0.8f, 20 * Px), 0, new Color(0.02f, 0.03f, 0.08f, 0.7f));
+            typeIcon = Make.Box("typei", t, Res.UI("ic_sword"), new Vector3(x0 + 58.5f * Px, y0 - TypeY, 0), new Vector2(13 * Px, 13 * Px), 0);
+            typeText = Make.Text("type", t, "", new Vector3(x0 + 67 * Px, y0 - TypeY, 0), 13 * Px, 0, Color.white, TextAlignmentOptions.Left, 1.2f);
             typeText.rectTransform.pivot = new Vector2(0, 0.5f);
             Make.Outline(typeText, 0.28f, Tone.Outline);
             // 사도 얼굴 핀 — 오른쪽 위 작은 원(손패는 손 위 핀이 맡아 감춘다)
@@ -202,16 +203,16 @@ namespace Bolzena.UI
             band.color = rc;
             glow.color = new Color(Mathf.Lerp(rc.r, 1f, 0.3f), Mathf.Lerp(rc.g, 1f, 0.3f), Mathf.Lerp(rc.b, 1f, 0.3f), glow.color.a);   // 올림 빛도 성격 빛
             SetArt(info, rc);
-            costText.text = info.Unplayable && info.Cost <= 0 ? "-" : info.Cost.ToString();
+            costText.text = info.Unplayable && info.Cost <= 0 ? "-" : info.Cost.ToString() + (info.CostUpWhy != null && info.Cost > info.BaseCost ? "<size=40%><voffset=0.5em>▲</voffset></size>" : "");
             nameText.text = info.Name;
             typeText.text = info.TypeName ?? (info.Type == CardType.Attack ? "공격" : info.Type == CardType.Power ? "강화" : "스킬");   // 「공격」 · 「스킬」 · 「강화」 그대로(머리말 없이 — 판 화면 W.TypeLabel 과 같은 글)
             typeText.color = TypeColor(info);
             typeText.ForceMeshUpdate();
-            typeBg.size = new Vector2(typeText.preferredWidth + 0.38f, 0.25f);
-            typeBg.transform.localPosition = new Vector3(-W / 2 + 0.12f + 0.4f + typeBg.size.x / 2, H / 2 - 0.1f - 0.47f, 0);
+            typeBg.size = new Vector2(typeText.preferredWidth + 31 * Px, 20 * Px);
+            typeBg.transform.localPosition = new Vector3(-W / 2 + 45 * Px + typeBg.size.x / 2, H / 2 - TypeY, 0);
             // 판 화면(W.TypeIcon)과 같은 그림 — 칼 둘(ic_swords)은 runui 스프라이트에만 있다(UI/ 에서 찾으면 비어 공격 카드에 아이콘이 없었다)
             typeIcon.sprite = info.Type == CardType.Attack ? Bolzena.RunUI.Theme.S("ic_swords") : Res.UI(info.Type == CardType.Power ? "ic_up" : info.Type == CardType.Status ? "ic_skull" : "ic_skill");
-            Make.Fit(typeIcon, new Vector2(0.18f, 0.18f));
+            Make.Fit(typeIcon, new Vector2(13 * Px, 13 * Px));
             var h = who >= 0 && HeroOf != null ? HeroOf(who) : null;
             pin.sprite = h != null ? Face(h.Key) : null;
             if (pin.sprite != null) Make.Fit(pin, new Vector2(0.36f, 0.36f));
@@ -231,7 +232,7 @@ namespace Bolzena.UI
                 needH = descText.GetPreferredValues(descText.text, descW, 0).y;
                 descText.enableAutoSizing = auto; descText.fontSize = fs;
             }
-            float descH = Mathf.Clamp(needH + 0.02f, baseH, baseH + 0.16f), extra = descH - baseH;
+            float descH = Mathf.Clamp(needH + 0.04f, 0.22f, baseH + 0.16f), extra = descH - baseH;   // 글 칸은 글이 필요한 만큼만(도감 카드와 같게 — 아래가 비지 않고 그림 칸이 넓어진다)
             bool hasBL = !string.IsNullOrEmpty(info.MarkBless) && !string.IsNullOrEmpty(info.MarkBlessText) && !Bolzena.RunUI.BlessFx.Old;
             float blessH = hasBL ? 0.2f : 0;   // 축복 효과 전용 줄(본문 맨 아래) — 기본 효과 글은 그대로 두고 그 아래에 덧붙인다
             tagText.transform.localPosition = new Vector3(0, -H / 2 + 0.88f + extra + blessH, 0);
@@ -275,9 +276,9 @@ namespace Bolzena.UI
                 blessLineIc.transform.localPosition = new Vector3(-W / 2 + 0.2f, ly, 0);
                 Make.Fit(blessLineIc, new Vector2(0.15f, 0.15f));
             }
-            CostTint = info.CostDown ? new Color(0.6f, 1f, 0.45f) : (Color?)null;
-            descBg.transform.localPosition = new Vector3(0, (bgTop + bgBot) / 2, 0);
-            Make.Fit(descBg, new Vector2(W - 0.14f, Mathf.Max(0.2f, bgTop - bgBot)));
+            CostTint = info.Cost > info.BaseCost && info.BaseCost >= 0 && info.CostUpWhy != null ? new Color(1f, 0.35f, 0.3f) : info.CostDown ? new Color(0.6f, 1f, 0.45f) : (Color?)null;
+            descBg.transform.localPosition = new Vector3(0.025f, (bgTop + bgBot) / 2, 0);   // 왼쪽은 색 띠, 오른쪽은 테두리 바로 안까지
+            Make.Fit(descBg, new Vector2(W - 0.09f, Mathf.Max(0.2f, bgTop - bgBot)));
             // 빛나는 카드(신탁 · 은총 대기)는 띠 글 없이 빛만(2026-10-07 사용자) — 받은 신탁의 이름 띠는 그대로
             epiText.text = "";   // 받은 신탁의 이름 띠도 뺀다(2026-10-07 사용자 — 장식 선의 별 줄 · 금 테로)
             PlaceMarks(info, decoY + 0.14f);
@@ -390,8 +391,15 @@ namespace Bolzena.UI
                 blessIcon.transform.localPosition = new Vector3(-blessBg.size.x / 2 + 0.13f, y, 0);
                 Make.Fit(blessIcon, new Vector2(0.15f, 0.15f));
             }
-            copyBg.enabled = copyIcon.enabled = copyText.enabled = info.Copy;
+            copyBg.enabled = copyIcon.enabled = info.Copy; copyText.enabled = false;   // 복제는 작은 아이콘 하나 — 문구는 풀이 상자로(2026-10-09)
             if (info.Copy)
+            {
+                copyBg.size = new Vector2(0.3f, 0.3f);
+                copyBg.transform.localPosition = new Vector3(W / 2 - 0.26f, H / 2 - 0.62f, 0);
+                copyIcon.transform.localPosition = copyBg.transform.localPosition;
+                Make.Fit(copyIcon, new Vector2(0.2f, 0.2f));
+            }
+            if (false)
             {
                 copyText.text = Bolzena.Core.CardMark.COPY_LINE;
                 copyText.ForceMeshUpdate();
@@ -411,7 +419,7 @@ namespace Bolzena.UI
         int artMode;
         string artKey;
         Bolzena.RunUI.CardArt.ObjPic objPic;
-        const float ArtTop = 0.26f;   // 위 글 · 칩 끝(그림 창 몫)
+        const float ArtTop = 56f / 276f;   // 위 글 · 칩 끝(그림 창 몫 — 판 화면 W.Card 와 같게)
 
         /// <summary>사물 · 아이콘 판 자리 — 위 글 · 칩 아래 ~ 장식 선(decoY) 위 칸을 채우고 아래를 장식 선에 붙인다(CardArt.Place — 판 W.Card 와 같은 규칙).</summary>
         /// <summary>점검용 — 장식 선 자리(그림 창 몫, 위에서) · 그림 내용 자리(창 몫 · 사물 · 아이콘 판만, 없으면 0 크기) · 늘리는 상한에 걸렸나.</summary>
@@ -484,7 +492,7 @@ namespace Bolzena.UI
         {
             bool pinOn = ShowPin && pin.sprite != null;
             if (pin.enabled != pinOn) pin.enabled = pinRim.enabled = pinOn;
-            nameText.rectTransform.sizeDelta = new Vector2(pinOn ? W - 0.58f : W - 0.34f, 0.3f);   // 얼굴 배지가 없으면 이름을 오른쪽 끝까지
+            nameText.rectTransform.sizeDelta = new Vector2(pinOn ? W - 0.73f : W - 47 * Px - 8 * Px, 25 * Px);   // 얼굴 배지가 없으면 이름을 오른쪽 끝까지
         }
 
         public static Color TypeColor(CardInfo info) =>
@@ -584,6 +592,26 @@ namespace Bolzena.UI
         public IEnumerator FlashCo(float dur = 0.35f, float peak = 1f)
         {
             yield return Clock.Tween(dur, t => { if (flash) Make.Alpha(flash, peak * (1 - Ease.OutCubic(t))); }, true);
+        }
+
+        /// <summary>비용이 올랐을 때 — 짧은 빨간 깜빡임 + 「비용 +n」 띄움 글.</summary>
+        public void CostUpPop(int by)
+        {
+            Clock.Run(CostUpCo(by));
+        }
+        IEnumerator CostUpCo(int by)
+        {
+            var old = flash.color;
+            flash.color = new Color(1f, 0.2f, 0.15f, 0);
+            var tx = Make.Text("costup", transform, "비용 +" + by, new Vector3(0, H / 2 - 0.1f, 0), 0.3f, order + 20, new Color(1f, 0.4f, 0.35f));
+            Make.Outline(tx, 0.3f, Color.black);
+            yield return Clock.Tween(0.7f, t =>
+            {
+                if (flash) Make.Alpha(flash, 0.55f * (1 - t) * (0.5f + 0.5f * Mathf.Sin(t * 14)));
+                if (tx) { tx.transform.localPosition = new Vector3(0, H / 2 - 0.1f + 0.5f * Ease.OutCubic(t), 0); tx.alpha = 1 - Mathf.Clamp01((t - 0.6f) * 2.5f); }
+            }, true);
+            if (tx) Destroy(tx.gameObject);
+            if (flash) { flash.color = old; Make.Alpha(flash, 0); }
         }
 
         public void SetFlash(float a) => Make.Alpha(flash, a);

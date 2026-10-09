@@ -40,7 +40,7 @@ static class Program
         string b = Opt("bot", "basic"), p = Opt("party", PartyPick.Random); bool u = Flag("uniqueonly");
         if (b != "basic" && b != "skilled") return (null, null, "--bot 은 basic(초보) · skilled(숙련)");
         if (!PartyPick.MODES.Contains(p)) return (null, null, "--party 는 random · role · synergy");
-        // --crayon all | 표.json — 교주 능력치(크레파스) 전부 올린 상태(기본 표: bolzena-runui Resources/RunUI/crayon.json)
+        // --crayon all | 표.json — 교주 보드(크레파스) 전부 올린 상태(기본 표: bolzena-runui Resources/RunUI/crayon.json)
         string cr = Opt("crayon");
         Dictionary<string, double> perks = null;
         if (cr != null)
@@ -48,7 +48,7 @@ static class Program
             string f = cr == "all" ? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../../bolzena-runui/Runtime/Resources/RunUI/crayon.json")) : cr;
             if (!File.Exists(f)) return (null, null, "크레파스 표가 없다: " + f);
             perks = Crayon.Perks(Crayon.Parse(File.ReadAllText(f)), null, all: true);
-            Console.WriteLine("교주 능력치 전부 — " + string.Join(" · ", perks.Select(kv => $"{kv.Key} {kv.Value}")));
+            Console.WriteLine("교주 보드 전부 — " + string.Join(" · ", perks.Select(kv => $"{kv.Key} {kv.Value}")));
         }
         return (new SimOpts { Skilled = b == "skilled", UniqueOnly = u, Perks = perks }, p, null);
     }
@@ -112,8 +112,10 @@ static class Program
         rest = args.ToList();
         if (Opt("bossult") == "0") BossUlt.On = false;   // 보스 클론 고학년 끄기(전후 비교)
         string bux = Opt("bossultx"); if (bux != null) BossUlt.Scale = D(bux);   // 보스 고학년 피해 배율(계수 찾기)
+        string fdm = Opt("floordmg"); if (fdm != null) { var fv = fdm.Split(',').Select(D).ToArray(); for (int i = 0; i < fv.Length; i++) R.FLOOR_DMG[i + 1] = fv[i]; }   // 층별 적 피해 배율 시험(1층,2층 — Rules.cs 를 고치기 전 후보 재기)
         var paths = Many("data");
-        if (paths.Count == 0) paths.Add(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../Data/Sample")));
+        if (paths.Count == 0) paths.Add(rest.FirstOrDefault() == "records" && Directory.Exists(@"C:\projects\bolzena-content-v2") ? @"C:\projects\bolzena-content-v2"   // 플레이 기록은 실제 콘텐츠로 읽는다
+            : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../Data/Sample")));
         GameData data;
         try { data = GameData.FromFolders(paths); }
         catch (Exception e) { Console.WriteLine("읽기 실패"); Console.WriteLine(e.Message); return 2; }
@@ -193,6 +195,10 @@ static class Program
                     if (outMd != null) { File.WriteAllText(outMd, MetaSim.MarkdownV2(data, res, null, null, res.Label)); Console.WriteLine($"→ {Path.GetFullPath(outMd)}"); }
                     if (kwOut != null) { KwMeter.On = false; File.WriteAllText(kwOut, KwTable(data)); }
                     Console.WriteLine(MetaSim.Report(data, res));
+                    // 멈춤 방지 상한(규칙 하나 한 턴 Battle.SAFETY_CAP 번)에 걸린 턴 수 — 사도 · 규칙별
+                    var caps = Battle.CapHits.OrderByDescending(kv => kv.Value).ToList();
+                    Console.WriteLine($"멈춤 방지 상한({Battle.SAFETY_CAP}회/턴) 걸림 — {caps.Sum(kv => kv.Value)}턴 · 규칙 {caps.Count}개");
+                    foreach (var kv in caps.Take(30)) { var k = kv.Key.Split('|'); Console.WriteLine($"  {data.Hero(k[0])?.Name ?? k[0]} · {string.Join("|", k.Skip(1))} — {kv.Value}턴"); }
                     return 0;
                 }
             case "botcmp":
@@ -248,6 +254,28 @@ static class Program
                     if (kwOut != null) { KwMeter.On = false; File.WriteAllText(kwOut, KwTable(data)); Console.WriteLine($"→ 고유 효과 계측 {Path.GetFullPath(kwOut)}"); }
                     foreach (var r in rows) Console.WriteLine($"  {r.Name}({r.Role}) {r.Win:0.0}% ±{r.Err:0.0} ({r.N}판)");
                     Console.WriteLine($"→ {Path.GetFullPath(outp)} · {rows.Sum(r => r.N)}판 · {(DateTime.Now - t0).TotalSeconds:0}초");
+                    return 0;
+                }
+            case "records":
+                {
+                    // records pull [--out 폴더] [--local 상태폴더] — KV → 폴더(wrangler 로그인 · 읽기만)
+                    // records [폴더] [--sim 판] [--bot skilled|basic] [--seed 0] [--out 파일.md] — 모아 보기 + 같은 편성 봇 판과 나란히(Records.cs)
+                    string outDir = Opt("out");
+                    if (rest.Count > 0 && rest[0] == "pull")
+                    {
+                        string local = Opt("local");
+                        Records.Pull(outDir ?? Records.DIR, local != null ? $"--local --persist-to \"{local}\"" : "--remote");
+                        return 0;
+                    }
+                    int simN = int.Parse(Opt("sim", "200")), rseed = int.Parse(Opt("seed", "0")); bool skilled = Opt("bot", "skilled") == "skilled";
+                    string dump = Opt("dump");   // --dump 폴더 — 봇 판 기록을 파일로(상한까지 줄여서 — 형식 · 크기 보기)
+                    string dir = rest.Count > 0 ? rest[0] : Records.DIR;
+                    var human = Records.Load(dir);
+                    Console.WriteLine($"사람 기록 {human.Count}판 ← {dir} · 봇 {simN}판 돌리는 중({(skilled ? "숙련" : "초보")} · 사람 편성 그대로)…");
+                    var bot = simN > 0 ? Records.Bots(data, simN, rseed, skilled, human) : new List<PlayRecord>();
+                    if (dump != null) { Directory.CreateDirectory(dump); foreach (var r in bot) { RunRecord.Shrink(r, RunRecord.MAX_BYTES); File.WriteAllText(Path.Combine(dump, $"bot-{r.Seed}-{r.Result}.json"), RunRecord.Json(r)); } }
+                    var md = Records.Report(data, human, bot, skilled ? "숙련 봇" : "초보 봇");
+                    if (outDir != null) { File.WriteAllText(outDir, md); Console.WriteLine($"→ {Path.GetFullPath(outDir)}"); } else Console.WriteLine(md);
                     return 0;
                 }
             case "bench":

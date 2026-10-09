@@ -84,7 +84,8 @@ namespace Bolzena.RunUI
         public void NewRun(List<string> party, string village, long seed, string foeNature = null)
         {
             Run = Run.New(Data, party, seed, village, foeNature);
-            Run.ApplyPerks(CrayonStore.Perks);   // 교주 능력치(크레파스) — 올린 단계의 영구 능력치
+            Run.ApplyPerks(CrayonStore.Perks);   // 교주 보드(크레파스) — 올린 단계의 영구 능력치
+            PlayRecord.Began(this);   // 플레이 기록 — 판 시작 시각
         }
 
         public bool Has => Run != null;
@@ -296,6 +297,13 @@ namespace Bolzena.RunUI
         }
 
         /// <summary>로비 「이어하기」 의 한 줄 — 판을 바꾸지 않고 읽어 본다.</summary>
+        /// <summary>저장된 판을 읽어 본다(지금 판은 그대로) — 버리고 새 모험 때 플레이 기록(포기)을 남기려고. 못 읽으면 null.</summary>
+        public Run SavedRun()
+        {
+            try { return HasSave ? Run.Load(Data, JsonUtility.FromJson<SaveFile>(File.ReadAllText(SavePath)).run) : null; }
+            catch { return null; }
+        }
+
         public string SaveSummary()
         {
             try

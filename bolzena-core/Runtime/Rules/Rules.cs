@@ -9,6 +9,14 @@ namespace Bolzena.Core
     /// </summary>
     public static class R
     {
+        // ── 학년(학점제 — RunGrade.cs) 스위치 ──────────────────────────
+        /// <summary>
+        /// 학년 시스템을 켜나 — 2026-10-09 사용자 결정으로 꺼 둔다(「카드 게임에 어울리지 않는다」). 끄면 학점 · 진급 · 진급 보상 · 졸업 · 학년 능력치 · 예습 노트 · 전술 교본이
+        /// 판에서 모두 사라지고(학년은 1 · 학점 0 그대로), 화면(runui · unity)도 학년 공책 · 진급 연출 · 보상 스티커를 그리지 않는다. 코드는 그대로 — true 로 되살린다.
+        /// 학년 시험(GradeTests 따위)은 이 값을 켜고 돈다.
+        /// </summary>
+        public static bool GRADE_ON = false;
+
         // ── AP · 손 ─────────────────────────────────────────────────
         public const int AP_PER_TURN = 3;
         public const int DRAW_PER_TURN = 5;
@@ -19,8 +27,10 @@ namespace Bolzena.Core
         public const int SCALE = 10;
         public static readonly Dictionary<int, double> FLOOR_HP = new() { [1] = 2.0, [2] = 3.25 };
         public static readonly Dictionary<int, double> BOSS_HP = new() { [1] = 0.7, [2] = 0.6 };
-        /// <summary>층별 적 피해 배율. 2층 3.8 → 5.15(2026-10-09 — 학년 시스템 켬 · 크레파스 없음 · 숙련 봇 역할 편성 완주 33% 맞춤. 모든 층을 올리면 1층 쓰러짐이 20% 넘어 2층만 올렸다)</summary>
-        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.4, [2] = 5.15 };
+        /// <summary>층별 적 피해 배율. 2층 3.8 → 5.15(2026-10-09 — 학년 시스템 켬 · 크레파스 없음 · 숙련 봇 역할 편성 완주 33% 맞춤. 모든 층을 올리면 1층 쓰러짐이 20% 넘어 2층만 올렸다).
+        /// 2026-10-09 재조정 1층 2.4 → 3.1 · 2층 5.15 → 5.4 — 턴당 제한 제거 · 끊기 제거 · 장비 확률 · 클론 키트 · 학년 보상 뒤 완주 45.6% → 33.1%. 2층 일반 쓰러짐이 몰리지 않게 1층 몫을 더 올렸다(1층 쓰러짐 18.5% · 2층 일반 34.6%, _measure/난이도_재조정_20261009.md).
+        /// 2026-10-09 학년 꺼짐(GRADE_ON false) 뒤 1층 3.1 → 2.9 · 2층 5.4 → 4.4 — 학년 몫이 빠져 17.4% 로 떨어진 것을 32.7% 로(1층 쓰러짐 18.3% · 2층 일반 37.3%). 학년을 되살리면 3.1 · 5.4 로 되돌린다</summary>
+        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.9, [2] = 4.4 };
         public const double ELITE_HP = 1.5;
 
         /// <summary>층(0부터) · 보스 · 엘리트 → 적 체력 배율 · 피해 배율.</summary>
@@ -79,7 +89,7 @@ namespace Bolzena.Core
         public const int GOLD_BOSS = 95;
         public const double ELITE_GOLD = 1.5;
         public const int SHOP_NEUTRAL = 3;
-        public const int SHOP_EQUIP_N = 3;
+        public const int SHOP_EQUIP_N = 4;   // 2026-10-09 장비 더 — 3 → 4
         public const int SHOP_REROLL = 25, SHOP_REROLL_STEP = 25;
         public const int PRICE_REMOVE = 80, PRICE_REMOVE_STEP = 20;
         public static readonly Dictionary<string, int> SHOP_GRADE_WEIGHT = new() { ["일반"] = 5, ["고급"] = 4, ["희귀"] = 2, ["전설"] = 1 };
@@ -88,10 +98,10 @@ namespace Bolzena.Core
         public static readonly Dictionary<string, int> EQUIP_PRICE = new() { ["일반"] = 90, ["고급"] = 130, ["희귀"] = 180, ["전설"] = 250 };
         public const double EQUIP_SELL = 0.4;
         public static readonly Dictionary<string, int> SHOP_EQUIP = new() { ["일반"] = 3, ["고급"] = 3, ["희귀"] = 2, ["전설"] = 1 };
-        public static readonly Dictionary<string, int>[] ELITE_EQUIP = { new() { ["고급"] = 1 }, new() { ["희귀"] = 3, ["전설"] = 1 } };
+        public static readonly Dictionary<string, int>[] ELITE_EQUIP = { new() { ["고급"] = 2, ["희귀"] = 1 }, new() { ["희귀"] = 3, ["전설"] = 1 } };   // 2026-10-09 1층 엘리트에 희귀
         public static readonly Dictionary<string, int>[] BOSS_EQUIP = { new() { ["전설"] = 1 }, new() { ["전설"] = 1 } };
-        public static readonly Dictionary<string, int>[] FIGHT_EQUIP = { new() { ["일반"] = 2, ["고급"] = 1 }, new() { ["고급"] = 2, ["희귀"] = 3 } };
-        public const double DROP_FIGHT = 0.5;   // 일반 싸움 장비 확률(엘리트 · 보스는 늘)
+        public static readonly Dictionary<string, int>[] FIGHT_EQUIP = { new() { ["일반"] = 3, ["고급"] = 2 }, new() { ["고급"] = 3, ["희귀"] = 4, ["전설"] = 1 } };   // 2026-10-09 2층 싸움에 전설 1/8
+        public const double DROP_FIGHT = 0.8;   // 일반 싸움 장비 확률(엘리트 · 보스는 늘)
 
         // ── 캠프 · 층 사이 ───────────────────────────────────────────
         public const double CAMP_HEAL = 0.3;

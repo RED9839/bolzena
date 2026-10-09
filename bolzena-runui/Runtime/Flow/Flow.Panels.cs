@@ -54,25 +54,16 @@ namespace Bolzena.RunUI
             hint.Pref(0, -1, 1);
             if (inRun)
             {
-                var lobby = Btn.Make(bar, "로비로(모험은 저장)", BtnStyle.Dark, () => { close(); Lobby(); }, Theme.FsMd);
+                var lobby = Btn.Make(bar, "로비로(모험은 저장)", BtnStyle.PillDark, () => { PlayRecord.Send(P, "quit"); close(); Lobby(); }, Theme.FsMd);
                 lobby.Pref(280);
                 Stage.Hot["settings.lobby"] = lobby;
             }
             if (!inRun)
-            {   // 크레파스 · 교주 능력치 진행 코드 — 내보내기(클립보드로) · 불러오기(클립보드에서, 체크섬 검사)
-                var cp = Btn.Make(bar, "진행 코드 복사", BtnStyle.Dark, () => { GUIUtility.systemCopyBuffer = CrayonStore.Export(); Toast.Show("크레파스 · 교주 능력치 진행 코드를 복사했습니다"); }, Theme.FsMd);
-                cp.Pref(Theme.C(220, 210)); Stage.Hot["settings.export"] = cp;
-                var ps = Btn.Make(bar, "코드 붙여넣기", BtnStyle.Dark, () =>
-                {
-                    var code = GUIUtility.systemCopyBuffer;
-                    if (string.IsNullOrWhiteSpace(code)) { Toast.Show("클립보드에 코드가 없습니다"); return; }
-                    var chk = Bolzena.Core.Crayon.Import(code, CrayonStore.Table);
-                    if (chk.why != null) { Toast.Show("받지 않았습니다 — " + chk.why); return; }
-                    Confirm("교주 능력치 진행을 바꿀까요?", $"크레파스 {string.Join(" · ", chk.save.Have.Select((n, i) => Bolzena.Core.Crayon.TIERS[i] + " " + n))} · 단계 {string.Join(" · ", chk.save.Level.Select(kv => kv.Key + " " + kv.Value))} 로 바뀝니다. 지금 진행은 사라집니다.", "바꾸기", () => { var w = CrayonStore.Import(code); Toast.Show(w ?? "교주 능력치 진행을 불러왔습니다"); }, true);
-                }, Theme.FsMd);
-                ps.Pref(Theme.C(220, 210)); Stage.Hot["settings.import"] = ps;
+            {   // 크레파스 · 교주 보드 진행 코드 — 창 하나에서 보이기 · 복사 · 붙여 넣어 불러오기(Flow.Crayon.cs ProgressCodePanel — 웹은 브라우저 클립보드)
+                var pc = Btn.Make(bar, "진행 코드", BtnStyle.PillDark, ProgressCodePanel, Theme.FsMd);
+                pc.Pref(Theme.C(200, 190)); Stage.Hot["settings.code"] = pc;
             }
-            var ok = Btn.Make(bar, "닫기", BtnStyle.Gold, close, Theme.FsMd);
+            var ok = Btn.Make(bar, "닫기", BtnStyle.PillGold, close, Theme.FsMd);
             ok.Pref(240);
             Stage.Hot["settings.close"] = ok;
         }
@@ -109,6 +100,7 @@ namespace Bolzena.RunUI
             SetToggle(c, "화면 흔들림 끄기", "타격과 고학년 때 화면이 흔들리지 않습니다", Settings.NoShake, v => Settings.NoShake = v, "set.shake");
             SetToggle(c, "컷인 건너뛰기", "고학년 컷인 없이 바로 씁니다", Settings.SkipCutin, v => Settings.SkipCutin = v, "set.cutin");
             SetToggle(c, "고학년 짧게 보기", "끄면 모험에서 처음 쓸 때만 길게 봅니다", Settings.UltShort, v => Settings.UltShort = v, "set.ultshort");
+            SetToggle(c, "사도 말풍선", "보스 전투 시작과 전투 승리 때 사도가 한마디씩 합니다", Settings.HeroTalk, v => Settings.HeroTalk = v, "set.herotalk");
         }
 
         // 화면 모드 한 줄 풀이 — 설명 칸에 한 줄로 들어가게 줄였다(DisplayOptions.ModeHint 는 전투 창이 쓴다)
@@ -177,6 +169,7 @@ namespace Bolzena.RunUI
             SetToggle(c, "화면 효과", low ? "저사양 모드라 꺼 둡니다" : "전투의 빛 번짐 · 타격 색 효과를 그립니다 · 끄면 폰 · 저사양 PC 에서 가벼워집니다", DisplayOptions.PostFxOn, v => DisplayOptions.SetPostFx(v), "disp.post");
             if (low) foreach (var hk in new[] { "disp.vsync", "disp.post" }) Lock(hk);
             SetToggle(c, "글자 크게", "판 화면 글자를 키웁니다 · 다음 화면부터 바뀝니다", Settings.BigText, v => Settings.BigText = v, "set.big");
+            SetToggle(c, "플레이 기록 보내기(익명)", "판이 끝나면 편성 · 카드 · 전투 결과를 익명으로 보내 밸런스에 씁니다 · 개인 정보는 없습니다", PlayRecord.On, v => PlayRecord.On = v, "set.rec");
 
             void Paint()
             {
@@ -369,11 +362,11 @@ namespace Bolzena.RunUI
         void KeepScreen(Action<bool> done)
         {
             var (panel, close) = Stage.Modal("keepscreen", 640, 300, false);
-            var t = Ui.Title(panel, "이 화면으로 둘까요?", Theme.FsXl, Theme.Gold, TextAlignmentOptions.Center);
+            var t = Ui.Title(panel, "이 화면으로 두겠습니까?", Theme.FsXl, Theme.Gold, TextAlignmentOptions.Center);
             t.rectTransform.Band(1, 46, 30, 30, -30);
             var b = Ui.Text(panel, "", Theme.FsBody, Theme.Sub, TextAlignmentOptions.Center);
             b.rectTransform.Band(1, 76, 40, 40, -82);
-            var row = Ui.Rect("row", panel).Band(0, 62, 36, 36, 30);
+            var row = Ui.Rect("row", panel).Band(0, Theme.BtnH, 36, 36, 30);
             Ui.Row(row, Theme.Gap + 4, TextAnchor.MiddleCenter, null, true, true);
             bool over = false;
             void End(bool keep)
@@ -385,8 +378,8 @@ namespace Bolzena.RunUI
                 done?.Invoke(keep);
                 if (!keep) Toast.Show("앞 화면으로 돌아갔습니다");
             }
-            var no = Btn.Make(row, "되돌리기", BtnStyle.Dark, () => End(false), Theme.FsMd);
-            var ok = Btn.Make(row, "이대로", BtnStyle.Gold, () => End(true), Theme.FsMd);
+            var no = Btn.Make(row, "되돌리기", BtnStyle.PillDark, () => End(false), Theme.FsMd);
+            var ok = Btn.Make(row, "이대로", BtnStyle.PillGold, () => End(true), Theme.FsMd);
             Stage.Hot["disp.revert"] = no;
             Stage.Hot["disp.keep"] = ok;
             StartCoroutine(Count());
@@ -420,8 +413,8 @@ namespace Bolzena.RunUI
             var nm = Ui.Title(panel, h.ko, Theme.Fs2xl, Theme.Ink); nm.rectTransform.At(0, 1, 164, -32, 600, 52);
             var sub = Ui.Text(panel, $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(h.nature))}>{h.nature}</color> · {h.race} · {h.role}", Theme.FsBody, Theme.Sub);
             sub.rectTransform.At(0, 1, 166, -88, 600, 30);
-            var x = Btn.Icon(panel, Theme.S("ic_x"), close, 44, "close");
-            x.GetComponent<RectTransform>().At(1, 1, -16, -16, 44, 44);
+            var x = Btn.Icon(panel, Theme.S("ic_x"), close, Theme.IconBtnSm, "close");
+            x.GetComponent<RectTransform>().At(1, 1, -18, -14, Theme.IconBtnSm, Theme.IconBtnSm);
             Stage.Hot["hero.close"] = x;
             var rule = Ui.Img(panel, Theme.White, Theme.Line, "rule"); rule.rectTransform.Band(1, 1, 24, 24, -154);
             // 고학년 · 고유 효과 · 패시브 — 수치가 다 든 한 가지 글(core CardText.HeroShort = Traits), 길면 칸 안에서 스크롤(「자세히」 없음)
@@ -431,7 +424,7 @@ namespace Bolzena.RunUI
             FullText(content, d != null ? P.Text.HeroShort(d) : h.blurb, Theme.FsSm + 1, Theme.Ink, coreId, "body", d != null);
             var gear = string.Join(" · ", P.GearOf(coreId).Select(kv => $"{kv.Key} {P.Data.Equip(kv.Value)?.Name}"));
             var rule2 = Ui.Img(panel, Theme.White, Theme.Line, "rule2"); rule2.rectTransform.Band(0, 1, 24, 24, 58);
-            var g = Ui.Text(panel, $"<color={Theme.GoldTag}>장비</color>  " + (gear.Length > 0 ? gear : $"<color={Theme.DimTag}>없음</color>"), Theme.FsSm + 1, Theme.Ink);
+            var g = Ui.Text(panel, $"<color={Theme.GoldTag}>아티팩트</color>  " + (gear.Length > 0 ? gear : $"<color={Theme.DimTag}>없음</color>"), Theme.FsSm + 1, Theme.Ink);
             g.rectTransform.Band(0, 30, 32, 32, 16);
         }
     }

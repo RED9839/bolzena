@@ -606,7 +606,7 @@ namespace Bolzena.RunUI
         /// <summary>약점 · 우세 한 줄 — 그 성격의 적은 약점 성격에 약하고, 우세 성격(상성으로 이기는 성격)에 강하다.</summary>
         static string EdgeKo(string n, bool small = false)
         {
-            if (n == null) return $"<color={Theme.SubTag}>상성은 모험의 적 속성을 따름</color>";
+            if (n == null) return $"<color={Theme.SubTag}>상성은 모험의 적 속성을 따릅니다</color>";
             var weak = R.WeakTo(n);
             R.BEATS.TryGetValue(n, out var beat);
             return $"<color={Theme.SubTag}>약점</color> {string.Join(" · ", weak.Select(NatTag))}" + (beat != null ? $"{(small ? " " : "  ")}<color={Theme.SubTag}>우세</color> {NatTag(beat)}" : "");
@@ -667,7 +667,7 @@ namespace Bolzena.RunUI
                 for (int j = 0; j < kd.Vars.Count; j++)
                 {
                     int jj = j;
-                    var pb = Btn.Make(pills, kd.Vars[j].Grade, BtnStyle.Ghost, () => { ls.Pick[kd.Key + "|" + n] = jj; Draw(jj); }, Theme.FsCap - 1, "var " + kd.Vars[j].Grade);
+                    var pb = Btn.Make(pills, kd.Vars[j].Grade, BtnStyle.Ghost, () => { ls.Pick[kd.Key + "|" + n] = jj; Draw(jj); }, Theme.FsCap, "var " + kd.Vars[j].Grade);
                     pb.Bg.sprite = Theme.Pill; pb.Label.rectTransform.Fill(6, 0, 6, 0);
                     pb.Pref(kd.Vars[j].Grade.Length > 2 ? 58 : 48, 22);
                     pillBtns.Add(pb);

@@ -93,7 +93,7 @@ namespace Bolzena.RunUI
             // 장비 칸은 없앴다(2026-10-06 사용자) — 낀 장비는 머리 띠의 장비 단추 · 덱 보기의 장비 탭에서 본다
             if (withShop)
             {
-                var shop = W.Option(bottom, "골디의 좌판", "「어서 오세요, 고객님!」 카드 · 장비 · 카드 제거 — 들러도 휴식 선택은 그대로", () => Shop(kind), optH, Theme.S("ic_bag"), "shop");
+                var shop = W.Option(bottom, "골디의 좌판", "「어서 오세요, 고객님!」 카드 · 아티팩트 · 카드 제거 — 들러도 휴식 선택은 그대로 남습니다", () => Shop(kind), optH, Theme.S("ic_bag"), "shop");
                 shop.Pref(320, -1, 1);
                 Stage.Hot["camp.shop"] = shop;
             }
@@ -103,7 +103,7 @@ namespace Bolzena.RunUI
             if (used != "")
             {
                 var leave = Btn.Make(root, "출발", BtnStyle.PillGold, LeaveCamp, Theme.FsLg);
-                leave.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, Theme.Gutter + (optH - 66) / 2, 272, 66);
+                leave.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, Theme.Gutter + (optH - Theme.BtnMainH) / 2, Theme.BtnMainW, Theme.BtnMainH);
                 Stage.Hot["camp.leave"] = leave;
                 Tw.Pop(leave.GetComponent<RectTransform>(), 0.1f, 0.8f, 0.35f);
             }

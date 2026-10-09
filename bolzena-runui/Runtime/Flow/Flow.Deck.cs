@@ -41,14 +41,14 @@ namespace Bolzena.RunUI
                 return b;
             }
             Tab(0, "ic_deck", "덱", true, null);
-            Stage.Hot["deck.gear"] = Tab(1, "ic_sword", "장비", false, () => { close(); GearView(); });
+            Stage.Hot["deck.gear"] = Tab(1, "ic_sword", "아티팩트", false, () => { close(); GearView(); });
 
             // 위 — 제목 · 정보 칸 둘 · 큰 ×
             var (cnt, avg) = DeckInfo();
             var title = Ui.Title(layer, "모든 덱", Theme.Fs2xl, Theme.Ink, TextAlignmentOptions.MidlineLeft);
             title.rectTransform.At(0, 1, railW + 34, -20, 400, 56);
-            var x = Btn.Icon(layer, Theme.S("ic_x"), close, 60, "close");
-            x.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -18, 60, 60);
+            var x = Btn.Icon(layer, Theme.S("ic_x"), close, Theme.IconBtn, "close");
+            x.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -18, Theme.IconBtn, Theme.IconBtn);
             Stage.Hot["deck.close"] = x;
             void Info(float right, string label, string val)
             {

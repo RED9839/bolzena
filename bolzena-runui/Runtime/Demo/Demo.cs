@@ -52,7 +52,7 @@ namespace Bolzena.RunUI
             StartCoroutine(AutoOwner());
             if (Has("-demo-loop")) { limit = float.TryParse(Arg("-demo-timeout"), out var ll) ? ll : 3600f; }
             StartCoroutine(Watchdog(limit));
-            StartCoroutine(Has("-demo-touch") ? Touch_() : Has("-demo-evby") ? EvBy_() : Has("-demo-partykit") ? PartyKit_() : arca ? Arca_() : Has("-demo-grade") ? Grade_() : Has("-demo-crayon") ? Crayon_() : Has("-demo-bless") ? Bless_() : Has("-demo-oraclepeek") ? OraclePeek_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listperf") ? ListPerf_() : Has("-demo-snapdiff") ? SnapDiff_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-resize") ? Resize_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
+            StartCoroutine(Has("-demo-rec") ? Rec_() : Has("-demo-herosay") ? HeroSay_() : Has("-demo-uitour") ? UiTour_() : Has("-demo-touch") ? Touch_() : Has("-demo-evby") ? EvBy_() : Has("-demo-partykit") ? PartyKit_() : arca ? Arca_() : Has("-demo-grade") ? Grade_() : Has("-demo-crayon") ? Crayon_() : Has("-demo-bless") ? Bless_() : Has("-demo-oraclepeek") ? OraclePeek_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listperf") ? ListPerf_() : Has("-demo-snapdiff") ? SnapDiff_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-resize") ? Resize_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
         }
 
         // 이벤트(-demo-events) — 꼴이 다른 이벤트 여섯(선택지 적음 · 많음 · 카드 고르기 · 신탁 · 전투 · 도박/판정)의 처음 화면 · 고른 뒤 결과를 찍고,
@@ -728,27 +728,21 @@ namespace Bolzena.RunUI
             Expect(f.Stage.Backs > b0 && f.Stage.Current == "camp" && f.P.CampChoice == "" && f.Stage.ModalLayer.childCount == 0, $"휴식 — 뒤로 키를 눌러도 그대로(키 {f.Stage.Backs - b0}번 · 화면 {f.Stage.Current} · 선택 「{f.P.CampChoice}」)");
             if (Hot("camp.trainopen") == null || !Hot("camp.trainopen").Interactable) { Debug.LogWarning("[Demo] 수련할 카드가 없습니다 — 연출 캡처 건너뜀"); yield break; }
             yield return Press("camp.trainopen", 0.1f);
+            yield return Wait(0.6f);
+            yield return Shot("camp_cardpick");
+            Expect(Hot("camp.card0") != null, "수련 — 강화할 카드를 먼저 고른다");
+            yield return Press("camp.card0", 0.1f);
             yield return Until(() => OracleReveal.Phase == "choose", 5); yield return Wait(0.35f);
             yield return Shot("camp_train");
-            b0 = f.Stage.Backs;
-            yield return PressEsc(); yield return Wait(0.4f);
-            Expect(f.Stage.Backs > b0 && OracleReveal.Phase == "choose" && Hot("camp.train.close") == null && f.P.CampChoice == "", "수련 고르기 — 뒤로 키를 눌러도 창이 그대로 · 닫기 단추 없음");
-            // 덱 보기 — 신탁 창 위에 열리고, 닫으면 같은 신탁 창(같은 후보 · 고르기 그대로)
-            var names0 = string.Join("|", f.Stage.ModalLayer.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Where(t => t.transform.parent && t.transform.parent.name == "label").Select(t => t.text));
+            // 덱 보기 — 신탁 창 위에 열리고, 닫으면 같은 신탁 창
             int d0 = OracleReveal.DeckOpens;
             yield return Press("camp.train.deck", 0.9f);
             bool deckUp = f.Stage.ModalLayer.Cast<Transform>().Any(t => t.name == "modal deck");
             Expect(OracleReveal.DeckOpens == d0 + 1 && deckUp && OracleReveal.Phase == "choose", "수련 고르기 — 덱 보기가 신탁 창 위에 열린다");
-            yield return Shot("camp_train_deck");
             yield return PressEsc(); yield return Wait(0.5f);
             deckUp = f.Stage.ModalLayer.Cast<Transform>().Any(t => t.name == "modal deck");
-            var names1 = string.Join("|", f.Stage.ModalLayer.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Where(t => t.transform.parent && t.transform.parent.name == "label").Select(t => t.text));
-            Expect(!deckUp && OracleReveal.Phase == "choose" && names0 == names1 && f.P.CampChoice == "", $"덱 보기를 닫으면 같은 신탁 창 그대로({names1})");
+            Expect(!deckUp && OracleReveal.Phase == "choose" && f.P.CampChoice == "", "덱 보기를 닫으면 같은 신탁 창 그대로");
             yield return Press("camp.train1", 0.05f);
-            yield return Until(() => OracleReveal.Phase == "burn", 3); yield return Wait(0.2f);
-            yield return Shot("camp_train_pick");
-            yield return Until(() => OracleReveal.Phase == "reborn", 3); yield return Wait(0.3f);
-            yield return Shot("camp_train_reborn");
             yield return Until(() => !OracleReveal.IsOpen, 6); yield return Wait(0.8f);
             Expect(f.P.CampChoice == "train" && Hot("camp.leave") != null, "수련을 고르면 출발 단추가 선다");
             yield return Shot("camp_trained");
@@ -787,7 +781,7 @@ namespace Bolzena.RunUI
             Expect(f.DexSearchShown.Count == 0 && nm, "결과 없음 → 「찾는 것이 없습니다」");
             yield return Type("ㄷㅇㄴ");
             // 도감을 바꾸면 그 도감의 검색어(비어 있음), 돌아오면 사도 검색어 그대로
-            yield return Press("tab:장비", 1.0f);
+            yield return Press("tab:아티팩트", 1.0f);
             Expect(f.DexSearchField != null && f.DexSearchField.text == "", "장비 도감 검색어는 따로(빈 칸)");
             var eqName = f.DexSearchShown.FirstOrDefault();
             if (eqName != null && eqName.Length >= 2)
@@ -884,10 +878,12 @@ namespace Bolzena.RunUI
 
             // 시동 카드 · 카드 상세 점검 — 로네(시장)의 카드 탭(시동 표식 · 고유 카드 줄에서 빠짐)과 카드 상세(큰 카드 · 풀이 상자 가운데)
             {
-                var rone = Roster.All.FirstOrDefault(h => h.ko != null && h.ko.StartsWith("로네") && h.CoreId != null) ?? gen ?? Roster.ByKey(keys[0]);
+                string dh = null; { var ca = System.Environment.GetCommandLineArgs(); int di = System.Array.IndexOf(ca, "-demohero"); if (di >= 0 && di + 1 < ca.Length) dh = ca[di + 1]; }
+                var rone = Roster.All.FirstOrDefault(h => h.ko != null && h.ko.StartsWith(dh ?? "로네") && h.CoreId != null) ?? gen ?? Roster.ByKey(keys[0]);
                 f.HeroDetail(rone.key, null, null, "카드");
                 yield return Wait(1.2f);
                 yield return Shot("rone_cards");
+                Expect(f.Stage.ScreenLayer.GetComponentsInChildren<Transform>(true).Count(t0 => t0.name == "costmark" || t0.name == "oracleglow" || t0.name == "blessline") == 0, "사도 상세 카드에 신탁 · 축복 마크 0");
                 var first = FirstHot("detail.card시작 카드");
                 if (Hot(first) != null) { yield return Press(first, 1.0f); yield return Shot("rone_card_zoom"); yield return Press("zoom.close", 0.5f); }
                 var uz = FirstHot("detail.card고유 카드");
@@ -910,6 +906,7 @@ namespace Bolzena.RunUI
             }
             float y0 = sr != null ? sr.content.anchoredPosition.y : 0;
             yield return Shot("dex_list");
+            if (Hot("tab:교주 카드") != null) { yield return Press("tab:교주 카드", 1.0f); yield return Shot("dex_cards"); Expect(f.Stage.ScreenLayer.GetComponentsInChildren<Transform>(true).Count(t0 => t0.name == "costmark" || t0.name == "oracleglow" || t0.name == "blessline") == 0, "도감 교주 카드에 신탁 · 축복 마크 0"); yield return Press("tab:사도", 0.6f); }
             yield return Press("hero:" + a, 1.0f);
             Check(a, "첫 누름");
             yield return Shot("dex_detail_a");
@@ -931,7 +928,7 @@ namespace Bolzena.RunUI
             yield return Press(FirstHot("dexcard:"), 1.0f);
             yield return Shot("dex_card_zoom");
             yield return Press("zoom.close", 0.5f);
-            yield return Press("tab:장비", 1.0f);
+            yield return Press("tab:아티팩트", 1.0f);
             yield return Shot("dex_equips");
             yield return Press("filter:무기", 0.8f);
             yield return Press("filter:전설", 0.8f);
@@ -1444,7 +1441,7 @@ namespace Bolzena.RunUI
             yield return Press("tab:교주 카드");
             yield return Wait(1.2f);
             yield return Shot("dex_cards");
-            yield return Press("tab:장비");
+            yield return Press("tab:아티팩트");
             yield return Wait(1.2f);
             yield return Shot("dex_equips");
             yield return Press("back");
@@ -1545,6 +1542,9 @@ namespace Bolzena.RunUI
             }
         }
 
+        /// <summary>남은 「전투 화면 학년 공책」 캡처 횟수(Demo.Grade 가 켠다).</summary>
+        int GradeBattleShots;
+
         IEnumerator GoFight(string mode, string type = "fight")
         {
             if (f.FightScreen != null)
@@ -1555,6 +1555,23 @@ namespace Bolzena.RunUI
                 while (!f.Fighting && t < 15) { t += Time.unscaledDeltaTime; yield return null; }
                 if (!f.Fighting) { Debug.LogWarning("[Demo] 싸움이 열리지 않았습니다 (지금 화면 " + f.Stage.Current + ")"); yield break; }
                 t = 0;
+                if (GradeBattleShots > 0 && mode == "win")
+                {
+                    // 전투 화면 학년 공책 — 시작 · 툴팁 고정 · 이긴 뒤 스티커 「착」(Demo.Grade 가 첫 싸움에 켠다)
+                    GradeBattleShots--;
+                    float slap0 = Flow.BattleGradeSlapAt;
+                    yield return Wait(2.2f); t += 2.2f;
+                    yield return Shot("battle_grade_start");
+                    // 봇이 카드를 누르면 고정이 풀린다 — 찍기 직전까지 매 프레임 다시 고정
+                    for (float w = 0; w < 0.5f; w += Time.unscaledDeltaTime) { Flow.BattleGradeTip?.Invoke(true); yield return null; }
+                    t += 0.5f;
+                    Flow.BattleGradeTip?.Invoke(true);
+                    yield return Shot("battle_grade_tip");
+                    Flow.BattleGradeTip?.Invoke(false);
+                    while (f.Fighting && t < 400 && Flow.BattleGradeSlapAt <= slap0) { t += Time.unscaledDeltaTime; yield return null; }
+                    if (Flow.BattleGradeSlapAt > slap0) { yield return Wait(0.5f); yield return Shot("battle_grade_credit"); }
+                    Expect(Flow.BattleGradeSlapAt > slap0, "전투 끝 — 학년 공책 스티커 「착」 연출");
+                }
                 while (f.Fighting && t < 400) { t += Time.unscaledDeltaTime; yield return null; }
                 if (f.Fighting) { Bail(3, "전투가 400초 안에 끝나지 않았습니다"); yield break; }
                 FightMode = "win";
@@ -1667,6 +1684,8 @@ namespace Bolzena.RunUI
                 if (Hot("pending0") != null) { yield return Shot("event_pending"); yield return Press("pending0", 0.8f); continue; }
                 break;
             }
+            // 카드 얻는 연출(CardGain, 약 2초 뒤 저절로 닫힘)이 끝나야 떠나기(event.leave)가 생긴다 — 기다린 뒤에 누른다
+            yield return Until(() => !CardGain.IsOpen && Hot("event.leave") != null, 10);
             yield return Wait(0.6f);
             yield return Shot("event_result");
             yield return Press("event.leave", 0.4f);
@@ -1681,6 +1700,7 @@ namespace Bolzena.RunUI
             if (canTrain && (seen.Contains("camp_rest") || !canRest))
             {
                 yield return Press("camp.trainopen", 0.9f);
+                if (Hot("camp.card0") != null) yield return Press("camp.card0", 0.1f);   // 수련은 강화할 카드를 먼저 고른다(카드 고르기 창 → 신탁 셋)
                 yield return Until(() => OracleReveal.Phase == "choose", 5); yield return Wait(0.3f);
                 yield return Shot("camp_train");
                 yield return Press("camp.train0", 0.1f);

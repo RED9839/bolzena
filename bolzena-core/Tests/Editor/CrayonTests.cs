@@ -7,6 +7,11 @@ namespace Bolzena.Core.Tests
     /// <summary>크레파스 보드(RunCrayon.cs) — 얻기 · 칠하기(단계) · 판에 걸기 · 진행 코드.</summary>
     public class CrayonTests
     {
+        // 학년(학점제)은 2026-10-09 꺼 두었다(R.GRADE_ON) — 학년 · 학점을 보는 이 시험은 켜고 돈다
+        bool gradeOn0;
+        [SetUp] public void GradeOn() { gradeOn0 = R.GRADE_ON; R.GRADE_ON = true; }
+        [TearDown] public void GradeBack() => R.GRADE_ON = gradeOn0;
+
         static readonly List<string> PARTY = new() { "rico", "carrot", "sion" };
         const string TABLE = @"{earn:{low:2, lowPerFloor:2, lowPerGrade:1, lowWin:3, midFloor2:2, midPerElite:1, highPerBoss:1, highClear:1, topGrad:1, topClear:1}, cols:3, cells:[
  {id:'atk', kind:'atk', v:0.02, costs:[{tier:0, n:3}, {tier:0, n:4}, {tier:1, n:1}]}, {id:'hp', kind:'hp', v:0.02, costs:[{tier:0, n:1}, {tier:0, n:1}]}, {id:'blank', kind:'blank'},
@@ -115,6 +120,35 @@ namespace Bolzena.Core.Tests
             Assert.IsNotNull(Crayon.Import(Crayon.Export(new CrayonSave { Level = new Dictionary<string, int> { ["atk"] = 99 } }), t).why, "단계를 넘음");
             Assert.IsNotNull(Crayon.Import(Crayon.Export(new CrayonSave { Level = new Dictionary<string, int> { ["blank"] = 1 } }), t).why, "빈칸");
             Assert.IsNotNull(Crayon.Import(Crayon.Export(new CrayonSave { Level = new Dictionary<string, int> { ["zz"] = 1 } }), t).why, "모르는 칸");
+        }
+
+        [Test] public void 진행_코드_왕복_빈_일부_꽉_참_그리고_옛_코드()
+        {
+            var t = T();
+            var empty = (new CrayonSave(), new Dictionary<string, string>());
+            var some = (new CrayonSave { Have = new[] { 3, 1, 0, 0 }, Earned = new[] { 9, 2, 1, 0 }, Runs = 2, Level = new Dictionary<string, int> { ["atk"] = 1 } },
+                new Dictionary<string, string> { ["recent"] = "rico|carrot|", ["preset1"] = "rico|carrot|sion" });
+            var full = (new CrayonSave { Have = new[] { 99, 50, 20, 9 }, Earned = new[] { 300, 90, 40, 15 }, Runs = 40, Level = t.Cells.Where(c => !c.Blank).ToDictionary(c => c.Id, c => c.Levels) },
+                new Dictionary<string, string> { ["recent"] = "a|b|c", ["preset1"] = "a|b|c", ["preset5"] = "c||a", ["tag1"] = "광기", ["clears"] = "a=3;b=1" });
+            foreach (var (s, x) in new[] { empty, some, full })
+            {
+                var code = Crayon.Export(s, x);
+                Assert.IsNotEmpty(code);
+                var (back, bx, why) = Crayon.ImportAll(code, t);
+                Assert.IsNull(why, why);
+                CollectionAssert.AreEqual(s.Have, back.Have); CollectionAssert.AreEqual(s.Earned, back.Earned); Assert.AreEqual(s.Runs, back.Runs);
+                CollectionAssert.AreEquivalent(s.Level, back.Level);
+                CollectionAssert.AreEquivalent(x, bx);
+                Assert.AreEqual(code, Crayon.Export(back, bx), "다시 내보내도 같은 코드");
+            }
+            // 옛 1판 코드(보드만 · v 없음)도 읽는다 — 덧붙임은 null
+            var oldBody = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("{\"h\":[1,2,0,0],\"e\":[1,2,0,0],\"l\":{\"atk\":1},\"r\":1}"));
+            var oldCode = $"BZP1-{oldBody}-{Crayon.Checksum(oldBody):x8}";
+            var (o, ox, ow) = Crayon.ImportAll(oldCode, t);
+            Assert.IsNull(ow); Assert.IsNull(ox); Assert.AreEqual(1, o.LevelOf("atk"));
+            // 모르는 새 판은 거부
+            var newBody = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("{\"v\":99,\"h\":[0,0,0,0],\"e\":[0,0,0,0],\"l\":{},\"r\":0}"));
+            Assert.IsNotNull(Crayon.ImportAll($"BZP1-{newBody}-{Crayon.Checksum(newBody):x8}", t).why);
         }
 
         [Test] public void 봇이_보드_효과를_건_판을_돈다()

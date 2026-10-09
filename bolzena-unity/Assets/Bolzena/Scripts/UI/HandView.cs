@@ -142,8 +142,10 @@ namespace Bolzena.UI
             {
                 if (Cards[i].Info.Id != hand[i].Id) continue;
                 bool changed = Cards[i].Info.Cost != hand[i].Cost || Cards[i].Info.Epiphany != hand[i].Epiphany || Cards[i].Info.Text != hand[i].Text || Cards[i].Info.EmpowerMul != hand[i].EmpowerMul;
+                int oldCost = Cards[i].Info.Cost;
                 Cards[i].Info = hand[i];
                 if (changed) Cards[i].Refresh();
+                if (hand[i].CostUpWhy != null && hand[i].Cost > oldCost && hand[i].Cost > hand[i].BaseCost) Cards[i].CostUpPop(hand[i].Cost - oldCost);
             }
         }
 
@@ -415,7 +417,7 @@ namespace Bolzena.UI
             // 카드 확대(모두 CardZoom 한 판 · 언제나 화면 가운데 위 · 키워드 판은 카드 오른쪽, 넘치면 왼쪽) —
             //   길게 누른 카드(마우스 · 터치 같게), 마우스를 잠깐 올려 둔 카드(PC). 고른 카드 · 끄는 카드는 확대하지 않는다(적 · 화살표를 가리지 않게)
             int holdCard = HoldZooming && press < Cards.Count ? press : -1;
-            int tipCard = drag >= 0 ? -1 : holdCard >= 0 ? holdCard : sel < 0 && hover >= 0 && hoverT > 0.4f && !hoverMute && !PointerInput.Touch && (!PointerInput.Held || press == hover) ? hover : -1;
+            int tipCard = drag >= 0 ? -1 : holdCard >= 0 ? holdCard : -1;   // 올려 두기만으로는 확대 · 낱말 판을 띄우지 않는다(2026-10-09 사용자 — 길게 누를 때만)
             if (tipCard >= 0 && tipCard < Cards.Count)
             {
                 var c = Cards[tipCard];

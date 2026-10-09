@@ -31,16 +31,16 @@ namespace Bolzena.RunUI
         {
             if (tab == "사도") HeroList(null, -1, back, dexHeroes ??= new ListState(), host);
             else if (tab == "적") DexFoes(host, back, dexFoes ??= new FoeListState());
-            else DexItems(host, tab, back, tab == "장비" ? dexEquips ??= new ItemListState() : dexCards ??= new ItemListState());
+            else DexItems(host, tab, back, tab == "아티팩트" ? dexEquips ??= new ItemListState() : dexCards ??= new ItemListState());
         }
 
         /// <summary>위 오른쪽 도감 탭 셋 — 지금 탭은 금 알약.</summary>
         void DexTabs(RectTransform row, RectTransform host, string current, Action back)
         {
-            foreach (var t in new[] { "사도", "교주 카드", "장비", "적" })
+            foreach (var t in new[] { "사도", "교주 카드", "아티팩트", "적" })
             {
                 bool on = t == current;
-                var icon = t == "사도" ? "ic_book" : t == "장비" ? "ic_sword" : t == "적" ? "ic_skull" : "ic_crown";
+                var icon = t == "사도" ? "ic_book" : t == "아티팩트" ? "ic_sword" : t == "적" ? "ic_skull" : "ic_crown";
                 Btn b;
                 if (on)
                 {
@@ -62,11 +62,11 @@ namespace Bolzena.RunUI
         void DexItems(RectTransform host, string tab, Action back, ItemListState ls)
         {
             Ui.Clear(host);
-            bool eq = tab == "장비";
+            bool eq = tab == "아티팩트";
             RosterBg(host, 0.9f);
             void Rebuild() => DexItems(host, tab, back, ls);
             void Refilter() { ls.ScrollY = 0; Rebuild(); }
-            RosterHead(host, eq ? "장비 도감" : "교주 카드 도감", back);
+            RosterHead(host, eq ? "아티팩트 도감" : "교주 카드 도감", back);
 
             // 위 오른쪽 — 정렬 · 도감 탭
             var tr = Ui.Rect("tools", host).At(1, 1, -Theme.Gutter, -20, 1240, 52);
@@ -170,9 +170,9 @@ namespace Bolzena.RunUI
                 {
                     keys.Add(c.Id);
                     var id = c.Id;
-                    var card = W.Card(content, this, id, cw, "card " + id);
+                    var card = W.Card(content, this, id, cw, "card " + id, P.Data.View(id));
                     var b = card.gameObject.AddComponent<Btn>();
-                    b.OnClick = () => { ls.Focus = id; Rebuild(); CardZoom(id, keys); };
+                    b.OnClick = () => { ls.Focus = id; Rebuild(); CardZoomPlain(id, keys); };
                     if (ls.Focus == id) { var fr = Ui.Img(card, Theme.S("frame_thick", 24), Theme.Sky, "focus"); fr.rectTransform.Fill(-3, -3, -3, -3); focusName = c.Name; focusSub = (c.Grade ?? "교주 카드") + " · " + W.TypeLabel(c.Type); }
                     Stage.Hot["dexcard:" + id] = b;
                     if (anim && idx < 30) Tw.Pop(card, 0.012f * idx, 0.88f, 0.28f);
@@ -200,7 +200,7 @@ namespace Bolzena.RunUI
             var drt = detail.GetComponent<RectTransform>(); drt.At(1, 0.5f, 0, 0, 250, 58);
             var dzi = Ui.Img(drt, Theme.S("ic_zoom"), Theme.Gold, "ic"); dzi.rectTransform.At(0, 0.5f, 22, 0, 24, 24); dzi.preserveAspect = true;
             var dl = Ui.Title(drt, "상세 정보", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight); dl.rectTransform.Fill(50, 0, 26, 0);
-            detail.Interactable = focusName != null; detail.Why = eq ? "장비를 먼저 고르세요" : "카드를 먼저 고르세요";
+            detail.Interactable = focusName != null; detail.Why = eq ? "아티팩트를 먼저 고르세요" : "카드를 먼저 고르세요";
             Stage.Hot["list.detail"] = detail;
             // 검색 칸 — 이름 · 초성(도감마다 따로 기억)
             DexSearch(tr, tab, content, area, n =>

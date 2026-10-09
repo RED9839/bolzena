@@ -774,7 +774,7 @@ namespace Bolzena.RunUI
                 var v = Ui.Title(r.transform, rows[i].Item2, Theme.FsLg, Theme.Gold, TextAlignmentOptions.MidlineRight); v.rectTransform.Fill(0, 0, 16, 0);
             }
             var note = Ui.Img(body, Theme.Glass, Color.white, "grow"); note.Pref(-1, 56);
-            var nt = Ui.Text(note.transform, "모험 안에서 강해지는 길 — 캠프 수련 · 장비 · 은총(고유 카드)", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); nt.rectTransform.Fill(12, 0, 12, 0);
+            var nt = Ui.Text(note.transform, "모험 안에서 강해지는 길 — 캠프 수련 · 아티팩트 · 은총(고유 카드)", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); nt.rectTransform.Fill(12, 0, 12, 0);
             // 이야기(옛 고유 효과 탭에서 옮김) — 남는 높이에 다 담기게 글자를 줄인다
             if (!string.IsNullOrEmpty(h.blurb))
             {
@@ -820,14 +820,9 @@ namespace Bolzena.RunUI
                 for (int i = 0; i < sorted.Count; i++)
                 {
                     var id = sorted[i];
-                    var c = W.Card(holder, this, id, cw); c.At(0, 1, (i % cols) * (cw + 12), -(i / cols) * (ch + 12), cw, ch);
-                    var b = c.gameObject.AddComponent<Btn>(); int at = allCards.IndexOf(id); b.OnClick = () => CardZoom(id, allCards, at);
+                    var c = W.Card(holder, this, id, cw, "card", P.Data.View(id)); c.At(0, 1, (i % cols) * (cw + 12), -(i / cols) * (ch + 12), cw, ch);
+                    var b = c.gameObject.AddComponent<Btn>(); int at = allCards.IndexOf(id); b.OnClick = () => CardZoomPlain(id, allCards, at);
                     Stage.Hot["detail.card" + title + i] = b;
-                    if (title == "시작 카드" && P.Data.Card(id)?.Unique == true)
-                    {   // 시동 카드 표식
-                        var tg = Ui.Img(c, Theme.Pill, new Color(0.35f, 0.2f, 0.02f, 0.95f), "ignition"); tg.rectTransform.At(1, 0, -6, 70 * cw / 200f, 46 * cw / 200f + 14, 22);
-                        var tt = Ui.Title(tg.transform, "시동", 13, new Color(1f, 0.88f, 0.5f), TextAlignmentOptions.Center); tt.rectTransform.Fill();
-                    }
                     Tw.Pop(c, 0.03f * i, 0.85f, 0.3f);
                 }
             }

@@ -43,7 +43,8 @@ namespace Bolzena.Core
         public int BreakSeq, DealtSeq, DealtAct;
         public List<List<string>> PlayTags;
         public List<LaterRec> Later;
-        public int PlaysTotal;
+        public int PlaysTotal, UltsUsed;
+        public BattleTape Tape;
         public List<CostModRec> CostMods;
         public Dictionary<string, int> PlayedPrev;
         public HashSet<string> BattleVals;
@@ -87,7 +88,7 @@ namespace Bolzena.Core
             Echo = Echo.Select(e => new EchoRec { Id = e.id, Target = e.target }).ToList(),
             GearRules = gearRules,
             EnemyHpx = EnemyHpx, EnemyDmgx = EnemyDmgx, CritDmgX = CritDmgX, EliteFight = EliteFight, EnemyNature = EnemyNature, Floor = Floor,
-            CardSt = CardSt, Frozen = Frozen, Bond = Bond, Removed = Removed, LastHero = LastHero, BreakSeq = BreakSeq, DealtSeq = DealtSeq, DealtAct = DealtAct, PlayTags = PlayTags, Later = Later, GrowthGain = GrowthGain, PlaysTotal = PlaysTotal, CostMods = CostMods, PlayedPrev = PlayedPrev, BattleVals = BattleVals, DebtNow = DebtNow, ShieldBy = ShieldBy, CutNext = CutNext, Forms = Forms.Count > 0 ? Forms : null, Powers = Powers.Count > 0 ? Powers : null,
+            CardSt = CardSt, Frozen = Frozen, Bond = Bond, Removed = Removed, LastHero = LastHero, BreakSeq = BreakSeq, DealtSeq = DealtSeq, DealtAct = DealtAct, PlayTags = PlayTags, Later = Later, GrowthGain = GrowthGain, PlaysTotal = PlaysTotal, UltsUsed = UltsUsed, Tape = Tape, CostMods = CostMods, PlayedPrev = PlayedPrev, BattleVals = BattleVals, DebtNow = DebtNow, ShieldBy = ShieldBy, CutNext = CutNext, Forms = Forms.Count > 0 ? Forms : null, Powers = Powers.Count > 0 ? Powers : null,
             PlayIds = PlayIds, Held = Held, ApSpent = ApSpent, PaidHp = PaidHp, DiscardedTurn = DiscardedTurn, TakenNow = TakenNow, TakenPrev = TakenPrev,
             GoneN = GoneN, FightEndDone = FightEndDone,
             GuardedNow = GuardedNow, GuardedPrev = GuardedPrev, HealLog = HealLog.Count > 0 ? HealLog : null,
@@ -115,7 +116,7 @@ namespace Bolzena.Core
             s.EnemyHpx = x.EnemyHpx; s.EnemyDmgx = x.EnemyDmgx; s.CritDmgX = x.CritDmgX; s.EliteFight = x.EliteFight; s.EnemyNature = x.EnemyNature; s.Floor = x.Floor;
             s.ApSpent = x.ApSpent; s.PaidHp = x.PaidHp; s.DiscardedTurn = x.DiscardedTurn; s.TakenNow = x.TakenNow; s.TakenPrev = x.TakenPrev;
             s.CardSt = x.CardSt ?? new(); s.Frozen = x.Frozen ?? new(); s.Bond = x.Bond ?? new(); s.Removed = x.Removed ?? new(); s.LastHero = x.LastHero;
-            s.BreakSeq = x.BreakSeq; s.DealtSeq = x.DealtSeq; s.DealtAct = x.DealtAct; s.PlayTags = x.PlayTags ?? new(); s.Later = x.Later ?? new(); s.PlaysTotal = x.PlaysTotal; s.CostMods = x.CostMods ?? new(); s.PlayedPrev = x.PlayedPrev ?? new(); s.BattleVals = x.BattleVals ?? new(); s.DebtNow = x.DebtNow; s.ShieldBy = x.ShieldBy; s.CutNext = x.CutNext; s.GrowthGain = x.GrowthGain ?? new();
+            s.BreakSeq = x.BreakSeq; s.DealtSeq = x.DealtSeq; s.DealtAct = x.DealtAct; s.PlayTags = x.PlayTags ?? new(); s.Later = x.Later ?? new(); s.PlaysTotal = x.PlaysTotal; s.UltsUsed = x.UltsUsed; s.Tape = x.Tape; s.CostMods = x.CostMods ?? new(); s.PlayedPrev = x.PlayedPrev ?? new(); s.BattleVals = x.BattleVals ?? new(); s.DebtNow = x.DebtNow; s.ShieldBy = x.ShieldBy; s.CutNext = x.CutNext; s.GrowthGain = x.GrowthGain ?? new();
             s.Forms = x.Forms ?? new();
             s.Powers = x.Powers ?? new();
             s.GoneN = x.GoneN; s.FightEndDone = x.FightEndDone;

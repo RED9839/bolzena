@@ -45,7 +45,7 @@ namespace Bolzena.RunUI
                     var face = W.Face(row, h, fs); face.At(0, 0.5f, 0, 0, fs, fs);
                     var nm = Ui.Title(row, h.ko, Theme.FsLg, Theme.Ink); nm.rectTransform.At(0, 1, fs + 16, -4, 260, 30);
                     var gear = P.GearOf(k).Values.Select(id => P.Data.Equip(id)?.Name).Where(x => x != null);
-                    var gt = Ui.Text(row, gear.Any() ? string.Join(" · ", gear) : "장비 없음", Theme.FsCap, Theme.Sub); gt.rectTransform.At(0, 1, fs + 18, -36, 270, 24);
+                    var gt = Ui.Text(row, gear.Any() ? string.Join(" · ", gear) : "아티팩트 없음", Theme.FsCap, Theme.Sub); gt.rectTransform.At(0, 1, fs + 18, -36, 270, 24);
                     gt.textWrappingMode = TextWrappingModes.NoWrap;
                 }
                 var nums = Ui.Text(party, $"<color={Theme.GoldTag}>골드</color> {P.S.Gold:N0}  ·  <color={Theme.GoldTag}>덱</color> {P.S.Deck.Count}장  ·  <color={Theme.GoldTag}>HP</color> {P.S.PartyHp:N0}/{P.S.PartyMaxHp:N0}", Theme.FsSm, Theme.Ink);
@@ -66,7 +66,7 @@ namespace Bolzena.RunUI
 
                 EndCrayon(root);   // 받은 크레파스(Flow.Crayon.cs)
                 var go = Btn.Make(root, "로비로", BtnStyle.PillGold, Lobby, Theme.FsLg);
-                go.GetComponent<RectTransform>().At(0.5f, 0, 0, Theme.C(34, 22), 340, Theme.C(70, 64));
+                go.GetComponent<RectTransform>().At(0.5f, 0, 0, Theme.C(34, 22), 340, Theme.BtnMainH);
                 Stage.Hot["end.lobby"] = go;
                 Tw.Rise(go.GetComponent<RectTransform>(), 0.6f, 20);
                 if (win) StartCoroutine(Confetti(root));

@@ -151,6 +151,7 @@ namespace Bolzena.Core
             var why = LockOf(opt);
             if (why != null) return (false, why);
             if (!S.EventsSeen.Contains(ev.Id)) S.EventsSeen.Add(ev.Id);
+            Pick("event", null, new[] { ev.Id }, idx.ToString());
             var E = S.Event;
             E.Label = opt.Label;
             if (opt.Fight != null)
@@ -240,7 +241,7 @@ namespace Bolzena.Core
                     case "equip":
                         {
                             var ids = o.Slot != null ? OfferEquipSlot(o.Grade, o.Slot) : OfferEquip(new Dictionary<string, int> { [o.Grade] = 1 }, 1);
-                            if (ids.Count > 0) { GainEquip(ids[0]); E.Log.Add($"장비 「{Data.Equip(ids[0]).Name}」({o.Grade}) — 끼거나 팝니다"); }
+                            if (ids.Count > 0) { GainEquip(ids[0]); E.Log.Add($"아티팩트 「{Data.Equip(ids[0]).Name}」({o.Grade}) — 끼거나 팝니다"); }
                             else E.Log.Add($"{o.Grade} {o.Slot ?? "장비"} — 이미 다 가졌습니다");
                             break;
                         }
@@ -279,7 +280,7 @@ namespace Bolzena.Core
                     case "mindBreak": S.MindBreak = Math.Max(S.MindBreak, Math.Max(1, o.N)); E.Log.Add($"정신 붕괴 — 다음 전투 {Math.Max(1, o.N)}번이 끝날 때까지 카드 얻기 · 신탁 · 제거를 할 수 없습니다"); break;
                     case "flag": if (!string.IsNullOrEmpty(o.Id)) S.Flags.Add(o.Id); break;
                     case "scout": S.Scout = true; E.Log.Add("지도 공개 — 다음 이벤트 칸에서 둘 중 하나를 고릅니다"); break;
-                    case "shopGift": S.ShopGift = o.Grade; E.Log.Add($"다음 상점에서 {o.Grade} 장비 하나를 공짜로 받습니다"); break;
+                    case "shopGift": S.ShopGift = o.Grade; E.Log.Add($"다음 상점에서 {o.Grade} 아티팩트 하나를 공짜로 받습니다"); break;
                     case "rewardFlash": S.RewardFlash = true; E.Log.Add("다음 전투에서 신탁이 꼭 뜹니다"); break;
                     case "next":
                         S.NextFight = (S.NextFight ?? new NextFight()).Merge(o.Next);
@@ -390,11 +391,14 @@ namespace Bolzena.Core
                     {
                         int n = value == null ? -1 : Convert.ToInt32(value);
                         if (n < 0 || n >= p.Options.Count) return "고를 수 없습니다";
+                        Pick("ev.gambleChoice", null, null, n.ToString());
                         E.Pending.RemoveAt(0);
                         ApplyOutcomes(p.Options[n]);
                         return null;
                     }
             }
+            Pick("ev." + p.K, p.K == "flash" ? GameData.NoInst(p.Offer?.CardId) : null,
+                p.K == "card" ? p.Cards : p.K == "flash" ? p.Offer?.Picks.Select(x => x.ToString()) : null, value?.ToString());
             E.Pending.RemoveAt(0);
             return null;
         }

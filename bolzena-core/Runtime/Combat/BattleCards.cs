@@ -138,6 +138,7 @@ namespace Bolzena.Core
             var ult = UltOf(heroKey);
             Gauge -= ult.Cost;
             LastUlt = heroKey;
+            UltsUsed++; Tape?.Ult(this);
             var owner = HeroUnit(heroKey);
             Say($"{owner.Name} 고학년 스킬 — {ult.Name} (게이지 {ult.Cost}%)");
             Talk(owner, "ego");
@@ -166,6 +167,14 @@ namespace Bolzena.Core
             return before < n;
         }
 
+        /// <summary>비용이 올라간 까닭(화면 풀이용) — 침체 · 카드에 붙은 비용 · 적이 바꾼 비용. 안 올랐으면 null.</summary>
+        public string CostUpWhy(string cardId)
+        {
+            if (CardStOf(cardId, "침체") > 0) return "침체";
+            if (CardStOf(cardId, "비용") > 0) return "비용 증가 효과";
+            if (CostMods.Count > 0 && CostModOf(cardId) > 0) return "적이 바꾼 비용";
+            return null;
+        }
         public int CostOf(string cardId, int? handIdx = null)
         {
             var c = CardOf(cardId);
@@ -186,6 +195,7 @@ namespace Bolzena.Core
             var g = GlowOf(cardId);
             if (g == null || choice < 0 || choice >= g.Count) return null;
             Glow.Remove(cardId);
+            Tape?.Epi(this, cardId, g, choice);
             Cue("epiphany", HeroUnit(CardOf(cardId)?.Hero) ?? PartyRep(),new Cue { CardId = cardId, Id = g.Kind, V = choice, Hero = g.Hero });
             if (g.Kind == "card")
             {
@@ -246,6 +256,7 @@ namespace Bolzena.Core
             var c = CardOf(cardId);
             ActSeq = ++SeqN;
             PlaysTotal++;
+            Tape?.Card(this, cardId);
             var owner = c.Hero != null ? HeroUnit(c.Hero) : null;
             bool grace = !FreeOnce.Contains(cardId) && GraceFree(cardId, handIdx);
             var def0 = Data.Card(cardId);

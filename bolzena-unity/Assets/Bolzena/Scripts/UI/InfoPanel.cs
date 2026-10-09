@@ -371,7 +371,7 @@ namespace Bolzena.UI
                 st.Head("다음 행동");
                 float it = st.Y;
                 if (e.Dead) st.Para("쓰러졌습니다", Pad, Wd - Pad * 2, Tone.Body, Tone.Dim);
-                else if (e.Broken || e.Intent == IntentKind.None) st.Para(e.Broken ? "격파 — 1턴 동안 행동하지 못한다(격파한 쪽 AP +1)." : "할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
+                else if (e.Broken || e.Intent == IntentKind.None) st.Para(e.Broken ? "격파 — 1턴 동안 행동하지 못합니다(격파한 쪽 AP +1)." : "할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
                 else
                 {
                     var k = e.Intent;

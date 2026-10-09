@@ -12,9 +12,24 @@ namespace Bolzena
         static Clock inst;
         float stopUntil, slowUntil, slowScale = 1f;
         public static float Now { get; private set; }          // 멈춤과 무관한 시간(초)
-        public static float Speed = 1f;                         // 배속(1× · 2×) — 연출 시간이 모두 이만큼 빨라진다
+        public static float Speed = InitSpeed();                // 배속(1× · 2×) — 연출 시간이 모두 이만큼 빨라진다(저장 안 함 — 실행 동안만)
+        // 기본 템포(2026-10-09 「모션이 너무 길어 2배속이 아니면 루즈하다」) — 1× 도 이만큼 빠르게 돈다. 배속은 그 위에 곱한다(2× = 2.4).
+        //   고학년(사도 · 보스 클론)은 원작 길이 원칙(ULT_SPEED_MAX)이 있어 그동안 Base = 1 로 둔다. -oldtempo 면 1(고치기 전 비교)
+        public static readonly float TEMPO = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-oldtempo") >= 0 ? 1f : 1.2f;
+        public static float Base = TEMPO;
+        public static float Scale => Speed * Base;              // 실제로 거는 배율
         public static bool Paused;                              // 일시정지 — 싸움터 · 연출이 멈춘다(화면 UI 는 산다)
-        public static float UDt => Paused ? 0f : Time.unscaledDeltaTime * Speed;   // 화면 시간(멈칫과 무관, 배속은 탄다)
+        public static float UDt => Paused ? 0f : Time.unscaledDeltaTime * Scale;   // 화면 시간(멈칫과 무관, 배속은 탄다)
+        // 화면 시계(초) — 데모는 한 프레임 = captureDeltaTime 이라 프레임 수로 잰다(템포 점검 로그)
+        public static float RealNow => Time.captureDeltaTime > 0 ? Time.frameCount * Time.captureDeltaTime : Time.realtimeSinceStartup;
+
+        // -speed 2 — 시작 배속(점검 · 비교용)
+        static float InitSpeed()
+        {
+            var a = System.Environment.GetCommandLineArgs();
+            int i = System.Array.IndexOf(a, "-speed");
+            return i >= 0 && i + 1 < a.Length && float.TryParse(a[i + 1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v) && v > 0 ? v : 1f;
+        }
 
         public static Clock Ensure()
         {
@@ -31,18 +46,18 @@ namespace Bolzena
         {
             if (Asleep) return;
             if (Paused) { Time.timeScale = 0f; return; }
-            Now += Time.unscaledDeltaTime * Speed;
+            Now += Time.unscaledDeltaTime * Scale;
             float s = 1f;
             if (Now < slowUntil) s = slowScale;
             if (Now < stopUntil) s = 0.0001f;
-            Time.timeScale = s * Speed;
+            Time.timeScale = s * Scale;
         }
 
         // 맞는 순간 멈칫 — 겹치면 긴 쪽
         public static void HitStop(float sec)
         {
             Ensure();
-            inst.stopUntil = Mathf.Max(inst.stopUntil, Now + sec / Mathf.Max(1f, Speed));   // 2× 면 멈칫도 반으로(배속 설정을 따른다)
+            inst.stopUntil = Mathf.Max(inst.stopUntil, Now + sec / Mathf.Max(1f, Scale));   // 2× 면 멈칫도 반으로(배속 · 템포를 따른다)
             if (!Paused) Time.timeScale = 0.0001f;
         }
 
@@ -56,13 +71,14 @@ namespace Bolzena
         public static Coroutine Run(IEnumerator co) => Ensure().StartCoroutine(co);
 
         // 멈칫 · 슬로를 바로 푼다(입력을 기다리는 창이 열릴 때)
-        public static void ClearStops() { if (inst != null) inst.stopUntil = inst.slowUntil = 0; if (!Paused) Time.timeScale = Speed; }
+        public static void ClearStops() { if (inst != null) inst.stopUntil = inst.slowUntil = 0; if (!Paused) Time.timeScale = Scale; }
 
         // 전투 장면을 떠날 때 — 장면 밖에 사는 시계가 돌리던 연출(사라진 물체를 만지는)을 멈추고 시간을 되돌린다
         public static void Reset()
         {
             if (inst != null) { inst.StopAllCoroutines(); inst.stopUntil = inst.slowUntil = 0; }
             Paused = false;
+            Base = TEMPO;
             Asleep = true;
             Time.timeScale = 1f;
         }

@@ -132,7 +132,7 @@ namespace Bolzena.Core
                 AvgTurnsFight = fN > 0 ? (double)fT / fN : 0, AvgTurnsBoss = bN > 0 ? (double)bT / bN : 0,
                 BreaksPerRun = jobs.Count > 0 ? (double)brk / jobs.Count : 0, WeakPct = Pct(tw, th),
                 BreaksPerFight = bk.ToDictionary(kv => kv.Key, kv => kv.Value[0] > 0 ? (double)kv.Value[1] / kv.Value[0] : 0),
-                Label = $"{(skilled ? "숙련" : "초보")} 봇 · {PartyName(party)} 편성{(uonly ? " · 고유 카드만" : "")}{(bot?.Perks != null ? " · 교주 능력치 전부" : "")}",
+                Label = $"{(skilled ? "숙련" : "초보")} 봇 · {PartyName(party)} 편성{(uonly ? " · 고유 카드만" : "")}{(bot?.Perks != null ? " · 교주 보드 전부" : "")}",
                 AvgDeck = res.Length > 0 ? res.Average(x => x.Deck) : 0, AvgUniques = res.Length > 0 ? res.Average(x => x.Uniques) : 0, AvgBasics = res.Length > 0 ? res.Average(x => x.Basics) : 0, AvgRemovals = res.Length > 0 ? res.Average(x => x.Removals) : 0,
                 FlagsPerRun = res.Length > 0 ? res.Average(x => x.Flags.Count) : 0,
                 FlagReadsPerRun = res.Length > 0 ? res.Average(x => x.FlagReads) : 0,
@@ -475,7 +475,8 @@ namespace Bolzena.Core
             sb.AppendLine($"  평균 턴 — 일반 싸움 {r.AvgTurnsFight:0.0} · 보스 {r.AvgTurnsBoss:0.0}");
             if (r.FlagPct.Count > 0) sb.AppendLine($"  깃발(연속 이벤트) — 판당 선 깃발 {r.FlagsPerRun:0.00} · 줄기 뒤 이벤트를 만남 {r.FlagReadsPerRun:0.000} · {string.Join(" · ", r.FlagPct.OrderByDescending(kv => kv.Value).Select(kv => $"{kv.Key} {kv.Value:0.0}%"))}");
             sb.AppendLine($"  격파 — 판당 {r.BreaksPerRun:0.0} · 싸움당 {string.Join(" · ", r.BreaksPerFight.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))} · 강인도 깎은 카드 가운데 약점 공격 {r.WeakPct:0}%");
-            if (r.GradeEnd.Count > 0)
+            if (!R.GRADE_ON) sb.AppendLine($"  이긴 싸움 판당 {string.Join(" · ", r.WinsPerRun.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))}");
+            else if (r.GradeEnd.Count > 0)
             {
                 sb.AppendLine($"  학년 — 판당 학점 {r.AvgCredits:0.0} · 이긴 싸움 판당 {string.Join(" · ", r.WinsPerRun.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))}");
                 sb.AppendLine($"    판 끝 학년 {string.Join(" · ", r.GradeEnd.Select(kv => $"{kv.Key}학년 {kv.Value:0.0}%"))}");

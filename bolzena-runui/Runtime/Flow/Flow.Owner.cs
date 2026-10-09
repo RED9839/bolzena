@@ -23,7 +23,7 @@ namespace Bolzena.RunUI
             {
                 var why = P.AssignNeutral(key);
                 if (why != null) Toast.Show(why);
-                else Toast.Show($"「{P.Data.Card(id)?.Name}」 — {Roster.OfCore(key)?.ko} 덱에");
+                else Toast.Show($"「{P.Data.Card(id)?.Name}」 — {Roster.OfCore(key)?.ko} 덱에 넣었습니다");
                 PickOwners(done);
             });
         }
@@ -45,7 +45,7 @@ namespace Bolzena.RunUI
             var keys = (party ?? P.S?.Party ?? new List<string>()).Take(3).ToList();
             if (v == null || keys.Count == 0) { done?.Invoke(keys.FirstOrDefault()); return; }
             float H = Theme.C(680, 640);
-            var (body, close, _) = Stage.ModalBox("ownerpick", 1240, H, "누구 덱에 넣을까요?", OwnerSub(cardId, v.Name), false, null, 0, false);
+            var (body, close, _) = Stage.ModalBox("ownerpick", 1240, H, "누구 덱에 넣겠습니까?", OwnerSub(cardId, v.Name), false, null, 0, false);
 
             // 왼쪽 — 얻은 카드
             float cardW = Theme.C(220, 196);

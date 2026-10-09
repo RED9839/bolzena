@@ -89,6 +89,28 @@ namespace Bolzena.RunUI
 
         /// <summary>시험 도구 — 완주 횟수를 직접 정한다.</summary>
         public static void SetCleared(string heroKey, int n) { if (n > 0) Clears[heroKey] = n; else Clears.Remove(heroKey); Flush(); }
+        // ── 진행 코드(CrayonStore.Export · Import — 코어 Crayon 진행 코드의 덧붙임) ──
+        /// <summary>진행 코드에 담는 편성 기억 — 최근 편성 · 프리셋 5칸(사도 셋 · 성격 표) · 사도별 완주 기록. 저장된 글 그대로(빈 칸은 뺀다).</summary>
+        static readonly string[] CodeKeys = { "recent", "preset1", "preset2", "preset3", "preset4", "preset5", "tag1", "tag2", "tag3", "tag4", "tag5", "clears" };
+        public static Dictionary<string, string> Dump()
+        {
+            var o = new Dictionary<string, string>();
+            foreach (var n in CodeKeys) { var v = PlayerPrefs.GetString(K(n), ""); if (v.Length > 0) o[n] = v; }
+            return o;
+        }
+        /// <summary>진행 코드의 편성 기억으로 덮어쓴다(코드에 없는 칸은 지운다). 모르는 이름은 버린다.</summary>
+        public static void Load(Dictionary<string, string> d)
+        {
+            if (d == null) return;
+            foreach (var n in CodeKeys)
+            {
+                if (d.TryGetValue(n, out var v) && !string.IsNullOrEmpty(v)) PlayerPrefs.SetString(K(n), v);
+                else PlayerPrefs.DeleteKey(K(n));
+            }
+            clears = null;
+            PlayerPrefs.Save();
+        }
+
         /// <summary>시험 도구 — 이 저장의 편성 기억을 모두 지운다.</summary>
         public static void ResetAll()
         {

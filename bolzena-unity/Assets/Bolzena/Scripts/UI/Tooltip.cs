@@ -94,6 +94,11 @@ namespace Bolzena.UI
             panel.enabled = edge.enabled = body.enabled = true;
         }
 
+        TipZone pinnedZone;
+        /// <summary>그 자리를 누른 것처럼 툴팁을 띄운다(null 이면 닫기) — 시범 캡처(runui Flow.BattleGradeTip)가 쓴다. 다음 누름에서 평소처럼 바뀐다.</summary>
+        public void PinZone(TipZone z) => pinnedZone = z;
+        public bool Showing => shown != null;
+        public static bool AnyShown;
         void Update()
         {
             var p = PointerInput.Pos;
@@ -106,20 +111,29 @@ namespace Bolzena.UI
             }
             if (best != hot) { hot = best; hotT = 0; }
             hotT += Time.unscaledDeltaTime;
-            bool want = hot != null && (PointerInput.Touch ? PointerInput.LongFired && PointerInput.Held : hotT > hot.Delay);
+            // 누를 때만 뜬다(2026-10-09 사용자) — 올리기만 해서는 안 뜨고, 같은 곳을 다시 누르거나 다른 곳을 누르면 닫힌다
+            if (PointerInput.Down) pinnedZone = best != null && pinnedZone != best ? best : null;
+            if (PointerInput.Down && Environment.GetCommandLineArgs().Length > 0 && Array.IndexOf(Environment.GetCommandLineArgs(), "-tipdebug") >= 0) Debug.Log($"[Tip] 누름 best={(best != null ? best.name : "-")} pinned={(pinnedZone != null ? pinnedZone.name : "-")} sup={Suppress} pri={(best != null ? best.Priority : -1)} modal={(Modal.Open != null)} pos={p}");
+            if (pinnedZone != null && (!pinnedZone.isActiveAndEnabled || (Suppress && pinnedZone.Priority < 100))) pinnedZone = null;
+            var act = pinnedZone;
+            bool want = act != null;
             if (want)
             {
-                var txt = hot.Text?.Invoke();
+                var txt = act.Text?.Invoke();
                 if (string.IsNullOrEmpty(txt)) { if (shown != null) Hide(); return; }
-                if (shown != hot || body.text != txt)
+                if (shown != act || body.text != txt)
                 {
-                    Layout(hot.Anchor(), txt, hot.PreferLeft);
-                    if (shown != hot) OnShown?.Invoke(hot.name);
-                    shown = hot;
+                    Layout(act.Anchor(), txt, act.PreferLeft);
+                    if (shown != act) OnShown?.Invoke(act.name);
+                    shown = act;
+                }
+                AnyShown = true;
+                {
                 }
             }
             else
             {
+                AnyShown = false;
                 if (shown != null) { shown = null; panel.enabled = edge.enabled = body.enabled = false; }
                 if (pinnedText != null && !Suppress) { if (!panel.enabled || body.text != pinnedText) Layout(pinnedAt, pinnedText, pinLeft); }
                 else if (panel.enabled) panel.enabled = edge.enabled = body.enabled = false;
@@ -150,6 +164,7 @@ namespace Bolzena.UI
         Vector2 C => (Vector2)transform.position + Offset * (Vector2)transform.lossyScale;
         Vector2 S => Size * new Vector2(Mathf.Abs(transform.lossyScale.x), Mathf.Abs(transform.lossyScale.y));
 
+        public Vector2 Center => C;
         public bool Hit(Vector2 p)
         {
             var c = C; var s = S;

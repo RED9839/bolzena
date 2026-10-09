@@ -350,8 +350,8 @@ namespace Bolzena.RunUI
             line.rectTransform.Band(1, 1, 20, 20, -headH);
             if (closeX)
             {
-                var x = Btn.Icon(panel, Theme.S("ic_x"), close, 44, "close");
-                x.GetComponent<RectTransform>().At(1, 1, -18, -14, 44, 44);
+                var x = Btn.Icon(panel, Theme.S("ic_x"), close, Theme.IconBtnSm, "close");
+                x.GetComponent<RectTransform>().At(1, 1, -18, -14, Theme.IconBtnSm, Theme.IconBtnSm);
                 Hot["modal.x"] = x;
                 var bc = panel.parent.GetComponent<BackClose>(); if (bc != null) bc.Locked = false;
             }

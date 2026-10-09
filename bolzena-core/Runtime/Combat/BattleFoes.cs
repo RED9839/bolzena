@@ -354,8 +354,9 @@ namespace Bolzena.Core
                 Emit("foeActBefore", new EmitInfo { Target = e, Type = HitLike(it) ? "공격" : "기타" });
                 if (Over != null || e.Dead || e.Sealed) return;
             }
-            int seq0 = ActSeq; ActSeq = ++SeqN;
+            int seq0 = ActSeq; ActSeq = ++SeqN; int taken0 = TakenNow;
             try { FoeAct(e, it, sayName ?? it.Say); } finally { ActSeq = seq0; }
+            if (!passive) Tape?.Foe(this, e, it, TakenNow - taken0);
             if (HitLike(it) && !e.Dead && Over == null) CounterEvent(e, "attack");   // 쌓이는 수치 clearOnAttack — 친 뒤에 비운다
             // 수를 한 뒤(패시브 말고 제 차례 · 즉시 행동) — 행동 카운트 상태(둔화 · 급속)는 사라지고 「행동하면」 이 돈다
             if (!passive && !e.Dead && Over == null)

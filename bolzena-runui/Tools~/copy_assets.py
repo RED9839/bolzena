@@ -33,7 +33,7 @@ except Exception as e:
     print("villages.json 못 읽음", e)
 # 콘텐츠 폴더(bolzena-content/world/villages/*.json — { villages: [...] })의 층 배경도
 import glob
-for vf in glob.glob(r"C:\projects\bolzena-content\world\villages\*.json"):
+for vf in glob.glob(r"C:\projects\bolzena-content\world\villages\*.json") + glob.glob(r"C:\projects\bolzena-content-v2\world\villages\*.json"):
     if os.path.basename(vf).startswith("_"):
         continue
     try:
@@ -311,4 +311,48 @@ for name in sorted(set(items["equips"].values()) | set(items["cards"].values()))
     bg.filter(ImageFilter.GaussianBlur(18)).resize((56, 80), Image.LANCZOS).save(dst.replace(".png", "_blur.png"))
     nit += 1
 print("장비 · 교주 카드 그림", nit, "새로")
+# 사도 말풍선(HeroBubble D1) — 원작 Common_TalkBubble_1 · Common_TalkBubbleTail_1 에 갈색 테를 둘러 RunArt/Ui 로(Tools~/bubble_art.py)
+import bubble_art
+bubble_art.make(PROJ)
+# 교주 보드 칸 능력 아이콘(2026-10-09 사용자 「보드 아이콘 통일」 — 칸마다 능력 아이콘 + 같은 틀) → RunArt/Board/<칸 종류>.png
+#   능력치 다섯은 원작 능력치 스티커 한 벌(iconsrc/commonicons/Icon_*, 60 → 120 으로 키움), 나머지는 원작 재화 아이콘(같은 굵은 테 화풍).
+#   원작에 딱 맞는 그림이 없는 칸: 보물 지도(eliteUp) → 보물상자 Box_03 · 용돈 주머니(gold) → 골드 동전 CurrencyIcon_0008 — Flow.Crayon.BoardAbility
+BOARD = {
+    "atk": "iconsrc/commonicons/Icon_AttackPhysic.png", "def": "iconsrc/commonicons/Icon_DefensePhysic.png", "hp": "iconsrc/commonicons/Icon_Hp.png",
+    "crit": "iconsrc/commonicons/Icon_CriticalRate.png", "critDmg": "iconsrc/commonicons/Icon_CriticalMult.png",
+    "gold": "currency/CurrencyIcon_0008.png", "oracleChance": "currency/CurrencyIcon_024002.png", "removeCost": "currency/CurrencyIcon_0038.png",
+    "credits": "currency/CurrencyIcon_0072.png", "oraclePick": "currency/2AnniversaryIcon_000001.png", "eliteUp": "iconsrc/treasureboxicon/Box_03.png",
+    "shopDiscount": "currency/CurrencyIcon_0038.png", "startOracle": "currency/CurrencyIcon_0072.png",   # 골디 할인권 = 이용권 · 예습 노트(시작 신탁) = 공책
+}
+for kind, rel in BOARD.items():
+    dst = f"{DST}/RunArt/Board/{kind}.png"
+    if os.path.exists(dst):
+        continue
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    im = Image.open(f"{SRC}/{rel}").convert("RGBA")
+    if max(im.size) < 120:
+        im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS)
+    im.thumbnail((128, 128), Image.LANCZOS)
+    im.save(dst)
+print("보드 능력 아이콘", len(BOARD))
+# 학년 진급 · 졸업 「참!잘햇어요.」 도장(2026-10-09 사용자 「트릭컬에 참 잘했어요 도장이 있으니 그걸 써라」) — 원작 생활 재료 Icon_PerfectStamp 그대로(128, 고치지 않는다)
+#   이미 뽑아 둔 MuMu 아틀라스(bolzena-unity-tmp/mumu_pull — 원작 그림이라 git 밖)에서 RunArt/Ui/perfect_stamp.png 로
+cp(r"C:\projects\bolzena-unity-tmp\mumu_pull\png\atlas\lifematerial\Icon_PerfectStamp.png", f"{DST}/RunArt/Ui/perfect_stamp.png")
+# 학년 HUD 장식 「교단 증명서」(2026-10-09 사용자) — 원작 재화 아이콘 CurrencyIcon_0016(새싹 · 파란 리본 초록 카드) 그대로
+cp(f"{SRC}/currency/CurrencyIcon_0016.png", f"{DST}/RunArt/Ui/order_cert.png")
+# 학년 칭찬 스티커 공책 조각(2026-10-09 사용자 「직접 그린 그림을 원작 그림으로」) — 이미 뽑아 둔 원작 아틀라스(bolzena-unity-tmp/mumu_pull, git 밖)에서 RunArt/Ui/grade/
+#   스티커 = 원작 미션 도장(사도 SD 얼굴) NewMission_Stamp01~12 · 빈 칸 = 미션 칸 NewMission_BodyItem · 선물 상자 = 앨범 기록 Album_Record_Icon_Present
+#   열림 반짝이 = 감정표현 Sparkle · 별 = Popup_Star_01 · 집게 = 미션 탭 집게 NewMission_TabClipFront04 · 테이프 = Album_Record_Sticker · 종이 = 잉클 로비 메모 InkleLobby_Book_Memo
+MUMU = r"C:\projects\bolzena-unity-tmp\mumu_pull\png\atlas"
+GRADE_ART = {f"sticker{n:02d}": f"quest/NewMission_Stamp{n:02d}.png" for n in range(1, 13)}
+GRADE_ART.update({"slot": "quest/NewMission_BodyItem.png", "gift": "archives_album/Album_Record_Icon_Present.png", "sparkle": "emoticon/Sparkle.png",
+                  "clip": "quest/NewMission_TabClipFront04.png", "tape": "archives_album/Album_Record_Sticker.png", "memo": "inklemainlobby/InkleLobby_Book_Memo.png"})
+for name, rel in GRADE_ART.items():
+    src = os.path.join(MUMU, rel)
+    if not os.path.exists(src):
+        print("학년 공책 원작 조각 없음", rel)
+        continue
+    cp(src, f"{DST}/RunArt/Ui/grade/{name}.png", (128, 128) if name.startswith("sticker") else None)
+cp(f"{SRC}/iconsrc/commonicons/Popup_Star_01.png", f"{DST}/RunArt/Ui/grade/star.png")
+print("학년 공책 원작 조각", len(GRADE_ART) + 1)
 print("ok")

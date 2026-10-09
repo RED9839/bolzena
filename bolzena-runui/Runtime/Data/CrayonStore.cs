@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Bolzena.RunUI
 {
     /// <summary>
-    /// 크레파스 보드(교주 능력치)의 판 밖 영구 저장(코어 RunCrayon.cs) — 표는 Resources/RunUI/crayon.json, 진행은 PlayerPrefs 「bz.crayon」(JSON).
+    /// 크레파스 보드(교주 보드)의 판 밖 영구 저장(코어 RunCrayon.cs) — 표는 Resources/RunUI/crayon.json, 진행은 PlayerPrefs 「bz.crayon」(JSON).
     /// -save 로 따로 둔 시험 실행은 그 이름을 붙인 키를 써서 사용자의 진행을 건드리지 않는다.
     /// </summary>
     public static class CrayonStore
@@ -43,23 +43,27 @@ namespace Bolzena.RunUI
             {
                 if (save != null) return save;
                 try { save = JsonUtility.FromJson<Wrap>(PlayerPrefs.GetString(Key, ""))?.ToSave(); } catch (Exception) { save = null; }
-                return save ??= new CrayonSave();
+                if (save == null) return save = new CrayonSave();
+                if (Crayon.Migrate(Table, save)) Write();   // 옛 보드(한 번 칸) 저장 — 칠했던 칸을 같은 효과의 단계로 옮긴다
+                return save;
             }
         }
 
         [Serializable] class Wrap
         {
             public int[] have = new int[4], earned = new int[4]; public int runs;
+            /// <summary>보드 판(Crayon.BOARD_VER) — 옛 저장엔 없어 0 이 된다.</summary>
+            public int ver;
             public List<string> keys = new List<string>(); public List<int> levels = new List<int>();
             public CrayonSave ToSave()
             {
-                var s = new CrayonSave { Runs = runs };
+                var s = new CrayonSave { Runs = runs, Ver = ver };
                 if (have != null && have.Length == 4) s.Have = have;
                 if (earned != null && earned.Length == 4) s.Earned = earned;
                 for (int i = 0; keys != null && levels != null && i < keys.Count && i < levels.Count; i++) s.Level[keys[i]] = levels[i];
                 return s;
             }
-            public static Wrap Of(CrayonSave s) => new Wrap { have = s.Have, earned = s.Earned, runs = s.Runs, keys = new List<string>(s.Level.Keys), levels = new List<int>(s.Level.Values) };
+            public static Wrap Of(CrayonSave s) => new Wrap { have = s.Have, earned = s.Earned, runs = s.Runs, ver = s.Ver, keys = new List<string>(s.Level.Keys), levels = new List<int>(s.Level.Values) };
         }
 
         public static void Write()
@@ -90,15 +94,17 @@ namespace Bolzena.RunUI
             return why;
         }
 
-        public static string Export() => Crayon.Export(Save);
+        /// <summary>진행 코드 — 보드(크레파스 · 단계) + 편성 기억(PartyStore — 프리셋 · 최근 · 완주 기록). 설정(소리 · 화면)은 기기마다라 넣지 않는다.</summary>
+        public static string Export() => Crayon.Export(Save, PartyStore.Dump());
 
         /// <summary>진행 코드를 받아 들인다 — 틀리면 까닭(지금 진행은 그대로).</summary>
         public static string Import(string code)
         {
-            var (s, why) = Crayon.Import(code, Table);
+            var (s, extra, why) = Crayon.ImportAll(code, Table);
             if (why != null) return why;
             save = s;
             Write();
+            if (extra != null) PartyStore.Load(extra);   // 옛 1판 코드(보드만)면 편성 기억은 그대로
             return null;
         }
 

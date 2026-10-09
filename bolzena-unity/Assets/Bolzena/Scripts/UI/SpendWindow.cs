@@ -42,7 +42,7 @@ namespace Bolzena.UI
             cv.SetOrder(O + 10);
 
             float topY = cy + colH / 2 + rowH / 2 + 0.2f * k;
-            Tone.Text("title", root, $"<color={Tone.GoldTag}>「{sp.Kw}」</color>을 몇 개 쓸까요?", new Vector3(rowsX, topY + 0.38f * k, 0), Tone.Xl * k, O + 20, Tone.Ink, TextAlignmentOptions.Center, false, rowW + 1f);
+            Tone.Text("title", root, $"<color={Tone.GoldTag}>「{sp.Kw}」</color>을 몇 개 쓰겠습니까?", new Vector3(rowsX, topY + 0.38f * k, 0), Tone.Xl * k, O + 20, Tone.Ink, TextAlignmentOptions.Center, false, rowW + 1f);
             string sub = $"가진 {sp.Have}개" + (string.IsNullOrEmpty(sp.PerUnit) ? "" : $" · {sp.PerUnit}");
             Tone.Text("sub", root, sub, new Vector3(rowsX, topY - 0.05f * k, 0), Tone.Md * k, O + 20, Tone.Sub, TextAlignmentOptions.Center, true, rowW + 1f);
 

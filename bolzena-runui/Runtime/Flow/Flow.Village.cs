@@ -55,10 +55,10 @@ namespace Bolzena.RunUI
                 note.rectTransform.Band(0, 30, 30, 30, 112);
                 var row2 = Ui.Rect("buttons", main).Band(0, 66, 40, 40, 34);
                 Ui.Row(row2, 16, TextAnchor.MiddleCenter, null, false, true);
-                var back = Btn.Make(row2, "로비로", BtnStyle.Dark, Lobby, Theme.FsMd);
-                back.Pref(200, 62);
-                var go = Btn.Make(row2, "파티 편성", BtnStyle.Gold, onGo, Theme.FsLg);
-                go.Pref(380, 62);
+                var back = Btn.Make(row2, "로비로", BtnStyle.PillDark, Lobby, Theme.FsMd);
+                back.Pref(200, Theme.BtnMainH);
+                var go = Btn.Make(row2, "파티 편성", BtnStyle.PillGold, onGo, Theme.FsLg);
+                go.Pref(380, Theme.BtnMainH);
                 Stage.Hot["go"] = go;
 
                 // 이름 굴리기 — 다른 마을 이름(없으면 층 이름)을 돌리다가 멈춘다

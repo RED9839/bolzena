@@ -320,6 +320,32 @@ namespace Bolzena.Battle
         /// <summary>낀 장비(사도 id → 칸 → 장비 id) — 판에서 연 싸움이면 BattleBridge 가 단다. 전투 시범은 null(빈 칸).</summary>
         public static Func<string, Dictionary<string, string>> GearOf;
 
+        /// <summary>이 카드를 내면 손에서 골라 버릴(소멸할) 장수 — 0 이면 고르지 않는다. kind: 「버릴」 · 「소멸할」.</summary>
+        public int DiscardNeed(int handIdx, out string kind)
+        {
+            kind = "버릴";
+            int n = b.DiscardChoice(handIdx);
+            if (n > 0) { var c = b.CardOf(b.Hand[handIdx]); var f = c?.Fx.FirstOrDefault(x => (x.K == FxK.Discard || x.K == FxK.Burn) && !x.Random && !x.All); if (f != null && f.K == FxK.Burn) kind = "소멸할"; }
+            return n;
+        }
+        /// <summary>손에서 고를 카드들을 낼 카드 번호에 맞춘 규칙 쪽 손 번호로(낼 카드를 뺀 화면 손 번호 → 규칙 번호).</summary>
+        public static int EngineIdx(int shown, int played) => shown >= played ? shown + 1 : shown;
+        public List<string> BotDiscard(int handIdx) => new Bolzena.Core.Bots(data).PickDiscard(b, handIdx);
+        public int[] DiscardIdxOf(List<string> ids, int played)
+        {
+            var used = new HashSet<int>(); var r = new List<int>();
+            foreach (var id in ids) for (int j = 0; j < b.Hand.Count; j++) if (j != played && !used.Contains(j) && b.Hand[j] == id) { used.Add(j); r.Add(j); break; }
+            return r.ToArray();
+        }
+        /// <summary>점검용(데모) — 손의 카드 하나 비용을 1 올린다(적 방해 흉내).</summary>
+        public void DebugRaiseCost(int handIdx)
+        {
+            var id = b.Hand[handIdx];
+            if (!b.CardSt.TryGetValue(id, out var st)) b.CardSt[id] = st = new Dictionary<string, int>();
+            st["비용"] = st.TryGetValue("비용", out var v) ? v + 1 : 1;
+        }
+        public int[] PendingDiscard;   // 낼 카드와 함께 넘길 손패 번호(규칙 쪽) — PlayCard 가 한 번 쓰고 비운다
+
         public IReadOnlyList<BattleEvent> PlayCard(int i, int target, int choice = -1, int branch = 0, int spend = 0)
         {
             var evs = new List<BattleEvent>();
@@ -328,7 +354,8 @@ namespace Bolzena.Battle
             var id = b.Hand[i];
             if (b.GlowOf(id) != null) b.ApplyEpiphany(id, Math.Max(0, choice));
             lastTarget = b.CardOf(id)?.Target == "아군" ? -1 : target;   // 아군 카드의 target 은 사도 번호(코어 oneAlly) — 연출의 적 번호로 쓰지 않는다
-            b.PlayCard(i, target, branch > 0 || spend > 0 ? new PlayOpts { Choice = branch > 0 ? branch : (int?)null, Spend = spend > 0 ? spend : (int?)null } : null);
+            var pd = PendingDiscard; PendingDiscard = null;
+            b.PlayCard(i, target, branch > 0 || spend > 0 || pd != null ? new PlayOpts { Choice = branch > 0 ? branch : (int?)null, Spend = spend > 0 ? spend : (int?)null, Discard = pd?.Select(j => b.Hand[j]).ToList() } : null);
             Translate(evs);
             After(evs);
             return evs;
@@ -884,11 +911,17 @@ namespace Bolzena.Battle
             if (info.Epiphany) info.Terms.Insert(0, info.Grace
                 ? new Term("은총", "빛나는 카드 — 내면 그 사도의 고유 카드 하나를 손에 얻습니다(그 턴 비용 0)", "flash")
                 : new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고릅니다(이번에는 비용 0)", "flash"));
+            info.BaseCost = cv.Cost;
+            if (info.Cost > info.BaseCost)
+            {
+                info.CostUpWhy = b.CostUpWhy(cv.Id) ?? "효과";
+                info.Terms.Insert(0, new Term("비용 +" + (info.Cost - info.BaseCost), $"원래 비용 {info.BaseCost} — {info.CostUpWhy}로 올랐습니다. 강인도는 카드에 적힌 원래 비용 기준입니다", "flash"));
+            }
             // 표식 — 얹힌 축복 · 복제본(core CardMark, 판 화면 W.Card 와 같은 것)
             var mk = b.MarkOf(cv.Id);
             info.MarkBless = mk.Bless; info.MarkBlessText = mk.BlessText; info.Copy = mk.Copy;
             if (mk.Blessed) info.Terms.Insert(info.Epiphany || cv.Oracle != null ? 1 : 0, new Term("축복", mk.BlessText, "flash"));
-            if (mk.Copy) info.Terms.Add(new Term("복제", "복제할 때 모습 그대로 묶인 카드 — 신탁 · 축복 불가", "flash"));
+            if (mk.Copy) info.Terms.Add(new Term("복제", "복제 — 이 카드는 신탁 · 축복을 받을 수 없습니다", "flash"));
             return info;
         }
 
@@ -991,6 +1024,15 @@ namespace Bolzena.Battle
                     var names = b.SeizedOf(u).Select(x => $"「{b.CardOf(x)?.Name ?? x}」");
                     res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "buff",
                         Text = $"이 적이 빼앗아 쥔 카드: {string.Join(" · ", names)}\n격파하거나 · 쓰러뜨리거나 · 피해 {b.SeizeLeft(u)} 더 주면 손으로 돌아옵니다." });
+                    continue;
+                }
+                // 적의 쌓이는 수치(배고픔 · 텃밭 …) — 그 적 데이터의 counters 에서 풀이(core CardText.Counter, 「이름: 」 머리는 칸 이름과 겹쳐 뺀다)
+                var cd = u.Side == CSide.Enemy ? data.Enemy(u.Key)?.Counters?.Find(c => c.Name == kv.Key) : null;
+                if (cd != null)
+                {
+                    var ct = text.Counter(cd);
+                    if (ct.StartsWith(cd.Name + ": ", StringComparison.Ordinal)) ct = ct.Substring(cd.Name.Length + 2);
+                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "buff", Text = Fmt(ct) });
                     continue;
                 }
                 bool bad = R.BAD_ST.Contains(kv.Key) || kv.Key == R.STUN;
@@ -1173,7 +1215,7 @@ namespace Bolzena.Battle
                         if (!foePassTexts.TryGetValue(e.Key, out var fp))   // 적 패시브 글은 전투 동안 그대로
                         {
                             foePassTexts[e.Key] = fp = new List<string>();
-                            foreach (var p in def.Passives) fp.Add(p.Name + (p.Do != null ? " — " + text.Intent(p.Do) : ""));
+                            foreach (var p in def.Passives) fp.Add((p.Name ?? "").Replace(" — ", " · ") + " — " + text.FoePassive(p));   // 계기 + 결과 + 횟수(core CardText.FoePassive)
                         }
                         es.Passives.AddRange(fp);
                     }

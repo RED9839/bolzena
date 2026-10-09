@@ -431,7 +431,7 @@ namespace Bolzena.Core
                 case FxK.Ap: return $"AP {(f.IV >= 0 ? "+" : "")}{f.IV}";
                 case FxK.NextCheaper: return $"다음 카드 비용 -{f.IV}";
                 case FxK.Gauge: return $"고학년 게이지 {(f.IV >= 0 ? "+" : "")}{f.IV}%";
-                case FxK.Discard: return f.All ? "손패 전부 버리기" : $"{(f.Random ? "무작위 " : "")}손패 {f.IV}장 버리기";
+                case FxK.Discard: return f.All ? "손패 전부 버리기" : (f.Random ? $"무작위 손패 {f.IV}장 버리기" : $"손패에서 {f.IV}장 골라 버리기");
                 case FxK.Make: return $"{Q(CardName(f.Id))} {Math.Max(1, f.IV)}장 생성{(f.To == "draw" ? "(뽑을 더미 무작위 자리)" : f.To == "top" ? "(뽑을 더미 맨 위)" : f.To == "discard" ? "(버린 더미)" : "")}{(f.Owner == "other" ? "(주인: 다음 아군)" : f.Owner != null && f.Owner != "self" ? $"(주인: {data?.Hero(f.Owner)?.Name ?? f.Owner})" : "")}";
                 case FxK.Empower: return $"{(f.Who == "any" ? "파티의" : "자신의")} 다음 카드 피해 · 실드 · 회복 +{P(f.Ratio)}";
                 case FxK.Ripen:
@@ -494,7 +494,7 @@ namespace Bolzena.Core
                 case FxK.PayHp: return $"파티 HP {f.IV} 소모";
                 case FxK.Feed: return f.Target == "oneAlly" ? $"아군 1명의 고유 효과 +{f.IV}" : f.Target == "self" ? $"자신의 고유 효과 +{f.IV}" : $"사도마다 고유 효과 +{f.IV}";
                 case FxK.NextAp: return $"다음 턴 AP {(f.IV >= 0 ? "+" : "")}{f.IV}";
-                case FxK.Burn: return f.All ? "손패 전부 소멸" : $"{(f.Random ? "무작위 " : "")}손패 {f.IV}장 소멸";
+                case FxK.Burn: return f.All ? "손패 전부 소멸" : (f.Random ? $"무작위 손패 {f.IV}장 소멸" : $"손패에서 {f.IV}장 골라 소멸");
                 case FxK.Reflect: return inRule ? $"그 피해의 {P(f.Ratio)}를 때린 적에게 고정 피해로" : $"지난 적의 차례에 받은 피해의 {P(f.Ratio)}를 {Who(f.Target)}에게 고정 피해로";
                 case FxK.PayHpPct: return $"파티 최대 HP의 {P(f.V)}만큼 HP 소모";
                 default: return $"({f.K})";
@@ -1230,7 +1230,7 @@ namespace Bolzena.Core
                 case "curse": return $"골칫거리 {Q(CardName(o.Id))}";
                 case "gift": return $"카드 {Q(CardName(o.Id))}";
                 case "scout": return "지도 공개";
-                case "shopGift": return $"다음 상점: 장비 ({o.Grade})";
+                case "shopGift": return $"다음 상점: 아티팩트 ({o.Grade})";
                 case "rewardFlash": return "다음 보상: 신탁 1";
                 case "next": return "다음 전투: " + Next(o.Next);
                 case "mindBreak": return $"정신 붕괴 {Math.Max(1, o.N)}";
@@ -1326,7 +1326,7 @@ namespace Bolzena.Core
             // 빛나는 카드(전투마다 run.RollEpiphany) — 한 전투에 사도마다 신탁 · 은총 가운데 하나만(2026-10-06 사용자)
             ["신탁"] = "전투 중 빛나는 고유 · 교주 카드를 내면 신탁 셋 가운데 하나를 얹음(이번에는 비용 0) · 내지 않으면 전투가 끝난 뒤 고름 · 한 전투에 사도마다 신탁 · 은총 가운데 하나만(교주 카드는 주인 사도 몫)",
             ["은총"] = "전투 중 빛나는 시작 카드를 내면 그 사도의 고유 카드를 손에 얻음(그 턴 비용 0) · 내지 않으면 전투가 끝난 뒤 받음 · 한 전투에 사도마다 신탁 · 은총 가운데 하나만",
-            ["분쇄"] = $"실드가 있는 적을 치면 피해 +{Pc("분쇄")}%", ["탄환"] = "다른 카드 · 장비 · 고유 효과가 세는 카드",
+            ["분쇄"] = $"실드가 있는 적을 치면 피해 +{Pc("분쇄")}%", ["탄환"] = "다른 카드 · 아티팩트 · 고유 효과가 세는 카드",
             ["결속"] = "같은 사도의 결속 카드가 한 장으로 겹침(최대 5) · 3 이상이면 강해진 카드로 · 내면 처음으로",
             // 이로운 효과 — 「파티」 = 파티 하나에 걸려 셋 모두에게 든다
             ["사기"] = $"파티 · 사기 1당 카드 피해 계수 +{Pc("사기")}%p(합연산, 최대 {Mx("사기")}) · 전투 끝까지",
@@ -1354,7 +1354,7 @@ namespace Bolzena.Core
             ["초재생"] = $"파티 · 턴 시작에 HP 회복(방어력 {Pc("초재생")}%) · 턴마다 −1", ["탐구심"] = $"이 카드 · 탐구심 1당 피해 +{Pc("탐구심")}%",
             ["절대 무적"] = "파티 · 1턴 · HP를 잃지 않음(치른 HP는 예외)", ["끈기"] = "파티 · 쓰러질 피해를 받으면 HP 1로 버팀 · 버틸 때마다 −1",
             // 해로운 효과 — 걸린 쪽(파티 · 적)
-            ["취약"] = $"받는 피해 +{Pc("취약")}% · 맞을 때마다 −1", ["약화"] = $"주는 피해 −{Pc("약화")}% · 칠 때마다 −1 · 파티에 걸리면 모든 사도가",
+            ["취약"] = $"받는 피해 +{Pc("취약")}% · 맞을 때마다 −1", ["약화"] = $"주는 피해 −{Pc("약화")}% · 칠 때마다 −1 · 파티에 걸리면 모든 사도의 카드 피해가 줄고 카드 1장마다 −1",
             ["손상"] = $"얻는 실드 −{Pc("손상")}% · 얻을 때마다 −1",
             ["고통"] = $"턴이 끝날 때 고통 1당 고정 지속 피해 {Pc("고통")}%(건 쪽 공격력, 최대 {Mx("고통")}) · 그 뒤 절반으로", ["고통 각인"] = $"고통을 얻을 때마다 +{R.SV("고통 각인")} 더",
             ["균열"] = $"턴이 끝날 때 균열 1당 지속 피해 {Pc("균열")}%(최대 {Mx("균열")}) · 그 뒤 절반으로",
@@ -1467,6 +1467,18 @@ namespace Bolzena.Core
                 l.Add($"{string.Join(" · ", ps.Select(p => p.Name))}: {FoeOn(ps[0], data)} {string.Join(" · ", ps.Select(p => Intent(p.Do)))}");
             }
             return string.Join("\n", l);
+        }
+
+        /// <summary>적 패시브 하나의 글 — 계기 + 결과 + 횟수(「HP가 30% 이하가 되면 스스로 회복 300」 · 「맞으면 … (턴에 한 번)」). 정보 창 패시브 칸.</summary>
+        public string FoePassive(EnemyPassive p)
+        {
+            if (p == null) return "";
+            string s = $"{FoeOn(p, data)} {(p.Do != null ? Intent(p.Do) : "")}".Trim();
+            // 횟수 — 엔진(BattleFoes.FoePassives)은 limit(없으면 1)을 턴마다 되돌린다(전투 시작 · HP 문턱은 전투에 한 번). 한 턴에 여러 번 올 수 있는 계기만 적는다
+            bool many = p.On == "card" || p.On == "hurt" || p.On == "allyDown" || p.On == "allyBroken" || p.On == "debuffed" || p.On == "guardBreak";
+            int lim = p.Limit ?? 1;
+            if (many && lim > 0) s += lim == 1 ? " (턴에 한 번)" : $" (턴에 {lim}번)";
+            return s;
         }
 
         static string FoeOn(EnemyPassive p, GameData d = null)

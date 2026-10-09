@@ -171,7 +171,7 @@ namespace Bolzena.UI
             if (trialUntil > 0)
             {
                 float left = trialUntil - Time.unscaledTime;
-                if (confirmText != null) confirmText.text = $"이 화면을 유지할까요?  <color={Tone.GoldTag}>{Mathf.CeilToInt(Mathf.Max(0, left))}</color>";
+                if (confirmText != null) confirmText.text = $"이 화면을 유지하겠습니까?  <color={Tone.GoldTag}>{Mathf.CeilToInt(Mathf.Max(0, left))}</color>";
                 if (left <= 0) { trialUntil = -1; Bolzena.RunUI.DisplayOptions.Revert(); }
             }
         }
@@ -198,7 +198,7 @@ namespace Bolzena.UI
             else
             {
                 Make.Sliced("xbar", T, Res.UI("cell_on_9s"), new Vector3(Wd / 2, y - 0.65f, 0), new Vector2(Wd - Pad * 2, 1.3f), OC - 1);
-                Tone.Text("xt", T, "진행은 저장됩니다. 메인 화면으로 나갈까요?\n<size=80%><color=" + Tone.SubTag + ">전투 중에는 저장되지 않아, 이 전투가 시작되기 전(지도)에서 이어집니다.</color></size>", new Vector3(Wd / 2, y - 0.3f, 0), Tone.Body, OC, Tone.Ink, TextAlignmentOptions.Center, true, Wd - Pad * 2 - 0.2f);
+                Tone.Text("xt", T, "진행은 저장됩니다. 메인 화면으로 나가겠습니까?\n<size=80%><color=" + Tone.SubTag + ">전투 중에는 저장되지 않아, 이 전투가 시작되기 전(지도)에서 이어집니다.</color></size>", new Vector3(Wd / 2, y - 0.3f, 0), Tone.Body, OC, Tone.Ink, TextAlignmentOptions.Center, true, Wd - Pad * 2 - 0.2f);
                 Pill(T, "xyes", new Vector3(Wd / 2 - 1.1f, y - 0.92f, 0), 1.9f, "나가기", true, () => { m.Close(); Bolzena.BattleBridge.LeaveToLobby(); }, 0.62f);
                 Pill(T, "xno", new Vector3(Wd / 2 + 1.1f, y - 0.92f, 0), 1.9f, "취소", false, () => { askExit = false; Draw(); }, 0.62f);
                 y -= 1.3f + 0.2f;

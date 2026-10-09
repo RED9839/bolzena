@@ -29,7 +29,7 @@ namespace Bolzena.RunUI
             var lg = layer.Group(); lg.alpha = 0;
             Tw.Run(layer, 0.25f, k => { if (lg) lg.alpha = k; });
             var hud0 = Toast.Hud; var title0 = Toast.HudTitle;
-            W.StatusBar(layer, this, false, false, false, "장비", null);
+            W.StatusBar(layer, this, false, false, false, "아티팩트", null);
             // 제목 아래 얇은 장식 선(가운데 금 마름모)
             var orn = Ui.Rect("ornament", layer).At(0.5f, 1, 0, -60, 560, 12);
             Ui.Img(orn, Theme.White, Theme.Edge.A(0.35f), "l").rectTransform.Band(0.5f, 1, 0, 0, 0);
@@ -106,7 +106,7 @@ namespace Bolzena.RunUI
             Tw.Rise(card, 0.05f, 30, 0.45f, Vector2.left);
 
             var hint = Ui.Img(stage, Theme.Glass, new Color(1, 1, 1, 0.8f), "hint"); hint.rectTransform.At(0, 1, 10, -(cardTop + cardH + 14), cardW - 20, hintH);
-            var ht = Ui.Text(hint.transform, "낀 장비 칸을 길게 누르면 지금 것과 새 것을 견줍니다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); ht.rectTransform.Fill(12, 0, 12, 0);
+            var ht = Ui.Text(hint.transform, "낀 아티팩트 칸을 길게 누르면 지금 것과 새 것을 견줍니다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); ht.rectTransform.Fill(12, 0, 12, 0);
 
             // 가지 선 — 카드 오른쪽 가운데 → 줄기 → 사도 줄마다
             float rowX = Wd - rowW, trunk = cardW + (rowX - cardW) * 0.55f, cy = cardTop + cardH / 2;
@@ -238,7 +238,7 @@ namespace Bolzena.RunUI
             if (!bought)
             {
                 int price = P.SellPrice(equipId);
-                var sellB = Btn.Make(foot, null, BtnStyle.PillRose, () => Confirm($"「{e.Name}」 을 팔까요?", $"아무에게도 끼지 않고 {price} 골드를 받습니다.", "팔기", () =>
+                var sellB = Btn.Make(foot, null, BtnStyle.PillRose, () => Confirm($"「{e.Name}」 을 팔겠습니까?", $"아무에게도 끼지 않고 {price} 골드를 받습니다.", "팔기", () =>
                 {
                     string why = P.Sell(equipId);
                     if (why != null) { Toast.Show(why); return; }
@@ -255,7 +255,7 @@ namespace Bolzena.RunUI
             }
             else
             {
-                var note = Ui.Text(foot, "산 장비는 팔 수 없습니다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineRight);
+                var note = Ui.Text(foot, "산 아티팩트는 팔 수 없습니다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineRight);
                 note.rectTransform.At(1, 0.5f, -356, 0, 260, 40);
             }
         }
@@ -299,7 +299,7 @@ namespace Bolzena.RunUI
         /// <summary>낀 장비 보기(지도 · 캠프의 「장비」).</summary>
         public void GearView()
         {
-            var (row, close, _) = Stage.ModalBox("gearview", 1100, 500, "낀 장비", "사도 하나에 무기 · 방어구 · 장신구 한 칸씩 · 애착 장비는 그 사도가 끼면 더 셉니다");
+            var (row, close, _) = Stage.ModalBox("gearview", 1100, 500, "낀 아티팩트", "사도 하나에 무기 · 방어구 · 장신구 한 칸씩 · 애착 아티팩트는 그 사도가 끼면 더 셉니다");
             Ui.Row(row, Theme.Gap, TextAnchor.UpperCenter, null, true, true);
             foreach (var k in P.S.Party)
             {

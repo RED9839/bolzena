@@ -213,8 +213,7 @@ namespace Bolzena
         {
             lastAspect = Cam.aspect;
             Cam.orthographicSize = Tone.CamSize(Cam.aspect);
-            float bw = Mathf.Max(18.4f, Cam.orthographicSize * Cam.aspect * 2 + 1.2f, (Cam.orthographicSize * 2 + 1.6f) * 18.4f / 10.35f);
-            Make.Fit(bgSprite, new Vector2(bw, bw * 10.35f / 18.4f));
+            BgFrame.Fit(bgSprite, Cam);   // 꽉 채우기 · 바닥 줄은 발 높이 · 깨진 위쪽 띠는 화면 밖(배경별 표)
         }
 
         void LateUpdate()
@@ -292,6 +291,7 @@ namespace Bolzena
 
             ScreenFx.Create(ScreenRoot);
             Tooltip.Create(UiRoot);
+            SayHook();
             if (run != null) Battle = run.Battle;                  // 판에서 연 싸움(Run.OpenFight)
             else
             {
@@ -300,7 +300,7 @@ namespace Bolzena
                 var cb = new CoreBattle(data, CoreBattle.Fixture.Override?.Invoke(data) ?? CoreBattle.Fixture.FromArgs(data) ?? CoreBattle.Fixture.Pilot(data));
                 Battle = cb;
                 if (cb.Fx.Note != null) Debug.Log("[Pilot] " + cb.Fx.Note);
-                var fbg = BattleBridge.BgSprite(cb.Fx.Bg);
+                var fbg = BattleBridge.BgSprite(BgFrame.Arg() ?? cb.Fx.Bg);
                 if (fbg != null) { bg.sprite = fbg; FitBg(); }
             }
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-artaudit") >= 0) { Look.Audit(); Application.Quit(0); return; }   // 그림 감사만 하고 끝
@@ -558,9 +558,11 @@ namespace Bolzena
                 if (request == null) break;
                 var r = request.Value;
                 Debug.Log($"[Battle] 요청 {r.kind} {r.a} → {r.b}");
+                float tAct = Clock.RealNow; int foesAct = Battle.Snapshot.Enemies.FindAll(x => !x.Dead).Count; bool bossAct = Battle.Snapshot.Enemies.Exists(x => x.Boss && !x.Dead);
                 if (r.kind == ReqKind.Card) yield return PlayCardFlow(r.a, r.b);
                 else if (r.kind == ReqKind.Ult) yield return UltFlow(r.a, r.b);
                 else { EnemyTurn = true; yield return EndTurnFlow(); EnemyTurn = false; }
+                Debug.Log($"[Tempo] {r.kind} {Clock.RealNow - tAct:F2}s — 배속 {Clock.Speed} · 템포 {Clock.TEMPO} · 적 {foesAct}{(bossAct ? " (보스)" : "")}");   // 한 행동이 입력을 붙든 시간(화면 초)
             }
             // 판에서 넘어온 싸움 — 끝을 보여 준 뒤 판 화면으로 돌아간다
             if (BattleBridge.Fight != null)
@@ -865,8 +867,8 @@ namespace Bolzena
                         yield return FxCueFx(group[again]);
                         yield return HeroAct(e, group.GetRange(again + 1, group.Count - again - 1));
                     }
-                    else if (e.Actor.Side == Side.Party) yield return HeroAct(e, group);
-                    else yield return EnemyAct(e, group);
+                    else if (e.Actor.Side == Side.Party) yield return Timed("사도 수", HeroAct(e, group));
+                    else yield return Timed("적 수", EnemyAct(e, group));
                     i = j;
                     continue;
                 }
@@ -892,11 +894,11 @@ namespace Bolzena
                 {
                     // 연달아 뽑는 것은 한꺼번에 — 부채가 한 번에 펼쳐지게
                     while (i < evs.Count && evs[i].Kind == EventKind.Draw) dealing.Add(evs[i++].Card);
-                    yield return Deal(dealing);
+                    yield return Timed("뽑기 " + dealing.Count, Deal(dealing));
                     dealing.Clear();
                     continue;
                 }
-                yield return Simple(e);
+                yield return Timed(e.Kind.ToString(), Simple(e));
                 i++;
             }
             RefreshHud();
@@ -927,10 +929,10 @@ namespace Bolzena
             {
                 Hand.Add(c);
                 Sfx.Play("card_draw", 0.3f);
-                yield return Clock.WaitU(0.07f);
+                yield return Clock.WaitU(OldTempo ? 0.07f : 0.04f);   // 템포(2026-10-09) — 부채는 그대로 펼쳐지고 기다림만 줄인다
             }
             RefreshHud();
-            yield return Clock.WaitU(0.25f);
+            yield return Clock.WaitU(OldTempo ? 0.25f : 0.1f);
         }
 
         IEnumerator Simple(BattleEvent e)
@@ -944,7 +946,7 @@ namespace Bolzena
                 case EventKind.TurnStart:
                     Hud.SetTurn(e.Value, s.Wave, s.WaveCount);
                     Sfx.Play("turn_start", 0.5f);
-                    yield return Banners.Turn(UiRoot, "PLAYER TURN", new Color(1f, 0.85f, 0.5f));
+                    yield return Banners.Turn(UiRoot, "나의 턴", new Color(1f, 0.85f, 0.5f));
                     break;
                 case EventKind.ApChanged:
                     Hud.SetAp(e.Value, s.MaxAp);
@@ -1196,6 +1198,7 @@ namespace Bolzena
                 }
                 else yield return Banners.Boss(ScreenRoot, b.Key, b.Skin, b.Name, bsub);
             }
+            SayStart(e.Boss || cloneE != null);   // 보스 싸움이면 등장 띠 뒤에 한마디(기다리지 않는다)
             int n = s.Enemies.Count;
             int bossI = s.Enemies.FindIndex(x => x.Boss);
             int k = 0;
@@ -1292,6 +1295,27 @@ namespace Bolzena
                     if (spend <= 0) { Hand.Cards.Insert(Mathf.Min(handIndex, Hand.Cards.Count), cv); Hand.Layout(); yield break; }   // 물렀다
                 }
             }
+            // 고르는 버리기 · 소멸 — 사람은 창에서 고르고, 자동 전투는 봇과 같은 선택(손패가 모자라면 창 없이 있는 만큼)
+            if (Battle is CoreBattle cb0)
+            {
+                int need = cb0.DiscardNeed(handIndex, out var dkind);
+                if (need > 0)
+                {
+                    if (Auto) cb0.PendingDiscard = cb0.DiscardIdxOf(cb0.BotDiscard(handIndex), handIndex);
+                    else
+                    {
+                        var shown = new List<CardInfo>(); foreach (var hc in Hand.Cards) shown.Add(hc.Info);
+                        List<int> got = null;
+                        bool handOn = Hand.gameObject.activeSelf;
+                        Hand.gameObject.SetActive(false);
+                        yield return DiscardWindow.Run(UiRoot, info, shown, need, dkind, g => got = g, DemoSpendPick >= 0);
+                        Hand.gameObject.SetActive(handOn);
+                        if (got == null) { Hand.Cards.Insert(Mathf.Min(handIndex, Hand.Cards.Count), cv); Hand.Layout(); yield break; }   // 물렀다
+                        var idx = new List<int>(); foreach (var g2 in got) idx.Add(CoreBattle.EngineIdx(g2, handIndex));
+                        cb0.PendingDiscard = idx.ToArray();
+                    }
+                }
+            }
             skipPlayed = info.Id;
             var evs = Battle.PlayCard(handIndex, target, choice, branch, spend);
             if (choice >= 0) Bolzena.Fx.BolzenaFx.Common("oracle", Heroes[Mathf.Clamp(info.Hero >= 0 ? info.Hero : info.Owner, 0, Heroes.Count - 1)].Fx);   // 신탁을 골랐다
@@ -1333,7 +1357,7 @@ namespace Bolzena
             // 손패를 버리고 적 차례 띠
             int k = 0;
             while (k < evs.Count && (evs[k].Kind == EventKind.Discard || evs[k].Kind == EventKind.Exhaust)) { yield return Simple(evs[k]); k++; }
-            yield return Banners.Turn(UiRoot, "ENEMY TURN", new Color(1f, 0.4f, 0.35f));
+            yield return Banners.Turn(UiRoot, "적의 턴", new Color(1f, 0.4f, 0.35f));
             var rest = new List<BattleEvent>();
             for (; k < evs.Count; k++) rest.Add(evs[k]);
             yield return Present(rest);
@@ -1383,6 +1407,7 @@ namespace Bolzena
             // 승리 띠를 걷는다 — 끝 자세(싸움터만) 위에 보상 줄이 올라오게
             var vic = UiRoot.Find("Victory");
             if (vic != null) StartCoroutine(FadeOut(vic, 0.5f));
+            SayVictory();   // 승리 목소리와 같은 사도가 한마디(엘리트 · 보스는 늘, 일반은 25%) — 승리 띠가 걷히는 때(띠 글을 가리지 않게, BattleDirector.Say.cs)
             Emit("battle_end");
             yield return Clock.WaitU(1.2f);
             if (BattleBridge.EndHold == null) ScreenFx.I.Fade(1f, 1.2f);   // 보상 오버레이가 없으면 예전처럼 검게 닫고 판으로

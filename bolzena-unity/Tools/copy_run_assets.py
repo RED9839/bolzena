@@ -167,6 +167,7 @@ def main():
         "reveal_open": "sfx_common_opencontents",   # 신탁 펼침(event.open)
         "reveal_hover": "sfx_deck_changeskillinfo", # 신탁 칸 올림(card.hover)
         "reveal_reborn": "sfx_card_levelup",        # 신탁 붙음(camp.train)
+        "stamp": "sfx_crayon_stamp",                # 학년 진급 · 졸업 「참!잘햇어요.」 도장(runui Flow.Grade)
     }
     run_dst = os.path.join(PROJ, "Assets", "Resources", "RunArt", "Sfx")
     rjobs = [(f"{SRC}/sfx/{v}.ogg", f"{run_dst}/{k}.wav") for k, v in RUN_SFX.items() if os.path.exists(f"{SRC}/sfx/{v}.ogg")]

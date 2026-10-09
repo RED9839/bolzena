@@ -45,6 +45,7 @@ namespace Bolzena
             var t = port.OpenFight(hpx, dmgx, cb.CueSink);
             cb.Attach(t.B);
             Fight = new Pending { Port = port, Ticket = t, Battle = cb, Done = done };
+            PlayRecord.FightSpeed = () => Fight != null && !finished && !Clock.Paused ? Clock.Speed : 0;   // 플레이 기록 — 전투 시간 · 2배속 몫
             // 이기면 판 화면의 「배경 없이 보상 열기」(Flow.RewardOverlay)를 전투 장면 위에 띄운다 — 판 자동 데모는 예전 길(보상 화면)로
             EndHold = Overlay;   // runui RewardOverlay 가 시작 때 Fighting 을 끄므로 판 자동 데모도 이 길로
             Debug.Log($"[Bridge] 싸움 열기 — {string.Join(", ", t.Foes)} (배경 {t.Bg ?? "-"}, 이벤트 {t.Event})");
@@ -110,6 +111,7 @@ namespace Bolzena
         public static void LeaveToLobby()
         {
             if (Fight == null || Flow.Me == null) { Debug.Log("[Bridge] 판이 없어(전투 시범) 메인 화면으로 못 나감"); return; }
+            PlayRecord.Send(Fight.Port, "quit");   // 플레이 기록 — 메인으로(판은 이어할 수 있다)
             Clock.Reset();
             void Loaded(Scene s, LoadSceneMode m)
             {

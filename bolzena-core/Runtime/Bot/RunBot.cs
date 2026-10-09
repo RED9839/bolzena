@@ -12,13 +12,15 @@ namespace Bolzena.Core
         public bool Skilled;
         /// <summary>기본 카드 없이 파티 사도의 고유 카드만으로 판을 시작한다(극단 측정).</summary>
         public bool UniqueOnly;
-        /// <summary>교주 능력치(크레파스 — Crayon.Perks) — 판을 열 때 건다. null = 없음(난이도 기준).</summary>
+        /// <summary>교주 보드(크레파스 — Crayon.Perks) — 판을 열 때 건다. null = 없음(난이도 기준).</summary>
         public Dictionary<string, double> Perks;
         public int Depth = 1, Width = 3;
         public double Hpx = 1, Dmgx = 1;
         public string Village;
         /// <summary>싸움마다 판을 넘겨 본다(시험 · 기록).</summary>
         public Action<Battle, Run> OnFight;
+        /// <summary>판이 끝날 때 판을 넘겨 본다(플레이 기록 비교 — bz records).</summary>
+        public Action<Run> OnEnd;
     }
 
     /// <summary>한 판의 결과.</summary>
@@ -154,6 +156,7 @@ namespace Bolzena.Core
             SettleNeutrals(run);
             if (st.Over != "win") return false;
             if (plan != null) ClaimLeftover(run, st);   // 숙련 — 빛났지만 안 낸 카드도 보상에서 받는다(화면의 보상 줄과 같다)
+            TakeGrades(run);   // 학년 진급 보상 고르기(RunBotGrade.cs)
             if (loot != null)
             {
                 if (loot.Equip != null && loot.Equip.Count > 0 && loot.EquipTaken == null) run.TakeEquip(loot.Equip[0]);
@@ -405,7 +408,7 @@ namespace Bolzena.Core
                 outr.Floor = run.S.Floor; outr.Where = node.Type;
                 if (node.Type == "fight" || node.Type == "elite" || node.Type == "boss")
                 {
-                    if (!Fight(run, P, outr)) return Finish(run, outr);
+                    if (!Fight(run, P, outr)) return Finish(run, outr, P);
                     run.S.Elite = false;
                     if (!run.IsBoss) continue;
                     var off = run.BossCopyOffer();
@@ -413,15 +416,16 @@ namespace Bolzena.Core
                     run.Advance();
                     if (run.S.Done == "clear") break;
                 }
-                else if (node.Type == "event") { if (!Event(run, P, outr)) return Finish(run, outr); }
+                else if (node.Type == "event") { if (!Event(run, P, outr)) return Finish(run, outr, P); }
                 else if (node.Type == "camp" || node.Type == "campshop") Camp(run, node.Type, P);
             }
             outr.Clear = run.S.Done == "clear";
-            return Finish(run, outr);
+            return Finish(run, outr, P);
         }
 
-        static SimResult Finish(Run run, SimResult o)
+        static SimResult Finish(Run run, SimResult o, SimOpts P = null)
         {
+            P?.OnEnd?.Invoke(run);
             o.Gold = run.S.Gold; o.Deck = run.S.Deck.Count;
             o.Uniques = run.S.Deck.Count(id => run.Data.Card(id)?.Unique == true);
             o.Basics = run.S.Deck.Count(run.IsBasic);

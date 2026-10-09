@@ -625,6 +625,12 @@ namespace Bolzena.Core
             {
                 var shut = R.FOE_NATURES.Except(Bolzena.Core.Run.NaturesFor(d, v.Id)).ToList();
                 if (shut.Count > 0) W($"{at}: 보스 클론을 못 채워 닫힌 적 속성 {string.Join(" · ", shut)} — 그 속성 사도(1~2성 · 3성)가 모자란다");
+                // 빌린 몸 — 보스 후보인데 제 클론 키트가 없어 원래 클론의 수 · 패시브를 빌려 쓰는 사도(2026-10-09: 0 이어야 — 생성기 content _gen/clones)
+                var kits = new HashSet<string>(d.Enemies.Values.Where(x => x.Clone != null).Select(x => x.Clone));
+                var borrowed = Bolzena.Core.Run.CloneSlots(d, v.Id).Select(s => s.floor).Distinct()
+                    .SelectMany(fl => R.FOE_NATURES.SelectMany(n => Bolzena.Core.Run.FloorCandidates(d, v.Id, n, fl)))
+                    .Where(h => !kits.Contains(h)).Distinct().OrderBy(x => x, StringComparer.Ordinal).ToList();
+                if (borrowed.Count > 0) W($"{at}: 빌린 몸 보스 클론 {borrowed.Count}명(제 클론 키트 없음) — {string.Join(" · ", borrowed)}");
             }
         }
 

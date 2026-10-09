@@ -30,7 +30,7 @@ namespace Bolzena.UI
             b.band.transform.parent.localScale = new Vector3(1, Mathf.Max(0.001f, open), 1);
         }
 
-        // 짧은 턴 띠 — 「PLAYER TURN」
+        // 짧은 턴 띠 — 「나의 턴」 · 「적의 턴」(2026-10-09 영어 띠 → 한국어)
         public static IEnumerator Turn(Transform parent, string text, Color c)
         {
             var root = Make.Node("TurnBanner", parent, new Vector3(0, 0.9f, 0));
@@ -41,32 +41,43 @@ namespace Bolzena.UI
             t.colorGradient = new VertexGradient(Color.white, Color.white, Color.Lerp(c, Color.white, 0.35f), Color.Lerp(c, Color.white, 0.35f));
             Make.Outline(t, 0.18f, new Color(0.02f, 0.03f, 0.08f, 0.9f));
             t.characterSpacing = 30;
-            yield return Clock.Tween(0.2f, k =>
+            // 템포(2026-10-09) — 들어오기 0.14 · 머묾 0.25 · 나가기 0.14(옛 0.2 · 0.45 · 0.2). 나가기는 뒤에서 — 띠가 걷히는 동안 다음 일이 시작된다
+            bool old = BattleDirector.OldTempo;
+            float inT = old ? 0.2f : 0.14f, hold = old ? 0.45f : 0.25f, outT = old ? 0.2f : 0.14f;
+            yield return Clock.Tween(inT, k =>
             {
                 BandAlpha(b, k, Ease.OutBack(k));
                 Make.Alpha(glow, 0.55f * k);
                 t.alpha = k;
                 t.characterSpacing = Mathf.Lerp(80, 30, Ease.OutCubic(k));
             }, true);
-            yield return Clock.WaitU(0.45f);
-            yield return Clock.Tween(0.2f, k =>
+            yield return Clock.WaitU(hold);
+            var leave = TurnOut(root, b, glow, t, outT);
+            if (old) yield return leave;
+            else Clock.Run(leave);
+        }
+
+        static IEnumerator TurnOut(Transform root, (SpriteRenderer band, SpriteRenderer top, SpriteRenderer bot) b, SpriteRenderer glow, TextMeshPro t, float dur)
+        {
+            yield return Clock.Tween(dur, k =>
             {
+                if (!root) return;   // 전투 장면을 떠났다
                 BandAlpha(b, 1 - k, 1);
                 Make.Alpha(glow, 0.55f * (1 - k));
                 t.alpha = 1 - k;
                 root.localPosition = new Vector3(k * 2f, 0.9f, 0);
             }, true);
-            Object.Destroy(root.gameObject);
+            if (root) Object.Destroy(root.gameObject);
         }
 
-        // 패배 — 붉은 실선의 남색 띠 · 「DEFEAT」, 남아 있는다(판으로 돌아갈 때까지)
+        // 패배 — 붉은 실선의 남색 띠 · 「패배…」(2026-10-09 영어 띠 → 한국어), 남아 있는다(판으로 돌아갈 때까지)
         public static IEnumerator Defeat(Transform parent)
         {
             var root = Make.Node("Defeat", parent, new Vector3(0, 1.0f, 0));
             var dim = Make.Box("dim", root, Res.UI("white"), new Vector3(0, -1.0f, 0), new Vector2(44, 16), O - 1, new Color(0.02f, 0.02f, 0.05f, 0));
             var bandRoot = Make.Node("b", root);
             var b = Band(bandRoot, 1.5f, new Color(1f, 0.42f, 0.42f), O);
-            var t = Make.Text("t", root, "DEFEAT", new Vector3(0, 0.12f, 0), 0.95f, O + 3, Color.white);
+            var t = Make.Text("t", root, "패배…", new Vector3(0, 0.12f, 0), 0.95f, O + 3, Color.white);
             t.colorGradient = new VertexGradient(new Color(0.95f, 0.92f, 0.95f), new Color(0.95f, 0.92f, 0.95f), new Color(1f, 0.45f, 0.45f), new Color(1f, 0.45f, 0.45f));
             Make.Outline(t, 0.15f, new Color(0.12f, 0, 0.02f));
             var sub = Make.Text("sub", root, "파티가 쓰러졌습니다", new Vector3(0, -0.5f, 0), 0.22f, O + 3, new Color(0.8f, 0.82f, 0.92f));
@@ -208,10 +219,10 @@ namespace Bolzena.UI
             Make.Own(rays.gameObject, raysMat);
             var bandRoot = Make.Node("b", root, new Vector3(0, 1.4f, 0));
             var band = Band(bandRoot, 1.7f, new Color(0.95f, 0.83f, 0.55f), O + 1);
-            var sub = Make.Text("sub", root, "승리", new Vector3(0, 0.82f, 0), 0.24f, O + 3, new Color(0.95f, 0.88f, 0.7f));
+            var sub = Make.Text("sub", root, "적을 모두 물리쳤습니다", new Vector3(0, 0.82f, 0), 0.24f, O + 3, new Color(0.95f, 0.88f, 0.7f));
             sub.characterSpacing = 30;
             sub.alpha = 0;
-            var t = Make.Text("t", root, "VICTORY", new Vector3(0, 1.58f, 0), 1.05f, O + 3, Color.white);
+            var t = Make.Text("t", root, "승리!", new Vector3(0, 1.58f, 0), 1.05f, O + 3, Color.white);
             t.colorGradient = new VertexGradient(Color.white, Color.white, new Color(1f, 0.75f, 0.3f), new Color(1f, 0.75f, 0.3f));
             Make.Outline(t, 0.15f, new Color(0.3f, 0.12f, 0));
             Make.Glow(t, Color.white, 1.5f);

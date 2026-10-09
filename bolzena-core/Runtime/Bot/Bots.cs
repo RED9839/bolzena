@@ -591,6 +591,16 @@ namespace Bolzena.Core
         }
 
         /// <summary>버릴(태울) 후보의 값 — 낮을수록 먼저 버린다. 상태 카드 · 저주가 먼저, 안식(버려지면 도는) 카드는 버리기가 이득.</summary>
+        /// <summary>고르는 버리기 · 소멸 카드를 낼 때 봇이 고르는 손패(낼 카드 제외) — 화면의 자동 전투도 이것을 쓴다.</summary>
+        public List<string> PickDiscard(Battle s, int handIdx)
+        {
+            int need = s.DiscardChoice(handIdx);
+            if (need <= 0) return null;
+            var c = s.CardOf(s.Hand[handIdx]);
+            bool burning = c.Fx.Any(f => f.K == FxK.Burn) && !c.Fx.Any(f => f.K == FxK.Discard);
+            return s.Hand.Where((_, j) => j != handIdx).OrderBy(x => DiscardWorth(s, x, burning)).Take(need).ToList();
+        }
+
         double DiscardWorth(Battle s, string id, bool burning)
         {
             var c = s.CardOf(id);

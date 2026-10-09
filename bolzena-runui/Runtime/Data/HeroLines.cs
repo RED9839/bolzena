@@ -5,7 +5,8 @@ using UnityEngine;
 namespace Bolzena.RunUI
 {
     // 사도별 대사(2026-10-08 사용자: 「에르핀이 존댓말할 일이 없는데」) — 로비 · 만지기 반응 · 편성 한마디를 사도마다 원작 말투로.
-    //   표: Resources/RunUI/hero_lines.json — 사도 키마다 reg(말 단계) · lobby · cheek · tickle · angry · knock(꿀밤) · pat · party.
+    //   표: Resources/RunUI/hero_lines.json — 사도 키마다 reg(말 단계) · lobby · cheek · tickle · angry · knock(꿀밤) · pat · party · promote(진급) · graduate(졸업).
+    //     판 진행(2026-10-09): rest · shop · reward · victory · bossStart · lowhp · event 를 표에 둔다 — 지금 화면에 띄우는 것은 bossStart(보스 시작) · victory(승리)뿐(사용자 결정, 나머지는 나중에 쓸 수 있게).
     //     reg = casual(반말) · royal(왕 말투, 반말 계열) · polite(존댓말) · special(하오체 · 「~사와요」 · 로봇 따위 특이 말투).
     //   우리가 쓴 2차 창작 대사다(원작 대사 원문이 아니다). 검사: Tools~/hero_lines_check.py
     //   표에 없는 사도 · 빈 칸은 공통 문구 — 존댓말 / 반말 두 벌 가운데 그 사도의 reg 로 고른다(reg 도 없으면 존댓말).
@@ -15,7 +16,9 @@ namespace Bolzena.RunUI
         class Entry
         {
             public string key, reg, note;
-            public string[] lobby, cheek, tickle, angry, knock, pat, party;
+            public string[] lobby, cheek, tickle, angry, knock, pat, party, promote, graduate;
+            // 판 진행 중 한마디(2026-10-09) — 휴식 · 상점 · 보상 · 승리 · 엘리트/보스 시작 · 위기(파티 HP 30% 아래) · 이벤트
+            public string[] rest, shop, reward, victory, bossStart, lowhp, @event;
         }
 
         [Serializable] class FileT { public List<Entry> heroes = new List<Entry>(); }
@@ -46,6 +49,15 @@ namespace Bolzena.RunUI
             ["knock"] = new[] { "아야! 머리는 때리지 마세요!", "으앗, 갑자기 꿀밤이에요?" },
             ["pat"] = new[] { "헤헤… 기분 좋아요." },
             ["party"] = new[] { "같이 가요. 맡겨 주세요!" },
+            ["promote"] = new[] { "진급이에요! 한 학년 올라갔어요!", "와, 진급했어요! 다음 학년도 같이 가요!", "진급 도장 받았어요. 헤헤!" },
+            ["graduate"] = new[] { "졸업이에요! 그동안 정말 고마웠어요!", "졸업장 받았어요! 꼭 간직할게요." },
+            ["rest"] = new[] { "잠깐 쉬어 가요. 불이 따뜻하네요.", "숨 좀 돌리고 다시 가요." },
+            ["shop"] = new[] { "뭐 살 만한 게 있을까요?", "골드는 아껴 써야 해요." },
+            ["reward"] = new[] { "전리품이에요! 하나 골라 봐요.", "수고했으니 챙겨 가요." },
+            ["victory"] = new[] { "이겼어요!", "해냈어요! 다음도 가요." },
+            ["bossStart"] = new[] { "강한 상대예요. 조심해요!", "여기가 고비예요. 힘내요!" },
+            ["lowhp"] = new[] { "아직 안 끝났어요… 버텨요!", "조금만 더 힘내요!" },
+            ["event"] = new[] { "여긴 뭐가 있을까요?", "조심해서 들어가 봐요." },
         };
         static readonly Dictionary<string, string[]> Casual = new Dictionary<string, string[]>
         {
@@ -56,6 +68,15 @@ namespace Bolzena.RunUI
             ["knock"] = new[] { "아야! 머리 때리지 마!", "으앗, 갑자기 꿀밤이야?" },   // 문체:허용 — 사도 대사(반말)
             ["pat"] = new[] { "헤헤… 기분 좋다." },   // 문체:허용 — 사도 대사(반말)
             ["party"] = new[] { "같이 가자. 나만 믿어!" },   // 문체:허용 — 사도 대사(반말)
+            ["promote"] = new[] { "진급이다! 한 학년 올라갔어!", "와, 진급했어! 다음 학년도 같이 가자!", "진급 도장 받았다. 헤헤!" },   // 문체:허용 — 사도 대사(반말)
+            ["graduate"] = new[] { "졸업이다! 그동안 진짜 고마웠어!", "졸업장 받았어! 꼭 간직할게." },   // 문체:허용 — 사도 대사(반말)
+            ["rest"] = new[] { "잠깐 쉬었다 가자. 불 따뜻하다.", "숨 좀 돌리고 다시 가자." },   // 문체:허용 — 사도 대사(반말)
+            ["shop"] = new[] { "뭐 살 만한 거 있나?", "골드는 아껴 써야 해." },   // 문체:허용 — 사도 대사(반말)
+            ["reward"] = new[] { "전리품이다! 하나 골라 봐.", "수고했으니 챙겨 가자." },   // 문체:허용 — 사도 대사(반말)
+            ["victory"] = new[] { "이겼다!", "해냈어! 다음도 가자." },   // 문체:허용 — 사도 대사(반말)
+            ["bossStart"] = new[] { "센 상대다. 조심해!", "여기가 고비야. 힘내자!" },   // 문체:허용 — 사도 대사(반말)
+            ["lowhp"] = new[] { "아직 안 끝났어… 버텨!", "조금만 더 힘내!" },   // 문체:허용 — 사도 대사(반말)
+            ["event"] = new[] { "여긴 뭐가 있으려나?", "조심해서 들어가 보자." },   // 문체:허용 — 사도 대사(반말)
         };
 
         /// <summary>그 사도의 말 단계(casual · royal · polite · special). 표에 없으면 null.</summary>
@@ -72,11 +93,32 @@ namespace Bolzena.RunUI
         {
             string[] a = null;
             if (h != null && Map.TryGetValue(h.key, out var e))
-                a = kind switch { "lobby" => e.lobby, "cheek" => e.cheek, "tickle" => e.tickle, "angry" => e.angry, "knock" => e.knock, "pat" => e.pat, "party" => e.party, _ => null };
+                a = kind switch { "lobby" => e.lobby, "cheek" => e.cheek, "tickle" => e.tickle, "angry" => e.angry, "knock" => e.knock, "pat" => e.pat, "party" => e.party, "promote" => e.promote, "graduate" => e.graduate,
+                    "rest" => e.rest, "shop" => e.shop, "reward" => e.reward, "victory" => e.victory, "bossStart" => e.bossStart, "lowhp" => e.lowhp, "event" => e.@event, _ => null };
             if (a != null && a.Length > 0) return a;
             var set = IsCasual(h) ? Casual : Polite;
             return set.TryGetValue(kind, out var f) ? f : Polite["lobby"];
         }
+
+        // 같은 판에서 같은 줄 · 같은 자리 한마디를 되풀이하지 않게 — 판(코어 Run 객체)이 바뀌면 비운다
+        static object runTag;
+        static readonly HashSet<string> usedLines = new HashSet<string>(), saidAt = new HashSet<string>();
+        static void Touch(object run) { if (!ReferenceEquals(run, runTag)) { runTag = run; usedLines.Clear(); saidAt.Clear(); } }
+
+        /// <summary>판 진행 한마디 — 이번 판에 아직 안 쓴 줄을 고른다(다 썼으면 아무 줄).</summary>
+        public static string PickFresh(HeroInfo h, string kind, object run)
+        {
+            Touch(run);
+            var a = Of(h, kind);
+            var fresh = new List<string>();
+            foreach (var l in a) if (!usedLines.Contains((h?.key ?? "") + "|" + l)) fresh.Add(l);
+            var pick = fresh.Count > 0 ? fresh[UnityEngine.Random.Range(0, fresh.Count)] : a[UnityEngine.Random.Range(0, a.Length)];
+            usedLines.Add((h?.key ?? "") + "|" + pick);
+            return pick;
+        }
+
+        /// <summary>이 자리(갈래 · 층 · 칸)에서 이번 판에 처음인가 — 처음이면 표시하고 true(상점을 들렀다 돌아온 휴식처럼 같은 곳을 다시 그릴 때 또 말하지 않게).</summary>
+        public static bool FirstAt(object run, string spot) { Touch(run); return saidAt.Add(spot); }
 
         /// <summary>그 상황에서 한 줄(무작위).</summary>
         public static string Pick(HeroInfo h, string kind)

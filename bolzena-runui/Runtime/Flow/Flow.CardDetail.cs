@@ -18,12 +18,14 @@ namespace Bolzena.RunUI
     public partial class Flow
     {
         /// <summary>카드 상세 — list 를 주면 양옆 화살표로 그 목록의 이전 · 다음 카드로 넘긴다(index 가 없으면 id 로 찾는다).</summary>
-        public void CardZoom(string id, IList<string> list = null, int index = -1) => CardDetail(id, list, index, true);
+        bool detailPlain;   // 판 밖(도감 · 사도 상세 · 시작 덱)에서 연 상세는 언제나 기본형 — 판에 남은 신탁이 새지 않게
+        public void CardZoom(string id, IList<string> list = null, int index = -1) { detailPlain = false; CardDetail(id, list, index, true); }
+        public void CardZoomPlain(string id, IList<string> list = null, int index = -1) { detailPlain = true; CardDetail(id, list, index, true); }
 
         void CardDetail(string id, IList<string> list, int index, bool fadeIn)
         {
             var size = Stage.Size;
-            var v = P.View(id);
+            var v = detailPlain ? P.Data.View(id) : P.View(id);
             var def = P.Data.Card(id);
             if (list != null && list.Count < 2) list = null;
             if (list != null && (index < 0 || index >= list.Count || list[index] != id)) index = list.IndexOf(id);
@@ -79,7 +81,7 @@ namespace Bolzena.RunUI
             var rule = Ui.Img(ui, Theme.White, Theme.Line, "rule"); rule.rectTransform.Band(1, 1, Theme.Gutter, Theme.Gutter, -topH);
 
             // ── 가운데 큰 카드 ──
-            var card = W.Card(ui, this, id, cw, "zoom"); card.At(0.5f, 0.5f, 0, midY, cw, ch);
+            var card = W.Card(ui, this, id, cw, "zoom", detailPlain ? v : null); card.At(0.5f, 0.5f, 0, midY, cw, ch);
             if (fadeIn) Tw.Pop(card, 0.02f, 0.9f, 0.3f);
             float side = (size.x - cw) / 2 - arrowW - 26;   // 카드 한쪽 옆에 남는 폭
             float sideTop = size.y / 2 - topH - 12, sideBot = -size.y / 2 + botH + 8;   // 가운데 칸 위 · 아래(화면 가운데 기준)
@@ -108,7 +110,7 @@ namespace Bolzena.RunUI
                     var cap = Ui.Text(hold, $"<color={Theme.SubTag}>{t.Rel ?? "만들어지는 카드"}</color>", Theme.FsCap, Theme.Sub, TextAlignmentOptions.BottomLeft);
                     cap.rectTransform.Band(1, 26, 2, 0, 0); cap.textWrappingMode = TextWrappingModes.NoWrap;
                     var mc = W.Card(hold, this, t.CardId, gw, "termcard"); mc.At(0, 1, 0, -30, gw, gw * 1.4f);
-                    var mb = mc.gameObject.AddComponent<Btn>(); var cid = t.CardId; mb.OnClick = () => CardZoom(cid);
+                    var mb = mc.gameObject.AddComponent<Btn>(); var cid = t.CardId; bool pl = detailPlain; mb.OnClick = () => { if (pl) CardZoomPlain(cid); else CardZoom(cid); };
                 }
             }
 
@@ -127,13 +129,13 @@ namespace Bolzena.RunUI
                 holder.Pref(-1, bx.sizeDelta.y); boxTotal += bx.sizeDelta.y + 10;
             }
             foreach (var t in boxes) Box(t);
-            var mark = P.Mark(id);
+            var mark = detailPlain ? Core.CardMark.Of(P.Data, id, 0, null) : P.Mark(id);
             if (mark.Any)
             {
                 var got = new List<string>();
                 if (mark.Oracle != null) got.Add($"<color={Theme.GoldTag}>신탁</color> 이번 모험에서 신탁으로 바뀐 카드입니다 — 비용 아래 금빛 별 마크가 그 표시입니다.");   // 신탁 이름은 보이지 않는다(2026-10-07)
                 if (mark.Blessed) got.Add($"<color=#D9C7FF>축복</color> {mark.BlessText} — 비용 아래 연보라 날개 마크와 본문 맨 아래 줄이 그 표시입니다.");   // 받은 축복만(받을 수 있는 축복 목록은 보이지 않는다)
-                if (mark.Copy) got.Add($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color> — 원본이 나중에 받는 신탁 · 축복은 따라오지 않습니다.");
+                if (mark.Copy) got.Add($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color> — 복제 — 이 카드는 신탁 · 축복을 받을 수 없고, 원본이 나중에 받는 것도 따라오지 않습니다.");
                 Box(new CardTerms.Term { Name = "이 카드에 얹힌 것", Kind = mark.Copy ? "복제할 때 모습 그대로" : null, Body = string.Join("\n", got) });
             }
             if (hasOracle)
@@ -299,7 +301,7 @@ namespace Bolzena.RunUI
             dot.rectTransform.localRotation = Quaternion.Euler(0, 0, 45);
             var guide = Ui.Text(layer, $"이 카드에는 아래의 신탁이 나올 수 있습니다.", Theme.FsMd, Theme.Ink, TextAlignmentOptions.Center, false, "guide");
             guide.rectTransform.At(0.5f, 1, 0, ly - 14, 900, 34); guide.Outline(0.2f);
-            var x = Btn.Icon(layer, Theme.S("ic_x"), close, 56, "close"); x.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -18, 56, 56);
+            var x = Btn.Icon(layer, Theme.S("ic_x"), close, Theme.IconBtn, "close"); x.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -18, Theme.IconBtn, Theme.IconBtn);
             Stage.Hot["oracles.close"] = x;
 
             // 카드 자리 — 한 줄에 다섯이 들면 한 줄, 너무 작아지면 두 줄

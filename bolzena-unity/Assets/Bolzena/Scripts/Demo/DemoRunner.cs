@@ -64,6 +64,7 @@ namespace Bolzena.Demo
             PointerInput.Simulated = true;
             PointerInput.SimPos = new Vector2(0, -6);
             d.DemoEpiphanyPick = 0;
+            d.DemoSpendPick = 0;   // 소모량 · 버리기 고르기 창 — 사람 손을 기다리다 데모가 멈췄다(2026-10-09 「Card 0 → -1」 160초)
             d.Moment += OnMoment;
             UltCutin.OnStage += s => { lastMoment = s; Shot(s, 0); };
             EpiphanyWindow.OnStage += s =>
@@ -974,6 +975,61 @@ namespace Bolzena.Demo
                     yield return Wait(2.5f);
                     Shot("second_after", 0);
                 }
+            }
+            // 비용이 오른 카드 — 적 방해를 흉내 내 한 장 비용을 올리고 깜빡임 · ▲ 를 찍는다
+            if (d.Battle is CoreBattle cbc && d.Hand.Cards.Count > 0)
+            {
+                cbc.DebugRaiseCost(0);
+                yield return Wait(0.25f);
+                Shot("cost_up_flash", 0);
+                yield return Wait(1.0f);
+                d.Hand.Cards[0].Hovered = true;
+                Shot("cost_up_hand", 0);
+                yield return Wait(0.3f);
+                CardZoom.Show(d.UiRoot, d.Hand.Cards[0].Info, new Vector3(0, 0.3f, 0), 1.7f);
+                yield return Wait(0.6f);
+                Shot("cost_up_zoom", 0);
+                CardZoom.Hide();
+            }
+            // 고르는 버리기 · 소멸 카드가 손에 있으면 고르기 창을 띄워 본다
+            {
+                var cbd = d.Battle as CoreBattle;
+                for (int t = 0; t < 6 && cbd != null && !d.Over; t++)
+                {
+                    int di = -1;
+                    for (int q = 0; q < d.Hand.Cards.Count; q++) { if (cbd.DiscardNeed(q, out _) > 0 && d.Battle.CanPlay(q, out _)) { di = q; break; } }
+                    if (di >= 0)
+                    {
+                        Debug.Log("[Demo] 버리기 고르기 카드 " + d.Hand.Cards[di].Info.Name);
+                        d.DemoSpendPick = 0;
+                        DiscardWindow.OnStage = st => StartCoroutine(ShotLater("discard_window", 0.4f));
+                        yield return Drag(di, d.FirstAliveEnemy());
+                        yield return Wait(3.0f);
+                        break;
+                    }
+                    yield return EndTurn(); yield return WaitInput(); yield return Wait(0.5f);
+                }
+            }
+            // 툴팁 — 올리기만 해서는 안 뜨고 눌러야 뜬다
+            {
+                TipZone zone = null;
+                Debug.Log("[Demo] 툴팁 구역: " + string.Join(",", Tooltip.Zones.FindAll(q => q != null && q.isActiveAndEnabled).ConvertAll(q => q.name)));
+                foreach (var z in Tooltip.Zones) if (z != null && z.isActiveAndEnabled && z.Priority < 100 && z.name != "hpzone" && !z.name.StartsWith("portrait") && z.Text != null && !string.IsNullOrEmpty(z.Text())) { zone = z; break; }
+                if (zone != null)
+                {
+                    Vector2 zp = zone.Center;
+                    yield return Click(new Vector2(0, 2.5f), 0.1f); yield return Wait(0.3f);   // 남은 눌림 닫기
+                    yield return MoveTo(zp, 0.3f);
+                    yield return Wait(1.0f);
+                    Debug.Log("[Demo] 툴팁 올림만: " + (Tooltip.AnyShown ? "떴다(실패)" : "안 뜸(통과)"));
+                    Shot("tip_hover_only", 0);
+                    yield return Click(zp, 0.1f);
+                    yield return Wait(0.4f);
+                    Debug.Log("[Demo] 툴팁 누름: " + (Tooltip.AnyShown ? "떴다(통과)" : "안 뜸(실패)"));
+                    Shot("tip_clicked", 0);
+                    yield return Click(new Vector2(0, 1.5f), 0.1f);
+                }
+                else Debug.Log("[Demo] 툴팁 구역 없음");
             }
             // 일시정지 메뉴 — 일반 / 저사양 / 나가기 확인
             for (int pass = 0; pass < 2; pass++)

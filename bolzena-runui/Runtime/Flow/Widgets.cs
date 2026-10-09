@@ -163,8 +163,8 @@ namespace Bolzena.RunUI
             var (gb, gt) = HudChip(bar, Theme.Icon("gold"), Ui.Gold(P.S.Gold), Theme.Gold);
             gt.name = "gold";
             if (deck) f.Stage.Hot["deck"] = HudChipBtn(bar, Theme.S("ic_deck"), P.S.Deck.Count.ToString(), f.DeckView);
-            if (gear) f.Stage.Hot["gear"] = Btn.Icon(bar, Theme.S("ic_sword"), f.GearView, 54, "gear");
-            if (menu) f.Stage.Hot["settings"] = Btn.Icon(bar, Theme.S("ic_menu"), () => f.SettingsPanel(true), 54, "menu");
+            if (gear) f.Stage.Hot["gear"] = Btn.Icon(bar, Theme.S("ic_sword"), f.GearView, Theme.IconBtn, "gear");
+            if (menu) f.Stage.Hot["settings"] = Btn.Icon(bar, Theme.S("ic_menu"), () => f.SettingsPanel(true), Theme.IconBtn, "menu");
             Tw.Rise(bar, 0.1f, 16, 0.4f, Vector2.up);
             return bar;
         }
@@ -495,7 +495,7 @@ namespace Bolzena.RunUI
             {
                 // 효과 글 뒤 어둠 판 — 밝은 그림(흰 옷 따위) 위에서도 글이 읽히게(전투 CardView 의 descbg 와 같은 것)
                 var plate = Ui.Img(wr, Theme.Round, new Color(0.01f, 0.02f, 0.06f, 0.6f), "descbg"); plate.pixelsPerUnitMultiplier = 2.2f;
-                plate.rectTransform.At(0.5f, 0, 0, descB - 6 * k - blessH, w - 12 * k, descH + blessH + (hasTags ? 21 * k : 0) + 10 * k);
+                plate.rectTransform.At(0.5f, 0, 1.5f * k, descB - 6 * k - blessH, w - 7 * k, descH + blessH + (hasTags ? 21 * k : 0) + 10 * k);
             }
             var band = Ui.Img(wr, Theme.White, tint, "band"); band.rectTransform.Column(0, 5 * k);
 
@@ -520,10 +520,8 @@ namespace Bolzena.RunUI
             float tyW = Mathf.Min(w - 60 * k, ty.GetPreferredValues(typeText).x + 1);
             ty.rectTransform.Fill(22 * k, 0, 6 * k, 0);
             pill.rectTransform.At(0, 1, 45 * k, -34 * k, tyW + 31 * k, 20 * k);
-            if (v != null && v.Unique)
+            if (false)
             {
-                var star = Ui.Img(rt, Theme.S("ic_spark"), Theme.Gold, "unique");
-                star.rectTransform.At(1, 1, -8 * k, -9 * k, 20 * k, 20 * k);
             }
             else if (false && owner != null && !noFace)   // 얼굴 배지 없음(2026-10-08 사용자)
             {
@@ -549,7 +547,7 @@ namespace Bolzena.RunUI
             if (terms != null && terms.Count > 0) TermPop.Attach(desc, terms, f.Stage.ToastLayer, (p, cid, cw2) => Card(p, f, cid, cw2, "termcard"));   // 글은 위에서 Mark 해 두었다
             // 카드에 마우스를 올려 두면 낱말을 모두 카드 옆에(CardSide — 전투 카드 확대와 같은 자리 · 판). 카드 크게 창의 큰 카드(「zoom」)는 오른쪽에 이미 판이 있어 빼고,
             // 낱말 판 속 작은 카드(「termcard」)도 뺀다
-            if (terms != null && terms.Count > 0 && name != "termcard" && name != "zoom")
+            if (false && terms != null && terms.Count > 0 && name != "termcard" && name != "zoom")   // 카드 올림으로 낱말 판 — 끔(누를 때만)
             {
                 var side = bg.gameObject.AddComponent<CardSide>();
                 side.Terms = terms; side.Layer = f.Stage.ToastLayer; side.Cards = (p, cid, cw2) => Card(p, f, cid, cw2, "termcard");
@@ -597,7 +595,7 @@ namespace Bolzena.RunUI
                 MarkBand(rt, "ic_bless", "축복", new Color(0.06f, 0.27f, 0.2f, 0.95f), new Color(0.75f, 1f, 0.82f), new Color(0.85f, 1f, 0.9f), chipY, w, k, "bless");
             if (mark.Copy)
             {
-                bool small = w < 150;
+                bool small = true;   // 복제는 작은 아이콘 하나(2026-10-09) — 문구는 카드 상세 풀이로
                 bool brief = Theme.Compact || w < 200;   // 폰 · 작은 카드는 「복제」 만 크게 — 「신탁 · 축복 불가」 는 카드 크게 · 툴팁에서
                 string copyLine = small ? "" : brief ? "복제" : CardMark.COPY_LINE;
                 float cfs = brief ? 13f * k : 10.5f * k;

@@ -23,7 +23,7 @@ namespace Bolzena.RunUI
             float H = Mathf.Min(Theme.C(620, 560), Stage.Size.y - 24);
             float W0 = Mathf.Min(Theme.C(1180, 1100), Stage.Size.x - 32);
             string sub = p.N > 1 ? $"고른 사도의 아직 없는 고유 카드 가운데 무작위 {p.N}장을 얻습니다" : "고른 사도의 아직 없는 고유 카드 가운데 무작위 한 장을 얻습니다";
-            var (body, close, _) = Stage.ModalBox("grace", W0, H, "은총 — 누구의 고유 카드를 받을까요?", sub, false, null, 0, false);
+            var (body, close, _) = Stage.ModalBox("grace", W0, H, "은총 — 누구의 고유 카드를 받겠습니까?", sub, false, null, 0, false);
 
             void Done(string key)
             {

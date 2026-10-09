@@ -300,7 +300,7 @@ namespace Bolzena.UI
             // 장비 — 칸 셋(무기 · 방어구 · 장신구), 판 바닥에 붙인다
             float sz = Mathf.Min(0.95f * k, (w - 0.3f) / 3);
             y = -Tone.HalfH + 0.25f + sz + 0.05f + 0.4f * k;
-            Band(R, x, w, ref y, k, "장비");
+            Band(R, x, w, ref y, k, "아티팩트");
             for (int i = 0; i < 3; i++)
             {
                 var g = i < h.Gear.Count ? h.Gear[i] : new GearSlot { Slot = i == 0 ? "무기" : i == 1 ? "방어구" : "장신구" };

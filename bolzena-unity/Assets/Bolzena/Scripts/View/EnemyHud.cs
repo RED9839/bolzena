@@ -213,7 +213,7 @@ namespace Bolzena.View
         }
 
         public static string WeakTip(List<string> weak) =>
-            Tip.Head("약점 속성") + "  " + string.Join(" · ", weak) + "\n이 성격 사도의 카드는 강인도를 비용만큼 깎는다(아니면 1/3).\n" + Tip.Dim("「공명」 사도는 늘 약점으로 칩니다");
+            Tip.Head("약점 속성") + "  " + string.Join(" · ", weak) + "\n이 성격 사도의 카드는 강인도를 비용만큼 깎습니다(아니면 1/3).\n" + Tip.Dim("「공명」 사도는 늘 약점으로 칩니다");
 
         void BuildWeak(List<string> list)
         {

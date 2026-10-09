@@ -86,6 +86,7 @@ namespace Bolzena
             string key = u.name.Replace("hero_", "");
             Split(group, out var pre, out var byHit, out int hits);
             ult |= act.Text == "ult";
+            int seq = BeginAct(u);   // 이 사도가 앞 수의 뒷정리(복귀) 중이면 그 자리에서 이어받는다
 
             // 대상들
             var targets = new List<int>();
@@ -102,7 +103,7 @@ namespace Bolzena
                 Vfx.Burst(u.Center, new Vfx.BurstOpt { Tex = "FX_UI_star_02", Count = 10, Speed = new Vector2(1f, 3f), Angle = 90, Spread = 120, Life = new Vector2(0.4f, 0.7f), Size = new Vector2(0.08f, 0.18f), C0 = new Color(1f, 0.9f, 0.6f), Order = 150, Boost = 3f, ShrinkTo = 0 });
                 foreach (var e in pre) yield return ApplyConsequence(e, u);
                 foreach (var kv in byHit) foreach (var e in kv.Value) yield return ApplyConsequence(e, u);
-                yield return Clock.Wait(0.25f);
+                yield return Clock.Wait(OldTempo ? 0.25f : 0.12f);
                 yield break;
             }
 
@@ -182,7 +183,18 @@ namespace Bolzena
             if (cardChain != null)
             {
                 CardNaturalMs = Mathf.RoundToInt(cardTotal * 1000);
+                // 타수만큼만 휘두른다(2026-10-09 「1타인데 2타 모션이 나가 길어진다」) — 엔진이 N 번 때리는데 애니가 그보다 많이 휘두르면
+                //   앞 N 번의 타격 뒤(+ 회수 몫 CARD_TAIL_KEEP)에서 몸짓을 끊는다. 자기형(강화 표시 이벤트)은 그대로
+                float trimEnd = float.MaxValue;
+                Debug.Log($"[Tempo] 카드 몸짓 {key} {act.Motion} {string.Join(" → ", cardChain)} — 엔진 타수 {byHit.Count} · 애니 타격 {marks.Count} · 애니 {cardTotal:F2}s");
+                if (!OldTempo && !cardSelf && byHit.Count >= 1 && marks.Count > byHit.Count)
+                {
+                    marks = marks.GetRange(0, byHit.Count);
+                    trimEnd = Mathf.Min(cardTotal, marks[marks.Count - 1] + CARD_TAIL_KEEP);
+                    cardTotal = trimEnd;
+                }
                 float over = CardCut(u, cardChain, marks, cardTotal, CardCap(act.Motion), speed);
+                if (trimEnd < cutEnd) cutEnd = trimEnd;
                 float shown = Rm(cardTotal) / speed;
                 if (over > 0.05f && shown > CardCap(act.Motion) + 0.4f) speed = Mathf.Min(CARD_SPEED_MAX, speed * shown / (CardCap(act.Motion) + 0.4f));
                 CardSpeed = speed;
@@ -381,6 +393,14 @@ namespace Bolzena
             // 남은 몸짓 — 카드는 마지막 타격 뒤 조금 더 보고 돌아온다. 고학년은 몸짓을 끝까지(조각 · 고리 다) 하고 돌아온다
             //   (웹판: 달려간 고학년은 total + back 까지. 전에는 타격 + 0.6초에 Idle 로 끊어 끝 조각이 잘렸다)
             float tail = ult ? Mathf.Max(duration, table != null ? Rm(table.TotalMs / 1000f) / speed : 0) : cardChain != null ? duration : Mathf.Min(duration, elapsed + 0.32f);   // 카드도 애니 끝까지(줄인 길이)
+            // 카드 — 마지막 타격 뒤 잠깐(HOLD_AFTER_HIT)만 붙들고 다음 입력을 받는다. 남은 몸짓 · 복귀 · 색 되돌리기는 뒤에서(Finish)
+            if (!ult && !OldTempo && !OldSync)
+            {
+                float hold = Mathf.Min(tail, elapsed + HOLD_AFTER_HIT);
+                while (elapsed < hold) { yield return null; elapsed = Time.time - tStart; if (fxClock != null) fxClock.Ms = elapsed * 1000f; }
+                StartCoroutine(Finish(u, seq, tStart, tail, fxClock, dash, dash ? 0.22f : 0.15f, baseOrder - act.Actor.Index * 2, true));
+                yield break;
+            }
             while (elapsed < tail) { yield return null; elapsed = OldSync ? elapsed + Time.deltaTime : Time.time - tStart; if (fxClock != null) fxClock.Ms = elapsed * 1000f; }
             if (ult) SyncReport(hitAtMs, tStart);
             if (ult)
@@ -1658,7 +1678,10 @@ namespace Bolzena
                 Enemies[i].Flash(col, 0.4f, 0.55f);
                 if (Bolzena.Fx.BolzenaFx.Common(good ? "buff" : "debuff", Enemies[i].Fx) == null)
                     Vfx.Glow(Enemies[i].Center, 2.4f, new Color(col.r, col.g, col.b, 0.7f), 0.5f, 1.8f, "FX_IN_Ring_ShockWave_03", 150);
-                Vfx.Word(Enemies[i].Top + new Vector3(0, 0.25f, 0), id, 0.4f, col, new Color(0.15f, 0, 0.1f));
+                // 머리 위 HUD 묶음(HP 막대 · 숫자) 바로 위에서 떠오르게 — 머리 높이에서 띄우면 흐려지는 동안 막대에 겹쳐 이름처럼 보였다
+                float wy = Enemies[i].Top.y + 0.25f;
+                if (i < EnemyHuds.Count && EnemyHuds[i] != null) wy = Mathf.Min(Mathf.Max(wy, Enemies[i].transform.localPosition.y + EnemyHuds[i].LocalBox.yMax + 0.22f), 3.6f);
+                Vfx.Word(new Vector3(Enemies[i].Top.x, wy, 0), id, 0.4f, col, new Color(0.15f, 0, 0.1f));
                 string ic = ChipRow.IconOf(id, good);
                 var icon = Make.Box("st", FieldRoot, ChipRow.IconSprite(ic), Enemies[i].Top + new Vector3(0.6f, 0, 0), new Vector2(0.6f, 0.6f), 470);
                 Clock.Run(Clock.Tween(0.6f, t => { if (icon) { icon.transform.localPosition += new Vector3(0, Time.deltaTime * (good ? 0.3f : -0.3f), 0); Make.Alpha(icon, 1 - t); if (t >= 1) Destroy(icon.gameObject); } }));
@@ -1836,15 +1859,19 @@ namespace Bolzena
             if (ei >= Enemies.Count) SpawnSummons();
             if (ei < 0 || ei >= Enemies.Count) yield break;
             var u = Enemies[ei];
+            int seq = BeginAct(u);
             Split(group, out var pre, out var byHit, out int hits);
             bool foeUlt = act.Text == "foeult";
+            if (foeUlt) Clock.Base = 1f;          // 보스 클론 고학년 — 원작 길이 원칙(사도 고학년과 같이 템포를 걸지 않는다)
             bool spend = act.Anim == "charge";   // 모은 힘을 쏟는 턴(엘리트 · 일반 힘 모으기)
             bool heavy = act.Text == "heavy" || foeUlt;
             string anim = u.AnimFor(act.Motion);
             float speed = foeUlt ? 1.05f : heavy ? 1.1f : 1.25f;
             var marks = u.Strikes(anim);
+            if (!OldTempo && hits >= 1 && marks.Count > hits) marks = marks.GetRange(0, hits);   // 타수만큼 앞 타격에(1타 수가 다타 몸짓의 마지막 휘두름까지 기다리지 않게)
             var times = HitTimes(marks, Mathf.Max(1, hits), speed);
             string key = u.name.Replace("enemy_", "");
+            Debug.Log($"[Tempo] 적 몸짓 {key} {anim} — 타수 {hits} · 애니 타격 {u.Strikes(anim).Count} · 애니 {u.Duration(u.F(anim)):F2}s · 첫 타격 {(marks.Count > 0 ? marks[0] : 0):F2}s{(foeUlt ? " · 고학년" : heavy ? " · 강타" : "")}");
 
             u.SetOrder(60);
             foreach (var en in Enemies) if (en != u) en.Tint(new Color(0.62f, 0.62f, 0.68f));
@@ -1852,7 +1879,7 @@ namespace Bolzena
             {
                 Vfx.Word(u.Top + new Vector3(0, 1.0f, 0), "즉시 행동!", 0.42f, new Color(1f, 0.85f, 0.3f), new Color(0.3f, 0.1f, 0), 1.0f, 1.2f);
                 Sfx.Play("turn_start", 0.5f, 1.3f);
-                yield return Clock.Wait(0.35f);
+                yield return Clock.Wait(OldTempo ? 0.35f : 0.25f);
             }
             if (spend)
             {
@@ -1863,7 +1890,7 @@ namespace Bolzena
                 Vfx.Glow(u.Center, 3f, new Color(1f, 0.5f, 0.15f, 0.75f), 0.4f, 2.6f, "FX_IN_Ring_ShockWave_03", 186);
                 if (heavy) ScreenFx.I.Lines(0.6f, new Color(1f, 0.55f, 0.25f), FieldRoot.TransformPoint(u.Center), 302, 0.3f);
                 Sfx.Play("turn_start", 0.45f, 0.8f);
-                yield return Clock.Wait(0.4f);
+                yield return Clock.Wait(OldTempo ? 0.4f : 0.3f);
             }
             else if (!string.IsNullOrEmpty(act.Say))
                 Vfx.Word(new Vector3(u.Top.x, Mathf.Min(u.Top.y + 1.2f, 3.45f), 0), "「" + act.Say + "」", 0.24f, new Color(1f, 0.95f, 0.88f), new Color(0.1f, 0.05f, 0.1f), 1.3f, 1f, null, 472, 0.2f);
@@ -1872,7 +1899,7 @@ namespace Bolzena
                 // 큰 수 — 붉은 경고, 집중선
                 Vfx.Word(u.Top + new Vector3(0, 0.6f, 0), "강타!", 0.7f, new Color(1f, 0.5f, 0.35f), new Color(0.3f, 0, 0), 1.0f, 1.5f);
                 ScreenFx.I.Lines(0.55f, new Color(1f, 0.4f, 0.3f), FieldRoot.TransformPoint(u.Center), 302, 0.3f);
-                yield return Clock.Wait(0.3f);
+                yield return Clock.Wait(OldTempo ? 0.3f : 0.2f);
             }
             float dur = u.Play(anim, speed);
             bool attack = hits > 0;
@@ -1899,6 +1926,14 @@ namespace Bolzena
             }
             if (heavy) ScreenFx.I.Lines(0, Color.white, Vector2.zero);
             float tail = foeUlt ? dur : Mathf.Min(dur, elapsed + 0.4f);   // 보스 고학년은 몸짓을 끝까지
+            // 보통 수 — 맞힌 뒤 잠깐만 붙들고 다음 적이 바로 시작한다(몸짓 꼬리 · 복귀는 뒤에서 — 적끼리 겹친다)
+            if (!foeUlt && !OldTempo)
+            {
+                float hold = Mathf.Min(tail, elapsed + HOLD_AFTER_HIT);
+                while (elapsed < hold) { yield return null; elapsed += Time.deltaTime; }
+                StartCoroutine(Finish(u, seq, Time.time - elapsed, tail, null, false, 0.2f, u.BaseOrder, false));
+                yield break;
+            }
             while (elapsed < tail) { yield return null; elapsed += Time.deltaTime; }
             if (foeUlt) u.Idle();
             if (u.Feet != u.Home)
@@ -1907,7 +1942,61 @@ namespace Bolzena
             }
             u.SetOrder(u.BaseOrder);
             foreach (var en in Enemies) if (en) en.Tint(Color.white);
+            if (foeUlt) Clock.Base = Clock.TEMPO;
             yield return Clock.Wait(0.15f);
+        }
+
+        // ── 템포(2026-10-09 「모션이 너무 길다 — 2배속이 아니면 루즈」) ──
+        public static readonly bool OldTempo = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-oldtempo") >= 0;   // 고치기 전 흐름(전후 비교)
+        const float HOLD_AFTER_HIT = 0.12f;      // 마지막 타격 뒤 붙드는 몫(게임 초) — 그 뒤는 다음 입력 · 다음 적
+        // -tempolog — 연출 한 칸이 붙든 시간(화면 초, 0.1초 넘는 것만). 어디서 시간이 드는지 재는 점검용
+        static readonly bool TempoLog = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-tempolog") >= 0;
+        IEnumerator Timed(string what, IEnumerator co)
+        {
+            if (!TempoLog) { yield return co; yield break; }
+            float t0 = Clock.RealNow;
+            yield return co;
+            float d = Clock.RealNow - t0;
+            if (d > 0.1f) Debug.Log($"[TempoE] {what} {d:F2}s");
+        }
+        int actSeq;                              // 몸짓을 시작할 때마다 하나씩
+        readonly Dictionary<UnitView, int> unitSeq = new Dictionary<UnitView, int>();
+        int BeginAct(UnitView u) { unitSeq[u] = ++actSeq; return actSeq; }
+        bool Stale(UnitView u, int seq) => !u || !unitSeq.TryGetValue(u, out var s) || s != seq;
+
+        // 뒷정리 — 남은 몸짓(tail 까지, 이펙트 시계도) → 제자리로 → 앞뒤 차례 · 색. 그 유닛이 그새 다시 움직이면(Stale) 자리 · 몸짓은 새 수에 맡긴다.
+        //   색 · 사도 차례는 그 뒤 아무도 새로 움직이지 않았을 때만 되돌린다(새 수가 끝날 때 되돌린다)
+        IEnumerator Finish(UnitView u, int seq, float tStart, float tail, Bolzena.Fx.UltClock clk, bool dash, float back, int order, bool hero)
+        {
+            while (Time.time - tStart < tail)
+            {
+                if (clk != null) clk.Ms = (Time.time - tStart) * 1000f;
+                if (Stale(u, seq) && clk == null) yield break;
+                yield return null;
+            }
+            if (clk != null) clk.Ms = tail * 1000f;
+            if (Stale(u, seq)) yield break;
+            if (u.Feet != u.Home)
+            {
+                if (dash && !Over) u.Loop("Move");
+                // u.Return 을 이 코루틴 안에서 한 칸씩 — 새 수가 오면 바로 놓는다(따로 띄운 이동끼리 자리를 다투지 않게)
+                var stack = new Stack<IEnumerator>();
+                stack.Push(u.Return(back));
+                while (stack.Count > 0)
+                {
+                    if (Stale(u, seq)) yield break;
+                    var top = stack.Peek();
+                    if (!top.MoveNext()) { stack.Pop(); continue; }
+                    if (top.Current is IEnumerator inner) stack.Push(inner); else yield return top.Current;
+                }
+                if (dash && !Over) u.Idle();
+            }
+            if (Stale(u, seq)) yield break;
+            if (!dyingFoes.Contains(u)) u.SetOrder(order);
+            if (seq != actSeq) yield break;
+            foreach (var h in Heroes) if (h) h.Tint(Color.white);
+            foreach (var en in Enemies) if (en) en.Tint(Color.white);
+            if (hero) ResetHeroOrder();
         }
 
         void Hurt(BattleEvent e, string enemyKey, bool heavy)
@@ -1961,6 +2050,7 @@ namespace Bolzena
             var s = Battle.Snapshot;
             var hs = s.Heroes[hero];
             InUlt = true;
+            Clock.Base = 1f;   // 고학년은 원작 길이 원칙(ULT_MAX · ULT_SPEED_MAX) — 기본 템포를 걸지 않는다(배속은 그대로)
             Emit("ult_start");
             if (!Bolzena.RunUI.Settings.SkipCutin) yield return UltCutin.Play(ScreenRoot, hs.Key, hs.Name, hs.UltName, hs.Tint);
             else { Sfx.Voice(hs.Key, "ultimate", "shout"); Vfx.Flash(new Color(1, 1, 1, 0.25f), 0.15f); }   // 컷인 건너뛰기(설정) — 목소리 · 번쩍만
@@ -1969,6 +2059,7 @@ namespace Bolzena
             Demo.UltLap.Lap("UseUlt");
             // Act 를 고학년으로 연출하고, 나머지는 보통으로
             yield return Present(evs);
+            Clock.Base = Clock.TEMPO;
             InUlt = false;
         }
 

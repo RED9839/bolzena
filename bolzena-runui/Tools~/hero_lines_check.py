@@ -6,12 +6,15 @@
 본다:
   1) 로스터 사도가 모두 있나 · 표에만 있는 키(오타)
   2) 칸마다 줄 수 — lobby 4~6 · cheek 2 · tickle 2 · angry 2 · knock(꿀밤) 1~2 · pat 1~2 · party 1
+     판 진행 한마디(2026-10-09) — rest · shop · reward · victory · bossStart · lowhp · event 각 2~3
   3) 줄 길이(36자 넘으면 경고) · 같은 줄 겹침
   4) 말 단계 — 반말(casual · royal) 사도 줄이 「요 · 니다 · 세요 · 죠 …」 로 끝나면 오류(0 이어야 한다).
      존댓말(polite) 사도는 존댓말 어미 비율이 70% 아래면 경고.
   5) 말투 프로필(사도 데스크 talk-ko.json, 있으면)과 비교 — style 과 reg 가 어긋나면 경고,
      교주 호칭이 「교주」 인데 「교주님」 을 쓰면(또는 그 반대) 경고. (프로필 파일은 읽기만 한다)
   6) 다른 사도 이름이 줄에 들어가면 경고.
+  7) 판 진행 한마디 — 같은 갈래에서 같은 머리(한글 앞 네 글자)로 시작하는 줄이 사도 4명 넘게면 경고(문장 틀 남발),
+     「장비」(화면 용어는 「아티팩트」) · 따옴표가 들어가면 오류.
 오류가 있으면 끝 코드 1.
 """
 import json, os, re, sys
@@ -24,6 +27,8 @@ TALK = "C:/projects/사도 데스크/prototype/data/talk-ko.json"
 NAMES = "C:/projects/사도 데스크/prototype/data/names-ko.json"
 
 KINDS = {"lobby": (4, 6), "cheek": (2, 2), "tickle": (2, 2), "angry": (2, 2), "knock": (1, 2), "pat": (1, 2), "party": (1, 1)}
+RUN_KINDS = {k: (2, 3) for k in ("rest", "shop", "reward", "victory", "bossStart", "lowhp", "event")}   # 판 진행 한마디(2026-10-09)
+KINDS.update(RUN_KINDS)
 POLITE_END_RE = re.compile(r"(요|세요|죠|지요|시오|십시오|소서|옵니다|사와요)$")
 
 
@@ -99,6 +104,7 @@ def main():
         if k not in ko_of: errs.append(f"{k}: 로스터에 없는 키(오타?)")
 
     seen = {}
+    heads = {}
     report = []
     for k in rkeys:
         e = heroes.get(k)
@@ -114,6 +120,11 @@ def main():
                 n_lines += 1
                 if len(line) > 36: warns.append(f"{k}/{kind}: {len(line)}자 「{line}」")
                 if line in seen and seen[line] != k: warns.append(f"{k}/{kind}: {seen[line]} 와 같은 줄 「{line}」")
+                if kind in RUN_KINDS:
+                    if "장비" in line: errs.append(f"{k}/{kind}: 「장비」 → 「아티팩트」 — 「{line}」")
+                    if re.search(r"[\"“”'‘’]", line): errs.append(f"{k}/{kind}: 따옴표 — 「{line}」")
+                    hd = re.sub(r"[^가-힣]", "", line)[:4]
+                    if len(hd) >= 2: heads.setdefault((kind, hd), set()).add(k)
                 seen.setdefault(line, k)
                 sents = sentences(line)
                 pol = any(POLITE_END.search(ending(s)) for s in sents)
@@ -144,6 +155,8 @@ def main():
             warns.append(f"{k}: 프로필 style={p['style']} 인데 reg={reg}" + (f" (note: {e.get('note')})" if e.get("note") else ""))
         report.append(f"{k:<14} {reg or '-':<8} {n_lines:>3}줄  존댓말 어미 {ratio:4.0%}  " + (f"프로필 {p['style']}/{p.get('addr')}" if p else "프로필 없음"))
 
+    for (kind, hd), ks in sorted(heads.items()):
+        if len(ks) > 4: warns.append(f"{kind}: 「{hd}…」 로 시작하는 줄이 사도 {len(ks)}명 — 문장 틀 반복 ({', '.join(sorted(ks))})")
     if verbose: print("\n".join(report))
     print(f"사도 {len([k for k in rkeys if k in heroes])}/{len(rkeys)} · 대사 {total}줄 · 말 단계 {reg_count}")
     casual_keys = [k for k in rkeys if heroes.get(k, {}).get("reg") in ("casual", "royal")]

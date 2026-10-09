@@ -13,6 +13,7 @@ namespace Bolzena.RunUI
     {
         public void Lobby()
         {
+            Tw.After(1.2f, PlayRecord.NoticeOnce);   // 처음 실행 때 한 번 — 플레이 기록 안내
             Stage.SetBg("stage1_1", 0.1f);
             Stage.Show("lobby", root =>
             {
@@ -58,15 +59,12 @@ namespace Bolzena.RunUI
 
                 // 말풍선
                 var lines = LinesOf(hero);
-                var bubbleT = W.Bubble(stage, hero?.ko ?? "에르핀", lines[0], 360, out var bubble);
-                bubble.At(0, 1, 70, -200, 360, 100);
-                Tw.Pop(bubble, 0.5f, 0.7f, 0.5f);
+                var bubble = HeroBubble.Show(stage, hero, lines[0], new Vector2(0, 1), new Vector2(70, -200), new Vector2(0, 1), 0, 0.5f, "lobby");   // 사도 말풍선 진입점(HeroBubble.cs)
                 int li = 0;
                 tb.OnClick = () =>
                 {
                     li = (li + 1) % lines.Length;
-                    bubbleT.text = lines[li];
-                    Tw.Pop(bubble, 0, 0.85f, 0.35f);
+                    bubble.SetLine(lines[li], 0.35f);
                     if (sg != null)
                     {
                         var hit = SpineUi.PickAnim(sg.Skeleton.Data, "Happy_1", "Smile_1", "Touch", "Happy");
@@ -76,7 +74,7 @@ namespace Bolzena.RunUI
                 };
                 Stage.Hot["hero"] = tb;
                 touch.Tap = () => tb.OnClick?.Invoke();
-                touch.Say = line => { if (!bubbleT) return; bubbleT.text = line; Tw.Pop(bubble, 0, 0.85f, 0.3f); };
+                touch.Say = line => { if (bubble.Alive) bubble.SetLine(line); };
                 touch.Bind(sg, hero);
                 LobbyTouchNow = touch;
 
@@ -104,10 +102,8 @@ namespace Bolzena.RunUI
                     if (touch) touch.Bind(sg, hero);
                     if (sg != null) { sg.color = new Color(1, 1, 1, 0); var ng = sg; Tw.Run(ng.rectTransform, 0.3f, t => { if (ng) ng.color = new Color(1, 1, 1, t); }, Tw.Linear, 0.12f); Tw.Rise(ng.rectTransform, 0.12f, 18, 0.35f); }
                     pt.text = $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}";
-                    if (bubble) Destroy(bubble.gameObject);
-                    bubbleT = W.Bubble(stage, hero?.ko ?? "에르핀", lines[0], 360, out bubble);
-                    bubble.At(0, 1, 70, -200, 360, 100);
-                    Tw.Pop(bubble, 0.25f, 0.7f, 0.4f);
+                    bubble.Close();
+                    bubble = HeroBubble.Show(stage, hero, lines[0], new Vector2(0, 1), new Vector2(70, -200), new Vector2(0, 1), 0, 0.25f, "lobby");
                 });
 
                 // 오른쪽 — 메뉴
@@ -124,29 +120,19 @@ namespace Bolzena.RunUI
                 Stage.Hot["start"] = start;
                 if (hasSave)
                     Stage.Hot["new"] = MenuItem(menu, Theme.S("ic_spark"), "새 모험", "지금 모험을 버리고 사도 셋을 새로 고릅니다", new Color(0.95f, 0.75f, 0.35f), () =>
-                        Confirm("지금 모험을 버릴까요?", "이어하던 모험은 사라집니다. 새 마을로 떠납니다.", "버리고 출발", () => { RunPort.ClearSave(); NewAdventure(); }, true));
+                        Confirm("지금 모험을 버리겠습니까?", "이어하던 모험은 사라집니다. 새 마을로 떠납니다.", "버리고 출발", () => { PlayRecord.Send(P.SavedRun(), "abandon"); RunPort.ClearSave(); NewAdventure(); }, true));
                 { var cs = CrayonStore.Save; var ct = CrayonStore.Table;
-                  Stage.Hot["crayon"] = MenuItem(menu, Theme.S("ic_up"), "교주 능력치", $"크레파스 보드로 파티 영구 강화 · 칠한 단계 {ct.Cells.Where(x => !x.Blank).Sum(x => System.Math.Min(x.Levels, cs.LevelOf(x.Id)))}/{ct.Cells.Where(x => !x.Blank).Sum(x => x.Levels)}", Theme.Hex("FFB648"), CrayonScreen); }
-                Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", $"사도 {Roster.All.Count}명 · 적 · 장비 · 교주 카드", Theme.Hex("7FE0B4"), () => Dex(Lobby));
+                  Stage.Hot["crayon"] = MenuItem(menu, Theme.BoardIcon, "교주 보드", $"크레파스 보드로 파티 영구 강화 · 칠한 단계 {ct.Cells.Where(x => !x.Blank).Sum(x => System.Math.Min(x.Levels, cs.LevelOf(x.Id)))}/{ct.Cells.Where(x => !x.Blank).Sum(x => x.Levels)}", Theme.Hex("FFB648"), CrayonScreen); }
+                Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", $"사도 {Roster.All.Count}명 · 적 · 아티팩트 · 교주 카드", Theme.Hex("7FE0B4"), () => Dex(Lobby));
                 Stage.Hot["settings"] = MenuItem(menu, Theme.S("ic_cog"), "설정", "소리 · 움직임 · 글자 · 화면", Theme.Hex("B9A8FF"), () => SettingsPanel(false));
 
-                // 마을 목록
-                var route = Ui.Panel(menu, Theme.Glass, new Color(1, 1, 1, 0.95f), "route");
-                Ui.Col(route.rectTransform, 4, TextAnchor.UpperLeft, new RectOffset(22, 22, 14, 14));
-                Ui.Title(route.transform, "마을 — 모험마다 하나", Theme.FsSm, Theme.Sub).Pref(-1, 24);
-                foreach (var v in P.Villages)
-                {
-                    var line = Ui.Text(route.transform, $"<color={Theme.GoldTag}>★</color> {v.Name}  <size=82%><color={Theme.SubTag}>{string.Join(" → ", v.Floors.Select(f => f.Name))}</color></size>", Theme.FsBody, Theme.Ink);
-                    line.Pref(-1, 28);
-                    line.textWrappingMode = TextWrappingModes.NoWrap;
-                }
                 int i = 0;
                 foreach (Transform c in menu) Tw.Pop((RectTransform)c, 0.15f + 0.07f * i++, 0.85f, 0.4f);
 
                 logo.SetAsLastSibling();
                 // 비공식 팬게임 안내 — 배경 위에서도 읽히게 마을 공개 창과 같은 남색 판(금 테 · 둥근 모서리)을 깔고 오른쪽 아래 작게(사용자 2026-10-07)
                 var legalBox = Ui.Panel(root, Theme.Panel, null, "legal").rectTransform;
-                legalBox.At(1, 0, -Theme.Gutter, 12, 560, 62);
+                legalBox.At(1, 0, -Theme.Gutter, 12, Mathf.Min(560, Stage.Size.x - 2 * Theme.Gutter), 62);
                 legalBox.GetComponent<UnityEngine.UI.Image>().color = Color.white.A(0.9f);
                 var legal = Ui.Text(legalBox, $"<color={Theme.GoldTag}>비공식 팬 게임 · 비영리</color> — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있습니다. 공식과 무관하며, 권리자의 요청이 있으면 즉시 내립니다.", Theme.FsCap - 1, Theme.Sub, TextAlignmentOptions.MidlineLeft);
                 legal.rectTransform.Fill(16, 6, 14, 6); legal.textWrappingMode = TextWrappingModes.Normal;
@@ -181,8 +167,10 @@ namespace Bolzena.RunUI
             var disc = Ui.Img(b.transform, Theme.S("circle"), Theme.NavyWell, "disc");
             disc.rectTransform.At(0, 0.5f, 18, 0, 48, 48);
             var ring = Ui.Img(disc.transform, Theme.S("ring"), tone.A(0.9f), "ring"); ring.rectTransform.Fill();
-            var ic = Ui.Img(disc.transform, icon, tone, "icon");
-            ic.rectTransform.Fill(12, 12, 12, 12); ic.preserveAspect = true;
+            // 원작 그림(RunArt — 교주 보드의 크레파스)은 제 색 그대로 크게, 화면 아이콘(RunUI/Sprites)은 칸 색으로 칠한다
+            bool art = icon != null && icon.name.StartsWith("RunArt/");
+            var ic = Ui.Img(disc.transform, icon, art ? Color.white : tone, "icon");
+            ic.rectTransform.Fill(art ? 4 : 12, art ? 4 : 12, art ? 4 : 12, art ? 4 : 12); ic.preserveAspect = true;
             var t = Ui.Title(b.transform, title, Theme.FsLg + 2, Theme.Ink, TextAlignmentOptions.BottomLeft);
             t.rectTransform.Fill(84, h * 0.46f, 16, 6);
             var s = Ui.Text(b.transform, sub, Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft);
@@ -199,10 +187,10 @@ namespace Bolzena.RunUI
             t.rectTransform.Band(1, 46, 30, 30, -34);
             var b = Ui.Text(panel, body, Theme.FsBody, Theme.Sub, TextAlignmentOptions.Center);
             b.rectTransform.Band(1, 70, 40, 40, -88);
-            var row = Ui.Rect("row", panel).Band(0, 62, 36, 36, 30);
+            var row = Ui.Rect("row", panel).Band(0, Theme.BtnH, 36, 36, 30);
             Ui.Row(row, Theme.Gap + 4, TextAnchor.MiddleCenter, null, true, true);
-            var no = Btn.Make(row, "취소", BtnStyle.Dark, close, Theme.FsMd);
-            var ok = Btn.Make(row, yes, danger ? BtnStyle.Red : BtnStyle.Gold, () => { close(); onYes(); }, Theme.FsMd);
+            var no = Btn.Make(row, "취소", BtnStyle.PillDark, close, Theme.FsMd);
+            var ok = Btn.Make(row, yes, danger ? BtnStyle.PillRose : BtnStyle.PillGold, () => { close(); onYes(); }, Theme.FsMd);
             Stage.Hot["confirm.yes"] = ok;
             Stage.Hot["confirm.no"] = no;
         }

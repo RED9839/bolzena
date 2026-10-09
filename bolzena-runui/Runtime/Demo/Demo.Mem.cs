@@ -73,7 +73,7 @@ namespace Bolzena.RunUI
             M("dex_after_details");
             yield return Press("tab:적", 2.0f);
             M("dex_foes");
-            yield return Press("tab:장비", 2.0f);
+            yield return Press("tab:아티팩트", 2.0f);
             M("dex_equips");
             yield return Press("tab:교주 카드", 2.0f);
             M("dex_cards");

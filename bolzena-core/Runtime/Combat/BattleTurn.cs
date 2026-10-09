@@ -75,6 +75,7 @@ namespace Bolzena.Core
         // ── 턴 ─────────────────────────────────────────────────────────
         void BeginTurn()
         {
+            if (Turn > 0) Tape?.TurnEnd(this);   // 지난 턴(내 턴 + 적의 차례)을 닫는다 — 플레이 기록
             Turn++;
             MeterTurn();
             Cue("turn", PartyRep(), new Cue { V = Turn });

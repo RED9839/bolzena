@@ -76,6 +76,8 @@ namespace Bolzena.Battle
         public string Nature;            // 주인 사도의 성격(카드 틀 빛깔) — 교주 카드는 넣은 사도의 성격, 주인 없는 교주 · 상태 카드는 null
         public string BlessName, BlessText;   // 신탁 선택지에 축복이 얹혔으면(15%) 그 이름 · 글
         public string MarkBless, MarkBlessText;   // 이 카드에 이미 얹힌 축복(core CardMark) — 카드 표식 · 확대 판
+        public int BaseCost;             // 카드에 적힌 원래 비용(오른 비용 표시 — 강인도는 이것 기준)
+        public string CostUpWhy;         // 비용이 오른 까닭(풀이용)
         public bool CostDown;            // 신탁으로 비용이 내려간 카드(비용 숫자 연두)
         public bool Copy;                // 복제본(core CardMark.Copy) — 오른쪽 위 복제 표 「복제 — 신탁 · 축복 불가」
         public List<string> Choices;     // 두 갈래 카드 — 갈래 이름 둘(낼 때 고른다). 없으면 null

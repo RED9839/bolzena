@@ -104,7 +104,7 @@ namespace Bolzena.RunUI
                 y -= rowH + secGap;
             }
             Shelf("교주 카드", "교주님이 직접 쓰는 카드 · 사면 덱에 들어갑니다", cards);
-            Shelf("장비", "사면 곧장 사도에게 낍니다 · 산 장비는 팔 수 없습니다", gears);
+            Shelf("아티팩트", "사면 곧장 사도에게 낍니다 · 산 아티팩트는 팔 수 없습니다", gears);
             if (sections == 0) { var none = Ui.Text(panel, "오늘은 다 팔렸습니다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center); none.rectTransform.Fill(); }
 
             // 아래 띠 — 서비스(카드 제거 · 새로고침) · 떠나기
@@ -112,7 +112,7 @@ namespace Bolzena.RunUI
             bar.anchorMin = new Vector2(0, 0); bar.anchorMax = new Vector2(1, 0); bar.pivot = new Vector2(0.5f, 0);
             bar.offsetMin = new Vector2(L + 8, 18); bar.offsetMax = new Vector2(-Theme.Gutter, 18 + Theme.C(66, 64));
             Ui.Row(bar, Theme.Gap, TextAnchor.MiddleLeft, null, false, true);
-            var rm = ServiceBtn(bar, Theme.S("ic_trash"), "카드 제거", shop.RemoveUsed ? "이번에는 뺐습니다" : "덱에서 한 장 · 쓸수록 오릅니다", P.RemovePrice, !shop.RemoveUsed, () => RemovePicker(root, kind, li));
+            var rm = ServiceBtn(bar, Theme.S("ic_trash"), "카드 제거", shop.RemoveUsed ? "이번에는 뺐습니다" : "덱에서 한 장 · 쓸수록 오릅니다", P.RemovePrice, !shop.RemoveUsed, () => RemovePicker(root, kind, li), P.Run.RemoveBase);
             rm.Pref(Theme.C(380, 380), -1);
             Stage.Hot["shop.remove"] = rm;
             var rr = ServiceBtn(bar, Theme.S("ic_refresh"), "새로고침", "진열을 통째로 바꿉니다", P.RerollPrice, true, () =>
@@ -122,11 +122,16 @@ namespace Bolzena.RunUI
                 Sfx.Play("coin");
                 P.Save("shop", kind);
                 BuildShop(root, kind, li + 1);
-            });
+            }, P.Run.RerollBase);
             rr.Pref(Theme.C(340, 340), -1);
             Stage.Hot["shop.reroll"] = rr;
+            if (P.Run.ShopOff > 0)   // 교주 보드 「골디 할인권」 — 값에 취소선 + 깎은 값, 여기엔 할인율 하나
+            {
+                var off = Ui.Text(bar, $"골디 할인권 -{P.Run.ShopOff * 100:0.#}%", Theme.FsSm, Theme.Gold, TextAlignmentOptions.MidlineLeft);
+                off.textWrappingMode = TextWrappingModes.NoWrap; off.Pref(Theme.C(190, 170), -1);
+            }
             W.Spacer(bar, -1, -1, 1);
-            var back = Btn.Make(bar, "캠프로", BtnStyle.PillDark, () => Camp(kind), Theme.FsLg);
+            var back = Btn.Make(bar, "휴식으로", BtnStyle.PillDark, () => Camp(kind), Theme.FsLg);
             back.Pref(220, -1);
             Stage.Hot["shop.back"] = back;
             Tw.Rise(bar, 0.35f, 16, 0.4f);
@@ -201,7 +206,7 @@ namespace Bolzena.RunUI
             else
             {
                 var ic = Ui.Img(b.transform, Theme.Icon("gold"), Color.white, "coin"); ic.Pref(24, 24); ic.preserveAspect = true;
-                var t = Ui.Title(b.transform, it.Delivery ? "무료" : it.Price.ToString(), Theme.FsMd, can ? Theme.Brown : Theme.Hex("7A2A1A"));
+                var t = Ui.Title(b.transform, it.Delivery ? "무료" : it.Base > it.Price ? $"<size=70%><s>{it.Base}</s></size> {it.Price}" : it.Price.ToString(), Theme.FsMd, can ? Theme.Brown : Theme.Hex("7A2A1A"));
                 t.textWrappingMode = TextWrappingModes.NoWrap; t.overflowMode = TextOverflowModes.Overflow;
             }
             b.Interactable = can;
@@ -210,7 +215,7 @@ namespace Bolzena.RunUI
         }
 
         /// <summary>서비스 띠 한 칸(카드 제거 · 새로고침) — 아이콘 · 이름 · 설명, 오른쪽에 값 알약.</summary>
-        Btn ServiceBtn(RectTransform parent, Sprite icon, string title, string sub, int price, bool can, System.Action go)
+        Btn ServiceBtn(RectTransform parent, Sprite icon, string title, string sub, int price, bool can, System.Action go, int basePrice = 0)
         {
             var b = Btn.Make(parent, null, BtnStyle.Glass, go, 0, title);
             var ic = Ui.Img(b.transform, icon, Theme.Gold, "ic"); ic.rectTransform.At(0, 0.5f, 18, 0, 30, 30); ic.preserveAspect = true;
@@ -218,8 +223,9 @@ namespace Bolzena.RunUI
             t.textWrappingMode = TextWrappingModes.NoWrap;
             var s = Ui.Text(b.transform, sub, Theme.FsCap, Theme.Sub, TextAlignmentOptions.TopLeft); s.rectTransform.Fill(62, 6, 112, 36);
             s.textWrappingMode = TextWrappingModes.NoWrap;
-            var (pb, pt) = Ui.Chip(b.transform, Theme.Icon("gold"), price.ToString(), 40, Theme.NavyWell.A(0.95f), null, Theme.FsMd);
-            pb.rectTransform.At(1, 0.5f, -12, 0, 92, 40);
+            bool off = basePrice > price;   // 골디 할인권 — 원래 값 취소선
+            var (pb, pt) = Ui.Chip(b.transform, Theme.Icon("gold"), off ? $"<size=70%><s>{basePrice}</s></size> {price}" : price.ToString(), 40, Theme.NavyWell.A(0.95f), null, Theme.FsMd);
+            pb.rectTransform.At(1, 0.5f, -12, 0, off ? 128 : 92, 40);
             pt.color = P.S.Gold >= price ? Theme.Gold : Theme.Bad;
             b.Interactable = can && P.S.Gold >= price;
             b.Why = !can ? "이번에는 더 할 수 없습니다" : "골드가 모자랍니다";
@@ -235,7 +241,7 @@ namespace Bolzena.RunUI
             CardGroups(content, P.S.Deck, 170, Theme.Compact ? 6 : GridCols(mw - 80, 170, 12, 6, 8), (c, id, i) =>   // 같은 카드도 한 장마다 한 칸
             {
                 var b = c.gameObject.AddComponent<Btn>();
-                b.OnClick = () => Confirm($"「{P.Data.Card(id)?.Name}」 을 뺄까요?", $"{P.RemovePrice} 골드 — 덱에서 한 장이 빠집니다.", "빼기", () =>
+                b.OnClick = () => Confirm($"「{P.Data.Card(id)?.Name}」 을 빼겠습니까?", $"{P.RemovePrice} 골드 — 덱에서 한 장이 빠집니다.", "빼기", () =>
                 {
                     var why = P.Remove(id);
                     if (why != null) { Toast.Show(why); return; }

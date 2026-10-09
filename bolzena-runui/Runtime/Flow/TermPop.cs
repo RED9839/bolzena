@@ -65,7 +65,7 @@ namespace Bolzena.RunUI
             return Attach(t, terms, layer, cardMaker);
         }
 
-        static bool Touch => UnityEngine.InputSystem.Touchscreen.current != null && UnityEngine.InputSystem.Mouse.current == null || Theme.Compact;
+        static bool Touch => true;   // 낱말 설명은 누를 때만(2026-10-09 사용자) — 올림으로는 안 뜬다. 바깥을 누르면 닫힘
 
         static Camera CamOf(Canvas c) => c != null && c.renderMode != RenderMode.ScreenSpaceOverlay ? c.worldCamera : null;
         Camera Cam => CamOf(canvas != null ? canvas : (canvas = tmp.canvas));

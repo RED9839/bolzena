@@ -34,9 +34,10 @@ namespace Bolzena.Demo
             label = $"fight{fightNo}" + (boss ? "_boss" : t != null && t.Event ? "_event" : "");
             PointerInput.Simulated = true;
             PointerInput.SimPos = new Vector2(0, -6);
-            Clock.Speed = 2f;                     // 데모는 2배속
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-speed") < 0) Clock.Speed = 2f;   // 데모는 2배속(-speed N 이면 그 배속 — 템포 점검)
             d.Hud.SetSpeed(Clock.Speed);
             d.DemoEpiphanyPick = 0;
+            d.DemoSpendPick = 0;                  // 소모량 · 버리기 고르기 창을 사람 손 없이
             d.Moment += OnMoment;
             UltCutin.OnStage += OnUlt;
             Banners.OnStage += OnBanner;
@@ -173,7 +174,8 @@ namespace Bolzena.Demo
             {
                 yield return WaitInput();
                 if (d.Over) break;
-                if (lose) { yield return Click(d.Hud.EndPos); yield return WaitTurnDone(); continue; }
+                // pass1(사도 한마디 시범 -demo-herosay) — 첫 턴은 카드 없이 넘겨 적의 공격을 한 번 받는다(위기 한마디 보기)
+                if (lose || (acts == 1 && RunDemo.FightMode == "pass1")) { yield return Click(d.Hud.EndPos); yield return WaitTurnDone(); continue; }
                 // 고학년
                 int ult = -1;
                 for (int h = 0; h < d.Hud.Ults.Count; h++) if (d.Battle.CanUlt(h, out _)) { ult = h; break; }

@@ -80,9 +80,9 @@ namespace Bolzena.RunUI
                     var o = P.AutoFight(mode);
                     Banner(o.Won ? "승리!" : "패배", o.Won ? Theme.Gold : Theme.Bad, () => FightDone(o));
                 }
-                var win = Btn.Make(bar, "전투 결과 받기 — 이김", BtnStyle.PillGold, () => Go("win"), 26); win.Pref(380, 80);
-                var bot = Btn.Make(bar, "봇 전투", BtnStyle.PillDark, () => Go("bot"), 24); bot.Pref(260, 80);
-                var lose = Btn.Make(bar, "짐", BtnStyle.PillDark, () => Confirm("진 것으로 받을까요?", "모험이 끝납니다.", "진 것으로", () => Go("lose"), true), 24); lose.Pref(140, 80);
+                var win = Btn.Make(bar, "전투 결과 받기 — 이김", BtnStyle.PillGold, () => Go("win"), Theme.FsLg); win.Pref(380, 80);
+                var bot = Btn.Make(bar, "봇 전투", BtnStyle.PillDark, () => Go("bot"), Theme.FsLg); bot.Pref(260, 80);
+                var lose = Btn.Make(bar, "짐", BtnStyle.PillDark, () => Confirm("진 것으로 받겠습니까?", "모험이 끝납니다.", "진 것으로", () => Go("lose"), true), Theme.FsLg); lose.Pref(140, 80);
                 Stage.Hot["fight.win"] = win; Stage.Hot["fight.bot"] = bot; Stage.Hot["fight.lose"] = lose;
                 Tw.Rise(bar, 0.4f, 30, 0.4f);
             });
@@ -180,7 +180,7 @@ namespace Bolzena.RunUI
             var ct = Ui.Title(chip, $"<size=62%><color={Theme.SubTag}>{o.Turns}턴 · 승리</color></size>\n전투 끝", Theme.FsLg, Theme.Gold, TextAlignmentOptions.Center);
             ct.rectTransform.Fill(8, 4, 8, 4); ct.lineSpacing = -18;
             Tw.Rise(chip, 0.1f, 20, 0.4f, Vector2.left);
-            RewardCredit(root, chip);   // 학점(Flow.Grade.cs)
+            if (Core.R.GRADE_ON) RewardCredit(root, chip);   // 학점(Flow.Grade.cs) — 학년 꺼짐이면 스티커 없음
 
             // 오른쪽 보상 줄
             float rowH = Theme.C(78, 70), gap = Theme.C(14, 10), listW = 380;
@@ -221,7 +221,7 @@ namespace Bolzena.RunUI
                     var e = P.Data.Equip(id);
                     var gc = Theme.GradeOf(e?.Grade);
                     bool taken = loot.EquipTaken != null;
-                    Line("equip", "장비", $"<color=#{ColorUtility.ToHtmlStringRGB(gc)}>{e?.Grade}</color> {e?.Name}", CardArt.Equip(id) ?? W.SlotIcon(e?.Slot), CardArt.Equip(id) != null ? Color.white : gc, taken, () =>
+                    Line("equip", "아티팩트", $"<color=#{ColorUtility.ToHtmlStringRGB(gc)}>{e?.Grade}</color> {e?.Name}", CardArt.Equip(id) ?? W.SlotIcon(e?.Slot), CardArt.Equip(id) != null ? Color.white : gc, taken, () =>
                     {
                         var why = P.TakeEquip(id);
                         if (why != null) { Toast.Show(why); return; }
@@ -261,12 +261,12 @@ namespace Bolzena.RunUI
             var next = Btn.Make(root, null, BtnStyle.PillGold, () =>
             {
                 var missed = new List<string>();
-                if (loot?.Equip != null && loot.Equip.Count > 0 && loot.EquipTaken == null) missed.Add("장비");
+                if (loot?.Equip != null && loot.Equip.Count > 0 && loot.EquipTaken == null) missed.Add("아티팩트");
                 if (glows.Count > 0) missed.Add("빛났던 카드");
                 if (missed.Count == 0) { Leave(); return; }
-                Confirm("받지 않고 떠날까요?", $"{string.Join(" · ", missed)} — 떠나면 사라집니다." + (loot != null && !loot.GoldTaken ? " 골드는 챙깁니다." : ""), "떠나기", Leave, true);
+                Confirm("받지 않고 떠나겠습니까?", $"{string.Join(" · ", missed)} — 떠나면 사라집니다." + (loot != null && !loot.GoldTaken ? " 골드는 챙깁니다." : ""), "떠나기", Leave, true);
             }, 0, "next");
-            var nrt = next.GetComponent<RectTransform>(); nrt.At(1, 0, -Theme.Gutter, Theme.Gutter, 300, 70);
+            var nrt = next.GetComponent<RectTransform>(); nrt.At(1, 0, -Theme.Gutter, Theme.Gutter, 300, Theme.BtnMainH);
             var play = Ui.Img(nrt, Theme.S("circle"), Theme.Brown.A(0.18f), "disc"); play.rectTransform.At(0, 0.5f, 12, 0, 46, 46);
             var pic = Ui.Img(play.transform, Theme.S("ic_play"), Theme.Brown, "ic"); pic.rectTransform.Fill(13, 12, 11, 12); pic.preserveAspect = true;
             var nl = Ui.Title(nrt, P.IsBoss ? "보스 몫으로" : "떠나기", Theme.FsLg + 2, Theme.Brown, TextAlignmentOptions.MidlineRight); nl.rectTransform.Fill(70, 4, 28, 4);

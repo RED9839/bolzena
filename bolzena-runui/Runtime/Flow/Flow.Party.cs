@@ -59,7 +59,7 @@ namespace Bolzena.RunUI
             }
             else
             {
-                foreach (var tab in new[] { "사도", "교주 카드", "장비" })
+                foreach (var tab in new[] { "사도", "교주 카드", "아티팩트" })
                 {
                     var tb = Btn.Make(head, tab, st.Tab == tab ? BtnStyle.PillGold : BtnStyle.PillDark, () => { st.Tab = tab; BuildParty(root, st, back); }, Theme.FsMd);
                     tb.Pref(150, 48);
@@ -143,9 +143,9 @@ namespace Bolzena.RunUI
                 float cw = Theme.C(200, 170);
                 grid.cellSize = new Vector2(cw, cw * 1.4f); grid.spacing = new Vector2(14, 14); grid.padding = new RectOffset(18, 18, 18, 18); grid.childAlignment = TextAnchor.UpperCenter;
                 int i = 0;
-                foreach (var id in P.Data.NeutralIds()) { var c = W.Card(content, this, id, cw); Tw.Pop(c, 0.02f * i++, 0.85f, 0.3f); }
+                foreach (var id in P.Data.NeutralIds()) { var c = W.Card(content, this, id, cw, "card", P.Data.View(id)); Tw.Pop(c, 0.02f * i++, 0.85f, 0.3f); }
                 foreach (var hero in P.Data.Heroes.Values)
-                    foreach (var id in P.Data.UniquesOf(hero.Id)) { var c = W.Card(content, this, id, cw); Tw.Pop(c, 0.02f * i++, 0.85f, 0.3f); }
+                    foreach (var id in P.Data.UniquesOf(hero.Id)) { var c = W.Card(content, this, id, cw, "card", P.Data.View(id)); Tw.Pop(c, 0.02f * i++, 0.85f, 0.3f); }
             }
             else if (st.Dex)
             {
@@ -188,7 +188,7 @@ namespace Bolzena.RunUI
 
         Btn Filter(Transform parent, string label, bool on, Action go, Color? tone = null, Sprite icon = null)
         {
-            var b = Btn.Make(parent, null, on ? BtnStyle.Gold : BtnStyle.Dark, go, 0, "filter " + label);
+            var b = Btn.Make(parent, null, on ? BtnStyle.PillGold : BtnStyle.PillDark, go, 0, "filter " + label);
             var row = Ui.Row(b.GetComponent<RectTransform>(), 6, TextAnchor.MiddleCenter, new RectOffset(14, 14, 4, 4), false, false);
             if (icon != null) { var ic = Ui.Img(b.transform, icon, Color.white, "icon"); ic.preserveAspect = true; ic.Pref(24, 24); }
             else if (tone.HasValue) { var d = Ui.Img(b.transform, Theme.S("circle"), tone.Value, "dot"); d.Pref(12, 12); }
@@ -339,9 +339,9 @@ namespace Bolzena.RunUI
             Ui.Col(box.rectTransform, 8, TextAnchor.UpperLeft, new RectOffset(22, 22, 16, 16));
             if (st.Tab != "사도")
             {
-                Ui.Title(box.transform, st.Tab == "장비" ? "장비 도감" : "교주 카드", 30, Theme.Ink).Pref(-1, 40);
-                Ui.Text(box.transform, st.Tab == "장비"
-                    ? $"{P.Data.Equips.Count}개 — 사도 하나에 무기 · 방어구 · 장신구 한 칸씩. 애착 장비는 그 사도가 끼면 더 셉니다. 얻으면 곧장 끼거나 팝니다."
+                Ui.Title(box.transform, st.Tab == "아티팩트" ? "아티팩트 도감" : "교주 카드", 30, Theme.Ink).Pref(-1, 40);
+                Ui.Text(box.transform, st.Tab == "아티팩트"
+                    ? $"{P.Data.Equips.Count}개 — 사도 하나에 무기 · 방어구 · 장신구 한 칸씩. 애착 아티팩트는 그 사도가 끼면 더 셉니다. 얻으면 곧장 끼거나 팝니다."
                     : "교주님이 직접 쓰는 카드와 사도 고유 카드. 교주 카드는 상점에서, 고유 카드는 싸우며 은총으로 얻습니다.", 18, Theme.Sub).Pref(-1, 120);
                 return;
             }

@@ -607,7 +607,7 @@ namespace Bolzena.RunUI
             {
                 var e = P.Data.Equip(eid);
                 var gc = Theme.GradeOf(e?.Grade);
-                Line(CardArt.Equip(eid) ?? W.SlotIcon(e?.Slot), CardArt.Equip(eid) != null ? Color.white : gc, $"장비 「{e?.Name ?? eid}」 <size=80%><color={Theme.SubTag}>(<color=#{ColorUtility.ToHtmlStringRGB(gc)}>{e?.Grade}</color> · {e?.Slot ?? "장비"})</color></size> — 가방에");
+                Line(CardArt.Equip(eid) ?? W.SlotIcon(e?.Slot), CardArt.Equip(eid) != null ? Color.white : gc, $"아티팩트 「{e?.Name ?? eid}」 <size=80%><color={Theme.SubTag}>(<color=#{ColorUtility.ToHtmlStringRGB(gc)}>{e?.Grade}</color> · {e?.Slot ?? "장비"})</color></size> — 가방에");
             }
             // 기록 — 위 줄에 없는 것(신탁 · 축복 · 다음 전투 …)까지
             var logs = E.Log.ToList();

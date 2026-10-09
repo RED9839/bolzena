@@ -7,6 +7,11 @@ namespace Bolzena.Core.Tests
     /// <summary>학점제 학년(RunGrade.cs) — 학점 · 진급 · 보상 · 저장.</summary>
     public class GradeTests
     {
+        // 학년(학점제)은 2026-10-09 꺼 두었다(R.GRADE_ON) — 학년 · 학점을 보는 이 시험은 켜고 돈다
+        bool gradeOn0;
+        [SetUp] public void GradeOn() { gradeOn0 = R.GRADE_ON; R.GRADE_ON = true; }
+        [TearDown] public void GradeBack() => R.GRADE_ON = gradeOn0;
+
         static readonly List<string> PARTY = new() { "rico", "carrot", "sion" };
         static Run New(long seed = 1) => Run.New(K.Sample(), PARTY, seed);
 
@@ -90,39 +95,105 @@ namespace Bolzena.Core.Tests
             Assert.IsFalse(run.S.Growth.Values.Any(g => g.Atk > 0), "판 성장(RunState.Growth)은 건드리지 않는다");
         }
 
-        [Test] public void 사학년부터_게이지_졸업은_더()
+        [Test] public void 졸업만_전투_시작_게이지()
         {
             var run = New();
             run.S.Gauge = 10;
-            run.S.Grade = 3; Assert.AreEqual(10, run.OpenFight().battle.Gauge);
-            run.S.Grade = Grades.GAUGE_AT; Assert.AreEqual(10 + Grades.GAUGE_START, run.OpenFight().battle.Gauge);
+            run.S.Grade = 5; Assert.AreEqual(10, run.OpenFight().battle.Gauge);
             run.S.Grade = Grades.GRAD; Assert.AreEqual(10 + Grades.GRAD_GAUGE, run.OpenFight().battle.Gauge);
         }
 
-        [Test] public void 삼학년부터_신탁_후보_넷()
+        [Test] public void 진급마다_서로_다른_보상_셋을_고른다()
         {
-            var d = K.Sample().Add(null, @"[{id:'or5', name:'다섯 갈래', hero:'rico', cost:1, type:'스킬', fx:[{k:'draw', v:1}],
- oracles:[{name:'하나', fx:[]}, {name:'둘', fx:[]}, {name:'셋', fx:[]}, {name:'넷', fx:[]}, {name:'다섯', fx:[]}]}]", null, null, null, null);
-            var run = Run.New(d, PARTY, 1);
-            run.S.Deck.Add("or5");
-            Assert.AreEqual(R.ORACLE_PICKS, run.OraclePicks);
-            Assert.AreEqual(R.ORACLE_PICKS, run.RollOracles("or5").Count);
-            run.S.Grade = Grades.ORACLE_AT;
-            Assert.AreEqual(R.ORACLE_PICKS + Grades.ORACLE_PLUS, run.OraclePicks);
-            Assert.AreEqual(R.ORACLE_PICKS + Grades.ORACLE_PLUS, run.RollOracles("or5").Count);
+            for (long seed = 1; seed <= 30; seed++)
+            {
+                var run = New(seed);
+                run.S.Credits = Grades.NEED[2] - 1;
+                Win(run);
+                var off = run.GradeOfferNow;
+                Assert.IsNotNull(off); Assert.AreEqual(2, off.Grade);
+                Assert.AreEqual(Grades.OFFER_N, off.Choices.Count);
+                Assert.AreEqual(Grades.OFFER_N, off.Choices.Select(c => c.Kind).Distinct().Count());
+                Assert.IsTrue(off.Choices.All(c => Grades.KINDS.Contains(c.Kind) && Grades.Describe(c).desc.Length > 0));
+            }
         }
 
-        [Test] public void 오학년_진급은_다음_전투_신탁_확정_졸업은_회복()
+        [Test] public void 보상을_고르면_바로_받고_다음_보상으로()
         {
             var run = New();
-            run.S.Grade = Grades.FLASH_AT - 1; run.S.Credits = Grades.NEED[Grades.FLASH_AT] - 1;
-            Win(run);
-            Assert.IsTrue(run.S.RewardFlash);
+            run.S.Credits = Grades.NEED[4] - Grades.CreditOf("boss");
+            run.S.Grade = Grades.Of(run.S.Credits);
+            Win(run, "boss");   // 두 학년을 넘는다 — 보상 둘
+            Assert.AreEqual(2, run.S.GradeOffers.Count);
+            run.S.GradeOffers[0].Choices[0] = new GradeChoice { Kind = "gold", V = 77 };
+            int g0 = run.S.Gold;
+            var t = run.TakeGrade(0);
+            Assert.AreEqual("gold", t.Choice.Kind);
+            Assert.AreEqual(g0 + 77, run.S.Gold);
+            Assert.AreEqual(1, run.S.GradeOffers.Count, "다음 보상이 남는다");
+            run.S.GradeOffers[0].Choices[1] = new GradeChoice { Kind = "remove", V = 1 };
+            var t2 = run.TakeGrade(1);
+            Assert.IsTrue(t2.Remove);
+            int n = run.S.Deck.Count; var id = run.S.Deck[0];
+            Assert.IsNull(run.GradeRemove(id));
+            Assert.AreEqual(n - 1, run.S.Deck.Count);
+            Assert.IsNull(run.GradeOfferNow);
+            Assert.IsNull(run.TakeGrade(0), "고를 것이 없다");
+        }
+
+        [Test] public void 보상_종류마다_받는다()
+        {
+            foreach (var kind in Grades.KINDS)
+            {
+                var run = New(5);
+                run.S.GradeOffers.Add(new GradeOffer { Grade = 3, Choices = new List<GradeChoice> { new GradeChoice { Kind = kind, V = Grades.ValueOf(kind, 3), Grade = Grades.GradeOf(kind, 3) } } });
+                int deck = run.S.Deck.Count, hp0 = run.S.PartyHp = run.S.PartyMaxHp / 2, bag = run.S.Bag.Count, gauge = run.S.Gauge, gold = run.S.Gold;
+                var t = run.TakeGrade(0);
+                Assert.IsNotNull(t, kind);
+                switch (kind)
+                {
+                    case "gold": Assert.Greater(run.S.Gold, gold); break;
+                    case "heal": Assert.Greater(run.S.PartyHp, hp0); break;
+                    case "gauge": Assert.Greater(run.S.Gauge, gauge); break;
+                    case "flash": Assert.IsTrue(t.Flash != null || t.Note != null, kind); if (t.Flash != null) Assert.IsTrue(run.TakeFlash(t.Flash.CardId, t.Flash.Picks[0])); break;
+                    case "grace": Assert.IsTrue(t.Card != null ? run.S.Deck.Contains(t.Card) : t.Note != null, kind); break;
+                    case "remove": Assert.IsTrue(t.Remove); break;
+                    case "equip": Assert.IsTrue(t.Equip != null ? run.S.Bag.Count == bag + 1 : t.Note != null, kind); break;
+                    case "neutral": Assert.IsTrue(t.Card != null || t.Note != null, kind); break;
+                    case "prep": Assert.AreEqual(Grades.PREP_FIGHTS, run.S.PrepLeft); Assert.Greater(run.S.PrepHand, 0); break;
+                    case "mock": Assert.AreEqual(Grades.MOCK_FIGHTS, run.S.MockLeft); Assert.Greater(run.S.MockMorale, 0); break;
+                }
+            }
+        }
+
+        [Test] public void 예습_노트는_다음_전투_셋_첫_손패_전술_교본은_엘리트_보스만()
+        {
+            var run = New(9);
+            int hand0 = run.OpenFight().battle.Hand.Count;
+            run.S.GradeOffers.Add(new GradeOffer { Grade = 2, Choices = new List<GradeChoice> { new GradeChoice { Kind = "prep", V = 1 }, new GradeChoice { Kind = "mock", V = 1 } } });
+            run.TakeGrade(0);
+            for (int i = 0; i < Grades.PREP_FIGHTS; i++) Assert.AreEqual(hand0 + 1, run.OpenFight().battle.Hand.Count, $"{i + 1}번째 전투");
+            Assert.AreEqual(hand0, run.OpenFight().battle.Hand.Count, "횟수가 다 되면 끝");
+            run.S.GradeOffers.Add(new GradeOffer { Grade = 2, Choices = new List<GradeChoice> { new GradeChoice { Kind = "mock", V = 1 } } });
+            run.TakeGrade(0);
+            Assert.AreEqual(0, run.OpenFight().battle.St(run.OpenFight().battle.Pool, "사기"), "일반 전투에는 안 걸린다");
+            Assert.AreEqual(1, run.S.MockLeft);
+            run.S.Elite = true;
+            var b = run.OpenFight().battle;
+            Assert.AreEqual(1, b.St(b.Pool, "사기"));
+            Assert.AreEqual(0, run.S.MockLeft);
+        }
+
+        [Test] public void 졸업은_선물_고르지_않는다()
+        {
+            var run = New();
+            run.S.Grade = Grades.GRAD - 1; run.S.Credits = Grades.NEED[Grades.GRAD] - 1;
             run.S.PartyHp = 1;
-            run.S.Credits = Grades.NEED[Grades.GRAD] - 1;
             Win(run);
             Assert.AreEqual(Grades.GRAD, run.Grade);
-            Assert.Greater(run.S.PartyHp, Num.Round(run.S.PartyMaxHp * Grades.GRAD_HEAL) - 1);
+            Assert.IsNull(run.GradeOfferNow, "졸업은 고르는 보상이 아니다");
+            Assert.GreaterOrEqual(run.S.PartyHp, Num.Round(run.S.PartyMaxHp * Grades.GRAD_HEAL));
+            Assert.IsTrue(run.S.GradeGift == null || run.S.Deck.Contains(run.S.GradeGift));
         }
 
         [Test] public void 저장하고_불러도_학년이_남고_옛_저장은_1학년()
