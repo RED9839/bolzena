@@ -83,6 +83,8 @@ namespace Bolzena.Battle
         public bool CostDown;            // 신탁으로 비용이 내려간 카드(비용 숫자 연두)
         public bool Copy;                // 복제본(core CardMark.Copy) — 오른쪽 위 복제 표 「복제 — 신탁 · 축복 불가」
         public List<string> Choices;     // 두 갈래 카드 — 갈래 이름 둘(낼 때 고른다). 없으면 null
+        /// <summary>카드 값(리뉴아 「시간」 · 비비(신성) 「새싹」 · 티그 「성장」) — 윗변 배지. 이름 없으면 배지 없음. Ready = 준비 글(「정각」 · 「만개」 · 「준비」) 또는 null.</summary>
+        public string ValName, ValReady; public int Val, ValMax;
         public float EmpowerMul;         // 다음 카드 강화가 걸려 있으면 그 배율(1.5 = ×1.5), 아니면 0 — 손패 카드에만(core b.EmpowerOf)
 
         /// <summary>얕은 복사 — 목록(태그 · 낱말 풀이 · 갈래)만 새로. CoreBattle 이 담아 둔 카드 정보를 받는 쪽이 고쳐도 담긴 것은 그대로(2026-10-08 성능).</summary>

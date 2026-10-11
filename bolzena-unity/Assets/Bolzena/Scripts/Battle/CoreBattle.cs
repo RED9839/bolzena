@@ -911,6 +911,21 @@ namespace Bolzena.Battle
             {   // 다음 카드 강화(core EmpowerOf: 사도 몫 + 파티 몫) — 걸려 있으면 배율 · 강화된 수치 글
                 int emp = b.EmpowerOf(cv.Hero);
                 if (emp > 0) { info.EmpowerMul = (float)(1 + emp / 100.0); info.Text = EmpowerText(info.Text, 1 + emp / 100.0); }
+                // 카드 값 배지(2026-10-11 사용자 「카드 위에 시간 · 새싹 표시」) — 그 사도의 카드 값 키워드가 이 카드에 붙을 수 있으면 지금 값 · 최대 · 준비
+                foreach (var kw in b.Kw.Values)
+                {
+                    var cvd = kw.Def.CardValue;
+                    if (cvd == null || kw.Owner != cv.Hero) continue;
+                    int val = b.CardStOf(cv.Id, kw.Id), need = 0; bool uses = false;
+                    foreach (var f in cv.Fx) if (f.Id == kw.Id && (f.K == FxK.IfCardSt || f.K == FxK.PerCardSt || f.K == FxK.CardStatus)) { uses = true; if (f.K == FxK.IfCardSt) need = need == 0 ? f.N : Math.Min(need, f.N); }
+                    bool grows = cvd.Grow != null && cv.Def.Unique && cv.Type != "강화";
+                    if (val <= 0 && !uses && !grows) continue;
+                    bool cheap = cvd.Cost < 0;   // 리뉴아 시간 — 1당 비용이 내려가는 값
+                    bool ready = cheap ? info.Cost == 0 && val > 0 : need > 0 && val >= need;
+                    info.ValName = kw.Id; info.Val = val; info.ValMax = cvd.Max > 0 ? cvd.Max : (kw.Def.Cap ?? 0);
+                    info.ValReady = ready ? (cheap ? "정각" : kw.Id.Contains("새싹") ? "만개" : "준비") : null;
+                    break;
+                }
                 // 태세 덤 강조(엘다인 4차) — 그 사도가 지금 든 태세의 「「이름」:」 마디는 금빛으로(켜진 덤이 보이게 · 우로스 선 · 악)
                 var fv = b.FormOf(cv.Hero);
                 if (fv != null && fv.Stance && info.Text != null) info.Text = info.Text.Replace($"「{fv.Name}」:", $"<color=#F2CF7A>「{fv.Name}」:</color>");

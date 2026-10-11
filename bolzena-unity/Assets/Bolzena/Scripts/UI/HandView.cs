@@ -141,7 +141,8 @@ namespace Bolzena.UI
             for (int i = 0; i < Cards.Count && i < hand.Count; i++)
             {
                 if (Cards[i].Info.Id != hand[i].Id) continue;
-                bool changed = Cards[i].Info.Cost != hand[i].Cost || Cards[i].Info.Epiphany != hand[i].Epiphany || Cards[i].Info.Text != hand[i].Text || Cards[i].Info.EmpowerMul != hand[i].EmpowerMul;
+                bool changed = Cards[i].Info.Cost != hand[i].Cost || Cards[i].Info.Epiphany != hand[i].Epiphany || Cards[i].Info.Text != hand[i].Text || Cards[i].Info.EmpowerMul != hand[i].EmpowerMul
+                    || Cards[i].Info.ValName != hand[i].ValName || Cards[i].Info.Val != hand[i].Val || Cards[i].Info.ValReady != hand[i].ValReady;   // 카드 값 배지(시간 · 새싹 · 성장)
                 int oldCost = Cards[i].Info.Cost;
                 Cards[i].Info = hand[i];
                 if (changed) Cards[i].Refresh();
