@@ -217,6 +217,10 @@ namespace Bolzena.RunUI
             var dtx = Ui.Text(deckChip.transform, $"<color={Theme.SubTag}>덱</color> <color={Theme.GoldTag}>{cnt}</color>장    <color={Theme.SubTag}>고유 카드 평균 비용</color>  <color={Theme.GoldTag}>{(avg < 0 ? "—" : avg.ToString("0.0"))}</color>",
                 Theme.FsBody, Theme.Ink, TextAlignmentOptions.MidlineLeft);
             dtx.rectTransform.Fill(68, 0, 16, 0); dtx.textWrappingMode = TextWrappingModes.NoWrap;
+            // 덱 칩을 누르면 덱 보기(2026-10-12 사용자 「무기 낄 때 덱 버튼 눌러도 덱 못 본다」 — 그림뿐이라 눌리지 않았다)
+            deckChip.raycastTarget = true;
+            var deckBtn = deckChip.gameObject.AddComponent<Button>(); deckBtn.transition = Selectable.Transition.None;
+            deckBtn.onClick.AddListener(DeckView);
 
             confirm = Btn.Make(foot, "낄 사도를 고르세요", BtnStyle.PillGold, () =>
             {

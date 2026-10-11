@@ -566,7 +566,7 @@ namespace Bolzena.Core
                         int pct = Num.Round(f.V * 100);
                         return $"{Dur(f)}{Whose(tg)}{STAT_KO[stat]} {StatPct(stat, pct)}";
                     }
-                case FxK.Draw: return HasF(f) ? $"{Filt(f)}카드 {f.IV}장 드로우" : $"드로우 {f.IV}";
+                case FxK.Draw: return !HasF(f) ? $"드로우 {f.IV}" : f.Tag != null && f.Who == null && !f.Basic && !f.Unique && f.Type == null && !f.Token && f.MinCost <= 0 && data?.Card(f.Tag) == null ? $"뽑을 더미에서 {Ko.J(Q(TagKo(f.Tag)), "이가")} 붙은 카드 {f.IV}장 드로우" : $"{Filt(f)}카드 {f.IV}장 드로우";   // 2026-10-12 사용자 — 「「천상」 카드 1장 드로우」 가 천상 발동으로 읽혔다
                 case FxK.HealMod: return $"{Dur(f)}{Whose(f.Target ?? "self")}회복량 {(f.V >= 0 ? "+" : "")}{Num.Round(f.V * 100)}%";
                 case FxK.Roll: return $"무작위로 {Math.Max(2, f.N)}갈래 가운데 하나";
                 case FxK.Recast: return $"이 카드 효과를 {P(f.Ratio > 0 ? f.Ratio : 0.5)}로 한 번 더";

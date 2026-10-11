@@ -384,15 +384,14 @@ namespace Bolzena.Core
             string kind = FightKind;
             T Pick<T>(IList<T> a) => a[RndInt(a.Count)];
             var glow = new Dictionary<string, Glow>();
-            var heroes = S.Party.Where(k => (UniquesLeft(k).Count > 0 || BasicsLeft(k).Count > 0) && S.Deck.Any(id => Data.Card(id) is CardDef c && c.Hero == k && !c.Unique)).ToList();
+            var heroes = S.Party.Where(k => UniquesLeft(k).Count > 0 && S.Deck.Any(id => Data.Card(id) is CardDef c && c.Hero == k && !c.Unique)).ToList();
             void Grace(string k)
             {
                 var bases = S.Deck.Where(id => Data.Card(id) is CardDef c && c.Hero == k && !c.Unique && !GameData.IsCopy(id)).ToList();
                 if (bases.Count == 0) return;
                 var at = Pick(bases);
-                var uq = UniquesLeft(k); var bs = BasicsLeft(k);
-                bool basic = bs.Count > 0 && (uq.Count == 0 || Rnd() < R.GRACE_BASIC);   // 빠진 기본 카드는 고유 카드보다 낮은 확률로
-                glow[at] = new Glow { Kind = "hero", Hero = k, Options = new List<string> { basic ? Pick(bs) : Pick(uq) } };
+                // 은총은 고유 카드만(2026-10-12 사용자 「은총으로 기본 카드를 얻는데?」 · 뺀 「슈로의 인사」 가 돌아옴 — 옛: 시작 덱에서 빠진 기본 카드도 R.GRACE_BASIC 로)
+                glow[at] = new Glow { Kind = "hero", Hero = k, Options = new List<string> { Pick(UniquesLeft(k)) } };
             }
             foreach (var k in heroes) if (Rnd() < (R.EPI_HERO.TryGetValue(kind, out var p) ? p : 0)) Grace(k);
             if (heroes.Count > 0 && R.EPI_SURE_HERO.Contains(kind) && glow.Count == 0) Grace(Pick(heroes));
@@ -493,7 +492,7 @@ namespace Bolzena.Core
 
         void ForgetCard(string cardId)
         {
-            if (Data.Card(cardId)?.Unique == true) S.Dropped.Add(cardId);
+            if (Data.Card(cardId) is CardDef fc && (fc.Unique || System.Text.RegularExpressions.Regex.IsMatch(fc.Id, @"_s\d+$"))) S.Dropped.Add(GameData.NoInst(cardId));   // 기본 카드를 뺀 것도 남긴다(2026-10-12 — 뺀 기본 카드가 은총으로 돌아왔다)
             S.Flash.Remove(cardId);
         }
 

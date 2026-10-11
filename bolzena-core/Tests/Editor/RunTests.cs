@@ -107,9 +107,9 @@ namespace Bolzena.Core.Tests
             Assert.Greater(cards, 0); Assert.Greater(graces, 0);
         }
 
-        [Test] public void 시작_덱에서_빠진_기본_카드는_은총에_낮은_확률로()
+        [Test] public void 은총은_고유_카드만_빠진_기본_카드는_안_뜬다()
         {
-            // 2026-10-10 시작 덱 4장(기본 3 + 시동 1) — 빠진 기본 카드(「사도_sN」)는 은총 후보에 R.GRACE_BASIC 로, 고유 카드보다 드물게
+            // 2026-10-12 사용자 — 은총은 고유 카드만(옛 10-10: 빠진 기본 카드도 낮은 확률로)
             int basic = 0, uniq = 0;
             for (long seed = 1; seed <= 300; seed++)
             {
@@ -120,8 +120,8 @@ namespace Bolzena.Core.Tests
                 foreach (var g in run.RollEpiphany().Values.Where(g => g.Kind == "hero" && g.Hero == "rico"))
                     if (g.Options[0] == "rico_s9") basic++; else uniq++;
             }
-            Assert.Greater(basic, 0, "빠진 기본 카드도 은총에 뜬다");
-            Assert.Greater(uniq, basic, "고유 카드보다 드물게");
+            Assert.AreEqual(0, basic, "기본 카드는 은총에 안 뜬다");
+            Assert.Greater(uniq, 0);
             var r2 = New(1); r2.Data.Cards["rico_s9"] = new CardDef { Id = "rico_s9", Name = "시험 강타", Hero = "rico", Type = "공격", Cost = 2 };
             r2.S.Deck.Add("rico_s9");
             Assert.IsFalse(r2.BasicsLeft("rico").Contains("rico_s9"), "덱에 있으면 후보가 아니다");

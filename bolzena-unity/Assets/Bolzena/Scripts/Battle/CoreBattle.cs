@@ -926,9 +926,29 @@ namespace Bolzena.Battle
                     info.ValReady = ready ? (cheap ? "정각" : kw.Id.Contains("새싹") ? "만개" : "준비") : null;
                     break;
                 }
+            }
+            if (depth == 0 && !cv.IsStatus && !cv.IsCurse)
+            {   // 태세 줄 — 손패 · 덱 보기 · 확대 어디서나 지금 태세 기준(2026-10-12)
                 // 태세 덤 강조(엘다인 4차) — 그 사도가 지금 든 태세의 「「이름」:」 마디는 금빛으로(켜진 덤이 보이게 · 우로스 선 · 악)
                 var fv = b.FormOf(cv.Hero);
-                if (fv != null && fv.Stance && info.Text != null) info.Text = info.Text.Replace($"「{fv.Name}」:", $"<color=#F2CF7A>「{fv.Name}」:</color>");
+                // 2026-10-12 사용자 「지금 상태에 따라 본성 · 허물이 활성화돼 보이게」 — 켜진 태세 줄은 이름표 금빛, 꺼진 태세 줄은 통째로 흐리게
+                var stances = data.Hero(cv.Hero)?.Forms?.Where(x => x.Stance).ToList();
+                if (stances != null && stances.Count > 0 && info.Text != null)
+                {
+                    var lines = info.Text.Split('\n');
+                    for (int li = 0; li < lines.Length; li++)
+                        foreach (var sf in stances)
+                        {
+                            string label = $"「{sf.Name}」:";
+                            // 글 속 낱말에 밑줄 · 색 태그(CardTerms.Mark)가 붙어 있어 태그를 뗀 글로 찾는다
+                            if (!System.Text.RegularExpressions.Regex.Replace(lines[li], "<[^>]+>", "").TrimStart().StartsWith(label)) continue;
+                            lines[li] = fv != null && fv.Name == sf.Name
+                                ? $"<color=#F2CF7A>{System.Text.RegularExpressions.Regex.Replace(lines[li], "</?color[^>]*>", "")}</color>"   // 켜진 태세 — 줄 전체 금빛
+                                : $"<color=#6E7590>{System.Text.RegularExpressions.Regex.Replace(lines[li], "</?color[^>]*>", "")}</color>";   // 꺼진 태세 — 줄 전체 흐리게
+                            break;
+                        }
+                    info.Text = string.Join("\n", lines);
+                }
             }
             var glow = b.GlowOf(cv.Id);
             info.Epiphany = glow != null; info.Grace = glow?.Kind == "hero";

@@ -712,7 +712,7 @@ namespace Bolzena.View
                 string label = c.Kind == "empower"
                     ? $"<size=80%>{c.Id}</size> <color={Bolzena.UI.Tone.EmpTag}>{c.Value}</color>"   // 다음 카드 강화 — 「다음 카드 강화 ×1.5」
                     : c.Kind == "form"
-                    ? $"<color=#F2CF7A><size=80%>{c.Id}</size></color> " + (c.Turns > 0 ? $"{c.Turns}턴" : "<size=80%>계속</size>")   // 변신 · 태세 — 「성전 3턴」
+                    ? $"<color=#F2CF7A><size=80%>{c.Id}</size></color> " + (c.Turns > 0 ? $"{c.Turns}턴" : "")   // 변신 · 태세 — 「성전 3턴」
                     : c.Kind == "power"
                     ? $"<size=80%>{c.Id}</size>" + (string.IsNullOrEmpty(c.Value) ? "" : $" ×{c.Value}")   // 강화 칩 — 카드 이름 · 겹
                     : (icon == null ? $"<color=#{ColorUtility.ToHtmlStringRGB(Color.Lerp(Color.white, KindColor(c.Kind), 0.5f))}>{(c.Kind == "key" ? $"<size=80%>{ShortName(c.Id)}</size>" : c.Id.Substring(0, 1))}</color> " : "") + c.Value + (c.Turns > 0 ? $"<size=70%><color=#9aa6c8>·{c.Turns}</color></size>" : "");
